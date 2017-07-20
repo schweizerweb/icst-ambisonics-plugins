@@ -1,19 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="AAMgSi" name="ZHdKAmbisonicsDecoder" displaySplashScreen="1"
+<JUCERPROJECT id="AAMgSi" name="Ambisonics Decoder" displaySplashScreen="1"
               reportAppUsage="1" splashScreenColour="Dark" projectType="audioplug"
-              version="0.1.0" bundleIdentifier="com.ZHdK.AmbisonicsDecoder"
-              includeBinaryInAppConfig="1" buildVST="1" buildVST3="1" buildAU="0"
+              version="0.1.0" bundleIdentifier="com.yourcompany.AmbisonicsDecoder"
+              includeBinaryInAppConfig="1" buildVST="1" buildVST3="1" buildAU="1"
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="0"
-              enableIAA="0" pluginName="ZHdKAmbisonicsDecoder" pluginDesc="ZHdK Ambisonics Decoder"
+              enableIAA="0" pluginName="Ambisonics Decoder" pluginDesc="Ambisonics Decoder"
               pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK" pluginCode="AADC"
               pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="AmbisonicsDecoderAU" pluginRTASCategory=""
-              aaxIdentifier="com.ZHdK.AmbisonicsDecoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
-              jucerVersion="5.0.2" companyName="ZHdK" companyEmail="christian.schweizer@zhdk.ch"
-              userNotes="">
-  <MAINGROUP id="oa5A98" name="ZHdKAmbisonicsDecoder">
+              aaxIdentifier="com.yourcompany.AmbisonicsDecoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
+              jucerVersion="5.0.2" companyName="ZHdK">
+  <MAINGROUP id="oa5A98" name="Ambisonics Decoder">
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
       <FILE id="kamJfG" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
@@ -25,13 +24,12 @@
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="" toolset=""
-            userNotes="Debugging&#10;------------&#10;Command:&#10;$(ProjectDir)..\..\..\..\JUCE\examples\audio plugin host\Builds\VisualStudio2017\x64\Debug\App\Plugin Host.exe&#10;&#10;Arguments:&#10;$(ProjectDir)..\..\Data\Debug.filtergraph">
+    <VS2017 targetFolder="Builds/VisualStudio2017">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="ZHdKAmbisonicsDecoder"/>
+                       isDebug="1" optimisation="1" targetName="Ambisonics Decoder"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="ZHdKAmbisonicsDecoder"/>
+                       isDebug="0" optimisation="3" targetName="Ambisonics Decoder"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
