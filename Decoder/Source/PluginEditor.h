@@ -36,7 +36,8 @@
 */
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
                                                public Timer,
-                                               public ComboBoxListener
+                                               public ComboBoxListener,
+                                               public ButtonListener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -61,6 +63,7 @@ private:
 
     //==============================================================================
     ScopedPointer<ComboBox> comboBoxChannelConfig;
+    ScopedPointer<TextButton> testButton;
 
 
     //==============================================================================

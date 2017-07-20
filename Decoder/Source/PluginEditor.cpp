@@ -44,8 +44,14 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     comboBoxChannelConfig->addItem (TRANS("8"), 4);
     comboBoxChannelConfig->addListener (this);
 
+    addAndMakeVisible (testButton = new TextButton ("testButton"));
+    testButton->setButtonText (TRANS("Test"));
+    testButton->setConnectedEdges (Button::ConnectedOnLeft | Button::ConnectedOnRight);
+    testButton->addListener (this);
+
 
     //[UserPreSize]
+	setResizable(true, true);
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -62,6 +68,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     //[/Destructor_pre]
 
     comboBoxChannelConfig = nullptr;
+    testButton = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -74,7 +81,7 @@ void AmbisonicsDecoderAudioProcessorEditor::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff6c9bb2));
+    g.fillAll (Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -86,6 +93,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     comboBoxChannelConfig->setBounds (8, 9, 192, 24);
+    testButton->setBounds (32, 40, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -98,33 +106,27 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
     if (comboBoxThatHasChanged == comboBoxChannelConfig)
     {
         //[UserComboBoxCode_comboBoxChannelConfig] -- add your combo box handling code here..
-		int channelNb = atoi(comboBoxChannelConfig->getItemText(comboBoxChannelConfig->getSelectedItemIndex()).toRawUTF8());
-		AudioChannelSet::ChannelType type = AudioChannelSet::unknown;
-    	AudioChannelSet layout = processor.getChannelLayoutOfBus(false, 0);
-		for (int i = 0; i < channelNb; i++)
-			layout.addChannel(type);
-
-		
-    	int cnt = processor.getBusCount(false);
-		int chanCnt = processor.getChannelCountOfBus(false, 0);
-		bool ok = processor.setChannelLayoutOfBus(false, 0, layout);
-		if(!ok)
-		{
-			return;
-		}
-		int chanCntNew = processor.getChannelCountOfBus(false, 0);
-
-		bool canAdd = processor.canAddBus(false);
-		if(canAdd)
-		{
-			processor.addBus(false);
-			processor.enableAllBuses();
-		}
 		//[/UserComboBoxCode_comboBoxChannelConfig]
     }
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
+}
+
+void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == testButton)
+    {
+        //[UserButtonCode_testButton] -- add your button handler code here..
+		processor.setChannelLayoutOfBus(true, 0, AudioChannelSet::mono());
+    	//[/UserButtonCode_testButton]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
 }
 
 
@@ -152,11 +154,14 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff6c9bb2"/>
+  <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="8 9 192 24" editable="0"
             layout="33" items="2&#10;4&#10;6&#10;8" textWhenNonSelected="-"
             textWhenNoItems="(no choices)"/>
+  <TEXTBUTTON name="testButton" id="229c5e3ebf944d5f" memberName="testButton"
+              virtualName="" explicitFocusOrder="0" pos="32 40 150 24" buttonText="Test"
+              connectedEdges="3" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
