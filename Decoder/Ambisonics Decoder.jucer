@@ -7,7 +7,7 @@
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="0"
               enableIAA="0" pluginName="Ambisonics Decoder" pluginDesc="Ambisonics Decoder"
               pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK" pluginCode="AADC"
-              pluginChannelConfigs="" pluginIsSynth="0" pluginWantsMidiIn="0"
+              pluginChannelConfigs="{4,32}" pluginIsSynth="0" pluginWantsMidiIn="1"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="AmbisonicsDecoderAU" pluginRTASCategory=""
               aaxIdentifier="com.yourcompany.AmbisonicsDecoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
@@ -22,9 +22,21 @@
             file="Source/PluginEditor.cpp"/>
       <FILE id="G0z6Dt" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
+    <GROUP id="{9E9B66A7-A131-AF4D-B624-3D4280C67801}" name="Common">
+      <FILE id="CdwDS7" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
+      <FILE id="TnVJDm" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
+      <FILE id="UqnteK" name="Radar.h" compile="0" resource="0" file="../Common/Radar.h"/>
+      <FILE id="ux8RBb" name="RadarComponent.cpp" compile="1" resource="0"
+            file="../Common/RadarComponent.cpp"/>
+      <FILE id="zQhquK" name="RadarComponent.h" compile="0" resource="0"
+            file="../Common/RadarComponent.h"/>
+      <FILE id="cxjwgP" name="text2D.cpp" compile="0" resource="0" file="../Common/text2D.cpp"/>
+      <FILE id="InmG0s" name="text2D.h" compile="0" resource="0" file="../Common/text2D.h"/>
+      <FILE id="Fg0Bui" name="TrackColors.h" compile="0" resource="0" file="../Common/TrackColors.h"/>
+    </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
-    <VS2017 targetFolder="Builds/VisualStudio2017">
+    <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
                        isDebug="1" optimisation="1" targetName="Ambisonics Decoder"/>
