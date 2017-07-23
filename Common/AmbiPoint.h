@@ -11,9 +11,7 @@
 #ifndef AMBIPOINT_H_INCLUDED
 #define AMBIPOINT_H_INCLUDED
 
-#include "JuceHeader.h"
 #include "Point3D.h"
-#include "PointLabel.h"
 
 class AmbiPoint
 {
@@ -22,21 +20,15 @@ public:
 	{
 
 	}
-	AmbiPoint(Point3D<double> pt, PointLabel lbl, int colorInd = 0)
+	AmbiPoint(Point3D<double> pt, int colorInd = 0)
 	{
 		point = pt;
-		label = lbl;
 		colorIndex = colorInd;
 	}
 
 	Point3D<double>* getPoint()
 	{
 		return &point;
-	}
-
-	PointLabel* getLabel()
-	{
-		return &label;
 	}
 
 	int getColorIndex()
@@ -46,7 +38,6 @@ public:
 
 private:
 	Point3D<double> point;
-	PointLabel label;
 	int colorIndex;
 };
 

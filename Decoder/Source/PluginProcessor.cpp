@@ -25,10 +25,13 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
                        )
 #endif
 {
+	pAmbiPointArray = new Array<AmbiPoint>();
+	pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0)));
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
+	pAmbiPointArray = nullptr;
 }
 
 //==============================================================================
@@ -168,6 +171,11 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getAmbiPointArray() const
+{
+	return pAmbiPointArray;
 }
 
 //==============================================================================

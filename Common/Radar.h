@@ -15,7 +15,6 @@ Author:  christian.schweizer
 
 #include "JuceHeader.h"
 #include "AmbiPoint.h"
-#include "GlLabel.h"
 #include "TrackColors.h"
 
 //==============================================================================
@@ -29,12 +28,12 @@ private:
 	AmbiPoint* _selectedXYPoint;
 	AmbiPoint* _selectedYZPoint;
 	Array<AmbiPoint>* pAmbiPointArray;
-	GlLabel _labelX;
-	GlLabel _labelY;
-	GlLabel _labelZ;
-	GlLabel _coordinateLabelAed;
-	GlLabel _coordinateLabelXyz;
-	Array<GlLabel> _pointLabels;
+	//GlLabel _labelX;
+	//GlLabel _labelY;
+	//GlLabel _labelZ;
+	//GlLabel _coordinateLabelAed;
+	//GlLabel _coordinateLabelXyz;
+	//Array<GlLabel> _pointLabels;
 	float _desktopScale;
 	TrackColors trackColors;
 
@@ -50,39 +49,30 @@ public:
 
 	~Radar()
 	{
-		shutdownOpenGL();
 	}
 
 	void initialise() override
 	{
-		_coordinateLabelAed.setPosition(Rectangle<double>(0.2, 1.0, 0.8, -0.05));
-		_coordinateLabelAed.setJustification(Justification::right);
-		_coordinateLabelXyz.setJustification(Justification::right);
-		_coordinateLabelXyz.setPosition(Rectangle<double>(0.2, 0.95, 0.8, -0.05));
-		_labelX.setLabel("X");
-		_labelX.setPosition(Rectangle<double>(0, 1.0, 0.1, -0.1));
-		_labelY.setLabel("Y");
-		_labelY.setPosition(Rectangle<double>(0.9, 0.1, 0.1, -0.1));
-		_labelZ.setLabel("Z");
-		_labelZ.setPosition(Rectangle<double>(0, 1.0, 0.1, -0.1));
+		//_coordinateLabelAed.setPosition(Rectangle<double>(0.2, 1.0, 0.8, -0.05));
+		//_coordinateLabelAed.setJustification(Justification::right);
+		//_coordinateLabelXyz.setJustification(Justification::right);
+		//_coordinateLabelXyz.setPosition(Rectangle<double>(0.2, 0.95, 0.8, -0.05));
+		//_labelX.setLabel("X");
+		//_labelX.setPosition(Rectangle<double>(0, 1.0, 0.1, -0.1));
+		//_labelY.setLabel("Y");
+		//_labelY.setPosition(Rectangle<double>(0.9, 0.1, 0.1, -0.1));
+		//_labelZ.setLabel("Z");
+		//_labelZ.setPosition(Rectangle<double>(0, 1.0, 0.1, -0.1));
+		
 	}
 
 	void shutdown() override
 	{
-		_labelX.shutdown();
-		_labelY.shutdown();
-		_labelZ.shutdown();
-		_coordinateLabelAed.shutdown();
-		_coordinateLabelXyz.shutdown();
-		clearTextures();
-	}
-
-	void clearTextures()
-	{
-		for (GlLabel label : _pointLabels) {
-			label.shutdown();
-		}
-		_pointLabels.clear();
+		//_labelX.shutdown();
+		//_labelY.shutdown();
+		//_labelZ.shutdown();
+		//_coordinateLabelAed.shutdown();
+		//_coordinateLabelXyz.shutdown();
 	}
 
 	void paint(Graphics& g) override
@@ -141,11 +131,11 @@ public:
 		pAmbiPointArray->getLock().enter();
 		if (_xyRadarViewport.contains(trPoint)) {
 			glPoint = getGLPoint(trPoint, _xyRadarViewport);
-			pAmbiPointArray->add(AmbiPoint(Point3D<double>(glPoint.getY(), glPoint.getX(), 0.0), PointLabel(String(pAmbiPointArray->size()))));
+			pAmbiPointArray->add(AmbiPoint(Point3D<double>(glPoint.getY(), glPoint.getX(), 0.0)));
 		}
 		else if (_yzRadarViewport.contains(trPoint)) {
 			glPoint = getGLPoint(trPoint, _yzRadarViewport);
-			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, glPoint.getX(), glPoint.getY()), PointLabel(String(pAmbiPointArray->size()))));
+			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, glPoint.getX(), glPoint.getY())));
 		}
 		pAmbiPointArray->getLock().exit();
 	}
@@ -201,15 +191,15 @@ public:
 		if (_selectedXYPoint != nullptr) {
 			Point<double> glPoint = getGLPoint(trPos, _xyRadarViewport, true);
 			_selectedXYPoint->getPoint()->setXY(glPoint.y, glPoint.x);
-			_coordinateLabelAed.setLabel(_selectedXYPoint->getPoint()->toStringAed());
-			_coordinateLabelXyz.setLabel(_selectedXYPoint->getPoint()->toString());
+			//_coordinateLabelAed.setLabel(_selectedXYPoint->getPoint()->toStringAed());
+			//_coordinateLabelXyz.setLabel(_selectedXYPoint->getPoint()->toString());
 			repaint();
 		}
 		if (_selectedYZPoint != nullptr) {	
 			Point<double> glPoint = getGLPoint(trPos, _yzRadarViewport, true);
 			_selectedYZPoint->getPoint()->setYZ(glPoint.x, glPoint.y);
-			_coordinateLabelAed.setLabel(_selectedYZPoint->getPoint()->toStringAed());
-			_coordinateLabelXyz.setLabel(_selectedYZPoint->getPoint()->toString());
+			//_coordinateLabelAed.setLabel(_selectedYZPoint->getPoint()->toStringAed());
+			//_coordinateLabelXyz.setLabel(_selectedYZPoint->getPoint()->toString());
 			repaint();
 		}
 	}
@@ -219,8 +209,8 @@ public:
 		// button toggles state on mouse over.
 		_selectedXYPoint = nullptr;
 		_selectedYZPoint = nullptr;
-		_coordinateLabelAed.setLabel("");
-		_coordinateLabelXyz.setLabel("");
+		//_coordinateLabelAed.setLabel("");
+		//_coordinateLabelXyz.setLabel("");
 	}
 
 	void render() override
@@ -238,11 +228,11 @@ public:
 		paintRadar();
 
 		glEnable(GL_TEXTURE_2D);
-		_coordinateLabelAed.paint();
-		_coordinateLabelXyz.paint();
-		updatePointLabels();
-		for (int l = 0; l < _pointLabels.size(); l++)
-			_pointLabels.getReference(l).paint();
+		//_coordinateLabelAed.paint();
+		//_coordinateLabelXyz.paint();
+		//updatePointLabels();
+		//for (int l = 0; l < _pointLabels.size(); l++)
+		//	_pointLabels.getReference(l).paint();
 		glDisable(GL_TEXTURE_2D);
 
 		// Z-Radar
@@ -253,7 +243,7 @@ public:
 	}
 
 private:
-	void updatePointLabels() 
+	/*void updatePointLabels() 
 	{
 		if (_pointLabels.size() != pAmbiPointArray->size()) {
 			clearTextures();
@@ -264,7 +254,7 @@ private:
 			_pointLabels.getReference(i).setLabel(pAmbiPointArray->getReference(i).getLabel()->getLabel());
 			_pointLabels.getReference(i).setPosition(Rectangle<double>(pAmbiPointArray->getReference(i).getPoint()->getY() - 0.05, pAmbiPointArray->getReference(i).getPoint()->getX() + 0.15, 0.1, -0.1));
 		}
-	}
+	}*/
 
 	void paintRadar(bool isZRadar = false)
 	{
@@ -290,11 +280,11 @@ private:
 		glVertex3d(0.0, 1.0, 0.0);
 		glEnd();
 
-		// right label
-		_labelY.paint();
-		// top label
-		isZRadar ? _labelZ.paint() : _labelX.paint();
-		
+		//// right label
+		//_labelY.paint();
+		//// top label
+		//isZRadar ? _labelZ.paint() : _labelX.paint();
+		//
 		pAmbiPointArray->getLock().enter();
 		// Draw Points
 		for (int i = 0; i < (*pAmbiPointArray).size(); i++)

@@ -31,6 +31,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	pAmbiPointArray = ownerProc.getAmbiPointArray();
     //[/Constructor_pre]
 
     addAndMakeVisible (comboBoxChannelConfig = new ComboBox ("channelConfig"));
@@ -44,7 +45,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     comboBoxChannelConfig->addItem (TRANS("8"), 4);
     comboBoxChannelConfig->addListener (this);
 
-    addAndMakeVisible (component = new RadarComponent());
+    addAndMakeVisible (component = new RadarComponent (pAmbiPointArray));
     component->setName ("new component");
 
 
@@ -91,7 +92,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     comboBoxChannelConfig->setBounds (8, 9, 192, 24);
-    component->setBounds (0, 40, 207, 120);
+    component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -142,8 +143,8 @@ BEGIN_JUCER_METADATA
             layout="33" items="2&#10;4&#10;6&#10;8" textWhenNonSelected="-"
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
-                    virtualName="" explicitFocusOrder="0" pos="0 40 207 120" class="RadarComponent"
-                    params=""/>
+                    virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
+                    params="pAmbiPointArray"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
