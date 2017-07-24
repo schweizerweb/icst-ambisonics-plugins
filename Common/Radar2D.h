@@ -12,16 +12,18 @@
 
 #include "../Decoder/JuceLibraryCode/JuceHeader.h"
 #include "AmbiPoint.h"
+#include "TrackColors.h"
+#include "ZoomSettings.h"
 
 //==============================================================================
 /*
 */
-class Radar2D    : public Component
+class Radar2D    : public Component, OpenGLRenderer, ChangeListener
 {
 public:
 	enum RadarMode { XY, ZY };
 
-	Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, float radius);
+	Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
@@ -42,17 +44,24 @@ private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
 	Point<float> getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const;
 	float getValueToScreenRatio() const;
+	void renderOpenGL() override;
 
 private:
+	OpenGLContext openGLContext;
+
 	Array<AmbiPoint>* pAmbiPoints;
 	Image radarBackground;
 	Rectangle<int> radarViewport;
-	float initialRadius;
+	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
-	Point<float> currentViewCenter;
-	float currentViewRadius;
 	String infoString;
 	AmbiPoint* selectedPoint;
-	
+	bool radarUpdated;
+	TrackColors trackColors;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
+public:
+	void newOpenGLContextCreated() override;
+	void openGLContextClosing() override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 };

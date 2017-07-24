@@ -10,22 +10,25 @@
 
 #include "../Decoder/JuceLibraryCode/JuceHeader.h"
 #include "Radar2D.h"
+#include "TrackColors.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, float radius):
+Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings):
 	pAmbiPoints(pAmbiPointArray), 
-	initialRadius(radius), 
+	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
-	selectedPoint(nullptr),
-	currentViewRadius(radius),
-	currentViewCenter(Point<float>(0.0, 0.0))
+	selectedPoint(nullptr)
 {
-	// In your constructor, you should add any child components, and
-	// initialise any special settings that your component needs.
+	openGLContext.setRenderer(this);
+	openGLContext.attachTo(*this);
+	openGLContext.setContinuousRepainting(true);
+
+	pZoomSettings->addChangeListener(this);
 }
 
 Radar2D::~Radar2D()
 {
+	openGLContext.detach();
 }
 
 Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
@@ -53,67 +56,102 @@ float Radar2D::getPointSize() const
 
 void Radar2D::paint (Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
-    g.fillAll (getLookAndFeel().findColour (ResizableWindow::backgroundColourId));   // clear the background
-
-    g.setColour (Colours::grey);
-    g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-	
-    g.setColour (Colours::white);
-    g.setFont (14.0f);
-    //g.drawText ("Radar2D", getLocalBounds(),
-    //            Justification::centred, true);   // draw some placeholder text
-	g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
-
-	for (AmbiPoint point : *pAmbiPoints)
-	{
-		Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
-		Rectangle<float> rect(
-			screenPt.getX() - getPointSize() / 2,
-			screenPt.getY() - getPointSize() / 2,
-			getPointSize(),
-			getPointSize());
-		g.fillEllipse(rect);
-	}
-
-	g.drawText(infoString, 0, 0, 100, 30, Justification::topLeft);
 }
 
 void Radar2D::createRadarBackground()
 {
+	radarUpdated = false;
+
 	Rectangle<int> localBounds = radarViewport;
 
 	Image img(Image::ARGB, localBounds.getWidth(), localBounds.getHeight(), true);
 	Graphics g(img);
 	g.setColour(Colours::lightgrey);
+	g.setFont(16);
+	int numberOfRings = 10;
 
-	int dist = currentViewRadius / 10 * getValueToScreenRatio();
+	float dist = pZoomSettings->getInitialRadius() / float(numberOfRings) * getValueToScreenRatio();
 	Point<float> centerPoint = getRelativeScreenPoint(Point<float>(0.0, 0.0));
-	for (int i = 0; i < 10; i++)
+	for (int i = 0; i < numberOfRings; i++)
 	{
-		int absDist = i * dist;
+		float absDist = (i + 1) * dist;
 		Rectangle<float> ellipseRect(centerPoint.getX() - absDist, centerPoint.getY() - absDist, 2 * absDist, 2 * absDist);
 		g.drawEllipse(ellipseRect, 1);
+		g.drawSingleLineText(String((i + 1) * pZoomSettings->getInitialRadius() / numberOfRings), centerPoint.getX(), centerPoint.getY() - absDist);
 	}
+	
+	g.drawLine(centerPoint.getX(), 0, centerPoint.getX(), localBounds.getHeight(), 2);
+	g.drawLine(0, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2);
 	
 	radarBackground = img;
 }
 
 float Radar2D::getValueToScreenRatio() const
 {
-	return radarViewport.getWidth() / (2 * currentViewRadius);
+	return radarViewport.getWidth() / (2 * pZoomSettings->getCurrentRadius());
+}
+
+void Radar2D::renderOpenGL()
+{
+	jassert(OpenGLHelpers::isContextActive());
+
+	const float desktopScale = (float)openGLContext.getRenderingScale();
+
+	OpenGLHelpers::clear(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+
+	ScopedPointer<LowLevelGraphicsContext> glRenderer(createOpenGLGraphicsContext(openGLContext,
+		roundToInt(desktopScale * getWidth()),
+		roundToInt(desktopScale * getHeight())));
+
+	if (glRenderer != nullptr)
+	{
+		Graphics g(*glRenderer);
+		g.addTransform(AffineTransform::scale(desktopScale));
+
+
+		g.setColour(Colours::grey);
+		g.drawRect(radarViewport, 1);   // draw an outline around the component
+
+		g.setColour(Colours::white);
+		g.setFont(14.0f);
+
+		if (radarUpdated)
+			createRadarBackground();
+
+		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
+
+		for (AmbiPoint point : *pAmbiPoints)
+		{
+			g.setColour(trackColors.getColor(point.getColorIndex()));
+			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
+			Rectangle<float> rect(
+				screenPt.getX() - getPointSize() / 2,
+				screenPt.getY() - getPointSize() / 2,
+				getPointSize(),
+				getPointSize());
+			g.fillEllipse(rect);
+		}
+
+		g.drawText(infoString, 0, 0, 100, 30, Justification::topLeft);
+	}
+}
+
+void Radar2D::newOpenGLContextCreated()
+{
+}
+
+void Radar2D::openGLContextClosing()
+{
+}
+
+void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
+{
+	radarUpdated = true;
 }
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 {
-	Rectangle<float> currentViewValueRect(currentViewCenter.getX() - currentViewRadius, currentViewCenter.getY() - currentViewRadius, 2 * currentViewRadius, radarMode == XY ? 2 * currentViewRadius : currentViewRadius);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode == ZY);
 
 	Point<float> convertedPoint(
 		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
@@ -124,7 +162,7 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 
 Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const
 {
-	Rectangle<float> currentViewValueRect(currentViewCenter.getX() - currentViewRadius, currentViewCenter.getY() - currentViewRadius, 2 * currentViewRadius, radarMode == XY ? 2 * currentViewRadius : currentViewRadius);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode == ZY);
 
 	Point<float> convertedPoint(
 		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
@@ -144,6 +182,7 @@ void Radar2D::resized()
 	{
 		// add additional space left and right
 		radarViewport = Rectangle<int>((getBounds().getWidth() - getBounds().getHeight() * wantedRatioWidthToHeight) / 2, 0, getBounds().getHeight() * wantedRatioWidthToHeight, getBounds().getHeight());
+		//radarViewport = Rectangle<int>(20, 20, getBounds().getWidth(), getBounds().getHeight());
 	}
 	else
 	{
@@ -155,19 +194,17 @@ void Radar2D::resized()
 			getBounds().getWidth() / wantedRatioWidthToHeight);
 	}
 
-	createRadarBackground();
-	repaint();
+	radarUpdated = true;
 }
 
 void Radar2D::mouseExit(const MouseEvent& e)
 {
-	infoString = "exit";
-	repaint();
+	infoString = "";
 }
 
 double Radar2D::getMinPointSelectionDist() const
 {
-	return currentViewRadius / 20.0;
+	return 20.0;
 }
 
 void Radar2D::mouseDown(const MouseEvent& e)
@@ -197,28 +234,31 @@ void Radar2D::mouseDown(const MouseEvent& e)
 			selectedPoint = &pAmbiPoints->getReference(minDistIndex);
 		}
 	}
-
-	repaint();
 }
 
 void Radar2D::mouseDrag(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
 
-	if(selectedPoint != nullptr)
+	if(e.mods.isShiftDown())
 	{
-		switch(radarMode)
-		{
-		case XY:
-			selectedPoint->getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
-			break;
-		case ZY:
-			selectedPoint->getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
-			break;
-		}
 		
 	}
-	repaint();
+	else
+	{
+		if (selectedPoint != nullptr)
+		{
+			switch (radarMode)
+			{
+			case XY:
+				selectedPoint->getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
+				break;
+			case ZY:
+				selectedPoint->getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
+				break;
+			}
+		}
+	}
 }
 
 void Radar2D::mouseUp(const MouseEvent& e)
@@ -227,22 +267,24 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
 
-	if(e.mods.isShiftDown())
+	if(e.mods.isShiftDown() && !e.mouseWasDraggedSinceMouseDown())
 	{
-		currentViewCenter = valuePoint;
+		if (radarMode == XY)
+			pZoomSettings->setCurrentCenterPointXY(valuePoint.getY(), valuePoint.getX());
+		else if (radarMode == ZY)
+			pZoomSettings->setCurrentCenterPointYZ(valuePoint.getX(), valuePoint.getY());
 
 		if(e.mods.isLeftButtonDown())
 		{
-			currentViewRadius *= 0.8;
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8);
 		}
 		else if(e.mods.isRightButtonDown())
 		{
-			currentViewRadius /= 0.8;
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8);
 		}
 	}
 
-	createRadarBackground();
-	repaint();
+	radarUpdated = true;
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
@@ -252,12 +294,10 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	// add new point
 	switch (radarMode) {
 	case XY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0)));
+		pAmbiPoints->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), pAmbiPoints->size()));
 		break;
 	case ZY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY())));
+		pAmbiPoints->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), pAmbiPoints->size()));
 		break;
 	}
-
-	repaint();
 }
