@@ -81,9 +81,16 @@ public:
 		g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 
 		g.setColour(Colours::black);
-		g.setFont(14.0f);
+		g.setFont(14.0f * _desktopScale);
 		g.drawText("Radar", getLocalBounds(),
 			Justification::top, true);   // draw some placeholder text
+
+		for(int i = 0; i < 100; i++)
+		{
+			Point<float> center(getBounds().getWidth() / 2, i * 10);
+			g.drawText("Front", Rectangle<float>(100, 30).withCentre(center), Justification::centredTop);
+		}
+			
 	}
 
 	void resized() override
@@ -217,11 +224,14 @@ public:
 	{
 		jassert(OpenGLHelpers::isContextActive());
 
+
 		// initialize GL
 		OpenGLHelpers::clear(Colour::greyLevel(0.9f));
 		glEnable(GL_BLEND);
 		glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
+		drawBackground2DStuff(_desktopScale);
+		/*
 		// XY-Radar
 		glColor3f(0.2f, 0.3f, 0.8f);
 		glViewport(_xyRadarViewport.getTopLeft().getX(), _xyRadarViewport.getTopLeft().getY(), _xyRadarViewport.getWidth(), _xyRadarViewport.getHeight());
@@ -239,10 +249,53 @@ public:
 		glColor3f(0.2f, 0.3f, 0.8f);
 		glViewport(_yzRadarViewport.getTopLeft().getX(), _yzRadarViewport.getTopLeft().getY(), _yzRadarViewport.getWidth(), _yzRadarViewport.getHeight());
 		paintRadar(true);
+
+		*/
 		glFlush();
+
 	}
 
 private:
+
+	void drawBackground2DStuff(float desktopScale)
+	{
+		// Create an OpenGLGraphicsContext that will draw into this GL window..
+		ScopedPointer<LowLevelGraphicsContext> glRenderer(createOpenGLGraphicsContext(openGLContext,
+			roundToInt(desktopScale * getWidth()),
+			roundToInt(desktopScale * getHeight())));
+
+		if (glRenderer != nullptr)
+		{
+			Graphics g(*glRenderer);
+			g.addTransform(AffineTransform::scale(desktopScale));
+			Random rnd;
+		
+			for (int i = 0; i < 10; ++i)
+			{
+				float size = 0.25f;
+
+				// This stuff just creates a spinning star shape and fills it..
+				float x = rnd.nextFloat()*getWidth();
+				float y = rnd.nextFloat()*getHeight();
+
+				Path p;
+				
+				p.addEllipse(x, y, rnd.nextFloat()*50, rnd.nextFloat()*50);
+
+				g.drawSingleLineText("test", x + 10, y + 10);
+				float hue = 0.8;
+
+				g.setGradientFill(ColourGradient(Colours::green.withRotatedHue(hue).withAlpha(0.8f),
+					0, 0,
+					Colours::red.withRotatedHue(hue).withAlpha(0.5f),
+					0, (float)getHeight(), false));
+				g.fillPath(p);
+				
+			}
+		}
+	}
+
+
 	/*void updatePointLabels() 
 	{
 		if (_pointLabels.size() != pAmbiPointArray->size()) {
