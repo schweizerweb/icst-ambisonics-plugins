@@ -39,7 +39,7 @@ class Radar3D  : public Component
 {
 public:
     //==============================================================================
-    Radar3D (Array<AmbiPoint>* pAmbiPointArray);
+    Radar3D (Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings);
     ~Radar3D();
 
     //==============================================================================
@@ -48,11 +48,6 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void mouseMove (const MouseEvent& e) override;
-    void mouseExit (const MouseEvent& e) override;
-    void mouseDown (const MouseEvent& e) override;
-    void mouseDrag (const MouseEvent& e) override;
-    void mouseUp (const MouseEvent& e) override;
 
 
 
