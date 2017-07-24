@@ -35,6 +35,9 @@
       <FILE id="zQhquK" name="RadarComponent.h" compile="0" resource="0"
             file="../Common/RadarComponent.h"/>
       <FILE id="Fg0Bui" name="TrackColors.h" compile="0" resource="0" file="../Common/TrackColors.h"/>
+      <FILE id="WbcbYJ" name="ZoomSettings.cpp" compile="1" resource="0"
+            file="../Common/ZoomSettings.cpp"/>
+      <FILE id="eErMQG" name="ZoomSettings.h" compile="0" resource="0" file="../Common/ZoomSettings.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
