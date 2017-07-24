@@ -48,7 +48,7 @@ RadarComponent::RadarComponent (Array<AmbiPoint>* pAmbiPointArray)
     labelCoordinatesAED->setColour (TextEditor::textColourId, Colours::black);
     labelCoordinatesAED->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (radar = new Radar (pAmbiPointArray));
+    addAndMakeVisible (radar = new Radar3D (pAmbiPointArray, &zoomSettings));
     radar->setName ("radar");
 
 
@@ -100,41 +100,6 @@ void RadarComponent::resized()
     //[/UserResized]
 }
 
-void RadarComponent::mouseMove (const MouseEvent& e)
-{
-    //[UserCode_mouseMove] -- Add your code here...
-	labelCoordinatesXYZ->setText(e.getPosition().toString(), sendNotificationAsync);
-	if(radar->contains(e.getPosition()))
-	{
-		labelCoordinatesAED->setText(radar->getMouseXYRelative().toString(), sendNotificationAsync);
-	}
-    //[/UserCode_mouseMove]
-}
-
-void RadarComponent::mouseExit (const MouseEvent& e)
-{
-    //[UserCode_mouseExit] -- Add your code here...
-    //[/UserCode_mouseExit]
-}
-
-void RadarComponent::mouseDown (const MouseEvent& e)
-{
-    //[UserCode_mouseDown] -- Add your code here...
-    //[/UserCode_mouseDown]
-}
-
-void RadarComponent::mouseDrag (const MouseEvent& e)
-{
-    //[UserCode_mouseDrag] -- Add your code here...
-    //[/UserCode_mouseDrag]
-}
-
-void RadarComponent::mouseUp (const MouseEvent& e)
-{
-    //[UserCode_mouseUp] -- Add your code here...
-    //[/UserCode_mouseUp]
-}
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -154,13 +119,6 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
-  <METHODS>
-    <METHOD name="mouseMove (const MouseEvent&amp; e)"/>
-    <METHOD name="mouseExit (const MouseEvent&amp; e)"/>
-    <METHOD name="mouseDown (const MouseEvent&amp; e)"/>
-    <METHOD name="mouseDrag (const MouseEvent&amp; e)"/>
-    <METHOD name="mouseUp (const MouseEvent&amp; e)"/>
-  </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <LABEL name="coordinatesXYZ" id="eb2d4e80735ade2e" memberName="labelCoordinatesXYZ"
          virtualName="" explicitFocusOrder="0" pos="0 -8 150 24" edTextCol="ff000000"
@@ -174,7 +132,7 @@ BEGIN_JUCER_METADATA
          fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
                     explicitFocusOrder="0" pos="0 0R 100% 32M" posRelativeY="dba7ee2a2153b8cf"
-                    class="Radar" params="pAmbiPointArray"/>
+                    class="Radar3D" params="pAmbiPointArray, &amp;zoomSettings"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
