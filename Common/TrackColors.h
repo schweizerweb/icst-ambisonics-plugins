@@ -18,7 +18,7 @@ class TrackColors
 public:
 	TrackColors()
 	{
-		trackColors.add(Colours::red);	// index 0 currently not used
+		trackColors.add(Colours::red);
 		trackColors.add(Colours::blue);
 		trackColors.add(Colours::darkgreen);
 		trackColors.add(Colours::darkred);
