@@ -15,6 +15,7 @@
 #include "TrackColors.h"
 #include "ZoomSettings.h"
 #include "RadarColors.h"
+#include "PointSelection.h"
 
 //==============================================================================
 /*
@@ -24,7 +25,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener
 public:
 	enum RadarMode { XY, ZY };
 
-	Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, int* pSelectedPointIndex);
+	Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
@@ -60,7 +61,7 @@ private:
 	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
 	String infoString;
-	int* pSelectedPointIndex;
+	PointSelection* pPointSelection;
 	bool radarUpdated;
 	TrackColors trackColors;
 	ScopedPointer<RadarColors> radarColors;

@@ -32,10 +32,10 @@ RadarComponent::RadarComponent (Array<AmbiPoint>* pAmbiPointArray)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (radar = new Radar3D (pAmbiPointArray, &zoomSettings, &selectedPointIndex));
+    addAndMakeVisible (radar = new Radar3D (pAmbiPointArray, &zoomSettings, &pointSelection));
     radar->setName ("radar");
 
-    addAndMakeVisible (pointInfo = new PointInfoControl (pAmbiPointArray, &selectedPointIndex));
+    addAndMakeVisible (pointInfo = new PointInfoControl (pAmbiPointArray, &pointSelection));
     pointInfo->setName ("pointInfo");
 
 
@@ -107,10 +107,10 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff323e44"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
                     explicitFocusOrder="0" pos="0 0R 100% 140M" posRelativeY="328b0557e3704175"
-                    class="Radar3D" params="pAmbiPointArray, &amp;zoomSettings, &amp;selectedPointIndex"/>
+                    class="Radar3D" params="pAmbiPointArray, &amp;zoomSettings, &amp;pointSelection"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
                     virtualName="" explicitFocusOrder="0" pos="0 0 100% 140" class="PointInfoControl"
-                    params="pAmbiPointArray, &amp;selectedPointIndex"/>
+                    params="pAmbiPointArray, &amp;pointSelection"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

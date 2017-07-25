@@ -25,6 +25,7 @@
 #include "Radar3D.h"
 #include "ZoomSettings.h"
 #include "PointInfoControl.h"
+#include "PointSelection.h"
 
 //[/Headers]
 
@@ -57,7 +58,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     ZoomSettings zoomSettings;
-	int selectedPointIndex;
+	PointSelection pointSelection;
     //[/UserVariables]
 
     //==============================================================================

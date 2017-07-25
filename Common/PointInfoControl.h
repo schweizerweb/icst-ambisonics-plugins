@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../Decoder/JuceLibraryCode/JuceHeader.h"
 #include "AmbiPoint.h"
-
+#include "PointSelection.h"
 //[/Headers]
 
 
@@ -41,7 +41,7 @@ class PointInfoControl  : public Component,
 {
 public:
     //==============================================================================
-    PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, int* pSelectedPointIndex);
+    PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection);
     ~PointInfoControl();
 
     //==============================================================================
@@ -59,7 +59,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	Array<AmbiPoint>* pAmbiPointArray;
-	int* pSelectedPointIndex;
+	PointSelection* pPointSelection;
     //[/UserVariables]
 
     //==============================================================================

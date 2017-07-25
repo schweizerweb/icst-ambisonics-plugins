@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, int* pSelectedPointIndex)
-    : pAmbiPointArray(pAmbiPointArray), pSelectedPointIndex(pSelectedPointIndex)
+PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection)
+    : pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -304,7 +304,7 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void PointInfoControl::updateSelectedPoint()
 {
-	int selection = *pSelectedPointIndex;
+	int selection = pPointSelection->getSelectedPointIndex();
 	if (selection >= 0 && selection < pAmbiPointArray->size())
 	{
 		AmbiPoint point = pAmbiPointArray->getReference(selection);
@@ -326,8 +326,8 @@ void PointInfoControl::updateSelectedPoint()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, int* pSelectedPointIndex"
-                 variableInitialisers="pAmbiPointArray(pAmbiPointArray), pSelectedPointIndex(pSelectedPointIndex)"
+                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, PointSelection* pPointSelection"
+                 variableInitialisers="pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="140">
   <BACKGROUND backgroundColour="ff323e44"/>

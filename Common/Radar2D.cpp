@@ -13,11 +13,11 @@
 #include "TrackColors.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, int* pSelectedPointIndex):
+Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection):
 	pAmbiPoints(pAmbiPointArray), 
 	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
-	pSelectedPointIndex(pSelectedPointIndex)
+	pPointSelection(pPointSelection)
 {
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
@@ -129,7 +129,7 @@ void Radar2D::renderOpenGL()
 			AmbiPoint point = pAmbiPoints->getReference(i);
 
 			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
-			if(i == *pSelectedPointIndex)
+			if(i == pPointSelection->getSelectedPointIndex())
 			{
 				g.setColour(radarColors->getPointSelectionColor());
 				Rectangle<float> rect(getSelectedPointSize(), getSelectedPointSize());
@@ -247,11 +247,11 @@ void Radar2D::mouseDown(const MouseEvent& e)
 		}
 		if (minDistIndex >= 0 && minDist < getMaxPointSelectionDist())
 		{
-			*pSelectedPointIndex = minDistIndex;
+			pPointSelection->selectPoint(minDistIndex);
 		}
 		else
 		{
-			*pSelectedPointIndex = -1;
+			pPointSelection->unselectPoint();
 		}
 	}
 }
@@ -267,7 +267,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		int pointSelection = *pSelectedPointIndex;
+		int pointSelection = pPointSelection->getSelectedPointIndex();
 		if (pointSelection >= 0 && pointSelection < pAmbiPoints->size())
 		{
 			switch (radarMode)
@@ -322,7 +322,7 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	}
 
 	// select added point
-	*pSelectedPointIndex = pAmbiPoints->size() - 1;
+	pPointSelection->selectPoint(pAmbiPoints->size() - 1);
 }
 
 void Radar2D::showCoordinates(const Point<float>& point)

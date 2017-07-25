@@ -29,6 +29,10 @@
             file="../Common/PointInfoControl.cpp"/>
       <FILE id="SGBPWh" name="PointInfoControl.h" compile="0" resource="0"
             file="../Common/PointInfoControl.h"/>
+      <FILE id="jiUwsF" name="PointSelection.cpp" compile="1" resource="0"
+            file="../Common/PointSelection.cpp"/>
+      <FILE id="mUBX1O" name="PointSelection.h" compile="0" resource="0"
+            file="../Common/PointSelection.h"/>
       <FILE id="UqnteK" name="Radar.h" compile="0" resource="0" file="../Common/Radar.h"/>
       <FILE id="Avj0Bb" name="Radar2D.cpp" compile="1" resource="0" file="../Common/Radar2D.cpp"/>
       <FILE id="W2rMLr" name="Radar2D.h" compile="0" resource="0" file="../Common/Radar2D.h"/>

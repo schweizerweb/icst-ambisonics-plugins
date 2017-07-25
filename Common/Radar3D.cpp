@@ -27,15 +27,15 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Radar3D::Radar3D (Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, int* pSelectedPointIndex)
+Radar3D::Radar3D (Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (xyRadar = new Radar2D (Radar2D::XY, pAmbiPointArray, pZoomSettings, pSelectedPointIndex));
+    addAndMakeVisible (xyRadar = new Radar2D (Radar2D::XY, pAmbiPointArray, pZoomSettings, pPointSelection));
     xyRadar->setName ("xyRadar");
 
-    addAndMakeVisible (zyRadar = new Radar2D (Radar2D::ZY, pAmbiPointArray, pZoomSettings, pSelectedPointIndex));
+    addAndMakeVisible (zyRadar = new Radar2D (Radar2D::ZY, pAmbiPointArray, pZoomSettings, pPointSelection));
     zyRadar->setName ("zyRadar");
 
 
@@ -101,16 +101,16 @@ void Radar3D::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Radar3D" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, ZoomSettings* pZoomSettings, int* pSelectedPointIndex"
+                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
                     explicitFocusOrder="0" pos="0 0 100% 66.565%" class="Radar2D"
-                    params="Radar2D::XY, pAmbiPointArray, pZoomSettings, pSelectedPointIndex"/>
+                    params="Radar2D::XY, pAmbiPointArray, pZoomSettings, pPointSelection"/>
   <GENERICCOMPONENT name="zyRadar" id="9b35aa2c2da622df" memberName="zyRadar" virtualName=""
                     explicitFocusOrder="0" pos="0 0R 100% 50%" posRelativeY="952154a5b6ffaa65"
-                    posRelativeH="952154a5b6ffaa65" class="Radar2D" params="Radar2D::ZY, pAmbiPointArray, pZoomSettings, pSelectedPointIndex"/>
+                    posRelativeH="952154a5b6ffaa65" class="Radar2D" params="Radar2D::ZY, pAmbiPointArray, pZoomSettings, pPointSelection"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
