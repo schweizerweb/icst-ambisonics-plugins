@@ -26,7 +26,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 #endif
 {
 	pAmbiPointArray = new Array<AmbiPoint>();
-	pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0)));
+	pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "Demo"));
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
