@@ -36,7 +36,8 @@
                                                                     //[/Comments]
 */
 class PointInfoControl  : public Component,
-                          public ComboBoxListener,
+                          public ChangeListener,
+                          public TextEditorListener,
                           public ButtonListener
 {
 public:
@@ -47,11 +48,15 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void updateSelectedPoint();
+	void changeListenerCallback(ChangeBroadcaster* source) override;
+	void textEditorTextChanged(TextEditor& source) override;
+	void disableListeners();
+	void enableListeners();
+	void setFieldsEnabled(bool enable) const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
 
@@ -63,8 +68,6 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<ComboBox> comboBoxSelctedPoint;
-    ScopedPointer<Label> label;
     ScopedPointer<TextEditor> textName;
     ScopedPointer<Label> label2;
     ScopedPointer<Label> label3;
@@ -81,7 +84,8 @@ private:
     ScopedPointer<Label> label9;
     ScopedPointer<TextEditor> textD;
     ScopedPointer<Label> label10;
-    ScopedPointer<TextButton> textButton;
+    ScopedPointer<TextButton> buttonAdd;
+    ScopedPointer<TextButton> buttonRemove;
 
 
     //==============================================================================

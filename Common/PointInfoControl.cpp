@@ -33,21 +33,6 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSele
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (comboBoxSelctedPoint = new ComboBox ("selectedPoint"));
-    comboBoxSelctedPoint->setEditableText (false);
-    comboBoxSelctedPoint->setJustificationType (Justification::centredLeft);
-    comboBoxSelctedPoint->setTextWhenNothingSelected (String());
-    comboBoxSelctedPoint->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxSelctedPoint->addListener (this);
-
-    addAndMakeVisible (label = new Label ("new label",
-                                          TRANS("Selected Point:")));
-    label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label->setJustificationType (Justification::centredLeft);
-    label->setEditable (false, false, false);
-    label->setColour (TextEditor::textColourId, Colours::black);
-    label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
     addAndMakeVisible (textName = new TextEditor ("textName"));
     textName->setMultiLine (false);
     textName->setReturnKeyStartsNewLine (false);
@@ -183,9 +168,13 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSele
     label10->setColour (TextEditor::textColourId, Colours::black);
     label10->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (textButton = new TextButton ("new button"));
-    textButton->setButtonText (TRANS("refresh"));
-    textButton->addListener (this);
+    addAndMakeVisible (buttonAdd = new TextButton ("buttonAdd"));
+    buttonAdd->setButtonText (TRANS("add"));
+    buttonAdd->addListener (this);
+
+    addAndMakeVisible (buttonRemove = new TextButton ("buttonAdd"));
+    buttonRemove->setButtonText (TRANS("remove"));
+    buttonRemove->addListener (this);
 
 
     //[UserPreSize]
@@ -195,6 +184,8 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSele
 
 
     //[Constructor] You can add your own custom stuff here..
+	updateSelectedPoint();
+	pPointSelection->addChangeListener(this);
     //[/Constructor]
 }
 
@@ -203,8 +194,6 @@ PointInfoControl::~PointInfoControl()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    comboBoxSelctedPoint = nullptr;
-    label = nullptr;
     textName = nullptr;
     label2 = nullptr;
     label3 = nullptr;
@@ -221,7 +210,8 @@ PointInfoControl::~PointInfoControl()
     label9 = nullptr;
     textD = nullptr;
     label10 = nullptr;
-    textButton = nullptr;
+    buttonAdd = nullptr;
+    buttonRemove = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -245,42 +235,26 @@ void PointInfoControl::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxSelctedPoint->setBounds (112, 0, 192, 24);
-    label->setBounds (0, 0, 104, 24);
-    textName->setBounds (112, 32, 192, 24);
-    label2->setBounds (0, 32, 104, 24);
-    label3->setBounds (112, 64, 24, 24);
-    textX->setBounds (136, 64, 56, 24);
-    label4->setBounds (192, 64, 24, 24);
-    textY->setBounds (216, 64, 56, 24);
-    label5->setBounds (273, 64, 24, 24);
-    textZ->setBounds (297, 64, 55, 24);
-    label6->setBounds (0, 64, 104, 24);
-    label7->setBounds (112, 96, 24, 24);
-    textA->setBounds (136, 96, 56, 24);
-    label8->setBounds (192, 96, 24, 24);
-    textE->setBounds (216, 96, 56, 24);
-    label9->setBounds (273, 96, 24, 24);
-    textD->setBounds (297, 96, 55, 24);
-    label10->setBounds (0, 96, 104, 24);
-    textButton->setBounds (312, 16, 48, 24);
+    textName->setBounds (136, 40, 216, 24);
+    label2->setBounds (0, 40, 104, 24);
+    label3->setBounds (112, 72, 24, 24);
+    textX->setBounds (136, 72, 56, 24);
+    label4->setBounds (192, 72, 24, 24);
+    textY->setBounds (216, 72, 56, 24);
+    label5->setBounds (273, 72, 24, 24);
+    textZ->setBounds (297, 72, 55, 24);
+    label6->setBounds (0, 72, 104, 24);
+    label7->setBounds (112, 104, 24, 24);
+    textA->setBounds (136, 104, 56, 24);
+    label8->setBounds (192, 104, 24, 24);
+    textE->setBounds (216, 104, 56, 24);
+    label9->setBounds (273, 104, 24, 24);
+    textD->setBounds (297, 104, 55, 24);
+    label10->setBounds (0, 104, 104, 24);
+    buttonAdd->setBounds (248, 8, 102, 24);
+    buttonRemove->setBounds (136, 8, 102, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
-}
-
-void PointInfoControl::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == comboBoxSelctedPoint)
-    {
-        //[UserComboBoxCode_comboBoxSelctedPoint] -- add your combo box handling code here..
-        //[/UserComboBoxCode_comboBoxSelctedPoint]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
@@ -288,11 +262,23 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == textButton)
+    if (buttonThatWasClicked == buttonAdd)
     {
-        //[UserButtonCode_textButton] -- add your button handler code here..
-		updateSelectedPoint();
-        //[/UserButtonCode_textButton]
+        //[UserButtonCode_buttonAdd] -- add your button handler code here..
+		pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", pAmbiPointArray->size()));
+		pPointSelection->selectPoint(pAmbiPointArray->size()-1);
+        //[/UserButtonCode_buttonAdd]
+    }
+    else if (buttonThatWasClicked == buttonRemove)
+    {
+        //[UserButtonCode_buttonRemove] -- add your button handler code here..
+		int selection = pPointSelection->getSelectedPointIndex();
+		if (selection >= 0 && selection < pAmbiPointArray->size())
+		{
+			pPointSelection->unselectPoint();
+			pAmbiPointArray->remove(selection);
+		}
+        //[/UserButtonCode_buttonRemove]
     }
 
     //[UserbuttonClicked_Post]
@@ -304,14 +290,112 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void PointInfoControl::updateSelectedPoint()
 {
+	disableListeners();
+
 	int selection = pPointSelection->getSelectedPointIndex();
 	if (selection >= 0 && selection < pAmbiPointArray->size())
 	{
 		AmbiPoint point = pAmbiPointArray->getReference(selection);
-		textX->setText(String(point.getPoint()->getX()));
-		textY->setText(String(point.getPoint()->getY()));
-		textZ->setText(String(point.getPoint()->getZ()));
+
+		setFieldsEnabled(true);
+		textName->setText(point.getName());
+		textX->setText(String(point.getPoint()->getX(), 3));
+		textY->setText(String(point.getPoint()->getY(), 3));
+		textZ->setText(String(point.getPoint()->getZ(), 3));
+		textA->setText(String(point.getPoint()->getAzimuth(), 3));
+		textE->setText(String(point.getPoint()->getElevation(), 3));
+		textD->setText(String(point.getPoint()->getDistance(), 3));
 	}
+	else
+	{
+		setFieldsEnabled(false);
+		textName->setText("-");
+		textX->setText("-");
+		textY->setText("-");
+		textZ->setText("-");
+		textA->setText("-");
+		textE->setText("-");
+		textD->setText("-");
+	}
+
+	enableListeners();
+}
+
+void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
+{
+	if(source == pPointSelection)
+		updateSelectedPoint();
+}
+
+void PointInfoControl::textEditorTextChanged(TextEditor& source)
+{
+	int selection = pPointSelection->getSelectedPointIndex();
+	if (selection < 0 || selection >= pAmbiPointArray->size())
+		return;
+
+	if (source.getName() == textName->getName())
+	{
+		pAmbiPointArray->getReference(selection).setName(textName->getText());
+	}
+
+	if (source.getName() == textX->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
+	}
+	if (source.getName() == textY->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
+	}
+	if (source.getName() == textZ->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
+	}
+
+	if (source.getName() == textA->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setAzimuth(textA->getText().getFloatValue());
+	}
+	if (source.getName() == textE->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setElevation(textE->getText().getFloatValue());
+	}
+	if (source.getName() == textD->getName())
+	{
+		pAmbiPointArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
+	}
+}
+
+void PointInfoControl::disableListeners()
+{
+	textName->removeListener(this);
+	textX->removeListener(this);
+	textY->removeListener(this);
+	textZ->removeListener(this);
+	textA->removeListener(this);
+	textE->removeListener(this);
+	textD->removeListener(this);
+}
+
+void PointInfoControl::enableListeners()
+{
+	textName->addListener(this);
+	textX->addListener(this);
+	textY->addListener(this);
+	textZ->addListener(this);
+	textA->addListener(this);
+	textE->addListener(this);
+	textD->addListener(this);
+}
+
+void PointInfoControl::setFieldsEnabled(bool enable) const
+{
+	textName->setEnabled(enable);
+	textX->setEnabled(enable);
+	textY->setEnabled(enable);
+	textZ->setEnabled(enable);
+	textA->setEnabled(enable);
+	textE->setEnabled(enable);
+	textD->setEnabled(enable);
 }
 //[/MiscUserCode]
 
@@ -326,87 +410,83 @@ void PointInfoControl::updateSelectedPoint()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, PointSelection* pPointSelection"
+                 parentClasses="public Component, public ChangeListener, public TextEditorListener"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, PointSelection* pPointSelection"
                  variableInitialisers="pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="140">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <COMBOBOX name="selectedPoint" id="7c4eb87f9d5c91a7" memberName="comboBoxSelctedPoint"
-            virtualName="" explicitFocusOrder="0" pos="112 0 192 24" editable="0"
-            layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <LABEL name="new label" id="ca93cd001ab1b76c" memberName="label" virtualName=""
-         explicitFocusOrder="0" pos="0 0 104 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Selected Point:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textName" id="2b706cdb3232f1d2" memberName="textName" virtualName=""
-              explicitFocusOrder="0" pos="112 32 192 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="136 40 216 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="7326de7683af8e2f" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="0 32 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 40 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Name:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="6fb8ecbc6da5fa76" memberName="label3" virtualName=""
-         explicitFocusOrder="0" pos="112 64 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="112 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="X:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textX" id="4dcd5fc970cdce6c" memberName="textX" virtualName=""
-              explicitFocusOrder="0" pos="136 64 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="136 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="d8cf1d21dc85896e" memberName="label4" virtualName=""
-         explicitFocusOrder="0" pos="192 64 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="192 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Y:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textY" id="46b4702ec60c236a" memberName="textY" virtualName=""
-              explicitFocusOrder="0" pos="216 64 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="216 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="385e50956f13effd" memberName="label5" virtualName=""
-         explicitFocusOrder="0" pos="273 64 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="273 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Z:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textZ" id="93f9644500f2da7f" memberName="textZ" virtualName=""
-              explicitFocusOrder="0" pos="297 64 55 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="297 72 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="f2af390154f0c032" memberName="label6" virtualName=""
-         explicitFocusOrder="0" pos="0 64 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 72 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Cartesian:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="c8e81a0262f1ac25" memberName="label7" virtualName=""
-         explicitFocusOrder="0" pos="112 96 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="112 104 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="A:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textA" id="e76184fec37afbfb" memberName="textA" virtualName=""
-              explicitFocusOrder="0" pos="136 96 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="136 104 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="6af5bb62c259b445" memberName="label8" virtualName=""
-         explicitFocusOrder="0" pos="192 96 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="192 104 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="E:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textE" id="7fb39984576e614e" memberName="textE" virtualName=""
-              explicitFocusOrder="0" pos="216 96 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="216 104 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="b1bd9596558e6f35" memberName="label9" virtualName=""
-         explicitFocusOrder="0" pos="273 96 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="273 104 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="D:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textD" id="411a4503627ed096" memberName="textD" virtualName=""
-              explicitFocusOrder="0" pos="297 96 55 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="297 104 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="41fcd21e0ce12407" memberName="label10" virtualName=""
-         explicitFocusOrder="0" pos="0 96 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 104 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Polar:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="new button" id="f00695df023ca647" memberName="textButton"
-              virtualName="" explicitFocusOrder="0" pos="312 16 48 24" buttonText="refresh"
+  <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
+              virtualName="" explicitFocusOrder="0" pos="248 8 102 24" buttonText="add"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonAdd" id="49c8de1156e72d8c" memberName="buttonRemove"
+              virtualName="" explicitFocusOrder="0" pos="136 8 102 24" buttonText="remove"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

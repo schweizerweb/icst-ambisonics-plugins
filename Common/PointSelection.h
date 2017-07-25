@@ -14,7 +14,7 @@
 
 #define NO_POINT_SELECTED -1
 
-class PointSelection : ChangeBroadcaster
+class PointSelection : public ChangeBroadcaster
 {
 public:
 	PointSelection();
