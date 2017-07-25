@@ -61,7 +61,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	setResizable(true, true);
     //[/UserPreSize]
 
-    setSize (800, 1400);
+    setSize (400, 700);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -164,7 +164,7 @@ BEGIN_JUCER_METADATA
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="800" initialHeight="1400">
+                 fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="88 8 192 24" editable="0"

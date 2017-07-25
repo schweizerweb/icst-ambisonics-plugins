@@ -55,7 +55,12 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 
 float Radar2D::getPointSize() const
 {
-	return 20;
+	return radarViewport.getWidth() / 50.0f;
+}
+
+float Radar2D::getFontSize() const
+{
+	return radarViewport.getWidth() / 25.0f;
 }
 
 void Radar2D::paint (Graphics& g)
@@ -71,7 +76,7 @@ void Radar2D::createRadarBackground()
 	Image img(Image::ARGB, localBounds.getWidth(), localBounds.getHeight(), true);
 	Graphics g(img);
 	g.setColour(radarColors->getRadarLineColor());
-	g.setFont(16);
+	g.setFont(getFontSize());
 	int numberOfRings = 10;
 
 	float dist = pZoomSettings->getInitialRadius() / float(numberOfRings) * getValueToScreenRatio();
@@ -116,6 +121,7 @@ void Radar2D::renderOpenGL()
 		Graphics g(*glRenderer);
 		g.addTransform(AffineTransform::scale(desktopScale));
 
+		g.setFont(getFontSize());
 		g.setColour(radarColors->getRadarLineColor());
 		g.drawRect(radarViewport, 1);   // draw an outline around the component
 
@@ -138,7 +144,7 @@ void Radar2D::renderOpenGL()
 			g.setColour(trackColors.getColor(point.getColorIndex()));
 			Rectangle<float> rect(getPointSize(), getPointSize());
 			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point.getName(), screenPt.getX() + getPointSize(), screenPt.getY() - getPointSize());
+			g.drawSingleLineText(point.getName(), screenPt.getX() + getPointSize()/2, screenPt.getY() - getPointSize()/2);
 		}
 
 		g.setColour(radarColors->getInfoTextColor());
@@ -220,7 +226,7 @@ void Radar2D::mouseExit(const MouseEvent& e)
 
 double Radar2D::getMaxPointSelectionDist() const
 {
-	return pZoomSettings->getCurrentRadius()/20.0;
+	return pZoomSettings->getCurrentRadius()/15.0;
 }
 
 void Radar2D::mouseDown(const MouseEvent& e)

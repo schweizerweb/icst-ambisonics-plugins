@@ -49,6 +49,7 @@ private:
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize() const;
 	float getPointSize() const;
+	float getFontSize() const;
 	void renderOpenGL() override;
 	void createRadarBackground();
 
