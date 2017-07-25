@@ -126,11 +126,11 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 		else
 		{
 			Point<float> projectedPoint(1.0, 0.0);
-			projectedPoint = projectedPoint.rotatedAboutOrigin(PI / nbChannels);
+			projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
 			for(int i = 0; i < nbChannels; i++)
 			{
 				pAmbiPointArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
-				projectedPoint = projectedPoint.rotatedAboutOrigin((PI * 2) / nbChannels);
+				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 			}
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]

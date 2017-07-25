@@ -63,7 +63,7 @@ float Radar2D::getFontSize() const
 	return radarViewport.getWidth() / 25.0f;
 }
 
-void Radar2D::paint (Graphics& g)
+void Radar2D::paint (Graphics&)
 {
 }
 
@@ -71,9 +71,9 @@ void Radar2D::createRadarBackground()
 {
 	radarUpdated = false;
 
-	Rectangle<int> localBounds = radarViewport;
+	Rectangle<float> localBounds = radarViewport.toFloat();
 
-	Image img(Image::ARGB, localBounds.getWidth(), localBounds.getHeight(), true);
+	Image img(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
 	Graphics g(img);
 	g.setColour(radarColors->getRadarLineColor());
 	g.setFont(getFontSize());
@@ -85,12 +85,12 @@ void Radar2D::createRadarBackground()
 	{
 		float absDist = (i + 1) * dist;
 		Rectangle<float> ellipseRect(centerPoint.getX() - absDist, centerPoint.getY() - absDist, 2 * absDist, 2 * absDist);
-		g.drawEllipse(ellipseRect, 1);
-		g.drawSingleLineText(String((i + 1) * pZoomSettings->getInitialRadius() / numberOfRings), centerPoint.getX(), centerPoint.getY() - absDist);
+		g.drawEllipse(ellipseRect, 1.0f);
+		g.drawSingleLineText(String((i + 1) * pZoomSettings->getInitialRadius() / numberOfRings), int(centerPoint.getX()), int(centerPoint.getY() - absDist));
 	}
 	
-	g.drawLine(centerPoint.getX(), 0, centerPoint.getX(), localBounds.getHeight(), 2);
-	g.drawLine(0, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2);
+	g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
+	g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
 	radarBackground = img;
 }
@@ -102,7 +102,7 @@ float Radar2D::getValueToScreenRatio() const
 
 float Radar2D::getSelectedPointSize() const
 {
-	return getPointSize() * 1.5;
+	return getPointSize() * 1.5f;
 }
 
 void Radar2D::renderOpenGL()
@@ -144,7 +144,7 @@ void Radar2D::renderOpenGL()
 			g.setColour(trackColors.getColor(point.getColorIndex()));
 			Rectangle<float> rect(getPointSize(), getPointSize());
 			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point.getName(), screenPt.getX() + getPointSize()/2, screenPt.getY() - getPointSize()/2);
+			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getPointSize()/2), int(screenPt.getY() - getPointSize()/2));
 		}
 
 		g.setColour(radarColors->getInfoTextColor());
@@ -203,8 +203,11 @@ void Radar2D::resized()
 	if(getBounds().getAspectRatio() >= wantedRatioWidthToHeight)
 	{
 		// add additional space left and right
-		radarViewport = Rectangle<int>((getBounds().getWidth() - getBounds().getHeight() * wantedRatioWidthToHeight) / 2, 0, getBounds().getHeight() * wantedRatioWidthToHeight, getBounds().getHeight());
-		//radarViewport = Rectangle<int>(20, 20, getBounds().getWidth(), getBounds().getHeight());
+		radarViewport = Rectangle<int>(
+			int((getBounds().getWidth() - getBounds().getHeight() * wantedRatioWidthToHeight) / 2), 
+			0, 
+			int(getBounds().getHeight() * wantedRatioWidthToHeight), 
+			int(getBounds().getHeight()));
 	}
 	else
 	{
@@ -213,13 +216,13 @@ void Radar2D::resized()
 			0,
 			(radarMode == XY) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
 			getBounds().getWidth(),
-			getBounds().getWidth() / wantedRatioWidthToHeight);
+			int(getBounds().getWidth() / wantedRatioWidthToHeight));
 	}
 
 	radarUpdated = true;
 }
 
-void Radar2D::mouseExit(const MouseEvent& e)
+void Radar2D::mouseExit(const MouseEvent&)
 {
 	infoString = "";
 }
@@ -286,6 +289,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 				pAmbiPoints->getReference(pointSelection).getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
 				break;
 			}
+			pPointSelection->notifyChange();
 		}
 	}
 }
@@ -308,11 +312,11 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 		if(e.mods.isLeftButtonDown())
 		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8);
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
 		}
 		else if(e.mods.isRightButtonDown())
 		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8);
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
 		}
 	}
 
