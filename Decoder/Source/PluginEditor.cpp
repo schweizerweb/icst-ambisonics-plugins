@@ -48,12 +48,20 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     addAndMakeVisible (component = new RadarComponent (pAmbiPointArray));
     component->setName ("new component");
 
+    addAndMakeVisible (label = new Label ("new label",
+                                          TRANS("Presets:")));
+    label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label->setJustificationType (Justification::centredLeft);
+    label->setEditable (false, false, false);
+    label->setColour (TextEditor::textColourId, Colours::black);
+    label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
 	setResizable(true, true);
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (800, 1400);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -68,6 +76,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
 
     comboBoxChannelConfig = nullptr;
     component = nullptr;
+    label = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -91,8 +100,9 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxChannelConfig->setBounds (8, 9, 192, 24);
+    comboBoxChannelConfig->setBounds (88, 8, 192, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
+    label->setBounds (8, 8, 112, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -105,6 +115,24 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
     if (comboBoxThatHasChanged == comboBoxChannelConfig)
     {
         //[UserComboBoxCode_comboBoxChannelConfig] -- add your combo box handling code here..
+		int nbChannels = comboBoxChannelConfig->getText().getIntValue();
+
+		pAmbiPointArray->clear();
+		if(nbChannels == 2)
+		{
+			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
+			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
+		}
+		else
+		{
+			Point<float> projectedPoint(1.0, 0.0);
+			projectedPoint = projectedPoint.rotatedAboutOrigin(PI / nbChannels);
+			for(int i = 0; i < nbChannels; i++)
+			{
+				pAmbiPointArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
+				projectedPoint = projectedPoint.rotatedAboutOrigin((PI * 2) / nbChannels);
+			}
+		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
     }
 
@@ -136,15 +164,20 @@ BEGIN_JUCER_METADATA
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 fixedSize="0" initialWidth="800" initialHeight="1400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="8 9 192 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="88 8 192 24" editable="0"
             layout="33" items="2&#10;4&#10;6&#10;8" textWhenNonSelected="-"
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
                     params="pAmbiPointArray"/>
+  <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
+         explicitFocusOrder="0" pos="8 8 112 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
+         kerning="0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

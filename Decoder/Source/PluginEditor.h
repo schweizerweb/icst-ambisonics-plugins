@@ -64,6 +64,7 @@ private:
     //==============================================================================
     ScopedPointer<ComboBox> comboBoxChannelConfig;
     ScopedPointer<RadarComponent> component;
+    ScopedPointer<Label> label;
 
 
     //==============================================================================
