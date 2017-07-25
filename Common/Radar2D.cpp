@@ -13,22 +13,26 @@
 #include "TrackColors.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings):
+Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, int* pSelectedPointIndex):
 	pAmbiPoints(pAmbiPointArray), 
 	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
-	selectedPoint(nullptr)
+	pSelectedPointIndex(pSelectedPointIndex)
 {
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(true);
 
 	pZoomSettings->addChangeListener(this);
+
+	radarColors = new RadarColors(0);
 }
 
 Radar2D::~Radar2D()
 {
 	openGLContext.detach();
+
+	radarColors = nullptr;
 }
 
 Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
@@ -66,7 +70,7 @@ void Radar2D::createRadarBackground()
 
 	Image img(Image::ARGB, localBounds.getWidth(), localBounds.getHeight(), true);
 	Graphics g(img);
-	g.setColour(Colours::lightgrey);
+	g.setColour(radarColors->getRadarLineColor());
 	g.setFont(16);
 	int numberOfRings = 10;
 
@@ -91,14 +95,18 @@ float Radar2D::getValueToScreenRatio() const
 	return radarViewport.getWidth() / (2 * pZoomSettings->getCurrentRadius());
 }
 
+float Radar2D::getSelectedPointSize() const
+{
+	return getPointSize() * 1.5;
+}
+
 void Radar2D::renderOpenGL()
 {
 	jassert(OpenGLHelpers::isContextActive());
 
 	const float desktopScale = (float)openGLContext.getRenderingScale();
 
-	OpenGLHelpers::clear(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
-
+	OpenGLHelpers::clear(radarColors->getRadarBackground());
 	ScopedPointer<LowLevelGraphicsContext> glRenderer(createOpenGLGraphicsContext(openGLContext,
 		roundToInt(desktopScale * getWidth()),
 		roundToInt(desktopScale * getHeight())));
@@ -108,31 +116,33 @@ void Radar2D::renderOpenGL()
 		Graphics g(*glRenderer);
 		g.addTransform(AffineTransform::scale(desktopScale));
 
-
-		g.setColour(Colours::grey);
+		g.setColour(radarColors->getRadarLineColor());
 		g.drawRect(radarViewport, 1);   // draw an outline around the component
-
-		g.setColour(Colours::white);
-		g.setFont(14.0f);
 
 		if (radarUpdated)
 			createRadarBackground();
 
 		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
 
-		for (AmbiPoint point : *pAmbiPoints)
+		for (int i = 0; i < pAmbiPoints->size(); i++)
 		{
-			g.setColour(trackColors.getColor(point.getColorIndex()));
+			AmbiPoint point = pAmbiPoints->getReference(i);
+
 			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
-			Rectangle<float> rect(
-				screenPt.getX() - getPointSize() / 2,
-				screenPt.getY() - getPointSize() / 2,
-				getPointSize(),
-				getPointSize());
-			g.fillEllipse(rect);
+			if(i == *pSelectedPointIndex)
+			{
+				g.setColour(radarColors->getPointSelectionColor());
+				Rectangle<float> rect(getSelectedPointSize(), getSelectedPointSize());
+				g.fillEllipse(rect.withCentre(screenPt));
+			}
+			g.setColour(trackColors.getColor(point.getColorIndex()));
+			Rectangle<float> rect(getPointSize(), getPointSize());
+			g.fillEllipse(rect.withCentre(screenPt));
+			g.drawSingleLineText(point.getName(), screenPt.getX() + getPointSize(), screenPt.getY() - getPointSize());
 		}
 
-		g.drawText(infoString, 0, 0, 100, 30, Justification::topLeft);
+		g.setColour(radarColors->getInfoTextColor());
+		g.drawText(infoString, radarViewport.getX(), radarViewport.getY(), radarViewport.getWidth(), 30, Justification::topLeft);
 	}
 }
 
@@ -146,7 +156,8 @@ void Radar2D::openGLContextClosing()
 
 void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 {
-	radarUpdated = true;
+	if(source == pZoomSettings)
+		radarUpdated = true;
 }
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
@@ -155,7 +166,7 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 
 	Point<float> convertedPoint(
 		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
-		float(valuePoint.getY() - currentViewValueRect.getY()) / currentViewValueRect.getHeight() * radarViewport.getHeight());
+		radarViewport.getHeight() - float(valuePoint.getY() - currentViewValueRect.getY()) / currentViewValueRect.getHeight() * radarViewport.getHeight());
 	
 	return convertedPoint;
 }
@@ -166,9 +177,14 @@ Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relative
 
 	Point<float> convertedPoint(
 		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
-		float(relativeScreenPoint.getY() / radarViewport.getHeight() * currentViewValueRect.getHeight()) + currentViewValueRect.getY());
+		float((radarViewport.getHeight() - relativeScreenPoint.getY()) / radarViewport.getHeight() * currentViewValueRect.getHeight()) + currentViewValueRect.getY());
 
 	return convertedPoint;
+}
+
+Point<float> Radar2D::getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const
+{
+	return getValuePointFromRelativeScreenPoint(absoluteScreenPoint - radarViewport.getTopLeft().toFloat());
 }
 
 void Radar2D::resized()
@@ -202,14 +218,14 @@ void Radar2D::mouseExit(const MouseEvent& e)
 	infoString = "";
 }
 
-double Radar2D::getMinPointSelectionDist() const
+double Radar2D::getMaxPointSelectionDist() const
 {
-	return 20.0;
+	return pZoomSettings->getCurrentRadius()/20.0;
 }
 
 void Radar2D::mouseDown(const MouseEvent& e)
 {
-	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
+	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
 	if (e.mods.isShiftDown())
 	{
@@ -229,16 +245,21 @@ void Radar2D::mouseDown(const MouseEvent& e)
 				minDistIndex = i;
 			}
 		}
-		if (minDistIndex >= 0 && minDist < getMinPointSelectionDist())
+		if (minDistIndex >= 0 && minDist < getMaxPointSelectionDist())
 		{
-			selectedPoint = &pAmbiPoints->getReference(minDistIndex);
+			*pSelectedPointIndex = minDistIndex;
+		}
+		else
+		{
+			*pSelectedPointIndex = -1;
 		}
 	}
 }
 
 void Radar2D::mouseDrag(const MouseEvent& e)
 {
-	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
+	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
+	showCoordinates(valuePoint);
 
 	if(e.mods.isShiftDown())
 	{
@@ -246,15 +267,16 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
-		if (selectedPoint != nullptr)
+		int pointSelection = *pSelectedPointIndex;
+		if (pointSelection >= 0 && pointSelection < pAmbiPoints->size())
 		{
 			switch (radarMode)
 			{
 			case XY:
-				selectedPoint->getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
+				pAmbiPoints->getReference(pointSelection).getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
 				break;
 			case ZY:
-				selectedPoint->getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
+				pAmbiPoints->getReference(pointSelection).getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
 				break;
 			}
 		}
@@ -263,9 +285,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
 void Radar2D::mouseUp(const MouseEvent& e)
 {
-	selectedPoint = nullptr;
-
-	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
+	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
 	if(e.mods.isShiftDown() && !e.mouseWasDraggedSinceMouseDown())
 	{
@@ -289,15 +309,30 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
 {
-	Point<float> valuePoint = getValuePointFromRelativeScreenPoint(e.getPosition().toFloat() - radarViewport.getTopLeft().toFloat());
+	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
 	// add new point
 	switch (radarMode) {
 	case XY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), pAmbiPoints->size()));
+		pAmbiPoints->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pAmbiPoints->size()), pAmbiPoints->size()));
 		break;
 	case ZY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), pAmbiPoints->size()));
+		pAmbiPoints->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pAmbiPoints->size()), pAmbiPoints->size()));
 		break;
 	}
+
+	// select added point
+	*pSelectedPointIndex = pAmbiPoints->size() - 1;
+}
+
+void Radar2D::showCoordinates(const Point<float>& point)
+{
+	String str;
+	str << String(point.getX(), 2) << "; " << String(point.getY(), 2);
+	infoString = str;
+}
+
+void Radar2D::mouseMove(const MouseEvent& e)
+{
+	showCoordinates(getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat()));
 }
