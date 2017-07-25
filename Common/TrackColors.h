@@ -27,7 +27,7 @@ public:
 		trackColors.add(Colours::darkblue);
 		trackColors.add(Colours::darkgrey);
 		trackColors.add(Colours::darkorange);
-		trackColors.add(Colours::lightgrey);
+		trackColors.add(Colours::darkgrey);
 		trackColors.add(Colours::green);
 	}
 
