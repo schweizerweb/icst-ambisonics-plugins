@@ -32,7 +32,4 @@ private:
 	
 	float initialRadius;
 	float currentRadius;
-
-	
-	
 };

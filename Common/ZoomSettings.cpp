@@ -20,8 +20,16 @@ ZoomSettings::ZoomSettings() :
 
 Rectangle<float> ZoomSettings::getVisibleArea(bool isZY)
 {
-	Point<float> projectedPoint(currentCenterPoint.getY(), isZY ? currentCenterPoint.getZ() : currentCenterPoint.getX());
-	return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY() - currentRadius, 2 * currentRadius, isZY ? currentRadius : 2 * currentRadius);
+	if(isZY)
+	{
+		Point<float> projectedPoint(currentCenterPoint.getY(), currentCenterPoint.getZ());
+		return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY(), 2 * currentRadius, currentRadius);
+	}
+	else
+	{
+		Point<float> projectedPoint(currentCenterPoint.getY(), currentCenterPoint.getX());
+		return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY() - currentRadius, 2 * currentRadius, 2 * currentRadius);
+	}
 }
 
 Point3D<float> ZoomSettings::getInitialCenterPoint() const
