@@ -32,24 +32,11 @@ RadarComponent::RadarComponent (Array<AmbiPoint>* pAmbiPointArray)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (labelCoordinatesXYZ = new Label ("coordinatesXYZ",
-                                                        TRANS("X: - ; Y: - ; Z: -")));
-    labelCoordinatesXYZ->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelCoordinatesXYZ->setJustificationType (Justification::centredLeft);
-    labelCoordinatesXYZ->setEditable (false, false, false);
-    labelCoordinatesXYZ->setColour (TextEditor::textColourId, Colours::black);
-    labelCoordinatesXYZ->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    addAndMakeVisible (labelCoordinatesAED = new Label ("coordinatesAED",
-                                                        TRANS("A: - ; E: - ; D: -")));
-    labelCoordinatesAED->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelCoordinatesAED->setJustificationType (Justification::centredLeft);
-    labelCoordinatesAED->setEditable (false, false, false);
-    labelCoordinatesAED->setColour (TextEditor::textColourId, Colours::black);
-    labelCoordinatesAED->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    addAndMakeVisible (radar = new Radar3D (pAmbiPointArray, &zoomSettings));
+    addAndMakeVisible (radar = new Radar3D (pAmbiPointArray, &zoomSettings, &selectedPointIndex));
     radar->setName ("radar");
+
+    addAndMakeVisible (pointInfo = new PointInfoControl (pAmbiPointArray, &selectedPointIndex));
+    pointInfo->setName ("pointInfo");
 
 
     //[UserPreSize]
@@ -67,9 +54,8 @@ RadarComponent::~RadarComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    labelCoordinatesXYZ = nullptr;
-    labelCoordinatesAED = nullptr;
     radar = nullptr;
+    pointInfo = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -93,9 +79,8 @@ void RadarComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    labelCoordinatesXYZ->setBounds (0, -8, 150, 24);
-    labelCoordinatesAED->setBounds (0, 8, 150, 24);
-    radar->setBounds (0, 8 + 24, proportionOfWidth (1.0000f), getHeight() - 32);
+    radar->setBounds (0, 0 + 140, proportionOfWidth (1.0000f), getHeight() - 140);
+    pointInfo->setBounds (0, 0, proportionOfWidth (1.0000f), 140);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -120,19 +105,12 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <LABEL name="coordinatesXYZ" id="eb2d4e80735ade2e" memberName="labelCoordinatesXYZ"
-         virtualName="" explicitFocusOrder="0" pos="0 -8 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="X: - ; Y: - ; Z: -" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
-  <LABEL name="coordinatesAED" id="dba7ee2a2153b8cf" memberName="labelCoordinatesAED"
-         virtualName="" explicitFocusOrder="0" pos="0 8 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="A: - ; E: - ; D: -" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 100% 32M" posRelativeY="dba7ee2a2153b8cf"
-                    class="Radar3D" params="pAmbiPointArray, &amp;zoomSettings"/>
+                    explicitFocusOrder="0" pos="0 0R 100% 140M" posRelativeY="328b0557e3704175"
+                    class="Radar3D" params="pAmbiPointArray, &amp;zoomSettings, &amp;selectedPointIndex"/>
+  <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
+                    virtualName="" explicitFocusOrder="0" pos="0 0 100% 140" class="PointInfoControl"
+                    params="pAmbiPointArray, &amp;selectedPointIndex"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

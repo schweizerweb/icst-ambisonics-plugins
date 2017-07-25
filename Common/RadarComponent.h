@@ -24,6 +24,8 @@
 #include "AmbiPoint.h"
 #include "Radar3D.h"
 #include "ZoomSettings.h"
+#include "PointInfoControl.h"
+
 //[/Headers]
 
 
@@ -55,12 +57,12 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     ZoomSettings zoomSettings;
+	int selectedPointIndex;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Label> labelCoordinatesXYZ;
-    ScopedPointer<Label> labelCoordinatesAED;
     ScopedPointer<Radar3D> radar;
+    ScopedPointer<PointInfoControl> pointInfo;
 
 
     //==============================================================================
