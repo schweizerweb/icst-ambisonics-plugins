@@ -16,14 +16,15 @@
 class AmbiPoint
 {
 public:
-	AmbiPoint()
+	AmbiPoint(): colorIndex(0)
 	{
-
 	}
-	AmbiPoint(Point3D<double> pt, int colorInd = 0)
+
+	AmbiPoint(Point3D<double> point, String name, int colorIndex = 0) : 
+		point(point),
+		name(name),
+		colorIndex(colorIndex)
 	{
-		point = pt;
-		colorIndex = colorInd;
 	}
 
 	Point3D<double>* getPoint()
@@ -31,14 +32,25 @@ public:
 		return &point;
 	}
 
-	int getColorIndex()
+	int getColorIndex() const
 	{
 		return colorIndex;
+	}
+
+	String getName() const
+	{
+		return name;
+	}
+
+	void setName(String newName)
+	{
+		name = newName;
 	}
 
 private:
 	Point3D<double> point;
 	int colorIndex;
+	String name;
 };
 
 
