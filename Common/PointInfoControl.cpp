@@ -265,7 +265,7 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonAdd)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", pSpeakerArray->size()));
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
 		pPointSelection->selectPoint(pSpeakerArray->size()-1);
         //[/UserButtonCode_buttonAdd]
     }

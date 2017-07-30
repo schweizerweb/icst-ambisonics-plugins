@@ -347,10 +347,10 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	// add new point
 	switch (radarMode) {
 	case XY:
-		pSpeakerArray->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pSpeakerArray->size()), pSpeakerArray->size()));
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pSpeakerArray->size()), 0));
 		break;
 	case ZY:
-		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pSpeakerArray->size()), pSpeakerArray->size()));
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pSpeakerArray->size()), 0));
 		break;
 	}
 

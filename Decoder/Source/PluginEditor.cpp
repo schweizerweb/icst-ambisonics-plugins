@@ -152,7 +152,7 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 			if (nbChannels == 2)
 			{
 				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
-				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
+				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 0));
 			}
 			else
 			{
@@ -160,7 +160,7 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
 				for (int i = 0; i < nbChannels; i++)
 				{
-					pSpeakerArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
+					pSpeakerArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), 0));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
