@@ -42,7 +42,7 @@ class PointInfoControl  : public Component,
 {
 public:
     //==============================================================================
-    PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection);
+    PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection);
     ~PointInfoControl();
 
     //==============================================================================
@@ -63,7 +63,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	Array<AmbiPoint>* pAmbiPointArray;
+	Array<AmbiPoint>* pSpeakerArray;
 	PointSelection* pPointSelection;
     //[/UserVariables]
 

@@ -13,8 +13,8 @@
 #include "TrackColors.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pAmbiPointArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection):
-	pAmbiPoints(pAmbiPointArray), 
+Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pSpeakerArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection):
+	pSpeakerArray(pSpeakerArray),
 	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
 	pPointSelection(pPointSelection)
@@ -130,9 +130,9 @@ void Radar2D::renderOpenGL()
 
 		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
 
-		for (int i = 0; i < pAmbiPoints->size(); i++)
+		for (int i = 0; i < pSpeakerArray->size(); i++)
 		{
-			AmbiPoint point = pAmbiPoints->getReference(i);
+			AmbiPoint point = pSpeakerArray->getReference(i);
 
 			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
 			if(i == pPointSelection->getSelectedPointIndex())
@@ -244,9 +244,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	{
 		double minDist = DBL_MAX;
 		int minDistIndex = -1;
-		for (int i = 0; i < pAmbiPoints->size(); i++)
+		for (int i = 0; i < pSpeakerArray->size(); i++)
 		{
-			AmbiPoint pt = pAmbiPoints->getReference(i);
+			AmbiPoint pt = pSpeakerArray->getReference(i);
 			double dist;
 			if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt.getPoint()).toFloat())) < minDist)
 			{
@@ -278,15 +278,15 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	else
 	{
 		int pointSelection = pPointSelection->getSelectedPointIndex();
-		if (pointSelection >= 0 && pointSelection < pAmbiPoints->size())
+		if (pointSelection >= 0 && pointSelection < pSpeakerArray->size())
 		{
 			switch (radarMode)
 			{
 			case XY:
-				pAmbiPoints->getReference(pointSelection).getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
+				pSpeakerArray->getReference(pointSelection).getPoint()->setXY(valuePoint.getY(), valuePoint.getX());
 				break;
 			case ZY:
-				pAmbiPoints->getReference(pointSelection).getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
+				pSpeakerArray->getReference(pointSelection).getPoint()->setYZ(valuePoint.getX(), valuePoint.getY());
 				break;
 			}
 			pPointSelection->notifyChange();
@@ -330,15 +330,15 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	// add new point
 	switch (radarMode) {
 	case XY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pAmbiPoints->size()), pAmbiPoints->size()));
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pSpeakerArray->size()), pSpeakerArray->size()));
 		break;
 	case ZY:
-		pAmbiPoints->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pAmbiPoints->size()), pAmbiPoints->size()));
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pSpeakerArray->size()), pSpeakerArray->size()));
 		break;
 	}
 
 	// select added point
-	pPointSelection->selectPoint(pAmbiPoints->size() - 1);
+	pPointSelection->selectPoint(pSpeakerArray->size() - 1);
 }
 
 void Radar2D::showCoordinates(const Point<float>& point)

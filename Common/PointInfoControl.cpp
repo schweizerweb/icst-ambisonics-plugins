@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection)
-    : pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)
+PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection)
+    : pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -265,18 +265,18 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonAdd)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", pAmbiPointArray->size()));
-		pPointSelection->selectPoint(pAmbiPointArray->size()-1);
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", pSpeakerArray->size()));
+		pPointSelection->selectPoint(pSpeakerArray->size()-1);
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove)
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if (selection >= 0 && selection < pAmbiPointArray->size())
+		if (selection >= 0 && selection < pSpeakerArray->size())
 		{
 			pPointSelection->unselectPoint();
-			pAmbiPointArray->remove(selection);
+			pSpeakerArray->remove(selection);
 		}
         //[/UserButtonCode_buttonRemove]
     }
@@ -293,9 +293,9 @@ void PointInfoControl::updateSelectedPoint()
 	disableListeners();
 
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection >= 0 && selection < pAmbiPointArray->size())
+	if (selection >= 0 && selection < pSpeakerArray->size())
 	{
-		AmbiPoint point = pAmbiPointArray->getReference(selection);
+		AmbiPoint point = pSpeakerArray->getReference(selection);
 
 		setFieldsEnabled(true);
 		textName->setText(point.getName());
@@ -330,38 +330,38 @@ void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
 void PointInfoControl::textEditorTextChanged(TextEditor& source)
 {
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection < 0 || selection >= pAmbiPointArray->size())
+	if (selection < 0 || selection >= pSpeakerArray->size())
 		return;
 
 	if (source.getName() == textName->getName())
 	{
-		pAmbiPointArray->getReference(selection).setName(textName->getText());
+		pSpeakerArray->getReference(selection).setName(textName->getText());
 	}
 
 	if (source.getName() == textX->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
 	}
 	if (source.getName() == textY->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
 	}
 	if (source.getName() == textZ->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
 	}
 
 	if (source.getName() == textA->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setAzimuth(textA->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setAzimuth(textA->getText().getFloatValue());
 	}
 	if (source.getName() == textE->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setElevation(textE->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setElevation(textE->getText().getFloatValue());
 	}
 	if (source.getName() == textD->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
 	}
 }
 
@@ -411,8 +411,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditorListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, PointSelection* pPointSelection"
-                 variableInitialisers="pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, PointSelection* pPointSelection"
+                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="140">
   <BACKGROUND backgroundColour="ff323e44"/>

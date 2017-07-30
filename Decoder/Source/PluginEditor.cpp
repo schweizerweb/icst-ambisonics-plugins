@@ -31,7 +31,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	pAmbiPointArray = ownerProc.getAmbiPointArray();
+	pSpeakerArray = ownerProc.getSpeakerArray();
     //[/Constructor_pre]
 
     addAndMakeVisible (comboBoxChannelConfig = new ComboBox ("channelConfig"));
@@ -45,7 +45,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     comboBoxChannelConfig->addItem (TRANS("8"), 4);
     comboBoxChannelConfig->addListener (this);
 
-    addAndMakeVisible (component = new RadarComponent (pAmbiPointArray));
+    addAndMakeVisible (component = new RadarComponent (pSpeakerArray));
     component->setName ("new component");
 
     addAndMakeVisible (label = new Label ("new label",
@@ -147,11 +147,11 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 		{
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
 
-			pAmbiPointArray->clear();
+			pSpeakerArray->clear();
 			if (nbChannels == 2)
 			{
-				pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
-				pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
+				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
+				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
 			}
 			else
 			{
@@ -159,7 +159,7 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
 				for (int i = 0; i < nbChannels; i++)
 				{
-					pAmbiPointArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
+					pSpeakerArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
@@ -200,7 +200,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 		{
 			PresetInfo* preset = new PresetInfo();
 			preset->setName(fileChooser->getResult().getFileNameWithoutExtension());
-			for (AmbiPoint pt : *pAmbiPointArray)
+			for (AmbiPoint pt : *pSpeakerArray)
 				preset->getPoints()->add(new AmbiPoint(pt));
 
 			preset->SaveToFile(fileChooser->getResult());
@@ -224,10 +224,10 @@ void AmbisonicsDecoderAudioProcessorEditor::timerCallback()
 }
 void AmbisonicsDecoderAudioProcessorEditor::loadPreset(PresetInfo* preset) const
 {
-	pAmbiPointArray->clear();
+	pSpeakerArray->clear();
 	for(AmbiPoint* pt : *preset->getPoints())
 	{
-		pAmbiPointArray->add(AmbiPoint(*pt));
+		pSpeakerArray->add(AmbiPoint(*pt));
 	}
 }
 
@@ -246,7 +246,7 @@ void AmbisonicsDecoderAudioProcessorEditor::updateComboBox(String elementToSelec
 	comboBoxChannelConfig->addItem("16", i++);
 	comboBoxChannelConfig->addItem("32", i++);
 
-	for(int i = 0; i < comboBoxChannelConfig->getNumItems(); i++)
+	for(i = 0; i < comboBoxChannelConfig->getNumItems(); i++)
 	{
 		if(comboBoxChannelConfig->getItemText(i) == elementToSelect)
 		{
@@ -281,7 +281,7 @@ BEGIN_JUCER_METADATA
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
-                    params="pAmbiPointArray"/>
+                    params="pSpeakerArray"/>
   <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="8 8 112 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
