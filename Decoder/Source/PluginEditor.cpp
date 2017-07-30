@@ -21,6 +21,7 @@
 //[/Headers]
 
 #include "PluginEditor.h"
+#include "PresetInfo.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -56,6 +57,14 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     label->setColour (TextEditor::textColourId, Colours::black);
     label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (buttonLoad = new TextButton ("buttonLoad"));
+    buttonLoad->setButtonText (TRANS("load"));
+    buttonLoad->addListener (this);
+
+    addAndMakeVisible (buttonSave = new TextButton ("buttonSave"));
+    buttonSave->setButtonText (TRANS("save"));
+    buttonSave->addListener (this);
+
 
     //[UserPreSize]
 	setResizable(true, true);
@@ -66,6 +75,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	startTimer(200);//starts timer with interval of 200mS
+	updateComboBox();
     //[/Constructor]
 }
 
@@ -77,6 +87,8 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     comboBoxChannelConfig = nullptr;
     component = nullptr;
     label = nullptr;
+    buttonLoad = nullptr;
+    buttonSave = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -103,6 +115,8 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     comboBoxChannelConfig->setBounds (88, 8, 192, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
     label->setBounds (8, 8, 112, 24);
+    buttonLoad->setBounds (288, 8, 88, 24);
+    buttonSave->setBounds (384, 8, 88, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -115,22 +129,40 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
     if (comboBoxThatHasChanged == comboBoxChannelConfig)
     {
         //[UserComboBoxCode_comboBoxChannelConfig] -- add your combo box handling code here..
-		int nbChannels = comboBoxChannelConfig->getText().getIntValue();
-
-		pAmbiPointArray->clear();
-		if(nbChannels == 2)
+		String presetName = comboBoxChannelConfig->getText();
+    	PresetInfo* namedPreset = nullptr;
+    	for(PresetInfo* info : presets)
 		{
-			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
-			pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
-		}
-		else
-		{
-			Point<float> projectedPoint(1.0, 0.0);
-			projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
-			for(int i = 0; i < nbChannels; i++)
+			if(info->getName() == presetName)
 			{
-				pAmbiPointArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
-				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
+				namedPreset = info;
+				break;
+			}
+		}
+    	
+		if(namedPreset != nullptr)
+		{
+			loadPreset(namedPreset);
+		}
+		else 
+		{
+			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
+
+			pAmbiPointArray->clear();
+			if (nbChannels == 2)
+			{
+				pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
+				pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 1));
+			}
+			else
+			{
+				Point<float> projectedPoint(1.0, 0.0);
+				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
+				for (int i = 0; i < nbChannels; i++)
+				{
+					pAmbiPointArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i), i));
+					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
+				}
 			}
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
@@ -140,6 +172,50 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
     //[/UsercomboBoxChanged_Post]
 }
 
+void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == buttonLoad)
+    {
+        //[UserButtonCode_buttonLoad] -- add your button handler code here..
+		ScopedPointer<FileChooser> fileChooser = new FileChooser("Load Preset", File(), "*.xml");
+		if(fileChooser->browseForFileToOpen())
+		{
+			PresetInfo* preset = new PresetInfo();
+			if (preset->LoadFromFile(fileChooser->getResult()))
+			{
+				loadPreset(preset);
+				presets.add(preset);
+				updateComboBox(preset->getName());
+			}
+		}
+        //[/UserButtonCode_buttonLoad]
+    }
+    else if (buttonThatWasClicked == buttonSave)
+    {
+        //[UserButtonCode_buttonSave] -- add your button handler code here..
+		ScopedPointer<FileChooser> fileChooser = new FileChooser("Save Preset", File(), "*.xml");
+		if (fileChooser->browseForFileToSave(true))
+		{
+			PresetInfo* preset = new PresetInfo();
+			preset->setName(fileChooser->getResult().getFileNameWithoutExtension());
+			for (AmbiPoint pt : *pAmbiPointArray)
+				preset->getPoints()->add(new AmbiPoint(pt));
+
+			preset->SaveToFile(fileChooser->getResult());
+
+			presets.add(preset);
+			updateComboBox(preset->getName());
+		}
+		//[/UserButtonCode_buttonSave]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -147,6 +223,40 @@ void AmbisonicsDecoderAudioProcessorEditor::timerCallback()
 {
 	//if you want any display updates with a refresh timer add them here
 }
+void AmbisonicsDecoderAudioProcessorEditor::loadPreset(PresetInfo* preset) const
+{
+	pAmbiPointArray->clear();
+	for(AmbiPoint* pt : *preset->getPoints())
+	{
+		pAmbiPointArray->add(AmbiPoint(*pt));
+	}
+}
+
+void AmbisonicsDecoderAudioProcessorEditor::updateComboBox(String elementToSelect)
+{
+	comboBoxChannelConfig->clear();
+	int i = 1;
+	for (PresetInfo* preset : presets)
+	{
+		comboBoxChannelConfig->addItem(preset->getName(), i++);
+	}
+	comboBoxChannelConfig->addItem("2", i++);
+	comboBoxChannelConfig->addItem("4", i++);
+	comboBoxChannelConfig->addItem("6", i++);
+	comboBoxChannelConfig->addItem("8", i++);
+	comboBoxChannelConfig->addItem("16", i++);
+	comboBoxChannelConfig->addItem("32", i++);
+
+	for(int i = 0; i < comboBoxChannelConfig->getNumItems(); i++)
+	{
+		if(comboBoxChannelConfig->getItemText(i) == elementToSelect)
+		{
+			comboBoxChannelConfig->setSelectedItemIndex(i);
+			break;
+		}
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -178,6 +288,12 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
+              virtualName="" explicitFocusOrder="0" pos="288 8 88 24" buttonText="load"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
+              virtualName="" explicitFocusOrder="0" pos="384 8 88 24" buttonText="save"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

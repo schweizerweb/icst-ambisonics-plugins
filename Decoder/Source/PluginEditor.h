@@ -23,6 +23,8 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "PluginProcessor.h"
 #include "../../Common/RadarComponent.h"
+#include "PresetInfo.h"
+
 //[/Headers]
 
 
@@ -37,7 +39,8 @@
 */
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
                                                public Timer,
-                                               public ComboBoxListener
+                                               public ComboBoxListener,
+                                               public ButtonListener
 {
 public:
     //==============================================================================
@@ -47,25 +50,28 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void timerCallback() override;
-    //[/UserMethods]
+	void loadPreset(PresetInfo* preset) const;
+	void updateComboBox(String elementToSelect = String::empty);
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-
-
+	void buttonClicked (Button* buttonThatWasClicked) override;
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& processor;
 	Array<AmbiPoint>* pAmbiPointArray;
-    //[/UserVariables]
+	OwnedArray<PresetInfo> presets;
+	//[/UserVariables]
 
     //==============================================================================
     ScopedPointer<ComboBox> comboBoxChannelConfig;
     ScopedPointer<RadarComponent> component;
     ScopedPointer<Label> label;
-
+    ScopedPointer<TextButton> buttonLoad;
+    ScopedPointer<TextButton> buttonSave;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
