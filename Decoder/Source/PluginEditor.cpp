@@ -21,7 +21,6 @@
 //[/Headers]
 
 #include "PluginEditor.h"
-#include "PresetInfo.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -115,8 +114,8 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     comboBoxChannelConfig->setBounds (88, 8, 192, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
     label->setBounds (8, 8, 112, 24);
-    buttonLoad->setBounds (288, 8, 88, 24);
-    buttonSave->setBounds (384, 8, 88, 24);
+    buttonLoad->setBounds (288, 8, 40, 24);
+    buttonSave->setBounds (336, 8, 40, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -139,12 +138,12 @@ void AmbisonicsDecoderAudioProcessorEditor::comboBoxChanged (ComboBox* comboBoxT
 				break;
 			}
 		}
-    	
+
 		if(namedPreset != nullptr)
 		{
 			loadPreset(namedPreset);
 		}
-		else 
+		else
 		{
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
 
@@ -209,7 +208,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 			presets.add(preset);
 			updateComboBox(preset->getName());
 		}
-		//[/UserButtonCode_buttonSave]
+        //[/UserButtonCode_buttonSave]
     }
 
     //[UserbuttonClicked_Post]
@@ -289,10 +288,10 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
-              virtualName="" explicitFocusOrder="0" pos="288 8 88 24" buttonText="load"
+              virtualName="" explicitFocusOrder="0" pos="288 8 40 24" buttonText="load"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="384 8 88 24" buttonText="save"
+              virtualName="" explicitFocusOrder="0" pos="336 8 40 24" buttonText="save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

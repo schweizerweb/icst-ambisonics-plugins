@@ -52,19 +52,21 @@ public:
 	void timerCallback() override;
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty);
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-	void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
+
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& processor;
 	Array<AmbiPoint>* pAmbiPointArray;
 	OwnedArray<PresetInfo> presets;
-	//[/UserVariables]
+    //[/UserVariables]
 
     //==============================================================================
     ScopedPointer<ComboBox> comboBoxChannelConfig;
@@ -72,6 +74,7 @@ private:
     ScopedPointer<Label> label;
     ScopedPointer<TextButton> buttonLoad;
     ScopedPointer<TextButton> buttonSave;
+
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
