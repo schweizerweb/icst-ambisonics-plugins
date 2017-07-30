@@ -178,6 +178,11 @@ Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const
 	return pSpeakerArray;
 }
 
+Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
+{
+	return pMovingPointsArray;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

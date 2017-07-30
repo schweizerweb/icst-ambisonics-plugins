@@ -13,8 +13,9 @@
 #include "TrackColors.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pSpeakerArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection):
+Radar2D::Radar2D(RadarMode mode, Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection):
 	pSpeakerArray(pSpeakerArray),
+	pMovingPointsArray(pMovingPointsArray),
 	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
 	pPointSelection(pPointSelection)
@@ -53,7 +54,12 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 	return getRelativeScreenPoint(valuePoint) + radarViewport.getTopLeft().toFloat();
 }
 
-float Radar2D::getPointSize() const
+float Radar2D::getSpeakerPointSize() const
+{
+	return radarViewport.getWidth() / 30.0f;
+}
+
+float Radar2D::getMovingPointSize() const
 {
 	return radarViewport.getWidth() / 50.0f;
 }
@@ -102,7 +108,7 @@ float Radar2D::getValueToScreenRatio() const
 
 float Radar2D::getSelectedPointSize() const
 {
-	return getPointSize() * 1.5f;
+	return getSpeakerPointSize() * 1.5f;
 }
 
 void Radar2D::renderOpenGL()
@@ -142,9 +148,20 @@ void Radar2D::renderOpenGL()
 				g.fillEllipse(rect.withCentre(screenPt));
 			}
 			g.setColour(trackColors.getColor(point.getColorIndex()));
-			Rectangle<float> rect(getPointSize(), getPointSize());
+			Rectangle<float> rect(getSpeakerPointSize(), getSpeakerPointSize());
 			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getPointSize()/2), int(screenPt.getY() - getPointSize()/2));
+			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getSpeakerPointSize()/2), int(screenPt.getY() - getSpeakerPointSize()/2));
+		}
+
+		for (int i = 0; i < pMovingPointsArray->size(); i++)
+		{
+			AmbiPoint point = pMovingPointsArray->getReference(i);
+
+			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
+			g.setColour(trackColors.getColor(point.getColorIndex()));
+			Rectangle<float> rect(getMovingPointSize(), getMovingPointSize());
+			g.fillEllipse(rect.withCentre(screenPt));
+			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getMovingPointSize() / 2), int(screenPt.getY() - getMovingPointSize() / 2));
 		}
 
 		g.setColour(radarColors->getInfoTextColor());

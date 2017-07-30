@@ -65,6 +65,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& processor;
 	Array<AmbiPoint>* pSpeakerArray;
+	Array<AmbiPoint>* pMovingPointsArray;
 	OwnedArray<PresetInfo> presets;
     //[/UserVariables]
 

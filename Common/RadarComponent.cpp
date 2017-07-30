@@ -27,12 +27,12 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-RadarComponent::RadarComponent (Array<AmbiPoint>* pSpeakerArray)
+RadarComponent::RadarComponent (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (radar = new Radar3D (pSpeakerArray, &zoomSettings, &pointSelection));
+    addAndMakeVisible (radar = new Radar3D (pSpeakerArray, pMovingPointsArray, &zoomSettings, &pointSelection));
     radar->setName ("radar");
 
     addAndMakeVisible (pointInfo = new PointInfoControl (pSpeakerArray, &pointSelection));
@@ -101,13 +101,13 @@ void RadarComponent::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray"
+                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, Array&lt;AmbiPoint&gt;* pMovingPointsArray"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
                     explicitFocusOrder="0" pos="0 0R 100% 140M" posRelativeY="328b0557e3704175"
-                    class="Radar3D" params="pSpeakerArray, &amp;zoomSettings, &amp;pointSelection"/>
+                    class="Radar3D" params="pSpeakerArray, pMovingPointsArray, &amp;zoomSettings, &amp;pointSelection"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
                     virtualName="" explicitFocusOrder="0" pos="0 0 100% 140" class="PointInfoControl"
                     params="pSpeakerArray, &amp;pointSelection"/>

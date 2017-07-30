@@ -32,6 +32,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	pSpeakerArray = ownerProc.getSpeakerArray();
+	pMovingPointsArray = ownerProc.getMovingPointsArray();
     //[/Constructor_pre]
 
     addAndMakeVisible (comboBoxChannelConfig = new ComboBox ("channelConfig"));
@@ -45,7 +46,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     comboBoxChannelConfig->addItem (TRANS("8"), 4);
     comboBoxChannelConfig->addListener (this);
 
-    addAndMakeVisible (component = new RadarComponent (pSpeakerArray));
+    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray));
     component->setName ("new component");
 
     addAndMakeVisible (label = new Label ("new label",
@@ -281,7 +282,7 @@ BEGIN_JUCER_METADATA
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
-                    params="pSpeakerArray"/>
+                    params="pSpeakerArray, pMovingPointsArray"/>
   <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="8 8 112 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"

@@ -58,9 +58,11 @@ public:
 
 	// ambsonic specific
 	Array<AmbiPoint>* getSpeakerArray() const;
+	Array<AmbiPoint>* getMovingPointsArray() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
+	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)
