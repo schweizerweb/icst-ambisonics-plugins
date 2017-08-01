@@ -14,6 +14,8 @@
               jucerVersion="5.0.2" companyName="ZHdK">
   <MAINGROUP id="oa5A98" name="Ambisonics Decoder">
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
+      <FILE id="eFp2Lr" name="OSCHandler.cpp" compile="1" resource="0" file="Source/OSCHandler.cpp"/>
+      <FILE id="dADHh1" name="OSCHandler.h" compile="0" resource="0" file="Source/OSCHandler.h"/>
       <FILE id="SbImea" name="PresetInfo.cpp" compile="1" resource="0" file="Source/PresetInfo.cpp"/>
       <FILE id="fhc3q5" name="PresetInfo.h" compile="0" resource="0" file="Source/PresetInfo.h"/>
       <FILE id="kamJfG" name="PluginProcessor.cpp" compile="1" resource="0"

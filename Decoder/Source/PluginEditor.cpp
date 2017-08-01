@@ -33,6 +33,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     //[Constructor_pre] You can add your own custom stuff here..
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
+	oscHandler = new OSCHandler(pMovingPointsArray);
+	if(!oscHandler->start())
+	{
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "OSC", "Error starting OSC-Handler!", "OK");
+	}
     //[/Constructor_pre]
 
     addAndMakeVisible (comboBoxChannelConfig = new ComboBox ("channelConfig"));

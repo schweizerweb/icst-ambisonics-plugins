@@ -27,6 +27,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 {
 	pSpeakerArray = new Array<AmbiPoint>();
 	pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "Demo"));
+
+	pMovingPointsArray = new Array<AmbiPoint>();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()

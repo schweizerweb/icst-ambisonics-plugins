@@ -24,6 +24,7 @@
 #include "PluginProcessor.h"
 #include "../../Common/RadarComponent.h"
 #include "PresetInfo.h"
+#include "OSCHandler.h"
 
 //[/Headers]
 
@@ -67,6 +68,7 @@ private:
 	Array<AmbiPoint>* pSpeakerArray;
 	Array<AmbiPoint>* pMovingPointsArray;
 	OwnedArray<PresetInfo> presets;
+	ScopedPointer<OSCHandler> oscHandler;
     //[/UserVariables]
 
     //==============================================================================
