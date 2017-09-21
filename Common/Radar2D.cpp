@@ -155,13 +155,13 @@ void Radar2D::renderOpenGL()
 
 		for (int i = 0; i < pMovingPointsArray->size(); i++)
 		{
-			AmbiPoint point = pMovingPointsArray->getReference(i);
+			AmbiPoint* point = &(pMovingPointsArray->getReference(i));
 
-			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
-			g.setColour(trackColors.getColor(point.getColorIndex()));
+			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
+			g.setColour(trackColors.getColor(point->getColorIndex()));
 			Rectangle<float> rect(getMovingPointSize(), getMovingPointSize());
 			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getMovingPointSize() / 2), int(screenPt.getY() - getMovingPointSize() / 2));
+			g.drawSingleLineText(point->getName(), int(screenPt.getX() + getMovingPointSize() / 2), int(screenPt.getY() - getMovingPointSize() / 2));
 		}
 
 		g.setColour(radarColors->getInfoTextColor());
