@@ -254,14 +254,14 @@ public:
 		case 0: // W
 			value = 1.0; 
 			break;
-		case 1: // Y
-			value = SQRT3 * cos(getAzimuth()) * sin(getElevation());
+		case 1: // X
+			value = SQRT3 * cos(getElevation()) * cos(getElevation());
 			break;
-		case 2: // Z
-			value = SQRT3 * sin(getAzimuth());
+		case 2: // Y
+			value = SQRT3 * sin(getAzimuth()) * cos(getElevation());
 			break;
-		case 3: // X
-			value = SQRT3 * cos(getAzimuth()) * cos(getElevation());
+		case 3: // Z
+			value = SQRT3 * sin(getElevation());
 			break;
 		default:
 			return 0;

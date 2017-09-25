@@ -131,6 +131,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
 
+	/*
     // In case we have more outputs than inputs, this code clears any output
     // channels that didn't contain input data, (because these aren't
     // guaranteed to be empty - they may contain garbage).
@@ -148,6 +149,29 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 
         // ..do something to the data...
     }
+	*/
+	AudioSampleBuffer inputBuffer;
+	inputBuffer.makeCopyOf(buffer);
+	const float* inputW = inputBuffer.getReadPointer(0);
+	const float* inputY = inputBuffer.getReadPointer(1);
+	const float* inputZ = inputBuffer.getReadPointer(2);
+	const float* inputX = inputBuffer.getReadPointer(3);
+
+	for(int iSpeaker = 0; iSpeaker < pSpeakerArray->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
+	{
+		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
+		float w = pSpeakerPoint->getAmbisonicsCoefficient(0, false);
+		float y = pSpeakerPoint->getAmbisonicsCoefficient(1, false);
+		float z = pSpeakerPoint->getAmbisonicsCoefficient(2, false);
+		float x = pSpeakerPoint->getAmbisonicsCoefficient(3, false);
+
+		float* channelData = buffer.getWritePointer(iSpeaker);
+
+		for(int i = 0; i < buffer.getNumSamples(); i++)
+		{
+			channelData[i] = inputW[i] * w + inputX[i] * x + inputY[i] * y + inputZ[i] * z;
+		}
+	}
 }
 
 //==============================================================================
