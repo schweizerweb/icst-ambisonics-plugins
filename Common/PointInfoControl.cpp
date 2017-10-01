@@ -288,23 +288,23 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void PointInfoControl::updateSelectedPoint()
+void PointInfoControl::updateSelectedPoint(String exceptField)
 {
 	disableListeners();
 
 	int selection = pPointSelection->getSelectedPointIndex();
 	if (selection >= 0 && selection < pSpeakerArray->size())
 	{
-		AmbiPoint point = pSpeakerArray->getReference(selection);
+		AmbiPoint* point = &(pSpeakerArray->getReference(selection));
 
 		setFieldsEnabled(true);
-		textName->setText(point.getName());
-		textX->setText(String(point.getPoint()->getX(), 3));
-		textY->setText(String(point.getPoint()->getY(), 3));
-		textZ->setText(String(point.getPoint()->getZ(), 3));
-		textA->setText(String(point.getPoint()->getAzimuth(), 3));
-		textE->setText(String(point.getPoint()->getElevation(), 3));
-		textD->setText(String(point.getPoint()->getDistance(), 3));
+		textName->setText(point->getName());
+		if (exceptField != textX->getName()) textX->setText(String(point->getPoint()->getX(), 3));
+		if (exceptField != textY->getName()) textY->setText(String(point->getPoint()->getY(), 3));
+		if (exceptField != textZ->getName()) textZ->setText(String(point->getPoint()->getZ(), 3));
+		if (exceptField != textA->getName()) textA->setText(String(RadToGrad(point->getPoint()->getAzimuth()), 2));
+		if (exceptField != textE->getName()) textE->setText(String(RadToGrad(point->getPoint()->getElevation()), 2));
+		if (exceptField != textD->getName()) textD->setText(String(point->getPoint()->getDistance(), 3));
 	}
 	else
 	{
@@ -353,16 +353,18 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 
 	if (source.getName() == textA->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setAzimuth(textA->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setElevation(textE->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
 		pSpeakerArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
 	}
+
+	updateSelectedPoint(source.getName());
 }
 
 void PointInfoControl::disableListeners()
@@ -397,6 +399,17 @@ void PointInfoControl::setFieldsEnabled(bool enable) const
 	textE->setEnabled(enable);
 	textD->setEnabled(enable);
 }
+
+double PointInfoControl::RadToGrad(double rad) const
+{
+	return rad * 180.0 / PI;
+}
+
+double PointInfoControl::GradToRad(float grad) const
+{
+	return grad * PI / 180.0;
+}
+
 //[/MiscUserCode]
 
 

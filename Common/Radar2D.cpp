@@ -138,19 +138,19 @@ void Radar2D::renderOpenGL()
 
 		for (int i = 0; i < pSpeakerArray->size(); i++)
 		{
-			AmbiPoint point = pSpeakerArray->getReference(i);
+			AmbiPoint* point = &(pSpeakerArray->getReference(i));
 
-			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point.getPoint()).toFloat());
+			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
 			if(i == pPointSelection->getSelectedPointIndex())
 			{
 				g.setColour(radarColors->getPointSelectionColor());
 				Rectangle<float> rect(getSelectedPointSize(), getSelectedPointSize());
 				g.fillEllipse(rect.withCentre(screenPt));
 			}
-			g.setColour(trackColors.getColor(point.getColorIndex()));
+			g.setColour(trackColors.getColor(point->getColorIndex()));
 			Rectangle<float> rect(getSpeakerPointSize(), getSpeakerPointSize());
 			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point.getName(), int(screenPt.getX() + getSpeakerPointSize()/2), int(screenPt.getY() - getSpeakerPointSize()/2));
+			g.drawSingleLineText(point->getName(), int(screenPt.getX() + getSpeakerPointSize()/2), int(screenPt.getY() - getSpeakerPointSize()/2));
 		}
 
 		for (int i = 0; i < pMovingPointsArray->size(); i++)
