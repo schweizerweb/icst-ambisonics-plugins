@@ -297,6 +297,11 @@ private:
 
 	void calculateXyz()
 	{
+		if(distance == 0)
+		{
+			azimuth = 0;
+			elevation = 0;
+		}
 		x = distance * cos(elevation) * cos(azimuth);
 		y = distance * cos(elevation) * sin(azimuth);
 		z = distance * sin(elevation);

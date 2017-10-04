@@ -42,18 +42,20 @@ class PointInfoControl  : public Component,
 {
 public:
     //==============================================================================
-    PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection);
+    PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection);
     ~PointInfoControl();
 
-    //==============================================================================
+	//==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void updateSelectedPoint();
+	void updateSelectedPoint(String exceptField = "");
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	void textEditorTextChanged(TextEditor& source) override;
 	void disableListeners();
 	void enableListeners();
 	void setFieldsEnabled(bool enable) const;
-    //[/UserMethods]
+	double RadToGrad(double rad) const;
+	double GradToRad(float grad) const;
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -63,7 +65,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	Array<AmbiPoint>* pAmbiPointArray;
+	Array<AmbiPoint>* pSpeakerArray;
 	PointSelection* pPointSelection;
     //[/UserVariables]
 

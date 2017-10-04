@@ -25,13 +25,15 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
                        )
 #endif
 {
-	pAmbiPointArray = new Array<AmbiPoint>();
-	pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "Demo"));
+	pSpeakerArray = new Array<AmbiPoint>();
+	pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "Demo"));
+
+	pMovingPointsArray = new Array<AmbiPoint>();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
-	pAmbiPointArray = nullptr;
+	pSpeakerArray = nullptr;
 }
 
 //==============================================================================
@@ -173,9 +175,14 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
     // whose contents will have been created by the getStateInformation() call.
 }
 
-Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getAmbiPointArray() const
+Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const
 {
-	return pAmbiPointArray;
+	return pSpeakerArray;
+}
+
+Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
+{
+	return pMovingPointsArray;
 }
 
 //==============================================================================

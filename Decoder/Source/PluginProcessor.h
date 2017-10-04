@@ -57,10 +57,12 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	// ambsonic specific
-	Array<AmbiPoint>* getAmbiPointArray() const;
+	Array<AmbiPoint>* getSpeakerArray() const;
+	Array<AmbiPoint>* getMovingPointsArray() const;
 
 private:
-	ScopedPointer<Array<AmbiPoint>> pAmbiPointArray;
+	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
+	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)

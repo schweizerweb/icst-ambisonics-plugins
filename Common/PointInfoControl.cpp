@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (Array<AmbiPoint>* pAmbiPointArray, PointSelection* pPointSelection)
-    : pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)
+PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection)
+    : pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -265,18 +265,18 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonAdd)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		pAmbiPointArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", pAmbiPointArray->size()));
-		pPointSelection->selectPoint(pAmbiPointArray->size()-1);
+		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
+		pPointSelection->selectPoint(pSpeakerArray->size()-1);
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove)
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if (selection >= 0 && selection < pAmbiPointArray->size())
+		if (selection >= 0 && selection < pSpeakerArray->size())
 		{
 			pPointSelection->unselectPoint();
-			pAmbiPointArray->remove(selection);
+			pSpeakerArray->remove(selection);
 		}
         //[/UserButtonCode_buttonRemove]
     }
@@ -288,23 +288,23 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void PointInfoControl::updateSelectedPoint()
+void PointInfoControl::updateSelectedPoint(String exceptField)
 {
 	disableListeners();
 
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection >= 0 && selection < pAmbiPointArray->size())
+	if (selection >= 0 && selection < pSpeakerArray->size())
 	{
-		AmbiPoint point = pAmbiPointArray->getReference(selection);
+		AmbiPoint* point = &(pSpeakerArray->getReference(selection));
 
 		setFieldsEnabled(true);
-		textName->setText(point.getName());
-		textX->setText(String(point.getPoint()->getX(), 3));
-		textY->setText(String(point.getPoint()->getY(), 3));
-		textZ->setText(String(point.getPoint()->getZ(), 3));
-		textA->setText(String(point.getPoint()->getAzimuth(), 3));
-		textE->setText(String(point.getPoint()->getElevation(), 3));
-		textD->setText(String(point.getPoint()->getDistance(), 3));
+		textName->setText(point->getName());
+		if (exceptField != textX->getName()) textX->setText(String(point->getPoint()->getX(), 3));
+		if (exceptField != textY->getName()) textY->setText(String(point->getPoint()->getY(), 3));
+		if (exceptField != textZ->getName()) textZ->setText(String(point->getPoint()->getZ(), 3));
+		if (exceptField != textA->getName()) textA->setText(String(RadToGrad(point->getPoint()->getAzimuth()), 2));
+		if (exceptField != textE->getName()) textE->setText(String(RadToGrad(point->getPoint()->getElevation()), 2));
+		if (exceptField != textD->getName()) textD->setText(String(point->getPoint()->getDistance(), 3));
 	}
 	else
 	{
@@ -330,39 +330,41 @@ void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
 void PointInfoControl::textEditorTextChanged(TextEditor& source)
 {
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection < 0 || selection >= pAmbiPointArray->size())
+	if (selection < 0 || selection >= pSpeakerArray->size())
 		return;
 
 	if (source.getName() == textName->getName())
 	{
-		pAmbiPointArray->getReference(selection).setName(textName->getText());
+		pSpeakerArray->getReference(selection).setName(textName->getText());
 	}
 
 	if (source.getName() == textX->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
 	}
 	if (source.getName() == textY->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
 	}
 	if (source.getName() == textZ->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
 	}
 
 	if (source.getName() == textA->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setAzimuth(textA->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setElevation(textE->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
-		pAmbiPointArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
+		pSpeakerArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
 	}
+
+	updateSelectedPoint(source.getName());
 }
 
 void PointInfoControl::disableListeners()
@@ -397,6 +399,17 @@ void PointInfoControl::setFieldsEnabled(bool enable) const
 	textE->setEnabled(enable);
 	textD->setEnabled(enable);
 }
+
+double PointInfoControl::RadToGrad(double rad) const
+{
+	return rad * 180.0 / PI;
+}
+
+double PointInfoControl::GradToRad(float grad) const
+{
+	return grad * PI / 180.0;
+}
+
 //[/MiscUserCode]
 
 
@@ -411,8 +424,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditorListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pAmbiPointArray, PointSelection* pPointSelection"
-                 variableInitialisers="pAmbiPointArray(pAmbiPointArray), pPointSelection(pPointSelection)"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, PointSelection* pPointSelection"
+                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="140">
   <BACKGROUND backgroundColour="ff323e44"/>
