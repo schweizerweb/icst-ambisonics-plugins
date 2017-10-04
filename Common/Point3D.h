@@ -255,13 +255,13 @@ public:
 			value = 1.0; 
 			break;
 		case 1: // X
-			value = SQRT3 * cos(getElevation()) * cos(getElevation());
+			value = __max(0.0, SQRT3 * cos(getElevation()) * cos(getElevation()));
 			break;
 		case 2: // Y
-			value = SQRT3 * sin(getAzimuth()) * cos(getElevation());
+			value = __max(0.0, SQRT3 * sin(getAzimuth()) * cos(getElevation()));
 			break;
 		case 3: // Z
-			value = SQRT3 * sin(getElevation());
+			value = __max(0.0, SQRT3 * sin(getElevation()));
 			break;
 		default:
 			return 0;
