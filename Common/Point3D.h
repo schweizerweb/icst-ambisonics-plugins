@@ -75,7 +75,7 @@ public:
 	inline void setElevation(ValueType newElevation) noexcept{ aedChanged = true; elevation = newElevation; }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = newDistance; }
+	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = (newDistance < 0.0001 ? 0.0001 : newDistance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
@@ -291,6 +291,9 @@ private:
 	void calculateAed()
 	{
 		distance = sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
+		if (distance < 0.0001)
+			distance = 0.0001;
+
 		azimuth = atan2(y, x);
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
@@ -298,11 +301,6 @@ private:
 
 	void calculateXyz()
 	{
-		if(distance == 0)
-		{
-			azimuth = 0;
-			elevation = 0;
-		}
 		x = distance * cos(elevation) * cos(azimuth);
 		y = distance * cos(elevation) * sin(azimuth);
 		z = distance * sin(elevation);
