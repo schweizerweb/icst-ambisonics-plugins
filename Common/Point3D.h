@@ -255,18 +255,18 @@ public:
 			value = 1.0; 
 			break;
 		case 1: // X
-			value = 0.0, SQRT3 * cos(getElevation()) * cos(getElevation());
+			value = SQRT3 * cos(getAzimuth()) * cos(getElevation());
 			break;
 		case 2: // Y
-			value = 0.0, SQRT3 * sin(getAzimuth()) * cos(getElevation());
+			value = SQRT3 * sin(getAzimuth()) * cos(getElevation());
 			break;
 		case 3: // Z
-			value = 0.0, SQRT3 * sin(getElevation());
+			value = SQRT3 * sin(getElevation());
 			break;
 		default:
 			return 0;
 		}
-		value = value < 0.0 ? 0.0 : value;
+		//value = value < 0.0 ? 0.0 : value;
 
 		if (applyDistance)
 			return (1.0-getDistance()) * value;
