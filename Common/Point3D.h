@@ -14,6 +14,7 @@
 #include "JuceHeader.h"
 #define SQRT3 sqrt(3)
 #define PI 3.1415926535897932384626433832795
+#define DISTANCE_MIN_VALUE 0.0001
 
 template <typename ValueType>
 class Point3D
@@ -75,7 +76,7 @@ public:
 	inline void setElevation(ValueType newElevation) noexcept{ aedChanged = true; elevation = newElevation; }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = (newDistance < 0.0001 ? 0.0001 : newDistance); }
+	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
@@ -266,8 +267,7 @@ public:
 		default:
 			return 0;
 		}
-		//value = value < 0.0 ? 0.0 : value;
-
+		
 		if (applyDistance)
 			return (1.0-getDistance()) * value;
 		else
@@ -291,9 +291,8 @@ private:
 	void calculateAed()
 	{
 		distance = sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
-		if (distance < 0.0001)
-			distance = 0.0001;
-
+		distance = distance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : distance;
+		
 		azimuth = atan2(y, x);
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
