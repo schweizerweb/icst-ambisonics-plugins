@@ -26,8 +26,6 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 #endif
 {
 	pSpeakerArray = new Array<AmbiPoint>();
-	pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "Demo"));
-
 	pMovingPointsArray = new Array<AmbiPoint>();
 }
 
@@ -130,46 +128,30 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
-
-	/*
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        float* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
-	*/
+    float currentCoefficients[JucePlugin_MaxNumInputChannels];
+	const float* inputBufferPointers[JucePlugin_MaxNumInputChannels];
+	int iChannel;
 	AudioSampleBuffer inputBuffer;
+
+	// copy input buffer and get read pointers
 	inputBuffer.makeCopyOf(buffer);
-	const float* inputW = inputBuffer.getReadPointer(0);
-	const float* inputY = inputBuffer.getReadPointer(1);
-	const float* inputZ = inputBuffer.getReadPointer(2);
-	const float* inputX = inputBuffer.getReadPointer(3);
+	for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
 
 	for(int iSpeaker = 0; iSpeaker < pSpeakerArray->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
+		// calculate ambisonics coefficients
 		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
-		float w = pSpeakerPoint->getAmbisonicsCoefficient(0, false);
-		float y = pSpeakerPoint->getAmbisonicsCoefficient(1, false);
-		float z = pSpeakerPoint->getAmbisonicsCoefficient(2, false);
-		float x = pSpeakerPoint->getAmbisonicsCoefficient(3, false);
-
+		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+			currentCoefficients[iChannel] = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
+		
+		// apply to B-format and create output
 		float* channelData = buffer.getWritePointer(iSpeaker);
-
-		for(int i = 0; i < buffer.getNumSamples(); i++)
+		for(int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
 		{
-			channelData[i] = inputW[i] * w + inputX[i] * x + inputY[i] * y + inputZ[i] * z;
+			channelData[iSample] = 0.0f;
+			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+				channelData[iSample] += inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
 		}
 	}
 }
