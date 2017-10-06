@@ -111,6 +111,37 @@ float Radar2D::getSelectedPointSize() const
 	return getSpeakerPointSize() * 1.5f;
 }
 
+void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const
+{
+	int y = int(screenPt.getY() + (screenPt.getY() < (offset + getFontSize()) ? 2.0 : -1.0) * offset);
+	if(screenPt.getX() > getWidth() / 2
+		&& screenPt.getX() > getWidth() - (offset + text.length() * getFontSize() / 2.0f))
+	{
+		g->drawSingleLineText(text, int(screenPt.getX() - offset), y, Justification::right);
+	}
+	else
+	{
+		g->drawSingleLineText(text, int(screenPt.getX() + offset), y);
+	}
+}
+
+void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select, float selectionSize)
+{
+	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
+	if (select)
+	{
+		g->setColour(radarColors->getPointSelectionColor());
+		Rectangle<float> rect(selectionSize, selectionSize);
+		g->fillEllipse(rect.withCentre(screenPt));
+	}
+
+	g->setColour(trackColors.getColor(point->getColorIndex()));
+	Rectangle<float> rect(pointSize, pointSize);
+	g->fillEllipse(rect.withCentre(screenPt));
+			
+	paintPointLabel(g, point->getName(), screenPt, pointSize * 0.5f);
+}
+
 void Radar2D::renderOpenGL()
 {
 	jassert(OpenGLHelpers::isContextActive());
@@ -138,30 +169,12 @@ void Radar2D::renderOpenGL()
 
 		for (int i = 0; i < pSpeakerArray->size(); i++)
 		{
-			AmbiPoint* point = &(pSpeakerArray->getReference(i));
-
-			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
-			if(i == pPointSelection->getSelectedPointIndex())
-			{
-				g.setColour(radarColors->getPointSelectionColor());
-				Rectangle<float> rect(getSelectedPointSize(), getSelectedPointSize());
-				g.fillEllipse(rect.withCentre(screenPt));
-			}
-			g.setColour(trackColors.getColor(point->getColorIndex()));
-			Rectangle<float> rect(getSpeakerPointSize(), getSpeakerPointSize());
-			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point->getName(), int(screenPt.getX() + getSpeakerPointSize()/2), int(screenPt.getY() - getSpeakerPointSize()/2));
+			paintPoint(&g, &pSpeakerArray->getReference(i), getSpeakerPointSize(), i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize());
 		}
 
 		for (int i = 0; i < pMovingPointsArray->size(); i++)
 		{
-			AmbiPoint* point = &(pMovingPointsArray->getReference(i));
-
-			Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
-			g.setColour(trackColors.getColor(point->getColorIndex()));
-			Rectangle<float> rect(getMovingPointSize(), getMovingPointSize());
-			g.fillEllipse(rect.withCentre(screenPt));
-			g.drawSingleLineText(point->getName(), int(screenPt.getX() + getMovingPointSize() / 2), int(screenPt.getY() - getMovingPointSize() / 2));
+			paintPoint(&g, &pMovingPointsArray->getReference(i), getMovingPointSize());
 		}
 
 		g.setColour(radarColors->getInfoTextColor());
