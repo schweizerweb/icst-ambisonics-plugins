@@ -265,6 +265,7 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonAdd)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
+		// todo: remove
 		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
 		pPointSelection->selectPoint(pSpeakerArray->size()-1);
         //[/UserButtonCode_buttonAdd]
@@ -272,7 +273,8 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonRemove)
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		// todo: remove
+    	int selection = pPointSelection->getSelectedPointIndex();
 		if (selection >= 0 && selection < pSpeakerArray->size())
 		{
 			pPointSelection->unselectPoint();

@@ -186,7 +186,8 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == buttonLoad)
     {
         //[UserButtonCode_buttonLoad] -- add your button handler code here..
-		ScopedPointer<FileChooser> fileChooser = new FileChooser("Load Preset", File(), "*.xml");
+		// todo: remove
+    	ScopedPointer<FileChooser> fileChooser = new FileChooser("Load Preset", File(), "*.xml");
 		if(fileChooser->browseForFileToOpen())
 		{
 			PresetInfo* preset = new PresetInfo();
@@ -202,7 +203,8 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     else if (buttonThatWasClicked == buttonSave)
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-		ScopedPointer<FileChooser> fileChooser = new FileChooser("Save Preset", File(), "*.xml");
+		// todo: remove
+    	ScopedPointer<FileChooser> fileChooser = new FileChooser("Save Preset", File(), "*.xml");
 		if (fileChooser->browseForFileToSave(true))
 		{
 			PresetInfo* preset = new PresetInfo();
@@ -225,10 +227,13 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+// todo:remove
 void AmbisonicsDecoderAudioProcessorEditor::timerCallback()
 {
 	//if you want any display updates with a refresh timer add them here
 }
+
+// todo remove
 void AmbisonicsDecoderAudioProcessorEditor::loadPreset(PresetInfo* preset) const
 {
 	pSpeakerArray->clear();
@@ -238,6 +243,7 @@ void AmbisonicsDecoderAudioProcessorEditor::loadPreset(PresetInfo* preset) const
 	}
 }
 
+// Todo: remove
 void AmbisonicsDecoderAudioProcessorEditor::updateComboBox(String elementToSelect)
 {
 	comboBoxChannelConfig->clear();
