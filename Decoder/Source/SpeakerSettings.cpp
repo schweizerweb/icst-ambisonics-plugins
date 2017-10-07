@@ -93,12 +93,14 @@ SpeakerSettings::SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<Pr
 	speakerList->getHeader().addColumn("Distance", COLUMN_ID_DISTANCE, 100);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
+	pPointSelection->addChangeListener(this);
     //[/Constructor]
 }
 
 SpeakerSettings::~SpeakerSettings()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
     comboBoxChannelConfig = nullptr;
@@ -190,6 +192,8 @@ void SpeakerSettings::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
+			speakerList->updateContent();
+			speakerList->repaint();
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
     }
@@ -243,6 +247,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
 		pPointSelection->selectPoint(pSpeakerArray->size() - 1);
 		speakerList->updateContent();
+		speakerList->repaint();
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove)
@@ -254,6 +259,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 			pPointSelection->unselectPoint();
 			pSpeakerArray->remove(selection);
 			speakerList->updateContent();
+			speakerList->repaint();
 		}
         //[/UserButtonCode_buttonRemove]
     }
@@ -261,19 +267,29 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if(selection >= 0 && selection < pSpeakerArray->size()+1)
+		if(selection >= 0 && selection < pSpeakerArray->size() - 1)
 		{
+			pPointSelection->unselectPoint();
 			AmbiPoint bak = pSpeakerArray->getReference(selection);
 			pSpeakerArray->getReference(selection) = pSpeakerArray->getReference(selection + 1);
 			pSpeakerArray->getReference(selection + 1) = bak;
-			speakerList->updateContent();
+			pPointSelection->selectPoint(selection + 1);
 		}
         //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp)
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
-        //[/UserButtonCode_buttonMoveUp]
+		int selection = pPointSelection->getSelectedPointIndex();
+		if (selection >= 1 && selection < pSpeakerArray->size())
+		{
+			pPointSelection->unselectPoint();
+			AmbiPoint bak = pSpeakerArray->getReference(selection);
+			pSpeakerArray->getReference(selection) = pSpeakerArray->getReference(selection - 1);
+			pSpeakerArray->getReference(selection - 1) = bak;
+			pPointSelection->selectPoint(selection - 1);
+		}
+		//[/UserButtonCode_buttonMoveUp]
     }
 
     //[UserbuttonClicked_Post]
@@ -344,6 +360,7 @@ void SpeakerSettings::loadPreset(PresetInfo* preset) const
 		pSpeakerArray->add(AmbiPoint(*pt));
 	}
 	speakerList->updateContent();
+	speakerList->repaint();
 }
 
 void SpeakerSettings::updateComboBox(String elementToSelect) const
@@ -371,6 +388,16 @@ void SpeakerSettings::updateComboBox(String elementToSelect) const
 	}
 }
 
+void SpeakerSettings::changeListenerCallback(ChangeBroadcaster* source)
+{
+	if (source == pPointSelection)
+	{
+		speakerList->updateContent();
+		speakerList->repaint();
+		speakerList->selectRow(pPointSelection->getSelectedPointIndex());
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -384,7 +411,8 @@ void SpeakerSettings::updateComboBox(String elementToSelect) const
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettings" componentName=""
-                 parentClasses="public Component, public TableListBoxModel" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection"
+                 parentClasses="public Component, public TableListBoxModel, public ChangeListener"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">

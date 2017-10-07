@@ -38,6 +38,7 @@
 */
 class SpeakerSettings  : public Component,
                          public TableListBoxModel,
+                         public ChangeListener,
                          public ComboBoxListener,
                          public ButtonListener
 {
@@ -55,6 +56,7 @@ public:
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
