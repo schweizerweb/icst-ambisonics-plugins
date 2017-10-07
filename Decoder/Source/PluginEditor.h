@@ -69,6 +69,7 @@ private:
 	Array<AmbiPoint>* pMovingPointsArray;
 	OwnedArray<PresetInfo> presets;
 	ScopedPointer<OSCHandler> oscHandler;
+	PointSelection pointSelection;
     //[/UserVariables]
 
     //==============================================================================
@@ -77,6 +78,7 @@ private:
     ScopedPointer<Label> label;
     ScopedPointer<TextButton> buttonLoad;
     ScopedPointer<TextButton> buttonSave;
+    ScopedPointer<TextButton> buttonConfigure;
 
 
     //==============================================================================

@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "SpeakerSettings.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -51,7 +52,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     comboBoxChannelConfig->addItem (TRANS("8"), 4);
     comboBoxChannelConfig->addListener (this);
 
-    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray));
+    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection));
     component->setName ("new component");
 
     addAndMakeVisible (label = new Label ("new label",
@@ -69,6 +70,10 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     addAndMakeVisible (buttonSave = new TextButton ("buttonSave"));
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
+
+    addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));
+    buttonConfigure->setButtonText (TRANS("configure"));
+    buttonConfigure->addListener (this);
 
 
     //[UserPreSize]
@@ -94,6 +99,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     label = nullptr;
     buttonLoad = nullptr;
     buttonSave = nullptr;
+    buttonConfigure = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -106,7 +112,7 @@ void AmbisonicsDecoderAudioProcessorEditor::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -119,9 +125,10 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
 
     comboBoxChannelConfig->setBounds (88, 8, 192, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
-    label->setBounds (8, 8, 112, 24);
+    label->setBounds (8, 8, 64, 24);
     buttonLoad->setBounds (288, 8, 40, 24);
     buttonSave->setBounds (336, 8, 40, 24);
+    buttonConfigure->setBounds (getWidth() - 106, 8, 94, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -219,6 +226,12 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 		}
         //[/UserButtonCode_buttonSave]
     }
+    else if (buttonThatWasClicked == buttonConfigure)
+    {
+        //[UserButtonCode_buttonConfigure] -- add your button handler code here..
+		SpeakerSettings::showAsDialog(pSpeakerArray, &presets, &pointSelection);
+        //[/UserButtonCode_buttonConfigure]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -287,17 +300,17 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
-  <BACKGROUND backgroundColour="ff323e44"/>
+  <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="88 8 192 24" editable="0"
             layout="33" items="2&#10;4&#10;6&#10;8" textWhenNonSelected="-"
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
-                    params="pSpeakerArray, pMovingPointsArray"/>
+                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection"/>
   <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
-         explicitFocusOrder="0" pos="8 8 112 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
+         explicitFocusOrder="0" pos="8 8 64 24" edTextCol="ff000000" edBkgCol="0"
+         labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
@@ -305,6 +318,9 @@ BEGIN_JUCER_METADATA
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
               virtualName="" explicitFocusOrder="0" pos="336 8 40 24" buttonText="save"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
+              virtualName="" explicitFocusOrder="0" pos="106R 8 94 24" buttonText="configure"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
