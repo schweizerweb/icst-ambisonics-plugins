@@ -142,8 +142,8 @@ void SpeakerSettings::resized()
     speakerList->setBounds (8, 40, getWidth() - 18, getHeight() - 82);
     buttonAdd->setBounds (8, getHeight() - 34, 64, 24);
     buttonRemove->setBounds (80, getHeight() - 34, 64, 24);
-    buttonMoveDown->setBounds (getWidth() - 74, 616, 64, 24);
-    buttonMoveUp->setBounds (getWidth() - 146, 616, 64, 24);
+    buttonMoveDown->setBounds (getWidth() - 74, getHeight() - 34, 64, 24);
+    buttonMoveUp->setBounds (getWidth() - 146, getHeight() - 34, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -289,7 +289,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 			pSpeakerArray->getReference(selection - 1) = bak;
 			pPointSelection->selectPoint(selection - 1);
 		}
-		//[/UserButtonCode_buttonMoveUp]
+        //[/UserButtonCode_buttonMoveUp]
     }
 
     //[UserbuttonClicked_Post]
@@ -441,10 +441,10 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="80 34R 64 24" buttonText="remove"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonMoveDown" id="7291297cb3544d01" memberName="buttonMoveDown"
-              virtualName="" explicitFocusOrder="0" pos="74R 616 64 24" buttonText="down"
+              virtualName="" explicitFocusOrder="0" pos="74R 34R 64 24" buttonText="down"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
-              virtualName="" explicitFocusOrder="0" pos="146R 616 64 24" buttonText="up"
+              virtualName="" explicitFocusOrder="0" pos="146R 34R 64 24" buttonText="up"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
