@@ -10,6 +10,11 @@
 
 #include "PresetInfo.h"
 
+PresetInfo::PresetInfo()
+{
+	ambiSettings = new AmbiSettings();
+}
+
 bool PresetInfo::LoadFromFile(File file)
 {
 	points.clear();
@@ -24,6 +29,14 @@ bool PresetInfo::LoadFromFile(File file)
 
 	name = root->getStringAttribute(XML_ATTRIBUTE_PRESET_NAME);
 
+	// general
+	XmlElement* xmlGeneral = root->getChildByName(XML_TAG_PRESET_GENERAL);
+	if (xmlGeneral == nullptr)
+		return false;
+
+	ambiSettings = new AmbiSettings(xmlGeneral->getDoubleAttribute(XML_ATTRIBUTE_PRESET_DISTANCESCALER));
+
+	// points
 	XmlElement* xmlPoints = root->getChildByName(XML_TAG_PRESET_POINTS);
 	if (xmlPoints == nullptr)
 		return false;
@@ -51,6 +64,12 @@ bool PresetInfo::SaveToFile(File file)
 	ScopedPointer<XmlElement> xmlRoot = new XmlElement(XML_TAG_PRESET_ROOT);
 	xmlRoot->setAttribute(XML_ATTRIBUTE_PRESET_NAME, name);
 	
+	// general
+	XmlElement* xmlGeneral = new XmlElement(XML_TAG_PRESET_GENERAL);
+	xmlGeneral->setAttribute(XML_ATTRIBUTE_PRESET_DISTANCESCALER, ambiSettings->getDistanceScaler());
+	xmlRoot->addChildElement(xmlGeneral);
+
+	// points
 	XmlElement* xmlPoints = new XmlElement(XML_TAG_PRESET_POINTS);
 	for (AmbiPoint* pt : points)
 	{
@@ -89,4 +108,9 @@ String PresetInfo::getName() const
 void PresetInfo::setName(String newName)
 {
 	name = newName;
+}
+
+AmbiSettings* PresetInfo::getAmbiSettings()
+{
+	return ambiSettings;
 }
