@@ -252,8 +252,15 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 			{
 				if (pPresets->getUnchecked(i)->getName() == newPresetName)
 				{
-					AlertWindow::showMessageBox(AlertWindow::AlertIconType::NoIcon, "Existing preset", "Preset " + newPresetName + " existis already!");
-					return;
+					int ret = AlertWindow::showYesNoCancelBox(AlertWindow::AlertIconType::QuestionIcon, "Existing preset", "Replace existing preset " + newPresetName + "?");
+					if (ret == 1) // YES
+					{
+						pPresets->remove(i);
+					}
+					else
+					{
+						return;
+					}
 				}
 			}
 

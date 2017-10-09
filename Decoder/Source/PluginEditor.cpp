@@ -237,8 +237,15 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 			{
 				if (presets.getUnchecked(i)->getName() == newPresetName)
 				{
-					AlertWindow::showMessageBox(AlertWindow::AlertIconType::NoIcon, "Existing preset", "Preset " + newPresetName + " existis already!");
-					return;
+					int ret = AlertWindow::showYesNoCancelBox(AlertWindow::AlertIconType::QuestionIcon, "Existing preset", "Replace existing preset " + newPresetName + "?");
+					if (ret == 1) // YES
+					{
+						presets.remove(i);
+					}
+					else
+					{
+						return;
+					}
 				}
 			}
 
