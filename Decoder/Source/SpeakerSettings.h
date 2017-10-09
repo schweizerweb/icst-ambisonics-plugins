@@ -69,12 +69,13 @@ public:
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
-    //[/UserMethods]
+	bool CheckForExistingPreset(String newPresetName) const;
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+	void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 

@@ -225,22 +225,8 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 			PresetInfo* preset = new PresetInfo();
 			if (preset->LoadFromFile(fileChooser->getResult()))
 			{
-				// check for existing presets
-				for(int i = 0; i < pPresets->size(); i++)
-				{
-					if(pPresets->getUnchecked(i)->getName() == preset->getName())
-					{
-						int ret = AlertWindow::showYesNoCancelBox(AlertWindow::AlertIconType::QuestionIcon, "Existing preset", "Replace existing preset " + preset->getName() + "?");
-						if (ret == 1) // YES
-						{
-							pPresets->remove(i);
-						}
-						else
-						{
-							return;
-						}
-					}
-				}
+				if (CheckForExistingPreset(preset->getName())) 
+					return;
 				loadPreset(preset);
 				pPresets->add(preset);
 				updateComboBox(preset->getName());
@@ -255,23 +241,8 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 		if (fileChooser->browseForFileToSave(true))
 		{
 			String newPresetName = fileChooser->getResult().getFileNameWithoutExtension();
-
-			// check for existing presets
-			for (int i = 0; i < pPresets->size(); i++)
-			{
-				if (pPresets->getUnchecked(i)->getName() == newPresetName)
-				{
-					int ret = AlertWindow::showYesNoCancelBox(AlertWindow::AlertIconType::QuestionIcon, "Existing preset", "Replace existing preset " + newPresetName + "?");
-					if (ret == 1) // YES
-					{
-						pPresets->remove(i);
-					}
-					else
-					{
-						return;
-					}
-				}
-			}
+			if (CheckForExistingPreset(newPresetName)) 
+				return;
 
 			PresetInfo* preset = new PresetInfo();
 			preset->setName(newPresetName);
@@ -515,6 +486,27 @@ void SpeakerSettings::changeListenerCallback(ChangeBroadcaster* source)
 		speakerList->repaint();
 		speakerList->selectRow(pPointSelection->getSelectedPointIndex());
 	}
+}
+
+bool SpeakerSettings::CheckForExistingPreset(String newPresetName) const
+{
+	// check for existing presets
+	for (int i = 0; i < pPresets->size(); i++)
+	{
+		if (pPresets->getUnchecked(i)->getName() == newPresetName)
+		{
+			int ret = AlertWindow::showYesNoCancelBox(AlertWindow::AlertIconType::QuestionIcon, "Existing preset", "Replace existing preset " + newPresetName + "?");
+			if (ret == 1) // YES
+			{
+				pPresets->remove(i);
+			}
+			else
+			{
+				return true;
+			}
+		}
+	}
+	return false;
 }
 
 //[/MiscUserCode]
