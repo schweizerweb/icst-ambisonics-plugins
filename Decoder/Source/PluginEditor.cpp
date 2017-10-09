@@ -18,7 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "SpeakerSettings.h"
+#include "SpeakerSettingsComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -264,7 +264,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     else if (buttonThatWasClicked == buttonConfigure)
     {
         //[UserButtonCode_buttonConfigure] -- add your button handler code here..
-		SpeakerSettings::showAsDialog(pSpeakerArray, &presets, &pointSelection);
+		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection);
         //[/UserButtonCode_buttonConfigure]
     }
 

@@ -24,7 +24,7 @@
 #include "SpeakerTestCustomComponent.h"
 //[/Headers]
 
-#include "SpeakerSettings.h"
+#include "SpeakerSettingsComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -37,7 +37,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettings::SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
+SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
     : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -106,7 +106,7 @@ SpeakerSettings::SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<Pr
     //[/Constructor]
 }
 
-SpeakerSettings::~SpeakerSettings()
+SpeakerSettingsComponent::~SpeakerSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
 	pPointSelection->removeChangeListener(this);
@@ -128,7 +128,7 @@ SpeakerSettings::~SpeakerSettings()
 }
 
 //==============================================================================
-void SpeakerSettings::paint (Graphics& g)
+void SpeakerSettingsComponent::paint (Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
@@ -139,7 +139,7 @@ void SpeakerSettings::paint (Graphics& g)
     //[/UserPaint]
 }
 
-void SpeakerSettings::resized()
+void SpeakerSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
@@ -157,7 +157,7 @@ void SpeakerSettings::resized()
     //[/UserResized]
 }
 
-void SpeakerSettings::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
@@ -211,7 +211,7 @@ void SpeakerSettings::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[/UsercomboBoxChanged_Post]
 }
 
-void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
+void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -225,7 +225,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 			PresetInfo* preset = new PresetInfo();
 			if (preset->LoadFromFile(fileChooser->getResult()))
 			{
-				if (CheckForExistingPreset(preset->getName())) 
+				if (CheckForExistingPreset(preset->getName()))
 					return;
 				loadPreset(preset);
 				pPresets->add(preset);
@@ -241,7 +241,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 		if (fileChooser->browseForFileToSave(true))
 		{
 			String newPresetName = fileChooser->getResult().getFileNameWithoutExtension();
-			if (CheckForExistingPreset(newPresetName)) 
+			if (CheckForExistingPreset(newPresetName))
 				return;
 
 			PresetInfo* preset = new PresetInfo();
@@ -314,9 +314,9 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettings::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
+void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
 {
-	SpeakerSettings *p = new SpeakerSettings(pSpeakerArray, pPresets, pPointSelection);
+	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection);
 	p->setSize(800, 700);
 
 	DialogWindow::LaunchOptions options;
@@ -330,18 +330,18 @@ void SpeakerSettings::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<P
 	options.launchAsync();
 }
 
-int SpeakerSettings::getNumRows()
+int SpeakerSettingsComponent::getNumRows()
 {
 	return pSpeakerArray->size();
 }
 
-void SpeakerSettings::selectedRowsChanged(int lastRowSelected)
+void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
 {
 	if(lastRowSelected >= 0 && lastRowSelected < pSpeakerArray->size())
 		pPointSelection->selectPoint(lastRowSelected);
 }
 
-void SpeakerSettings::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
 {
 	const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
 		.interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
@@ -351,7 +351,7 @@ void SpeakerSettings::paintRowBackground(Graphics& g, int rowNumber, int width, 
 		g.fillAll(alternateColour);
 }
 
-void SpeakerSettings::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
 {
 	g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
 	String text;
@@ -369,7 +369,7 @@ void SpeakerSettings::paintCell(Graphics& g, int rowNumber, int columnId, int wi
 	g.fillRect(width - 1, 0, 1, height);
 }
 
-Component* SpeakerSettings::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
+Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
 {
 	if(columnId == COLUMN_ID_GAIN)
 	{
@@ -402,7 +402,7 @@ Component* SpeakerSettings::refreshComponentForCell(int rowNumber, int columnId,
 	return nullptr;
 }
 
-String SpeakerSettings::getTableText(const int columnId, const int rowNumber) const
+String SpeakerSettingsComponent::getTableText(const int columnId, const int rowNumber) const
 {
 	switch(columnId)
 	{
@@ -412,7 +412,7 @@ String SpeakerSettings::getTableText(const int columnId, const int rowNumber) co
 	}
 }
 
-void SpeakerSettings::setTableText(const int columnId, const int rowNumber, const String& newText) const
+void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNumber, const String& newText) const
 {
 	switch(columnId)
 	{
@@ -422,27 +422,27 @@ void SpeakerSettings::setTableText(const int columnId, const int rowNumber, cons
 	}
 }
 
-void SpeakerSettings::setGain(int rowNumber, double newValue) const
+void SpeakerSettingsComponent::setGain(int rowNumber, double newValue) const
 {
 	pSpeakerArray->getReference(rowNumber).setGain(newValue);
 }
 
-double SpeakerSettings::getGain(int rowNumber) const
+double SpeakerSettingsComponent::getGain(int rowNumber) const
 {
 	return pSpeakerArray->getReference(rowNumber).getGain();
 }
 
-void SpeakerSettings::speakerTest(int rowNumber) const
+void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
 	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Speaker Test", "Test sound for channel " + String(rowNumber) + " - Not implemented yet!");
 }
 
-TableListBox* SpeakerSettings::getTable() const
+TableListBox* SpeakerSettingsComponent::getTable() const
 {
 	return speakerList;
 }
 
-void SpeakerSettings::loadPreset(PresetInfo* preset) const
+void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 {
 	pSpeakerArray->clear();
 	for (AmbiPoint* pt : *preset->getPoints())
@@ -453,7 +453,7 @@ void SpeakerSettings::loadPreset(PresetInfo* preset) const
 	speakerList->repaint();
 }
 
-void SpeakerSettings::updateComboBox(String elementToSelect) const
+void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
 {
 	comboBoxChannelConfig->clear();
 	int i = 1;
@@ -478,7 +478,7 @@ void SpeakerSettings::updateComboBox(String elementToSelect) const
 	}
 }
 
-void SpeakerSettings::changeListenerCallback(ChangeBroadcaster* source)
+void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
 	if (source == pPointSelection)
 	{
@@ -488,7 +488,7 @@ void SpeakerSettings::changeListenerCallback(ChangeBroadcaster* source)
 	}
 }
 
-bool SpeakerSettings::CheckForExistingPreset(String newPresetName) const
+bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) const
 {
 	// check for existing presets
 	for (int i = 0; i < pPresets->size(); i++)
@@ -521,8 +521,8 @@ bool SpeakerSettings::CheckForExistingPreset(String newPresetName) const
 
 BEGIN_JUCER_METADATA
 
-<JUCER_COMPONENT documentType="Component" className="SpeakerSettings" componentName=""
-                 parentClasses="public Component, public TableListBoxModel, public ChangeListener"
+<JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener"
                  constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"

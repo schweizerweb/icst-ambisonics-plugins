@@ -45,7 +45,7 @@ public:
     PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection);
     ~PointInfoControl();
 
-	//==============================================================================
+    //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void updateSelectedPoint(String exceptField = "");
 	void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -55,7 +55,7 @@ public:
 	void setFieldsEnabled(bool enable) const;
 	double RadToGrad(double rad) const;
 	double GradToRad(float grad) const;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;

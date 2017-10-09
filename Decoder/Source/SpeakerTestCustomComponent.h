@@ -9,13 +9,13 @@
 */
 
 #pragma once
-#include "SpeakerSettings.h"
+#include "SpeakerSettingsComponent.h"
 
 class SpeakerTestCustomComponent : public Component,
 	private ButtonListener
 {
 public:
-	SpeakerTestCustomComponent(SpeakerSettings& td) : owner(td)
+	SpeakerTestCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(button);
 		button.setImages(false, true, true, ImageCache::getFromMemory(BinaryData::speaker_png, BinaryData::speaker_pngSize), 1.0, Colours::transparentBlack, Image::null, 1.0, Colours::blue.withAlpha(0.3f), Image::null, 1.0, Colours::red.withAlpha(0.3f));
@@ -40,7 +40,7 @@ public:
 	}
 
 private:
-	SpeakerSettings& owner;
+	SpeakerSettingsComponent& owner;
 	ImageButton button;
 	int row, columnId;
 };

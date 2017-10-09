@@ -36,16 +36,16 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class SpeakerSettings  : public Component,
-                         public TableListBoxModel,
-                         public ChangeListener,
-                         public ComboBoxListener,
-                         public ButtonListener
+class SpeakerSettingsComponent  : public Component,
+                                  public TableListBoxModel,
+                                  public ChangeListener,
+                                  public ComboBoxListener,
+                                  public ButtonListener
 {
 public:
     //==============================================================================
-    SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection);
-    ~SpeakerSettings();
+    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection);
+    ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -70,12 +70,12 @@ public:
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-	void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -99,7 +99,7 @@ private:
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpeakerSettings)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpeakerSettingsComponent)
 };
 
 //[EndFile] You can add extra defines here...

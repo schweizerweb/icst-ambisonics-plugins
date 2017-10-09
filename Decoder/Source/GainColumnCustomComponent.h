@@ -9,13 +9,13 @@
 */
 
 #pragma once
-#include "SpeakerSettings.h"
+#include "SpeakerSettingsComponent.h"
 
 class GainColumnCustomComponent : public Component,
 	private SliderListener
 {
 public:
-	GainColumnCustomComponent(SpeakerSettings& td) : owner(td)
+	GainColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(slider);
 		slider.setSliderStyle(Slider::LinearBar);
@@ -43,7 +43,7 @@ public:
 
 	
 private:
-	SpeakerSettings& owner;
+	SpeakerSettingsComponent& owner;
 	Slider slider;
 	int row, columnId;
 };

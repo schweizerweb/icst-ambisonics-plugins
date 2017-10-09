@@ -23,10 +23,10 @@
             file="Source/GainColumnCustomComponent.h"/>
       <FILE id="ogZyJW" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="Source/EditableTextCustomComponent.h"/>
-      <FILE id="mzFIWk" name="SpeakerSettings.cpp" compile="1" resource="0"
-            file="Source/SpeakerSettings.cpp"/>
-      <FILE id="kA1i4a" name="SpeakerSettings.h" compile="0" resource="0"
-            file="Source/SpeakerSettings.h"/>
+      <FILE id="mzFIWk" name="SpeakerSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/SpeakerSettingsComponent.cpp"/>
+      <FILE id="kA1i4a" name="SpeakerSettingsComponent.h" compile="0" resource="0"
+            file="Source/SpeakerSettingsComponent.h"/>
       <FILE id="eFp2Lr" name="OSCHandler.cpp" compile="1" resource="0" file="Source/OSCHandler.cpp"/>
       <FILE id="dADHh1" name="OSCHandler.h" compile="0" resource="0" file="Source/OSCHandler.h"/>
       <FILE id="SbImea" name="PresetInfo.cpp" compile="1" resource="0" file="Source/PresetInfo.cpp"/>

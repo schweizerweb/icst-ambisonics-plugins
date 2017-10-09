@@ -9,12 +9,12 @@
 */
 
 #pragma once
-#include "SpeakerSettings.h"
+#include "SpeakerSettingsComponent.h"
 
 class EditableTextCustomComponent : public Label
 {
 public:
-	EditableTextCustomComponent(SpeakerSettings& td) : owner(td)
+	EditableTextCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		setEditable(false, true, false);
 	}
@@ -47,7 +47,7 @@ public:
 	}
 
 private:
-	SpeakerSettings& owner;
+	SpeakerSettingsComponent& owner;
 	int row, columnId;
 	Colour textColour;
 };
