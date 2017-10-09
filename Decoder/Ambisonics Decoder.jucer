@@ -41,6 +41,9 @@
     </GROUP>
     <GROUP id="{9E9B66A7-A131-AF4D-B624-3D4280C67801}" name="Common">
       <FILE id="CdwDS7" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
+      <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
+            file="../Common/AmbiSettings.cpp"/>
+      <FILE id="z0ap1U" name="AmbiSettings.h" compile="0" resource="0" file="../Common/AmbiSettings.h"/>
       <FILE id="TnVJDm" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
       <FILE id="jYT0co" name="PointInfoControl.cpp" compile="1" resource="0"
             file="../Common/PointInfoControl.cpp"/>

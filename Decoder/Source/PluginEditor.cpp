@@ -34,6 +34,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     //[Constructor_pre] You can add your own custom stuff here..
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
+	pAmbiSettings = ownerProc.getAmbiSettings();
 	oscHandler = new OSCHandler(pMovingPointsArray);
 	if(!oscHandler->start())
 	{
@@ -264,7 +265,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     else if (buttonThatWasClicked == buttonConfigure)
     {
         //[UserButtonCode_buttonConfigure] -- add your button handler code here..
-		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection);
+		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings);
         //[/UserButtonCode_buttonConfigure]
     }
 

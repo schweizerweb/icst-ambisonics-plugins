@@ -37,11 +37,14 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
-    : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)
+SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings)
+    : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
+
+    addAndMakeVisible (groupSpeakers = new GroupComponent ("groupSpeakers",
+                                                           TRANS("Speakers")));
 
     addAndMakeVisible (comboBoxChannelConfig = new ComboBox ("channelConfig"));
     comboBoxChannelConfig->setEditableText (false);
@@ -85,6 +88,23 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
+    addAndMakeVisible (groupAmbisonics = new GroupComponent ("groupAmbisonics",
+                                                             TRANS("Ambisonics")));
+
+    addAndMakeVisible (label2 = new Label ("new label",
+                                           TRANS("Distance scaler")));
+    label2->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label2->setJustificationType (Justification::centredLeft);
+    label2->setEditable (false, false, false);
+    label2->setColour (TextEditor::textColourId, Colours::black);
+    label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    addAndMakeVisible (sliderDistanceScaler = new Slider ("sliderDistanceScaler"));
+    sliderDistanceScaler->setRange (1, 500, 0.1);
+    sliderDistanceScaler->setSliderStyle (Slider::LinearHorizontal);
+    sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderDistanceScaler->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -96,13 +116,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 	speakerList->setModel(this);
 	speakerList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
 	speakerList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
-	speakerList->getHeader().addColumn("Distance", COLUMN_ID_DISTANCE, 100);
-	speakerList->getHeader().addColumn("Delay", COLUMN_ID_DELAY, 100);
+	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 100);
+	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 100);
 	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 100);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
+	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
     //[/Constructor]
 }
 
@@ -112,6 +133,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
 	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
+    groupSpeakers = nullptr;
     comboBoxChannelConfig = nullptr;
     label = nullptr;
     buttonLoad = nullptr;
@@ -121,6 +143,9 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
+    groupAmbisonics = nullptr;
+    label2 = nullptr;
+    sliderDistanceScaler = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -144,15 +169,19 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    groupSpeakers->setBounds (8, 40, getWidth() - 18, getHeight() - 118);
     comboBoxChannelConfig->setBounds (80, 8, getWidth() - 186, 24);
     label->setBounds (8, 8, 64, 24);
     buttonLoad->setBounds (getWidth() - 98, 8, 40, 24);
     buttonSave->setBounds (getWidth() - 50, 8, 40, 24);
-    speakerList->setBounds (8, 40, getWidth() - 18, getHeight() - 82);
-    buttonAdd->setBounds (8, getHeight() - 34, 64, 24);
-    buttonRemove->setBounds (80, getHeight() - 34, 64, 24);
-    buttonMoveDown->setBounds (getWidth() - 74, getHeight() - 34, 64, 24);
-    buttonMoveUp->setBounds (getWidth() - 146, getHeight() - 34, 64, 24);
+    speakerList->setBounds (8 + 8, 40 + 16, (getWidth() - 18) - 16, (getHeight() - 118) - 56);
+    buttonAdd->setBounds ((8 + 8) + 0, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 8) + 72, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 64, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 136, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
+    groupAmbisonics->setBounds (8, getHeight() - 70, 512, 64);
+    label2->setBounds (8 + 16, (getHeight() - 70) + 24, 104, 24);
+    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 70) + 24, 150, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -203,6 +232,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			}
 			speakerList->updateContent();
 			speakerList->repaint();
+			pAmbiSettings->setDistanceScaler(DEFAULT_DISTANCE_SCALER);
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
     }
@@ -248,7 +278,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			preset->setName(newPresetName);
 			for (AmbiPoint pt : *pSpeakerArray)
 				preset->getPoints()->add(new AmbiPoint(pt));
-
+			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
 			preset->SaveToFile(fileChooser->getResult());
 
 			pPresets->add(preset);
@@ -311,12 +341,29 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
+void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == sliderDistanceScaler)
+    {
+        //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
+		pAmbiSettings->setDistanceScaler(sliderDistanceScaler->getValue());
+		speakerList->repaint();
+        //[/UserSliderCode_sliderDistanceScaler]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
+void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings)
 {
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection);
+	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings);
 	p->setSize(800, 700);
 
 	DialogWindow::LaunchOptions options;
@@ -359,9 +406,9 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	{
 	case COLUMN_ID_NB: text = String(rowNumber); break;
 	case COLUMN_ID_NAME: text = pSpeakerArray->getReference(rowNumber).getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance(), 3); break;
-	case COLUMN_ID_DELAY: text = ""; break; // todo:  String(pSpeakerArray->getReference(rowNumber).getPoint()->getDelay(distanceScaler), 3); break;
-	case COLUMN_ID_GAIN: text = String(pSpeakerArray->getReference(rowNumber).getGain(), 3); break;
+	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
+	case COLUMN_ID_DELAY: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler() * SOUND_SPEED_M_PER_MS, 2); break;
+	case COLUMN_ID_GAIN: text = String(pSpeakerArray->getReference(rowNumber).getGain(), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -451,6 +498,8 @@ void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 	}
 	speakerList->updateContent();
 	speakerList->repaint();
+
+	pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 }
 
 void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
@@ -523,11 +572,13 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection"
-                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)&#10;"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings"
+                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="800" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
+  <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
+                  virtualName="" explicitFocusOrder="0" pos="8 40 18M 118M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="80 8 186M 24" editable="0"
             layout="33" items="" textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
@@ -543,20 +594,38 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="50R 8 40 24" buttonText="save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
-                    virtualName="" explicitFocusOrder="0" pos="8 40 18M 82M" class="TableListBox"
-                    params=""/>
+                    virtualName="" explicitFocusOrder="0" pos="8 16 16M 56M" posRelativeX="450188aa0f332e78"
+                    posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
+                    posRelativeH="450188aa0f332e78" class="TableListBox" params=""/>
   <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
-              virtualName="" explicitFocusOrder="0" pos="8 34R 64 24" buttonText="add"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="0 -8R 64 24" posRelativeX="34ae3e87c64e62da"
+              posRelativeY="34ae3e87c64e62da" buttonText="add" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonAdd" id="49c8de1156e72d8c" memberName="buttonRemove"
-              virtualName="" explicitFocusOrder="0" pos="80 34R 64 24" buttonText="remove"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="72 -8R 64 24" posRelativeX="34ae3e87c64e62da"
+              posRelativeY="34ae3e87c64e62da" buttonText="remove" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonMoveDown" id="7291297cb3544d01" memberName="buttonMoveDown"
-              virtualName="" explicitFocusOrder="0" pos="74R 34R 64 24" buttonText="down"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="64R -8R 64 24" posRelativeX="34ae3e87c64e62da"
+              posRelativeY="34ae3e87c64e62da" buttonText="down" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
-              virtualName="" explicitFocusOrder="0" pos="146R 34R 64 24" buttonText="up"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
+              posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
+                  virtualName="" explicitFocusOrder="0" pos="8 70R 512 64" title="Ambisonics"/>
+  <LABEL name="new label" id="b7b6f80386dfdff3" memberName="label2" virtualName=""
+         explicitFocusOrder="0" pos="16 24 104 24" posRelativeX="17eb4b418501687a"
+         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
+         labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
+         kerning="0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
+          virtualName="" explicitFocusOrder="0" pos="128 24 150 24" posRelativeX="17eb4b418501687a"
+          posRelativeY="17eb4b418501687a" min="1" max="500" int="0.10000000000000000555"
+          style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

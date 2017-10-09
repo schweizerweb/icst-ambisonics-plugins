@@ -23,6 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
+#include "../../Common/AmbiSettings.h"
 #include "PresetInfo.h"
 //[/Headers]
 
@@ -40,16 +41,17 @@ class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
                                   public ComboBoxListener,
-                                  public ButtonListener
+                                  public ButtonListener,
+                                  public SliderListener
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection);
+    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection);
+	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings);
 
 	// table overrides
 	int getNumRows() override;
@@ -76,6 +78,7 @@ public:
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
@@ -84,9 +87,11 @@ private:
 	Array<AmbiPoint>* pSpeakerArray;
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
+	AmbiSettings* pAmbiSettings;
     //[/UserVariables]
 
     //==============================================================================
+    ScopedPointer<GroupComponent> groupSpeakers;
     ScopedPointer<ComboBox> comboBoxChannelConfig;
     ScopedPointer<Label> label;
     ScopedPointer<TextButton> buttonLoad;
@@ -96,6 +101,9 @@ private:
     ScopedPointer<TextButton> buttonRemove;
     ScopedPointer<TextButton> buttonMoveDown;
     ScopedPointer<TextButton> buttonMoveUp;
+    ScopedPointer<GroupComponent> groupAmbisonics;
+    ScopedPointer<Label> label2;
+    ScopedPointer<Slider> sliderDistanceScaler;
 
 
     //==============================================================================

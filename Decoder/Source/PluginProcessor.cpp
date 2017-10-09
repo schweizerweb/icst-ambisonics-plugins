@@ -27,6 +27,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 {
 	pSpeakerArray = new Array<AmbiPoint>();
 	pMovingPointsArray = new Array<AmbiPoint>();
+	pAmbiSettings = new AmbiSettings();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
@@ -190,6 +191,11 @@ Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const
 Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
 {
 	return pMovingPointsArray;
+}
+
+AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
+{
+	return pAmbiSettings;
 }
 
 //==============================================================================
