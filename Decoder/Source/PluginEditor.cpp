@@ -123,12 +123,12 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxChannelConfig->setBounds (88, 8, 192, 24);
+    comboBoxChannelConfig->setBounds (64, 8, 120, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
-    label->setBounds (8, 8, 64, 24);
-    buttonLoad->setBounds (288, 8, 40, 24);
-    buttonSave->setBounds (336, 8, 40, 24);
-    buttonConfigure->setBounds (getWidth() - 106, 8, 94, 24);
+    label->setBounds (8, 8, 56, 24);
+    buttonLoad->setBounds (192, 8, 40, 24);
+    buttonSave->setBounds (240, 8, 40, 24);
+    buttonConfigure->setBounds (getWidth() - 90, 8, 78, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -330,25 +330,25 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="88 8 192 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="64 8 120 24" editable="0"
             layout="33" items="2&#10;4&#10;6&#10;8" textWhenNonSelected="-"
             textWhenNoItems="(no choices)"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection"/>
   <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
-         explicitFocusOrder="0" pos="8 8 64 24" edTextCol="ff000000" edBkgCol="0"
+         explicitFocusOrder="0" pos="8 8 56 24" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
-              virtualName="" explicitFocusOrder="0" pos="288 8 40 24" buttonText="load"
+              virtualName="" explicitFocusOrder="0" pos="192 8 40 24" buttonText="load"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="336 8 40 24" buttonText="save"
+              virtualName="" explicitFocusOrder="0" pos="240 8 40 24" buttonText="save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
-              virtualName="" explicitFocusOrder="0" pos="106R 8 94 24" buttonText="configure"
+              virtualName="" explicitFocusOrder="0" pos="90R 8 78 24" buttonText="configure"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
