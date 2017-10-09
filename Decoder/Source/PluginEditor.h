@@ -80,9 +80,9 @@ private:
     ScopedPointer<TextButton> buttonLoad;
     ScopedPointer<TextButton> buttonSave;
     ScopedPointer<TextButton> buttonConfigure;
-	
 
-	//==============================================================================
+
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
 };
 

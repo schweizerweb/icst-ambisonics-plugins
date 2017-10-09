@@ -67,20 +67,19 @@ public:
 	double getGain(int rowNumber) const;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() const;
-
+	
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
-    //[/UserMethods]
+	void updateDistanceScaler() const;
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
-
-
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.

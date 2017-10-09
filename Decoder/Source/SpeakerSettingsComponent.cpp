@@ -102,7 +102,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     addAndMakeVisible (sliderDistanceScaler = new Slider ("sliderDistanceScaler"));
     sliderDistanceScaler->setRange (1, 500, 0.1);
     sliderDistanceScaler->setSliderStyle (Slider::LinearHorizontal);
-    sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
 
@@ -123,7 +123,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
-	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
+	updateDistanceScaler();
     //[/Constructor]
 }
 
@@ -181,7 +181,7 @@ void SpeakerSettingsComponent::resized()
     buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 136, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
     groupAmbisonics->setBounds (8, getHeight() - 70, 512, 64);
     label2->setBounds (8 + 16, (getHeight() - 70) + 24, 104, 24);
-    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 70) + 24, 150, 24);
+    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 70) + 24, 368, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -233,6 +233,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			speakerList->updateContent();
 			speakerList->repaint();
 			pAmbiSettings->setDistanceScaler(DEFAULT_DISTANCE_SCALER);
+			updateDistanceScaler();
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
     }
@@ -489,6 +490,11 @@ TableListBox* SpeakerSettingsComponent::getTable() const
 	return speakerList;
 }
 
+void SpeakerSettingsComponent::updateDistanceScaler() const
+{
+	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
+}
+
 void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 {
 	pSpeakerArray->clear();
@@ -500,6 +506,7 @@ void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 	speakerList->repaint();
 
 	pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
+	updateDistanceScaler();
 }
 
 void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
@@ -622,9 +629,9 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="128 24 150 24" posRelativeX="17eb4b418501687a"
+          virtualName="" explicitFocusOrder="0" pos="128 24 368 24" posRelativeX="17eb4b418501687a"
           posRelativeY="17eb4b418501687a" min="1" max="500" int="0.10000000000000000555"
-          style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
 </JUCER_COMPONENT>
 
