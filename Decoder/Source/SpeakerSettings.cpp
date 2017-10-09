@@ -19,6 +19,9 @@
 
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
+#include "EditableTextCustomComponent.h"
+#include "GainColumnCustomComponent.h"
+#include "SpeakerTestCustomComponent.h"
 //[/Headers]
 
 #include "SpeakerSettings.h"
@@ -28,6 +31,9 @@
 #define COLUMN_ID_NB		1
 #define COLUMN_ID_NAME		2
 #define COLUMN_ID_DISTANCE	3
+#define COLUMN_ID_DELAY		4
+#define COLUMN_ID_GAIN		5
+#define	COLUMN_ID_TEST		6
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -83,7 +89,7 @@ SpeakerSettings::SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<Pr
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (400, 700);
+    setSize (800, 700);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -91,6 +97,9 @@ SpeakerSettings::SpeakerSettings (Array<AmbiPoint>* pSpeakerArray, OwnedArray<Pr
 	speakerList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
 	speakerList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
 	speakerList->getHeader().addColumn("Distance", COLUMN_ID_DISTANCE, 100);
+	speakerList->getHeader().addColumn("Delay", COLUMN_ID_DELAY, 100);
+	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 100);
+	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
@@ -337,7 +346,7 @@ void SpeakerSettings::buttonClicked (Button* buttonThatWasClicked)
 void SpeakerSettings::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection)
 {
 	SpeakerSettings *p = new SpeakerSettings(pSpeakerArray, pPresets, pPointSelection);
-	p->setSize(400, 700);
+	p->setSize(800, 700);
 
 	DialogWindow::LaunchOptions options;
 	options.content.setOwned(p);
@@ -380,11 +389,86 @@ void SpeakerSettings::paintCell(Graphics& g, int rowNumber, int columnId, int wi
 	case COLUMN_ID_NB: text = String(rowNumber); break;
 	case COLUMN_ID_NAME: text = pSpeakerArray->getReference(rowNumber).getName(); break;
 	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance(), 3); break;
+	case COLUMN_ID_DELAY: text = ""; break; // todo:  String(pSpeakerArray->getReference(rowNumber).getPoint()->getDelay(distanceScaler), 3); break;
+	case COLUMN_ID_GAIN: text = String(pSpeakerArray->getReference(rowNumber).getGain(), 3); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
 	g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
 	g.fillRect(width - 1, 0, 1, height);
+}
+
+Component* SpeakerSettings::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
+{
+	if(columnId == COLUMN_ID_GAIN)
+	{
+		GainColumnCustomComponent* gainBox = static_cast<GainColumnCustomComponent*> (existingComponentToUpdate);
+		if (gainBox == nullptr)
+			gainBox = new GainColumnCustomComponent(*this);
+
+		gainBox->setRowAndColumn(rowNumber, columnId);
+		return gainBox;
+	}
+	else if(columnId == COLUMN_ID_TEST)
+	{
+		SpeakerTestCustomComponent* button = static_cast<SpeakerTestCustomComponent*> (existingComponentToUpdate);
+		if (button == nullptr)
+			button = new SpeakerTestCustomComponent(*this);
+
+		button->setRowAndColumn(rowNumber, columnId);
+		return button;
+	}
+	else if(columnId == COLUMN_ID_NAME)
+	{
+		EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
+		if (textLabel == nullptr)
+			textLabel = new EditableTextCustomComponent(*this);
+
+		textLabel->setRowAndColumn(rowNumber, columnId);
+		return textLabel;
+	}
+
+	return nullptr;
+}
+
+String SpeakerSettings::getTableText(const int columnId, const int rowNumber) const
+{
+	switch(columnId)
+	{
+	case COLUMN_ID_NAME: return pSpeakerArray->getReference(rowNumber).getName();
+	case COLUMN_ID_GAIN: return String(pSpeakerArray->getReference(rowNumber).getGain(), 3);
+	default: return "";
+	}
+}
+
+void SpeakerSettings::setTableText(const int columnId, const int rowNumber, const String& newText) const
+{
+	switch(columnId)
+	{
+	case COLUMN_ID_NAME: pSpeakerArray->getReference(rowNumber).setName(newText); break;
+	case COLUMN_ID_GAIN: pSpeakerArray->getReference(rowNumber).setGain(newText.getDoubleValue()); break;
+	default: throw;
+	}
+}
+
+void SpeakerSettings::setGain(int rowNumber, double newValue) const
+{
+	pSpeakerArray->getReference(rowNumber).setGain(newValue);
+}
+
+double SpeakerSettings::getGain(int rowNumber) const
+{
+	return pSpeakerArray->getReference(rowNumber).getGain();
+}
+
+void SpeakerSettings::speakerTest(int rowNumber) const
+{
+	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Speaker Test", "Test sound for channel " + String(rowNumber) + " - Not implemented yet!");
+}
+
+TableListBox* SpeakerSettings::getTable() const
+{
+	return speakerList;
 }
 
 void SpeakerSettings::loadPreset(PresetInfo* preset) const
@@ -450,7 +534,7 @@ BEGIN_JUCER_METADATA
                  constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="400" initialHeight="700">
+                 fixedSize="0" initialWidth="800" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="80 8 186M 24" editable="0"

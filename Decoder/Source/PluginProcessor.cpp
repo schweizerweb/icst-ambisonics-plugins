@@ -142,6 +142,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	{
 		// calculate ambisonics coefficients
 		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
+		double speakerGain = pSpeakerArray->getReference(iSpeaker).getGain();
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 			currentCoefficients[iChannel] = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
 		
@@ -151,7 +152,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		{
 			channelData[iSample] = 0.0f;
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-				channelData[iSample] += inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
+				channelData[iSample] += speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
 		}
 	}
 }

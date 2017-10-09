@@ -37,7 +37,8 @@ bool PresetInfo::LoadFromFile(File file)
 				xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
 				xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z)),
 			xmlPoint->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME),
-			xmlPoint->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)
+			xmlPoint->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR),
+			xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)
 		));
 		xmlPoint = xmlPoint->getNextElement();
 	}
@@ -59,6 +60,7 @@ bool PresetInfo::SaveToFile(File file)
 		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Z, pt->getPoint()->getZ());
 		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME, pt->getName());
 		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR, pt->getColorIndex());
+		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, pt->getGain());
 		xmlPoints->addChildElement(xmlPt);
 	}
 	xmlRoot->addChildElement(xmlPoints);

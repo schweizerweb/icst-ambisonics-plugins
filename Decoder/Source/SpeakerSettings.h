@@ -50,10 +50,22 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection);
+
+	// table overrides
 	int getNumRows() override;
 	void selectedRowsChanged(int lastRowSelected) override;
 	void paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override;
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
+	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override;
+
+	// table item callbacks
+	String getTableText(const int columnId, const int rowNumber) const;
+	void setTableText(const int columnId, const int rowNumber, const String& newText) const;
+	void setGain(int rowNumber, double newValue) const;
+	double getGain(int rowNumber) const;
+	void speakerTest(int rowNumber) const;
+	TableListBox* getTable() const;
+
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
