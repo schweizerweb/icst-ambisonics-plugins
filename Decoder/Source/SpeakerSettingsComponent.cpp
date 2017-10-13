@@ -41,6 +41,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	OwnedArray<String> ambiChannelNames;
+	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+		ambiChannelNames.add(new String(AmbiHelper::getAmbiChannelName(i)));
     //[/Constructor_pre]
 
     addAndMakeVisible (groupSpeakers = new GroupComponent ("groupSpeakers",
@@ -105,11 +108,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
+    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (JucePlugin_MaxNumInputChannels, pAmbiSettings->getAmbiChannelWeightPointer(), &ambiChannelNames));
+    ambiChannelControl->setName ("ambiChannelControl");
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (800, 700);
+    setSize (800, 800);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -146,6 +152,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     groupAmbisonics = nullptr;
     label2 = nullptr;
     sliderDistanceScaler = nullptr;
+    ambiChannelControl = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -169,19 +176,20 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupSpeakers->setBounds (8, 40, getWidth() - 18, getHeight() - 118);
+    groupSpeakers->setBounds (8, 40, getWidth() - 18, getHeight() - 222);
     comboBoxChannelConfig->setBounds (80, 8, getWidth() - 186, 24);
     label->setBounds (8, 8, 64, 24);
     buttonLoad->setBounds (getWidth() - 98, 8, 40, 24);
     buttonSave->setBounds (getWidth() - 50, 8, 40, 24);
-    speakerList->setBounds (8 + 8, 40 + 16, (getWidth() - 18) - 16, (getHeight() - 118) - 56);
-    buttonAdd->setBounds ((8 + 8) + 0, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 8) + 72, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 64, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 136, (40 + 16) + ((getHeight() - 118) - 56) - -8, 64, 24);
-    groupAmbisonics->setBounds (8, getHeight() - 70, 512, 64);
-    label2->setBounds (8 + 16, (getHeight() - 70) + 24, 104, 24);
-    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 70) + 24, 368, 24);
+    speakerList->setBounds (8 + 8, 40 + 16, (getWidth() - 18) - 16, (getHeight() - 222) - 56);
+    buttonAdd->setBounds ((8 + 8) + 0, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 8) + 72, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 64, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 136, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    groupAmbisonics->setBounds (8, getHeight() - 182, getWidth() - 18, 176);
+    label2->setBounds (8 + 16, (getHeight() - 182) + 16, 104, 24);
+    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 182) + 16, 368, 24);
+    ambiChannelControl->setBounds (8 + 8, (getHeight() - 182) + 40, (getWidth() - 18) - 16, 176 - 56);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -582,10 +590,10 @@ BEGIN_JUCER_METADATA
                  constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="800" initialHeight="700">
+                 fixedSize="0" initialWidth="800" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 40 18M 118M" title="Speakers"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 40 18M 222M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="80 8 186M 24" editable="0"
             layout="33" items="" textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
@@ -621,18 +629,22 @@ BEGIN_JUCER_METADATA
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
-                  virtualName="" explicitFocusOrder="0" pos="8 70R 512 64" title="Ambisonics"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 182R 18M 176" title="Ambisonics"/>
   <LABEL name="new label" id="b7b6f80386dfdff3" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="16 24 104 24" posRelativeX="17eb4b418501687a"
+         explicitFocusOrder="0" pos="16 16 104 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="128 24 368 24" posRelativeX="17eb4b418501687a"
+          virtualName="" explicitFocusOrder="0" pos="128 16 368 24" posRelativeX="17eb4b418501687a"
           posRelativeY="17eb4b418501687a" min="1" max="500" int="0.10000000000000000555"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
+  <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
+                    virtualName="" explicitFocusOrder="0" pos="8 40 16M 56M" posRelativeX="17eb4b418501687a"
+                    posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="JucePlugin_MaxNumInputChannels, pAmbiSettings-&gt;getAmbiChannelWeightPointer(), &amp;ambiChannelNames"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

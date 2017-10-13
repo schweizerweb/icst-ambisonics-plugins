@@ -24,6 +24,8 @@
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
+#include "../../Common/MultiSliderControl.h"
+#include "../../Common/AmbiHelper.h"
 #include "PresetInfo.h"
 //[/Headers]
 
@@ -67,19 +69,21 @@ public:
 	double getGain(int rowNumber) const;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() const;
-	
+
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
+
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
@@ -103,6 +107,7 @@ private:
     ScopedPointer<GroupComponent> groupAmbisonics;
     ScopedPointer<Label> label2;
     ScopedPointer<Slider> sliderDistanceScaler;
+    ScopedPointer<MultiSliderControl> ambiChannelControl;
 
 
     //==============================================================================

@@ -27,3 +27,8 @@ void AmbiSettings::setDistanceScaler(double newDistanceScaler)
 {
 	distanceScaler = newDistanceScaler;
 }
+
+double* AmbiSettings::getAmbiChannelWeightPointer()
+{
+	return ambiChannelWeights;
+}
