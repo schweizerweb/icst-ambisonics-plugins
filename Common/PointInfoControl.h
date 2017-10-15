@@ -37,8 +37,7 @@
 */
 class PointInfoControl  : public Component,
                           public ChangeListener,
-                          public TextEditorListener,
-                          public ButtonListener
+                          public TextEditorListener
 {
 public:
     //==============================================================================
@@ -59,7 +58,6 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -86,8 +84,6 @@ private:
     ScopedPointer<Label> label9;
     ScopedPointer<TextEditor> textD;
     ScopedPointer<Label> label10;
-    ScopedPointer<TextButton> buttonAdd;
-    ScopedPointer<TextButton> buttonRemove;
 
 
     //==============================================================================

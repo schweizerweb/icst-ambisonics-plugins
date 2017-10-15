@@ -36,9 +36,9 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelect
     addAndMakeVisible (textName = new TextEditor ("textName"));
     textName->setMultiLine (false);
     textName->setReturnKeyStartsNewLine (false);
-    textName->setReadOnly (false);
+    textName->setReadOnly (true);
     textName->setScrollbarsShown (true);
-    textName->setCaretVisible (true);
+    textName->setCaretVisible (false);
     textName->setPopupMenuEnabled (true);
     textName->setText (String());
 
@@ -168,19 +168,11 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelect
     label10->setColour (TextEditor::textColourId, Colours::black);
     label10->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (buttonAdd = new TextButton ("buttonAdd"));
-    buttonAdd->setButtonText (TRANS("add"));
-    buttonAdd->addListener (this);
-
-    addAndMakeVisible (buttonRemove = new TextButton ("buttonAdd"));
-    buttonRemove->setButtonText (TRANS("remove"));
-    buttonRemove->addListener (this);
-
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (360, 140);
+    setSize (360, 100);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -210,8 +202,6 @@ PointInfoControl::~PointInfoControl()
     label9 = nullptr;
     textD = nullptr;
     label10 = nullptr;
-    buttonAdd = nullptr;
-    buttonRemove = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -235,56 +225,24 @@ void PointInfoControl::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    textName->setBounds (136, 40, 216, 24);
-    label2->setBounds (0, 40, 104, 24);
-    label3->setBounds (112, 72, 24, 24);
-    textX->setBounds (136, 72, 56, 24);
-    label4->setBounds (192, 72, 24, 24);
-    textY->setBounds (216, 72, 56, 24);
-    label5->setBounds (273, 72, 24, 24);
-    textZ->setBounds (297, 72, 55, 24);
-    label6->setBounds (0, 72, 104, 24);
-    label7->setBounds (112, 104, 24, 24);
-    textA->setBounds (136, 104, 56, 24);
-    label8->setBounds (192, 104, 24, 24);
-    textE->setBounds (216, 104, 56, 24);
-    label9->setBounds (273, 104, 24, 24);
-    textD->setBounds (297, 104, 55, 24);
-    label10->setBounds (0, 104, 104, 24);
-    buttonAdd->setBounds (248, 8, 102, 24);
-    buttonRemove->setBounds (136, 8, 102, 24);
+    textName->setBounds (136, 8, 216, 24);
+    label2->setBounds (0, 8, 104, 24);
+    label3->setBounds (112, 40, 24, 24);
+    textX->setBounds (136, 40, 56, 24);
+    label4->setBounds (192, 40, 24, 24);
+    textY->setBounds (216, 40, 56, 24);
+    label5->setBounds (273, 40, 24, 24);
+    textZ->setBounds (297, 40, 55, 24);
+    label6->setBounds (0, 40, 104, 24);
+    label7->setBounds (112, 72, 24, 24);
+    textA->setBounds (136, 72, 56, 24);
+    label8->setBounds (192, 72, 24, 24);
+    textE->setBounds (216, 72, 56, 24);
+    label9->setBounds (273, 72, 24, 24);
+    textD->setBounds (297, 72, 55, 24);
+    label10->setBounds (0, 72, 104, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
-}
-
-void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
-{
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
-    if (buttonThatWasClicked == buttonAdd)
-    {
-        //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		// todo: remove
-		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
-		pPointSelection->selectPoint(pSpeakerArray->size()-1);
-        //[/UserButtonCode_buttonAdd]
-    }
-    else if (buttonThatWasClicked == buttonRemove)
-    {
-        //[UserButtonCode_buttonRemove] -- add your button handler code here..
-		// todo: remove
-    	int selection = pPointSelection->getSelectedPointIndex();
-		if (selection >= 0 && selection < pSpeakerArray->size())
-		{
-			pPointSelection->unselectPoint();
-			pSpeakerArray->remove(selection);
-		}
-        //[/UserButtonCode_buttonRemove]
-    }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
 }
 
 
@@ -429,80 +387,74 @@ BEGIN_JUCER_METADATA
                  constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, PointSelection* pPointSelection"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="1" initialWidth="360" initialHeight="140">
-  <BACKGROUND backgroundColour="ff323e44"/>
+                 fixedSize="1" initialWidth="360" initialHeight="100">
+  <BACKGROUND backgroundColour="ff505050"/>
   <TEXTEDITOR name="textName" id="2b706cdb3232f1d2" memberName="textName" virtualName=""
-              explicitFocusOrder="0" pos="136 40 216 24" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+              explicitFocusOrder="0" pos="136 8 216 24" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
   <LABEL name="new label" id="7326de7683af8e2f" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="0 40 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 8 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Name:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="6fb8ecbc6da5fa76" memberName="label3" virtualName=""
-         explicitFocusOrder="0" pos="112 72 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="112 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="X:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textX" id="4dcd5fc970cdce6c" memberName="textX" virtualName=""
-              explicitFocusOrder="0" pos="136 72 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="136 40 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="d8cf1d21dc85896e" memberName="label4" virtualName=""
-         explicitFocusOrder="0" pos="192 72 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="192 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Y:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textY" id="46b4702ec60c236a" memberName="textY" virtualName=""
-              explicitFocusOrder="0" pos="216 72 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="216 40 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="385e50956f13effd" memberName="label5" virtualName=""
-         explicitFocusOrder="0" pos="273 72 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="273 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Z:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textZ" id="93f9644500f2da7f" memberName="textZ" virtualName=""
-              explicitFocusOrder="0" pos="297 72 55 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="297 40 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="f2af390154f0c032" memberName="label6" virtualName=""
-         explicitFocusOrder="0" pos="0 72 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 40 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Cartesian:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="c8e81a0262f1ac25" memberName="label7" virtualName=""
-         explicitFocusOrder="0" pos="112 104 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="112 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="A:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textA" id="e76184fec37afbfb" memberName="textA" virtualName=""
-              explicitFocusOrder="0" pos="136 104 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="136 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="6af5bb62c259b445" memberName="label8" virtualName=""
-         explicitFocusOrder="0" pos="192 104 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="192 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="E:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textE" id="7fb39984576e614e" memberName="textE" virtualName=""
-              explicitFocusOrder="0" pos="216 104 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="216 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="b1bd9596558e6f35" memberName="label9" virtualName=""
-         explicitFocusOrder="0" pos="273 104 24 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="273 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="D:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textD" id="411a4503627ed096" memberName="textD" virtualName=""
-              explicitFocusOrder="0" pos="297 104 55 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="297 72 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="new label" id="41fcd21e0ce12407" memberName="label10" virtualName=""
-         explicitFocusOrder="0" pos="0 104 104 24" edTextCol="ff000000"
+         explicitFocusOrder="0" pos="0 72 104 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Polar:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
-              virtualName="" explicitFocusOrder="0" pos="248 8 102 24" buttonText="add"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonAdd" id="49c8de1156e72d8c" memberName="buttonRemove"
-              virtualName="" explicitFocusOrder="0" pos="136 8 102 24" buttonText="remove"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -79,8 +79,8 @@ void RadarComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    radar->setBounds (0, 0 + 140, proportionOfWidth (1.0000f), getHeight() - 140);
-    pointInfo->setBounds (0, 0, proportionOfWidth (1.0000f), 140);
+    radar->setBounds (0, 0 + 100, proportionOfWidth (1.0000f), getHeight() - 100);
+    pointInfo->setBounds (0, 0, proportionOfWidth (1.0000f), 100);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -106,10 +106,10 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 100% 140M" posRelativeY="328b0557e3704175"
+                    explicitFocusOrder="0" pos="0 0R 100% 100M" posRelativeY="328b0557e3704175"
                     class="Radar3D" params="pSpeakerArray, pMovingPointsArray, &amp;zoomSettings, pPointSelection"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
-                    virtualName="" explicitFocusOrder="0" pos="0 0 100% 140" class="PointInfoControl"
+                    virtualName="" explicitFocusOrder="0" pos="0 0 100% 100" class="PointInfoControl"
                     params="pSpeakerArray, pPointSelection"/>
 </JUCER_COMPONENT>
 

@@ -68,7 +68,7 @@ void Radar3D::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -104,12 +104,12 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, Array&lt;AmbiPoint&gt;* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff323e44"/>
+  <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0 100% 66.615%" class="Radar2D"
+                    explicitFocusOrder="0" pos="0 0 100% 66.596%" class="Radar2D"
                     params="Radar2D::XY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection"/>
   <GENERICCOMPONENT name="zyRadar" id="9b35aa2c2da622df" memberName="zyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 100% 49.885%" posRelativeY="952154a5b6ffaa65"
+                    explicitFocusOrder="0" pos="0 0R 100% 49.84%" posRelativeY="952154a5b6ffaa65"
                     posRelativeH="952154a5b6ffaa65" class="Radar2D" params="Radar2D::ZY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection"/>
 </JUCER_COMPONENT>
 
