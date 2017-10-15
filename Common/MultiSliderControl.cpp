@@ -12,7 +12,7 @@
 #include "MultiSliderControl.h"
 
 //==============================================================================
-MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames)
+MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, String title, double minVal, double maxVal, double interval, double deafultValue) : defaultValue(deafultValue)
 {
 	// create sliders
 	for(int i = 0; i < numberOfSliders; i++)
@@ -24,20 +24,30 @@ MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, Owne
 
 		Slider* s = new Slider(Slider::LinearVertical, Slider::TextBoxBelow);
 		s->addListener(this);
-		s->setValue(values[i]);
 		s->setName(String(i));
-		s->setRange(0.0, 1.5, 0.01);
+		s->setRange(minVal, maxVal, interval);
 		addAndMakeVisible(s);
 		sliders.add(s);
-
-		addAndMakeVisible(infoLabel = new Label("infoLabel", "Ambisonics\r\nchannel\r\nweighting"));
-		infoLabel->setJustificationType(Justification::centred);
 	}
+
+	addAndMakeVisible(infoLabel = new Label("infoLabel", title));
+	infoLabel->setJustificationType(Justification::centred);
+	addAndMakeVisible(resetButton = new TextButton());
+	resetButton->setButtonText("reset");
+	resetButton->addListener(this);
+
 	pSliderValueArray = values;
+	updateValues();
 }
 
 MultiSliderControl::~MultiSliderControl()
 {
+}
+
+void MultiSliderControl::updateValues() const
+{
+	for(int i = 0; i < sliders.size(); i++)
+		sliders[i]->setValue(pSliderValueArray[i]);
 }
 
 void MultiSliderControl::paint (Graphics& g)
@@ -51,16 +61,18 @@ void MultiSliderControl::paint (Graphics& g)
 
 void MultiSliderControl::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-	int compWidth = getWidth() / (sliders.size() + 1);
+    int compWidth = getWidth() / (sliders.size() + 1);
 	int labelHeight = 30;
 	int sliderHeight = getHeight() - labelHeight;
-	infoLabel->setBounds(0, 0, compWidth, getHeight());
+	
+	infoLabel->setBounds(0, 0, compWidth, sliderHeight);
+	resetButton->setBounds(0, sliderHeight, compWidth, labelHeight);
+	
 	for(int i = 0; i < labels.size(); i++)
 	{
 		labels[i]->setBounds((i+1) * compWidth, 0, compWidth, labelHeight);
 	}
+	
 	for(int i = 0; i < sliders.size(); i++)
 	{
 		sliders[i]->setBounds((i+1) * compWidth, labelHeight, compWidth, sliderHeight);
@@ -70,4 +82,13 @@ void MultiSliderControl::resized()
 void MultiSliderControl::sliderValueChanged(Slider* slider)
 {
 	pSliderValueArray[slider->getName().getIntValue()] = slider->getValue();
+}
+
+void MultiSliderControl::buttonClicked(Button* btn)
+{
+	if(btn == resetButton)
+	{
+		for (int i = 0; i < sliders.size(); i++)
+			sliders[i]->setValue(defaultValue);
+	}
 }

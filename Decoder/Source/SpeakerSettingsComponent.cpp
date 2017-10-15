@@ -108,7 +108,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (JucePlugin_MaxNumInputChannels, pAmbiSettings->getAmbiChannelWeightPointer(), &ambiChannelNames));
+    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (JucePlugin_MaxNumInputChannels, pAmbiSettings->getAmbiChannelWeightPointer(), &ambiChannelNames, "Ambisonics\r\nchannel\r\nweighting",  0.0, 1.5, 0.01, 1.0));
     ambiChannelControl->setName ("ambiChannelControl");
 
 
@@ -288,6 +288,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			for (AmbiPoint pt : *pSpeakerArray)
 				preset->getPoints()->add(new AmbiPoint(pt));
 			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
+			for (int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+				preset->getAmbiSettings()->getAmbiChannelWeightPointer()[i] = pAmbiSettings->getAmbiChannelWeightPointer()[i];
 			preset->SaveToFile(fileChooser->getResult());
 
 			pPresets->add(preset);
@@ -515,6 +517,12 @@ void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 
 	pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 	updateDistanceScaler();
+
+	for(int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+	{
+		pAmbiSettings->getAmbiChannelWeightPointer()[i] = preset->getAmbiSettings()->getAmbiChannelWeightPointer()[i];
+	}
+	ambiChannelControl->updateValues();
 }
 
 void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
@@ -644,7 +652,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="8 40 16M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="JucePlugin_MaxNumInputChannels, pAmbiSettings-&gt;getAmbiChannelWeightPointer(), &amp;ambiChannelNames"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="JucePlugin_MaxNumInputChannels, pAmbiSettings-&gt;getAmbiChannelWeightPointer(), &amp;ambiChannelNames, &quot;Ambisonics\r\nchannel\r\nweighting&quot;,  0.0, 1.5, 0.01, 1.0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -34,7 +34,24 @@ bool PresetInfo::LoadFromFile(File file)
 	if (xmlGeneral == nullptr)
 		return false;
 
-	ambiSettings = new AmbiSettings(xmlGeneral->getDoubleAttribute(XML_ATTRIBUTE_PRESET_DISTANCESCALER));
+	// ambisonics settings
+	ambiSettings = new AmbiSettings();
+	XmlElement* xmlDistanceScaler = xmlGeneral->getChildByName(XML_TAG_PRESET_DISTANCESCALER);
+	if (xmlDistanceScaler != nullptr)
+	{
+		ambiSettings->setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
+	}
+	XmlElement* xmlAmbiChannelWeight = xmlGeneral->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
+	int index = 0;
+	if (xmlAmbiChannelWeight != nullptr)
+	{
+		String attributeName;
+		while (xmlAmbiChannelWeight->hasAttribute(attributeName = "CH" + String(index)))
+		{
+			ambiSettings->getAmbiChannelWeightPointer()[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
+			index++;
+		}
+	}
 
 	// points
 	XmlElement* xmlPoints = root->getChildByName(XML_TAG_PRESET_POINTS);
@@ -66,7 +83,15 @@ bool PresetInfo::SaveToFile(File file)
 	
 	// general
 	XmlElement* xmlGeneral = new XmlElement(XML_TAG_PRESET_GENERAL);
-	xmlGeneral->setAttribute(XML_ATTRIBUTE_PRESET_DISTANCESCALER, ambiSettings->getDistanceScaler());
+	XmlElement* xmlDistanceScaler = new XmlElement(XML_TAG_PRESET_DISTANCESCALER);
+	xmlDistanceScaler->setAttribute(XML_VALUE, ambiSettings->getDistanceScaler());
+	xmlGeneral->addChildElement(xmlDistanceScaler);
+	XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
+	for (int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+	{
+		xmlAmbiChannelWeight->setAttribute("CH" + String(i), ambiSettings->getAmbiChannelWeightPointer()[i]);
+	}
+	xmlGeneral->addChildElement(xmlAmbiChannelWeight);
 	xmlRoot->addChildElement(xmlGeneral);
 
 	// points

@@ -12,6 +12,8 @@
 
 AmbiSettings::AmbiSettings(): distanceScaler(DEFAULT_DISTANCE_SCALER)
 {
+	for (int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+		ambiChannelWeights[i] = 1.0;
 }
 
 AmbiSettings::AmbiSettings(double distanceScaler): distanceScaler(distanceScaler)
