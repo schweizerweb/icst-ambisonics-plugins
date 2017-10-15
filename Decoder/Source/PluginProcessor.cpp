@@ -139,6 +139,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
 
+	// clear output buffers if less than #input channels used, the others will be overwritten later
+	for (int i = pSpeakerArray->size(); i < totalNumInputChannels; ++i)
+		buffer.clear(i, 0, buffer.getNumSamples());
+
 	for(int iSpeaker = 0; iSpeaker < pSpeakerArray->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		// calculate ambisonics coefficients
