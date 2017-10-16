@@ -249,6 +249,7 @@ public:
 	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance)
 	{
 		double value;
+		double azimuthFactor = 1.0;
 
 		switch (ambiChannel) 
 		{
@@ -256,10 +257,10 @@ public:
 			value = 1.0; 
 			break;
 		case 1: // X
-			value = SQRT3 * cos(getAzimuth()) * cos(getElevation());
+			value = SQRT3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
 		case 2: // Y
-			value = SQRT3 * sin(getAzimuth()) * cos(getElevation());
+			value = SQRT3 * sin(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
 		case 3: // Z
 			value = SQRT3 * sin(getElevation());
