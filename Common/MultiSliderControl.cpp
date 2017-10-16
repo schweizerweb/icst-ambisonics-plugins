@@ -12,7 +12,7 @@
 #include "MultiSliderControl.h"
 
 //==============================================================================
-MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, String title, double minVal, double maxVal, double interval, double deafultValue) : defaultValue(deafultValue)
+MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
 {
 	// create sliders
 	for(int i = 0; i < numberOfSliders; i++)
@@ -29,12 +29,6 @@ MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, Owne
 		addAndMakeVisible(s);
 		sliders.add(s);
 	}
-
-	addAndMakeVisible(infoLabel = new Label("infoLabel", title));
-	infoLabel->setJustificationType(Justification::centred);
-	addAndMakeVisible(resetButton = new TextButton());
-	resetButton->setButtonText("reset");
-	resetButton->addListener(this);
 
 	pSliderValueArray = values;
 	updateValues();
@@ -65,9 +59,6 @@ void MultiSliderControl::resized()
 	int labelHeight = 30;
 	int sliderHeight = getHeight() - labelHeight;
 	
-	infoLabel->setBounds(0, 0, compWidth, sliderHeight);
-	resetButton->setBounds(0, sliderHeight, compWidth, labelHeight);
-	
 	for(int i = 0; i < labels.size(); i++)
 	{
 		labels[i]->setBounds((i+1) * compWidth, 0, compWidth, labelHeight);
@@ -82,13 +73,4 @@ void MultiSliderControl::resized()
 void MultiSliderControl::sliderValueChanged(Slider* slider)
 {
 	pSliderValueArray[slider->getName().getIntValue()] = slider->getValue();
-}
-
-void MultiSliderControl::buttonClicked(Button* btn)
-{
-	if(btn == resetButton)
-	{
-		for (int i = 0; i < sliders.size(); i++)
-			sliders[i]->setValue(defaultValue);
-	}
 }

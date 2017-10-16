@@ -109,8 +109,24 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, "Ambisonics\r\nchannel\r\nweighting",  0.0, 1.5, 0.01, 1.0));
+    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.01));
     ambiChannelControl->setName ("ambiChannelControl");
+
+    addAndMakeVisible (label3 = new Label ("new label",
+                                           TRANS("Channel weights")));
+    label3->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    label3->setJustificationType (Justification::centredLeft);
+    label3->setEditable (false, false, false);
+    label3->setColour (TextEditor::textColourId, Colours::black);
+    label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    addAndMakeVisible (buttonInPhase = new TextButton ("buttonInPhase"));
+    buttonInPhase->setButtonText (TRANS("calculate in-phase"));
+    buttonInPhase->addListener (this);
+
+    addAndMakeVisible (buttonBasic = new TextButton ("buttonBasic"));
+    buttonBasic->setButtonText (TRANS("reset to basic"));
+    buttonBasic->addListener (this);
 
 
     //[UserPreSize]
@@ -154,6 +170,9 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     label2 = nullptr;
     sliderDistanceScaler = nullptr;
     ambiChannelControl = nullptr;
+    label3 = nullptr;
+    buttonInPhase = nullptr;
+    buttonBasic = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -182,15 +201,18 @@ void SpeakerSettingsComponent::resized()
     label->setBounds (8, 8, 64, 24);
     buttonLoad->setBounds (getWidth() - 98, 8, 40, 24);
     buttonSave->setBounds (getWidth() - 50, 8, 40, 24);
-    speakerList->setBounds (8 + 8, 40 + 16, (getWidth() - 18) - 16, (getHeight() - 222) - 56);
-    buttonAdd->setBounds ((8 + 8) + 0, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 8) + 72, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 64, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 18) - 16) - 136, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    speakerList->setBounds (8 + 16, 40 + 16, (getWidth() - 18) - 32, (getHeight() - 222) - 56);
+    buttonAdd->setBounds ((8 + 16) + 0, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 16) + 72, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (40 + 16) + ((getHeight() - 222) - 56) - -8, 64, 24);
     groupAmbisonics->setBounds (8, getHeight() - 182, getWidth() - 18, 176);
-    label2->setBounds (8 + 16, (getHeight() - 182) + 16, 104, 24);
-    sliderDistanceScaler->setBounds (8 + 128, (getHeight() - 182) + 16, 368, 24);
-    ambiChannelControl->setBounds (8 + 8, (getHeight() - 182) + 40, (getWidth() - 18) - 16, 176 - 56);
+    label2->setBounds (8 + 8, (getHeight() - 182) + 16, 104, 24);
+    sliderDistanceScaler->setBounds (8 + 144, (getHeight() - 182) + 16, 352, 24);
+    ambiChannelControl->setBounds (8 + 144, (getHeight() - 182) + 40, (getWidth() - 18) - 160, 176 - 56);
+    label3->setBounds (16, 328, 112, 24);
+    buttonInPhase->setBounds (8 + 16, (getHeight() - 182) + 96, 120, 24);
+    buttonBasic->setBounds (8 + 16, (getHeight() - 182) + 64, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -347,6 +369,19 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			pPointSelection->selectPoint(selection - 1);
 		}
         //[/UserButtonCode_buttonMoveUp]
+    }
+    else if (buttonThatWasClicked == buttonInPhase)
+    {
+        //[UserButtonCode_buttonInPhase] -- add your button handler code here..
+        //[/UserButtonCode_buttonInPhase]
+    }
+    else if (buttonThatWasClicked == buttonBasic)
+    {
+        //[UserButtonCode_buttonBasic] -- add your button handler code here..
+		for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+			pAmbiSettings->getAmbiOrderWeightPointer()[i] = 1.0;
+		ambiChannelControl->updateValues();
+        //[/UserButtonCode_buttonBasic]
     }
 
     //[UserbuttonClicked_Post]
@@ -595,7 +630,7 @@ bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) cons
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster"
                  constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
@@ -618,7 +653,7 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="50R 8 40 24" buttonText="save"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
-                    virtualName="" explicitFocusOrder="0" pos="8 16 16M 56M" posRelativeX="450188aa0f332e78"
+                    virtualName="" explicitFocusOrder="0" pos="16 16 32M 56M" posRelativeX="450188aa0f332e78"
                     posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                     posRelativeH="450188aa0f332e78" class="TableListBox" params=""/>
   <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
@@ -640,20 +675,33 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
                   virtualName="" explicitFocusOrder="0" pos="8 182R 18M 176" title="Ambisonics"/>
   <LABEL name="new label" id="b7b6f80386dfdff3" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="16 16 104 24" posRelativeX="17eb4b418501687a"
+         explicitFocusOrder="0" pos="8 16 104 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="128 16 368 24" posRelativeX="17eb4b418501687a"
+          virtualName="" explicitFocusOrder="0" pos="144 16 352 24" posRelativeX="17eb4b418501687a"
           posRelativeY="17eb4b418501687a" min="1" max="500" int="0.10000000000000000555"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
-                    virtualName="" explicitFocusOrder="0" pos="8 40 16M 56M" posRelativeX="17eb4b418501687a"
+                    virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="JucePlugin_MaxNumInputChannels, pAmbiSettings-&gt;getAmbiChannelWeightPointer(), &amp;ambiChannelNames, &quot;Ambisonics\r\nchannel\r\nweighting&quot;,  0.0, 1.5, 0.01, 1.0"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.01"/>
+  <LABEL name="new label" id="ce2f83213d847908" memberName="label3" virtualName=""
+         explicitFocusOrder="0" pos="16 328 112 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Channel weights" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
+              virtualName="" explicitFocusOrder="0" pos="16 96 120 24" posRelativeX="17eb4b418501687a"
+              posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonBasic" id="d53e1a131a389be4" memberName="buttonBasic"
+              virtualName="" explicitFocusOrder="0" pos="16 64 120 24" posRelativeX="17eb4b418501687a"
+              posRelativeY="17eb4b418501687a" buttonText="reset to basic" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

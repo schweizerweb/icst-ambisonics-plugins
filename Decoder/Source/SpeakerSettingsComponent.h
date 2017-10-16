@@ -108,6 +108,9 @@ private:
     ScopedPointer<Label> label2;
     ScopedPointer<Slider> sliderDistanceScaler;
     ScopedPointer<MultiSliderControl> ambiChannelControl;
+    ScopedPointer<Label> label3;
+    ScopedPointer<TextButton> buttonInPhase;
+    ScopedPointer<TextButton> buttonBasic;
 
 
     //==============================================================================
