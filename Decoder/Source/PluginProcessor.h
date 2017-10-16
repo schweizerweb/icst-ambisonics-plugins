@@ -63,7 +63,6 @@ public:
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
 	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
-
-    //==============================================================================
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)
 };
