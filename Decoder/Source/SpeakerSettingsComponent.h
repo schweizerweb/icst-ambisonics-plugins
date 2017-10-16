@@ -25,7 +25,6 @@
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/MultiSliderControl.h"
-#include "../../Common/AmbiHelper.h"
 #include "PresetInfo.h"
 //[/Headers]
 

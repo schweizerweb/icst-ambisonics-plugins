@@ -40,8 +40,6 @@
       <FILE id="G0z6Dt" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{9E9B66A7-A131-AF4D-B624-3D4280C67801}" name="Common">
-      <FILE id="kruL52" name="AmbiHelper.cpp" compile="1" resource="0" file="../Common/AmbiHelper.cpp"/>
-      <FILE id="VWQLuG" name="AmbiHelper.h" compile="0" resource="0" file="../Common/AmbiHelper.h"/>
       <FILE id="CdwDS7" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
       <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiSettings.cpp"/>

@@ -153,8 +153,11 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
 		double speakerGain = pSpeakerArray->getReference(iSpeaker).getGain();
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-			currentCoefficients[iChannel] = pAmbiSettings->getAmbiChannelWeightPointer()[iChannel] * pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
-		
+		{
+			double ambiChannelWeight = pAmbiSettings->getAmbiChannelWeight(iChannel);
+			double ambiCoefficient = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
+			currentCoefficients[iChannel] = ambiChannelWeight * ambiCoefficient;
+		}
 		// apply to B-format and create output
 		float* channelData = buffer.getWritePointer(iSpeaker);
 		for(int iSample = 0; iSample < buffer.getNumSamples(); iSample++)

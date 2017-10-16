@@ -42,8 +42,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
-	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
-		ambiChannelNames.add(new String(AmbiHelper::getAmbiChannelName(i)));
+	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+		ambiChannelNames.add(new String("m = " + String(i)));
 	addActionListener(pTestSoundListener);
     //[/Constructor_pre]
 
@@ -109,7 +109,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (JucePlugin_MaxNumInputChannels, pAmbiSettings->getAmbiChannelWeightPointer(), &ambiChannelNames, "Ambisonics\r\nchannel\r\nweighting",  0.0, 1.5, 0.01, 1.0));
+    addAndMakeVisible (ambiChannelControl = new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, "Ambisonics\r\nchannel\r\nweighting",  0.0, 1.5, 0.01, 1.0));
     ambiChannelControl->setName ("ambiChannelControl");
 
 
@@ -289,8 +289,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			for (AmbiPoint pt : *pSpeakerArray)
 				preset->getPoints()->add(new AmbiPoint(pt));
 			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
-			for (int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
-				preset->getAmbiSettings()->getAmbiChannelWeightPointer()[i] = pAmbiSettings->getAmbiChannelWeightPointer()[i];
+			for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+				preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i] = pAmbiSettings->getAmbiOrderWeightPointer()[i];
 			preset->SaveToFile(fileChooser->getResult());
 
 			pPresets->add(preset);
@@ -519,9 +519,9 @@ void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 	pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 	updateDistanceScaler();
 
-	for(int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+	for(int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{
-		pAmbiSettings->getAmbiChannelWeightPointer()[i] = preset->getAmbiSettings()->getAmbiChannelWeightPointer()[i];
+		pAmbiSettings->getAmbiOrderWeightPointer()[i] = preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i];
 	}
 	ambiChannelControl->updateValues();
 }

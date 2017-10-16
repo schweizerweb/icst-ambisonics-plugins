@@ -46,9 +46,9 @@ bool PresetInfo::LoadFromFile(File file)
 	if (xmlAmbiChannelWeight != nullptr)
 	{
 		String attributeName;
-		while (xmlAmbiChannelWeight->hasAttribute(attributeName = "CH" + String(index)))
+		while (xmlAmbiChannelWeight->hasAttribute(attributeName = "Order" + String(index)))
 		{
-			ambiSettings->getAmbiChannelWeightPointer()[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
+			ambiSettings->getAmbiOrderWeightPointer()[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
 			index++;
 		}
 	}
@@ -87,9 +87,9 @@ bool PresetInfo::SaveToFile(File file)
 	xmlDistanceScaler->setAttribute(XML_VALUE, ambiSettings->getDistanceScaler());
 	xmlGeneral->addChildElement(xmlDistanceScaler);
 	XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
-	for (int i = 0; i < MAX_NB_AMBISONICS_CHANNELS; i++)
+	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{
-		xmlAmbiChannelWeight->setAttribute("CH" + String(i), ambiSettings->getAmbiChannelWeightPointer()[i]);
+		xmlAmbiChannelWeight->setAttribute("Order" + String(i), ambiSettings->getAmbiOrderWeightPointer()[i]);
 	}
 	xmlGeneral->addChildElement(xmlAmbiChannelWeight);
 	xmlRoot->addChildElement(xmlGeneral);
