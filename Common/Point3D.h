@@ -256,14 +256,14 @@ public:
 		case 0: // W
 			value = 1.0; 
 			break;
-		case 1: // X
-			value = SQRT3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
+		case 1: // Y
+			value = 3 * sin(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
-		case 2: // Y
-			value = SQRT3 * sin(azimuthFactor * getAzimuth()) * cos(getElevation());
+		case 2: // Z
+			value = 3 * sin(getElevation());
 			break;
-		case 3: // Z
-			value = SQRT3 * sin(getElevation());
+		case 3: // X
+			value = 3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
 		default:
 			return 0;
