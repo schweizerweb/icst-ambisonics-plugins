@@ -24,6 +24,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
                      #endif
                        )
 #endif
+	: testSoundChannel(NO_TEST_SOUND)
 {
 	pSpeakerArray = new Array<AmbiPoint>();
 	pMovingPointsArray = new Array<AmbiPoint>();
@@ -160,6 +161,14 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 				channelData[iSample] += speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
 		}
 	}
+	if(testSoundChannel != NO_TEST_SOUND)
+	{
+		float* channelData = buffer.getWritePointer(testSoundChannel);
+		for(int i = 0; i < buffer.getNumSamples(); i++)
+		{
+			channelData[i] = random.nextFloat() * 0.25f - 0.125f;
+		}
+	}
 }
 
 //==============================================================================
@@ -185,6 +194,26 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+void AmbisonicsDecoderAudioProcessor::timerCallback()
+{
+	stopTimer();
+	testSoundChannel = NO_TEST_SOUND;
+}
+
+void AmbisonicsDecoderAudioProcessor::startSpeakerTest(int channelNb)
+{
+	stopTimer();
+	startTimer(2000);
+	testSoundChannel = channelNb;
+}
+
+void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String& message)
+{
+	int speakerId = message.getTrailingIntValue();
+	if (speakerId >= 0)
+		startSpeakerTest(speakerId);
 }
 
 Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const

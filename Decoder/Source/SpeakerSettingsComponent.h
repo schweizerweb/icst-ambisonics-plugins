@@ -42,18 +42,19 @@
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
+                                  public ActionBroadcaster,
                                   public ComboBoxListener,
                                   public ButtonListener,
                                   public SliderListener
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings);
+    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings);
+	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
 
 	// table overrides
 	int getNumRows() override;

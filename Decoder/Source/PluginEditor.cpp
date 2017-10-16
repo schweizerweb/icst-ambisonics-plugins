@@ -105,7 +105,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == buttonConfigure)
     {
         //[UserButtonCode_buttonConfigure] -- add your button handler code here..
-		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings);
+		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings, &processor);
         //[/UserButtonCode_buttonConfigure]
     }
 

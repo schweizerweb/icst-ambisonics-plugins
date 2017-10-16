@@ -37,13 +37,14 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings)
+SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener)
     : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
 		ambiChannelNames.add(new String(AmbiHelper::getAmbiChannelName(i)));
+	addActionListener(pTestSoundListener);
     //[/Constructor_pre]
 
     addAndMakeVisible (groupSpeakers = new GroupComponent ("groupSpeakers",
@@ -372,9 +373,9 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings)
+void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener)
 {
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings);
+	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings, pTestSoundListener);
 	p->setSize(800, 700);
 
 	DialogWindow::LaunchOptions options;
@@ -492,7 +493,7 @@ double SpeakerSettingsComponent::getGain(int rowNumber) const
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	AlertWindow::showMessageBox(AlertWindow::InfoIcon, "Speaker Test", "Test sound for channel " + String(rowNumber) + " - Not implemented yet!");
+	sendActionMessage(String(rowNumber));
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const
@@ -595,7 +596,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener"
                  variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="800" initialHeight="800">
