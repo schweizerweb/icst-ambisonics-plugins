@@ -13,12 +13,12 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/AmbiSettings.h"
+#include "../../Common/TestSoundGenerator.h"
 
-#define NO_TEST_SOUND	-1
 //==============================================================================
 /**
 */
-class AmbisonicsDecoderAudioProcessor  : public AudioProcessor, public Timer, public ActionListener
+class AmbisonicsDecoderAudioProcessor  : public AudioProcessor
 {
 public:
     //==============================================================================
@@ -57,22 +57,17 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	void timerCallback() override;
-	void startSpeakerTest(int channelNb);
-	
-	void actionListenerCallback(const String& message) override;
-
 	// ambsonic specific
 	Array<AmbiPoint>* getSpeakerArray() const;
 	Array<AmbiPoint>* getMovingPointsArray() const;
 	AmbiSettings* getAmbiSettings() const;
+	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
 	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
 	ScopedPointer<AmbiSettings> pAmbiSettings;
-	int testSoundChannel;
-	Random random;
+	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)
