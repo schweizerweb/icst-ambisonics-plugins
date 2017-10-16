@@ -36,9 +36,9 @@ public:
 		slider.setValue(owner.getGain(row), dontSendNotification);
 	}
 
-	void sliderValueChanged(Slider* slider) override
+	void sliderValueChanged(Slider* changedSlider) override
 	{
-		owner.setGain(row, slider->getValue());
+		owner.setGain(row, changedSlider->getValue());
 	}
 
 	

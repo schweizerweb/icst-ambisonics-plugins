@@ -400,7 +400,7 @@ void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
 		pPointSelection->selectPoint(lastRowSelected);
 }
 
-void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int, int, bool rowIsSelected)
 {
 	const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
 		.interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
@@ -410,7 +410,7 @@ void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, in
 		g.fillAll(alternateColour);
 }
 
-void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool)
 {
 	g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
 	String text;
