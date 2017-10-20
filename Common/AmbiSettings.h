@@ -21,15 +21,18 @@ class AmbiSettings
 {
 public:
 	AmbiSettings();
-	AmbiSettings(double distanceScaler);
+	AmbiSettings(double distanceScaler, bool directionFlip);
 
 	double getDistanceScaler() const;
 	void setDistanceScaler(double newDistanceScaler);
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();
-	
+	bool getDirectionFlip() const;
+	void setDirectionFlip(bool flip);
+
 private:
 	double distanceScaler;
+	bool directionFlip;
 	double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];
 	double ambiOrderWeights[NB_OF_AMBISONICS_GAINS];
 };

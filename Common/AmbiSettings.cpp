@@ -10,23 +10,24 @@
 
 #include "AmbiSettings.h"
 
-AmbiSettings::AmbiSettings(): distanceScaler(DEFAULT_DISTANCE_SCALER)
+AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER, false)
+{
+	
+}
+
+AmbiSettings::AmbiSettings(double distanceScaler, bool directionFlip): distanceScaler(distanceScaler), directionFlip(directionFlip)
 {
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 		ambiOrderWeights[i] = 1.0;
 
 	// create mapping table
 	int order = 0;
-	for(int i = 0; i < NB_OF_AMBISONICS_CHANNELS; i++)
+	for (int i = 0; i < NB_OF_AMBISONICS_CHANNELS; i++)
 	{
 		if (i == (order + 1)*(order + 1))
 			order++;
 		ambiChannelWeights[i] = &ambiOrderWeights[order];
 	}
-}
-
-AmbiSettings::AmbiSettings(double distanceScaler): distanceScaler(distanceScaler)
-{
 }
 
 double AmbiSettings::getDistanceScaler() const
@@ -47,4 +48,14 @@ double AmbiSettings::getAmbiChannelWeight(int ambiChannel)
 double* AmbiSettings::getAmbiOrderWeightPointer()
 {
 	return ambiOrderWeights;
+}
+
+bool AmbiSettings::getDirectionFlip() const
+{
+	return directionFlip;
+}
+
+void AmbiSettings::setDirectionFlip(bool flip)
+{
+	directionFlip = flip;
 }

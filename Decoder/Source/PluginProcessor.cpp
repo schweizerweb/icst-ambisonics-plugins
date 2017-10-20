@@ -155,7 +155,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 		{
 			double ambiChannelWeight = pAmbiSettings->getAmbiChannelWeight(iChannel);
-			double ambiCoefficient = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
+			double ambiCoefficient = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false, pAmbiSettings->getDirectionFlip());
 			currentCoefficients[iChannel] = ambiChannelWeight * ambiCoefficient;
 		}
 		// apply to B-format and create output

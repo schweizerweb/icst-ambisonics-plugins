@@ -41,6 +41,11 @@ bool PresetInfo::LoadFromFile(File file)
 	{
 		ambiSettings->setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
 	}
+	XmlElement* xmlFlipDirection = xmlGeneral->getChildByName(XML_TAG_PRESET_FLIPDIRECTION);
+	if (xmlFlipDirection != nullptr)
+	{
+		ambiSettings->setDirectionFlip(xmlFlipDirection->getBoolAttribute(XML_VALUE));
+	}
 	XmlElement* xmlAmbiChannelWeight = xmlGeneral->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
 	int index = 0;
 	if (xmlAmbiChannelWeight != nullptr)
@@ -83,9 +88,15 @@ bool PresetInfo::SaveToFile(File file)
 	
 	// general
 	XmlElement* xmlGeneral = new XmlElement(XML_TAG_PRESET_GENERAL);
+	
 	XmlElement* xmlDistanceScaler = new XmlElement(XML_TAG_PRESET_DISTANCESCALER);
 	xmlDistanceScaler->setAttribute(XML_VALUE, ambiSettings->getDistanceScaler());
 	xmlGeneral->addChildElement(xmlDistanceScaler);
+	
+	XmlElement* xmlFlipDirection = new XmlElement(XML_TAG_PRESET_FLIPDIRECTION);
+	xmlFlipDirection->setAttribute(XML_VALUE, ambiSettings->getDirectionFlip());
+	xmlGeneral->addChildElement(xmlFlipDirection);
+
 	XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{

@@ -70,6 +70,7 @@ public:
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() const;
 
+	void updateDirectionFlip() const;
 	void loadPreset(PresetInfo* preset) const;
 	void updateComboBox(String elementToSelect = String::empty) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -77,12 +78,12 @@ public:
 	void updateDistanceScaler() const;
 	static int fact(int n);
 	void setInPhaseWeighting();
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-	void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
@@ -113,6 +114,9 @@ private:
     ScopedPointer<Label> label3;
     ScopedPointer<TextButton> buttonInPhase;
     ScopedPointer<TextButton> buttonBasic;
+    ScopedPointer<Label> label4;
+    ScopedPointer<ToggleButton> btnClockwise;
+    ScopedPointer<ToggleButton> btnCounterclockwise;
 
 
     //==============================================================================
