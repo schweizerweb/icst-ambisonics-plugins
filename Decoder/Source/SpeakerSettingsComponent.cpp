@@ -252,50 +252,46 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
     {
         //[UserComboBoxCode_comboBoxChannelConfig] -- add your combo box handling code here..
 		String presetName = comboBoxChannelConfig->getText();
-		PresetInfo* namedPreset = nullptr;
+		PresetInfo* preset = nullptr;
 		for (PresetInfo* info : *pPresets)
 		{
 			if (info->getName() == presetName)
 			{
-				namedPreset = info;
+				preset = info;
 				break;
 			}
 		}
-
-		if (namedPreset != nullptr)
+		if (preset != nullptr)
 		{
-			loadPreset(namedPreset);
+			loadPreset(preset);
 		}
 		else
 		{
-			// standard presets
+			preset = new PresetInfo();
+			
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
-
-			pSpeakerArray->clear();
 			if (nbChannels == 2)
 			{
-				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, -0.7, 0.0), "L", 0));
-				pSpeakerArray->add(AmbiPoint(Point3D<double>(0.7, 0.7, 0.0), "R", 0));
+				preset->getPoints()->add(new AmbiPoint(Point3D<double>(0.0, -1.0, 0.0), "L", 0));
+				preset->getPoints()->add(new AmbiPoint(Point3D<double>(0.0, 1.0, 0.0), "R", 0));
 			}
 			else
 			{
 				Point<float> projectedPoint(1.0, 0.0);
-				projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / nbChannels));
+				projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / nbChannels));
 				for (int i = 0; i < nbChannels; i++)
 				{
-					pSpeakerArray->add(AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), 0));
+					preset->getPoints()->add(new AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), 0));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
-			speakerList->updateContent();
-			speakerList->repaint();
-			pAmbiSettings->setDistanceScaler(DEFAULT_DISTANCE_SCALER);
-			pAmbiSettings->setDirectionFlip(false);
-			setInPhaseWeighting();
-			updateDirectionFlip();
-			updateDistanceScaler();
+			preset->getAmbiSettings()->setDistanceScaler(DEFAULT_DISTANCE_SCALER);
+			preset->getAmbiSettings()->setDirectionFlip(false);
+			setInPhaseWeighting(preset->getAmbiSettings());
+			loadPreset(preset);
+			delete(preset);
 		}
-        //[/UserComboBoxCode_comboBoxChannelConfig]
+		//[/UserComboBoxCode_comboBoxChannelConfig]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -403,7 +399,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonInPhase)
     {
         //[UserButtonCode_buttonInPhase] -- add your button handler code here..
-		setInPhaseWeighting();
+		setInPhaseWeighting(pAmbiSettings);
+		ambiChannelControl->updateValues();
         //[/UserButtonCode_buttonInPhase]
     }
     else if (buttonThatWasClicked == buttonBasic)
@@ -676,7 +673,7 @@ bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) cons
 	}
 	return false;
 }
-void SpeakerSettingsComponent::setInPhaseWeighting()
+void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings)
 {
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{
@@ -684,14 +681,13 @@ void SpeakerSettingsComponent::setInPhaseWeighting()
 		{
 			double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
 			double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
-			pAmbiSettings->getAmbiOrderWeightPointer()[i] = nom / denom;
+			pSettings->getAmbiOrderWeightPointer()[i] = nom / denom;
 		}
 		else
 		{
-			pAmbiSettings->getAmbiOrderWeightPointer()[i] = 0.0;
+			pSettings->getAmbiOrderWeightPointer()[i] = 0.0;
 		}
 	}
-	ambiChannelControl->updateValues();
 }
 //[/MiscUserCode]
 
