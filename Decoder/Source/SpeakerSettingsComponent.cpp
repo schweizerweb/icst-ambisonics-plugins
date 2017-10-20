@@ -210,7 +210,7 @@ void SpeakerSettingsComponent::resized()
     label2->setBounds (8 + 8, (getHeight() - 182) + 16, 104, 24);
     sliderDistanceScaler->setBounds (8 + 144, (getHeight() - 182) + 16, 352, 24);
     ambiChannelControl->setBounds (8 + 144, (getHeight() - 182) + 40, (getWidth() - 18) - 160, 176 - 56);
-    label3->setBounds (16, 328, 112, 24);
+    label3->setBounds (16, (getHeight() - 182) + 40, 112, 24);
     buttonInPhase->setBounds (8 + 16, (getHeight() - 182) + 96, 120, 24);
     buttonBasic->setBounds (8 + 16, (getHeight() - 182) + 64, 120, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -373,6 +373,20 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonInPhase)
     {
         //[UserButtonCode_buttonInPhase] -- add your button handler code here..
+		for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+		{
+			if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
+			{
+				double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
+				double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
+				pAmbiSettings->getAmbiOrderWeightPointer()[i] = nom/denom;
+			}
+			else
+			{
+				pAmbiSettings->getAmbiOrderWeightPointer()[i] = 0.0;
+			}
+		}
+		ambiChannelControl->updateValues();
         //[/UserButtonCode_buttonInPhase]
     }
     else if (buttonThatWasClicked == buttonBasic)
@@ -541,6 +555,16 @@ void SpeakerSettingsComponent::updateDistanceScaler() const
 	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
 }
 
+int SpeakerSettingsComponent::fact(int n)
+{
+	if (n == 0)
+		return 1;
+	int ret = n;
+	for (int i = n - 1; i > 1; i--)
+		ret *= i;
+	return ret;
+}
+
 void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 {
 	pSpeakerArray->clear();
@@ -690,10 +714,11 @@ BEGIN_JUCER_METADATA
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.01"/>
   <LABEL name="new label" id="ce2f83213d847908" memberName="label3" virtualName=""
-         explicitFocusOrder="0" pos="16 328 112 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Channel weights" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
+         explicitFocusOrder="0" pos="16 40 112 24" posRelativeY="17eb4b418501687a"
+         edTextCol="ff000000" edBkgCol="0" labelText="Channel weights"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15" kerning="0" bold="0" italic="0"
+         justification="33"/>
   <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
               virtualName="" explicitFocusOrder="0" pos="16 96 120 24" posRelativeX="17eb4b418501687a"
               posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"

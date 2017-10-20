@@ -75,6 +75,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
+	static int fact(int n);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
