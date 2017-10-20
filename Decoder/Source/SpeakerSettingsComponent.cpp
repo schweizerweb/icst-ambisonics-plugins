@@ -264,6 +264,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			speakerList->updateContent();
 			speakerList->repaint();
 			pAmbiSettings->setDistanceScaler(DEFAULT_DISTANCE_SCALER);
+			setInPhaseWeighting();
 			updateDistanceScaler();
 		}
         //[/UserComboBoxCode_comboBoxChannelConfig]
@@ -373,20 +374,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonInPhase)
     {
         //[UserButtonCode_buttonInPhase] -- add your button handler code here..
-		for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-		{
-			if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
-			{
-				double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
-				double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
-				pAmbiSettings->getAmbiOrderWeightPointer()[i] = nom/denom;
-			}
-			else
-			{
-				pAmbiSettings->getAmbiOrderWeightPointer()[i] = 0.0;
-			}
-		}
-		ambiChannelControl->updateValues();
+		setInPhaseWeighting();
         //[/UserButtonCode_buttonInPhase]
     }
     else if (buttonThatWasClicked == buttonBasic)
@@ -640,7 +628,23 @@ bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) cons
 	}
 	return false;
 }
-
+void SpeakerSettingsComponent::setInPhaseWeighting()
+{
+	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+	{
+		if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
+		{
+			double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
+			double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
+			pAmbiSettings->getAmbiOrderWeightPointer()[i] = nom / denom;
+		}
+		else
+		{
+			pAmbiSettings->getAmbiOrderWeightPointer()[i] = 0.0;
+		}
+	}
+	ambiChannelControl->updateValues();
+}
 //[/MiscUserCode]
 
 

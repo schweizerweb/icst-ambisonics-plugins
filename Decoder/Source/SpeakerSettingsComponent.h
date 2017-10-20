@@ -76,12 +76,13 @@ public:
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
 	static int fact(int n);
-    //[/UserMethods]
+	void setInPhaseWeighting();
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+	void buttonClicked (Button* buttonThatWasClicked) override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
