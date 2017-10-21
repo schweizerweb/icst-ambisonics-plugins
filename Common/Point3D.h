@@ -12,7 +12,13 @@
 #define POINT3D_H_INCLUDED
 
 #include "JuceHeader.h"
-#define SQRT3 sqrt(3)
+#define	SQRT105		10.246950766	/*sqrt(105.0)*/
+#define SQRT15		3.87298334621	/*sqrt(15.0)*/
+#define SQRT7		2.64575131106	/*sqrt(7.0)*/
+#define SQRT5		2.2360679775	/*sqrt(5.0)*/
+#define SQRT35_8	2.09165006634	/*sqrt(35.0/8.0)*/
+#define SQRT21_8	1.6201851746	/*sqrt(21.0/8.0)*/
+
 #define PI 3.1415926535897932384626433832795
 #define DISTANCE_MIN_VALUE 0.0001
 
@@ -264,6 +270,42 @@ public:
 			break;
 		case 3: // X
 			value = 3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
+			break;
+		case 4: // V
+			value = SQRT15 / 2.0 * pow(cos(getElevation()), 2.0) * sin(2.0 * azimuthFactor * getAzimuth()) / SQRT5;
+			break;
+		case 5: // T
+			value = SQRT15 / 2.0 * sin(2.0 * getElevation()) * sin(azimuthFactor * getAzimuth()) / SQRT5;
+			break;
+		case 6:	// R
+			value = 0.5 * (3 * pow(sin(getElevation()), 2.0) - 1);
+			break;
+		case 7: // S
+			value = SQRT15 / 2.0 * sin(2 * getElevation()) * cos(azimuthFactor * getAzimuth()) / SQRT5;
+			break;
+		case 8: // U
+			value = SQRT15 / 2.0 * pow(cos(getElevation()), 2.0) * cos(2.0 * azimuthFactor * getAzimuth()) / SQRT5;
+			break;
+		case 9: // Q
+			value = SQRT35_8 * pow(cos(getElevation()), 3.0) * sin(3.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			break;
+		case 10:	// O
+			value = SQRT105 / 2.0 * sin(getElevation()) * pow(cos(getElevation()), 2.0) * sin(2.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			break;
+		case 11:	// M
+			value = SQRT21_8 * cos(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 1.0) * sin(azimuthFactor * getAzimuth()) / SQRT7;
+			break;
+		case 12:	// K
+			value = 0.5 * sin(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 3);
+			break;
+		case 13:	// L
+			value = SQRT21_8 * cos(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 1.0) * cos(azimuthFactor * getAzimuth()) / SQRT7;
+			break;
+		case 14:	// N
+			value = SQRT105 / 2.0 * sin(getElevation()) * pow(cos(getElevation()), 2.0) * cos(2.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			break;
+		case 15:	// P
+			value = SQRT35_8 * pow(cos(getElevation()), 3.0) * cos(3.0 * azimuthFactor * getAzimuth()) / SQRT7;
 			break;
 		default:
 			return 0;
