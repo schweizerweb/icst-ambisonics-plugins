@@ -18,6 +18,15 @@
 #define SQRT5		2.2360679775	/*sqrt(5.0)*/
 #define SQRT35_8	2.09165006634	/*sqrt(35.0/8.0)*/
 #define SQRT21_8	1.6201851746	/*sqrt(21.0/8.0)*/
+#define SQRT35		5.9160797831	/*sqrt(35.0)*/
+#define SQRT35_2	4.18330013267	/*sqrt(35.0/2.0)*/
+#define SQRT5_2		1.58113883008	/*sqrt(5.0/2.0)*/
+#define SQRT77_2	6.204836823		/*sqrt(77.0/2.0)*/
+#define SQRT11		3.31662479036	/*sqrt(11.0)*/
+#define SQRT385		19.6214168703	/*sqrt(385.0)*/
+#define SQRT1155	33.9852909359	/*sqrt(1155.0)*/
+#define SQRT165		12.8452325787	/*sqrt(165.0)*/
+#define SQRT385_2	13.8744369255	/*sqrt(385.0/2.0)*/
 
 #define PI 3.1415926535897932384626433832795
 #define DISTANCE_MIN_VALUE 0.0001
@@ -252,60 +261,225 @@ public:
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
 	String toShortStringAed()	{ return String(getAzimuth()*180/PI, 2) + ", " + String(getElevation()*180/PI, 2) + ", " + String(getDistance(), 2); }
 
+	void getAmbisonicsCoefficients(ValueType* pCoefficients, bool flipDirection)
+	{
+		ValueType a = (flipDirection ? -1.0 : 1.0) * getAzimuth();
+		ValueType e = getElevation();
+
+		pCoefficients[0] = 1.0;
+
+		if (JucePlugin_MaxNumInputChannels < 4)
+			return;
+
+		ValueType sinE = sin(e);
+		ValueType cosE = cos(e);
+		ValueType sinA = sin(a);
+		ValueType cosA = cos(a);
+
+		pCoefficients[1] = 3.0 * cosE * sinA;
+		pCoefficients[2] = 3.0 * sinE;
+		pCoefficients[3] = 3.0 * cosE * cosA;
+
+		if (JucePlugin_MaxNumInputChannels < 9)
+			return;
+
+		ValueType cosE2 = pow(cos(e), 2.0);
+		ValueType sin2A = sin(2.0 * a);
+		ValueType sin2E = sin(2.0 * e);
+		ValueType sinE2 = pow(sin(e), 2.0);
+		ValueType cos2A = cos(2.0 * a);
+		pCoefficients[4] = SQRT15 / 2.0 * cosE2 * sin2A * SQRT5;
+		pCoefficients[5] = SQRT15 / 2.0 * sin2E * sinA * SQRT5;
+		pCoefficients[6] = 2.5 * (3 * sinE2 - 1);
+		pCoefficients[7] = SQRT15 / 2.0 * sin2E * cosA * SQRT5;
+		pCoefficients[8] = SQRT15 / 2.0 * cosE2 * cos2A * SQRT5;
+
+		if (JucePlugin_MaxNumInputChannels < 16)
+			return;
+
+		ValueType cosE3 = pow(cos(e), 3.0);
+		ValueType sin3A = sin(3.0 * a);
+		ValueType cos3A = cos(3.0 * a);
+		pCoefficients[9] = SQRT35_8 * cosE3 * sin3A * SQRT7;
+		pCoefficients[10] = SQRT105 / 2.0 * sinE * cosE2 * sin2A * SQRT7;
+		pCoefficients[11] = SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * sinA * SQRT7;
+		pCoefficients[12] = 3.5 * sinE * (5.0 * sinE2 - 3);
+		pCoefficients[13] = SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * cosA * SQRT7;
+		pCoefficients[14] = SQRT105 / 2.0 * sinE * cosE2 * cos2A * SQRT7;
+		pCoefficients[15] = SQRT35_8 * cosE3 * cos3A * SQRT7;
+			
+		if (JucePlugin_MaxNumInputChannels < 25)
+			return;
+
+		ValueType cosE4 = pow(cos(e), 4.0);
+		ValueType sin4A = sin(4.0 * a);
+		ValueType sinE4 = pow(sin(e), 4.0);
+		ValueType cos4A = cos(4.0 * a);
+		pCoefficients[16] = 9.0 / 8.0 * SQRT35 * cosE4 * sin4A;
+		pCoefficients[17] = 4.5 * SQRT35_2 * sinE * cosE3 * sin3A;
+		pCoefficients[18] = 9.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * sin2A;
+		pCoefficients[19] = 9.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * sinA;
+		pCoefficients[20] = 9.0 / 8.0 * (35.0 * sinE4 - 30.0 * sinE2 + 3.0);
+		pCoefficients[21] = 9.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * cosA;
+		pCoefficients[22] = 9.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * cos2A;
+		pCoefficients[23] = 4.5 * SQRT35_2 * sinE * cosE3 * cos3A;
+		pCoefficients[24] = 9.0 / 8.0 * SQRT35 * cosE4 * cos4A;
+
+		if (JucePlugin_MaxNumInputChannels < 36)
+			return;
+
+		ValueType cosE5 = pow(cos(e), 5.0);
+		ValueType sin5A = sin(5.0 * a);
+		ValueType sinE5 = pow(sin(e), 5.0);
+		ValueType sinE3 = pow(sin(e), 3.0);
+		ValueType cos5A = cos(5.0 * a);
+		pCoefficients[25] = 3.0 / 8.0 * SQRT77_2 * cosE5 * sin5A * SQRT11;
+		pCoefficients[26] = 3.0 / 8.0 * SQRT385 * sinE * cosE4 * sin4A * SQRT11;
+		pCoefficients[27] = 1.0 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * sin3A * SQRT11;
+		pCoefficients[28] = SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * sin2A * SQRT11;
+		pCoefficients[29] = SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * sinA * SQRT11;
+		pCoefficients[30] = 11.0 / 8.0 * (63.0 * sinE5 - 70.0 * sinE3 + 15.0 * sinA);
+		pCoefficients[31] = SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * cosA * SQRT11;
+		pCoefficients[32] = SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * cos2A * SQRT11;
+		pCoefficients[33] = 1.0 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * cos3A * SQRT11;
+		pCoefficients[34] = 3.0 / 8.0 * SQRT385 * sinE * cosE4 * cos4A * SQRT11;
+		pCoefficients[35] = 3.0 / 8.0 * SQRT77_2 * cosE5 * cos5A * SQRT11;
+	}
+
 	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance, bool flipDirection)
 	{
 		double value;
-		double azimuthFactor = flipDirection ? -1.0 : 1.0;
-
+		double a = (flipDirection ? -1.0 : 1.0) * getAzimuth();
+		double e = getElevation();
 		switch (ambiChannel) 
 		{
 		case 0: // W
 			value = 1.0; 
 			break;
+
+			////////////////////////////////////////////////
+			// Order 1
+			////////////////////////////////////////////////
 		case 1: // Y
-			value = 3 * sin(azimuthFactor * getAzimuth()) * cos(getElevation());
+			value = 3 * sin(a) * cos(e);
 			break;
 		case 2: // Z
-			value = 3 * sin(getElevation());
+			value = 3 * sin(e);
 			break;
 		case 3: // X
-			value = 3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
+			value = 3 * cos(a) * cos(e);
 			break;
+
+			////////////////////////////////////////////////
+			// Order 2
+			////////////////////////////////////////////////
 		case 4: // V
-			value = SQRT15 / 2.0 * pow(cos(getElevation()), 2.0) * sin(2.0 * azimuthFactor * getAzimuth()) / SQRT5;
+			value = SQRT15 / 2.0 * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT5;
 			break;
 		case 5: // T
-			value = SQRT15 / 2.0 * sin(2.0 * getElevation()) * sin(azimuthFactor * getAzimuth()) / SQRT5;
+			value = SQRT15 / 2.0 * sin(2.0 * e) * sin(a) * SQRT5;
 			break;
 		case 6:	// R
-			value = 0.5 * (3 * pow(sin(getElevation()), 2.0) - 1);
+			value = 2.5 * (3 * pow(sin(e), 2.0) - 1);
 			break;
 		case 7: // S
-			value = SQRT15 / 2.0 * sin(2 * getElevation()) * cos(azimuthFactor * getAzimuth()) / SQRT5;
+			value = SQRT15 / 2.0 * sin(2 * e) * cos(a) * SQRT5;
 			break;
 		case 8: // U
-			value = SQRT15 / 2.0 * pow(cos(getElevation()), 2.0) * cos(2.0 * azimuthFactor * getAzimuth()) / SQRT5;
+			value = SQRT15 / 2.0 * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT5;
 			break;
+
+			////////////////////////////////////////////////
+			// Order 3
+			////////////////////////////////////////////////
 		case 9: // Q
-			value = SQRT35_8 * pow(cos(getElevation()), 3.0) * sin(3.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT35_8 * pow(cos(e), 3.0) * sin(3.0 * a) * SQRT7;
 			break;
 		case 10:	// O
-			value = SQRT105 / 2.0 * sin(getElevation()) * pow(cos(getElevation()), 2.0) * sin(2.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT105 / 2.0 * sin(e) * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT7;
 			break;
 		case 11:	// M
-			value = SQRT21_8 * cos(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 1.0) * sin(azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT21_8 * cos(e) * (5.0 * pow(sin(e), 2.0) - 1.0) * sin(a) * SQRT7;
 			break;
 		case 12:	// K
-			value = 0.5 * sin(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 3);
+			value = 3.5 * sin(e) * (5.0 * pow(sin(e), 2.0) - 3);
 			break;
 		case 13:	// L
-			value = SQRT21_8 * cos(getElevation()) * (5.0 * pow(sin(getElevation()), 2.0) - 1.0) * cos(azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT21_8 * cos(e) * (5.0 * pow(sin(e), 2.0) - 1.0) * cos(a) * SQRT7;
 			break;
 		case 14:	// N
-			value = SQRT105 / 2.0 * sin(getElevation()) * pow(cos(getElevation()), 2.0) * cos(2.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT105 / 2.0 * sin(e) * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT7;
 			break;
 		case 15:	// P
-			value = SQRT35_8 * pow(cos(getElevation()), 3.0) * cos(3.0 * azimuthFactor * getAzimuth()) / SQRT7;
+			value = SQRT35_8 * pow(cos(e), 3.0) * cos(3.0 * a) * SQRT7;
+			break;
+
+			////////////////////////////////////////////////
+			// Order 4
+			////////////////////////////////////////////////
+		case 16:
+			value = 9.0 / 8.0 * SQRT35 * pow(cos(e), 4.0) * sin(4.0 * a);
+			break;
+		case 17:
+			value = 4.5 * SQRT35_2 * sin(e) * pow(cos(e), 3.0) * sin(3.0 * a);
+			break;
+		case 18:
+			value = 9.0 * SQRT5 / 4.0 * (7.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * sin(2.0 * a);
+			break;
+		case 19:
+			value = 9.0 / 4.0 * SQRT5_2 * sin(2.0 * e) * (7.0 * pow(sin(e), 2.0) - 3.0) * sin(a);
+			break;
+		case 20:
+			value = 9.0 / 8.0 * (35.0 * pow(sin(e), 4.0) - 30.0 * pow(sin(e), 2.0) + 3.0);
+			break;
+		case 21:
+			value = 9.0 / 4.0 * SQRT5_2 * sin(2.0 * e) * (7.0 * pow(sin(e), 2.0) - 3.0) * cos(a);
+			break;
+		case 22:
+			value = 9.0 * SQRT5 / 4.0 * (7.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * cos(2.0 * a);
+			break;
+		case 23:
+			value = 4.5 * SQRT35_2 * sin(e) * pow(cos(e), 3.0) * cos(3.0 * a);
+			break;
+		case 24:
+			value = 9.0 / 8.0 * SQRT35 * pow(cos(e), 4.0) * cos(4.0 * a);
+			break;
+
+			////////////////////////////////////////////////
+			// Order 5
+			////////////////////////////////////////////////
+		case 25:
+			value = 3.0 / 8.0 * SQRT77_2 * pow(cos(e), 5.0) * sin(5.0 * a) * SQRT11;
+			break;
+		case 26:
+			value = 3.0 / 8.0 * SQRT385 * sin(e) * pow(cos(e), 4.0) * sin(4.0 * a) * SQRT11;
+			break;
+		case 27:
+			value = 1.0 / 8.0 * SQRT385_2 * (9.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 3.0) * sin(3.0 * a) * SQRT11;
+			break;
+		case 28:
+			value = SQRT1155 / 4.0 * sin(e) * (3.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT11;
+			break;
+		case 29:
+			value = SQRT165 / 8.0 * (21.0 * pow(sin(e), 4.0) - 14.0 * pow(sin(e), 2.0) + 1.0) * cos(e) * sin(a) * SQRT11;
+			break;
+		case 30:
+			value = 11.0 / 8.0 * (63.0 * pow(sin(e), 5.0) - 70.0 * pow(sin(e), 3.0) + 15.0 * sin(a));
+			break;
+		case 31:
+			value = SQRT165 / 8.0 * (21.0 * pow(sin(e), 4.0) - 14.0 * pow(sin(e), 2.0) + 1.0) * cos(e) * cos(a) * SQRT11;
+			break;
+		case 32:
+			value = SQRT1155 / 4.0 * sin(e) * (3.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT11;
+			break;
+		case 33:
+			value = 1.0 / 8.0 * SQRT385_2 * (9.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 3.0) * cos(3.0 * a) * SQRT11;
+			break;
+		case 34:
+			value = 3.0 / 8.0 * SQRT385 * sin(e) * pow(cos(e), 4.0) * cos(4.0 * a) * SQRT11;
+			break;
+		case 35:
+			value = 3.0 / 8.0 * SQRT77_2 * pow(cos(e), 5.0) * cos(5.0 * a) * SQRT11;
 			break;
 		default:
 			return 0;
