@@ -263,12 +263,14 @@ public:
 
 	void getAmbisonicsCoefficients(ValueType* pCoefficients, bool flipDirection)
 	{
+		// speed optimized version, calculates all coefficients in one sequence
+
 		ValueType a = (flipDirection ? -1.0 : 1.0) * getAzimuth();
 		ValueType e = getElevation();
 
 		pCoefficients[0] = 1.0;
 
-		if (JucePlugin_MaxNumInputChannels < 4)
+		if (JucePlugin_MaxNumInputChannels < 4)	// 0th order
 			return;
 
 		ValueType sinE = sin(e);
@@ -280,7 +282,7 @@ public:
 		pCoefficients[2] = 3.0 * sinE;
 		pCoefficients[3] = 3.0 * cosE * cosA;
 
-		if (JucePlugin_MaxNumInputChannels < 9)
+		if (JucePlugin_MaxNumInputChannels < 9) // 1st order
 			return;
 
 		ValueType cosE2 = pow(cos(e), 2.0);
@@ -294,7 +296,7 @@ public:
 		pCoefficients[7] = SQRT15 / 2.0 * sin2E * cosA * SQRT5;
 		pCoefficients[8] = SQRT15 / 2.0 * cosE2 * cos2A * SQRT5;
 
-		if (JucePlugin_MaxNumInputChannels < 16)
+		if (JucePlugin_MaxNumInputChannels < 16)	// 2nd order
 			return;
 
 		ValueType cosE3 = pow(cos(e), 3.0);
@@ -308,7 +310,7 @@ public:
 		pCoefficients[14] = SQRT105 / 2.0 * sinE * cosE2 * cos2A * SQRT7;
 		pCoefficients[15] = SQRT35_8 * cosE3 * cos3A * SQRT7;
 			
-		if (JucePlugin_MaxNumInputChannels < 25)
+		if (JucePlugin_MaxNumInputChannels < 25)	// 3rd order
 			return;
 
 		ValueType cosE4 = pow(cos(e), 4.0);
@@ -325,7 +327,7 @@ public:
 		pCoefficients[23] = 4.5 * SQRT35_2 * sinE * cosE3 * cos3A;
 		pCoefficients[24] = 9.0 / 8.0 * SQRT35 * cosE4 * cos4A;
 
-		if (JucePlugin_MaxNumInputChannels < 36)
+		if (JucePlugin_MaxNumInputChannels < 36)	// 4th order
 			return;
 
 		ValueType cosE5 = pow(cos(e), 5.0);
@@ -348,6 +350,8 @@ public:
 
 	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance, bool flipDirection)
 	{
+		// first implementation of coefficient calculation, allows to apply distance gain and is easier to use for debugging
+
 		double value;
 		double a = (flipDirection ? -1.0 : 1.0) * getAzimuth();
 		double e = getElevation();
