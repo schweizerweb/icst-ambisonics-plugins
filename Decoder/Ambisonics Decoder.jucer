@@ -1,18 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="AAMgSi" name="Ambisonics Decoder" displaySplashScreen="1"
+<JUCERPROJECT id="AAMgSi" name="Ambisonic Decoder" displaySplashScreen="1"
               reportAppUsage="1" splashScreenColour="Dark" projectType="audioplug"
-              version="0.1.0" bundleIdentifier="com.yourcompany.AmbisonicsDecoder"
+              version="0.2.0" bundleIdentifier="com.zhdk.ambisonicdecoder"
               includeBinaryInAppConfig="1" buildVST="1" buildVST3="1" buildAU="1"
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="0"
-              enableIAA="0" pluginName="Ambisonics Decoder" pluginDesc="Ambisonics Decoder"
+              enableIAA="0" pluginName="Ambisonic Decoder" pluginDesc="Ambisonic Decoder"
               pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK" pluginCode="AADC"
-              pluginChannelConfigs="{4,32}" pluginIsSynth="0" pluginWantsMidiIn="1"
+              pluginChannelConfigs="{4,32}" pluginIsSynth="0" pluginWantsMidiIn="0"
               pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
-              pluginAUExportPrefix="AmbisonicsDecoderAU" pluginRTASCategory=""
-              aaxIdentifier="com.yourcompany.AmbisonicsDecoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
+              pluginAUExportPrefix="AmbisonicDecoderAU" pluginRTASCategory=""
+              aaxIdentifier="com.zhdk.ambisonicdecoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
               jucerVersion="5.0.2" companyName="ZHdK">
-  <MAINGROUP id="oa5A98" name="Ambisonics Decoder">
+  <MAINGROUP id="oa5A98" name="Ambisonic Decoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
@@ -80,9 +80,9 @@
     <VS2017 targetFolder="Builds/VisualStudio2017" vst3Folder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="1" optimisation="1" targetName="Ambisonics Decoder"/>
+                       isDebug="1" optimisation="1" targetName="Ambisonic Decoder"/>
         <CONFIGURATION name="Release" winWarningLevel="4" generateManifest="1" winArchitecture="x64"
-                       isDebug="0" optimisation="3" targetName="Ambisonics Decoder"/>
+                       isDebug="0" optimisation="3" targetName="Ambisonic Decoder"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
@@ -104,8 +104,8 @@
     </VS2017>
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonics Decoder"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonics Decoder"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Decoder"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Decoder"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../JUCE/modules"/>
