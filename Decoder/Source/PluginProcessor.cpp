@@ -29,6 +29,10 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 	pMovingPointsArray = new Array<AmbiPoint>();
 	pAmbiSettings = new AmbiSettings();
 	pTestSoundGenerator = new TestSoundGenerator();
+
+	UndoManager* undoManager = new UndoManager();
+	AudioProcessorValueTreeState* state = new AudioProcessorValueTreeState(*this, undoManager);
+	state->createAndAddParameter("OSC-Port", "OSC-Port", "OSC-Port", NormalisableRange<float>(1, 9999999999, 1), 5011, intFloatToString, stringToIntFloat);
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()

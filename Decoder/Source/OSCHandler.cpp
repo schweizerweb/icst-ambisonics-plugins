@@ -17,6 +17,7 @@ OSCHandler::OSCHandler(Array<AmbiPoint>* pAmbiPointArr)
 
 bool OSCHandler::start()
 {
+	disconnect();
 	bool ok = connect(5011);
 
 	if (!ok)
