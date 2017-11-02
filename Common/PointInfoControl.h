@@ -37,15 +37,14 @@
 */
 class PointInfoControl  : public Component,
                           public ChangeListener,
-                          public TextEditorListener,
-                          public ButtonListener
+                          public TextEditorListener
 {
 public:
     //==============================================================================
     PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection);
     ~PointInfoControl();
 
-	//==============================================================================
+    //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void updateSelectedPoint(String exceptField = "");
 	void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -55,11 +54,10 @@ public:
 	void setFieldsEnabled(bool enable) const;
 	double RadToGrad(double rad) const;
 	double GradToRad(float grad) const;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
@@ -86,8 +84,6 @@ private:
     ScopedPointer<Label> label9;
     ScopedPointer<TextEditor> textD;
     ScopedPointer<Label> label10;
-    ScopedPointer<TextButton> buttonAdd;
-    ScopedPointer<TextButton> buttonRemove;
 
 
     //==============================================================================

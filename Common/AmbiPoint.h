@@ -16,14 +16,15 @@
 class AmbiPoint
 {
 public:
-	AmbiPoint(): colorIndex(0)
+	AmbiPoint(): colorIndex(0), gain(1.0)
 	{
 	}
 
-	AmbiPoint(Point3D<double> point, String name, int colorIndex = 0) : 
+	AmbiPoint(Point3D<double> point, String name, int colorIndex = 0, double gain = 1.0) :
 		point(point),
+		colorIndex(colorIndex), 
 		name(name),
-		colorIndex(colorIndex)
+		gain(gain)
 	{
 	}
 
@@ -47,10 +48,21 @@ public:
 		name = newName;
 	}
 
+	double getGain() const
+	{
+		return gain;
+	};
+
+	void setGain(double newGain)
+	{
+		gain = newGain;
+	}
+
 private:
 	Point3D<double> point;
 	int colorIndex;
 	String name;
+	double gain;
 };
 
 

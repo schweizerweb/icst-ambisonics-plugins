@@ -43,7 +43,7 @@ class RadarComponent  : public Component
 {
 public:
     //==============================================================================
-    RadarComponent (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray);
+    RadarComponent (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, PointSelection* pPointSelection);
     ~RadarComponent();
 
     //==============================================================================
@@ -58,7 +58,6 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     ZoomSettings zoomSettings;
-	PointSelection pointSelection;
     //[/UserVariables]
 
     //==============================================================================

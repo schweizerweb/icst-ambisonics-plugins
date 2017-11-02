@@ -39,8 +39,6 @@
                                                                     //[/Comments]
 */
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
-                                               public Timer,
-                                               public ComboBoxListener,
                                                public ButtonListener
 {
 public:
@@ -50,14 +48,10 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void timerCallback() override;
-	void loadPreset(PresetInfo* preset) const;
-	void updateComboBox(String elementToSelect = String::empty);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
 
@@ -67,16 +61,15 @@ private:
 	AmbisonicsDecoderAudioProcessor& processor;
 	Array<AmbiPoint>* pSpeakerArray;
 	Array<AmbiPoint>* pMovingPointsArray;
+	AmbiSettings* pAmbiSettings;
 	OwnedArray<PresetInfo> presets;
 	ScopedPointer<OSCHandler> oscHandler;
+	PointSelection pointSelection;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<ComboBox> comboBoxChannelConfig;
     ScopedPointer<RadarComponent> component;
-    ScopedPointer<Label> label;
-    ScopedPointer<TextButton> buttonLoad;
-    ScopedPointer<TextButton> buttonSave;
+    ScopedPointer<TextButton> buttonConfigure;
 
 
     //==============================================================================

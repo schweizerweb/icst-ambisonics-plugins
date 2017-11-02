@@ -12,7 +12,8 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
-
+#include "../../Common/AmbiSettings.h"
+#include "../../Common/TestSoundGenerator.h"
 
 //==============================================================================
 /**
@@ -59,10 +60,15 @@ public:
 	// ambsonic specific
 	Array<AmbiPoint>* getSpeakerArray() const;
 	Array<AmbiPoint>* getMovingPointsArray() const;
+	AmbiSettings* getAmbiSettings() const;
+	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
 	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
+	ScopedPointer<AmbiSettings> pAmbiSettings;
+	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;
+
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)
 };

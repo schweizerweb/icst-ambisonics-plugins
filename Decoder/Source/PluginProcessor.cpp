@@ -27,11 +27,16 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 {
 	pSpeakerArray = new Array<AmbiPoint>();
 	pMovingPointsArray = new Array<AmbiPoint>();
+	pAmbiSettings = new AmbiSettings();
+	pTestSoundGenerator = new TestSoundGenerator();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
 	pSpeakerArray = nullptr;
+	pMovingPointsArray = nullptr;
+	pAmbiSettings = nullptr;
+	pTestSoundGenerator = nullptr;
 }
 
 //==============================================================================
@@ -138,22 +143,32 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
 
+	// clear output buffers if less than #input channels used, the others will be overwritten later
+	for (int i = pSpeakerArray->size(); i < totalNumInputChannels; ++i)
+		buffer.clear(i, 0, buffer.getNumSamples());
+
 	for(int iSpeaker = 0; iSpeaker < pSpeakerArray->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		// calculate ambisonics coefficients
 		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
+		double speakerGain = pSpeakerArray->getReference(iSpeaker).getGain();
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-			currentCoefficients[iChannel] = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false);
-		
+		{
+			double ambiChannelWeight = pAmbiSettings->getAmbiChannelWeight(iChannel);
+			double ambiCoefficient = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false, pAmbiSettings->getDirectionFlip());
+			currentCoefficients[iChannel] = ambiChannelWeight * ambiCoefficient;
+		}
 		// apply to B-format and create output
 		float* channelData = buffer.getWritePointer(iSpeaker);
 		for(int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
 		{
 			channelData[iSample] = 0.0f;
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-				channelData[iSample] += inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
+				channelData[iSample] += speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
 		}
 	}
+
+	pTestSoundGenerator->process(&buffer);
 }
 
 //==============================================================================
@@ -189,6 +204,16 @@ Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const
 Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
 {
 	return pMovingPointsArray;
+}
+
+AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
+{
+	return pAmbiSettings;
+}
+
+TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() const
+{
+	return pTestSoundGenerator;
 }
 
 //==============================================================================

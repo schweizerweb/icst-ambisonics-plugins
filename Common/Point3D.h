@@ -246,23 +246,24 @@ public:
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
 	String toShortStringAed()	{ return String(getAzimuth()*180/PI, 2) + ", " + String(getElevation()*180/PI, 2) + ", " + String(getDistance(), 2); }
 
-	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance)
+	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance, bool flipDirection)
 	{
 		double value;
+		double azimuthFactor = flipDirection ? -1.0 : 1.0;
 
 		switch (ambiChannel) 
 		{
 		case 0: // W
 			value = 1.0; 
 			break;
-		case 1: // X
-			value = SQRT3 * cos(getAzimuth()) * cos(getElevation());
+		case 1: // Y
+			value = 3 * sin(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
-		case 2: // Y
-			value = SQRT3 * sin(getAzimuth()) * cos(getElevation());
+		case 2: // Z
+			value = 3 * sin(getElevation());
 			break;
-		case 3: // Z
-			value = SQRT3 * sin(getElevation());
+		case 3: // X
+			value = 3 * cos(azimuthFactor * getAzimuth()) * cos(getElevation());
 			break;
 		default:
 			return 0;
