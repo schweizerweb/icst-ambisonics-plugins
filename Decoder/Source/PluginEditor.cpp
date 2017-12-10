@@ -36,7 +36,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	oscHandler = new OSCHandler(pMovingPointsArray);
-	if(!oscHandler->start())
+	if(!oscHandler->start(5011))
 	{
 		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "OSC", "Error starting OSC-Handler!", "OK");
 	}

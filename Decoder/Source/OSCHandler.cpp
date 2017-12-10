@@ -15,10 +15,10 @@ OSCHandler::OSCHandler(Array<AmbiPoint>* pAmbiPointArr)
 	pAmbiPointArray = pAmbiPointArr;
 }
 
-bool OSCHandler::start()
+bool OSCHandler::start(int portNb)
 {
 	disconnect();
-	bool ok = connect(5011);
+	bool ok = connect(portNb);
 
 	if (!ok)
 		return false;

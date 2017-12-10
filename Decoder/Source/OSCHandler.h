@@ -18,7 +18,7 @@ class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCa
 {
 public:
 	OSCHandler(Array<AmbiPoint>* pAmbiPointArray);
-	bool start();
+	bool start(int portNb);
 	void oscMessageReceived(const OSCMessage& message) override;
 
 private:
