@@ -137,7 +137,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
-    float currentCoefficients[JucePlugin_MaxNumInputChannels];
+    double currentCoefficients[JucePlugin_MaxNumInputChannels];
 	const float* inputBufferPointers[JucePlugin_MaxNumInputChannels];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
@@ -156,11 +156,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		// calculate ambisonics coefficients
 		Point3D<double>* pSpeakerPoint = pSpeakerArray->getReference(iSpeaker).getPoint();
 		double speakerGain = pSpeakerArray->getReference(iSpeaker).getGain();
+		pSpeakerPoint->getAmbisonicsCoefficients(&currentCoefficients[0], pAmbiSettings->getDirectionFlip());
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 		{
-			double ambiChannelWeight = pAmbiSettings->getAmbiChannelWeight(iChannel);
-			double ambiCoefficient = pSpeakerPoint->getAmbisonicsCoefficient(iChannel, false, pAmbiSettings->getDirectionFlip());
-			currentCoefficients[iChannel] = ambiChannelWeight * ambiCoefficient;
+			currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
 		}
 		// apply to B-format and create output
 		float* channelData = buffer.getWritePointer(iSpeaker);
