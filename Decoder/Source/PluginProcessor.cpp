@@ -32,8 +32,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 	pTestSoundGenerator = new TestSoundGenerator();
 
 	// Todo: load state
-	UndoManager* undoManager = new UndoManager();
-	AudioProcessorValueTreeState* state = new AudioProcessorValueTreeState(*this, undoManager);
+//	UndoManager* undoManager = new UndoManager();
+//	AudioProcessorValueTreeState* state = new AudioProcessorValueTreeState(*this, undoManager);
 //	state->createAndAddParameter("OSC-Port", "OSC-Port", "OSC-Port", NormalisableRange<float>(1, 9999999999, 1), 5011, intFloatToString, stringToIntFloat);
 }
 
