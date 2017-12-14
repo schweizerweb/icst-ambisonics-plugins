@@ -65,6 +65,7 @@ DecoderSettingsComponent::DecoderSettingsComponent (DecoderSettings* pSettings)
 
 
     //[Constructor] You can add your own custom stuff here..
+	textOscPort->addListener(this);
 	toggleReceiveOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
     //[/Constructor]
@@ -141,7 +142,7 @@ void DecoderSettingsComponent::showAsDialog(DecoderSettings* pSettings)
 	options.escapeKeyTriggersCloseButton = false;
 	options.useNativeTitleBar = false;
 	options.resizable = true;
-	options.launchAsync();
+	options.runModal();
 }
 
 void DecoderSettingsComponent::textEditorTextChanged(TextEditor& editor)
