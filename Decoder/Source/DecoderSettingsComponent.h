@@ -21,10 +21,6 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "PluginProcessor.h"
-#include "../../Common/RadarComponent.h"
-#include "PresetInfo.h"
-#include "OSCHandler.h"
 #include "DecoderSettings.h"
 //[/Headers]
 
@@ -38,18 +34,20 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
-                                               public ButtonListener
+class DecoderSettingsComponent  : public Component,
+                                  public TextEditorListener,
+                                  public ButtonListener
 {
 public:
     //==============================================================================
-    AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc);
-    ~AmbisonicsDecoderAudioProcessorEditor();
+    DecoderSettingsComponent (DecoderSettings* pSettings);
+    ~DecoderSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void initializeOscHandler() const;
-    //[/UserMethods]
+	static void showAsDialog(DecoderSettings* pSettings);
+	void textEditorTextChanged(TextEditor& editor) override;
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -59,24 +57,18 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	AmbisonicsDecoderAudioProcessor& processor;
-	Array<AmbiPoint>* pSpeakerArray;
-	Array<AmbiPoint>* pMovingPointsArray;
-	AmbiSettings* pAmbiSettings;
-	DecoderSettings *pDecoderSettings;
-	OwnedArray<PresetInfo> presets;
-	ScopedPointer<OSCHandler> oscHandler;
-	PointSelection pointSelection;
+	DecoderSettings * pDecoderSettings;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<RadarComponent> component;
-    ScopedPointer<TextButton> buttonConfigure;
-    ScopedPointer<TextButton> buttonConfigurePlugin;
+    ScopedPointer<GroupComponent> groupOsc;
+    ScopedPointer<ToggleButton> toggleReceiveOsc;
+    ScopedPointer<TextEditor> textOscPort;
+    ScopedPointer<Label> labelOscPort;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecoderSettingsComponent)
 };
 
 //[EndFile] You can add extra defines here...

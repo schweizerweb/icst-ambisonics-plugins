@@ -62,12 +62,14 @@ public:
 	Array<AmbiPoint>* getSpeakerArray() const;
 	Array<AmbiPoint>* getMovingPointsArray() const;
 	AmbiSettings* getAmbiSettings() const;
+	DecoderSettings* getDecoderSettings() const;
 	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
 	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
 	ScopedPointer<AmbiSettings> pAmbiSettings;
+	ScopedPointer<DecoderSettings> pDecoderSettings;
 	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;
 
 	//==============================================================================

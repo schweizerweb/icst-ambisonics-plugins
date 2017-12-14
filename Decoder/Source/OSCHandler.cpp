@@ -65,3 +65,8 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 		}
 	}
 }
+
+void OSCHandler::stop()
+{
+	disconnect();
+}

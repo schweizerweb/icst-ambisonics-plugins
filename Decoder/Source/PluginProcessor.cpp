@@ -28,11 +28,13 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 	pSpeakerArray = new Array<AmbiPoint>();
 	pMovingPointsArray = new Array<AmbiPoint>();
 	pAmbiSettings = new AmbiSettings();
+	pDecoderSettings = new DecoderSettings();
 	pTestSoundGenerator = new TestSoundGenerator();
 
+	// Todo: load state
 	UndoManager* undoManager = new UndoManager();
 	AudioProcessorValueTreeState* state = new AudioProcessorValueTreeState(*this, undoManager);
-	state->createAndAddParameter("OSC-Port", "OSC-Port", "OSC-Port", NormalisableRange<float>(1, 9999999999, 1), 5011, intFloatToString, stringToIntFloat);
+//	state->createAndAddParameter("OSC-Port", "OSC-Port", "OSC-Port", NormalisableRange<float>(1, 9999999999, 1), 5011, intFloatToString, stringToIntFloat);
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
@@ -40,6 +42,7 @@ AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 	pSpeakerArray = nullptr;
 	pMovingPointsArray = nullptr;
 	pAmbiSettings = nullptr;
+	pDecoderSettings = nullptr;
 	pTestSoundGenerator = nullptr;
 }
 
@@ -212,6 +215,11 @@ Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
 AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
 {
 	return pAmbiSettings;
+}
+
+DecoderSettings* AmbisonicsDecoderAudioProcessor::getDecoderSettings() const
+{
+	return pDecoderSettings;
 }
 
 TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() const

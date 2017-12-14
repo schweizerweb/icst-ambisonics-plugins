@@ -167,7 +167,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 	pPointSelection->addChangeListener(this);
 	updateDistanceScaler();
 	updateDirectionFlip();
-	//[/Constructor]
+    //[/Constructor]
 }
 
 SpeakerSettingsComponent::~SpeakerSettingsComponent()
@@ -268,7 +268,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 		else
 		{
 			preset = new PresetInfo();
-			
+
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
 			if (nbChannels == 2)
 			{
@@ -291,7 +291,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			loadPreset(preset);
 			delete(preset);
 		}
-		//[/UserComboBoxCode_comboBoxChannelConfig]
+        //[/UserComboBoxCode_comboBoxChannelConfig]
     }
 
     //[UsercomboBoxChanged_Post]

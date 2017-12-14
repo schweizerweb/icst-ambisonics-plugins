@@ -20,6 +20,7 @@ public:
 	OSCHandler(Array<AmbiPoint>* pAmbiPointArray);
 	bool start(int portNb);
 	void oscMessageReceived(const OSCMessage& message) override;
+	void stop();
 
 private:
 	Array<AmbiPoint>* pAmbiPointArray;
