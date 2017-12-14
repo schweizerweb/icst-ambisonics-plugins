@@ -8,7 +8,7 @@
   ==============================================================================
 */
 
-#include "../Decoder/JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "Radar2D.h"
 #include "TrackColors.h"
 

@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/TestSoundGenerator.h"
+#include "DecoderSettings.h"
 
 //==============================================================================
 /**

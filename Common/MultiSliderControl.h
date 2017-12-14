@@ -10,7 +10,7 @@
 
 #pragma once
 
-#include "../Decoder/JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 
 //==============================================================================
 /*
