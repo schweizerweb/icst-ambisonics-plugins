@@ -34,7 +34,9 @@ class PresetInfo
 {
 public:
 	PresetInfo();
+	bool LoadFromXmlRoot(XmlElement* root);
 	bool LoadFromFile(File file);
+	void CreateXmlRoot(XmlElement* xmlRoot);
 	bool SaveToFile(File file);
 	OwnedArray<AmbiPoint>* getPoints();
 	String getName() const;

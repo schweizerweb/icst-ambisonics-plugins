@@ -15,15 +15,8 @@ PresetInfo::PresetInfo()
 	ambiSettings = new AmbiSettings();
 }
 
-bool PresetInfo::LoadFromFile(File file)
+bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 {
-	points.clear();
-	
-	if (!file.existsAsFile())
-		return false;
-
-	ScopedPointer<XmlDocument> xmlDoc = new XmlDocument(file);
-	ScopedPointer<XmlElement> root = xmlDoc->getDocumentElement();
 	if (root->getTagName() != XML_TAG_PRESET_ROOT)
 		return false;
 
@@ -81,9 +74,22 @@ bool PresetInfo::LoadFromFile(File file)
 	return true;
 }
 
-bool PresetInfo::SaveToFile(File file)
+bool PresetInfo::LoadFromFile(File file)
 {
-	ScopedPointer<XmlElement> xmlRoot = new XmlElement(XML_TAG_PRESET_ROOT);
+	points.clear();
+	
+	if (!file.existsAsFile())
+		return false;
+
+	ScopedPointer<XmlDocument> xmlDoc = new XmlDocument(file);
+
+	ScopedPointer<XmlElement> root = xmlDoc->getDocumentElement();
+	
+	return LoadFromXmlRoot(root);
+}
+
+void PresetInfo::CreateXmlRoot(XmlElement* xmlRoot)
+{
 	xmlRoot->setAttribute(XML_ATTRIBUTE_PRESET_NAME, name);
 	
 	// general
@@ -119,6 +125,13 @@ bool PresetInfo::SaveToFile(File file)
 		xmlPoints->addChildElement(xmlPt);
 	}
 	xmlRoot->addChildElement(xmlPoints);
+}
+
+bool PresetInfo::SaveToFile(File file)
+{
+	ScopedPointer<XmlElement> xmlRoot = new XmlElement(XML_TAG_PRESET_ROOT);
+	
+	CreateXmlRoot(xmlRoot);
 
 	String xmlDocStr = xmlRoot->createDocument("");
 	
