@@ -153,7 +153,7 @@ void DecoderSettingsComponent::textEditorTextChanged(TextEditor& editor)
 	}
 	else
 	{
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Invalid port number");
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid port number");
 		editor.undo();
 	}
 }

@@ -140,7 +140,7 @@ void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler() const
 	{
 		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
 		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Ambisonic Decoder Plugin", "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
 		}
 	}
 }
