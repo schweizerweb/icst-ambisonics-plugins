@@ -61,7 +61,7 @@ DecoderSettingsComponent::DecoderSettingsComponent (DecoderSettings* pSettings)
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (400, 200);
+    setSize (500, 200);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -133,7 +133,7 @@ void DecoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 void DecoderSettingsComponent::showAsDialog(DecoderSettings* pSettings)
 {
 	DecoderSettingsComponent *p = new DecoderSettingsComponent(pSettings);
-	p->setSize(400, 200);
+	p->setSize(500, 200);
 
 	DialogWindow::LaunchOptions options;
 	options.content.setOwned(p);
@@ -174,7 +174,7 @@ BEGIN_JUCER_METADATA
                  componentName="" parentClasses="public Component, public TextEditorListener"
                  constructorParams="DecoderSettings* pSettings" variableInitialisers="pDecoderSettings(pSettings)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="400" initialHeight="200">
+                 fixedSize="0" initialWidth="500" initialHeight="200">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="8 8 8M 64" title="OSC"/>
