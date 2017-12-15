@@ -114,9 +114,7 @@ private:
     ScopedPointer<Label> label3;
     ScopedPointer<TextButton> buttonInPhase;
     ScopedPointer<TextButton> buttonBasic;
-    ScopedPointer<Label> label4;
-    ScopedPointer<ToggleButton> btnClockwise;
-    ScopedPointer<ToggleButton> btnCounterclockwise;
+    ScopedPointer<ToggleButton> btnFlipDirection;
 
 
     //==============================================================================
