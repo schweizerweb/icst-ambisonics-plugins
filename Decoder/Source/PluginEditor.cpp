@@ -135,12 +135,12 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler() const
 {
 	oscHandler->stop();
-
+	
 	if (pDecoderSettings->oscReceive)
 	{
 		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
 		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, "OSC", "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Ambisonic Decoder Plugin", "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
 		}
 	}
 }
