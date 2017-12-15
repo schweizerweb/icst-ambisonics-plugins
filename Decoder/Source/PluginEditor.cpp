@@ -61,6 +61,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
 
     //[Constructor] You can add your own custom stuff here..
+	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
     //[/Constructor]
 }
 
@@ -99,6 +100,8 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     buttonConfigure->setBounds (8, 8, proportionOfWidth (0.6491f), 24);
     buttonConfigurePlugin->setBounds (getWidth() - 8 - proportionOfWidth (0.3057f), 8, proportionOfWidth (0.3057f), 24);
     //[UserResized] Add your own custom resize handling here..
+	pDecoderSettings->lastUIWidth = getWidth();
+	pDecoderSettings->lastUIHeight = getHeight();
     //[/UserResized]
 }
 
