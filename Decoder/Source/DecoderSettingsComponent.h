@@ -47,7 +47,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	static void showAsDialog(DecoderSettings* pSettings);
 	void textEditorTextChanged(TextEditor& editor) override;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
