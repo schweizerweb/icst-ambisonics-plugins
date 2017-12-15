@@ -16,4 +16,6 @@ public:
 	bool oscReceive;
 	int oscReceivePort;
 
+	int lastUIWidth;
+	int lastUIHeight;
 };
