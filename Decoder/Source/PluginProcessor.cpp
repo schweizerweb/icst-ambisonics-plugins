@@ -107,6 +107,25 @@ void AmbisonicsDecoderAudioProcessor::releaseResources()
     // spare memory, etc.
 }
 
+void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
+{
+	// add or remove delay buffers if number of speakers changed
+	while(pSpeakerArray->size() > delayBuffers.size())
+	{
+		delayBuffers.add(new DelayBuffer());
+	}
+	if (pSpeakerArray->size() < delayBuffers.size())
+		delayBuffers.removeLast(delayBuffers.size() - pSpeakerArray->size());
+
+	// check delays
+	double maxDist = delayHelper.getMaxNormalizedDistance(pSpeakerArray);
+	for (int i = 0; i < pSpeakerArray->size(); i++)
+	{
+		int requiredDelay = delayHelper.getDelayCompensationSamples(pAmbiSettings, &pSpeakerArray->getReference(i), maxDist, getSampleRate());		
+		delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
+	}
+}
+
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
@@ -140,6 +159,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
+	checkDelayBuffers();
+
 	// copy input buffer and get read pointers
 	inputBuffer.makeCopyOf(buffer);
 	for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
@@ -163,9 +184,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		float* channelData = buffer.getWritePointer(iSpeaker);
 		for(int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
 		{
-			channelData[iSample] = 0.0f;
+			float currentSample = 0.0f;
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-				channelData[iSample] += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
+				currentSample += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
+			channelData[iSample] = delayBuffers.getUnchecked(iSpeaker)->processNextSample(currentSample);
 		}
 	}
 
