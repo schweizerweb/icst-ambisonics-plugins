@@ -26,6 +26,7 @@
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "PresetInfo.h"
+#include "SliderRange.h"
 //[/Headers]
 
 
@@ -50,8 +51,8 @@ public:
     //==============================================================================
     SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
-
-    //==============================================================================
+	
+	//==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
 
@@ -65,10 +66,11 @@ public:
 	// table item callbacks
 	String getTableText(const int columnId, const int rowNumber) const;
 	void setTableText(const int columnId, const int rowNumber, const String& newText) const;
-	void setGain(int rowNumber, double newValue) const;
-	double getGain(int rowNumber) const;
+	void setValue(int columnId, int rowNumber, double newValue) const;
+	double getValue(int columnId, int rowNumber) const;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() const;
+	SliderRange getSliderRange(int columnId) const;
 
 	void updateDirectionFlip() const;
 	void loadPreset(PresetInfo* preset) const;

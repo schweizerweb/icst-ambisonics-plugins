@@ -11,15 +11,14 @@
 #pragma once
 #include "SpeakerSettingsComponent.h"
 
-class GainColumnCustomComponent : public Component,
+class SliderColumnCustomComponent : public Component,
 	private SliderListener
 {
 public:
-	GainColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(slider);
 		slider.setSliderStyle(Slider::LinearBar);
-		slider.setRange(0.0, 1.2, 0.001);
 		slider.addListener(this);
 		slider.setWantsKeyboardFocus(false);
 	}
@@ -33,12 +32,14 @@ public:
 	{
 		row = newRow;
 		columnId = newColumn;
-		slider.setValue(owner.getGain(row), dontSendNotification);
+		SliderRange range = owner.getSliderRange(columnId);
+		slider.setRange(range.min, range.max, range.interval);
+		slider.setValue(owner.getValue(columnId, row), dontSendNotification);
 	}
 
 	void sliderValueChanged(Slider* changedSlider) override
 	{
-		owner.setGain(row, changedSlider->getValue());
+		owner.setValue(columnId, row, changedSlider->getValue());
 	}
 
 	
