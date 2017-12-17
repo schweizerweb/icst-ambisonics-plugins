@@ -17,7 +17,7 @@ class DelayHelper
 {
 public:
 	double getMaxNormalizedDistance(Array<AmbiPoint>* pPoints) const;
-	static double getTotalDelay(AmbiSettings* pAmbiSettings, Array<AmbiPoint>* pPoints, int wantedIndex);
+	static double getTotalDelayMs(AmbiSettings* pAmbiSettings, Array<AmbiPoint>* pPoints, int wantedIndex);
 	double getDelayCompensationMs(AmbiSettings* pAmbiSettings, Array<AmbiPoint>* pPoints, int wantedIndex) const;
 	static int getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint, double maxNormalizedDistance, double samplingRate);
 };
