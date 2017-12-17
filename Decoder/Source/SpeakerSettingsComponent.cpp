@@ -439,7 +439,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener)
 {
 	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings, pTestSoundListener);
-	p->setSize(800, 700);
+	p->setSize(850, 600);
 
 	DialogWindow::LaunchOptions options;
 	options.content.setOwned(p);
