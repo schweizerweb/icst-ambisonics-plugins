@@ -717,7 +717,7 @@ bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) cons
 	}
 	return false;
 }
-void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings)
+void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings) const
 {
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{

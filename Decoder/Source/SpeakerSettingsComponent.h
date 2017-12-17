@@ -79,7 +79,7 @@ public:
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
 	static int fact(int n);
-	void setInPhaseWeighting(AmbiSettings* pSettings);
+	void setInPhaseWeighting(AmbiSettings* pSettings) const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
