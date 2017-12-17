@@ -53,6 +53,10 @@
       <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiSettings.cpp"/>
       <FILE id="z0ap1U" name="AmbiSettings.h" compile="0" resource="0" file="../Common/AmbiSettings.h"/>
+      <FILE id="clRUKZ" name="DelayBuffer.cpp" compile="1" resource="0" file="../Common/DelayBuffer.cpp"/>
+      <FILE id="hhDqWe" name="DelayBuffer.h" compile="0" resource="0" file="../Common/DelayBuffer.h"/>
+      <FILE id="JK1b6q" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
+      <FILE id="Bo1T5o" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
       <FILE id="pzDeOs" name="MultiSliderControl.cpp" compile="1" resource="0"
             file="../Common/MultiSliderControl.cpp"/>
       <FILE id="grXjg5" name="MultiSliderControl.h" compile="0" resource="0"
