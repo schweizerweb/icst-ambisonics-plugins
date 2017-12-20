@@ -30,7 +30,7 @@ bool OSCHandler::start(int portNb)
 
 void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
-	if (message.size() > 0)
+	if (message.getAddressPattern() == "/aed" && message.size() > 0)
 	{
 		int channel = message[0].getInt32();
 		float a = message[1].getFloat32();
