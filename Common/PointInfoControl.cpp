@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "RadarOptions.h"
 //[/Headers]
 
 #include "PointInfoControl.h"
@@ -27,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelection* pPointSelection)
-    : pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)
+PointInfoControl::PointInfoControl (Array<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+    : pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -170,6 +171,7 @@ PointInfoControl::PointInfoControl (Array<AmbiPoint>* pSpeakerArray, PointSelect
 
 
     //[UserPreSize]
+	textName->setReadOnly(!pRadarOptions->nameFieldEditable);
     //[/UserPreSize]
 
     setSize (360, 100);
@@ -253,9 +255,9 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	disableListeners();
 
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection >= 0 && selection < pSpeakerArray->size())
+	if (selection >= 0 && selection < pEditablePointsArray->size())
 	{
-		AmbiPoint* point = &(pSpeakerArray->getReference(selection));
+		AmbiPoint* point = &(pEditablePointsArray->getReference(selection));
 
 		setFieldsEnabled(true);
 		textName->setText(point->getName());
@@ -290,38 +292,38 @@ void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
 void PointInfoControl::textEditorTextChanged(TextEditor& source)
 {
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection < 0 || selection >= pSpeakerArray->size())
+	if (selection < 0 || selection >= pEditablePointsArray->size())
 		return;
 
 	if (source.getName() == textName->getName())
 	{
-		pSpeakerArray->getReference(selection).setName(textName->getText());
+		pEditablePointsArray->getReference(selection).setName(textName->getText());
 	}
 
 	if (source.getName() == textX->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
+		pEditablePointsArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
 	}
 	if (source.getName() == textY->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
+		pEditablePointsArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
 	}
 	if (source.getName() == textZ->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
+		pEditablePointsArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
 	}
 
 	if (source.getName() == textA->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
+		pEditablePointsArray->getReference(selection).getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
+		pEditablePointsArray->getReference(selection).getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
-		pSpeakerArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
+		pEditablePointsArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
 	}
 
 	updateSelectedPoint(source.getName());
@@ -384,8 +386,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditorListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, PointSelection* pPointSelection"
-                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPointSelection(pPointSelection)"
+                 constructorParams="Array&lt;AmbiPoint&gt;* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 variableInitialisers="pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>

@@ -25,10 +25,12 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
                        )
 #endif
 {
+	pSourcesArray = new Array<AmbiPoint>();
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 {
+	pSourcesArray = nullptr;
 }
 
 //==============================================================================
@@ -168,6 +170,11 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 {
     // You should use this method to restore your parameters from this memory block,
     // whose contents will have been created by the getStateInformation() call.
+}
+
+Array<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray() const
+{
+	return pSourcesArray;
 }
 
 //==============================================================================

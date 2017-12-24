@@ -27,15 +27,15 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Radar3D::Radar3D (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection)
+Radar3D::Radar3D (Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (xyRadar = new Radar2D (Radar2D::XY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection));
+    addAndMakeVisible (xyRadar = new Radar2D (Radar2D::XY, pEditablePointsArray, pDisplayOnlyPointsArray, pZoomSettings, pPointSelection, pRadarOptions));
     xyRadar->setName ("xyRadar");
 
-    addAndMakeVisible (zyRadar = new Radar2D (Radar2D::ZY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection));
+    addAndMakeVisible (zyRadar = new Radar2D (Radar2D::ZY, pEditablePointsArray, pDisplayOnlyPointsArray, pZoomSettings, pPointSelection, pRadarOptions));
     zyRadar->setName ("zyRadar");
 
 
@@ -79,8 +79,8 @@ void Radar3D::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    xyRadar->setBounds (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (0.6661f));
-    zyRadar->setBounds (0, 0 + proportionOfHeight (0.6661f), proportionOfWidth (1.0000f), roundFloatToInt (proportionOfHeight (0.6661f) * 0.4989f));
+    xyRadar->setBounds (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (0.6654f));
+    zyRadar->setBounds (0, 0 + proportionOfHeight (0.6654f), proportionOfWidth (1.0000f), roundFloatToInt (proportionOfHeight (0.6654f) * 0.5000f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -101,16 +101,16 @@ void Radar3D::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Radar3D" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, Array&lt;AmbiPoint&gt;* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection"
+                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pEditablePointsArray, Array&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0 100% 66.596%" class="Radar2D"
-                    params="Radar2D::XY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection"/>
+                    explicitFocusOrder="0" pos="0 0 100% 66.54%" class="Radar2D"
+                    params="Radar2D::XY, pEditablePointsArray, pDisplayOnlyPointsArray, pZoomSettings, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="zyRadar" id="9b35aa2c2da622df" memberName="zyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 100% 49.84%" posRelativeY="952154a5b6ffaa65"
-                    posRelativeH="952154a5b6ffaa65" class="Radar2D" params="Radar2D::ZY, pSpeakerArray, pMovingPointsArray, pZoomSettings, pPointSelection"/>
+                    explicitFocusOrder="0" pos="0 0R 100% 50%" posRelativeY="952154a5b6ffaa65"
+                    posRelativeH="952154a5b6ffaa65" class="Radar2D" params="Radar2D::ZY, pEditablePointsArray, pDisplayOnlyPointsArray, pZoomSettings, pPointSelection, pRadarOptions"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

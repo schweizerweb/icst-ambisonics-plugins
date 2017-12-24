@@ -42,6 +42,9 @@
             file="../Common/RadarComponent.cpp"/>
       <FILE id="LwWLBN" name="RadarComponent.h" compile="0" resource="0"
             file="../Common/RadarComponent.h"/>
+      <FILE id="txOVY9" name="RadarOptions.cpp" compile="1" resource="0"
+            file="../Common/RadarOptions.cpp"/>
+      <FILE id="pBBZnl" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
       <FILE id="Hw1uM6" name="TrackColors.h" compile="0" resource="0" file="../Common/TrackColors.h"/>
       <FILE id="zPbNEo" name="ZoomSettings.cpp" compile="1" resource="0"
             file="../Common/ZoomSettings.cpp"/>

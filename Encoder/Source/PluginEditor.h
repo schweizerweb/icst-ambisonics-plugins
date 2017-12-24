@@ -60,7 +60,8 @@ private:
     AmbisonicEncoderAudioProcessor& processor;
 	Array<AmbiPoint>* pSourcesArray;
 	PointSelection pointSelection;
-	//[/UserVariables]
+	RadarOptions radarOptions;
+    //[/UserVariables]
 
     //==============================================================================
     ScopedPointer<TextButton> buttonConfigure;

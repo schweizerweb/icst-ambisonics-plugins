@@ -32,17 +32,21 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	pSourcesArray = ownerProc.getSourcesArray();
+	radarOptions.nameFieldEditable = true;
+	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
     //[/Constructor_pre]
 
     addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));
     buttonConfigure->setButtonText (TRANS("settings"));
     buttonConfigure->addListener (this);
 
-    addAndMakeVisible (component = new RadarComponent (nullptr, pSourcesArray, &pointSelection));
+    addAndMakeVisible (component = new RadarComponent (pSourcesArray, nullptr, &pointSelection, &radarOptions));
     component->setName ("new component");
 
 
     //[UserPreSize]
+	setResizable(true, true);
     //[/UserPreSize]
 
     setSize (400, 700);
@@ -130,7 +134,7 @@ BEGIN_JUCER_METADATA
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="new component" id="5bf6bd31c23a4886" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 46M" class="RadarComponent"
-                    params="nullptr, pSourcesArray, &amp;pointSelection"/>
+                    params="pSourcesArray, nullptr, &amp;pointSelection, &amp;radarOptions"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

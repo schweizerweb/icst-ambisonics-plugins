@@ -27,15 +27,15 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-RadarComponent::RadarComponent (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, PointSelection* pPointSelection)
+RadarComponent::RadarComponent (Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (radar = new Radar3D (pSpeakerArray, pMovingPointsArray, &zoomSettings, pPointSelection));
+    addAndMakeVisible (radar = new Radar3D (pEditablePointsArray, pDisplayOnlyPointsArray, &zoomSettings, pPointSelection, pRadarOptions));
     radar->setName ("radar");
 
-    addAndMakeVisible (pointInfo = new PointInfoControl (pSpeakerArray, pPointSelection));
+    addAndMakeVisible (pointInfo = new PointInfoControl (pEditablePointsArray, pPointSelection, pRadarOptions));
     pointInfo->setName ("pointInfo");
 
 
@@ -79,8 +79,8 @@ void RadarComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    radar->setBounds (0, 0 + 100, proportionOfWidth (1.0000f), getHeight() - 100);
-    pointInfo->setBounds (0, 0, proportionOfWidth (1.0000f), 100);
+    radar->setBounds (0, 0 + 100, getWidth() - 0, getHeight() - 100);
+    pointInfo->setBounds (0, 0, getWidth() - 0, 100);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -101,16 +101,16 @@ void RadarComponent::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pSpeakerArray, Array&lt;AmbiPoint&gt;* pMovingPointsArray, PointSelection* pPointSelection"
+                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pEditablePointsArray, Array&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 100% 100M" posRelativeY="328b0557e3704175"
-                    class="Radar3D" params="pSpeakerArray, pMovingPointsArray, &amp;zoomSettings, pPointSelection"/>
+                    explicitFocusOrder="0" pos="0 0R 0M 100M" posRelativeY="328b0557e3704175"
+                    class="Radar3D" params="pEditablePointsArray, pDisplayOnlyPointsArray, &amp;zoomSettings, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
-                    virtualName="" explicitFocusOrder="0" pos="0 0 100% 100" class="PointInfoControl"
-                    params="pSpeakerArray, pPointSelection"/>
+                    virtualName="" explicitFocusOrder="0" pos="0 0 0M 100" class="PointInfoControl"
+                    params="pEditablePointsArray, pPointSelection, pRadarOptions"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

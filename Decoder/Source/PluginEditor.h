@@ -23,6 +23,7 @@
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
 #include "../../Common/RadarComponent.h"
+#include "../../Common/RadarOptions.h"
 #include "PresetInfo.h"
 #include "OSCHandler.h"
 #include "DecoderSettings.h"
@@ -67,6 +68,7 @@ private:
 	OwnedArray<PresetInfo> presets;
 	ScopedPointer<OSCHandler> oscHandler;
 	PointSelection pointSelection;
+	RadarOptions radarOptions;
     //[/UserVariables]
 
     //==============================================================================

@@ -11,6 +11,7 @@
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
+#include "../../Common/AmbiPoint.h"
 
 
 //==============================================================================
@@ -55,7 +56,11 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+	Array<AmbiPoint>* getSourcesArray() const;
+
 private:
+	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
+
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

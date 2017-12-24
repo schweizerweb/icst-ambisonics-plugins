@@ -33,6 +33,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	radarOptions.nameFieldEditable = false;
+	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();
@@ -41,7 +43,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	initializeOscHandler();
     //[/Constructor_pre]
 
-    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection));
+    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
     component->setName ("new component");
 
     addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));
@@ -166,7 +168,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
-                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection"/>
+                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
               virtualName="" explicitFocusOrder="0" pos="8 8 64.987% 24" buttonText="decoder settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
