@@ -59,15 +59,7 @@ bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 	XmlElement* xmlPoint = xmlPoints->getChildByName(XML_TAG_PRESET_POINT);
 	while (xmlPoint != nullptr)
 	{
-		points.add(new AmbiPoint(
-			Point3D<double>(
-				xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
-				xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
-				xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z)),
-			xmlPoint->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME),
-			xmlPoint->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR),
-			xmlPoint->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)
-		));
+		points.add(new AmbiPoint(xmlPoint));
 		xmlPoint = xmlPoint->getNextElement();
 	}
 
@@ -115,14 +107,7 @@ void PresetInfo::CreateXmlRoot(XmlElement* xmlRoot)
 	XmlElement* xmlPoints = new XmlElement(XML_TAG_PRESET_POINTS);
 	for (AmbiPoint* pt : points)
 	{
-		XmlElement* xmlPt = new XmlElement(XML_TAG_PRESET_POINT);
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_X, pt->getPoint()->getX());
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Y, pt->getPoint()->getY());
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Z, pt->getPoint()->getZ());
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME, pt->getName());
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR, pt->getColorIndex());
-		xmlPt->setAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, pt->getGain());
-		xmlPoints->addChildElement(xmlPt);
+		xmlPoints->addChildElement(pt->getAsXmlElement(XML_TAG_PRESET_POINT));
 	}
 	xmlRoot->addChildElement(xmlPoints);
 }
