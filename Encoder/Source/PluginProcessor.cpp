@@ -146,6 +146,18 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		}
 	}
 
+	// MIDI Out handling
+	midiMessages.clear();
+	for (int i = 0; i < pSourcesArray->size(); i++)
+	{
+		int midiAzimuth = int(pSourcesArray->getReference(i).getPoint()->getAzimuth() / 2.0 / PI * 127);
+		int midiElevation = int(pSourcesArray->getReference(i).getPoint()->getElevation() / 0.5 / PI * 127);
+		int midiDistance = int(pSourcesArray->getReference(i).getPoint()->getDistance() * 127.0);
+		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 12, midiAzimuth), 0);
+		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 13, midiElevation), 0);
+		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 14, midiDistance), 0);
+	}
+
 	// Audio handling
 	const int totalNumInputChannels = getTotalNumInputChannels();
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
