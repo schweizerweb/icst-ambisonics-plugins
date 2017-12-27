@@ -130,6 +130,23 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
+	// MIDI In Handling
+	int time;
+	MidiMessage m;
+	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
+	{
+		if (m.isController() && m.getChannel() <= pSourcesArray->size())
+		{
+			switch (m.getControllerNumber())
+			{
+			case 12: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setAzimuth(m.getControllerValue() / 127.0 * 2.0 * PI); pSourcesArray->getReference(m.getChannel() - 1).setName(String(m.getTimeStamp())); break;
+			case 13: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setElevation(m.getControllerValue() / 127.0 * 0.5 * PI); break;
+			case 14: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setDistance(m.getControllerValue() / 127.0); break;
+			}
+		}
+	}
+
+	// Audio handling
 	const int totalNumInputChannels = getTotalNumInputChannels();
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
