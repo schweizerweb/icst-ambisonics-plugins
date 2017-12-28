@@ -217,7 +217,7 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	xml->setAttribute("oscReceivePort", pDecoderSettings->oscReceivePort);
 
 	// load last speaker preset
-	PresetInfo* preset = new PresetInfo();
+	ScopedPointer<PresetInfo> preset = new PresetInfo();
 	preset->setName("LastState");
 	for (AmbiPoint pt : *pSpeakerArray)
 		preset->getPoints()->add(new AmbiPoint(pt));
@@ -230,7 +230,9 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	xml->addChildElement(speakerSettings);
 
 	copyXmlToBinary(*xml, destData);
+
 	xml->deleteAllChildElements();
+	preset = nullptr;
 }
 
 void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
@@ -253,9 +255,9 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 			if (presetElement != nullptr && preset->LoadFromXmlRoot(presetElement))
 			{
 				pSpeakerArray->clear();
-				for (AmbiPoint* pt : *preset->getPoints())
+				for (int i = 0; i < preset->getPoints()->size(); i++)
 				{
-					pSpeakerArray->add(AmbiPoint(*pt));
+					pSpeakerArray->add(AmbiPoint(*preset->getPoints()->getUnchecked(i)));
 				}
 				pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 				pAmbiSettings->setDirectionFlip(preset->getAmbiSettings()->getDirectionFlip());
