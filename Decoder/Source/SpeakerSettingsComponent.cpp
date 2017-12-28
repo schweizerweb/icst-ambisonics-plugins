@@ -196,7 +196,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
+	//[/Destructor]
 }
 
 //==============================================================================
@@ -267,8 +267,10 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
 			if (nbChannels == 2)
 			{
-				preset->getPoints()->add(new AmbiPoint(Point3D<double>(0.0, -1.0, 0.0), "L", 0));
-				preset->getPoints()->add(new AmbiPoint(Point3D<double>(0.0, 1.0, 0.0), "R", 0));
+				ScopedPointer<Uuid> newId1 = new Uuid();
+				ScopedPointer<Uuid> newId2 = new Uuid();
+				preset->getPoints()->add(new AmbiPoint(newId1->toString(), Point3D<double>(0.0, -1.0, 0.0), "L", 0));
+				preset->getPoints()->add(new AmbiPoint(newId2->toString(), Point3D<double>(0.0, 1.0, 0.0), "R", 0));
 			}
 			else
 			{
@@ -276,7 +278,8 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 				projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / nbChannels));
 				for (int i = 0; i < nbChannels; i++)
 				{
-					preset->getPoints()->add(new AmbiPoint(Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), 0));
+					ScopedPointer<Uuid> newId = new Uuid();
+					preset->getPoints()->add(new AmbiPoint(newId->toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), 0));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
@@ -344,7 +347,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonAdd)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		pSpeakerArray->add(AmbiPoint(Point3D<double>(0.0, 0.0, 0.0), "new", 0));
+		ScopedPointer<Uuid> newId = new Uuid();
+		pSpeakerArray->add(AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", 0));
 		pPointSelection->selectPoint(pSpeakerArray->size() - 1);
 		speakerList->updateContent();
 		speakerList->repaint();
@@ -736,6 +740,7 @@ void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings) cons
 		}
 	}
 }
+
 //[/MiscUserCode]
 
 

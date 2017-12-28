@@ -49,7 +49,7 @@ class SpeakerSettingsComponent  : public Component,
                                   public SliderListener
 {
 public:
-    //==============================================================================
+	//==============================================================================
     SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
 	
@@ -81,7 +81,7 @@ public:
 	void updateDistanceScaler() const;
 	static int fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
-    //[/UserMethods]
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
