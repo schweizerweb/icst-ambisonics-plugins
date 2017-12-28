@@ -49,11 +49,11 @@ private:
 	Point<float> getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const;
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
-	float getSelectedPointSize() const;
+	float getSelectedPointSize(float scaler) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select = false, float selectionSize = 0.0);
 	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
-	float getEditablePointSize() const;
-	float getDisplayOnlyPointSize() const;
+	float getEditablePointSize(float scaler) const;
+	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
 	void renderOpenGL() override;
 	void createRadarBackground();

@@ -55,14 +55,14 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 	return getRelativeScreenPoint(valuePoint) + radarViewport.getTopLeft().toFloat();
 }
 
-float Radar2D::getEditablePointSize() const
+float Radar2D::getEditablePointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 30.0f;
+	return radarViewport.getWidth() / 30.0f * scaler;
 }
 
-float Radar2D::getDisplayOnlyPointSize() const
+float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 50.0f;
+	return radarViewport.getWidth() / 50.0f * scaler;
 }
 
 float Radar2D::getFontSize() const
@@ -107,9 +107,9 @@ float Radar2D::getValueToScreenRatio() const
 	return radarViewport.getWidth() / (2 * pZoomSettings->getCurrentRadius());
 }
 
-float Radar2D::getSelectedPointSize() const
+float Radar2D::getSelectedPointSize(float scaler) const
 {
-	return getEditablePointSize() * 1.5f;
+	return getEditablePointSize(scaler) * 1.5f;
 }
 
 void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const
@@ -172,7 +172,8 @@ void Radar2D::renderOpenGL()
 		{
 			for (int i = 0; i < pEditablePointsArray->size(); i++)
 			{
-				paintPoint(&g, &pEditablePointsArray->getReference(i), getEditablePointSize(), i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize());
+				float scaler = 1.0f + 10.0f * pEditablePointsArray->getReference(i).getRms();
+				paintPoint(&g, &pEditablePointsArray->getReference(i), getEditablePointSize(scaler), i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize(scaler));
 			}
 		}
 
@@ -180,7 +181,8 @@ void Radar2D::renderOpenGL()
 		{
 			for (int i = 0; i < pDisplayOnlyPointsArray->size(); i++)
 			{
-				paintPoint(&g, &pDisplayOnlyPointsArray->getReference(i), getDisplayOnlyPointSize());
+				float scaler = 1.0f + 10.0f * pDisplayOnlyPointsArray->getReference(i).getRms();
+				paintPoint(&g, &pDisplayOnlyPointsArray->getReference(i), getDisplayOnlyPointSize(scaler));
 			}
 		}
 
@@ -368,12 +370,13 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 		return;
 
 	// add new point
+	ScopedPointer<Uuid> newId = new Uuid();
 	switch (radarMode) {
 	case XY:
-		pEditablePointsArray->add(AmbiPoint(Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pEditablePointsArray->size()+1), 0));
 		break;
 	case ZY:
-		pEditablePointsArray->add(AmbiPoint(Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pEditablePointsArray->size()+1), 0));
 		break;
 	}
 
