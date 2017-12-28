@@ -83,21 +83,21 @@ int AmbisonicEncoderAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void AmbisonicEncoderAudioProcessor::setCurrentProgram (int index)
+void AmbisonicEncoderAudioProcessor::setCurrentProgram (int /*index*/)
 {
 }
 
-const String AmbisonicEncoderAudioProcessor::getProgramName (int index)
+const String AmbisonicEncoderAudioProcessor::getProgramName (int /*index*/)
 {
     return {};
 }
 
-void AmbisonicEncoderAudioProcessor::changeProgramName (int index, const String& newName)
+void AmbisonicEncoderAudioProcessor::changeProgramName (int /*index*/, const String& /*newName*/)
 {
 }
 
 //==============================================================================
-void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void AmbisonicEncoderAudioProcessor::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlock*/)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
