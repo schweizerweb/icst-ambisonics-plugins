@@ -36,8 +36,6 @@
             file="Source/SpeakerSettingsComponent.cpp"/>
       <FILE id="kA1i4a" name="SpeakerSettingsComponent.h" compile="0" resource="0"
             file="Source/SpeakerSettingsComponent.h"/>
-      <FILE id="eFp2Lr" name="OSCHandler.cpp" compile="1" resource="0" file="Source/OSCHandler.cpp"/>
-      <FILE id="dADHh1" name="OSCHandler.h" compile="0" resource="0" file="Source/OSCHandler.h"/>
       <FILE id="SbImea" name="PresetInfo.cpp" compile="1" resource="0" file="Source/PresetInfo.cpp"/>
       <FILE id="fhc3q5" name="PresetInfo.h" compile="0" resource="0" file="Source/PresetInfo.h"/>
       <FILE id="kamJfG" name="PluginProcessor.cpp" compile="1" resource="0"
@@ -61,6 +59,8 @@
             file="../Common/MultiSliderControl.cpp"/>
       <FILE id="grXjg5" name="MultiSliderControl.h" compile="0" resource="0"
             file="../Common/MultiSliderControl.h"/>
+      <FILE id="AvjHii" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>
+      <FILE id="kkDzgn" name="OSCHandler.h" compile="0" resource="0" file="../Common/OSCHandler.h"/>
       <FILE id="TnVJDm" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
       <FILE id="jYT0co" name="PointInfoControl.cpp" compile="1" resource="0"
             file="../Common/PointInfoControl.cpp"/>
