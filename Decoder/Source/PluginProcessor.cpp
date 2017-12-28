@@ -81,21 +81,21 @@ int AmbisonicsDecoderAudioProcessor::getCurrentProgram()
     return 0;
 }
 
-void AmbisonicsDecoderAudioProcessor::setCurrentProgram (int index)
+void AmbisonicsDecoderAudioProcessor::setCurrentProgram (int /*index*/)
 {
 }
 
-const String AmbisonicsDecoderAudioProcessor::getProgramName (int index)
+const String AmbisonicsDecoderAudioProcessor::getProgramName (int /*index*/)
 {
     return {};
 }
 
-void AmbisonicsDecoderAudioProcessor::changeProgramName (int index, const String& newName)
+void AmbisonicsDecoderAudioProcessor::changeProgramName (int /*index*/, const String& /*newName*/)
 {
 }
 
 //==============================================================================
-void AmbisonicsDecoderAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
+void AmbisonicsDecoderAudioProcessor::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlock*/)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
@@ -150,7 +150,7 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
 }
 #endif
 
-void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&)
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
