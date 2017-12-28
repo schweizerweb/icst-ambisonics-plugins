@@ -15,6 +15,11 @@ PresetInfo::PresetInfo()
 	ambiSettings = new AmbiSettings();
 }
 
+PresetInfo::~PresetInfo()
+{
+	points.clear();
+}
+
 bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 {
 	if (root->getTagName() != XML_TAG_PRESET_ROOT)

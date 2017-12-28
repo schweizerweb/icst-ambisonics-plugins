@@ -28,6 +28,7 @@ class PresetInfo
 {
 public:
 	PresetInfo();
+	~PresetInfo();
 	bool LoadFromXmlRoot(XmlElement* root);
 	bool LoadFromFile(File file);
 	void CreateXmlRoot(XmlElement* xmlRoot);
