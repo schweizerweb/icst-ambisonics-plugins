@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/RadarComponent.h"
+#include "EncoderSettingsComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -101,6 +102,8 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
     if (buttonThatWasClicked == buttonConfigure)
     {
         //[UserButtonCode_buttonConfigure] -- add your button handler code here..
+		EncoderSettingsComponent::showAsDialog(pEncoderSettings);
+		processor.initializeOsc();
         //[/UserButtonCode_buttonConfigure]
     }
 
