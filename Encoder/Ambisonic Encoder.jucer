@@ -14,6 +14,9 @@
               jucerVersion="5.0.2">
   <MAINGROUP id="kUoKTp" name="Ambisonic Encoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="mmyVim" name="AmbiOSCSender.cpp" compile="1" resource="0"
+            file="Source/AmbiOSCSender.cpp"/>
+      <FILE id="QCTjN6" name="AmbiOSCSender.h" compile="0" resource="0" file="Source/AmbiOSCSender.h"/>
       <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
             file="Source/EncoderSettings.cpp"/>
       <FILE id="mjvFIP" name="EncoderSettings.h" compile="0" resource="0"

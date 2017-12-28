@@ -61,6 +61,7 @@ private:
 	Array<AmbiPoint>* pSourcesArray;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
+	EncoderSettings* pEncoderSettings;
     //[/UserVariables]
 
     //==============================================================================
@@ -68,7 +69,7 @@ private:
     ScopedPointer<RadarComponent> component;
 
 
-    //==============================================================================
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessorEditor)
 };
 

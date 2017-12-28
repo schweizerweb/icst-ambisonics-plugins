@@ -31,11 +31,16 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 {
 	pSourcesArray = new Array<AmbiPoint>();
 	pEncoderSettings = new EncoderSettings();
+	pOscHandler = new OSCHandler(pSourcesArray);
+	pOscSender = new AmbiOSCSender(pSourcesArray);
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 {
 	pSourcesArray = nullptr;
+	pEncoderSettings = nullptr;
+	pOscHandler = nullptr;
+	pOscSender = nullptr;
 }
 
 //==============================================================================
@@ -157,7 +162,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 13, midiElevation), 0);
 		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 14, midiDistance), 0);
 	}
-
+	
 	// Audio handling
 	const int totalNumInputChannels = getTotalNumInputChannels();
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
@@ -174,11 +179,14 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < pSourcesArray->size() && iSource < totalNumInputChannels; iSource++)
 	{
+		// keep RMS
+		pSourcesArray->getReference(iSource).setRms(inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
+
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = pSourcesArray->getReference(iSource).getPoint();
 		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], false);
 		const float* inputData = inputBuffer.getReadPointer(iSource);
-
+		
 		// create B-format
 		for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
 		{
@@ -242,11 +250,47 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			}
 		}
 	}
+
+	initializeOsc();
 }
 
 Array<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray() const
 {
 	return pSourcesArray;
+}
+
+EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings() const
+{
+	return pEncoderSettings;
+}
+
+void AmbisonicEncoderAudioProcessor::initializeOsc() const
+{
+	if(pEncoderSettings->oscReceiveFlag)
+	{
+		if (!pOscHandler->start(pEncoderSettings->oscReceivePort))
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(pEncoderSettings->oscReceivePort));
+			pEncoderSettings->oscReceiveFlag = false;
+		}
+	}
+	else
+	{
+		pOscHandler->stop();
+	}
+
+	if(pEncoderSettings->oscSendFlag)
+	{
+		if (!pOscSender->start(pEncoderSettings->oscSendTargetHost, pEncoderSettings->oscSendPort, pEncoderSettings->oscSendIntervalMs))
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender on " + pEncoderSettings->oscSendTargetHost + ":" + String(pEncoderSettings->oscSendPort));
+			pEncoderSettings->oscSendFlag = false;
+		}
+	}
+	else
+	{
+		pOscSender->stop();
+	}
 }
 
 //==============================================================================

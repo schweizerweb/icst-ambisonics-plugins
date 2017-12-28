@@ -10,9 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
+#include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "../../Common/AmbiPoint.h"
+#include "../../Common/OSCHandler.h"
+#include "AmbiOSCSender.h"
 
 
 //==============================================================================
@@ -58,10 +60,14 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	Array<AmbiPoint>* getSourcesArray() const;
+	EncoderSettings* getEncoderSettings() const;
+	void initializeOsc() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
 	ScopedPointer<EncoderSettings> pEncoderSettings;
+	ScopedPointer<OSCHandler> pOscHandler;
+	ScopedPointer<AmbiOSCSender> pOscSender;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

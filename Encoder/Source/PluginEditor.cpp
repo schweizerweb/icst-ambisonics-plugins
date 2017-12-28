@@ -33,6 +33,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	pSourcesArray = ownerProc.getSourcesArray();
+	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
     //[/Constructor_pre]
