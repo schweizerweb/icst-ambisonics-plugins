@@ -12,6 +12,8 @@
 #define POINT3D_H_INCLUDED
 
 #include "JuceHeader.h"
+#include "AudioParameterSet.h"
+
 #define	SQRT105		10.246950766	/*sqrt(105.0)*/
 #define SQRT15		3.87298334621	/*sqrt(15.0)*/
 #define SQRT7		2.64575131106	/*sqrt(7.0)*/
@@ -39,14 +41,17 @@ public:
 	Point3D() noexcept : x(), y(), z() { xyzChanged = true; aedChanged = false; }
 
 	/** Creates a copy of another Point3D. */
-	Point3D(const Point3D& other) noexcept : x(other.x), y(other.y), z(other.z) { xyzChanged = true; aedChanged = false; }
+	Point3D(const Point3D& other) noexcept : x(other.x), y(other.y), z(other.z), audioParams(other.audioParams) { xyzChanged = true; aedChanged = false; }
 
 	/** Creates a Point3D from an (x, y, z) position. */
 	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ) noexcept : x(initialX), y(initialY), z(initialZ) { xyzChanged = true; aedChanged = false; }
+	
+	/** Creates a Point3D from an (x, y, z) position. Keeps a reference to the corresponding audio parameter.*/
+	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ, AudioParameterSet paramSet) noexcept : x(initialX), y(initialY), z(initialZ), audioParams(paramSet) { xyzChanged = true; aedChanged = false; }
 
 	//==============================================================================
 	/** Copies this Point3D from another one. */
-	Point3D& operator= (Point3D& other) noexcept{ xyzChanged = true; x = other.getX(); y = other.getY(); z = other.getZ(); return *this; }
+	Point3D& operator= (Point3D& other) noexcept { xyzChanged = true; x = other.getX(); y = other.getY(); z = other.getZ(); audioParams = other.audioParams; return *this; }
 
 	inline bool operator== (Point3D other) const noexcept{ return getX() == other.getX() && getY() == other.getY() && getZ() == other.getZ(); }
 	inline bool operator!= (Point3D other) const noexcept{ return getX() != other.getX() || getY() != other.getY() || getZ() != other.getZ(); }
@@ -76,22 +81,22 @@ public:
 	inline ValueType getDistance() noexcept{ if (xyzChanged) calculateAed(); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX) noexcept{ xyzChanged = true; x = newX; }
+	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; x = newX; if(notify) audioParams.notifyX(x); }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY) noexcept{ xyzChanged = true; y = newY; }
+	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; y = newY; if (notify) audioParams.notifyY(y); }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ) noexcept{ xyzChanged = true; z = newZ; }
+	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; z = newZ; if (notify) audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
-	inline void setAzimuth(ValueType newAzimuth) noexcept{ aedChanged = true; azimuth = newAzimuth; }
+	inline void setAzimuth(ValueType newAzimuth, bool notify = true) noexcept { aedChanged = true; azimuth = newAzimuth; if (notify) audioParams.notifyA(azimuth); }
 
 		/** Sets the Point3D's elevation. */
-	inline void setElevation(ValueType newElevation) noexcept{ aedChanged = true; elevation = newElevation; }
+	inline void setElevation(ValueType newElevation, bool notify = true) noexcept { aedChanged = true; elevation = newElevation; if (notify) audioParams.notifyE(elevation); }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
+	inline void setDistance(ValueType newDistance, bool notify = true) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); if (notify) audioParams.notifyD(distance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
@@ -108,9 +113,6 @@ public:
 		/** Changes the Point3D's y and z coordinates. */
 	void setYZ(ValueType newY, ValueType newZ) noexcept{ xyzChanged = true; y = newY; z = newZ; }
 
-	//	/** Adds a pair of coordinates to this value. */
-	//void addXY(ValueType xToAdd, ValueType yToAdd) noexcept{ xyzChanged = true; x += xToAdd; y += yToAdd; }
-
 		//==============================================================================
 		/** Returns a Point3D with a given offset from this one. */
 	Point3D translated(ValueType deltaX, ValueType deltaY, ValueType deltaZ) const noexcept{ return Point3D(getX() + deltaX, getY() + deltaY, getZ() + deltaZ); }
@@ -118,31 +120,8 @@ public:
 		/** Adds two Point3Ds together */
 	Point3D operator+ (Point3D other) const noexcept{ return Point3D(getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ()); }
 
-	//	/** Adds another Point3D's coordinates to this one */
-	//Point3D& operator+= (Point3D other) noexcept{ this.xyzChanged = true; x += other.x; y += other.y; z += other.z; return *this; }
-
 		/** Subtracts one Point3Ds from another */
 	Point3D operator- (Point3D other) const noexcept{ return Point3D(getX() - other.getX(), getY() - other.getY(), getZ() -other.getZ()); }
-
-	//	/** Subtracts another Point3D's coordinates to this one */
-	//Point3D& operator-= (Point3D other) noexcept{ this.xyzChanged = true; x -= other.x; y -= other.y; z -= other.z; return *this; }
-
-		
-	//	/** Multiplies two Point3Ds together */
-	//	template <typename OtherType>
-	//Point3D operator* (Point3D<OtherType> other) const noexcept{ return Point3D((ValueType)(x * other.x), (ValueType)(y * other.y)); }
-
-	//	/** Multiplies another Point3D's coordinates to this one */
-	//	template <typename OtherType>
-	//Point3D& operator*= (Point3D<OtherType> other) noexcept{ *this = *this * other; return *this; }
-
-	//	/** Divides one Point3D by another */
-	//	template <typename OtherType>
-	//Point3D operator/ (Point3D<OtherType> other) const noexcept{ return Point3D((ValueType)(x / other.x), (ValueType)(y / other.y)); }
-
-	//	/** Divides this Point3D's coordinates by another */
-	//	template <typename OtherType>
-	//Point3D& operator/= (Point3D<OtherType> other) noexcept{ *this = *this / other; return *this; }
 
 		/** Returns a Point3D whose coordinates are multiplied by a given scalar value. */
 		template <typename FloatType>
@@ -152,94 +131,12 @@ public:
 		template <typename FloatType>
 	Point3D operator/ (FloatType divisor) const noexcept{ return Point3D((ValueType)(getX() / divisor), (ValueType)(getY() / divisor), (ValueType)(getZ() / divisor)); }
 
-	//	/** Multiplies the Point3D's coordinates by a scalar value. */
-	//	template <typename FloatType>
-	//Point3D& operator*= (FloatType multiplier) noexcept{ this.xyzChanged = true; x = (ValueType)(x * multiplier); y = (ValueType)(y * multiplier); z = (ValueType)(z * multiplier); return *this; }
-
-	//	/** Divides the Point3D's coordinates by a scalar value. */
-	//	template <typename FloatType>
-	//Point3D& operator/= (FloatType divisor) noexcept{ this.xyzChanged = true; x = (ValueType)(x / divisor); y = (ValueType)(y / divisor); z = (ValueType)(z / divisor); return *this; }
-
 		/** Returns the inverse of this Point3D. */
 	Point3D operator-() const noexcept{ return Point3D(-getX(), -getY(), -getZ()); }
 
 		//==============================================================================
 		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
 	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;
-
-	////==============================================================================
-	///** Returns the straight-line distance between this Point3D and the origin. */
-	//ValueType getDistanceFromOrigin() const noexcept{ return juce_hypot(x, y); }
-
-	//	/** Returns the straight-line distance between this Point3D and another one. */
-	//ValueType getDistanceFrom(Point3D other) const noexcept{ return juce_hypot(x - other.x, y - other.y); }
-
-	//	/** Returns the square of the straight-line distance between this Point3D and the origin. */
-	//ValueType getDistanceSquaredFromOrigin() const noexcept{ return x * x + y * y; }
-
-	//	/** Returns the square of the straight-line distance between this Point3D and another one. */
-	//ValueType getDistanceSquaredFrom(Point3D other) const noexcept{ return (*this - other).getDistanceSquaredFromOrigin(); }
-
-	//	/** Returns the angle from this Point3D to another one.
-
-	//	Taking this Point3D to be the centre of a circle, and the other Point3D being a position on
-	//	the circumference, the return value is the number of radians clockwise from the 12 o'clock
-	//	direction.
-	//	So 12 o'clock = 0, 3 o'clock = Pi/2, 6 o'clock = Pi, 9 o'clock = -Pi/2
-	//	*/
-	//	FloatType getAngleToPoint3D(Point3D other) const noexcept
-	//{
-	//	return static_cast<FloatType> (std::atan2(static_cast<FloatType> (other.x - x),
-	//	static_cast<FloatType> (y - other.y)));
-	//}
-
-	//	/** Returns the Point3D that would be reached by rotating this Point3D clockwise
-	//	about the origin by the specified angle.
-	//	*/
-	//	Point3D rotatedAboutOrigin(ValueType angleRadians) const noexcept
-	//{
-	//	return Point3D(x * std::cos(angleRadians) - y * std::sin(angleRadians),
-	//	x * std::sin(angleRadians) + y * std::cos(angleRadians));
-	//}
-
-	//	/** Taking this Point3D to be the centre of a circle, this returns a Point3D on its circumference.
-	//	@param radius   the radius of the circle.
-	//	@param angle    the angle of the Point3D, in radians clockwise from the 12 o'clock position.
-	//	*/
-	//	Point3D<FloatType> getPoint3DOnCircumference(float radius, float angle) const noexcept
-	//{
-	//	return Point3D<FloatType>(static_cast<FloatType> (x + radius * std::sin(angle)),
-	//	static_cast<FloatType> (y - radius * std::cos(angle)));
-	//}
-
-	//	/** Taking this Point3D to be the centre of an ellipse, this returns a Point3D on its circumference.
-	//	@param radiusX  the horizontal radius of the circle.
-	//	@param radiusY  the vertical radius of the circle.
-	//	@param angle    the angle of the Point3D, in radians clockwise from the 12 o'clock position.
-	//	*/
-	//	Point3D<FloatType> getPoint3DOnCircumference(float radiusX, float radiusY, float angle) const noexcept
-	//{
-	//	return Point3D<FloatType>(static_cast<FloatType> (x + radiusX * std::sin(angle)),
-	//	static_cast<FloatType> (y - radiusY * std::cos(angle)));
-	//}
-
-	//	/** Returns the dot-product of two Point3Ds (x1 * x2 + y1 * y2). */
-	//FloatType getDotProduct(Point3D other) const noexcept{ return x * other.x + y * other.y; }
-
-	//	//==============================================================================
-	//	/** Uses a transform to change the Point3D's coordinates.
-	//	This will only compile if ValueType = float!
-
-	//	@see AffineTransform::transformPoint3D
-	//	*/
-	//void applyTransform(const AffineTransform& transform) noexcept{ transform.transformPoint3D(x, y); }
-
-	//	/** Returns the position of this Point3D, if it is transformed by a given AffineTransform. */
-	//	Point3D transformedBy(const AffineTransform& transform) const noexcept
-	//{
-	//	return Point3D(static_cast<ValueType> (transform.mat00 * x + transform.mat01 * y + transform.mat02),
-	//	static_cast<ValueType> (transform.mat10 * x + transform.mat11 * y + transform.mat12));
-	//}
 
 	//	//==============================================================================
 		/** Casts this Point3D to a Point3D<int> object. */
@@ -507,7 +404,7 @@ private:
 	ValueType distance;		// d
 	bool aedChanged;
 
-	String label;
+	AudioParameterSet audioParams;
 
 	void calculateAed()
 	{
@@ -517,6 +414,10 @@ private:
 		azimuth = atan2(y, x);
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
+
+		audioParams.notifyA(azimuth);
+		audioParams.notifyE(elevation);
+		audioParams.notifyD(distance);
 	}
 
 	void calculateXyz()
@@ -525,6 +426,10 @@ private:
 		y = distance * cos(elevation) * sin(azimuth);
 		z = distance * sin(elevation);
 		aedChanged = false;
+
+		audioParams.notifyX(x);
+		audioParams.notifyY(y);
+		audioParams.notifyZ(z);
 	}
 };
 

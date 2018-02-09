@@ -38,6 +38,14 @@ public:
 	{
 	}
 
+	AmbiPoint(Point3D<double> point, AudioParameterSet audioParams, String name, int colorIndex = 0, double gain = 1.0) :
+		point(Point3D<double>(point.getX(), point.getY(), point.getZ(), audioParams)),
+		colorIndex(colorIndex),
+		name(name),
+		gain(gain)
+	{
+	}
+
 	AmbiPoint(XmlElement* element) :
 		id(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_ID, Uuid().toString())),
 		point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
@@ -47,6 +55,17 @@ public:
 		name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
 		gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)), 
 		rms(0.0f)
+	{
+	}
+
+	AmbiPoint(XmlElement* element, AudioParameterSet audioParams) :
+	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
+			element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
+			element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z),
+			audioParams)),
+	colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
+	name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0))
 	{
 	}
 

@@ -373,10 +373,10 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	ScopedPointer<Uuid> newId = new Uuid();
 	switch (radarMode) {
 	case XY:
-		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
 		break;
 	case ZY:
-		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY()), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
 		break;
 	}
 

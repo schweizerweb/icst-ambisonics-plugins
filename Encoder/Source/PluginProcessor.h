@@ -62,12 +62,14 @@ public:
 	Array<AmbiPoint>* getSourcesArray() const;
 	EncoderSettings* getEncoderSettings() const;
 	void initializeOsc() const;
+	Array<AudioParameterSet>* getAudioParams();
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
 	ScopedPointer<EncoderSettings> pEncoderSettings;
 	ScopedPointer<OSCHandler> pOscHandler;
 	ScopedPointer<AmbiOSCSender> pOscSender;
+	Array<AudioParameterSet> audioParams;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };
