@@ -68,9 +68,9 @@ void AudioParameterFloatAmbi::setValue(float newValue)
 		{
 			switch (type)
 			{
-			case Azimuth: pAmbiPoints->getReference(ambiIndex).getPoint()->setAzimuth(value); break;
-			case Elevation: pAmbiPoints->getReference(ambiIndex).getPoint()->setElevation(value); break;
-			case Distance: pAmbiPoints->getReference(ambiIndex).getPoint()->setDistance(value); break;
+			case Azimuth: pAmbiPoints->getReference(ambiIndex).getPoint()->setAzimuth(value, false); break;
+			case Elevation: pAmbiPoints->getReference(ambiIndex).getPoint()->setElevation(value, false); break;
+			case Distance: pAmbiPoints->getReference(ambiIndex).getPoint()->setDistance(value, false); break;
 			case X: pAmbiPoints->getReference(ambiIndex).getPoint()->setX(value); break;
 			case Y: pAmbiPoints->getReference(ambiIndex).getPoint()->setY(value); break;
 			case Z: pAmbiPoints->getReference(ambiIndex).getPoint()->setZ(value); break;

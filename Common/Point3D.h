@@ -81,22 +81,22 @@ public:
 	inline ValueType getDistance() noexcept{ if (xyzChanged) calculateAed(); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX) noexcept { xyzChanged = true; x = newX; audioParams.notifyX(x); }
+	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; x = newX; if(notify) audioParams.notifyX(x); }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY) noexcept { xyzChanged = true; y = newY; audioParams.notifyY(y); }
+	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; y = newY; if (notify) audioParams.notifyY(y); }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ) noexcept { xyzChanged = true; z = newZ; audioParams.notifyZ(z); }
+	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; z = newZ; if (notify) audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
-	inline void setAzimuth(ValueType newAzimuth) noexcept { aedChanged = true; azimuth = newAzimuth; audioParams.notifyA(azimuth); }
+	inline void setAzimuth(ValueType newAzimuth, bool notify = true) noexcept { aedChanged = true; azimuth = newAzimuth; if (notify) audioParams.notifyA(azimuth); }
 
 		/** Sets the Point3D's elevation. */
-	inline void setElevation(ValueType newElevation) noexcept { aedChanged = true; elevation = newElevation; audioParams.notifyE(elevation); }
+	inline void setElevation(ValueType newElevation, bool notify = true) noexcept { aedChanged = true; elevation = newElevation; if (notify) audioParams.notifyE(elevation); }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); audioParams.notifyD(distance); }
+	inline void setDistance(ValueType newDistance, bool notify = true) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); if (notify) audioParams.notifyD(distance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
