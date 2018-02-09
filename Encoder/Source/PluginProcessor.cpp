@@ -171,7 +171,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
 		{
 			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += inputData[iSample] * currentCoefficients[iChannel];
+				outputBufferPointers[iChannel][iSample] += float(inputData[iSample] * currentCoefficients[iChannel]);
 		}
 	}
 }
