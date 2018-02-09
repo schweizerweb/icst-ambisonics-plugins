@@ -2,7 +2,7 @@
 
 <JUCERPROJECT id="TRwhZJ" name="Ambisonic Encoder" displaySplashScreen="1"
               reportAppUsage="1" splashScreenColour="Dark" projectType="audioplug"
-              version="0.2.0" bundleIdentifier="com.yourcompany.AmbisonicEncoder"
+              version="0.3.0" bundleIdentifier="com.yourcompany.AmbisonicEncoder"
               includeBinaryInAppConfig="1" buildVST="1" buildVST3="1" buildAU="1"
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="0"
               enableIAA="0" pluginName="Ambisonic Encoder" pluginDesc="Ambisonic Encoder"
