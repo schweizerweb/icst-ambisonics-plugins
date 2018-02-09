@@ -147,6 +147,19 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 }
 #endif
 
+void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance)
+{
+	if (!pEncoderSettings->distanceEncodingFlag || pEncoderSettings->unitCircleRadius == 0.0)
+		return;
+
+	double scaledDistance = distance * (1.0 / pEncoderSettings->unitCircleRadius);
+	double wFactor = atan(scaledDistance * PI / 2.0) / scaledDistance * PI / 2.0;
+	double otherFactor = (1 - exp(-scaledDistance)) * wFactor;
+	pCoefficientArray[0] *= wFactor;
+	for (int i = 1; i < arraySize; i++)
+		pCoefficientArray[i] *= otherFactor;
+}
+
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
@@ -171,6 +184,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = sourcesArray[iSource]->getPoint();
 		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], false);
+		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
 		// create B-format

@@ -35,6 +35,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
+	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance);
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
