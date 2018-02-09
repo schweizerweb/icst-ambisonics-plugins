@@ -20,6 +20,11 @@ public:
 	{
 	}
 
+	~DelayBuffer()
+	{
+		buffer = nullptr;
+	}
+
 	void checkAndAdjustSize(int requiredDelay);
 	float processNextSample(float input);
 
