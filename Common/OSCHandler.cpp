@@ -127,6 +127,27 @@ void OSCHandler::HandleOwnExternStyle(const OSCMessage& message) const
 	}
 }
 
+void OSCHandler::HandleOwnExternIntStyle(const OSCMessage& message) const
+{
+	if (message.size() < 4)
+		return;
+
+	int channel = message[0].getInt32();
+	float a = message[1].getFloat32();
+	float e = message[2].getFloat32();
+	float d = message[3].getFloat32();
+
+	channel--;	// channel comes 1-based, has to be used here as 0-based
+
+	if (pAmbiPointArray->size() > channel)
+	{
+		AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(channel);
+		ambiPt->getPoint()->setDistance(d);
+		ambiPt->getPoint()->setAzimuth((int(a) % 360) / 180.0 * PI);
+		ambiPt->getPoint()->setElevation(e / 180.0 * PI);
+	}
+}
+
 void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	OSCAddressPattern pattern = message.getAddressPattern();
@@ -141,6 +162,10 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN)))
 	{
 		HandleOwnExternStyle(message);
+	}
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_INT_EXTERN)))
+	{
+		HandleOwnExternIntStyle(message);
 	}
 }
 

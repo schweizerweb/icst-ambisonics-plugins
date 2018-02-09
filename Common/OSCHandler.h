@@ -17,6 +17,7 @@
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS "/zhdk/ambi/source/internal"
 #define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN "/zhdk/ambi/source"
+#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_INT_EXTERN "/zhdk/ambi/channelsource"
 
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
@@ -26,6 +27,7 @@ public:
 	void HandleMusescoreSSMNStyle(const OSCMessage& message) const;
 	void HandleOwnInternalStyle(const OSCMessage& message) const;
 	void HandleOwnExternStyle(const OSCMessage& message) const;
+	void HandleOwnExternIntStyle(const OSCMessage& message) const;
 	void oscMessageReceived(const OSCMessage& message) override;
 	void stop();
 
