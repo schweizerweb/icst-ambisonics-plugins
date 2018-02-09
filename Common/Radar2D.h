@@ -26,7 +26,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener
 public:
 	enum RadarMode { XY, ZY };
 
-	Radar2D(RadarMode mode, Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+	Radar2D(RadarMode mode, OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
@@ -61,8 +61,8 @@ private:
 private:
 	OpenGLContext openGLContext;
 
-	Array<AmbiPoint>* pEditablePointsArray;
-	Array<AmbiPoint>* pDisplayOnlyPointsArray;
+	OwnedArray<AmbiPoint>* pEditablePointsArray;
+	OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray;
 	Image radarBackground;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;

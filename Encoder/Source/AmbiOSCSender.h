@@ -15,7 +15,7 @@
 class AmbiOSCSender : public Timer
 {
 public:
-	AmbiOSCSender(Array<AmbiPoint>* ambiPoints);
+	AmbiOSCSender(OwnedArray<AmbiPoint>* ambiPoints);
 	~AmbiOSCSender();
 
 	bool start(String targetHost, int port, int intervalMs);
@@ -25,7 +25,7 @@ private:
 	void timerCallback() override;
 
 private:
-	Array<AmbiPoint>* pPoints;
+	OwnedArray<AmbiPoint>* pPoints;
 	ScopedPointer<OSCSender> oscSender;
 	int sendIntervalMs;
 };

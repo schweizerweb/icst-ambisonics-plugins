@@ -21,7 +21,7 @@
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
-	OSCHandler(Array<AmbiPoint>* pAmbiPointArray);
+	OSCHandler(OwnedArray<AmbiPoint>* pAmbiPointArray);
 	bool start(int portNb);
 	void HandleMusescoreSSMNStyle(const OSCMessage& message) const;
 	void HandleOwnInternalStyle(const OSCMessage& message) const;
@@ -30,7 +30,7 @@ public:
 	void stop();
 
 private:
-	Array<AmbiPoint>* pAmbiPointArray;
+	OwnedArray<AmbiPoint>* pAmbiPointArray;
 };
 
 

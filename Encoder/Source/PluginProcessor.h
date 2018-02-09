@@ -59,13 +59,13 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	Array<AmbiPoint>* getSourcesArray() const;
+	OwnedArray<AmbiPoint>* getSourcesArray();
 	EncoderSettings* getEncoderSettings() const;
 	void initializeOsc() const;
 	Array<AudioParameterSet>* getAudioParams();
 
 private:
-	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
+	OwnedArray<AmbiPoint> sourcesArray;
 	ScopedPointer<EncoderSettings> pEncoderSettings;
 	ScopedPointer<OSCHandler> pOscHandler;
 	ScopedPointer<AmbiOSCSender> pOscSender;

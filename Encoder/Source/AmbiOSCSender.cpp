@@ -11,7 +11,7 @@
 #include "AmbiOSCSender.h"
 #include "../../Common/OSCHandler.h"
 
-AmbiOSCSender::AmbiOSCSender(Array<AmbiPoint>* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
+AmbiOSCSender::AmbiOSCSender(OwnedArray<AmbiPoint>* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
 {
 	oscSender = new OSCSender();
 }
@@ -48,13 +48,13 @@ void AmbiOSCSender::timerCallback()
 	{
 		OSCMessage message = OSCMessage(
 			OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS),
-			OSCArgument(pPoints->getReference(iPoint).getId()),
-			OSCArgument(pPoints->getReference(iPoint).getName()),
-			OSCArgument(float(pPoints->getReference(iPoint).getPoint()->getAzimuth())),
-			OSCArgument(float(pPoints->getReference(iPoint).getPoint()->getElevation())),
-			OSCArgument(float(pPoints->getReference(iPoint).getPoint()->getDistance())),
-			OSCArgument(pPoints->getReference(iPoint).getRms(true)),
-			OSCArgument(pPoints->getReference(iPoint).getColorIndex()));
+			OSCArgument(pPoints->getUnchecked(iPoint)->getId()),
+			OSCArgument(pPoints->getUnchecked(iPoint)->getName()),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getAzimuth())),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getElevation())),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getDistance())),
+			OSCArgument(pPoints->getUnchecked(iPoint)->getRms(true)),
+			OSCArgument(pPoints->getUnchecked(iPoint)->getColorIndex()));
 		oscSender->send(message);
 	}
 

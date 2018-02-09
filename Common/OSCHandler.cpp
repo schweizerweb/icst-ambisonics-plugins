@@ -10,7 +10,7 @@
 
 #include "OSCHandler.h"
 
-OSCHandler::OSCHandler(Array<AmbiPoint>* pAmbiPointArr)
+OSCHandler::OSCHandler(OwnedArray<AmbiPoint>* pAmbiPointArr)
 {
 	pAmbiPointArray = pAmbiPointArr;
 }
@@ -46,7 +46,7 @@ void OSCHandler::HandleMusescoreSSMNStyle(const OSCMessage& message) const
 
 		for (int i = 0; i < pAmbiPointArray->size(); i++)
 		{
-			if (((*pAmbiPointArray)[i]).getName() == channelString)
+			if (((*pAmbiPointArray)[i])->getName() == channelString)
 			{
 				index = i;
 				break;
@@ -56,11 +56,11 @@ void OSCHandler::HandleMusescoreSSMNStyle(const OSCMessage& message) const
 		if (index == -1)
 		{
 			ScopedPointer<Uuid> newId = new Uuid();
-			pAmbiPointArray->add(AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), channelString, channel));
+			pAmbiPointArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), channelString, channel));
 			index = pAmbiPointArray->size() - 1;
 		}
 
-		AmbiPoint* ambiPt = &pAmbiPointArray->getReference(index);
+		AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(index);
 		ambiPt->getPoint()->setDistance(d);
 		ambiPt->getPoint()->setAzimuth((int(a)%360) / 180.0 * PI);
 		ambiPt->getPoint()->setElevation(e / 180.0 * PI);
@@ -83,7 +83,7 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 	int index = -1;
 	for (int i = 0; i < pAmbiPointArray->size(); i++)
 	{
-		if ((*pAmbiPointArray)[i].getId() == id)
+		if ((*pAmbiPointArray)[i]->getId() == id)
 		{
 			index = i;
 			break;
@@ -92,11 +92,11 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 
 	if (index == -1)
 	{
-		pAmbiPointArray->add(AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, colorIndex));
+		pAmbiPointArray->add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, colorIndex));
 		index = pAmbiPointArray->size() - 1;
 	}
 
-	AmbiPoint* ambiPt = &pAmbiPointArray->getReference(index);
+	AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(index);
 	ambiPt->setName(name);
 	ambiPt->getPoint()->setAzimuth(a);
 	ambiPt->getPoint()->setElevation(e);
@@ -116,9 +116,9 @@ void OSCHandler::HandleOwnExternStyle(const OSCMessage& message) const
 
 	for (int i = 0; i < pAmbiPointArray->size(); i++)
 	{
-		if (((*pAmbiPointArray)[i]).getName() == channelString)
+		if (((*pAmbiPointArray)[i])->getName() == channelString)
 		{
-			AmbiPoint* ambiPt = &pAmbiPointArray->getReference(i);
+			AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(i);
 			ambiPt->getPoint()->setDistance(d);
 			ambiPt->getPoint()->setAzimuth((int(a) % 360) / 180.0 * PI);
 			ambiPt->getPoint()->setElevation(e / 180.0 * PI);
