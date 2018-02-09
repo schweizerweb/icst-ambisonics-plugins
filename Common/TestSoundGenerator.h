@@ -22,10 +22,11 @@ public:
 
 private:
 	void timerCallback() override;
-	void startSpeakerTest(int channelNb);
+	void startSpeakerTest(int channelNb, double gain);
 	void actionListenerCallback(const String& message) override;
 
 private:
 	int testSoundChannel;
+	double testSoundGain;
 	Random random;
 };
