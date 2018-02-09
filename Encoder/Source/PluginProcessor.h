@@ -58,10 +58,12 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	Array<AmbiPoint>* getSourcesArray() const;
+	Array<AudioParameterSet>* getAudioParams();
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
 	ScopedPointer<EncoderSettings> pEncoderSettings;
+	Array<AudioParameterSet> audioParams;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

@@ -12,6 +12,8 @@
 #define POINT3D_H_INCLUDED
 
 #include "JuceHeader.h"
+#include "AudioParameterSet.h"
+
 #define	SQRT105		10.246950766	/*sqrt(105.0)*/
 #define SQRT15		3.87298334621	/*sqrt(15.0)*/
 #define SQRT7		2.64575131106	/*sqrt(7.0)*/
@@ -39,14 +41,17 @@ public:
 	Point3D() noexcept : x(), y(), z() { xyzChanged = true; aedChanged = false; }
 
 	/** Creates a copy of another Point3D. */
-	Point3D(const Point3D& other) noexcept : x(other.x), y(other.y), z(other.z) { xyzChanged = true; aedChanged = false; }
+	Point3D(const Point3D& other) noexcept : x(other.x), y(other.y), z(other.z), audioParams(other.audioParams) { xyzChanged = true; aedChanged = false; }
 
 	/** Creates a Point3D from an (x, y, z) position. */
 	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ) noexcept : x(initialX), y(initialY), z(initialZ) { xyzChanged = true; aedChanged = false; }
+	
+	/** Creates a Point3D from an (x, y, z) position. Keeps a reference to the corresponding audio parameter.*/
+	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ, AudioParameterSet paramSet) noexcept : x(initialX), y(initialY), z(initialZ), audioParams(paramSet) { xyzChanged = true; aedChanged = false; }
 
 	//==============================================================================
 	/** Copies this Point3D from another one. */
-	Point3D& operator= (Point3D& other) noexcept{ xyzChanged = true; x = other.getX(); y = other.getY(); z = other.getZ(); return *this; }
+	Point3D& operator= (Point3D& other) noexcept { xyzChanged = true; x = other.getX(); y = other.getY(); z = other.getZ(); audioParams = other.audioParams; return *this; }
 
 	inline bool operator== (Point3D other) const noexcept{ return getX() == other.getX() && getY() == other.getY() && getZ() == other.getZ(); }
 	inline bool operator!= (Point3D other) const noexcept{ return getX() != other.getX() || getY() != other.getY() || getZ() != other.getZ(); }
@@ -76,22 +81,22 @@ public:
 	inline ValueType getDistance() noexcept{ if (xyzChanged) calculateAed(); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX) noexcept{ xyzChanged = true; x = newX; }
+	inline void setX(ValueType newX) noexcept { xyzChanged = true; x = newX; audioParams.notifyX(x); }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY) noexcept{ xyzChanged = true; y = newY; }
+	inline void setY(ValueType newY) noexcept { xyzChanged = true; y = newY; audioParams.notifyY(y); }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ) noexcept{ xyzChanged = true; z = newZ; }
+	inline void setZ(ValueType newZ) noexcept { xyzChanged = true; z = newZ; audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
-	inline void setAzimuth(ValueType newAzimuth) noexcept{ aedChanged = true; azimuth = newAzimuth; }
+	inline void setAzimuth(ValueType newAzimuth) noexcept { aedChanged = true; azimuth = newAzimuth; audioParams.notifyA(azimuth); }
 
 		/** Sets the Point3D's elevation. */
-	inline void setElevation(ValueType newElevation) noexcept{ aedChanged = true; elevation = newElevation; }
+	inline void setElevation(ValueType newElevation) noexcept { aedChanged = true; elevation = newElevation; audioParams.notifyE(elevation); }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance) noexcept{ aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
+	inline void setDistance(ValueType newDistance) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); audioParams.notifyD(distance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
@@ -507,7 +512,7 @@ private:
 	ValueType distance;		// d
 	bool aedChanged;
 
-	String label;
+	AudioParameterSet audioParams;
 
 	void calculateAed()
 	{
@@ -517,6 +522,10 @@ private:
 		azimuth = atan2(y, x);
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
+
+		audioParams.notifyA(azimuth);
+		audioParams.notifyE(elevation);
+		audioParams.notifyD(distance);
 	}
 
 	void calculateXyz()
@@ -525,6 +534,10 @@ private:
 		y = distance * cos(elevation) * sin(azimuth);
 		z = distance * sin(elevation);
 		aedChanged = false;
+
+		audioParams.notifyX(x);
+		audioParams.notifyY(y);
+		audioParams.notifyZ(z);
 	}
 };
 

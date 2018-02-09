@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "AudioParameterFloatAmbi.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
@@ -31,6 +32,21 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 {
 	pSourcesArray = new Array<AmbiPoint>();
 	pEncoderSettings = new EncoderSettings();
+
+	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+	{
+		String indexStr = String(i + 1);
+		
+		AudioParameterSet set;
+		set.pA = new AudioParameterFloatAmbi("Azimuth" + indexStr, "Azimuth " + indexStr, "Point " + indexStr + ": Azimuth", AudioProcessorParameter::genericParameter, NormalisableRange<float>(float(-PI), float(PI)), 0.0f, pSourcesArray, i, AudioParameterFloatAmbi::Azimuth);
+		set.pE = new AudioParameterFloatAmbi("Elevation" + indexStr, "Elevation " + indexStr, "Point " + indexStr + ": Elevation", AudioProcessorParameter::genericParameter, NormalisableRange<float>(0.0f, float(PI)), 0.0f, pSourcesArray, i, AudioParameterFloatAmbi::Elevation);
+		set.pD = new AudioParameterFloatAmbi("Distance" + indexStr, "Distance " + indexStr, "Point " + indexStr + ": Distance", AudioProcessorParameter::genericParameter, NormalisableRange<float>(0.0f, 1.0f), 0.0f, pSourcesArray, i, AudioParameterFloatAmbi::Distance);
+		
+		audioParams.add(set);
+		addParameter(set.pA);
+		addParameter(set.pE);
+		addParameter(set.pD);
+	}
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -128,36 +144,8 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 }
 #endif
 
-void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
+void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
-	// MIDI In Handling
-	int time;
-	MidiMessage m;
-	for (MidiBuffer::Iterator i(midiMessages); i.getNextEvent(m, time);)
-	{
-		if (m.isController() && m.getChannel() <= pSourcesArray->size())
-		{
-			switch (m.getControllerNumber())
-			{
-			case 12: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setAzimuth(m.getControllerValue() / 127.0 * 2.0 * PI); pSourcesArray->getReference(m.getChannel() - 1).setName(String(m.getTimeStamp())); break;
-			case 13: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setElevation(m.getControllerValue() / 127.0 * 0.5 * PI); break;
-			case 14: pSourcesArray->getReference(m.getChannel() - 1).getPoint()->setDistance(m.getControllerValue() / 127.0); break;
-			}
-		}
-	}
-
-	// MIDI Out handling
-	midiMessages.clear();
-	for (int i = 0; i < pSourcesArray->size(); i++)
-	{
-		int midiAzimuth = int(pSourcesArray->getReference(i).getPoint()->getAzimuth() / 2.0 / PI * 127);
-		int midiElevation = int(pSourcesArray->getReference(i).getPoint()->getElevation() / 0.5 / PI * 127);
-		int midiDistance = int(pSourcesArray->getReference(i).getPoint()->getDistance() * 127.0);
-		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 12, midiAzimuth), 0);
-		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 13, midiElevation), 0);
-		midiMessages.addEvent(MidiMessage::controllerEvent(i + 1, 14, midiDistance), 0);
-	}
-
 	// Audio handling
 	const int totalNumInputChannels = getTotalNumInputChannels();
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
@@ -233,11 +221,17 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			pSourcesArray->clear();
 			if (sourcesElement != nullptr)
 			{
+				int index = 0;
 				XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
 				while (xmlPoint != nullptr)
 				{
-					pSourcesArray->add(AmbiPoint(xmlPoint));
+					if (audioParams.size() > index)
+						pSourcesArray->add(AmbiPoint(xmlPoint, audioParams[index]));
+					else
+						pSourcesArray->add(AmbiPoint(xmlPoint, AudioParameterSet()));
+
 					xmlPoint = xmlPoint->getNextElement();
+					index++;
 				}
 			}
 		}
@@ -247,6 +241,11 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 Array<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray() const
 {
 	return pSourcesArray;
+}
+
+Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()
+{
+	return &audioParams;
 }
 
 //==============================================================================
