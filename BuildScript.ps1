@@ -2,11 +2,13 @@ param(
     [string]$powershellCommand,
     [string]$projucer,
     [string]$buildExecutable,
-    [string]$buildArguments,
+    [string]$buildArgumentsPre,
+    [string]$buildArgumentsPost,
     [string]$projectFileExtension,
     [string[]]$pluginTypeStrings
 )
 
+$ErrorActionPreference = "Stop"
 $targetPathBase = "./bin"
 $targetPathZipBase = "./packages"
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
@@ -35,7 +37,7 @@ function removePathIfExists([string]$path)
 removePathIfExists $targetPathBase
 
 # create jucer files
-$ret = Start-Process $powershellCommand "& ./JucerFilesCreator.ps1" -Wait -PassThru
+$ret = Start-Process $powershellCommand "./JucerFilesCreator.ps1" -Wait -PassThru
 if($ret.ExitCode -ne 0)
 {
     Write-Output "Error calling JucerFilesCreator: $($ret.ExitCode)"
@@ -68,7 +70,7 @@ foreach($file in $jucerFiles)
     # build solution
     $projectFile = @($projectFiles)[0]
     Write-Output "Building solution..."
-    $process = Start-Process $buildExecutable -ArgumentList $projectFiles.FullName, $buildArguments -Wait -PassThru
+    $process = Start-Process $buildExecutable "$($buildArgumentsPre) $($projectFiles.FullName) $($buildArgumentsPost)" -Wait -PassThru
     if($process.ExitCode -ne 0)
     {
         Write-Output "Error building $($projectFile)"
