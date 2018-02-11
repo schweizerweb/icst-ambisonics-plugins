@@ -6,14 +6,36 @@ $EncoderVersions =
     @{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" }
 )
 
-$source = '.\Encoder\AmbisonicEncoder.jucer'
+$DecoderVersions = 
+@(
+    @{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
+    @{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" }
+)
 
-foreach ($element in $EncoderVersions) {
-    $projectId =  'O' + $element.Order + 'CH' + $element.Input.ToString('00')
-    $code = 'O' + $element.Order + '_' + $element.Input + 'CH'
+#program start
+Write-Output "Generating Encoder files"
+$source = '.\Encoder\AmbisonicEncoder.jucer'
+foreach ($element in $EncoderVersions) 
+{
     $output = $ChannelsPerOrder[$element.Order]
-    $target = $source.Replace('.jucer', "_$($code).jucer")
-    Copy-Item $source $target
+    createFile $source $element.Input $output $element.Order $element.Input $element.Description
+}
+
+Write-Output "Generating Decoder files"
+$source = '.\Decoder\AmbisonicDecoder.jucer'
+foreach ($element in $DecoderVersions) 
+{
+    $input = $ChannelsPerOrder[$element.Order]
+    createFile $source $input $element.Output $element.Order $element.Output $element.Description
+}
+# program end
+
+function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
+{
+    $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
+    $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
+    $target = $sourceFile.Replace('.jucer', "_$($code).jucer")
+    Copy-Item $sourceFile $target
 
     Write-Output "ProjectId $($projectId)"
     Write-Output "Code $($code)"
@@ -27,10 +49,9 @@ foreach ($element in $EncoderVersions) {
     
     $version = $node.version
     $node.id = $projectId
-    $node.name = $node.name
     $node.pluginName = "$($node.pluginName)_$($code)"
-    $node.pluginDesc = $element.Description
-    $node.pluginChannelConfigs = "{$($element.Input),$($output)}"
+    $node.pluginDesc = $description
+    $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
     
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
@@ -49,62 +70,3 @@ foreach ($element in $EncoderVersions) {
     Write-Output "Done"
     Write-Output " "
 }
-
-<#
-foreach ($element in $EncoderVersions) {
-    $projectId =  'O' + $element.Order + 'CH' + $element.Input.ToString('00')
-    $code = 'O' + $element.Order + '_' + $element.Input + 'CH'
-    $output = $ChannelsPerOrder[$element.Order]
-    $source = '.\Encoder\Ambisonic Encoder.jucer'
-    $target = '.\Encoder\AmbisonicEncoder_' + $code + '.jucer'
-
-    Write-Output "ProjectId $($projectId)"
-    Write-Output "Code $($code)"
-    Write-Output "Outputs $($output)"
-
-    $regex1 = "(<JUCERPROJECT.*?id="")"`
-    + "(?<Id>\w*?)"`
-    + "("".*?name="")"`
-    + "(?<ProjectName>.*?)"`
-    + "("".*?version="")"`
-    + "(?<Version>[\d\.]*?)"`
-    + "("".*?pluginName="")"`
-    + "(?<PluginName>.*?)"`
-    + "("".*?pluginDesc="")"`
-    + "(?<PluginDesc>.*?)"`
-    + "("".*?pluginChannelConfigs=""\{)"`
-    + "(?<PluginChannelConfigs>[\d,]*?)"`
-    + "(\})"`
-    + "("".*?>)"
-
-    $content = [string](Get-Content $source)
-
-    if($content -match $regex1)
-    {
-        $originalProjectName = $matches.ProjectName
-        $version = $matches.Version    
-        $originalPluginName = $matches.PluginName
-    }
-    else
-    {
-        Write-Output "No match"
-    }
-    $projectName = "$($originalProjectName)"
-    $pluginName = "$($originalPluginName)_$($code)"
-    $description = $element.Description
-    $channelConfig = "$($element.Input),$($output)"
-    $replaceString = ('$1{0}$2{1}$3{2}$4{3}$5{4}$6{5}$7$8' -f $projectId, $projectName, $version, $pluginName, $description, $channelConfig)
-    $content = $content -replace $regex1, $replaceString
-    
-    Write-Output "Original project name: $($originalProjectName)"
-    Write-Output "New project name: $($projectName)"
-    Write-Output "Original plugin name: $($originalPluginName)"
-    Write-Output "New plugin name: $($pluginName)"
-    Write-Output "Version: $($version)"
-    
-    Write-Output "Create $($target)"
-    Set-Content -Path $target -Value $content -Encoding UTF8
-}
-#>
-
-
