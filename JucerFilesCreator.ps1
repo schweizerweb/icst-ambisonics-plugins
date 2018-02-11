@@ -1,4 +1,6 @@
 $ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36 )
+$VersionFile = "./versionInformation.txt"
+$releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions = 
 @(
@@ -11,24 +13,6 @@ $DecoderVersions =
     @{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
     @{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" }
 )
-
-#program start
-Write-Output "Generating Encoder files"
-$source = '.\Encoder\AmbisonicEncoder.jucer'
-foreach ($element in $EncoderVersions) 
-{
-    $output = $ChannelsPerOrder[$element.Order]
-    createFile $source $element.Input $output $element.Order $element.Input $element.Description
-}
-
-Write-Output "Generating Decoder files"
-$source = '.\Decoder\AmbisonicDecoder.jucer'
-foreach ($element in $DecoderVersions) 
-{
-    $input = $ChannelsPerOrder[$element.Order]
-    createFile $source $input $element.Output $element.Order $element.Output $element.Description
-}
-# program end
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
 {
@@ -46,7 +30,12 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
 
     # Modify
     $node = $xml.JUCERPROJECT
-    
+
+    if(![string]::IsNullOrEmpty($releaseVersion))
+    {
+        $node.version = $releaseVersion
+    }
+
     $version = $node.version
     $node.id = $projectId
     $node.pluginName = "$($node.pluginName)_$($code)"
@@ -70,3 +59,22 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     Write-Output "Done"
     Write-Output " "
 }
+
+#program start
+Write-Output "Generating Encoder files"
+$source = '.\Encoder\AmbisonicEncoder.jucer'
+foreach ($element in $EncoderVersions) 
+{
+    $output = $ChannelsPerOrder[$element.Order]
+    createFile $source $element.Input $output $element.Order $element.Input $element.Description
+}
+
+Write-Output "Generating Decoder files"
+$source = '.\Decoder\AmbisonicDecoder.jucer'
+foreach ($element in $DecoderVersions) 
+{
+    $input = $ChannelsPerOrder[$element.Order]
+    createFile $source $input $element.Output $element.Order $element.Output $element.Description
+}
+return 0
+# program end
