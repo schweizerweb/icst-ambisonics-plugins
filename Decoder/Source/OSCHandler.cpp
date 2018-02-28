@@ -15,9 +15,10 @@ OSCHandler::OSCHandler(Array<AmbiPoint>* pAmbiPointArr)
 	pAmbiPointArray = pAmbiPointArr;
 }
 
-bool OSCHandler::start()
+bool OSCHandler::start(int portNb)
 {
-	bool ok = connect(5011);
+	disconnect();
+	bool ok = connect(portNb);
 
 	if (!ok)
 		return false;
@@ -63,4 +64,9 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 			ambiPt->getPoint()->setElevation(e / 180.0 * PI);
 		}
 	}
+}
+
+void OSCHandler::stop()
+{
+	disconnect();
 }

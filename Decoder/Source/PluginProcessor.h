@@ -10,10 +10,11 @@
 
 #pragma once
 
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/TestSoundGenerator.h"
+#include "DecoderSettings.h"
 
 //==============================================================================
 /**
@@ -61,12 +62,14 @@ public:
 	Array<AmbiPoint>* getSpeakerArray() const;
 	Array<AmbiPoint>* getMovingPointsArray() const;
 	AmbiSettings* getAmbiSettings() const;
+	DecoderSettings* getDecoderSettings() const;
 	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
 	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
 	ScopedPointer<AmbiSettings> pAmbiSettings;
+	ScopedPointer<DecoderSettings> pDecoderSettings;
 	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;
 
 	//==============================================================================

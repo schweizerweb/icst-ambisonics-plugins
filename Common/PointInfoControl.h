@@ -20,7 +20,7 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../Decoder/JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "AmbiPoint.h"
 #include "PointSelection.h"
 //[/Headers]

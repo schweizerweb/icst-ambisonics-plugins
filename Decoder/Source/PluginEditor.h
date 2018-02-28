@@ -20,12 +20,12 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "PluginProcessor.h"
 #include "../../Common/RadarComponent.h"
 #include "PresetInfo.h"
 #include "OSCHandler.h"
-
+#include "DecoderSettings.h"
 //[/Headers]
 
 
@@ -48,6 +48,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void initializeOscHandler() const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -62,6 +63,7 @@ private:
 	Array<AmbiPoint>* pSpeakerArray;
 	Array<AmbiPoint>* pMovingPointsArray;
 	AmbiSettings* pAmbiSettings;
+	DecoderSettings *pDecoderSettings;
 	OwnedArray<PresetInfo> presets;
 	ScopedPointer<OSCHandler> oscHandler;
 	PointSelection pointSelection;
@@ -70,6 +72,7 @@ private:
     //==============================================================================
     ScopedPointer<RadarComponent> component;
     ScopedPointer<TextButton> buttonConfigure;
+    ScopedPointer<TextButton> buttonConfigurePlugin;
 
 
     //==============================================================================

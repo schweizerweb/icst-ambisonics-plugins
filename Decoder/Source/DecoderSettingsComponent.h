@@ -21,8 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "Radar2D.h"
-
+#include "DecoderSettings.h"
 //[/Headers]
 
 
@@ -35,33 +34,41 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class Radar3D  : public Component
+class DecoderSettingsComponent  : public Component,
+                                  public TextEditorListener,
+                                  public ButtonListener
 {
 public:
     //==============================================================================
-    Radar3D (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection);
-    ~Radar3D();
+    DecoderSettingsComponent (DecoderSettings* pSettings);
+    ~DecoderSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	static void showAsDialog(DecoderSettings* pSettings);
+	void textEditorTextChanged(TextEditor& editor) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+	DecoderSettings * pDecoderSettings;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Radar2D> xyRadar;
-    ScopedPointer<Radar2D> zyRadar;
+    ScopedPointer<GroupComponent> groupOsc;
+    ScopedPointer<ToggleButton> toggleReceiveOsc;
+    ScopedPointer<TextEditor> textOscPort;
+    ScopedPointer<Label> labelOscPort;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar3D)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecoderSettingsComponent)
 };
 
 //[EndFile] You can add extra defines here...

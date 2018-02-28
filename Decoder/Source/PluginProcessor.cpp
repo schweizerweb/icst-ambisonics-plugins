@@ -28,6 +28,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 	pSpeakerArray = new Array<AmbiPoint>();
 	pMovingPointsArray = new Array<AmbiPoint>();
 	pAmbiSettings = new AmbiSettings();
+	pDecoderSettings = new DecoderSettings();
 	pTestSoundGenerator = new TestSoundGenerator();
 }
 
@@ -36,6 +37,7 @@ AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 	pSpeakerArray = nullptr;
 	pMovingPointsArray = nullptr;
 	pAmbiSettings = nullptr;
+	pDecoderSettings = nullptr;
 	pTestSoundGenerator = nullptr;
 }
 
@@ -184,15 +186,65 @@ AudioProcessorEditor* AmbisonicsDecoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+    ScopedPointer<XmlElement> xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
+
+	// save general decoder settings
+	xml->setAttribute("uiWidth", pDecoderSettings->lastUIWidth);
+	xml->setAttribute("uiHeight", pDecoderSettings->lastUIHeight);
+	xml->setAttribute("oscReceive", pDecoderSettings->oscReceive);
+	xml->setAttribute("oscReceivePort", pDecoderSettings->oscReceivePort);
+
+	// load last speaker preset
+	PresetInfo* preset = new PresetInfo();
+	preset->setName("LastState");
+	for (AmbiPoint pt : *pSpeakerArray)
+		preset->getPoints()->add(new AmbiPoint(pt));
+	preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
+	preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
+	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+		preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i] = pAmbiSettings->getAmbiOrderWeightPointer()[i];
+	XmlElement* speakerSettings = new XmlElement(XML_TAG_PRESET_ROOT);
+	preset->CreateXmlRoot(speakerSettings);
+	xml->addChildElement(speakerSettings);
+
+	copyXmlToBinary(*xml, destData);
+	xml->deleteAllChildElements();
 }
 
 void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+    ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+	if (xmlState != nullptr)
+	{
+		// make sure that it's actually our type of XML object..
+		if (xmlState->hasTagName("AMBISONICDECODERPLUGINSETTINGS"))
+		{
+			// load general decoder settings
+			pDecoderSettings->lastUIWidth = jmax(xmlState->getIntAttribute("uiWidth", pDecoderSettings->lastUIWidth), 300);
+			pDecoderSettings->lastUIHeight = jmax(xmlState->getIntAttribute("uiHeight", pDecoderSettings->lastUIHeight), 600);
+			pDecoderSettings->oscReceive = xmlState->getBoolAttribute("oscReceive", false);
+			pDecoderSettings->oscReceivePort = xmlState->getIntAttribute("oscReceivePort", 5011);
+			
+			// load last speaker preset
+			PresetInfo* preset = new PresetInfo();
+			XmlElement* presetElement = xmlState->getChildByName(XML_TAG_PRESET_ROOT);
+			if (presetElement != nullptr && preset->LoadFromXmlRoot(presetElement))
+			{
+				pSpeakerArray->clear();
+				for (AmbiPoint* pt : *preset->getPoints())
+				{
+					pSpeakerArray->add(AmbiPoint(*pt));
+				}
+				pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
+				pAmbiSettings->setDirectionFlip(preset->getAmbiSettings()->getDirectionFlip());
+
+				for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+				{
+					pAmbiSettings->getAmbiOrderWeightPointer()[i] = preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i];
+				}
+			}
+		}
+	}
 }
 
 Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray() const
@@ -208,6 +260,11 @@ Array<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray() const
 AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
 {
 	return pAmbiSettings;
+}
+
+DecoderSettings* AmbisonicsDecoderAudioProcessor::getDecoderSettings() const
+{
+	return pDecoderSettings;
 }
 
 TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() const

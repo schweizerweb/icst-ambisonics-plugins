@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "SpeakerSettingsComponent.h"
+#include "DecoderSettingsComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -35,19 +36,21 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();
+	pDecoderSettings = ownerProc.getDecoderSettings();
 	oscHandler = new OSCHandler(pMovingPointsArray);
-	if(!oscHandler->start())
-	{
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, "OSC", "Error starting OSC-Handler!", "OK");
-	}
+	initializeOscHandler();
     //[/Constructor_pre]
 
     addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection));
     component->setName ("new component");
 
     addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));
-    buttonConfigure->setButtonText (TRANS("configure"));
+    buttonConfigure->setButtonText (TRANS("decoder settings"));
     buttonConfigure->addListener (this);
+
+    addAndMakeVisible (buttonConfigurePlugin = new TextButton ("buttonConfigurePlugin"));
+    buttonConfigurePlugin->setButtonText (TRANS("plugin settings"));
+    buttonConfigurePlugin->addListener (this);
 
 
     //[UserPreSize]
@@ -58,6 +61,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
 
     //[Constructor] You can add your own custom stuff here..
+	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
     //[/Constructor]
 }
 
@@ -68,6 +72,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
 
     component = nullptr;
     buttonConfigure = nullptr;
+    buttonConfigurePlugin = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -92,8 +97,11 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
-    buttonConfigure->setBounds (8, 8, getWidth() - 12, 24);
+    buttonConfigure->setBounds (8, 8, proportionOfWidth (0.6491f), 24);
+    buttonConfigurePlugin->setBounds (getWidth() - 8 - proportionOfWidth (0.3057f), 8, proportionOfWidth (0.3057f), 24);
     //[UserResized] Add your own custom resize handling here..
+	pDecoderSettings->lastUIWidth = getWidth();
+	pDecoderSettings->lastUIHeight = getHeight();
     //[/UserResized]
 }
 
@@ -108,6 +116,13 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings, processor.getTestSoundGenerator());
         //[/UserButtonCode_buttonConfigure]
     }
+    else if (buttonThatWasClicked == buttonConfigurePlugin)
+    {
+        //[UserButtonCode_buttonConfigurePlugin] -- add your button handler code here..
+		DecoderSettingsComponent::showAsDialog(pDecoderSettings);
+		initializeOscHandler();
+        //[/UserButtonCode_buttonConfigurePlugin]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -116,6 +131,20 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler() const
+{
+	oscHandler->stop();
+	
+	if (pDecoderSettings->oscReceive)
+	{
+		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
+		}
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -139,8 +168,12 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection"/>
   <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
-              virtualName="" explicitFocusOrder="0" pos="8 8 12M 24" buttonText="configure"
+              virtualName="" explicitFocusOrder="0" pos="8 8 64.906% 24" buttonText="decoder settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonConfigurePlugin" id="265eef40909bd6dd" memberName="buttonConfigurePlugin"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 8 30.566% 24"
+              buttonText="plugin settings" connectedEdges="0" needsCallback="1"
+              radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
