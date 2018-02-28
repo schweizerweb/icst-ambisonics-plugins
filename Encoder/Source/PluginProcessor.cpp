@@ -125,26 +125,33 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& midiMessages)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
-    const int totalNumOutputChannels = getTotalNumOutputChannels();
+	const int totalNumInputChannels = getTotalNumInputChannels();
+	const int totalNumOutputChannels = getTotalNumOutputChannels();
+	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
+	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
+	int iChannel;
+	AudioSampleBuffer inputBuffer;
 
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (int i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
+	// copy input buffer, clear output and get write pointers
+	inputBuffer.makeCopyOf(buffer);
+	buffer.clear();
+	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
+	
+	for (int iSource = 0; iSource < pSourcesArray->size() && iSource < totalNumInputChannels; iSource++)
+	{
+		// calculate ambisonics coefficients
+		Point3D<double>* pSourcePoint = pSourcesArray->getReference(iSource).getPoint();
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], false);
+		const float* inputData = inputBuffer.getReadPointer(iSource);
 
-    // This is the place where you'd normally do the guts of your plugin's
-    // audio processing...
-    for (int channel = 0; channel < totalNumInputChannels; ++channel)
-    {
-        float* channelData = buffer.getWritePointer (channel);
-
-        // ..do something to the data...
-    }
+		// create B-format
+		for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+		{
+			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+				outputBufferPointers[iChannel][iSample] += inputData[iSample] * currentCoefficients[iChannel];
+		}
+	}
 }
 
 //==============================================================================
