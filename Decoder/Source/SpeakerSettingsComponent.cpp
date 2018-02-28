@@ -128,24 +128,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
     buttonBasic->setButtonText (TRANS("reset to basic"));
     buttonBasic->addListener (this);
 
-    addAndMakeVisible (label4 = new Label ("new label",
-                                           TRANS("Circle direction:")));
-    label4->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label4->setJustificationType (Justification::centredLeft);
-    label4->setEditable (false, false, false);
-    label4->setColour (TextEditor::textColourId, Colours::black);
-    label4->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    addAndMakeVisible (btnClockwise = new ToggleButton ("btnClockwise"));
-    btnClockwise->setButtonText (TRANS("Clockwise"));
-    btnClockwise->setRadioGroupId (1);
-    btnClockwise->addListener (this);
-    btnClockwise->setToggleState (true, dontSendNotification);
-
-    addAndMakeVisible (btnCounterclockwise = new ToggleButton ("btnCounterclockwise"));
-    btnCounterclockwise->setButtonText (TRANS("Counterclockwise"));
-    btnCounterclockwise->setRadioGroupId (1);
-    btnCounterclockwise->addListener (this);
+    addAndMakeVisible (btnFlipDirection = new ToggleButton ("btnFlipDirection"));
+    btnFlipDirection->setButtonText (TRANS("Flip Direction"));
+    btnFlipDirection->addListener (this);
 
 
     //[UserPreSize]
@@ -193,9 +178,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     label3 = nullptr;
     buttonInPhase = nullptr;
     buttonBasic = nullptr;
-    label4 = nullptr;
-    btnClockwise = nullptr;
-    btnCounterclockwise = nullptr;
+    btnFlipDirection = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -232,13 +215,11 @@ void SpeakerSettingsComponent::resized()
     groupAmbisonics->setBounds (8, getHeight() - 198, getWidth() - 18, 192);
     label2->setBounds (8 + 8, (getHeight() - 198) + 16, 104, 24);
     sliderDistanceScaler->setBounds (8 + 144, (getHeight() - 198) + 16, getWidth() - 178, 24);
-    ambiChannelControl->setBounds (8 + 144, (getHeight() - 198) + 40, (getWidth() - 18) - 160, 192 - 72);
+    ambiChannelControl->setBounds (8 + 144, (getHeight() - 198) + 40, (getWidth() - 18) - 160, 192 - 56);
     label3->setBounds (16, (getHeight() - 198) + 40, 112, 24);
     buttonInPhase->setBounds (8 + 16, (getHeight() - 198) + 96, 120, 24);
     buttonBasic->setBounds (8 + 16, (getHeight() - 198) + 64, 120, 24);
-    label4->setBounds (8 + 8, (getHeight() - 198) + 160, 128, 24);
-    btnClockwise->setBounds (8 + 144, (getHeight() - 198) + 160, 150, 24);
-    btnCounterclockwise->setBounds (8 + 296, (getHeight() - 198) + 160, 150, 24);
+    btnFlipDirection->setBounds (8 + 16, (getHeight() - 198) + 128, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -411,17 +392,11 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		ambiChannelControl->updateValues();
         //[/UserButtonCode_buttonBasic]
     }
-    else if (buttonThatWasClicked == btnClockwise)
+    else if (buttonThatWasClicked == btnFlipDirection)
     {
-        //[UserButtonCode_btnClockwise] -- add your button handler code here..
-		pAmbiSettings->setDirectionFlip(false);
-        //[/UserButtonCode_btnClockwise]
-    }
-    else if (buttonThatWasClicked == btnCounterclockwise)
-    {
-        //[UserButtonCode_btnCounterclockwise] -- add your button handler code here..
-		pAmbiSettings->setDirectionFlip(true);
-        //[/UserButtonCode_btnCounterclockwise]
+        //[UserButtonCode_btnFlipDirection] -- add your button handler code here..
+		pAmbiSettings->setDirectionFlip(btnFlipDirection->getToggleState());
+        //[/UserButtonCode_btnFlipDirection]
     }
 
     //[UserbuttonClicked_Post]
@@ -578,8 +553,7 @@ TableListBox* SpeakerSettingsComponent::getTable() const
 
 void SpeakerSettingsComponent::updateDirectionFlip() const
 {
-	btnCounterclockwise->setToggleState(pAmbiSettings->getDirectionFlip(), dontSendNotification);
-	btnClockwise->setToggleState(!pAmbiSettings->getDirectionFlip(), dontSendNotification);
+	btnFlipDirection->setToggleState(pAmbiSettings->getDirectionFlip(), dontSendNotification);
 }
 
 void SpeakerSettingsComponent::updateDistanceScaler() const
@@ -758,7 +732,7 @@ BEGIN_JUCER_METADATA
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
-                    virtualName="" explicitFocusOrder="0" pos="144 40 160M 72M" posRelativeX="17eb4b418501687a"
+                    virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.01"/>
   <LABEL name="new label" id="ce2f83213d847908" memberName="label3" virtualName=""
@@ -775,20 +749,10 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="16 64 120 24" posRelativeX="17eb4b418501687a"
               posRelativeY="17eb4b418501687a" buttonText="reset to basic" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <LABEL name="new label" id="ab56fe2bab0b91be" memberName="label4" virtualName=""
-         explicitFocusOrder="0" pos="8 160 128 24" posRelativeX="17eb4b418501687a"
-         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
-         labelText="Circle direction:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="btnClockwise" id="b6567f77e6a2e40e" memberName="btnClockwise"
-                virtualName="" explicitFocusOrder="0" pos="144 160 150 24" posRelativeX="17eb4b418501687a"
-                posRelativeY="17eb4b418501687a" buttonText="Clockwise" connectedEdges="0"
-                needsCallback="1" radioGroupId="1" state="1"/>
-  <TOGGLEBUTTON name="btnCounterclockwise" id="a5a5594a226277aa" memberName="btnCounterclockwise"
-                virtualName="" explicitFocusOrder="0" pos="296 160 150 24" posRelativeX="17eb4b418501687a"
-                posRelativeY="17eb4b418501687a" buttonText="Counterclockwise"
-                connectedEdges="0" needsCallback="1" radioGroupId="1" state="0"/>
+  <TOGGLEBUTTON name="btnFlipDirection" id="b6567f77e6a2e40e" memberName="btnFlipDirection"
+                virtualName="" explicitFocusOrder="0" pos="16 128 120 24" posRelativeX="17eb4b418501687a"
+                posRelativeY="17eb4b418501687a" buttonText="Flip Direction" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
