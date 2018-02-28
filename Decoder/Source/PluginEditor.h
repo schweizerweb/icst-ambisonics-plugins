@@ -22,11 +22,11 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
+#include "PresetInfo.h"
+#include "DecoderSettings.h"
 #include "../../Common/RadarComponent.h"
 #include "../../Common/RadarOptions.h"
-#include "PresetInfo.h"
-#include "OSCHandler.h"
-#include "DecoderSettings.h"
+#include "../../Common/OSCHandler.h"
 //[/Headers]
 
 
@@ -61,8 +61,8 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& processor;
-	Array<AmbiPoint>* pSpeakerArray;
-	Array<AmbiPoint>* pMovingPointsArray;
+	OwnedArray<AmbiPoint>* pSpeakerArray;
+	OwnedArray<AmbiPoint>* pMovingPointsArray;
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
 	OwnedArray<PresetInfo> presets;

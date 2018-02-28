@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-RadarComponent::RadarComponent (Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+RadarComponent::RadarComponent (OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -101,7 +101,7 @@ void RadarComponent::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
-                 parentClasses="public Component" constructorParams="Array&lt;AmbiPoint&gt;* pEditablePointsArray, Array&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 parentClasses="public Component" constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, OwnedArray&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>

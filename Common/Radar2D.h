@@ -26,7 +26,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener
 public:
 	enum RadarMode { XY, ZY };
 
-	Radar2D(RadarMode mode, Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+	Radar2D(RadarMode mode, OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
@@ -49,11 +49,11 @@ private:
 	Point<float> getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const;
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
-	float getSelectedPointSize() const;
+	float getSelectedPointSize(float scaler) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select = false, float selectionSize = 0.0);
 	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
-	float getEditablePointSize() const;
-	float getDisplayOnlyPointSize() const;
+	float getEditablePointSize(float scaler) const;
+	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
 	void renderOpenGL() override;
 	void createRadarBackground();
@@ -61,8 +61,8 @@ private:
 private:
 	OpenGLContext openGLContext;
 
-	Array<AmbiPoint>* pEditablePointsArray;
-	Array<AmbiPoint>* pDisplayOnlyPointsArray;
+	OwnedArray<AmbiPoint>* pEditablePointsArray;
+	OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray;
 	Image radarBackground;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;

@@ -62,15 +62,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	// ambsonic specific
-	Array<AmbiPoint>* getSpeakerArray() const;
-	Array<AmbiPoint>* getMovingPointsArray() const;
+	OwnedArray<AmbiPoint>* getSpeakerArray();
+	OwnedArray<AmbiPoint>* getMovingPointsArray();
 	AmbiSettings* getAmbiSettings() const;
 	DecoderSettings* getDecoderSettings() const;
 	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
-	ScopedPointer<Array<AmbiPoint>> pSpeakerArray;
-	ScopedPointer<Array<AmbiPoint>> pMovingPointsArray;
+	OwnedArray<AmbiPoint> speakerArray;
+	OwnedArray<AmbiPoint> movingPointsArray;
 	ScopedPointer<AmbiSettings> pAmbiSettings;
 	ScopedPointer<DecoderSettings> pDecoderSettings;
 	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;

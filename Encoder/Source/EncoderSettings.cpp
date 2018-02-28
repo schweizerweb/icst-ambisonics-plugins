@@ -14,8 +14,9 @@
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_IP "Ip"
+#define XML_ATTRIBUTE_INTERVAL "Interval"
 
-EncoderSettings::EncoderSettings(): oscReceiveFlag(false), oscReceivePort(0), oscSendFlag(false), oscSendPort(0)
+EncoderSettings::EncoderSettings(): oscReceiveFlag(false), oscReceivePort(0), oscSendFlag(false), oscSendPort(0), oscSendIntervalMs(100)
 {
 }
 
@@ -33,9 +34,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	element->addChildElement(oscReceive);
 
 	XmlElement* oscSend = new XmlElement(XML_TAG_OSC_SEND);
-	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendFlag);
-	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscSendPort);
-	oscReceive->setAttribute(XML_ATTRIBUTE_IP, oscSendIp.toString());
+	oscSend->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendFlag);
+	oscSend->setAttribute(XML_ATTRIBUTE_PORT, oscSendPort);
+	oscSend->setAttribute(XML_ATTRIBUTE_IP, oscSendTargetHost);
+	oscSend->setAttribute(XML_ATTRIBUTE_INTERVAL, oscSendIntervalMs);
 	element->addChildElement(oscSend);
 
 	return element;
@@ -53,5 +55,6 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
 	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, false);
 	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, 5014);
-	oscSendIp = IPAddress(oscSend->getStringAttribute(XML_ATTRIBUTE_IP, "127.0.0.1"));
+	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_IP, "127.0.0.1");
+	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, 100);
 }

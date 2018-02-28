@@ -25,5 +25,6 @@ public:
 
 	bool oscSendFlag;
 	int oscSendPort;
-	IPAddress oscSendIp;
+	String oscSendTargetHost;
+	int oscSendIntervalMs;
 };

@@ -58,9 +58,10 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& processor;
-	Array<AmbiPoint>* pSourcesArray;
+	OwnedArray<AmbiPoint>* pSourcesArray;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
+	EncoderSettings* pEncoderSettings;
     //[/UserVariables]
 
     //==============================================================================
@@ -68,7 +69,7 @@ private:
     ScopedPointer<RadarComponent> component;
 
 
-    //==============================================================================
+	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessorEditor)
 };
 

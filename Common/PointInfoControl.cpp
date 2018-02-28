@@ -28,7 +28,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (Array<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
     : pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -216,7 +216,7 @@ void PointInfoControl::paint (Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -257,7 +257,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	int selection = pPointSelection->getSelectedPointIndex();
 	if (selection >= 0 && selection < pEditablePointsArray->size())
 	{
-		AmbiPoint* point = &(pEditablePointsArray->getReference(selection));
+		AmbiPoint* point = pEditablePointsArray->getUnchecked(selection);
 
 		setFieldsEnabled(true);
 		textName->setText(point->getName());
@@ -297,33 +297,33 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 
 	if (source.getName() == textName->getName())
 	{
-		pEditablePointsArray->getReference(selection).setName(textName->getText());
+		pEditablePointsArray->getUnchecked(selection)->setName(textName->getText());
 	}
 
 	if (source.getName() == textX->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setX(textX->getText().getFloatValue());
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setX(textX->getText().getFloatValue());
 	}
 	if (source.getName() == textY->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setY(textY->getText().getFloatValue());
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setY(textY->getText().getFloatValue());
 	}
 	if (source.getName() == textZ->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setZ(textZ->getText().getFloatValue());
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setZ(textZ->getText().getFloatValue());
 	}
 
 	if (source.getName() == textA->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
-		pEditablePointsArray->getReference(selection).getPoint()->setDistance(textD->getText().getFloatValue());
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setDistance(textD->getText().getFloatValue());
 	}
 
 	updateSelectedPoint(source.getName());
@@ -386,7 +386,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditorListener"
-                 constructorParams="Array&lt;AmbiPoint&gt;* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="360" initialHeight="100">

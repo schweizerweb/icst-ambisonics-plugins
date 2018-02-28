@@ -19,7 +19,7 @@ public:
 	enum ParamType { Azimuth, Elevation, Distance, X, Y, Z };
 
 	AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
-		NormalisableRange<float> r, float def, Array<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType);
+		NormalisableRange<float> r, float def, OwnedArray<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterFloatAmbi();
 
 	float getValue() const override;
@@ -39,6 +39,6 @@ private:
 	float defaultValue;
 	NormalisableRange<float> range;
 
-	Array<AmbiPoint>* pAmbiPoints;
+	OwnedArray<AmbiPoint>* pAmbiPoints;
 	int ambiIndex;
 };

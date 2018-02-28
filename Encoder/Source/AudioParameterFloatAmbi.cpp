@@ -10,7 +10,7 @@
 
 #include "AudioParameterFloatAmbi.h"
 
-AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, Array<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType)
+AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, OwnedArray<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType)
 	: AudioParameterFloatAmbiAbs(idToUse, nameToUse, labelToUse, categoryToUse), 
 	type(paramType),
 	value(def),
@@ -68,12 +68,12 @@ void AudioParameterFloatAmbi::setValue(float newValue)
 		{
 			switch (type)
 			{
-			case Azimuth: pAmbiPoints->getReference(ambiIndex).getPoint()->setAzimuth(value, false); break;
-			case Elevation: pAmbiPoints->getReference(ambiIndex).getPoint()->setElevation(value, false); break;
-			case Distance: pAmbiPoints->getReference(ambiIndex).getPoint()->setDistance(value, false); break;
-			case X: pAmbiPoints->getReference(ambiIndex).getPoint()->setX(value); break;
-			case Y: pAmbiPoints->getReference(ambiIndex).getPoint()->setY(value); break;
-			case Z: pAmbiPoints->getReference(ambiIndex).getPoint()->setZ(value); break;
+			case Azimuth: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setAzimuth(value, false); break;
+			case Elevation: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setElevation(value, false); break;
+			case Distance: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setDistance(value, false); break;
+			case X: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setX(value); break;
+			case Y: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setY(value); break;
+			case Z: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setZ(value); break;
 			}
 		}
 	}

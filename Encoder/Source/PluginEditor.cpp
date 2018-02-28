@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/RadarComponent.h"
+#include "EncoderSettingsComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -33,6 +34,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	pSourcesArray = ownerProc.getSourcesArray();
+	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
 	radarOptions.audioParams = ownerProc.getAudioParams();
@@ -101,6 +103,8 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
     if (buttonThatWasClicked == buttonConfigure)
     {
         //[UserButtonCode_buttonConfigure] -- add your button handler code here..
+		EncoderSettingsComponent::showAsDialog(pEncoderSettings);
+		processor.initializeOsc();
         //[/UserButtonCode_buttonConfigure]
     }
 

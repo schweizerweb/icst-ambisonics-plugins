@@ -41,7 +41,7 @@ class PointInfoControl  : public Component,
 {
 public:
     //==============================================================================
-    PointInfoControl (Array<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+    PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~PointInfoControl();
 
     //==============================================================================
@@ -63,7 +63,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	Array<AmbiPoint>* pEditablePointsArray;
+	OwnedArray<AmbiPoint>* pEditablePointsArray;
 	PointSelection* pPointSelection;
     //[/UserVariables]
 

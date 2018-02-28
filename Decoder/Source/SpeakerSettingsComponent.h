@@ -50,12 +50,12 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
+    SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
-	
-	//==============================================================================
+
+    //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
+	static void showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
 
 	// table overrides
 	int getNumRows() override;
@@ -93,7 +93,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	Array<AmbiPoint>* pSpeakerArray;
+	OwnedArray<AmbiPoint>* pSpeakerArray;
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;

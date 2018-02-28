@@ -43,7 +43,7 @@ class RadarComponent  : public Component
 {
 public:
     //==============================================================================
-    RadarComponent (Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+    RadarComponent (OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~RadarComponent();
 
     //==============================================================================

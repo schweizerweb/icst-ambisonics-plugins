@@ -13,6 +13,7 @@
 
 #include "Point3D.h"
 
+#define XML_ATTRIBUTE_PRESET_POINT_ID "Uuid"
 #define XML_ATTRIBUTE_PRESET_POINT_X "X"
 #define XML_ATTRIBUTE_PRESET_POINT_Y "Y"
 #define XML_ATTRIBUTE_PRESET_POINT_Z "Z"
@@ -23,15 +24,17 @@
 class AmbiPoint
 {
 public:
-	AmbiPoint(): colorIndex(0), gain(1.0)
+	AmbiPoint(): colorIndex(0), gain(1.0), rms(0.0f)
 	{
 	}
 
-	AmbiPoint(Point3D<double> point, String name, int colorIndex = 0, double gain = 1.0) :
+	AmbiPoint(String id, Point3D<double> point, String name, int colorIndex = 0, double gain = 1.0) :
+		id(id),
 		point(point),
-		colorIndex(colorIndex), 
+		colorIndex(colorIndex),
 		name(name),
-		gain(gain)
+		gain(gain), 
+		rms(0.0f)
 	{
 	}
 
@@ -44,12 +47,14 @@ public:
 	}
 
 	AmbiPoint(XmlElement* element) :
-	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
-	                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
-	                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
-	colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
-	name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
-	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0))
+		id(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_ID, Uuid().toString())),
+		point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
+		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
+		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
+		colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
+		name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
+		gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)), 
+		rms(0.0f)
 	{
 	}
 
@@ -92,6 +97,7 @@ public:
 	XmlElement* getAsXmlElement(String tagName)
 	{
 		XmlElement* element =  new XmlElement(tagName);
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_ID, getId());
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_X, getPoint()->getX());
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Y, getPoint()->getY());
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Z, getPoint()->getZ());
@@ -106,11 +112,32 @@ public:
 		gain = newGain;
 	}
 
+	void setRms(float newRmsLevel, bool onlyIfGreater = false)
+	{
+		if(!onlyIfGreater || newRmsLevel > rms)
+			rms = newRmsLevel;
+	}
+
+	float getRms(bool reset = false)
+	{
+		float ret = rms;
+		if (reset)
+			rms = 0;
+		return ret;
+	}
+
+	String getId() const
+	{
+		return id;
+	}
+
 private:
+	String id;
 	Point3D<double> point;
 	int colorIndex;
 	String name;
 	double gain;
+	float rms;
 };
 
 
