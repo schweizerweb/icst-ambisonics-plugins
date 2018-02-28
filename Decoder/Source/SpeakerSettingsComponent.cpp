@@ -20,7 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
 #include "EditableTextCustomComponent.h"
-#include "GainColumnCustomComponent.h"
+#include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 //[/Headers]
 
@@ -30,6 +30,12 @@
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 #define COLUMN_ID_NB		1
 #define COLUMN_ID_NAME		2
+#define	COLUMN_ID_X			7
+#define	COLUMN_ID_Y			8
+#define	COLUMN_ID_Z			9
+#define	COLUMN_ID_A			10
+#define	COLUMN_ID_E			11
+#define	COLUMN_ID_D			12
 #define COLUMN_ID_DISTANCE	3
 #define COLUMN_ID_DELAY		4
 #define COLUMN_ID_GAIN		5
@@ -143,9 +149,15 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 	speakerList->setModel(this);
 	speakerList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
 	speakerList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
-	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 100);
-	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 100);
-	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 100);
+	speakerList->getHeader().addColumn("X", COLUMN_ID_X, 50);
+	speakerList->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
+	speakerList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
+	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 50);
+	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 50);
+	speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
+	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
+	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
+	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
@@ -412,6 +424,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
 		pAmbiSettings->setDistanceScaler(sliderDistanceScaler->getValue());
+		speakerList->updateContent();
 		speakerList->repaint();
         //[/UserSliderCode_sliderDistanceScaler]
     }
@@ -470,7 +483,6 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	case COLUMN_ID_NAME: text = pSpeakerArray->getReference(rowNumber).getName(); break;
 	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
 	case COLUMN_ID_DELAY: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler() * SOUND_SPEED_M_PER_MS, 2); break;
-	case COLUMN_ID_GAIN: text = String(pSpeakerArray->getReference(rowNumber).getGain(), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -480,11 +492,18 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 
 Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
 {
-	if(columnId == COLUMN_ID_GAIN)
+	if(columnId == COLUMN_ID_GAIN
+		|| columnId == COLUMN_ID_X
+		|| columnId == COLUMN_ID_Y
+		|| columnId == COLUMN_ID_Z
+		|| columnId == COLUMN_ID_A
+		|| columnId == COLUMN_ID_E
+		|| columnId == COLUMN_ID_D
+		|| columnId == COLUMN_ID_DISTANCE)
 	{
-		GainColumnCustomComponent* gainBox = static_cast<GainColumnCustomComponent*> (existingComponentToUpdate);
+		SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
 		if (gainBox == nullptr)
-			gainBox = new GainColumnCustomComponent(*this);
+			gainBox = new SliderColumnCustomComponent(*this);
 
 		gainBox->setRowAndColumn(rowNumber, columnId);
 		return gainBox;
@@ -516,7 +535,6 @@ String SpeakerSettingsComponent::getTableText(const int columnId, const int rowN
 	switch(columnId)
 	{
 	case COLUMN_ID_NAME: return pSpeakerArray->getReference(rowNumber).getName();
-	case COLUMN_ID_GAIN: return String(pSpeakerArray->getReference(rowNumber).getGain(), 3);
 	default: return "";
 	}
 }
@@ -526,19 +544,43 @@ void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNum
 	switch(columnId)
 	{
 	case COLUMN_ID_NAME: pSpeakerArray->getReference(rowNumber).setName(newText); break;
-	case COLUMN_ID_GAIN: pSpeakerArray->getReference(rowNumber).setGain(newText.getDoubleValue()); break;
 	default: throw;
 	}
 }
 
-void SpeakerSettingsComponent::setGain(int rowNumber, double newValue) const
+void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newValue) const
 {
-	pSpeakerArray->getReference(rowNumber).setGain(newValue);
+	switch (columnId)
+	{
+	case COLUMN_ID_GAIN: pSpeakerArray->getReference(rowNumber).setGain(newValue); break;
+	case COLUMN_ID_X: pSpeakerArray->getReference(rowNumber).getPoint()->setX(newValue); break;
+	case COLUMN_ID_Y: pSpeakerArray->getReference(rowNumber).getPoint()->setY(newValue); break;
+	case COLUMN_ID_Z: pSpeakerArray->getReference(rowNumber).getPoint()->setZ(newValue); break;
+	case COLUMN_ID_A: pSpeakerArray->getReference(rowNumber).getPoint()->setAzimuth(newValue * PI / 180.0); break;
+	case COLUMN_ID_E: pSpeakerArray->getReference(rowNumber).getPoint()->setElevation(newValue * PI / 180.0); break;
+	case COLUMN_ID_D: pSpeakerArray->getReference(rowNumber).getPoint()->setDistance(newValue); break;
+	case COLUMN_ID_DISTANCE: pSpeakerArray->getReference(rowNumber).getPoint()->setDistance(newValue / pAmbiSettings->getDistanceScaler()); break;
+	default: throw;
+	}
+
+	speakerList->updateContent();
+	speakerList->repaint();
 }
 
-double SpeakerSettingsComponent::getGain(int rowNumber) const
+double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 {
-	return pSpeakerArray->getReference(rowNumber).getGain();
+	switch (columnId)
+	{
+	case COLUMN_ID_GAIN: return pSpeakerArray->getReference(rowNumber).getGain();
+	case COLUMN_ID_X: return pSpeakerArray->getReference(rowNumber).getPoint()->getX();
+	case COLUMN_ID_Y: return pSpeakerArray->getReference(rowNumber).getPoint()->getY();
+	case COLUMN_ID_Z: return pSpeakerArray->getReference(rowNumber).getPoint()->getZ();
+	case COLUMN_ID_A: return pSpeakerArray->getReference(rowNumber).getPoint()->getAzimuth() * 180.0 / PI;
+	case COLUMN_ID_E: return pSpeakerArray->getReference(rowNumber).getPoint()->getElevation() * 180.0 / PI;
+	case COLUMN_ID_D: return pSpeakerArray->getReference(rowNumber).getPoint()->getDistance();
+	case COLUMN_ID_DISTANCE: return pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+	default: return 0.0;
+	}
 }
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
@@ -549,6 +591,34 @@ void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 TableListBox* SpeakerSettingsComponent::getTable() const
 {
 	return speakerList;
+}
+
+SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
+{
+	switch(columnId)
+	{
+	case COLUMN_ID_X: 
+	case COLUMN_ID_Y: 
+		return SliderRange(-1.0, 1.0, 0.001);
+	
+	case COLUMN_ID_Z: 
+	case COLUMN_ID_D:
+		return SliderRange(0.0, 1.0, 0.001);
+
+	case COLUMN_ID_A:
+		return SliderRange(-360.0, 360.0, 0.1);
+
+	case COLUMN_ID_E: 
+		return SliderRange(0.0, 180.0, 0.1);
+
+	case COLUMN_ID_GAIN:
+		return SliderRange(0.0, 1.2, 0.001);
+
+	case COLUMN_ID_DISTANCE:
+		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
+	}
+
+	return SliderRange(0.0, 1.0, 0.001);
 }
 
 void SpeakerSettingsComponent::updateDirectionFlip() const
@@ -647,7 +717,7 @@ bool SpeakerSettingsComponent::CheckForExistingPreset(String newPresetName) cons
 	}
 	return false;
 }
-void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings)
+void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings) const
 {
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{

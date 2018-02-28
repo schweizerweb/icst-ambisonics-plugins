@@ -165,7 +165,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		{
 			channelData[iSample] = 0.0f;
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-				channelData[iSample] += speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel];
+				channelData[iSample] += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
 		}
 	}
 
