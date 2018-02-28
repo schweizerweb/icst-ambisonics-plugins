@@ -15,6 +15,8 @@
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
+#include "../../Common/DelayBuffer.h"
+#include "../../Common/DelayHelper.h"
 
 //==============================================================================
 /**
@@ -34,6 +36,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
+	void checkDelayBuffers();
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
@@ -71,6 +74,8 @@ private:
 	ScopedPointer<AmbiSettings> pAmbiSettings;
 	ScopedPointer<DecoderSettings> pDecoderSettings;
 	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;
+	OwnedArray<DelayBuffer> delayBuffers;
+	DelayHelper delayHelper;
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)

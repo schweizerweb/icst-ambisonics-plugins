@@ -27,6 +27,7 @@
 #include "../../Common/MultiSliderControl.h"
 #include "PresetInfo.h"
 #include "SliderRange.h"
+#include "../../Common/DelayHelper.h"
 //[/Headers]
 
 
@@ -96,6 +97,7 @@ private:
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;
+	DelayHelper delayHelper;
     //[/UserVariables]
 
     //==============================================================================

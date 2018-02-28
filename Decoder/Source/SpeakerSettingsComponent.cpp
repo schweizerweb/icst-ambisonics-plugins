@@ -38,6 +38,7 @@
 #define	COLUMN_ID_D			12
 #define COLUMN_ID_DISTANCE	3
 #define COLUMN_ID_DELAY		4
+#define COLUMN_ID_DELAY_COMPENSATION 13
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
 //[/MiscUserDefs]
@@ -157,6 +158,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (Array<AmbiPoint>* pSpeakerAr
 	speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
 	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
+	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
@@ -439,7 +441,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 void SpeakerSettingsComponent::showAsDialog(Array<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener)
 {
 	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings, pTestSoundListener);
-	p->setSize(800, 700);
+	p->setSize(850, 600);
 
 	DialogWindow::LaunchOptions options;
 	options.content.setOwned(p);
@@ -482,7 +484,8 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	case COLUMN_ID_NB: text = String(rowNumber); break;
 	case COLUMN_ID_NAME: text = pSpeakerArray->getReference(rowNumber).getName(); break;
 	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
-	case COLUMN_ID_DELAY: text = String(pSpeakerArray->getReference(rowNumber).getPoint()->getDistance() * pAmbiSettings->getDistanceScaler() * SOUND_SPEED_M_PER_MS, 2); break;
+	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pSpeakerArray, rowNumber), 2); break;
+	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerArray, rowNumber), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
