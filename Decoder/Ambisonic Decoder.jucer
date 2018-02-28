@@ -79,6 +79,9 @@
             file="../Common/RadarComponent.cpp"/>
       <FILE id="zQhquK" name="RadarComponent.h" compile="0" resource="0"
             file="../Common/RadarComponent.h"/>
+      <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
+            file="../Common/RadarOptions.cpp"/>
+      <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
       <FILE id="zm8AUT" name="TestSoundGenerator.cpp" compile="1" resource="0"
             file="../Common/TestSoundGenerator.cpp"/>
       <FILE id="z8bkap" name="TestSoundGenerator.h" compile="0" resource="0"

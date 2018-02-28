@@ -22,11 +22,9 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
+#include "../../Common/AmbiPoint.h"
+#include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
-#include "../../Common/RadarOptions.h"
-#include "PresetInfo.h"
-#include "OSCHandler.h"
-#include "DecoderSettings.h"
 //[/Headers]
 
 
@@ -39,17 +37,16 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
-                                               public ButtonListener
+class AmbisonicEncoderAudioProcessorEditor  : public AudioProcessorEditor,
+                                              public ButtonListener
 {
 public:
     //==============================================================================
-    AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc);
-    ~AmbisonicsDecoderAudioProcessorEditor();
+    AmbisonicEncoderAudioProcessorEditor (AmbisonicEncoderAudioProcessor& ownerProc);
+    ~AmbisonicEncoderAudioProcessorEditor();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void initializeOscHandler() const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -60,25 +57,19 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	AmbisonicsDecoderAudioProcessor& processor;
-	Array<AmbiPoint>* pSpeakerArray;
-	Array<AmbiPoint>* pMovingPointsArray;
-	AmbiSettings* pAmbiSettings;
-	DecoderSettings *pDecoderSettings;
-	OwnedArray<PresetInfo> presets;
-	ScopedPointer<OSCHandler> oscHandler;
+    AmbisonicEncoderAudioProcessor& processor;
+	Array<AmbiPoint>* pSourcesArray;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<RadarComponent> component;
     ScopedPointer<TextButton> buttonConfigure;
-    ScopedPointer<TextButton> buttonConfigurePlugin;
+    ScopedPointer<RadarComponent> component;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessorEditor)
 };
 
 //[EndFile] You can add extra defines here...

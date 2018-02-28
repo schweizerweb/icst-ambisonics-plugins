@@ -16,6 +16,7 @@
 #include "ZoomSettings.h"
 #include "RadarColors.h"
 #include "PointSelection.h"
+#include "RadarOptions.h"
 
 //==============================================================================
 /*
@@ -25,7 +26,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener
 public:
 	enum RadarMode { XY, ZY };
 
-	Radar2D(RadarMode mode, Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection);
+	Radar2D(RadarMode mode, Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
@@ -51,8 +52,8 @@ private:
 	float getSelectedPointSize() const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select = false, float selectionSize = 0.0);
 	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
-	float getSpeakerPointSize() const;
-	float getMovingPointSize() const;
+	float getEditablePointSize() const;
+	float getDisplayOnlyPointSize() const;
 	float getFontSize() const;
 	void renderOpenGL() override;
 	void createRadarBackground();
@@ -60,8 +61,8 @@ private:
 private:
 	OpenGLContext openGLContext;
 
-	Array<AmbiPoint>* pSpeakerArray;
-	Array<AmbiPoint>* pMovingPointsArray;
+	Array<AmbiPoint>* pEditablePointsArray;
+	Array<AmbiPoint>* pDisplayOnlyPointsArray;
 	Image radarBackground;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;
@@ -71,6 +72,7 @@ private:
 	bool radarUpdated;
 	TrackColors trackColors;
 	ScopedPointer<RadarColors> radarColors;
+	RadarOptions* pRadarOptions;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 public:

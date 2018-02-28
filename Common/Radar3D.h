@@ -39,7 +39,7 @@ class Radar3D  : public Component
 {
 public:
     //==============================================================================
-    Radar3D (Array<AmbiPoint>* pSpeakerArray, Array<AmbiPoint>* pMovingPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection);
+    Radar3D (Array<AmbiPoint>* pEditablePointsArray, Array<AmbiPoint>* pDisplayOnlyPointsArray, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar3D();
 
     //==============================================================================

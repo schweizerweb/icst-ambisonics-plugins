@@ -33,6 +33,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	radarOptions.nameFieldEditable = false;
+	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();
@@ -41,7 +43,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	initializeOscHandler();
     //[/Constructor_pre]
 
-    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection));
+    addAndMakeVisible (component = new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
     component->setName ("new component");
 
     addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));
@@ -97,8 +99,8 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
-    buttonConfigure->setBounds (8, 8, proportionOfWidth (0.6491f), 24);
-    buttonConfigurePlugin->setBounds (getWidth() - 8 - proportionOfWidth (0.3057f), 8, proportionOfWidth (0.3057f), 24);
+    buttonConfigure->setBounds (8, 8, proportionOfWidth (0.6499f), 24);
+    buttonConfigurePlugin->setBounds (getWidth() - 8 - proportionOfWidth (0.3050f), 8, proportionOfWidth (0.3050f), 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -135,7 +137,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler() const
 {
 	oscHandler->stop();
-	
+
 	if (pDecoderSettings->oscReceive)
 	{
 		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
@@ -166,12 +168,12 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
-                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection"/>
+                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
-              virtualName="" explicitFocusOrder="0" pos="8 8 64.906% 24" buttonText="decoder settings"
+              virtualName="" explicitFocusOrder="0" pos="8 8 64.987% 24" buttonText="decoder settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonConfigurePlugin" id="265eef40909bd6dd" memberName="buttonConfigurePlugin"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 8 30.566% 24"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 8 30.504% 24"
               buttonText="plugin settings" connectedEdges="0" needsCallback="1"
               radioGroupId="0"/>
 </JUCER_COMPONENT>

@@ -35,8 +35,8 @@ double DelayHelper::getDelayCompensationMs(AmbiSettings* pAmbiSettings, Array<Am
 
 int DelayHelper::getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint, double maxNormalizedDistance, double samplingRate)
 {
-	return (maxNormalizedDistance - pPoint->getPoint()->getDistance())
+	return int((maxNormalizedDistance - pPoint->getPoint()->getDistance())
 		* pAmbiSettings->getDistanceScaler()
 		* SOUND_SPEED_S_PER_M
-		* samplingRate;
+		* samplingRate);
 }
