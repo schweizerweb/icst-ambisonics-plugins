@@ -9,12 +9,18 @@
 */
 
 #pragma once
+#include "JuceHeader.h"
+#include "AudioParameterSet.h"
+
 class RadarOptions
 {
 public:
 	RadarOptions();
+	AudioParameterSet getAudioParamForIndex(int index) const;
 
 public:
 	bool nameFieldEditable;
 	int maxNumberEditablePoints;
+
+	Array<AudioParameterSet>* audioParams;
 };

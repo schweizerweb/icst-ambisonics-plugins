@@ -35,6 +35,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	pSourcesArray = ownerProc.getSourcesArray();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
+	radarOptions.audioParams = ownerProc.getAudioParams();
     //[/Constructor_pre]
 
     addAndMakeVisible (buttonConfigure = new TextButton ("buttonConfigure"));

@@ -14,4 +14,15 @@ RadarOptions::RadarOptions()
 {
 	nameFieldEditable = false;
 	maxNumberEditablePoints = -1;
+	audioParams = nullptr;
+}
+
+AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const
+{
+	if(audioParams != nullptr && audioParams->size()>index)
+	{
+		return audioParams->getUnchecked(index);
+	}
+
+	return AudioParameterSet();
 }

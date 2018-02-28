@@ -7,13 +7,17 @@
               buildAUv3="0" buildRTAS="0" buildAAX="0" buildStandalone="0"
               enableIAA="0" pluginName="Ambisonic Encoder" pluginDesc="Ambisonic Encoder"
               pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK" pluginCode="AAEC"
-              pluginChannelConfigs="{1,4}" pluginIsSynth="0" pluginWantsMidiIn="1"
-              pluginProducesMidiOut="1" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
+              pluginChannelConfigs="{1,4}" pluginIsSynth="0" pluginWantsMidiIn="0"
+              pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0"
               pluginAUExportPrefix="AmbisonicEncoderAU" pluginRTASCategory=""
               aaxIdentifier="com.zhdk.ambisonicencoder" pluginAAXCategory="AAX_ePlugInCategory_Dynamics"
               jucerVersion="5.0.2">
   <MAINGROUP id="kUoKTp" name="Ambisonic Encoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
+            file="Source/AudioParameterFloatAmbi.cpp"/>
+      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
+            file="Source/AudioParameterFloatAmbi.h"/>
       <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
             file="Source/EncoderSettings.cpp"/>
       <FILE id="mjvFIP" name="EncoderSettings.h" compile="0" resource="0"
@@ -28,6 +32,10 @@
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
       <FILE id="WVKDPz" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
+      <FILE id="b0ptGs" name="AudioParameterFloatAmbiAbs.h" compile="0" resource="0"
+            file="../Common/AudioParameterFloatAmbiAbs.h"/>
+      <FILE id="IeOIVL" name="AudioParameterSet.h" compile="0" resource="0"
+            file="../Common/AudioParameterSet.h"/>
       <FILE id="ZHl4WA" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
       <FILE id="Qz0Ecw" name="PointInfoControl.cpp" compile="1" resource="0"
             file="../Common/PointInfoControl.cpp"/>
