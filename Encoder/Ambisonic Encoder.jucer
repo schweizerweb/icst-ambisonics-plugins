@@ -14,6 +14,10 @@
               jucerVersion="5.0.2">
   <MAINGROUP id="kUoKTp" name="Ambisonic Encoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
+            file="Source/EncoderSettings.cpp"/>
+      <FILE id="mjvFIP" name="EncoderSettings.h" compile="0" resource="0"
+            file="Source/EncoderSettings.h"/>
       <FILE id="tUmxIJ" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="DR1KSx" name="PluginProcessor.h" compile="0" resource="0"

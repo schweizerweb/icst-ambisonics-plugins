@@ -12,6 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
+#include "EncoderSettings.h"
 
 
 //==============================================================================
@@ -60,7 +61,7 @@ public:
 
 private:
 	ScopedPointer<Array<AmbiPoint>> pSourcesArray;
-
+	ScopedPointer<EncoderSettings> pEncoderSettings;
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

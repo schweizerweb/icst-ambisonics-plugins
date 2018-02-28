@@ -13,6 +13,13 @@
 
 #include "Point3D.h"
 
+#define XML_ATTRIBUTE_PRESET_POINT_X "X"
+#define XML_ATTRIBUTE_PRESET_POINT_Y "Y"
+#define XML_ATTRIBUTE_PRESET_POINT_Z "Z"
+#define XML_ATTRIBUTE_PRESET_POINT_NAME "Name"
+#define XML_ATTRIBUTE_PRESET_POINT_COLOR "Color"
+#define XML_ATTRIBUTE_PRESET_POINT_GAIN "Gain"
+
 class AmbiPoint
 {
 public:
@@ -25,6 +32,16 @@ public:
 		colorIndex(colorIndex), 
 		name(name),
 		gain(gain)
+	{
+	}
+
+	AmbiPoint(XmlElement* element) :
+	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
+	                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
+	                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
+	colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
+	name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0))
 	{
 	}
 
@@ -51,7 +68,19 @@ public:
 	double getGain() const
 	{
 		return gain;
-	};
+	}
+
+	XmlElement* getAsXmlElement(String tagName)
+	{
+		XmlElement* element =  new XmlElement(tagName);
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_X, getPoint()->getX());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Y, getPoint()->getY());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Z, getPoint()->getZ());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME, getName());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR, getColorIndex());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, getGain());
+		return element;
+	}
 
 	void setGain(double newGain)
 	{

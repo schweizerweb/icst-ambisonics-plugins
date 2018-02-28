@@ -11,6 +11,10 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+#define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
+#define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
+#define XML_TAG_SOURCES "Sources"
+#define XML_TAG_SOURCE "Source"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -26,6 +30,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #endif
 {
 	pSourcesArray = new Array<AmbiPoint>();
+	pEncoderSettings = new EncoderSettings();
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -168,15 +173,46 @@ AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
+	ScopedPointer<XmlElement> xml = new XmlElement(XML_ROOT_TAG);
+
+	// save general encoder settings
+	xml->addChildElement(pEncoderSettings->getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
+	
+	// load sources
+	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
+	for (AmbiPoint pt : *pSourcesArray)
+		sourcesElement->addChildElement(pt.getAsXmlElement(XML_TAG_SOURCE));
+	xml->addChildElement(sourcesElement);
+
+	copyXmlToBinary(*xml, destData);
+	xml->deleteAllChildElements();
 }
 
 void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
+	ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+	if (xmlState != nullptr)
+	{
+		// make sure that it's actually our type of XML object..
+		if (xmlState->hasTagName(XML_ROOT_TAG))
+		{
+			// load general encoder settings
+			pEncoderSettings->loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
+
+			// load last speaker preset
+			XmlElement* sourcesElement = xmlState->getChildByName(XML_TAG_SOURCES);
+			pSourcesArray->clear();
+			if (sourcesElement != nullptr)
+			{
+				XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
+				while (xmlPoint != nullptr)
+				{
+					pSourcesArray->add(AmbiPoint(xmlPoint));
+					xmlPoint = xmlPoint->getNextElement();
+				}
+			}
+		}
+	}
 }
 
 Array<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray() const
