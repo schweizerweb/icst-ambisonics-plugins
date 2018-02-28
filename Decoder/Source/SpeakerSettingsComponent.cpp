@@ -588,7 +588,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	sendActionMessage(String(rowNumber));
+	sendActionMessage(String(pSpeakerArray->getUnchecked(rowNumber)->getGain()) + ";" + String(rowNumber));
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const
