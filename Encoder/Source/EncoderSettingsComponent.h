@@ -47,6 +47,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	static void showAsDialog(EncoderSettings* encoder_settings);
 	void checkForNumbers(TextEditor* pEditor, int* pParameter) const;
+	void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
 	void textEditorTextChanged(TextEditor&) override;
     //[/UserMethods]
 
@@ -74,6 +75,10 @@ private:
     ScopedPointer<Label> labelOscSendPort;
     ScopedPointer<TextEditor> textOscSendInterval;
     ScopedPointer<Label> labelOscSendInterval;
+    ScopedPointer<GroupComponent> groupDistanceEncoding;
+    ScopedPointer<ToggleButton> toggleDistanceEncoding;
+    ScopedPointer<TextEditor> textUnitCircleRadius;
+    ScopedPointer<Label> labelUnitCircleRadius;
 
 
     //==============================================================================

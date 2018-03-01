@@ -115,6 +115,30 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendInterval->setColour (TextEditor::textColourId, Colours::black);
     labelOscSendInterval->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (groupDistanceEncoding = new GroupComponent ("groupDistanceEncoding",
+                                                                   TRANS("Distance Encoding")));
+
+    addAndMakeVisible (toggleDistanceEncoding = new ToggleButton ("toggleDistanceEncoding"));
+    toggleDistanceEncoding->setButtonText (TRANS("Enable"));
+    toggleDistanceEncoding->addListener (this);
+
+    addAndMakeVisible (textUnitCircleRadius = new TextEditor ("textUnitCircleRadius"));
+    textUnitCircleRadius->setMultiLine (false);
+    textUnitCircleRadius->setReturnKeyStartsNewLine (false);
+    textUnitCircleRadius->setReadOnly (false);
+    textUnitCircleRadius->setScrollbarsShown (true);
+    textUnitCircleRadius->setCaretVisible (true);
+    textUnitCircleRadius->setPopupMenuEnabled (true);
+    textUnitCircleRadius->setText (String());
+
+    addAndMakeVisible (labelUnitCircleRadius = new Label ("labelUnitCircleRadius",
+                                                          TRANS("Unit Circle Radius:")));
+    labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelUnitCircleRadius->setJustificationType (Justification::centredLeft);
+    labelUnitCircleRadius->setEditable (false, false, false);
+    labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
+    labelUnitCircleRadius->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -127,6 +151,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
 	textOscSendPort->addListener(this);
 	textOscSendIp->addListener(this);
 	textOscSendInterval->addListener(this);
+	textUnitCircleRadius->addListener(this);
 
 	toggleReceiveOsc->setToggleState(pEncoderSettings->oscReceiveFlag, dontSendNotification);
 	toggleSendOsc->setToggleState(pEncoderSettings->oscSendFlag, dontSendNotification);
@@ -134,6 +159,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
 	textOscSendPort->setText(String(pEncoderSettings->oscSendPort));
 	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
 	textOscSendInterval->setText(String(pEncoderSettings->oscSendIntervalMs));
+	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
+	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
     //[/Constructor]
 }
 
@@ -154,6 +181,10 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     labelOscSendPort = nullptr;
     textOscSendInterval = nullptr;
     labelOscSendInterval = nullptr;
+    groupDistanceEncoding = nullptr;
+    toggleDistanceEncoding = nullptr;
+    textUnitCircleRadius = nullptr;
+    labelUnitCircleRadius = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -189,6 +220,10 @@ void EncoderSettingsComponent::resized()
     labelOscSendPort->setBounds (2 + (getWidth() - 8) - 141 - 110, 137, 110, 24);
     textOscSendInterval->setBounds (2 + (getWidth() - 8) - 21 - 104, 5 + 167, 104, 24);
     labelOscSendInterval->setBounds (2 + (getWidth() - 8) - 141 - 110, 172, 110, 24);
+    groupDistanceEncoding->setBounds (1, 218, getWidth() - 8, 64);
+    toggleDistanceEncoding->setBounds (17, 242, 150, 24);
+    textUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 21 - 105, 5 + 237, 105, 24);
+    labelUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 142 - 109, 242, 109, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -210,6 +245,12 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		pEncoderSettings->oscSendFlag = toggleSendOsc->getToggleState();
         //[/UserButtonCode_toggleSendOsc]
     }
+    else if (buttonThatWasClicked == toggleDistanceEncoding)
+    {
+        //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
+		pEncoderSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
+        //[/UserButtonCode_toggleDistanceEncoding]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -226,10 +267,10 @@ void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendPort);
 	else if (&textEditor == textOscSendInterval)
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendIntervalMs);
-	else if(&textEditor == textOscSendIp)
-	{
+	else if (&textEditor == textOscSendIp)
 		pEncoderSettings->oscSendTargetHost = textEditor.getText();
-	}
+	else if (&textEditor == textUnitCircleRadius)
+		checkForNumbers(&textEditor, &pEncoderSettings->unitCircleRadius);
 }
 
 void EncoderSettingsComponent::showAsDialog(EncoderSettings* pSettings)
@@ -252,6 +293,19 @@ void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, int* pParame
 	if (pEditor->getText().containsOnly("0123456789"))
 	{
 		*pParameter = pEditor->getText().getIntValue();
+	}
+	else
+	{
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid number");
+		pEditor->undo();
+	}
+}
+
+void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, float* pParameter) const
+{
+	if (pEditor->getText().containsOnly("0123456789."))
+	{
+		*pParameter = pEditor->getText().getFloatValue();
 	}
 	else
 	{
@@ -325,6 +379,21 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 172 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
+         kerning="0" bold="0" italic="0" justification="33"/>
+  <GROUPCOMPONENT name="groupDistanceEncoding" id="b72378bdfe4e130" memberName="groupDistanceEncoding"
+                  virtualName="" explicitFocusOrder="0" pos="1 218 8M 64" title="Distance Encoding"/>
+  <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
+                virtualName="" explicitFocusOrder="0" pos="17 242 150 24" buttonText="Enable"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTEDITOR name="textUnitCircleRadius" id="9b1288d93f3bb201" memberName="textUnitCircleRadius"
+              virtualName="" explicitFocusOrder="0" pos="21Rr 237 105 24" posRelativeX="f4cf3a53a6ef0d87"
+              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+  <LABEL name="labelUnitCircleRadius" id="efb161958642a965" memberName="labelUnitCircleRadius"
+         virtualName="" explicitFocusOrder="0" pos="142Rr 242 109 24"
+         posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
+         labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15"
          kerning="0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>

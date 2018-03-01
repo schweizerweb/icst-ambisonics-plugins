@@ -27,4 +27,7 @@ public:
 	int oscSendPort;
 	String oscSendTargetHost;
 	int oscSendIntervalMs;
+
+	bool distanceEncodingFlag;
+	float unitCircleRadius;
 };
