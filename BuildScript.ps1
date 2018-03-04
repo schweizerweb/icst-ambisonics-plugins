@@ -5,6 +5,7 @@ param(
     [string]$buildArgumentsPre,
     [string]$buildArgumentsPost,
     [string]$projectFileExtension,
+	[string]$platformString,
     [string[]]$pluginTypeStrings
 )
 
@@ -122,7 +123,7 @@ foreach($pluginType in $pluginTypes)
 {
     $targetPath = Join-Path $targetPathBase $pluginType.Name
     $sourcesFilter = Join-Path $targetPath *.*
-    $targetZip = Join-Path $targetPathZipBase "$($pluginType.Name)_$($releaseVersion).zip"
+    $targetZip = Join-Path $targetPathZipBase "AmbisonicPlugins_$($pluginType.Name)_$($releaseVersion)_$($platformString).zip"
     Compress-Archive -Path $sourcesFilter -DestinationPath $targetZip -Force
     Write-Output $targetZip
 }

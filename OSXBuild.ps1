@@ -5,6 +5,7 @@ $buildExecutable = "xcodebuild"
 $buildArgumentsPre = "-project"
 $buildArgumentsPost = "-configuration Release build"
 $projectFileExtension = "*.xcodeproj"
+$platformString = "osx"
 $pluginTypeStrings = @("VST;*.vst", "VST3;*.vst3", "AU;*.component")
 
-. .\BuildScript.ps1 $powershellCommand $projucer $buildExecutable $buildArgumentsPre $buildArgumentsPost $projectFileExtension $pluginTypeStrings
+. .\BuildScript.ps1 $powershellCommand $projucer $buildExecutable $buildArgumentsPre $buildArgumentsPost $projectFileExtension $platformString $pluginTypeStrings
