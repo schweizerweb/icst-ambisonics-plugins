@@ -15,7 +15,7 @@
 //==============================================================================
 /*
 */
-class MultiSliderControl    : public Component, public SliderListener
+class MultiSliderControl    : public Component, public Slider::Listener
 {
 public:
     MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval);

@@ -21,7 +21,7 @@ void TestSoundGenerator::process(AudioSampleBuffer* audioBuffer)
 		float* channelData = audioBuffer->getWritePointer(testSoundChannel);
 		for (int i = 0; i < audioBuffer->getNumSamples(); i++)
 		{
-			channelData[i] = (random.nextFloat() * 0.25f - 0.125f) * testSoundGain;
+			channelData[i] = float((random.nextFloat() * 0.25f - 0.125f) * testSoundGain);
 		}
 	}
 }

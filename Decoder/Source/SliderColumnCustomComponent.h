@@ -12,7 +12,7 @@
 #include "SpeakerSettingsComponent.h"
 
 class SliderColumnCustomComponent : public Component,
-	private SliderListener
+	private Slider::Listener
 {
 public:
 	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)

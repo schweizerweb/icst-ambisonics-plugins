@@ -12,7 +12,7 @@
 #include "SpeakerSettingsComponent.h"
 
 class SpeakerTestCustomComponent : public Component,
-	private ButtonListener
+	private Button::Listener
 {
 public:
 	SpeakerTestCustomComponent(SpeakerSettingsComponent& td) : owner(td)

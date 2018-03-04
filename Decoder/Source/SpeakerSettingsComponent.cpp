@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.0.2
+  Created with Projucer version: 5.2.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -72,6 +72,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     label->setColour (TextEditor::textColourId, Colours::black);
     label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    label->setBounds (8, 8, 64, 24);
+
     addAndMakeVisible (buttonLoad = new TextButton ("buttonLoad"));
     buttonLoad->setButtonText (TRANS("load"));
     buttonLoad->addListener (this);
@@ -110,6 +112,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     label2->setColour (TextEditor::textColourId, Colours::black);
     label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    label2->setBounds (8 + 8, (getHeight() - 198) + 16, 104, 24);
+
     addAndMakeVisible (sliderDistanceScaler = new Slider ("sliderDistanceScaler"));
     sliderDistanceScaler->setRange (1, 500, 0.1);
     sliderDistanceScaler->setSliderStyle (Slider::LinearHorizontal);
@@ -127,17 +131,25 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     label3->setColour (TextEditor::textColourId, Colours::black);
     label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    label3->setBounds (16, (getHeight() - 198) + 40, 112, 24);
+
     addAndMakeVisible (buttonInPhase = new TextButton ("buttonInPhase"));
     buttonInPhase->setButtonText (TRANS("calculate in-phase"));
     buttonInPhase->addListener (this);
+
+    buttonInPhase->setBounds (8 + 16, (getHeight() - 198) + 96, 120, 24);
 
     addAndMakeVisible (buttonBasic = new TextButton ("buttonBasic"));
     buttonBasic->setButtonText (TRANS("reset to basic"));
     buttonBasic->addListener (this);
 
+    buttonBasic->setBounds (8 + 16, (getHeight() - 198) + 64, 120, 24);
+
     addAndMakeVisible (btnFlipDirection = new ToggleButton ("btnFlipDirection"));
     btnFlipDirection->setButtonText (TRANS("Flip Direction"));
     btnFlipDirection->addListener (this);
+
+    btnFlipDirection->setBounds (8 + 16, (getHeight() - 198) + 128, 120, 24);
 
 
     //[UserPreSize]
@@ -218,7 +230,6 @@ void SpeakerSettingsComponent::resized()
 
     groupSpeakers->setBounds (8, 40, getWidth() - 18, getHeight() - 246);
     comboBoxChannelConfig->setBounds (80, 8, getWidth() - 186, 24);
-    label->setBounds (8, 8, 64, 24);
     buttonLoad->setBounds (getWidth() - 98, 8, 40, 24);
     buttonSave->setBounds (getWidth() - 50, 8, 40, 24);
     speakerList->setBounds (8 + 16, 40 + 16, (getWidth() - 18) - 32, (getHeight() - 246) - 56);
@@ -227,13 +238,8 @@ void SpeakerSettingsComponent::resized()
     buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (40 + 16) + ((getHeight() - 246) - 56) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (40 + 16) + ((getHeight() - 246) - 56) - -8, 64, 24);
     groupAmbisonics->setBounds (8, getHeight() - 198, getWidth() - 18, 192);
-    label2->setBounds (8 + 8, (getHeight() - 198) + 16, 104, 24);
     sliderDistanceScaler->setBounds (8 + 144, (getHeight() - 198) + 16, getWidth() - 178, 24);
     ambiChannelControl->setBounds (8 + 144, (getHeight() - 198) + 40, (getWidth() - 18) - 160, 192 - 56);
-    label3->setBounds (16, (getHeight() - 198) + 40, 112, 24);
-    buttonInPhase->setBounds (8 + 16, (getHeight() - 198) + 96, 120, 24);
-    buttonBasic->setBounds (8 + 16, (getHeight() - 198) + 64, 120, 24);
-    btnFlipDirection->setBounds (8 + 16, (getHeight() - 198) + 128, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -764,8 +770,8 @@ BEGIN_JUCER_METADATA
   <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="8 8 64 24" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
               virtualName="" explicitFocusOrder="0" pos="98R 8 40 24" buttonText="load"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
@@ -798,13 +804,14 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="8 16 104 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
           virtualName="" explicitFocusOrder="0" pos="144 16 178M 24" posRelativeX="17eb4b418501687a"
-          posRelativeY="17eb4b418501687a" min="1" max="500" int="0.10000000000000000555"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
+          posRelativeY="17eb4b418501687a" min="1.00000000000000000000"
+          max="500.00000000000000000000" int="0.10000000000000000555" style="LinearHorizontal"
+          textBoxPos="TextBoxRight" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.00000000000000000000" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
@@ -813,8 +820,8 @@ BEGIN_JUCER_METADATA
          explicitFocusOrder="0" pos="16 40 112 24" posRelativeY="17eb4b418501687a"
          edTextCol="ff000000" edBkgCol="0" labelText="Channel weights"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
               virtualName="" explicitFocusOrder="0" pos="16 96 120 24" posRelativeX="17eb4b418501687a"
               posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"
