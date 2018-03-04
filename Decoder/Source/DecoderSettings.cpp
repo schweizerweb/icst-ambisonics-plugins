@@ -3,7 +3,7 @@
 
     DecoderSettings.cpp
     Created: 11 Dec 2017 11:21:33pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

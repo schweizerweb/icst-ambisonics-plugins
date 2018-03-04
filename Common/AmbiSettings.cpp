@@ -3,7 +3,7 @@
 
     AmbiSettings.cpp
     Created: 9 Oct 2017 4:02:43pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

@@ -3,7 +3,7 @@
 
     AmbiPoint.h
     Created: 3 Sep 2016 11:29:07am
-    Author:  christian.schweizer
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

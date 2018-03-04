@@ -3,7 +3,7 @@
 
     SpeakerTestCustomComponent.h
     Created: 9 Oct 2017 2:52:14pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

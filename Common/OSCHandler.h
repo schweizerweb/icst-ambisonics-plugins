@@ -3,7 +3,7 @@
 
     OSCHandler.h
     Created: 18 Mar 2017 5:07:47pm
-    Author:  christian.schweizer
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

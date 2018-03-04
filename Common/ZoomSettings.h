@@ -3,7 +3,7 @@
 
     ZoomSettings.h
     Created: 24 Jul 2017 4:39:16am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

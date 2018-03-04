@@ -3,7 +3,7 @@
 
     DelayBuffer.h
     Created: 17 Dec 2017 10:14:03pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

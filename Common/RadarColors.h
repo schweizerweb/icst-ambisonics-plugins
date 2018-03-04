@@ -3,7 +3,7 @@
 
     RadarColors.h
     Created: 25 Jul 2017 6:12:01am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

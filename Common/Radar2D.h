@@ -3,7 +3,7 @@
 
     Radar2D.h
     Created: 22 Jul 2017 1:43:26pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

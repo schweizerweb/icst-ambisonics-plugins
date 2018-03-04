@@ -3,7 +3,7 @@
 
     PresetInfo.h
     Created: 30 Jul 2017 5:12:01pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

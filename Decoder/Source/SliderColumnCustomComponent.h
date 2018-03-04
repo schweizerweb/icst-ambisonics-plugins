@@ -3,7 +3,7 @@
 
     GainColumnCustomComponent.h
     Created: 9 Oct 2017 2:25:32pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

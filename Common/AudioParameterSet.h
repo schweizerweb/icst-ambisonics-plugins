@@ -3,7 +3,7 @@
 
     AudioParameterSet.h
     Created: 9 Feb 2018 12:29:36pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

@@ -3,7 +3,7 @@
 
     MultiSliderControl.h
     Created: 13 Oct 2017 3:08:23pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

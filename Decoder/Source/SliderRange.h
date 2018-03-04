@@ -3,7 +3,7 @@
 
     SliderRange.h
     Created: 15 Dec 2017 10:25:37pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
