@@ -75,6 +75,7 @@ private:
     ScopedPointer<RadarComponent> component;
     ScopedPointer<TextButton> buttonConfigure;
     ScopedPointer<TextButton> buttonConfigurePlugin;
+    ScopedPointer<Label> labelVersion;
 
 
     //==============================================================================
