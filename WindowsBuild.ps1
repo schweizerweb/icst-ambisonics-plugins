@@ -1,6 +1,6 @@
 $powershellCommand = "powershell"
 $projucer = "./../../JUCE/Projucer"
-$buildExecutable = """c:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/devenv.exe"""
+$buildExecutable = """c:/Program Files (x86)/Microsoft Visual Studio/2017/Community/Common7/IDE/devenv.com"""
 $buildArgumentsPre = ""
 $buildArgumentsPost = "/build ""Release"""
 $projectFileExtension = "*.sln"
