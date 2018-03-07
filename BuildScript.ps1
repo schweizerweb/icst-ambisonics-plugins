@@ -95,7 +95,7 @@ foreach($file in $jucerFiles)
         foreach($file in @($resultFiles))
         {
             $target = (Join-Path $($targetPath) $file.Name)
-            $ret = Copy-Item $file.FullName $target -PassThru
+            $ret = Copy-Item $file.FullName $target -Recurse -PassThru
             if($ret)
             {
                 Write-Output $file.Name

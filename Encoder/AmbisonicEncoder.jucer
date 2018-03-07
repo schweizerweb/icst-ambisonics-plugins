@@ -76,8 +76,8 @@
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Encoder"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Encoder"
-                       vstBinaryLocation="$(PROJECT_DIR)" vst3BinaryLocation="$(PROJECT_DIR)"
-                       auBinaryLocation="$(PROJECT_DIR)"/>
+                       vstBinaryLocation="$(PROJECT_DIR)/build/Release/" vst3BinaryLocation="$(PROJECT_DIR)/build/Release/"
+                       auBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE/modules"/>
