@@ -24,7 +24,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
 {
     $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
     $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
-    $target = $sourceFile.Replace('.jucer', "_$($code).jucer")
+    $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 
     Write-Output "ProjectId $($projectId)"

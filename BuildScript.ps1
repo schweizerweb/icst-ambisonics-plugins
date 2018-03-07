@@ -46,9 +46,10 @@ if($ret.ExitCode -ne 0)
 }
 
 # loop through jucer files
-$jucerFiles = Get-ChildItem -Path ./ -Filter *_*.jucer -Recurse -ErrorAction SilentlyContinue -Force
+$jucerFiles = Get-ChildItem -Path ./ -Filter *_AutoGen.jucer -Recurse -ErrorAction SilentlyContinue -Force
 foreach($file in $jucerFiles)
 {
+	$fileToRemove = $file.FullName
     Write-Output "Project: $($file.Name)"
     $path = ([System.IO.Path]::GetDirectoryName($file.FullName))
     $buildPath = "$(Join-Path $path 'Builds')/"
@@ -108,6 +109,7 @@ foreach($file in $jucerFiles)
         }
     }
     Write-Output "."
+	Remove-Item $fileToRemove -Force
 }
 
 # zip packages
