@@ -124,6 +124,11 @@ foreach($pluginType in $pluginTypes)
     $targetPath = Join-Path $targetPathBase $pluginType.Name
     $sourcesFilter = Join-Path $targetPath *.*
     $targetZip = Join-Path $targetPathZipBase "AmbisonicPlugins_$($pluginType.Name)_$($releaseVersion)_$($platformString).zip"
+	if(Test-Path $targetZip)
+	{
+		Remove-Item $targetZip -Force
+	}
+	
     Compress-Archive -Path $sourcesFilter -DestinationPath $targetZip -Force
     Write-Output $targetZip
 }
