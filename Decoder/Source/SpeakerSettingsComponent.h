@@ -101,6 +101,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    ScopedPointer<GroupComponent> groupAmbisonics;
     ScopedPointer<GroupComponent> groupSpeakers;
     ScopedPointer<ComboBox> comboBoxChannelConfig;
     ScopedPointer<Label> label;
@@ -111,14 +112,13 @@ private:
     ScopedPointer<TextButton> buttonRemove;
     ScopedPointer<TextButton> buttonMoveDown;
     ScopedPointer<TextButton> buttonMoveUp;
-    ScopedPointer<GroupComponent> groupAmbisonics;
-    ScopedPointer<Label> label2;
     ScopedPointer<Slider> sliderDistanceScaler;
     ScopedPointer<MultiSliderControl> ambiChannelControl;
-    ScopedPointer<Label> label3;
-    ScopedPointer<TextButton> buttonInPhase;
     ScopedPointer<TextButton> buttonBasic;
+    ScopedPointer<Label> labelChannelWeights;
+    ScopedPointer<TextButton> buttonInPhase;
     ScopedPointer<ToggleButton> btnFlipDirection;
+    ScopedPointer<Label> labelDistanceScaler;
 
 
     //==============================================================================
