@@ -18,7 +18,15 @@
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
 
-EncoderSettings::EncoderSettings(): oscReceiveFlag(false), oscReceivePort(0), oscSendFlag(false), oscSendPort(0), oscSendIntervalMs(100), distanceEncodingFlag(true), unitCircleRadius(0.1f)
+EncoderSettings::EncoderSettings(): 
+	oscReceiveFlag(DEFAULT_RECEIVE_FLAG), 
+	oscReceivePort(DEFALUT_RECEIVE_PORT), 
+	oscSendFlag(DEFALUT_SEND_FLAG), 
+	oscSendPort(DEFAULT_SEND_PORT), 
+	oscSendTargetHost(DEFAULT_SEND_HOST),
+	oscSendIntervalMs(DEFAULT_SEND_INTERVAL), 
+	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG), 
+	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE)
 {
 }
 
@@ -56,19 +64,19 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		return;
 
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
-	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, false);
-	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, 5011);
+	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
+	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFALUT_RECEIVE_PORT);
 	
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
-	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, false);
-	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, 5014);
-	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_IP, "127.0.0.1");
-	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, 100);
+	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFALUT_SEND_FLAG);
+	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
+	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_HOST);
+	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
 
 	XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
 	if(distanceEncoding != nullptr)
 	{
-		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, true);
-		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, 0.1));
+		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
+		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
 	}
 }
