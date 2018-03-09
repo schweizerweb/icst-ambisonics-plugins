@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include "JuceHeader.h"
 
 class DecoderSettings
 {
@@ -18,4 +19,7 @@ public:
 
 	int lastUIWidth;
 	int lastUIHeight;
+
+	void saveToXml(XmlElement* xmlElement) const;
+	void loadFromXml(XmlElement* xmlElement);
 };

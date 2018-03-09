@@ -207,11 +207,8 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
     ScopedPointer<XmlElement> xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
 
 	// save general decoder settings
-	xml->setAttribute("uiWidth", pDecoderSettings->lastUIWidth);
-	xml->setAttribute("uiHeight", pDecoderSettings->lastUIHeight);
-	xml->setAttribute("oscReceive", pDecoderSettings->oscReceive);
-	xml->setAttribute("oscReceivePort", pDecoderSettings->oscReceivePort);
-
+	pDecoderSettings->saveToXml(xml.get());
+	
 	// load last speaker preset
 	ScopedPointer<PresetInfo> preset = new PresetInfo();
 	preset->setName("LastState");
@@ -240,10 +237,7 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 		if (xmlState->hasTagName("AMBISONICDECODERPLUGINSETTINGS"))
 		{
 			// load general decoder settings
-			pDecoderSettings->lastUIWidth = jmax(xmlState->getIntAttribute("uiWidth", pDecoderSettings->lastUIWidth), 300);
-			pDecoderSettings->lastUIHeight = jmax(xmlState->getIntAttribute("uiHeight", pDecoderSettings->lastUIHeight), 600);
-			pDecoderSettings->oscReceive = xmlState->getBoolAttribute("oscReceive", false);
-			pDecoderSettings->oscReceivePort = xmlState->getIntAttribute("oscReceivePort", 5011);
+			pDecoderSettings->loadFromXml(xmlState.get());
 			
 			// load last speaker preset
 			PresetInfo* preset = new PresetInfo();
