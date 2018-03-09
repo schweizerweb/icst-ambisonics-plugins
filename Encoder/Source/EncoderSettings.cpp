@@ -3,7 +3,7 @@
 
     EncoderSettings.cpp
     Created: 26 Dec 2017 11:55:01pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

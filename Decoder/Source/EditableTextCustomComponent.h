@@ -3,7 +3,7 @@
 
     EditableTextCustomComponent.h
     Created: 9 Oct 2017 2:04:27pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

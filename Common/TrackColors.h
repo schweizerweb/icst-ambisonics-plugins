@@ -3,7 +3,7 @@
 
     TrackColors.h
     Created: 20 Mar 2017 8:07:27am
-    Author:  christian.schweizer
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

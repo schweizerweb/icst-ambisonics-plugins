@@ -3,7 +3,7 @@
 
     SpeakerTestCustomComponent.h
     Created: 9 Oct 2017 2:52:14pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
@@ -12,7 +12,7 @@
 #include "SpeakerSettingsComponent.h"
 
 class SpeakerTestCustomComponent : public Component,
-	private ButtonListener
+	private Button::Listener
 {
 public:
 	SpeakerTestCustomComponent(SpeakerSettingsComponent& td) : owner(td)

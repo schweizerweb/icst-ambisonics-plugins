@@ -3,7 +3,7 @@
 
     PointSelection.h
     Created: 25 Jul 2017 8:39:25am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

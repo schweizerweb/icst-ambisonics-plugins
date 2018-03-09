@@ -3,7 +3,7 @@
 
     TestSoundGenerator.h
     Created: 16 Oct 2017 10:26:17am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

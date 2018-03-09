@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.0.2
+  Created with Projucer version: 5.2.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -39,6 +39,8 @@ DecoderSettingsComponent::DecoderSettingsComponent (DecoderSettings* pSettings)
     addAndMakeVisible (toggleReceiveOsc = new ToggleButton ("toggleReceiveOsc"));
     toggleReceiveOsc->setButtonText (TRANS("Enable OSC Receiver"));
     toggleReceiveOsc->addListener (this);
+
+    toggleReceiveOsc->setBounds (24, 32, 150, 24);
 
     addAndMakeVisible (textOscPort = new TextEditor ("textOscPort"));
     textOscPort->setMultiLine (false);
@@ -104,7 +106,6 @@ void DecoderSettingsComponent::resized()
     //[/UserPreResize]
 
     groupOsc->setBounds (8, 8, getWidth() - 8, 64);
-    toggleReceiveOsc->setBounds (24, 32, 150, 24);
     textOscPort->setBounds (8 + (getWidth() - 8) - 20 - 142, 8 + 24, 142, 24);
     labelOscPort->setBounds (8 + (getWidth() - 8) - 170 - 80, 32, 80, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -171,7 +172,7 @@ void DecoderSettingsComponent::textEditorTextChanged(TextEditor& editor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DecoderSettingsComponent"
-                 componentName="" parentClasses="public Component, public TextEditorListener"
+                 componentName="" parentClasses="public Component, public TextEditor::Listener"
                  constructorParams="DecoderSettings* pSettings" variableInitialisers="pDecoderSettings(pSettings)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="500" initialHeight="200">
@@ -189,8 +190,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="170Rr 32 80 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

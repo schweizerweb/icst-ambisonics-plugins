@@ -3,7 +3,7 @@
 
     DelayHelper.h
     Created: 17 Dec 2017 11:42:36pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

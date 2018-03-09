@@ -3,7 +3,7 @@
 
     GainColumnCustomComponent.h
     Created: 9 Oct 2017 2:25:32pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
@@ -12,7 +12,7 @@
 #include "SpeakerSettingsComponent.h"
 
 class SliderColumnCustomComponent : public Component,
-	private SliderListener
+	private Slider::Listener
 {
 public:
 	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)

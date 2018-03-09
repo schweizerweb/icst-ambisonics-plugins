@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbisonicDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.zhdk.ambisonicdecoder"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2"
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.1"
               companyName="ZHdK">
   <MAINGROUP id="oa5A98" name="AmbisonicDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
@@ -121,7 +121,9 @@
     <XCODE_MAC targetFolder="Builds/MacOSX" vst3Folder="">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Decoder"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Decoder"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Decoder"
+                       vst3BinaryLocation="$(PROJECT_DIR)/build/Release/" auBinaryLocation="$(PROJECT_DIR)/build/Release/"
+                       vstBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_video" path="../../JUCE/modules"/>

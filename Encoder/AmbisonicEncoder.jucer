@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbisonicEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.zhdk.ambisonicencoder"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.0.2">
+              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.2.1">
   <MAINGROUP id="kUoKTp" name="AmbisonicEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
       <FILE id="tPcKpu" name="EncoderSettingsComponent.cpp" compile="1" resource="0"
@@ -75,7 +75,9 @@
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
         <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Encoder"/>
-        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Encoder"/>
+        <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Encoder"
+                       vstBinaryLocation="$(PROJECT_DIR)/build/Release/" vst3BinaryLocation="$(PROJECT_DIR)/build/Release/"
+                       auBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE/modules"/>

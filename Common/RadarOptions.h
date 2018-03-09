@@ -3,7 +3,7 @@
 
     RadarOptions.h
     Created: 24 Dec 2017 3:11:46pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

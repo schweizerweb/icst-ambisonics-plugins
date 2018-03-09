@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.0.2
+  Created with Projucer version: 5.2.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -50,9 +50,23 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     buttonConfigure->setButtonText (TRANS("decoder settings"));
     buttonConfigure->addListener (this);
 
+    buttonConfigure->setBounds (8, 8, 128, 24);
+
     addAndMakeVisible (buttonConfigurePlugin = new TextButton ("buttonConfigurePlugin"));
     buttonConfigurePlugin->setButtonText (TRANS("plugin settings"));
     buttonConfigurePlugin->addListener (this);
+
+    buttonConfigurePlugin->setBounds (152, 8, 128, 24);
+
+    addAndMakeVisible (labelVersion = new Label ("labelVersion",
+                                                 TRANS("Version")));
+    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setJustificationType (Justification::centredRight);
+    labelVersion->setEditable (false, false, false);
+    labelVersion->setColour (TextEditor::textColourId, Colours::black);
+    labelVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelVersion->setBounds (288, 8, 62, 24);
 
 
     //[UserPreSize]
@@ -64,7 +78,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
-    //[/Constructor]
+	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
+	//[/Constructor]
 }
 
 AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
@@ -75,6 +90,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     component = nullptr;
     buttonConfigure = nullptr;
     buttonConfigurePlugin = nullptr;
+    labelVersion = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -99,8 +115,6 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 40);
-    buttonConfigure->setBounds (8, 8, proportionOfWidth (0.6499f), 24);
-    buttonConfigurePlugin->setBounds (getWidth() - 8 - proportionOfWidth (0.3050f), 8, proportionOfWidth (0.3050f), 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -170,12 +184,16 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 40M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <TEXTBUTTON name="buttonConfigure" id="9d167617277afe11" memberName="buttonConfigure"
-              virtualName="" explicitFocusOrder="0" pos="8 8 64.987% 24" buttonText="decoder settings"
+              virtualName="" explicitFocusOrder="0" pos="8 8 128 24" buttonText="decoder settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonConfigurePlugin" id="265eef40909bd6dd" memberName="buttonConfigurePlugin"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 8 30.504% 24"
-              buttonText="plugin settings" connectedEdges="0" needsCallback="1"
-              radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="152 8 128 24" buttonText="plugin settings"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
+         virtualName="" explicitFocusOrder="0" pos="288 8 62 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -5,6 +5,7 @@ param(
     [string]$buildArgumentsPre,
     [string]$buildArgumentsPost,
     [string]$projectFileExtension,
+	[string]$platformString,
     [string[]]$pluginTypeStrings
 )
 
@@ -45,9 +46,10 @@ if($ret.ExitCode -ne 0)
 }
 
 # loop through jucer files
-$jucerFiles = Get-ChildItem -Path ./ -Filter *_*.jucer -Recurse -ErrorAction SilentlyContinue -Force
+$jucerFiles = Get-ChildItem -Path ./ -Filter *_AutoGen.jucer -Recurse -ErrorAction SilentlyContinue -Force
 foreach($file in $jucerFiles)
 {
+	$fileToRemove = $file.FullName
     Write-Output "Project: $($file.Name)"
     $path = ([System.IO.Path]::GetDirectoryName($file.FullName))
     $buildPath = "$(Join-Path $path 'Builds')/"
@@ -94,7 +96,7 @@ foreach($file in $jucerFiles)
         foreach($file in @($resultFiles))
         {
             $target = (Join-Path $($targetPath) $file.Name)
-            $ret = Copy-Item $file.FullName $target -PassThru
+            $ret = Copy-Item $file.FullName $target -Recurse -PassThru
             if($ret)
             {
                 Write-Output $file.Name
@@ -107,6 +109,7 @@ foreach($file in $jucerFiles)
         }
     }
     Write-Output "."
+	Remove-Item $fileToRemove -Force
 }
 
 # zip packages
@@ -122,7 +125,12 @@ foreach($pluginType in $pluginTypes)
 {
     $targetPath = Join-Path $targetPathBase $pluginType.Name
     $sourcesFilter = Join-Path $targetPath *.*
-    $targetZip = Join-Path $targetPathZipBase "$($pluginType.Name)_$($releaseVersion).zip"
+    $targetZip = Join-Path $targetPathZipBase "AmbisonicPlugins_$($pluginType.Name)_$($releaseVersion)_$($platformString).zip"
+	if(Test-Path $targetZip)
+	{
+		Remove-Item $targetZip -Force
+	}
+	
     Compress-Archive -Path $sourcesFilter -DestinationPath $targetZip -Force
     Write-Output $targetZip
 }

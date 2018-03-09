@@ -3,7 +3,7 @@
 
     DelayBuffer.cpp
     Created: 17 Dec 2017 10:14:04pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

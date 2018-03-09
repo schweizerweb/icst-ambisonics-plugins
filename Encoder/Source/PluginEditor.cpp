@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.0.2
+  Created with Projucer version: 5.2.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -44,8 +44,20 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     buttonConfigure->setButtonText (TRANS("settings"));
     buttonConfigure->addListener (this);
 
+    buttonConfigure->setBounds (0, 8, 280, 24);
+
     addAndMakeVisible (component = new RadarComponent (pSourcesArray, nullptr, &pointSelection, &radarOptions));
     component->setName ("new component");
+
+    addAndMakeVisible (labelVersion = new Label ("labelVersion",
+                                                 TRANS("Version")));
+    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setJustificationType (Justification::centredRight);
+    labelVersion->setEditable (false, false, false);
+    labelVersion->setColour (TextEditor::textColourId, Colours::black);
+    labelVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelVersion->setBounds (288, 8, 62, 24);
 
 
     //[UserPreSize]
@@ -56,6 +68,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 
 
     //[Constructor] You can add your own custom stuff here..
+	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
     //[/Constructor]
 }
 
@@ -66,6 +79,7 @@ AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 
     buttonConfigure = nullptr;
     component = nullptr;
+    labelVersion = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -89,7 +103,6 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    buttonConfigure->setBounds (0, 8, getWidth() - 0, 24);
     component->setBounds (0, 40, getWidth() - 0, getHeight() - 46);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -135,11 +148,16 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <TEXTBUTTON name="buttonConfigure" id="3fc456e2bfcc8706" memberName="buttonConfigure"
-              virtualName="" explicitFocusOrder="0" pos="0 8 0M 24" buttonText="settings"
+              virtualName="" explicitFocusOrder="0" pos="0 8 280 24" buttonText="settings"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="new component" id="5bf6bd31c23a4886" memberName="component"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 46M" class="RadarComponent"
                     params="pSourcesArray, nullptr, &amp;pointSelection, &amp;radarOptions"/>
+  <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
+         virtualName="" explicitFocusOrder="0" pos="288 8 62 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

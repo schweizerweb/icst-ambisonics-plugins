@@ -3,7 +3,7 @@
 
     Point3D.h
     Created: 28 Jul 2016 8:17:47am
-    Author:  christian.schweizer
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

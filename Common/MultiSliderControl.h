@@ -3,7 +3,7 @@
 
     MultiSliderControl.h
     Created: 13 Oct 2017 3:08:23pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
@@ -15,7 +15,7 @@
 //==============================================================================
 /*
 */
-class MultiSliderControl    : public Component, public SliderListener
+class MultiSliderControl    : public Component, public Slider::Listener
 {
 public:
     MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval);

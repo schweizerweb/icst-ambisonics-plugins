@@ -3,7 +3,7 @@
 
     ZoomSettings.cpp
     Created: 24 Jul 2017 4:39:17am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

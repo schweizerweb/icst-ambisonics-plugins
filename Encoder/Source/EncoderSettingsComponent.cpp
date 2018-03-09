@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.0.2
+  Created with Projucer version: 5.2.1
 
   ------------------------------------------------------------------------------
 
-  The Projucer is part of the JUCE library - "Jules' Utility Class Extensions"
-  Copyright (c) 2015 - ROLI Ltd.
+  The Projucer is part of the JUCE library.
+  Copyright (c) 2017 - ROLI Ltd.
 
   ==============================================================================
 */
@@ -40,6 +40,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     toggleReceiveOsc->setButtonText (TRANS("Enable"));
     toggleReceiveOsc->addListener (this);
 
+    toggleReceiveOsc->setBounds (18, 29, 150, 24);
+
     addAndMakeVisible (textOscReceivePort = new TextEditor ("textOscReceivePort"));
     textOscReceivePort->setMultiLine (false);
     textOscReceivePort->setReturnKeyStartsNewLine (false);
@@ -63,6 +65,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     addAndMakeVisible (toggleSendOsc = new ToggleButton ("toggleSendOsc"));
     toggleSendOsc->setButtonText (TRANS("Enable"));
     toggleSendOsc->addListener (this);
+
+    toggleSendOsc->setBounds (17, 101, 150, 24);
 
     addAndMakeVisible (textOscSendIp = new TextEditor ("textOscSendIp"));
     textOscSendIp->setMultiLine (false);
@@ -121,6 +125,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     addAndMakeVisible (toggleDistanceEncoding = new ToggleButton ("toggleDistanceEncoding"));
     toggleDistanceEncoding->setButtonText (TRANS("Enable"));
     toggleDistanceEncoding->addListener (this);
+
+    toggleDistanceEncoding->setBounds (17, 242, 150, 24);
 
     addAndMakeVisible (textUnitCircleRadius = new TextEditor ("textUnitCircleRadius"));
     textUnitCircleRadius->setMultiLine (false);
@@ -209,11 +215,9 @@ void EncoderSettingsComponent::resized()
     //[/UserPreResize]
 
     groupOscReceive->setBounds (2, 5, getWidth() - 8, 64);
-    toggleReceiveOsc->setBounds (18, 29, 150, 24);
     textOscReceivePort->setBounds (2 + (getWidth() - 8) - 20 - 105, 5 + 24, 105, 24);
     labelOscPort->setBounds (2 + (getWidth() - 8) - 141 - 109, 29, 109, 24);
     groupOscSend->setBounds (1, 77, getWidth() - 8, 131);
-    toggleSendOsc->setBounds (17, 101, 150, 24);
     textOscSendIp->setBounds (2 + (getWidth() - 8) - 21 - 136, 5 + 96, 136, 24);
     labelOscSendIp->setBounds (2 + (getWidth() - 8) - 165 - 86, 101, 86, 24);
     textOscSendPort->setBounds (2 + (getWidth() - 8) - 21 - 104, 5 + 132, 104, 24);
@@ -221,7 +225,6 @@ void EncoderSettingsComponent::resized()
     textOscSendInterval->setBounds (2 + (getWidth() - 8) - 21 - 104, 5 + 167, 104, 24);
     labelOscSendInterval->setBounds (2 + (getWidth() - 8) - 141 - 110, 172, 110, 24);
     groupDistanceEncoding->setBounds (1, 218, getWidth() - 8, 64);
-    toggleDistanceEncoding->setBounds (17, 242, 150, 24);
     textUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 21 - 105, 5 + 237, 105, 24);
     labelUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 142 - 109, 242, 109, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -327,7 +330,7 @@ void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, float* pPara
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
-                 componentName="" parentClasses="public Component, public TextEditorListener"
+                 componentName="" parentClasses="public Component, public TextEditor::Listener"
                  constructorParams="EncoderSettings* pSettings" variableInitialisers="pEncoderSettings(pSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="500" initialHeight="400">
@@ -345,8 +348,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 29 109 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15" kerning="0" bold="0" italic="0"
-         justification="33"/>
+         fontname="Default font" fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOscSend" id="6e42d11d1b0564d7" memberName="groupOscSend"
                   virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send"/>
   <TOGGLEBUTTON name="toggleSendOsc" id="309574c60d08c55e" memberName="toggleSendOsc"
@@ -360,7 +363,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="165Rr 101 86 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15" kerning="0" bold="0" italic="0" justification="33"/>
+         fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendPort" id="c2dff2f42ed301d1" memberName="textOscSendPort"
               virtualName="" explicitFocusOrder="0" pos="21Rr 132 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -369,8 +373,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 137 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendInterval" id="2c20c78495fbd07c" memberName="textOscSendInterval"
               virtualName="" explicitFocusOrder="0" pos="21Rr 167 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -379,8 +383,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 172 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupDistanceEncoding" id="b72378bdfe4e130" memberName="groupDistanceEncoding"
                   virtualName="" explicitFocusOrder="0" pos="1 218 8M 64" title="Distance Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
@@ -394,8 +398,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="142Rr 242 109 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

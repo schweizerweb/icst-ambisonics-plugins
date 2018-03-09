@@ -80,7 +80,7 @@ void Radar3D::resized()
     //[/UserPreResize]
 
     xyRadar->setBounds (0, 0, proportionOfWidth (1.0000f), proportionOfHeight (0.6654f));
-    zyRadar->setBounds (0, 0 + proportionOfHeight (0.6654f), proportionOfWidth (1.0000f), roundFloatToInt (proportionOfHeight (0.6654f) * 0.5000f));
+    zyRadar->setBounds (0, 0 + proportionOfHeight (0.6654f), proportionOfWidth (1.0000f), roundToInt (proportionOfHeight (0.6654f) * 0.5000f));
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }

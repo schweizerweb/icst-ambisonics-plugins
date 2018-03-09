@@ -3,7 +3,7 @@
 
     AudioParameterFloatAmbi.h
     Created: 15 Jan 2018 6:21:08am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

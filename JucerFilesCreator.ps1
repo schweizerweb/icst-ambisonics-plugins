@@ -2,23 +2,29 @@ $ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36 )
 $VersionFile = "./versionInformation.txt"
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
-$EncoderVersions = 
+$EncoderVersions =
 @(
-    @{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input" },
-    @{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" }
+@{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input" },
+@{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" },
+@{ Order = 3; Input = 1; Description = "3nd Order Ambisonic, 1 Channel Input" },
+@{ Order = 4; Input = 1; Description = "4nd Order Ambisonic, 1 Channel Input" },
+@{ Order = 5; Input = 1; Description = "5nd Order Ambisonic, 1 Channel Input" }
 )
 
-$DecoderVersions = 
+$DecoderVersions =
 @(
-    @{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
-    @{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" }
+@{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
+@{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" },
+@{ Order = 3; Output = 32; Description = "3nd Order Ambisonic, 32 Channel Output" },
+@{ Order = 4; Output = 32; Description = "4nd Order Ambisonic, 32 Channel Output" },
+@{ Order = 5; Output = 32; Description = "5nd Order Ambisonic, 32 Channel Output" }
 )
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
 {
     $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
     $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
-    $target = $sourceFile.Replace('.jucer', "_$($code).jucer")
+    $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 
     Write-Output "ProjectId $($projectId)"

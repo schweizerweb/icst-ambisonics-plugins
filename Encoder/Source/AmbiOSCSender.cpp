@@ -3,7 +3,7 @@
 
     AmbiOSCSender.cpp
     Created: 28 Dec 2017 1:09:23pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
