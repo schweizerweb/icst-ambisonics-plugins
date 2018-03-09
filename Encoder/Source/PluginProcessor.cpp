@@ -115,6 +115,8 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double /*sampleRate*/, int /
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+	initializeOsc();
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -256,8 +258,6 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			}
 		}
 	}
-
-	initializeOsc();
 }
 
 OwnedArray<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray()
