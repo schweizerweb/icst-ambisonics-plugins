@@ -11,9 +11,16 @@
 #pragma once
 #include "JuceHeader.h"
 
+#define DEFALUT_RECEIVE_FLAG	true
+#define DEFAULT_RECEIVE_PORT	50000
+#define DEFAULT_UI_WIDTH		300
+#define DEFAULT_UI_HEIGTH		600
+
 class DecoderSettings
 {
 public:
+	DecoderSettings();
+
 	bool oscReceive;
 	int oscReceivePort;
 

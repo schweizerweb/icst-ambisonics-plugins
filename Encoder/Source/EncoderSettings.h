@@ -10,6 +10,14 @@
 
 #pragma once
 #include "JuceHeader.h"
+#define DEFAULT_RECEIVE_FLAG		true
+#define DEFALUT_RECEIVE_PORT		50001
+#define DEFALUT_SEND_FLAG			true
+#define DEFAULT_SEND_PORT			50000
+#define DEFAULT_SEND_HOST			"127.0.0.1"
+#define DEFAULT_SEND_INTERVAL		50
+#define DEFAULT_DIST_ENC_FLAG		true
+#define DEFAULT_UNIT_CIRCLE_SIZE	0.1f
 
 class EncoderSettings
 {
