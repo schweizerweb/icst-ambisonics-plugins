@@ -33,6 +33,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pEncoderSettings = new EncoderSettings();
 	pOscHandler = new OSCHandler(&sourcesArray);
 	pOscSender = new AmbiOSCSender(&sourcesArray);
+	initializeOsc();
 
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
 	{
@@ -115,8 +116,6 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double /*sampleRate*/, int /
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
-
-	initializeOsc();
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -258,6 +257,8 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			}
 		}
 	}
+
+	initializeOsc();
 }
 
 OwnedArray<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray()
