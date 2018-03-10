@@ -493,7 +493,7 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	String text;
 	switch(columnId)
 	{
-	case COLUMN_ID_NB: text = String(rowNumber); break;
+	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pSpeakerArray->getUnchecked(rowNumber)->getName(); break;
 	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
 	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pSpeakerArray, rowNumber), 2); break;
