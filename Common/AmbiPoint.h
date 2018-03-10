@@ -141,9 +141,9 @@ public:
 		return id;
 	}
 
-	void setColorIndex(int colorIndex)
+	void setColorIndex(int color)
 	{
-		this->colorIndex = colorIndex;
+		colorIndex = color;
 	};
 
 private:
