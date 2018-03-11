@@ -10,7 +10,7 @@
 
 #pragma once
 #include "JuceHeader.h"
-#define DEFAULT_RECEIVE_FLAG		true
+#define DEFAULT_RECEIVE_FLAG		false
 #define DEFALUT_RECEIVE_PORT		50001
 #define DEFALUT_SEND_FLAG			true
 #define DEFAULT_SEND_PORT			50000

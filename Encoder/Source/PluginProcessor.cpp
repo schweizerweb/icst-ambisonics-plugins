@@ -33,6 +33,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pEncoderSettings = new EncoderSettings();
 	pOscHandler = new OSCHandler(&sourcesArray);
 	pOscSender = new AmbiOSCSender(&sourcesArray);
+	initializeOsc();
 
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
 	{
