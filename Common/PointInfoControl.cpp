@@ -43,27 +43,27 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
     textName->setPopupMenuEnabled (true);
     textName->setText (String());
 
-    textName->setBounds (136, 8, 216, 24);
+    textName->setBounds (120, 8, 144, 24);
 
-    addAndMakeVisible (label2 = new Label ("new label",
-                                           TRANS("Name:")));
-    label2->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label2->setJustificationType (Justification::centredLeft);
-    label2->setEditable (false, false, false);
-    label2->setColour (TextEditor::textColourId, Colours::black);
-    label2->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    addAndMakeVisible (labelName = new Label ("labelName",
+                                              TRANS("Name:")));
+    labelName->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelName->setJustificationType (Justification::centredLeft);
+    labelName->setEditable (false, false, false);
+    labelName->setColour (TextEditor::textColourId, Colours::black);
+    labelName->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label2->setBounds (0, 8, 104, 24);
+    labelName->setBounds (0, 8, 80, 24);
 
-    addAndMakeVisible (label3 = new Label ("new label",
+    addAndMakeVisible (labelX = new Label ("labelX",
                                            TRANS("X:")));
-    label3->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label3->setJustificationType (Justification::centredLeft);
-    label3->setEditable (false, false, false);
-    label3->setColour (TextEditor::textColourId, Colours::black);
-    label3->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelX->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelX->setJustificationType (Justification::centredLeft);
+    labelX->setEditable (false, false, false);
+    labelX->setColour (TextEditor::textColourId, Colours::black);
+    labelX->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label3->setBounds (112, 40, 24, 24);
+    labelX->setBounds (88, 40, 24, 24);
 
     addAndMakeVisible (textX = new TextEditor ("textX"));
     textX->setMultiLine (false);
@@ -74,17 +74,17 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
     textX->setPopupMenuEnabled (true);
     textX->setText (String());
 
-    textX->setBounds (136, 40, 56, 24);
+    textX->setBounds (120, 40, 56, 24);
 
-    addAndMakeVisible (label4 = new Label ("new label",
+    addAndMakeVisible (labelY = new Label ("labelY",
                                            TRANS("Y:")));
-    label4->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label4->setJustificationType (Justification::centredLeft);
-    label4->setEditable (false, false, false);
-    label4->setColour (TextEditor::textColourId, Colours::black);
-    label4->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelY->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelY->setJustificationType (Justification::centredLeft);
+    labelY->setEditable (false, false, false);
+    labelY->setColour (TextEditor::textColourId, Colours::black);
+    labelY->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label4->setBounds (192, 40, 24, 24);
+    labelY->setBounds (176, 40, 24, 24);
 
     addAndMakeVisible (textY = new TextEditor ("textY"));
     textY->setMultiLine (false);
@@ -95,17 +95,17 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
     textY->setPopupMenuEnabled (true);
     textY->setText (String());
 
-    textY->setBounds (216, 40, 56, 24);
+    textY->setBounds (208, 40, 56, 24);
 
-    addAndMakeVisible (label5 = new Label ("new label",
+    addAndMakeVisible (labelZ = new Label ("labelZ",
                                            TRANS("Z:")));
-    label5->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label5->setJustificationType (Justification::centredLeft);
-    label5->setEditable (false, false, false);
-    label5->setColour (TextEditor::textColourId, Colours::black);
-    label5->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelZ->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelZ->setJustificationType (Justification::centredLeft);
+    labelZ->setEditable (false, false, false);
+    labelZ->setColour (TextEditor::textColourId, Colours::black);
+    labelZ->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label5->setBounds (273, 40, 24, 24);
+    labelZ->setBounds (265, 40, 24, 24);
 
     addAndMakeVisible (textZ = new TextEditor ("textZ"));
     textZ->setMultiLine (false);
@@ -118,25 +118,25 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
 
     textZ->setBounds (297, 40, 55, 24);
 
-    addAndMakeVisible (label6 = new Label ("new label",
-                                           TRANS("Cartesian:")));
-    label6->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label6->setJustificationType (Justification::centredLeft);
-    label6->setEditable (false, false, false);
-    label6->setColour (TextEditor::textColourId, Colours::black);
-    label6->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    addAndMakeVisible (labelCartesian = new Label ("labelCartesian",
+                                                   TRANS("Cartesian:")));
+    labelCartesian->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelCartesian->setJustificationType (Justification::centredLeft);
+    labelCartesian->setEditable (false, false, false);
+    labelCartesian->setColour (TextEditor::textColourId, Colours::black);
+    labelCartesian->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label6->setBounds (0, 40, 104, 24);
+    labelCartesian->setBounds (0, 40, 80, 24);
 
-    addAndMakeVisible (label7 = new Label ("new label",
+    addAndMakeVisible (labelA = new Label ("labelA",
                                            TRANS("A:")));
-    label7->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label7->setJustificationType (Justification::centredLeft);
-    label7->setEditable (false, false, false);
-    label7->setColour (TextEditor::textColourId, Colours::black);
-    label7->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelA->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelA->setJustificationType (Justification::centredLeft);
+    labelA->setEditable (false, false, false);
+    labelA->setColour (TextEditor::textColourId, Colours::black);
+    labelA->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label7->setBounds (112, 72, 24, 24);
+    labelA->setBounds (88, 72, 24, 24);
 
     addAndMakeVisible (textA = new TextEditor ("textA"));
     textA->setMultiLine (false);
@@ -147,17 +147,17 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
     textA->setPopupMenuEnabled (true);
     textA->setText (String());
 
-    textA->setBounds (136, 72, 56, 24);
+    textA->setBounds (120, 72, 56, 24);
 
-    addAndMakeVisible (label8 = new Label ("new label",
+    addAndMakeVisible (labelE = new Label ("labelE",
                                            TRANS("E:")));
-    label8->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label8->setJustificationType (Justification::centredLeft);
-    label8->setEditable (false, false, false);
-    label8->setColour (TextEditor::textColourId, Colours::black);
-    label8->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelE->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelE->setJustificationType (Justification::centredLeft);
+    labelE->setEditable (false, false, false);
+    labelE->setColour (TextEditor::textColourId, Colours::black);
+    labelE->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label8->setBounds (192, 72, 24, 24);
+    labelE->setBounds (176, 72, 24, 24);
 
     addAndMakeVisible (textE = new TextEditor ("textE"));
     textE->setMultiLine (false);
@@ -168,17 +168,17 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
     textE->setPopupMenuEnabled (true);
     textE->setText (String());
 
-    textE->setBounds (216, 72, 56, 24);
+    textE->setBounds (208, 72, 56, 24);
 
-    addAndMakeVisible (label9 = new Label ("new label",
+    addAndMakeVisible (labelD = new Label ("labelD",
                                            TRANS("D:")));
-    label9->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label9->setJustificationType (Justification::centredLeft);
-    label9->setEditable (false, false, false);
-    label9->setColour (TextEditor::textColourId, Colours::black);
-    label9->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelD->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelD->setJustificationType (Justification::centredLeft);
+    labelD->setEditable (false, false, false);
+    labelD->setColour (TextEditor::textColourId, Colours::black);
+    labelD->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label9->setBounds (273, 72, 24, 24);
+    labelD->setBounds (265, 72, 24, 24);
 
     addAndMakeVisible (textD = new TextEditor ("textD"));
     textD->setMultiLine (false);
@@ -191,15 +191,36 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
 
     textD->setBounds (297, 72, 55, 24);
 
-    addAndMakeVisible (label10 = new Label ("new label",
-                                            TRANS("Polar:")));
-    label10->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label10->setJustificationType (Justification::centredLeft);
-    label10->setEditable (false, false, false);
-    label10->setColour (TextEditor::textColourId, Colours::black);
-    label10->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    addAndMakeVisible (labelPolar = new Label ("labelPolar",
+                                               TRANS("Polar:")));
+    labelPolar->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPolar->setJustificationType (Justification::centredLeft);
+    labelPolar->setEditable (false, false, false);
+    labelPolar->setColour (TextEditor::textColourId, Colours::black);
+    labelPolar->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    label10->setBounds (0, 72, 104, 24);
+    labelPolar->setBounds (0, 72, 80, 24);
+
+    addAndMakeVisible (labelCH = new Label ("labelCH",
+                                            TRANS("CH:")));
+    labelCH->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelCH->setJustificationType (Justification::centredLeft);
+    labelCH->setEditable (false, false, false);
+    labelCH->setColour (TextEditor::textColourId, Colours::black);
+    labelCH->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelCH->setBounds (264, 8, 32, 24);
+
+    addAndMakeVisible (textCH = new TextEditor ("textCH"));
+    textCH->setMultiLine (false);
+    textCH->setReturnKeyStartsNewLine (false);
+    textCH->setReadOnly (true);
+    textCH->setScrollbarsShown (true);
+    textCH->setCaretVisible (false);
+    textCH->setPopupMenuEnabled (true);
+    textCH->setText (String());
+
+    textCH->setBounds (296, 8, 55, 24);
 
 
     //[UserPreSize]
@@ -210,6 +231,8 @@ PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray,
 
 
     //[Constructor] You can add your own custom stuff here..
+	textCH->setVisible(pRadarOptions->maxNumberEditablePoints > 1);
+	labelCH->setVisible(pRadarOptions->maxNumberEditablePoints > 1);
 	updateSelectedPoint();
 	pPointSelection->addChangeListener(this);
     //[/Constructor]
@@ -221,21 +244,23 @@ PointInfoControl::~PointInfoControl()
     //[/Destructor_pre]
 
     textName = nullptr;
-    label2 = nullptr;
-    label3 = nullptr;
+    labelName = nullptr;
+    labelX = nullptr;
     textX = nullptr;
-    label4 = nullptr;
+    labelY = nullptr;
     textY = nullptr;
-    label5 = nullptr;
+    labelZ = nullptr;
     textZ = nullptr;
-    label6 = nullptr;
-    label7 = nullptr;
+    labelCartesian = nullptr;
+    labelA = nullptr;
     textA = nullptr;
-    label8 = nullptr;
+    labelE = nullptr;
     textE = nullptr;
-    label9 = nullptr;
+    labelD = nullptr;
     textD = nullptr;
-    label10 = nullptr;
+    labelPolar = nullptr;
+    labelCH = nullptr;
+    textCH = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -277,6 +302,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 
 		setFieldsEnabled(true);
 		textName->setText(point->getName());
+		textCH->setText(String(selection + 1));
 		if (exceptField != textX->getName()) textX->setText(String(point->getPoint()->getX(), 3));
 		if (exceptField != textY->getName()) textY->setText(String(point->getPoint()->getY(), 3));
 		if (exceptField != textZ->getName()) textZ->setText(String(point->getPoint()->getZ(), 3));
@@ -288,6 +314,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	{
 		setFieldsEnabled(false);
 		textName->setText("-");
+		textCH->setText("-");
 		textX->setText("-");
 		textY->setText("-");
 		textZ->setText("-");
@@ -408,71 +435,79 @@ BEGIN_JUCER_METADATA
                  fixedSize="1" initialWidth="360" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>
   <TEXTEDITOR name="textName" id="2b706cdb3232f1d2" memberName="textName" virtualName=""
-              explicitFocusOrder="0" pos="136 8 216 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="120 8 144 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
-  <LABEL name="new label" id="7326de7683af8e2f" memberName="label2" virtualName=""
-         explicitFocusOrder="0" pos="0 8 104 24" edTextCol="ff000000"
+  <LABEL name="labelName" id="7326de7683af8e2f" memberName="labelName"
+         virtualName="" explicitFocusOrder="0" pos="0 8 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Name:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="6fb8ecbc6da5fa76" memberName="label3" virtualName=""
-         explicitFocusOrder="0" pos="112 40 24 24" edTextCol="ff000000"
+  <LABEL name="labelX" id="6fb8ecbc6da5fa76" memberName="labelX" virtualName=""
+         explicitFocusOrder="0" pos="88 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="X:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textX" id="4dcd5fc970cdce6c" memberName="textX" virtualName=""
-              explicitFocusOrder="0" pos="136 40 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="120 40 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="d8cf1d21dc85896e" memberName="label4" virtualName=""
-         explicitFocusOrder="0" pos="192 40 24 24" edTextCol="ff000000"
+  <LABEL name="labelY" id="d8cf1d21dc85896e" memberName="labelY" virtualName=""
+         explicitFocusOrder="0" pos="176 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Y:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textY" id="46b4702ec60c236a" memberName="textY" virtualName=""
-              explicitFocusOrder="0" pos="216 40 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="208 40 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="385e50956f13effd" memberName="label5" virtualName=""
-         explicitFocusOrder="0" pos="273 40 24 24" edTextCol="ff000000"
+  <LABEL name="labelZ" id="385e50956f13effd" memberName="labelZ" virtualName=""
+         explicitFocusOrder="0" pos="265 40 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Z:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textZ" id="93f9644500f2da7f" memberName="textZ" virtualName=""
               explicitFocusOrder="0" pos="297 40 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="f2af390154f0c032" memberName="label6" virtualName=""
-         explicitFocusOrder="0" pos="0 40 104 24" edTextCol="ff000000"
+  <LABEL name="labelCartesian" id="f2af390154f0c032" memberName="labelCartesian"
+         virtualName="" explicitFocusOrder="0" pos="0 40 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Cartesian:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="c8e81a0262f1ac25" memberName="label7" virtualName=""
-         explicitFocusOrder="0" pos="112 72 24 24" edTextCol="ff000000"
+  <LABEL name="labelA" id="c8e81a0262f1ac25" memberName="labelA" virtualName=""
+         explicitFocusOrder="0" pos="88 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="A:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textA" id="e76184fec37afbfb" memberName="textA" virtualName=""
-              explicitFocusOrder="0" pos="136 72 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="120 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="6af5bb62c259b445" memberName="label8" virtualName=""
-         explicitFocusOrder="0" pos="192 72 24 24" edTextCol="ff000000"
+  <LABEL name="labelE" id="6af5bb62c259b445" memberName="labelE" virtualName=""
+         explicitFocusOrder="0" pos="176 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="E:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textE" id="7fb39984576e614e" memberName="textE" virtualName=""
-              explicitFocusOrder="0" pos="216 72 56 24" initialText="" multiline="0"
+              explicitFocusOrder="0" pos="208 72 56 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="b1bd9596558e6f35" memberName="label9" virtualName=""
-         explicitFocusOrder="0" pos="273 72 24 24" edTextCol="ff000000"
+  <LABEL name="labelD" id="b1bd9596558e6f35" memberName="labelD" virtualName=""
+         explicitFocusOrder="0" pos="265 72 24 24" edTextCol="ff000000"
          edBkgCol="0" labelText="D:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textD" id="411a4503627ed096" memberName="textD" virtualName=""
               explicitFocusOrder="0" pos="297 72 55 24" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="new label" id="41fcd21e0ce12407" memberName="label10" virtualName=""
-         explicitFocusOrder="0" pos="0 72 104 24" edTextCol="ff000000"
+  <LABEL name="labelPolar" id="41fcd21e0ce12407" memberName="labelPolar"
+         virtualName="" explicitFocusOrder="0" pos="0 72 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Polar:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+  <LABEL name="labelCH" id="6db02d6b63396cba" memberName="labelCH" virtualName=""
+         explicitFocusOrder="0" pos="264 8 32 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="CH:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+  <TEXTEDITOR name="textCH" id="d9bdcb7a01c25c33" memberName="textCH" virtualName=""
+              explicitFocusOrder="0" pos="296 8 55 24" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

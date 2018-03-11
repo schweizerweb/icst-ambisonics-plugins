@@ -69,21 +69,23 @@ private:
 
     //==============================================================================
     ScopedPointer<TextEditor> textName;
-    ScopedPointer<Label> label2;
-    ScopedPointer<Label> label3;
+    ScopedPointer<Label> labelName;
+    ScopedPointer<Label> labelX;
     ScopedPointer<TextEditor> textX;
-    ScopedPointer<Label> label4;
+    ScopedPointer<Label> labelY;
     ScopedPointer<TextEditor> textY;
-    ScopedPointer<Label> label5;
+    ScopedPointer<Label> labelZ;
     ScopedPointer<TextEditor> textZ;
-    ScopedPointer<Label> label6;
-    ScopedPointer<Label> label7;
+    ScopedPointer<Label> labelCartesian;
+    ScopedPointer<Label> labelA;
     ScopedPointer<TextEditor> textA;
-    ScopedPointer<Label> label8;
+    ScopedPointer<Label> labelE;
     ScopedPointer<TextEditor> textE;
-    ScopedPointer<Label> label9;
+    ScopedPointer<Label> labelD;
     ScopedPointer<TextEditor> textD;
-    ScopedPointer<Label> label10;
+    ScopedPointer<Label> labelPolar;
+    ScopedPointer<Label> labelCH;
+    ScopedPointer<TextEditor> textCH;
 
 
     //==============================================================================

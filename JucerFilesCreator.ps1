@@ -8,7 +8,12 @@ $EncoderVersions =
 @{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" },
 @{ Order = 3; Input = 1; Description = "3nd Order Ambisonic, 1 Channel Input" },
 @{ Order = 4; Input = 1; Description = "4nd Order Ambisonic, 1 Channel Input" },
-@{ Order = 5; Input = 1; Description = "5nd Order Ambisonic, 1 Channel Input" }
+@{ Order = 5; Input = 1; Description = "5nd Order Ambisonic, 1 Channel Input" },
+@{ Order = 1; Input = 32; Description = "1st Order Ambisonic, 32 Channel Input" },
+@{ Order = 2; Input = 32; Description = "2nd Order Ambisonic, 32 Channel Input" },
+@{ Order = 3; Input = 32; Description = "3nd Order Ambisonic, 32 Channel Input" },
+@{ Order = 4; Input = 32; Description = "4nd Order Ambisonic, 32 Channel Input" },
+@{ Order = 5; Input = 32; Description = "5nd Order Ambisonic, 32 Channel Input" }
 )
 
 $DecoderVersions =
