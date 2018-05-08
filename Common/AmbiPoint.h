@@ -91,7 +91,6 @@ public:
 	void setName(String newName)
 	{
 		name = newName;
-		colorIndex = newName.initialSectionContainingOnly("0123456789").getIntValue();
 	}
 
 	double getGain() const
