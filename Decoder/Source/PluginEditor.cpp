@@ -35,6 +35,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     //[Constructor_pre] You can add your own custom stuff here..
 	radarOptions.nameFieldEditable = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
+	radarOptions.editablePointsAsSquare = true;
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();

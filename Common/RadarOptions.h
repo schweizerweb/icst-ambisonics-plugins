@@ -21,6 +21,7 @@ public:
 public:
 	bool nameFieldEditable;
 	int maxNumberEditablePoints;
+	bool editablePointsAsSquare;
 
 	Array<AudioParameterSet>* audioParams;
 };

@@ -50,7 +50,9 @@ private:
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
-	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select = false, float selectionSize = 0.0);
+	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
+	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select = false, float selectionSize = 0.0);
+	
 	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;

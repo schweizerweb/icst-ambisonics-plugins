@@ -112,6 +112,16 @@ float Radar2D::getSelectedPointSize(float scaler) const
 	return getEditablePointSize(scaler) * 1.5f;
 }
 
+void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const
+{
+	double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getY(), pt->getZ())) + PI * 0.25;
+
+	Path p;
+	p.addPolygon(*screenPt, 4, pointSize, float(angle));
+	p.closeSubPath();
+	g->fillPath(p);
+}
+
 void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const
 {
 	int y = int(screenPt.getY() + (screenPt.getY() < (offset + getFontSize()) ? 2.0 : -1.0) * offset);
@@ -126,21 +136,33 @@ void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, f
 	}
 }
 
-void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool select, float selectionSize)
+void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select, float selectionSize)
 {
-	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
+	Point3D<double>* pt = point->getPoint();
+	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(pt).toFloat());
 	if (select)
 	{
 		g->setColour(radarColors->getPointSelectionColor());
-		Rectangle<float> rect(selectionSize, selectionSize);
-		g->fillEllipse(rect.withCentre(screenPt));
+		if (square)
+			drawSquare(g, &screenPt, pt, selectionSize);
+		else
+		{
+			Rectangle<float> rect(selectionSize, selectionSize);
+			g->fillEllipse(rect.withCentre(screenPt));
+		}
 	}
 
 	g->setColour(trackColors.getColor(point->getColorIndex()));
-	Rectangle<float> rect(pointSize, pointSize);
-	g->fillEllipse(rect.withCentre(screenPt));
-			
-	paintPointLabel(g, point->getName(), screenPt, pointSize * 0.5f);
+	
+	if(square)
+		drawSquare(g, &screenPt, pt, pointSize);
+	else
+	{
+		Rectangle<float> rect(pointSize, pointSize);
+		g->fillEllipse(rect.withCentre(screenPt));
+	}
+	
+	paintPointLabel(g, point->getName(), screenPt, pointSize * (square ? 0.7f : 0.5f));
 }
 
 void Radar2D::renderOpenGL()
@@ -173,7 +195,7 @@ void Radar2D::renderOpenGL()
 			for (int i = 0; i < pEditablePointsArray->size(); i++)
 			{
 				float scaler = 1.0f + 10.0f * pEditablePointsArray->getUnchecked(i)->getRms();
-				paintPoint(&g, pEditablePointsArray->getUnchecked(i), getEditablePointSize(scaler), i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize(scaler));
+				paintPoint(&g, pEditablePointsArray->getUnchecked(i), getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare, i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize(scaler));
 			}
 		}
 
@@ -182,7 +204,7 @@ void Radar2D::renderOpenGL()
 			for (int i = 0; i < pDisplayOnlyPointsArray->size(); i++)
 			{
 				float scaler = 1.0f + 10.0f * pDisplayOnlyPointsArray->getUnchecked(i)->getRms();
-				paintPoint(&g, pDisplayOnlyPointsArray->getUnchecked(i), getDisplayOnlyPointSize(scaler));
+				paintPoint(&g, pDisplayOnlyPointsArray->getUnchecked(i), getDisplayOnlyPointSize(scaler), false);
 			}
 		}
 
