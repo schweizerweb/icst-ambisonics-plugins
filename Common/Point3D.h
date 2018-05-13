@@ -29,6 +29,12 @@
 #define SQRT1155	33.9852909359	/*sqrt(1155.0)*/
 #define SQRT165		12.8452325787	/*sqrt(165.0)*/
 #define SQRT385_2	13.8744369255	/*sqrt(385.0/2.0)*/
+#define SQRT13		3.60555127546	/*sqrt(13.0)*/
+#define SQRT3003_2	38.74919354		/*sqrt(3003.0/2.0)*/
+#define SQRT1001_2	22.3718573212	/*sqrt(1001.0/2.0)*/
+#define SQRT91		9.53939201417	/*sqrt(91.0)*/
+#define SQRT1365_2	26.1247009552	/*sqrt(1365.0/2.0)*/
+#define SQRT273		16.5227116419	/*sqrt(273)*/
 
 #define PI 3.1415926535897932384626433832795
 #define DISTANCE_MIN_VALUE 0.0001
@@ -243,6 +249,28 @@ public:
 		pCoefficients[33] = 1.0 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * cos3A * SQRT11;
 		pCoefficients[34] = 3.0 / 8.0 * SQRT385 * sinE * cosE4 * cos4A * SQRT11;
 		pCoefficients[35] = 3.0 / 8.0 * SQRT77_2 * cosE5 * cos5A * SQRT11;
+
+		if (numCoefficients < 49)	// 5th order
+			return;
+
+		ValueType cosE6 = pow(cos(e), 6.0);
+		ValueType sin6A = sin(6.0 * a);
+		ValueType sinE6 = pow(sin(e), 6.0);
+		ValueType cos6A = cos(6.0 * a);
+		pCoefficients[36] = 1.0 / 16.0 * SQRT3003_2 * cosE6 * sin6A * SQRT13;
+		pCoefficients[37] = 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * sin5A * SQRT13;
+		pCoefficients[38] = 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * sin4A * SQRT13;
+		pCoefficients[39] = 1.0 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * sin3A * SQRT13;
+		pCoefficients[40] = 1.0 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * sin2A * SQRT13;
+		pCoefficients[41] = 1.0 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * sinA * SQRT13;
+		pCoefficients[42] = 13.0 / 16.0 * (231.0 * sinE6 - 315.0 * sinE4 + 105.0 * sinE2 - 5.0);
+		pCoefficients[43] = 1.0 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * cosA * SQRT13;
+		pCoefficients[44] = 1.0 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * cos2A * SQRT13;
+		pCoefficients[45] = 1.0 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * cos3A * SQRT13;
+		pCoefficients[46] = 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * cos4A * SQRT13;
+		pCoefficients[47] = 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * cos5A * SQRT13;
+		pCoefficients[48] = 1.0 / 16.0 * SQRT3003_2 * cosE6 * cos6A * SQRT13;
+
 	}
 
 	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance, bool flipDirection)
