@@ -18,6 +18,7 @@
 #define DEFAULT_SEND_INTERVAL		50
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_UNIT_CIRCLE_SIZE	0.1f
+#define DEFAULT_DIRECTION_FLIP		false
 
 class EncoderSettings
 {
@@ -38,4 +39,6 @@ public:
 
 	bool distanceEncodingFlag;
 	float unitCircleRadius;
+
+	bool directionFlip;
 };

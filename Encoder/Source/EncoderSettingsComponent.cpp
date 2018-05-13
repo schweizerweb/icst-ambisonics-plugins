@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.0
 
   ------------------------------------------------------------------------------
 
@@ -145,6 +145,15 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
     labelUnitCircleRadius->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (groupOrientation = new GroupComponent ("groupOrientation",
+                                                              TRANS("Orientation")));
+
+    addAndMakeVisible (toggleDirectionFlip = new ToggleButton ("toggleDirectionFlip"));
+    toggleDirectionFlip->setButtonText (TRANS("Flip Direction"));
+    toggleDirectionFlip->addListener (this);
+
+    toggleDirectionFlip->setBounds (17, 312, 150, 24);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -167,6 +176,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
 	textOscSendInterval->setText(String(pEncoderSettings->oscSendIntervalMs));
 	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
 	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
+	toggleDirectionFlip->setToggleState(pEncoderSettings->directionFlip, dontSendNotification);
     //[/Constructor]
 }
 
@@ -191,6 +201,8 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     toggleDistanceEncoding = nullptr;
     textUnitCircleRadius = nullptr;
     labelUnitCircleRadius = nullptr;
+    groupOrientation = nullptr;
+    toggleDirectionFlip = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -227,6 +239,7 @@ void EncoderSettingsComponent::resized()
     groupDistanceEncoding->setBounds (1, 218, getWidth() - 8, 64);
     textUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 21 - 105, 5 + 237, 105, 24);
     labelUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 142 - 109, 242, 109, 24);
+    groupOrientation->setBounds (1, 288, getWidth() - 8, 64);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -253,6 +266,12 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
 		pEncoderSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
         //[/UserButtonCode_toggleDistanceEncoding]
+    }
+    else if (buttonThatWasClicked == toggleDirectionFlip)
+    {
+        //[UserButtonCode_toggleDirectionFlip] -- add your button handler code here..
+		pEncoderSettings->directionFlip = toggleDirectionFlip->getToggleState();
+        //[/UserButtonCode_toggleDirectionFlip]
     }
 
     //[UserbuttonClicked_Post]
@@ -400,6 +419,11 @@ BEGIN_JUCER_METADATA
          labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+  <GROUPCOMPONENT name="groupOrientation" id="3d25e935657cd603" memberName="groupOrientation"
+                  virtualName="" explicitFocusOrder="0" pos="1 288 8M 64" title="Orientation"/>
+  <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"
+                virtualName="" explicitFocusOrder="0" pos="17 312 150 24" buttonText="Flip Direction"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
