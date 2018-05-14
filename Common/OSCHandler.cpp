@@ -103,6 +103,7 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 	ambiPt->getPoint()->setDistance(d);
 	ambiPt->setRms(rms);
 	ambiPt->setColorIndex(colorIndex);
+	ambiPt->setAlive(Time::currentTimeMillis());
 }
 
 void OSCHandler::HandleOwnExternStyle(const OSCMessage& message) const

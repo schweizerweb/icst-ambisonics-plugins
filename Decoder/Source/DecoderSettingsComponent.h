@@ -65,6 +65,8 @@ private:
     ScopedPointer<ToggleButton> toggleReceiveOsc;
     ScopedPointer<TextEditor> textOscPort;
     ScopedPointer<Label> labelOscPort;
+    ScopedPointer<TextEditor> textTimeout;
+    ScopedPointer<Label> labelTimeout;
 
 
     //==============================================================================

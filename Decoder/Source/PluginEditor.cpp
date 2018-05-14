@@ -149,8 +149,11 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler() const
+void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 {
+	// update timeout
+	radarOptions.displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
+
 	oscHandler->stop();
 
 	if (pDecoderSettings->oscReceive)

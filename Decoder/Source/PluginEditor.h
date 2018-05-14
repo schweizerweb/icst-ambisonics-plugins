@@ -49,7 +49,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void initializeOscHandler() const;
+    void initializeOscHandler();
     //[/UserMethods]
 
     void paint (Graphics& g) override;

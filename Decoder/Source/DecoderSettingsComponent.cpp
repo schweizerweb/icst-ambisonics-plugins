@@ -59,6 +59,23 @@ DecoderSettingsComponent::DecoderSettingsComponent (DecoderSettings* pSettings)
     labelOscPort->setColour (TextEditor::textColourId, Colours::black);
     labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    addAndMakeVisible (textTimeout = new TextEditor ("textTimeout"));
+    textTimeout->setMultiLine (false);
+    textTimeout->setReturnKeyStartsNewLine (false);
+    textTimeout->setReadOnly (false);
+    textTimeout->setScrollbarsShown (true);
+    textTimeout->setCaretVisible (true);
+    textTimeout->setPopupMenuEnabled (true);
+    textTimeout->setText (String());
+
+    addAndMakeVisible (labelTimeout = new Label ("labelTimeout",
+                                                 TRANS("Timeout [ms]:")));
+    labelTimeout->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelTimeout->setJustificationType (Justification::centredLeft);
+    labelTimeout->setEditable (false, false, false);
+    labelTimeout->setColour (TextEditor::textColourId, Colours::black);
+    labelTimeout->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -68,8 +85,10 @@ DecoderSettingsComponent::DecoderSettingsComponent (DecoderSettings* pSettings)
 
     //[Constructor] You can add your own custom stuff here..
 	textOscPort->addListener(this);
+	textTimeout->addListener(this);
 	toggleReceiveOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
+	textTimeout->setText(String(pDecoderSettings->oscReceiveTimeoutMs));
     //[/Constructor]
 }
 
@@ -82,6 +101,8 @@ DecoderSettingsComponent::~DecoderSettingsComponent()
     toggleReceiveOsc = nullptr;
     textOscPort = nullptr;
     labelOscPort = nullptr;
+    textTimeout = nullptr;
+    labelTimeout = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -105,9 +126,11 @@ void DecoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupOsc->setBounds (8, 8, getWidth() - 8, 64);
+    groupOsc->setBounds (8, 8, getWidth() - 8, 96);
     textOscPort->setBounds (8 + (getWidth() - 8) - 20 - 142, 8 + 24, 142, 24);
-    labelOscPort->setBounds (8 + (getWidth() - 8) - 170 - 80, 32, 80, 24);
+    labelOscPort->setBounds (8 + (getWidth() - 8) - 170 - 105, 32, 105, 24);
+    textTimeout->setBounds (8 + (getWidth() - 8) - 20 - 142, 8 + 58, 142, 24);
+    labelTimeout->setBounds (8 + (getWidth() - 8) - 170 - 105, 66, 105, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -148,14 +171,29 @@ void DecoderSettingsComponent::showAsDialog(DecoderSettings* pSettings)
 
 void DecoderSettingsComponent::textEditorTextChanged(TextEditor& editor)
 {
-	if (textOscPort->getText().containsOnly("0123456789"))
+	if (&editor == textOscPort)
 	{
-		pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
+		if (textOscPort->getText().containsOnly("0123456789"))
+		{
+			pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
+		}
+		else
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid port number");
+			editor.undo();
+		}
 	}
-	else
+	else if (&editor == textTimeout)
 	{
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid port number");
-		editor.undo();
+		if (textTimeout->getText().containsOnly("0123456789"))
+		{
+			pDecoderSettings->oscReceiveTimeoutMs = textTimeout->getText().getIntValue();
+		}
+		else
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid timeout");
+			editor.undo();
+		}
 	}
 }
 
@@ -178,7 +216,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="500" initialHeight="200">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
-                  explicitFocusOrder="0" pos="8 8 8M 64" title="OSC"/>
+                  explicitFocusOrder="0" pos="8 8 8M 96" title="OSC"/>
   <TOGGLEBUTTON name="toggleReceiveOsc" id="8d9b70b5bf27a026" memberName="toggleReceiveOsc"
                 virtualName="" explicitFocusOrder="0" pos="24 32 150 24" buttonText="Enable OSC Receiver"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
@@ -187,10 +225,20 @@ BEGIN_JUCER_METADATA
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="170Rr 32 80 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="170Rr 32 105 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
+         bold="0" italic="0" justification="33"/>
+  <TEXTEDITOR name="textTimeout" id="337c3e6db7308866" memberName="textTimeout"
+              virtualName="" explicitFocusOrder="0" pos="20Rr 58 142 24" posRelativeX="f4cf3a53a6ef0d87"
+              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+  <LABEL name="labelTimeout" id="628a0500d66bc466" memberName="labelTimeout"
+         virtualName="" explicitFocusOrder="0" pos="170Rr 66 105 24" posRelativeX="f4cf3a53a6ef0d87"
+         edTextCol="ff000000" edBkgCol="0" labelText="Timeout [ms]:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
          bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 

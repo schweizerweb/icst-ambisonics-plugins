@@ -199,12 +199,21 @@ void Radar2D::renderOpenGL()
 			}
 		}
 
+		int64 referenceTime = Time::currentTimeMillis();
 		if (pDisplayOnlyPointsArray != nullptr)
 		{
-			for (int i = 0; i < pDisplayOnlyPointsArray->size(); i++)
+			for (int i = pDisplayOnlyPointsArray->size() - 1; i >= 0 ; i--)
 			{
-				float scaler = 1.0f + 10.0f * pDisplayOnlyPointsArray->getUnchecked(i)->getRms();
-				paintPoint(&g, pDisplayOnlyPointsArray->getUnchecked(i), getDisplayOnlyPointSize(scaler), false);
+				AmbiPoint* pt = pDisplayOnlyPointsArray->getUnchecked(i);
+ 				if (pt->checkAlive(referenceTime, pRadarOptions->displayTimeout))
+				{
+					float scaler = 1.0f + 10.0f * pt->getRms();
+					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), false);
+				}
+				else
+				{
+					pDisplayOnlyPointsArray->remove(i);
+				}
 			}
 		}
 
