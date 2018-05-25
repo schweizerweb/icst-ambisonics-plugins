@@ -12,21 +12,24 @@
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
+#define XML_TAG_ORIENTATION "Orientation"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_IP "Ip"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
+#define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
 
-EncoderSettings::EncoderSettings(): 
-	oscReceiveFlag(DEFAULT_RECEIVE_FLAG), 
-	oscReceivePort(DEFALUT_RECEIVE_PORT), 
-	oscSendFlag(DEFALUT_SEND_FLAG), 
-	oscSendPort(DEFAULT_SEND_PORT), 
+EncoderSettings::EncoderSettings():
+	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
+	oscReceivePort(DEFALUT_RECEIVE_PORT),
+	oscSendFlag(DEFALUT_SEND_FLAG),
+	oscSendPort(DEFAULT_SEND_PORT),
 	oscSendTargetHost(DEFAULT_SEND_HOST),
-	oscSendIntervalMs(DEFAULT_SEND_INTERVAL), 
-	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG), 
-	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE)
+	oscSendIntervalMs(DEFAULT_SEND_INTERVAL),
+	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
+	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE), 
+	directionFlip(DEFAULT_DIRECTION_FLIP)
 {
 }
 
@@ -55,6 +58,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, unitCircleRadius);
 	element->addChildElement(distanceEncoding);
 
+	XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
+	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, directionFlip);
+	element->addChildElement(orientation);
+
 	return element;
 }
 
@@ -78,5 +85,11 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	{
 		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
 		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
+	}
+
+	XmlElement* orientation = element->getChildByName(XML_TAG_ORIENTATION);
+	if(orientation != nullptr)
+	{
+		directionFlip = orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP);
 	}
 }
