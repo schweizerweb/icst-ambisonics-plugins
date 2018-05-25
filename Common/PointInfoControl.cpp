@@ -341,6 +341,7 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 	if (source.getName() == textName->getName())
 	{
 		pEditablePointsArray->getUnchecked(selection)->setName(textName->getText());
+		pEditablePointsArray->getUnchecked(selection)->setColorIndex(textName->getText().initialSectionContainingOnly("0123456789").getIntValue());
 	}
 
 	if (source.getName() == textX->getName())
