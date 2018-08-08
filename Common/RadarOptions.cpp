@@ -15,6 +15,8 @@ RadarOptions::RadarOptions()
 	nameFieldEditable = false;
 	maxNumberEditablePoints = -1;
 	audioParams = nullptr;
+	displayTimeout = 1000;
+	editablePointsAsSquare = false;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const

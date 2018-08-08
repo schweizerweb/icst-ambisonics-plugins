@@ -143,7 +143,17 @@ public:
 	void setColorIndex(int color)
 	{
 		colorIndex = color;
-	};
+	}
+
+	bool checkAlive(int64 referenceTime, int timeout) const
+	{
+		return (lastUpdate == 0 || referenceTime - lastUpdate < timeout);
+	}
+
+	void setAlive(int64 currentTimeMillis)
+	{
+		lastUpdate = currentTimeMillis;
+	}
 
 private:
 	String id;
@@ -152,6 +162,7 @@ private:
 	String name;
 	double gain;
 	float rms;
+	int64 lastUpdate = 0;
 };
 
 

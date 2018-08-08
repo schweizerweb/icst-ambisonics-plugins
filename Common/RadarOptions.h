@@ -22,6 +22,7 @@ public:
 	bool nameFieldEditable;
 	int maxNumberEditablePoints;
 	bool editablePointsAsSquare;
+	int displayTimeout;
 
 	Array<AudioParameterSet>* audioParams;
 };

@@ -10,7 +10,7 @@
 
 #include "DecoderSettings.h"
 
-DecoderSettings::DecoderSettings(): oscReceive(DEFALUT_RECEIVE_FLAG), oscReceivePort(DEFAULT_RECEIVE_PORT), lastUIWidth(DEFAULT_UI_WIDTH), lastUIHeight(DEFAULT_UI_HEIGTH)
+DecoderSettings::DecoderSettings(): oscReceive(DEFALUT_RECEIVE_FLAG), oscReceivePort(DEFAULT_RECEIVE_PORT), oscReceiveTimeoutMs(DEFAULT_RECEIVE_TIMEOUT), lastUIWidth(DEFAULT_UI_WIDTH), lastUIHeight(DEFAULT_UI_HEIGTH)
 {
 }
 
@@ -20,6 +20,7 @@ void DecoderSettings::saveToXml(XmlElement* xmlElement) const
 	xmlElement->setAttribute("uiHeight", lastUIHeight);
 	xmlElement->setAttribute("oscReceive", oscReceive);
 	xmlElement->setAttribute("oscReceivePort", oscReceivePort);
+	xmlElement->setAttribute("oscReceiveTimeoutMs", oscReceiveTimeoutMs);
 }
 
 void DecoderSettings::loadFromXml(XmlElement* xmlElement)
@@ -28,4 +29,5 @@ void DecoderSettings::loadFromXml(XmlElement* xmlElement)
 	lastUIHeight = jmax(xmlElement->getIntAttribute("uiHeight", lastUIHeight), DEFAULT_UI_HEIGTH);
 	oscReceive = xmlElement->getBoolAttribute("oscReceive", DEFALUT_RECEIVE_FLAG);
 	oscReceivePort = xmlElement->getIntAttribute("oscReceivePort", DEFAULT_RECEIVE_PORT);
+	oscReceiveTimeoutMs = xmlElement->getIntAttribute("oscReceiveTimeoutMs", DEFAULT_RECEIVE_TIMEOUT);
 }
