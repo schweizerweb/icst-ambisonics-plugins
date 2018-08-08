@@ -1,4 +1,4 @@
-$ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36 )
+$ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36, 49, 64 )
 $VersionFile = "./versionInformation.txt"
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
@@ -6,23 +6,29 @@ $EncoderVersions =
 @(
 @{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input" },
 @{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" },
-@{ Order = 3; Input = 1; Description = "3nd Order Ambisonic, 1 Channel Input" },
-@{ Order = 4; Input = 1; Description = "4nd Order Ambisonic, 1 Channel Input" },
-@{ Order = 5; Input = 1; Description = "5nd Order Ambisonic, 1 Channel Input" },
+@{ Order = 3; Input = 1; Description = "3rd Order Ambisonic, 1 Channel Input" },
+@{ Order = 4; Input = 1; Description = "4th Order Ambisonic, 1 Channel Input" },
+@{ Order = 5; Input = 1; Description = "5th Order Ambisonic, 1 Channel Input" },
+@{ Order = 6; Input = 1; Description = "6th Order Ambisonic, 1 Channel Input" },
+@{ Order = 7; Input = 1; Description = "7th Order Ambisonic, 1 Channel Input" },
 @{ Order = 1; Input = 32; Description = "1st Order Ambisonic, 32 Channel Input" },
 @{ Order = 2; Input = 32; Description = "2nd Order Ambisonic, 32 Channel Input" },
-@{ Order = 3; Input = 32; Description = "3nd Order Ambisonic, 32 Channel Input" },
-@{ Order = 4; Input = 32; Description = "4nd Order Ambisonic, 32 Channel Input" },
-@{ Order = 5; Input = 32; Description = "5nd Order Ambisonic, 32 Channel Input" }
+@{ Order = 3; Input = 32; Description = "3rd Order Ambisonic, 32 Channel Input" },
+@{ Order = 4; Input = 32; Description = "4th Order Ambisonic, 32 Channel Input" },
+@{ Order = 5; Input = 32; Description = "5th Order Ambisonic, 32 Channel Input" },
+@{ Order = 6; Input = 32; Description = "6th Order Ambisonic, 32 Channel Input" },
+@{ Order = 7; Input = 32; Description = "7th Order Ambisonic, 32 Channel Input" }
 )
 
 $DecoderVersions =
 @(
 @{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
 @{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" },
-@{ Order = 3; Output = 32; Description = "3nd Order Ambisonic, 32 Channel Output" },
-@{ Order = 4; Output = 32; Description = "4nd Order Ambisonic, 32 Channel Output" },
-@{ Order = 5; Output = 32; Description = "5nd Order Ambisonic, 32 Channel Output" }
+@{ Order = 3; Output = 32; Description = "3rd Order Ambisonic, 32 Channel Output" },
+@{ Order = 4; Output = 32; Description = "4th Order Ambisonic, 32 Channel Output" },
+@{ Order = 5; Output = 32; Description = "5th Order Ambisonic, 32 Channel Output" },
+@{ Order = 6; Output = 32; Description = "6th Order Ambisonic, 32 Channel Output" },
+@{ Order = 7; Output = 32; Description = "7th Order Ambisonic, 32 Channel Output" }
 )
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
