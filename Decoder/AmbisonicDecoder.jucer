@@ -10,8 +10,8 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbisonicDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.zhdk.ambisonicdecoder"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.3.0"
-              companyName="ZHdK">
+              pluginAAXCategory="2" jucerVersion="5.3.2" companyName="ZHdK"
+              pluginFormats="buildVST,buildVST3,buildAU">
   <MAINGROUP id="oa5A98" name="AmbisonicDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
@@ -162,4 +162,7 @@
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>

@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbisonicEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.zhdk.ambisonicencoder"
-              pluginAAXCategory="AAX_ePlugInCategory_Dynamics" jucerVersion="5.3.0">
+              pluginAAXCategory="2" jucerVersion="5.3.2" pluginFormats="buildVST,buildVST3,buildAU">
   <MAINGROUP id="kUoKTp" name="AmbisonicEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
       <FILE id="tPcKpu" name="EncoderSettingsComponent.cpp" compile="1" resource="0"
@@ -141,4 +141,7 @@
     <MODULE id="juce_video" showAllCode="1" useLocalCopy="0"/>
   </MODULES>
   <JUCEOPTIONS JUCE_QUICKTIME="disabled"/>
+  <LIVE_SETTINGS>
+    <WINDOWS/>
+  </LIVE_SETTINGS>
 </JUCERPROJECT>
