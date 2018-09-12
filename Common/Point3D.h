@@ -166,7 +166,7 @@ public:
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
 	String toShortStringAed()	{ return String(getAzimuth()*180/PI, 2) + ", " + String(getElevation()*180/PI, 2) + ", " + String(getDistance(), 2); }
 
-	void getAmbisonicsCoefficients(int numCoefficients, ValueType* pCoefficients, bool flipDirection)
+	void getAmbisonicsCoefficients(int numCoefficients, ValueType* pCoefficients, bool flipDirection, bool inverseNormalisation)
 	{
 		// speed optimized version, calculates all coefficients in one sequence
 
@@ -182,10 +182,10 @@ public:
 		ValueType cosE = cos(e);
 		ValueType sinA = sin(a);
 		ValueType cosA = cos(a);
-
-		pCoefficients[1] = 3.0 * cosE * sinA;
-		pCoefficients[2] = 3.0 * sinE;
-		pCoefficients[3] = 3.0 * cosE * cosA;
+		ValueType snf1 = inverseNormalisation ? 1.0 : 3.0;
+		pCoefficients[1] = snf1 * cosE * sinA;
+		pCoefficients[2] = snf1 * sinE;
+		pCoefficients[3] = snf1 * cosE * cosA;
 
 		if (numCoefficients < 9) // 1st order
 			return;
@@ -195,11 +195,12 @@ public:
 		ValueType sin2E = sin(2.0 * e);
 		ValueType sinE2 = pow(sin(e), 2.0);
 		ValueType cos2A = cos(2.0 * a);
-		pCoefficients[4] = SQRT15 / 2.0 * cosE2 * sin2A * SQRT5;
-		pCoefficients[5] = SQRT15 / 2.0 * sin2E * sinA * SQRT5;
-		pCoefficients[6] = 2.5 * (3 * sinE2 - 1);
-		pCoefficients[7] = SQRT15 / 2.0 * sin2E * cosA * SQRT5;
-		pCoefficients[8] = SQRT15 / 2.0 * cosE2 * cos2A * SQRT5;
+		ValueType nf2 = inverseNormalisation ? 1.0 / SQRT5 : SQRT5;
+		pCoefficients[4] = nf2 * SQRT15 / 2.0 * cosE2 * sin2A;
+		pCoefficients[5] = nf2 * SQRT15 / 2.0 * sin2E * sinA;
+		pCoefficients[6] = nf2 * SQRT5 / 2.0 * (3 * sinE2 - 1);
+		pCoefficients[7] = nf2 * SQRT15 / 2.0 * sin2E * cosA;
+		pCoefficients[8] = nf2 * SQRT15 / 2.0 * cosE2 * cos2A;
 
 		if (numCoefficients < 16)	// 2nd order
 			return;
@@ -207,13 +208,14 @@ public:
 		ValueType cosE3 = pow(cos(e), 3.0);
 		ValueType sin3A = sin(3.0 * a);
 		ValueType cos3A = cos(3.0 * a);
-		pCoefficients[9] = SQRT35_8 * cosE3 * sin3A * SQRT7;
-		pCoefficients[10] = SQRT105 / 2.0 * sinE * cosE2 * sin2A * SQRT7;
-		pCoefficients[11] = SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * sinA * SQRT7;
-		pCoefficients[12] = 3.5 * sinE * (5.0 * sinE2 - 3);
-		pCoefficients[13] = SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * cosA * SQRT7;
-		pCoefficients[14] = SQRT105 / 2.0 * sinE * cosE2 * cos2A * SQRT7;
-		pCoefficients[15] = SQRT35_8 * cosE3 * cos3A * SQRT7;
+		ValueType nf3 = inverseNormalisation ? 1.0 / SQRT7 : SQRT7;
+		pCoefficients[9] = nf3 * SQRT35_8 * cosE3 * sin3A;
+		pCoefficients[10] = nf3 * SQRT105 / 2.0 * sinE * cosE2 * sin2A;
+		pCoefficients[11] = nf3 * SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * sinA;
+		pCoefficients[12] = nf3 * SQRT7 / 2.0 * sinE * (5.0 * sinE2 - 3);
+		pCoefficients[13] = nf3 * SQRT21_8 * cosE * (5.0 * sinE2 - 1.0) * cosA;
+		pCoefficients[14] = nf3 * SQRT105 / 2.0 * sinE * cosE2 * cos2A;
+		pCoefficients[15] = nf3 * SQRT35_8 * cosE3 * cos3A;
 			
 		if (numCoefficients < 25)	// 3rd order
 			return;
@@ -222,15 +224,16 @@ public:
 		ValueType sin4A = sin(4.0 * a);
 		ValueType sinE4 = pow(sin(e), 4.0);
 		ValueType cos4A = cos(4.0 * a);
-		pCoefficients[16] = 9.0 / 8.0 * SQRT35 * cosE4 * sin4A;
-		pCoefficients[17] = 4.5 * SQRT35_2 * sinE * cosE3 * sin3A;
-		pCoefficients[18] = 9.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * sin2A;
-		pCoefficients[19] = 9.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * sinA;
-		pCoefficients[20] = 9.0 / 8.0 * (35.0 * sinE4 - 30.0 * sinE2 + 3.0);
-		pCoefficients[21] = 9.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * cosA;
-		pCoefficients[22] = 9.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * cos2A;
-		pCoefficients[23] = 4.5 * SQRT35_2 * sinE * cosE3 * cos3A;
-		pCoefficients[24] = 9.0 / 8.0 * SQRT35 * cosE4 * cos4A;
+		ValueType nf4 = inverseNormalisation ? 1.0 / 3.0 : 3.0;
+		pCoefficients[16] = nf4 * 3.0 / 8.0 * SQRT35 * cosE4 * sin4A;
+		pCoefficients[17] = nf4 * 1.5 * SQRT35_2 * sinE * cosE3 * sin3A;
+		pCoefficients[18] = nf4 * 3.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * sin2A;
+		pCoefficients[19] = nf4 * 3.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * sinA;
+		pCoefficients[20] = nf4 * 3.0 / 8.0 * (35.0 * sinE4 - 30.0 * sinE2 + 3.0);
+		pCoefficients[21] = nf4 * 3.0 / 4.0 * SQRT5_2 * sin2E * (7.0 * sinE2 - 3.0) * cosA;
+		pCoefficients[22] = nf4 * 3.0 * SQRT5 / 4.0 * (7.0 * sinE2 - 1.0) * cosE2 * cos2A;
+		pCoefficients[23] = nf4 * 1.5 * SQRT35_2 * sinE * cosE3 * cos3A;
+		pCoefficients[24] = nf4 * 3.0 / 8.0 * SQRT35 * cosE4 * cos4A;
 
 		if (numCoefficients < 36)	// 4th order
 			return;
@@ -240,17 +243,18 @@ public:
 		ValueType sinE5 = pow(sin(e), 5.0);
 		ValueType sinE3 = pow(sin(e), 3.0);
 		ValueType cos5A = cos(5.0 * a);
-		pCoefficients[25] = 3.0 / 8.0 * SQRT77_2 * cosE5 * sin5A * SQRT11;
-		pCoefficients[26] = 3.0 / 8.0 * SQRT385 * sinE * cosE4 * sin4A * SQRT11;
-		pCoefficients[27] = 1.0 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * sin3A * SQRT11;
-		pCoefficients[28] = SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * sin2A * SQRT11;
-		pCoefficients[29] = SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * sinA * SQRT11;
-		pCoefficients[30] = 11.0 / 8.0 * (63.0 * sinE5 - 70.0 * sinE3 + 15.0 * sinA);
-		pCoefficients[31] = SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * cosA * SQRT11;
-		pCoefficients[32] = SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * cos2A * SQRT11;
-		pCoefficients[33] = 1.0 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * cos3A * SQRT11;
-		pCoefficients[34] = 3.0 / 8.0 * SQRT385 * sinE * cosE4 * cos4A * SQRT11;
-		pCoefficients[35] = 3.0 / 8.0 * SQRT77_2 * cosE5 * cos5A * SQRT11;
+		ValueType nf5 = inverseNormalisation ? 1.0 / SQRT11 : SQRT11;
+		pCoefficients[25] = nf5 * 3.0 / 8.0 * SQRT77_2 * cosE5 * sin5A;
+		pCoefficients[26] = nf5 * 3.0 / 8.0 * SQRT385 * sinE * cosE4 * sin4A;
+		pCoefficients[27] = nf5 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * sin3A;
+		pCoefficients[28] = nf5 * SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * sin2A;
+		pCoefficients[29] = nf5 * SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * sinA;
+		pCoefficients[30] = nf5 * SQRT11 / 8.0 * (63.0 * sinE5 - 70.0 * sinE3 + 15.0 * sinA);
+		pCoefficients[31] = nf5 * SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * cosA;
+		pCoefficients[32] = nf5 * SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * cos2A;
+		pCoefficients[33] = nf5 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * cos3A;
+		pCoefficients[34] = nf5 * 3.0 / 8.0 * SQRT385 * sinE * cosE4 * cos4A;
+		pCoefficients[35] = nf5 * 3.0 / 8.0 * SQRT77_2 * cosE5 * cos5A;
 
 		if (numCoefficients < 49)	// 5th order
 			return;
@@ -259,19 +263,20 @@ public:
 		ValueType sin6A = sin(6.0 * a);
 		ValueType sinE6 = pow(sin(e), 6.0);
 		ValueType cos6A = cos(6.0 * a);
-		pCoefficients[36] = 1.0 / 16.0 * SQRT3003_2 * cosE6 * sin6A * SQRT13;
-		pCoefficients[37] = 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * sin5A * SQRT13;
-		pCoefficients[38] = 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * sin4A * SQRT13;
-		pCoefficients[39] = 1.0 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * sin3A * SQRT13;
-		pCoefficients[40] = 1.0 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * sin2A * SQRT13;
-		pCoefficients[41] = 1.0 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * sinA * SQRT13;
-		pCoefficients[42] = 13.0 / 16.0 * (231.0 * sinE6 - 315.0 * sinE4 + 105.0 * sinE2 - 5.0);
-		pCoefficients[43] = 1.0 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * cosA * SQRT13;
-		pCoefficients[44] = 1.0 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * cos2A * SQRT13;
-		pCoefficients[45] = 1.0 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * cos3A * SQRT13;
-		pCoefficients[46] = 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * cos4A * SQRT13;
-		pCoefficients[47] = 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * cos5A * SQRT13;
-		pCoefficients[48] = 1.0 / 16.0 * SQRT3003_2 * cosE6 * cos6A * SQRT13;
+		ValueType nf6 = inverseNormalisation ? 1.0 / SQRT13 : SQRT13;
+		pCoefficients[36] = nf6 / 16.0 * SQRT3003_2 * cosE6 * sin6A;
+		pCoefficients[37] = nf6 * 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * sin5A;
+		pCoefficients[38] = nf6 * 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * sin4A;
+		pCoefficients[39] = nf6 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * sin3A;
+		pCoefficients[40] = nf6 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * sin2A;
+		pCoefficients[41] = nf6 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * sinA;
+		pCoefficients[42] = nf6 * SQRT13 / 16.0 * (231.0 * sinE6 - 315.0 * sinE4 + 105.0 * sinE2 - 5.0);
+		pCoefficients[43] = nf6 / 16.0 * SQRT273 * sin2E * (33.0 * sinE4 - 30.0 * sinE2 + 5.0) * cosA;
+		pCoefficients[44] = nf6 / 16.0 * SQRT1365_2 * (33.0 * sinE4 - 18.0 * sinE2 + 1.0) * cosE2 * cos2A;
+		pCoefficients[45] = nf6 / 8.0 * SQRT1365_2 * sinE * (11.0 * sinE2 - 3.0) * cosE3 * cos3A;
+		pCoefficients[46] = nf6 * 3.0 / 16.0 * SQRT91 * (11.0 * sinE2 - 1.0) * cosE4 * cos4A;
+		pCoefficients[47] = nf6 * 3.0 / 8.0 * SQRT1001_2 * sinE * cosE5 * cos5A;
+		pCoefficients[48] = nf6 / 16.0 * SQRT3003_2 * cosE6 * cos6A;
 
 		if (numCoefficients < 64)	// 6th order
 			return;
@@ -280,168 +285,22 @@ public:
 		ValueType sin7A = sin(7.0 * a);
 		ValueType sinE7 = pow(sin(e), 7.0);
 		ValueType cos7A = cos(7.0 * a);
-		pCoefficients[49] = 3.0 / 32.0 * SQRT715 * cosE7 * sin7A * SQRT15;
-		pCoefficients[50] = 3.0 / 16.0 * SQRT5005_2 * sinE * cosE6 * sin6A * SQRT15;
-		pCoefficients[51] = 3.0 / 32.0 * SQRT385 * (13.0 * sinE2 - 1.0) * cosE5 * sin5A * SQRT15;
-		pCoefficients[52] = 3.0 / 16.0 * SQRT385 * (13.0 * sinE3 - 3.0 * sinE) * cosE4 * sin4A * SQRT15;
-		pCoefficients[53] = 3.0 / 32.0 * SQRT35 * (143.0 * sinE4 - 66.0 * sinE2 + 3.0) * cosE3 * sin3A * SQRT15;
-		pCoefficients[54] = 3.0 / 16.0 * SQRT35_2 * (143.0 * sinE5 - 110.0 * sinE3 + 15.0 * sinE) * cosE2 * sin2A * SQRT15;
-		pCoefficients[55] = 1.0 / 32.0 * SQRT105 * (429.0 * sinE6 - 495.0 * sinE4 + 135.0 * sinE2 - 5.0) * cosE * sinA * SQRT15;
-		pCoefficients[56] = 1.0 / 16.0 * 15.0 * (429.0 * sinE7 - 693.0 * sinE5 + 315.0 * sinE3 - 35.0 * sinE);
-		pCoefficients[57] = 1.0 / 32.0 * SQRT105 * (429.0 * sinE6 - 495.0 * sinE4 + 135.0 * sinE2 - 5.0) * cosE * cosA * SQRT15;
-		pCoefficients[58] = 3.0 / 16.0 * SQRT35_2 * (143.0 * sinE5 - 110.0 * sinE3 + 15.0 * sinE) * cosE2 * cos2A * SQRT15;
-		pCoefficients[59] = 3.0 / 32.0 * SQRT35 * (143.0 * sinE4 - 66.0 * sinE2 + 3.0) * cosE3 * cos3A * SQRT15;
-		pCoefficients[60] = 3.0 / 16.0 * SQRT385 * (13.0 * sinE3 - 3.0 * sinE) * cosE4 * cos4A * SQRT15;
-		pCoefficients[61] = 3.0 / 32.0 * SQRT385 * (13.0 * sinE2 - 1.0) * cosE5 * cos5A * SQRT15;
-		pCoefficients[62] = 3.0 / 16.0 * SQRT5005_2 * sinE * cosE6 * cos6A * SQRT15;
-		pCoefficients[63] = 3.0 / 32.0 * SQRT715 * cosE7 * cos7A * SQRT15;
-	}
-
-	ValueType getAmbisonicsCoefficient(int ambiChannel, bool applyDistance, bool flipDirection)
-	{
-		// first implementation of coefficient calculation, allows to apply distance gain and is easier to use for debugging
-
-		double value;
-		double a = (flipDirection ? -1.0 : 1.0) * getAzimuth();
-		double e = getElevation();
-		switch (ambiChannel) 
-		{
-		case 0: // W
-			value = 1.0; 
-			break;
-
-			////////////////////////////////////////////////
-			// Order 1
-			////////////////////////////////////////////////
-		case 1: // Y
-			value = 3 * sin(a) * cos(e);
-			break;
-		case 2: // Z
-			value = 3 * sin(e);
-			break;
-		case 3: // X
-			value = 3 * cos(a) * cos(e);
-			break;
-
-			////////////////////////////////////////////////
-			// Order 2
-			////////////////////////////////////////////////
-		case 4: // V
-			value = SQRT15 / 2.0 * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT5;
-			break;
-		case 5: // T
-			value = SQRT15 / 2.0 * sin(2.0 * e) * sin(a) * SQRT5;
-			break;
-		case 6:	// R
-			value = 2.5 * (3 * pow(sin(e), 2.0) - 1);
-			break;
-		case 7: // S
-			value = SQRT15 / 2.0 * sin(2 * e) * cos(a) * SQRT5;
-			break;
-		case 8: // U
-			value = SQRT15 / 2.0 * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT5;
-			break;
-
-			////////////////////////////////////////////////
-			// Order 3
-			////////////////////////////////////////////////
-		case 9: // Q
-			value = SQRT35_8 * pow(cos(e), 3.0) * sin(3.0 * a) * SQRT7;
-			break;
-		case 10:	// O
-			value = SQRT105 / 2.0 * sin(e) * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT7;
-			break;
-		case 11:	// M
-			value = SQRT21_8 * cos(e) * (5.0 * pow(sin(e), 2.0) - 1.0) * sin(a) * SQRT7;
-			break;
-		case 12:	// K
-			value = 3.5 * sin(e) * (5.0 * pow(sin(e), 2.0) - 3);
-			break;
-		case 13:	// L
-			value = SQRT21_8 * cos(e) * (5.0 * pow(sin(e), 2.0) - 1.0) * cos(a) * SQRT7;
-			break;
-		case 14:	// N
-			value = SQRT105 / 2.0 * sin(e) * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT7;
-			break;
-		case 15:	// P
-			value = SQRT35_8 * pow(cos(e), 3.0) * cos(3.0 * a) * SQRT7;
-			break;
-
-			////////////////////////////////////////////////
-			// Order 4
-			////////////////////////////////////////////////
-		case 16:
-			value = 9.0 / 8.0 * SQRT35 * pow(cos(e), 4.0) * sin(4.0 * a);
-			break;
-		case 17:
-			value = 4.5 * SQRT35_2 * sin(e) * pow(cos(e), 3.0) * sin(3.0 * a);
-			break;
-		case 18:
-			value = 9.0 * SQRT5 / 4.0 * (7.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * sin(2.0 * a);
-			break;
-		case 19:
-			value = 9.0 / 4.0 * SQRT5_2 * sin(2.0 * e) * (7.0 * pow(sin(e), 2.0) - 3.0) * sin(a);
-			break;
-		case 20:
-			value = 9.0 / 8.0 * (35.0 * pow(sin(e), 4.0) - 30.0 * pow(sin(e), 2.0) + 3.0);
-			break;
-		case 21:
-			value = 9.0 / 4.0 * SQRT5_2 * sin(2.0 * e) * (7.0 * pow(sin(e), 2.0) - 3.0) * cos(a);
-			break;
-		case 22:
-			value = 9.0 * SQRT5 / 4.0 * (7.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * cos(2.0 * a);
-			break;
-		case 23:
-			value = 4.5 * SQRT35_2 * sin(e) * pow(cos(e), 3.0) * cos(3.0 * a);
-			break;
-		case 24:
-			value = 9.0 / 8.0 * SQRT35 * pow(cos(e), 4.0) * cos(4.0 * a);
-			break;
-
-			////////////////////////////////////////////////
-			// Order 5
-			////////////////////////////////////////////////
-		case 25:
-			value = 3.0 / 8.0 * SQRT77_2 * pow(cos(e), 5.0) * sin(5.0 * a) * SQRT11;
-			break;
-		case 26:
-			value = 3.0 / 8.0 * SQRT385 * sin(e) * pow(cos(e), 4.0) * sin(4.0 * a) * SQRT11;
-			break;
-		case 27:
-			value = 1.0 / 8.0 * SQRT385_2 * (9.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 3.0) * sin(3.0 * a) * SQRT11;
-			break;
-		case 28:
-			value = SQRT1155 / 4.0 * sin(e) * (3.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * sin(2.0 * a) * SQRT11;
-			break;
-		case 29:
-			value = SQRT165 / 8.0 * (21.0 * pow(sin(e), 4.0) - 14.0 * pow(sin(e), 2.0) + 1.0) * cos(e) * sin(a) * SQRT11;
-			break;
-		case 30:
-			value = 11.0 / 8.0 * (63.0 * pow(sin(e), 5.0) - 70.0 * pow(sin(e), 3.0) + 15.0 * sin(a));
-			break;
-		case 31:
-			value = SQRT165 / 8.0 * (21.0 * pow(sin(e), 4.0) - 14.0 * pow(sin(e), 2.0) + 1.0) * cos(e) * cos(a) * SQRT11;
-			break;
-		case 32:
-			value = SQRT1155 / 4.0 * sin(e) * (3.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 2.0) * cos(2.0 * a) * SQRT11;
-			break;
-		case 33:
-			value = 1.0 / 8.0 * SQRT385_2 * (9.0 * pow(sin(e), 2.0) - 1.0) * pow(cos(e), 3.0) * cos(3.0 * a) * SQRT11;
-			break;
-		case 34:
-			value = 3.0 / 8.0 * SQRT385 * sin(e) * pow(cos(e), 4.0) * cos(4.0 * a) * SQRT11;
-			break;
-		case 35:
-			value = 3.0 / 8.0 * SQRT77_2 * pow(cos(e), 5.0) * cos(5.0 * a) * SQRT11;
-			break;
-		default:
-			return 0;
-		}
-		
-		if (applyDistance)
-			return (1.0-getDistance()) * value;
-		else
-			return value;
+		ValueType nf7 = inverseNormalisation ? 1.0 / SQRT15 : SQRT15;
+		pCoefficients[49] = nf7 * 3.0 / 32.0 * SQRT715 * cosE7 * sin7A;
+		pCoefficients[50] = nf7 * 3.0 / 16.0 * SQRT5005_2 * sinE * cosE6 * sin6A;
+		pCoefficients[51] = nf7 * 3.0 / 32.0 * SQRT385 * (13.0 * sinE2 - 1.0) * cosE5 * sin5A;
+		pCoefficients[52] = nf7 * 3.0 / 16.0 * SQRT385 * (13.0 * sinE3 - 3.0 * sinE) * cosE4 * sin4A;
+		pCoefficients[53] = nf7 * 3.0 / 32.0 * SQRT35 * (143.0 * sinE4 - 66.0 * sinE2 + 3.0) * cosE3 * sin3A;
+		pCoefficients[54] = nf7 * 3.0 / 16.0 * SQRT35_2 * (143.0 * sinE5 - 110.0 * sinE3 + 15.0 * sinE) * cosE2 * sin2A;
+		pCoefficients[55] = nf7 / 32.0 * SQRT105 * (429.0 * sinE6 - 495.0 * sinE4 + 135.0 * sinE2 - 5.0) * cosE * sinA;
+		pCoefficients[56] = nf7 / 16.0 * SQRT15 * (429.0 * sinE7 - 693.0 * sinE5 + 315.0 * sinE3 - 35.0 * sinE);
+		pCoefficients[57] = nf7 / 32.0 * SQRT105 * (429.0 * sinE6 - 495.0 * sinE4 + 135.0 * sinE2 - 5.0) * cosE * cosA;
+		pCoefficients[58] = nf7 * 3.0 / 16.0 * SQRT35_2 * (143.0 * sinE5 - 110.0 * sinE3 + 15.0 * sinE) * cosE2 * cos2A;
+		pCoefficients[59] = nf7 * 3.0 / 32.0 * SQRT35 * (143.0 * sinE4 - 66.0 * sinE2 + 3.0) * cosE3 * cos3A;
+		pCoefficients[60] = nf7 * 3.0 / 16.0 * SQRT385 * (13.0 * sinE3 - 3.0 * sinE) * cosE4 * cos4A;
+		pCoefficients[61] = nf7 * 3.0 / 32.0 * SQRT385 * (13.0 * sinE2 - 1.0) * cosE5 * cos5A;
+		pCoefficients[62] = nf7 * 3.0 / 16.0 * SQRT5005_2 * sinE * cosE6 * cos6A;
+		pCoefficients[63] = nf7 * 3.0 / 32.0 * SQRT715 * cosE7 * cos7A;
 	}
 
 private:
