@@ -13,6 +13,7 @@
               jucerVersion="5.3.2" companyName="ZHdK" pluginFormats="buildVST,buildVST3,buildAU">
   <MAINGROUP id="oa5A98" name="ZDec">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
+      <FILE id="roXymN" name="settings.png" compile="0" resource="1" file="../Resources/settings.png"/>
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
