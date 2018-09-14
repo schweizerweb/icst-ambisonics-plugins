@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -68,24 +68,24 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<TextEditor> textName;
-    ScopedPointer<Label> labelName;
-    ScopedPointer<Label> labelX;
-    ScopedPointer<TextEditor> textX;
-    ScopedPointer<Label> labelY;
-    ScopedPointer<TextEditor> textY;
-    ScopedPointer<Label> labelZ;
-    ScopedPointer<TextEditor> textZ;
-    ScopedPointer<Label> labelCartesian;
-    ScopedPointer<Label> labelA;
-    ScopedPointer<TextEditor> textA;
-    ScopedPointer<Label> labelE;
-    ScopedPointer<TextEditor> textE;
-    ScopedPointer<Label> labelD;
-    ScopedPointer<TextEditor> textD;
-    ScopedPointer<Label> labelPolar;
-    ScopedPointer<Label> labelCH;
-    ScopedPointer<TextEditor> textCH;
+    std::unique_ptr<TextEditor> textName;
+    std::unique_ptr<Label> labelName;
+    std::unique_ptr<Label> labelX;
+    std::unique_ptr<TextEditor> textX;
+    std::unique_ptr<Label> labelY;
+    std::unique_ptr<TextEditor> textY;
+    std::unique_ptr<Label> labelZ;
+    std::unique_ptr<TextEditor> textZ;
+    std::unique_ptr<Label> labelCartesian;
+    std::unique_ptr<Label> labelA;
+    std::unique_ptr<TextEditor> textA;
+    std::unique_ptr<Label> labelE;
+    std::unique_ptr<TextEditor> textE;
+    std::unique_ptr<Label> labelD;
+    std::unique_ptr<TextEditor> textD;
+    std::unique_ptr<Label> labelPolar;
+    std::unique_ptr<Label> labelCH;
+    std::unique_ptr<TextEditor> textCH;
 
 
     //==============================================================================
