@@ -132,7 +132,7 @@ public:
 
 	String getId()
 	{
-		if (id == String::empty)
+		if (id.isEmpty())
 		{
 			id = Uuid().toString();
 		}

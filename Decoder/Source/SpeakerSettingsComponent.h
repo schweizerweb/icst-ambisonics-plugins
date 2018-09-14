@@ -75,7 +75,7 @@ public:
 
 	void updateDirectionFlip() const;
 	void loadPreset(PresetInfo* preset) const;
-	void updateComboBox(String elementToSelect = String::empty) const;
+	void updateComboBox(String elementToSelect = String()) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
