@@ -23,10 +23,6 @@
             file="Source/DecoderSettings.cpp"/>
       <FILE id="vSACyw" name="DecoderSettings.h" compile="0" resource="0"
             file="Source/DecoderSettings.h"/>
-      <FILE id="cATjGk" name="DecoderSettingsComponent.cpp" compile="1" resource="0"
-            file="Source/DecoderSettingsComponent.cpp"/>
-      <FILE id="aCaxcN" name="DecoderSettingsComponent.h" compile="0" resource="0"
-            file="Source/DecoderSettingsComponent.h"/>
       <FILE id="cuZVRN" name="SpeakerTestCustomComponent.h" compile="0" resource="0"
             file="Source/SpeakerTestCustomComponent.h"/>
       <FILE id="ogZyJW" name="EditableTextCustomComponent.h" compile="0"
