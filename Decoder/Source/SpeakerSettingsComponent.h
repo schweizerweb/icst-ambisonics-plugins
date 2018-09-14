@@ -106,6 +106,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<GroupComponent> groupOsc;
     std::unique_ptr<GroupComponent> groupAmbisonics;
     std::unique_ptr<GroupComponent> groupSpeakers;
     std::unique_ptr<ComboBox> comboBoxChannelConfig;
@@ -125,12 +126,11 @@ private:
     std::unique_ptr<ToggleButton> btnFlipDirection;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<ToggleButton> btnEditMode;
-    std::unique_ptr<GroupComponent> groupOsc;
     std::unique_ptr<TextEditor> textOscPort;
     std::unique_ptr<Label> labelOscPort;
     std::unique_ptr<TextEditor> textTimeout;
     std::unique_ptr<Label> labelTimeout;
-    std::unique_ptr<ToggleButton> toggleReceiveOsc;
+    std::unique_ptr<ToggleButton> toggleOsc;
 
 
     //==============================================================================

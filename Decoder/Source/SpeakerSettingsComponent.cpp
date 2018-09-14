@@ -54,6 +54,10 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	addActionListener(pTestSoundListener);
     //[/Constructor_pre]
 
+    groupOsc.reset (new GroupComponent ("groupOsc",
+                                        TRANS("OSC")));
+    addAndMakeVisible (groupOsc.get());
+
     groupAmbisonics.reset (new GroupComponent ("groupAmbisonics",
                                                TRANS("Ambisonics")));
     addAndMakeVisible (groupAmbisonics.get());
@@ -174,10 +178,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
 
-    groupOsc.reset (new GroupComponent ("groupOsc",
-                                        TRANS("OSC")));
-    addAndMakeVisible (groupOsc.get());
-
     textOscPort.reset (new TextEditor ("textOscPort"));
     addAndMakeVisible (textOscPort.get());
     textOscPort->setMultiLine (false);
@@ -216,12 +216,12 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     labelTimeout->setColour (TextEditor::textColourId, Colours::black);
     labelTimeout->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    toggleReceiveOsc.reset (new ToggleButton ("toggleReceiveOsc"));
-    addAndMakeVisible (toggleReceiveOsc.get());
-    toggleReceiveOsc->setButtonText (TRANS("Enable OSC Receiver"));
-    toggleReceiveOsc->addListener (this);
+    toggleOsc.reset (new ToggleButton ("toggleOsc"));
+    addAndMakeVisible (toggleOsc.get());
+    toggleOsc->setButtonText (TRANS("Receive OSC messages"));
+    toggleOsc->addListener (this);
 
-    toggleReceiveOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 138, 24);
+    toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
 
 
     //[UserPreSize]
@@ -255,7 +255,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	// OSC
 	textOscPort->addListener(this);
 	textTimeout->addListener(this);
-	toggleReceiveOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
+	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
 	textTimeout->setText(String(pDecoderSettings->oscReceiveTimeoutMs));
 
@@ -269,6 +269,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
 	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
+    groupOsc = nullptr;
     groupAmbisonics = nullptr;
     groupSpeakers = nullptr;
     comboBoxChannelConfig = nullptr;
@@ -288,12 +289,11 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     btnFlipDirection = nullptr;
     labelDistanceScaler = nullptr;
     btnEditMode = nullptr;
-    groupOsc = nullptr;
     textOscPort = nullptr;
     labelOscPort = nullptr;
     textTimeout = nullptr;
     labelTimeout = nullptr;
-    toggleReceiveOsc = nullptr;
+    toggleOsc = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -317,6 +317,7 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
     groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 306);
     comboBoxChannelConfig->setBounds (8 + 240, 0 + 24, getWidth() - 369, 24);
@@ -330,7 +331,6 @@ void SpeakerSettingsComponent::resized()
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
     sliderDistanceScaler->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 16, getWidth() - 178, 24);
     ambiChannelControl->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
-    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
     textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 24, 130, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 19, 93, 24);
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
@@ -342,6 +342,7 @@ void SpeakerSettingsComponent::resized()
 	buttonBasic->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 64, 120, 24);
 	buttonInPhase->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 96, 120, 24);
 	btnFlipDirection->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 128, 120, 24);
+	toggleOsc->setBounds((8 + 12) + 0, (0 + (getHeight() - 306)) + 220, 150, 30);	// needed because of JUCE bug
     //[/UserResized]
 }
 
@@ -526,11 +527,11 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		controlDimming();
         //[/UserButtonCode_btnEditMode]
     }
-    else if (buttonThatWasClicked == toggleReceiveOsc.get())
+    else if (buttonThatWasClicked == toggleOsc.get())
     {
-        //[UserButtonCode_toggleReceiveOsc] -- add your button handler code here..
-		pDecoderSettings->oscReceive = toggleReceiveOsc->getToggleState();
-        //[/UserButtonCode_toggleReceiveOsc]
+        //[UserButtonCode_toggleOsc] -- add your button handler code here..
+		pDecoderSettings->oscReceive = toggleOsc->getToggleState();
+        //[/UserButtonCode_toggleOsc]
     }
 
     //[UserbuttonClicked_Post]
@@ -919,6 +920,10 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="800" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>
+  <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
+                  explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
+                  posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
+                  title="OSC"/>
   <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
                   virtualName="" explicitFocusOrder="0" pos="0 0R 0M 200" posRelativeX="450188aa0f332e78"
                   posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
@@ -1001,10 +1006,6 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="16 24 150 24" posRelativeX="450188aa0f332e78"
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
-  <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
-                  explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
-                  posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                  title="OSC"/>
   <TEXTEDITOR name="textOscPort" id="ef3c7d2594795ec7" memberName="textOscPort"
               virtualName="" explicitFocusOrder="0" pos="20Rr 24 130 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -1025,9 +1026,9 @@ BEGIN_JUCER_METADATA
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="toggleReceiveOsc" id="8d9b70b5bf27a026" memberName="toggleReceiveOsc"
-                virtualName="" explicitFocusOrder="0" pos="12 24 138 24" posRelativeX="f4cf3a53a6ef0d87"
-                posRelativeY="f4cf3a53a6ef0d87" buttonText="Enable OSC Receiver"
+  <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
+                virtualName="" explicitFocusOrder="0" pos="12 24 180 24" posRelativeX="f4cf3a53a6ef0d87"
+                posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
