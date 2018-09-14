@@ -70,16 +70,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     comboBoxChannelConfig->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxChannelConfig->addListener (this);
 
-    label.reset (new Label ("new label",
-                            TRANS("Presets:")));
-    addAndMakeVisible (label.get());
-    label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label->setJustificationType (Justification::centredLeft);
-    label->setEditable (false, false, false);
-    label->setColour (TextEditor::textColourId, Colours::black);
-    label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    label->setBounds (8 + 16, 40 + 24, 64, 24);
+    labelPresets.reset (new Label ("labelPresets",
+                                   TRANS("Presets:")));
+    addAndMakeVisible (labelPresets.get());
+    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setEditable (false, false, false);
+    labelPresets->setColour (TextEditor::textColourId, Colours::black);
+    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     buttonLoad.reset (new TextButton ("buttonLoad"));
     addAndMakeVisible (buttonLoad.get());
@@ -131,7 +129,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     buttonBasic->setButtonText (TRANS("reset to basic"));
     buttonBasic->addListener (this);
 
-    buttonBasic->setBounds ((8 + 0) + 12, (40 + (getHeight() - 346)) + 64, 120, 24);
+    buttonBasic->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 64, 120, 24);
 
     labelChannelWeights.reset (new Label ("labelChannelWeights",
                                           TRANS("Channel weights")));
@@ -142,21 +140,21 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     labelChannelWeights->setColour (TextEditor::textColourId, Colours::black);
     labelChannelWeights->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelChannelWeights->setBounds ((8 + 0) + 8, (40 + (getHeight() - 346)) + 40, 112, 24);
+    labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 40, 112, 24);
 
     buttonInPhase.reset (new TextButton ("buttonInPhase"));
     addAndMakeVisible (buttonInPhase.get());
     buttonInPhase->setButtonText (TRANS("calculate in-phase"));
     buttonInPhase->addListener (this);
 
-    buttonInPhase->setBounds ((8 + 0) + 12, (40 + (getHeight() - 346)) + 96, 120, 24);
+    buttonInPhase->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 96, 120, 24);
 
     btnFlipDirection.reset (new ToggleButton ("btnFlipDirection"));
     addAndMakeVisible (btnFlipDirection.get());
     btnFlipDirection->setButtonText (TRANS("Flip direction"));
     btnFlipDirection->addListener (this);
 
-    btnFlipDirection->setBounds ((8 + 0) + 12, (40 + (getHeight() - 346)) + 128, 120, 24);
+    btnFlipDirection->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 128, 120, 24);
 
     labelDistanceScaler.reset (new Label ("labelDistanceScaler",
                                           TRANS("Distance scaler")));
@@ -167,14 +165,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     labelDistanceScaler->setColour (TextEditor::textColourId, Colours::black);
     labelDistanceScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelDistanceScaler->setBounds ((8 + 0) + 8, (40 + (getHeight() - 346)) + 15, 150, 24);
+    labelDistanceScaler->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 15, 150, 24);
 
     btnEditMode.reset (new ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
     btnEditMode->setButtonText (TRANS("Edit mode"));
     btnEditMode->addListener (this);
 
-    btnEditMode->setBounds (8, 8, 150, 24);
+    btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
 
     groupOsc.reset (new GroupComponent ("groupOsc",
                                         TRANS("OSC")));
@@ -223,7 +221,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
     toggleReceiveOsc->setButtonText (TRANS("Enable OSC Receiver"));
     toggleReceiveOsc->addListener (this);
 
-    toggleReceiveOsc->setBounds (((8 + 0) + 0) + 12, ((40 + (getHeight() - 346)) + 200) + 24, 138, 24);
+    toggleReceiveOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 138, 24);
 
 
     //[UserPreSize]
@@ -252,6 +250,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	pPointSelection->addChangeListener(this);
 	updateDistanceScaler();
 	updateDirectionFlip();
+	btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
 
 	// OSC
 	textOscPort->addListener(this);
@@ -259,6 +258,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	toggleReceiveOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
 	textTimeout->setText(String(pDecoderSettings->oscReceiveTimeoutMs));
+
+	controlDimming();
     //[/Constructor]
 }
 
@@ -271,7 +272,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     groupAmbisonics = nullptr;
     groupSpeakers = nullptr;
     comboBoxChannelConfig = nullptr;
-    label = nullptr;
+    labelPresets = nullptr;
     buttonLoad = nullptr;
     buttonSave = nullptr;
     speakerList = nullptr;
@@ -316,23 +317,24 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupAmbisonics->setBounds (8 + 0, 40 + (getHeight() - 346), (getWidth() - 18) - 0, 200);
-    groupSpeakers->setBounds (8, 40, getWidth() - 18, getHeight() - 346);
-    comboBoxChannelConfig->setBounds (8 + 88, 40 + 24, getWidth() - 217, 24);
-    buttonLoad->setBounds (8 + (getWidth() - 18) - 103, 40 + 24, 40, 24);
-    buttonSave->setBounds (8 + (getWidth() - 18) - 55, 40 + 24, 40, 24);
-    speakerList->setBounds (8 + 16, 40 + 56, (getWidth() - 18) - 32, (getHeight() - 346) - 96);
-    buttonAdd->setBounds ((8 + 16) + 0, (40 + 56) + ((getHeight() - 346) - 96) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 16) + 72, (40 + 56) + ((getHeight() - 346) - 96) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (40 + 56) + ((getHeight() - 346) - 96) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (40 + 56) + ((getHeight() - 346) - 96) - -8, 64, 24);
-    sliderDistanceScaler->setBounds ((8 + 0) + 144, (40 + (getHeight() - 346)) + 16, getWidth() - 178, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 144, (40 + (getHeight() - 346)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
-    groupOsc->setBounds ((8 + 0) + 0, (40 + (getHeight() - 346)) + 200, ((getWidth() - 18) - 0) - 0, 96);
-    textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((40 + (getHeight() - 346)) + 200) + 24, 130, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((40 + (getHeight() - 346)) + 200) + 19, 93, 24);
-    textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((40 + (getHeight() - 346)) + 200) + 58, 130, 24);
-    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((40 + (getHeight() - 346)) + 200) + 53, 93, 24);
+    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
+    groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 306);
+    comboBoxChannelConfig->setBounds (8 + 240, 0 + 24, getWidth() - 369, 24);
+    labelPresets->setBounds ((8 + 240) + 0 - 64, 0 + 24, 64, 24);
+    buttonLoad->setBounds (8 + (getWidth() - 18) - 103, 0 + 24, 40, 24);
+    buttonSave->setBounds (8 + (getWidth() - 18) - 55, 0 + 24, 40, 24);
+    speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 306) - 96);
+    buttonAdd->setBounds ((8 + 16) + 0, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
+    sliderDistanceScaler->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 16, getWidth() - 178, 24);
+    ambiChannelControl->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
+    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
+    textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 24, 130, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 19, 93, 24);
+    textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
+    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -520,6 +522,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnEditMode.get())
     {
         //[UserButtonCode_btnEditMode] -- add your button handler code here..
+		pDecoderSettings->editMode = btnEditMode->getToggleState();
+		controlDimming();
         //[/UserButtonCode_btnEditMode]
     }
     else if (buttonThatWasClicked == toggleReceiveOsc.get())
@@ -567,7 +571,7 @@ void SpeakerSettingsComponent::showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray
 	options.useNativeTitleBar = false;
 	options.resizable = true;
 
-	options.launchAsync();
+	options.runModal();
 }
 
 int SpeakerSettingsComponent::getNumRows()
@@ -852,6 +856,22 @@ void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings) cons
 		}
 	}
 }
+
+void SpeakerSettingsComponent::controlDimming()
+{
+	bool en = pDecoderSettings->editMode;
+	groupSpeakers->setEnabled(en);
+	labelPresets->setEnabled(en);
+	comboBoxChannelConfig->setEnabled(en);
+	speakerList->setEnabled(en);
+	buttonLoad->setEnabled(en);
+	buttonSave->setEnabled(en);
+	buttonAdd->setEnabled(en);
+	buttonRemove->setEnabled(en);
+	buttonMoveUp->setEnabled(en);
+	buttonMoveDown->setEnabled(en);
+}
+
 void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 {
 	if (&editor == textOscPort.get())
@@ -904,13 +924,13 @@ BEGIN_JUCER_METADATA
                   posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                   title="Ambisonics"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 40 18M 346M" title="Speakers"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 0 18M 306M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="88 24 217M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="240 24 369M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
-  <LABEL name="new label" id="107b43efebb2a5c8" memberName="label" virtualName=""
-         explicitFocusOrder="0" pos="16 24 64 24" posRelativeX="450188aa0f332e78"
+  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
+         virtualName="" explicitFocusOrder="0" pos="0r 24 64 24" posRelativeX="4b25adf5b07e9492"
          posRelativeY="450188aa0f332e78" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
@@ -978,8 +998,9 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
-                virtualName="" explicitFocusOrder="0" pos="8 8 150 24" buttonText="Edit mode"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+                virtualName="" explicitFocusOrder="0" pos="16 24 150 24" posRelativeX="450188aa0f332e78"
+                posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
                   posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"

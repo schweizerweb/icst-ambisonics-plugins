@@ -84,6 +84,7 @@ public:
 	void updateDistanceScaler() const;
 	static int fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
+	void controlDimming();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -108,7 +109,7 @@ private:
     std::unique_ptr<GroupComponent> groupAmbisonics;
     std::unique_ptr<GroupComponent> groupSpeakers;
     std::unique_ptr<ComboBox> comboBoxChannelConfig;
-    std::unique_ptr<Label> label;
+    std::unique_ptr<Label> labelPresets;
     std::unique_ptr<TextButton> buttonLoad;
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TableListBox> speakerList;
