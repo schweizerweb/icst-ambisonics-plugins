@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.3.0
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -63,24 +63,24 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<GroupComponent> groupOscReceive;
-    ScopedPointer<ToggleButton> toggleReceiveOsc;
-    ScopedPointer<TextEditor> textOscReceivePort;
-    ScopedPointer<Label> labelOscPort;
-    ScopedPointer<GroupComponent> groupOscSend;
-    ScopedPointer<ToggleButton> toggleSendOsc;
-    ScopedPointer<TextEditor> textOscSendIp;
-    ScopedPointer<Label> labelOscSendIp;
-    ScopedPointer<TextEditor> textOscSendPort;
-    ScopedPointer<Label> labelOscSendPort;
-    ScopedPointer<TextEditor> textOscSendInterval;
-    ScopedPointer<Label> labelOscSendInterval;
-    ScopedPointer<GroupComponent> groupDistanceEncoding;
-    ScopedPointer<ToggleButton> toggleDistanceEncoding;
-    ScopedPointer<TextEditor> textUnitCircleRadius;
-    ScopedPointer<Label> labelUnitCircleRadius;
-    ScopedPointer<GroupComponent> groupOrientation;
-    ScopedPointer<ToggleButton> toggleDirectionFlip;
+    std::unique_ptr<GroupComponent> groupOscReceive;
+    std::unique_ptr<ToggleButton> toggleReceiveOsc;
+    std::unique_ptr<TextEditor> textOscReceivePort;
+    std::unique_ptr<Label> labelOscPort;
+    std::unique_ptr<GroupComponent> groupOscSend;
+    std::unique_ptr<ToggleButton> toggleSendOsc;
+    std::unique_ptr<TextEditor> textOscSendIp;
+    std::unique_ptr<Label> labelOscSendIp;
+    std::unique_ptr<TextEditor> textOscSendPort;
+    std::unique_ptr<Label> labelOscSendPort;
+    std::unique_ptr<TextEditor> textOscSendInterval;
+    std::unique_ptr<Label> labelOscSendInterval;
+    std::unique_ptr<GroupComponent> groupDistanceEncoding;
+    std::unique_ptr<ToggleButton> toggleDistanceEncoding;
+    std::unique_ptr<TextEditor> textUnitCircleRadius;
+    std::unique_ptr<Label> labelUnitCircleRadius;
+    std::unique_ptr<GroupComponent> groupOrientation;
+    std::unique_ptr<ToggleButton> toggleDirectionFlip;
 
 
     //==============================================================================
