@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -53,6 +53,9 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
 
+    // Binary resources:
+    static const char* settings_png;
+    static const int settings_pngSize;
 
 
 private:
@@ -65,9 +68,9 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<TextButton> buttonConfigure;
-    ScopedPointer<RadarComponent> component;
-    ScopedPointer<Label> labelVersion;
+    std::unique_ptr<RadarComponent> radarComponent;
+    std::unique_ptr<Label> labelVersion;
+    std::unique_ptr<ImageButton> btnSettings;
 
 
     //==============================================================================
