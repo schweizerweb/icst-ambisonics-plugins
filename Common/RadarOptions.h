@@ -23,6 +23,8 @@ public:
 	int maxNumberEditablePoints;
 	bool editablePointsAsSquare;
 	int displayTimeout;
+	bool showEditablePoints;
+	bool showDisplayOnlyPoints;
 
 	Array<AudioParameterSet>* audioParams;
 };

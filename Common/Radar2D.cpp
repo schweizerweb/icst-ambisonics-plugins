@@ -77,7 +77,6 @@ void Radar2D::paint (Graphics&)
 void Radar2D::createRadarBackground()
 {
 	radarUpdated = false;
-
 	Rectangle<float> localBounds = radarViewport.toFloat();
 
 	Image img(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
@@ -190,7 +189,7 @@ void Radar2D::renderOpenGL()
 
 		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
 
-		if (pEditablePointsArray != nullptr)
+		if (pEditablePointsArray != nullptr && pRadarOptions->showEditablePoints)
 		{
 			for (int i = 0; i < pEditablePointsArray->size(); i++)
 			{
@@ -200,7 +199,7 @@ void Radar2D::renderOpenGL()
 		}
 
 		int64 referenceTime = Time::currentTimeMillis();
-		if (pDisplayOnlyPointsArray != nullptr)
+		if (pDisplayOnlyPointsArray != nullptr && pRadarOptions->showDisplayOnlyPoints)
 		{
 			for (int i = pDisplayOnlyPointsArray->size() - 1; i >= 0 ; i--)
 			{
@@ -306,6 +305,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
+	if (!pRadarOptions->showEditablePoints)
+		return;
+
 	if (e.mods.isShiftDown())
 	{
 		
@@ -347,6 +349,9 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	}
 	else
 	{
+		if (!pRadarOptions->showEditablePoints)
+			return;
+
 		int pointSelection = pPointSelection->getSelectedPointIndex();
 		if (pointSelection >= 0 && pointSelection < pEditablePointsArray->size())
 		{
@@ -396,6 +401,9 @@ void Radar2D::mouseUp(const MouseEvent& e)
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
+
+	if (!pRadarOptions->showEditablePoints)
+		return;
 
 	if (pRadarOptions->maxNumberEditablePoints > 0 && pEditablePointsArray->size() >= pRadarOptions->maxNumberEditablePoints)
 		return;

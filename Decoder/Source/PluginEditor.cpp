@@ -32,20 +32,20 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	radarOptions.nameFieldEditable = false;
-	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
-	radarOptions.editablePointsAsSquare = true;
 	pSpeakerArray = ownerProc.getSpeakerArray();
 	pMovingPointsArray = ownerProc.getMovingPointsArray();
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	pDecoderSettings = ownerProc.getDecoderSettings();
 	oscHandler = new OSCHandler(pMovingPointsArray);
 	initializeOscHandler();
-    //[/Constructor_pre]
+	radarOptions.nameFieldEditable = false;
+	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
+	radarOptions.editablePointsAsSquare = true;
+	//[/Constructor_pre]
 
-    component.reset (new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
-    addAndMakeVisible (component.get());
-    component->setName ("new component");
+    radarComponent.reset (new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
+    addAndMakeVisible (radarComponent.get());
+    radarComponent->setName ("radarComponent");
 
     labelVersion.reset (new Label ("labelVersion",
                                    TRANS("Version")));
@@ -78,7 +78,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
 	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
-    //[/Constructor]
+	updateRadarOptions();
+	//[/Constructor]
 }
 
 AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
@@ -86,7 +87,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    component = nullptr;
+    radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
 
@@ -112,7 +113,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    component->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
+    radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
     labelVersion->setBounds (getWidth() - 67, 8, 62, 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
@@ -130,6 +131,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator());
 		initializeOscHandler();
+		updateRadarOptions();
         //[/UserButtonCode_btnSettings]
     }
 
@@ -157,6 +159,15 @@ void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 	}
 }
 
+void AmbisonicsDecoderAudioProcessorEditor::updateRadarOptions()
+{
+	radarOptions.showEditablePoints = pDecoderSettings->editMode;
+	radarOptions.showDisplayOnlyPoints = !pDecoderSettings->editMode;
+	if(!pDecoderSettings->editMode)
+		pointSelection.unselectPoint();
+	radarComponent->setPointInfoVisible(pDecoderSettings->editMode);
+}
+
 //[/MiscUserCode]
 
 
@@ -176,7 +187,7 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
-  <GENERICCOMPONENT name="new component" id="cb26712c5c52dede" memberName="component"
+  <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"

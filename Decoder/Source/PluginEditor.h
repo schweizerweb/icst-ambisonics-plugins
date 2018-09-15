@@ -49,7 +49,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void initializeOscHandler();
+	void initializeOscHandler();
+	void updateRadarOptions();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -75,7 +76,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<RadarComponent> component;
+    std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
 

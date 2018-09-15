@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -30,12 +30,15 @@
 RadarComponent::RadarComponent (OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	showPointInfo = true;
     //[/Constructor_pre]
 
-    addAndMakeVisible (radar = new Radar3D (pEditablePointsArray, pDisplayOnlyPointsArray, &zoomSettings, pPointSelection, pRadarOptions));
+    radar.reset (new Radar3D (pEditablePointsArray, pDisplayOnlyPointsArray, &zoomSettings, pPointSelection, pRadarOptions));
+    addAndMakeVisible (radar.get());
     radar->setName ("radar");
 
-    addAndMakeVisible (pointInfo = new PointInfoControl (pEditablePointsArray, pPointSelection, pRadarOptions));
+    pointInfo.reset (new PointInfoControl (pEditablePointsArray, pPointSelection, pRadarOptions));
+    addAndMakeVisible (pointInfo.get());
     pointInfo->setName ("pointInfo");
 
 
@@ -77,17 +80,30 @@ void RadarComponent::paint (Graphics& g)
 void RadarComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
+	if(!showPointInfo)
+	{
+		radar->setBounds(0, 0, getWidth() - 0, getHeight());
+		pointInfo->setBounds(0, 0, 0, 0);
+	}
+	else
+	{
+		//[/UserPreResize]
 
-    radar->setBounds (0, 0 + 100, getWidth() - 0, getHeight() - 100);
-    pointInfo->setBounds (0, 0, getWidth() - 0, 100);
-    //[UserResized] Add your own custom resize handling here..
+		radar->setBounds(0, 0 + 100, getWidth() - 0, getHeight() - 100);
+		pointInfo->setBounds(0, 0, getWidth() - 0, 100);
+		//[UserResized] Add your own custom resize handling here..
+	}
     //[/UserResized]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void RadarComponent::setPointInfoVisible(bool visible)
+{
+	this->showPointInfo = visible;
+	resized();
+}
 //[/MiscUserCode]
 
 
