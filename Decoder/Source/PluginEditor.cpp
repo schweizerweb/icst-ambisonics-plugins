@@ -63,8 +63,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     btnSettings->setImages (false, true, true,
                             ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0x00000000),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.422f, Colour (0x6eee1010),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.904f, Colour (0x00000000));
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, Colour (0x6eee1010),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
 
@@ -114,7 +114,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 5 - 62, 8, 62, 24);
+    labelVersion->setBounds (getWidth() - 67, 8, 62, 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -191,7 +191,7 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="5Rr 8 62 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="67R 8 62 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
@@ -199,9 +199,9 @@ BEGIN_JUCER_METADATA
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText=""
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
                resourceNormal="settings_png" opacityNormal="1.00000000000000000000"
-               colourNormal="0" resourceOver="settings_png" opacityOver="0.42177733778953552246"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="0.90449219942092895508"
-               colourDown="0"/>
+               colourNormal="0" resourceOver="settings_png" opacityOver="0.40000000596046447754"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.00000000000000000000"
+               colourDown="c0ee1010"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
