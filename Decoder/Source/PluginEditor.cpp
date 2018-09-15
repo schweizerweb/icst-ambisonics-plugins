@@ -41,7 +41,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	radarOptions.nameFieldEditable = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
-	//[/Constructor_pre]
+    //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
     addAndMakeVisible (radarComponent.get());
@@ -79,7 +79,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
 	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
 	updateRadarOptions();
-	//[/Constructor]
+    //[/Constructor]
 }
 
 AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
@@ -114,7 +114,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 67, 8, 62, 24);
+    labelVersion->setBounds (getWidth() - 5 - 62, 8, 62, 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -191,7 +191,7 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="67R 8 62 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="5Rr 8 62 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
          kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
