@@ -77,7 +77,7 @@ void Radar2D::drawRadar(Graphics* g) const
 	g->drawImageAt(*radarBackground, radarViewport.getX(), radarViewport.getY());
 }
 
-void Radar2D::drawInfoLabel(Graphics* g)
+void Radar2D::drawInfoLabel(Graphics* g) const
 {
 	const ScopedLock lock(infoLabelLock);
 	g->drawImageAt(*infoImage, radarViewport.getX() + 3, radarViewport.getY());
