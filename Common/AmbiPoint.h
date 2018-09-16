@@ -176,13 +176,13 @@ public:
 	}
 
 private:
-	Image* createNewLabel(String label, Colour color) const
+	Image* createNewLabel(String label, Colour newColor) const
 	{
 		const MessageManagerLock lock;
 		int width = labelFont.getStringWidth(label);
 		Image* img = new Image(Image::ARGB, width, FONT_SIZE, true);
 		Graphics g(*img);
-		g.setColour(color);
+		g.setColour(newColor);
 		g.setFont(labelFont);
 		g.drawSingleLineText(label, 0, FONT_SIZE);
 		return img;
