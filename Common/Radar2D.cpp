@@ -27,7 +27,7 @@ Radar2D::Radar2D(RadarMode mode, OwnedArray<AmbiPoint>* pEditablePointsArray, Ow
 
 	pZoomSettings->addChangeListener(this);
 
-	radarColors = new RadarColors(0);
+	radarColors = new RadarColors();
 }
 
 Radar2D::~Radar2D()

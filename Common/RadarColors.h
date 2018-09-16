@@ -16,15 +16,15 @@
 class RadarColors
 {
 public:
-	RadarColors(int colorScheme = 0) : colorScheme(colorScheme)
+	RadarColors(): colorScheme(0)
 	{
-		jassert(colorScheme < NUMBER_OF_SCHEMES);
 	}
 
 	Colour getRadarBackground() const { return radarBackground[colorScheme]; }
 	Colour getRadarLineColor() const { return radarLineColor[colorScheme]; }
 	Colour getInfoTextColor() const { return infoTextColor[colorScheme]; }
 	Colour getPointSelectionColor() const { return pointSelectionColor[colorScheme]; }
+	void setColorScheme(int scheme) { colorScheme = jmin(scheme, NUMBER_OF_SCHEMES - 1); }
 
 private:
 	Colour radarBackground[NUMBER_OF_SCHEMES] { Colours::lightgrey, Colours::lightgoldenrodyellow };
