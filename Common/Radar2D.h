@@ -43,6 +43,9 @@ public:
 	void mouseDoubleClick(const MouseEvent& e) override;
 	void showCoordinates(const Point<float>& point);
 	void mouseMove(const MouseEvent& e) override;
+	void newOpenGLContextCreated() override;
+	void openGLContextClosing() override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
@@ -58,7 +61,7 @@ private:
 	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
 	void drawRadar(Graphics* g) const;
-	void drawInfoLabel(Graphics* g);
+	void drawInfoLabel(Graphics* g) const;
 	void renderOpenGL() override;
 	Image createRadarBackground() const;
 	void updateRadarBackground();
@@ -83,8 +86,4 @@ private:
 	const Font infoFont = Font(INFO_FONT_SIZE);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
-public:
-	void newOpenGLContextCreated() override;
-	void openGLContextClosing() override;
-	void changeListenerCallback(ChangeBroadcaster* source) override;
 };
