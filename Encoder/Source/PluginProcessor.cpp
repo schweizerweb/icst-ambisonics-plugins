@@ -87,6 +87,15 @@ double AmbisonicEncoderAudioProcessor::getTailLengthSeconds() const
     return 0.0;
 }
 
+void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
+{
+	if (sourcesArray.size() == 1)
+	{
+		sourcesArray.getUnchecked(0)->setName(properties.name);
+		sourcesArray.getUnchecked(0)->setColor(properties.colour);
+	}
+}
+
 int AmbisonicEncoderAudioProcessor::getNumPrograms()
 {
     return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,

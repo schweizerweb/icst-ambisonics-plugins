@@ -48,7 +48,7 @@ public:
     bool acceptsMidi() const override;
     bool producesMidi() const override;
     double getTailLengthSeconds() const override;
-
+	void updateTrackProperties(const TrackProperties& properties) override;
     //==============================================================================
     int getNumPrograms() override;
     int getCurrentProgram() override;
