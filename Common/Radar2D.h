@@ -53,28 +53,30 @@ private:
 	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select = false, float selectionSize = 0.0);
 	
-	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
+	void drawRadar(Graphics* g) const;
 	void renderOpenGL() override;
-	void createRadarBackground();
+	Image createRadarBackground() const;
+	void updateRadarBackground();
 
 private:
 	OpenGLContext openGLContext;
 
 	OwnedArray<AmbiPoint>* pEditablePointsArray;
 	OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray;
-	Image radarBackground;
+	ScopedPointer<Image> radarBackground;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
 	String infoString;
 	PointSelection* pPointSelection;
-	bool radarUpdated;
 	TrackColors trackColors;
 	ScopedPointer<RadarColors> radarColors;
 	RadarOptions* pRadarOptions;
+	CriticalSection radarBackgroundLock;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 public:

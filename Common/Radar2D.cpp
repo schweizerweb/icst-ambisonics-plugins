@@ -70,13 +70,20 @@ float Radar2D::getFontSize() const
 	return radarViewport.getWidth() / 25.0f;
 }
 
+void Radar2D::drawRadar(Graphics* g) const
+{
+	const ScopedLock lock(radarBackgroundLock);
+	g->drawImageAt(*radarBackground, radarViewport.getX(), radarViewport.getY());
+}
+
 void Radar2D::paint (Graphics&)
 {
 }
 
-void Radar2D::createRadarBackground()
+Image Radar2D::createRadarBackground() const
 {
-	radarUpdated = false;
+	const MessageManagerLock lock;
+
 	Rectangle<float> localBounds = radarViewport.toFloat();
 
 	Image img(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
@@ -98,7 +105,15 @@ void Radar2D::createRadarBackground()
 	g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
 	g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
-	radarBackground = img;
+	return img;
+}
+
+void Radar2D::updateRadarBackground()
+{
+	Image img = createRadarBackground();
+
+	const ScopedLock lock(radarBackgroundLock);
+	radarBackground = new Image(img);
 }
 
 float Radar2D::getValueToScreenRatio() const
@@ -121,17 +136,19 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
-void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-	int y = int(screenPt.getY() + (screenPt.getY() < (offset + getFontSize()) ? 2.0 : -1.0) * offset);
+	int y = screenPt.getY() > offset + labelImage.getHeight()
+		? int(screenPt.getY() - offset - labelImage.getHeight())
+		: int(screenPt.getY() + offset);
 	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + text.length() * getFontSize() / 2.0f))
+		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth()))
 	{
-		g->drawSingleLineText(text, int(screenPt.getX() - offset), y, Justification::right);
+		g->drawImageAt(labelImage, int(screenPt.getX() - offset - labelImage.getWidth()), y);
 	}
 	else
 	{
-		g->drawSingleLineText(text, int(screenPt.getX() + offset), y);
+		g->drawImageAt(labelImage, int(screenPt.getX() + offset), y);
 	}
 }
 
@@ -161,7 +178,8 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		g->fillEllipse(rect.withCentre(screenPt));
 	}
 	
-	paintPointLabel(g, point->getName(), screenPt, pointSize * (square ? 0.7f : 0.5f));
+	ScopedPointer<Image> labelImage = point->getLabelImage();
+	paintPointLabel(g, *labelImage, screenPt, pointSize * (square ? 0.7f : 0.5f));
 }
 
 void Radar2D::renderOpenGL()
@@ -184,11 +202,8 @@ void Radar2D::renderOpenGL()
 		g.setColour(radarColors->getRadarLineColor());
 		g.drawRect(radarViewport, 1);   // draw an outline around the component
 
-		if (radarUpdated)
-			createRadarBackground();
-
-		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
-
+		drawRadar(&g);
+		
 		if (pEditablePointsArray != nullptr && pRadarOptions->showEditablePoints)
 		{
 			for (int i = 0; i < pEditablePointsArray->size(); i++)
@@ -231,8 +246,8 @@ void Radar2D::openGLContextClosing()
 
 void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if(source == pZoomSettings)
-		radarUpdated = true;
+	if (source == pZoomSettings)
+		updateRadarBackground();
 }
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
@@ -288,7 +303,7 @@ void Radar2D::resized()
 			int(getBounds().getWidth() / wantedRatioWidthToHeight));
 	}
 
-	radarUpdated = true;
+	updateRadarBackground();
 }
 
 void Radar2D::mouseExit(const MouseEvent&)
@@ -395,7 +410,7 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		}
 	}
 
-	radarUpdated = true;
+	updateRadarBackground();
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)

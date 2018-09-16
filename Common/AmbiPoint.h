@@ -20,6 +20,7 @@
 #define XML_ATTRIBUTE_PRESET_POINT_NAME "Name"
 #define XML_ATTRIBUTE_PRESET_POINT_COLOR "Color"
 #define XML_ATTRIBUTE_PRESET_POINT_GAIN "Gain"
+#define FONT_SIZE	20
 
 class AmbiPoint
 {
@@ -90,6 +91,12 @@ public:
 
 	void setName(String newName)
 	{
+		if (name != newName)
+		{
+			Image* img = createNewLabel(newName);
+			labelImage = img;
+		}
+
 		name = newName;
 	}
 
@@ -155,6 +162,26 @@ public:
 		lastUpdate = currentTimeMillis;
 	}
 
+	Image* getLabelImage()
+	{
+		if (labelImage == nullptr)
+			labelImage = createNewLabel(name);
+		return new Image(*labelImage);
+	}
+
+private:
+	Image* createNewLabel(String label) const
+	{
+		const MessageManagerLock lock;
+		int width = labelFont.getStringWidth(label);
+		Image* img = new Image(Image::ARGB, width, FONT_SIZE, true);
+		Graphics g(*img);
+		g.setFont(labelFont);
+		g.drawSingleLineText(label, 0, FONT_SIZE);
+		return img;
+	}
+	const Font labelFont = Font(FONT_SIZE);
+
 private:
 	String id;
 	Point3D<double> point;
@@ -163,6 +190,7 @@ private:
 	double gain;
 	float rms;
 	int64 lastUpdate = 0;
+	ScopedPointer<Image> labelImage;
 };
 
 
