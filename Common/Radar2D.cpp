@@ -21,6 +21,7 @@ Radar2D::Radar2D(RadarMode mode, OwnedArray<AmbiPoint>* pEditablePointsArray, Ow
 	pPointSelection(pPointSelection),
 	pRadarOptions(pRadarOptions)
 {
+	infoImage = new Image();
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(true);
@@ -76,6 +77,12 @@ void Radar2D::drawRadar(Graphics* g) const
 	g->drawImageAt(*radarBackground, radarViewport.getX(), radarViewport.getY());
 }
 
+void Radar2D::drawInfoLabel(Graphics* g)
+{
+	const ScopedLock lock(infoLabelLock);
+	g->drawImageAt(*infoImage, radarViewport.getX() + 3, radarViewport.getY());
+}
+
 void Radar2D::paint (Graphics&)
 {
 }
@@ -114,6 +121,29 @@ void Radar2D::updateRadarBackground()
 
 	const ScopedLock lock(radarBackgroundLock);
 	radarBackground = new Image(img);
+}
+
+Image Radar2D::createInfoLabel(String info)
+{
+	const MessageManagerLock lock;
+	int width = infoFont.getStringWidth(info);
+	if (width <= 0)
+		return Image();
+
+	Image img = Image(Image::ARGB, width, INFO_FONT_SIZE, true);
+	Graphics g(img);
+	g.setColour(radarColors->getInfoTextColor());
+	g.setFont(infoFont);
+	g.drawSingleLineText(info, 0, INFO_FONT_SIZE);
+	return img;
+}
+
+void Radar2D::updateInfoLabel(String info)
+{
+	Image img = createInfoLabel(info);
+
+	const ScopedLock lock(infoLabelLock);
+	infoImage = new Image(img);
 }
 
 float Radar2D::getValueToScreenRatio() const
@@ -231,8 +261,7 @@ void Radar2D::renderOpenGL()
 			}
 		}
 
-		g.setColour(radarColors->getInfoTextColor());
-		g.drawText(infoString, radarViewport.getX(), radarViewport.getY(), radarViewport.getWidth(), 30, Justification::topLeft);
+		drawInfoLabel(&g);
 	}
 }
 
@@ -308,7 +337,7 @@ void Radar2D::resized()
 
 void Radar2D::mouseExit(const MouseEvent&)
 {
-	infoString = "";
+	updateInfoLabel("");
 }
 
 double Radar2D::getMaxPointSelectionDist() const
@@ -444,7 +473,7 @@ void Radar2D::showCoordinates(const Point<float>& point)
 {
 	String str;
 	str << String(point.getX(), 2) << "; " << String(point.getY(), 2);
-	infoString = str;
+	updateInfoLabel(str);
 }
 
 void Radar2D::mouseMove(const MouseEvent& e)

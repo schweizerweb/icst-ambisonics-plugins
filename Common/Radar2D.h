@@ -12,11 +12,11 @@
 
 #include "JuceHeader.h"
 #include "AmbiPoint.h"
-#include "TrackColors.h"
 #include "ZoomSettings.h"
 #include "RadarColors.h"
 #include "PointSelection.h"
 #include "RadarOptions.h"
+#define INFO_FONT_SIZE	20
 
 //==============================================================================
 /*
@@ -58,9 +58,12 @@ private:
 	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
 	void drawRadar(Graphics* g) const;
+	void drawInfoLabel(Graphics* g);
 	void renderOpenGL() override;
 	Image createRadarBackground() const;
 	void updateRadarBackground();
+	Image createInfoLabel(String info);
+	void updateInfoLabel(String info);
 
 private:
 	OpenGLContext openGLContext;
@@ -68,14 +71,16 @@ private:
 	OwnedArray<AmbiPoint>* pEditablePointsArray;
 	OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray;
 	ScopedPointer<Image> radarBackground;
+	ScopedPointer<Image> infoImage;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
-	String infoString;
 	PointSelection* pPointSelection;
 	ScopedPointer<RadarColors> radarColors;
 	RadarOptions* pRadarOptions;
 	CriticalSection radarBackgroundLock;
+	CriticalSection infoLabelLock;
+	const Font infoFont = Font(INFO_FONT_SIZE);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 public:
