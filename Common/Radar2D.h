@@ -73,7 +73,6 @@ private:
 	RadarMode radarMode;
 	String infoString;
 	PointSelection* pPointSelection;
-	TrackColors trackColors;
 	ScopedPointer<RadarColors> radarColors;
 	RadarOptions* pRadarOptions;
 	CriticalSection radarBackgroundLock;

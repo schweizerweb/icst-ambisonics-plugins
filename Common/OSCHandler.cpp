@@ -9,6 +9,7 @@
 */
 
 #include "OSCHandler.h"
+#include "TrackColors.h"
 
 OSCHandler::OSCHandler(OwnedArray<AmbiPoint>* pAmbiPointArr)
 {
@@ -56,7 +57,7 @@ void OSCHandler::HandleMusescoreSSMNStyle(const OSCMessage& message) const
 		if (index == -1)
 		{
 			ScopedPointer<Uuid> newId = new Uuid();
-			pAmbiPointArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), channelString, channel));
+			pAmbiPointArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), channelString, TrackColors::getColor(channel)));
 			index = pAmbiPointArray->size() - 1;
 		}
 
@@ -78,7 +79,7 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 	float e = message[3].getFloat32();
 	float d = message[4].getFloat32();
 	float rms = message[5].getFloat32();
-	int colorIndex = message[6].getInt32();
+	Colour color = Colour(uint32(message[6].getInt32()));
 
 	int index = -1;
 	for (int i = 0; i < pAmbiPointArray->size(); i++)
@@ -92,7 +93,7 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 
 	if (index == -1)
 	{
-		pAmbiPointArray->add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, colorIndex));
+		pAmbiPointArray->add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
 		index = pAmbiPointArray->size() - 1;
 	}
 
@@ -102,7 +103,7 @@ void OSCHandler::HandleOwnInternalStyle(const OSCMessage& message) const
 	ambiPt->getPoint()->setElevation(e);
 	ambiPt->getPoint()->setDistance(d);
 	ambiPt->setRms(rms);
-	ambiPt->setColorIndex(colorIndex);
+	ambiPt->setColor(color);
 	ambiPt->setAlive(Time::currentTimeMillis());
 }
 

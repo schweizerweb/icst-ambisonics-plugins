@@ -168,7 +168,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		}
 	}
 
-	g->setColour(trackColors.getColor(point->getColorIndex()));
+	g->setColour(point->getColor());
 	
 	if(square)
 		drawSquare(g, &screenPt, pt, pointSize);
@@ -425,12 +425,14 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 
 	// add new point
 	ScopedPointer<Uuid> newId = new Uuid();
+	int index = pEditablePointsArray->size();
+	int indexForName = index + 1;
 	switch (radarMode) {
 	case XY:
-		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
 		break;
 	case ZY:
-		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
 		break;
 	}
 

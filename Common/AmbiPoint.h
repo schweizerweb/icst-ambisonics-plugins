@@ -25,24 +25,24 @@
 class AmbiPoint
 {
 public:
-	AmbiPoint(): colorIndex(0), gain(1.0), rms(0.0f)
+	AmbiPoint(): color(Colour()), gain(1.0), rms(0.0f)
 	{
 	}
 
-	AmbiPoint(String id, Point3D<double> point, String name, int colorIndex = 0, double gain = 1.0) :
+	AmbiPoint(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0) :
 		id(id),
 		point(point),
-		colorIndex(colorIndex),
+		color(color),
 		name(name),
 		gain(gain), 
 		rms(0.0f)
 	{
 	}
 
-	AmbiPoint(Point3D<double> point, AudioParameterSet audioParams, String name, int colorIndex = 0, double gain = 1.0) :
+	AmbiPoint(Point3D<double> point, AudioParameterSet audioParams, String name, Colour color = Colour(), double gain = 1.0) :
 		id(Uuid().toString()),
 		point(Point3D<double>(point.getX(), point.getY(), point.getZ(), audioParams)),
-		colorIndex(colorIndex),
+		color(color),
 		name(name),
 		gain(gain),
 		rms(0.0f)
@@ -54,7 +54,7 @@ public:
 		point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
-		colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
+		color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR))).withAlpha(1.0f)),
 		name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
 		gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)), 
 		rms(0.0f)
@@ -67,7 +67,7 @@ public:
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z),
 		                      audioParams)),
-		colorIndex(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR)),
+		color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR))).withAlpha(1.0f)),
 		name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
 		gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)), 
 		rms(0.0f)
@@ -79,9 +79,9 @@ public:
 		return &point;
 	}
 
-	int getColorIndex() const
+	Colour getColor() const
 	{
-		return colorIndex;
+		return color;
 	}
 
 	String getName() const
@@ -93,7 +93,7 @@ public:
 	{
 		if (name != newName)
 		{
-			Image* img = createNewLabel(newName);
+			Image* img = createNewLabel(newName, color);
 			labelImage = img;
 		}
 
@@ -113,7 +113,7 @@ public:
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Y, getPoint()->getY());
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_Z, getPoint()->getZ());
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME, getName());
-		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR, getColorIndex());
+		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR, int(getColor().getARGB()));
 		element->setAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, getGain());
 		return element;
 	}
@@ -147,9 +147,15 @@ public:
 		return id;
 	}
 
-	void setColorIndex(int color)
+	void setColor(Colour newColor)
 	{
-		colorIndex = color;
+		if (color != newColor)
+		{
+			Image* img = createNewLabel(name, newColor);
+			labelImage = img;
+		}
+
+		color = newColor;
 	}
 
 	bool checkAlive(int64 referenceTime, int timeout) const
@@ -165,17 +171,18 @@ public:
 	Image* getLabelImage()
 	{
 		if (labelImage == nullptr)
-			labelImage = createNewLabel(name);
+			labelImage = createNewLabel(name, color);
 		return new Image(*labelImage);
 	}
 
 private:
-	Image* createNewLabel(String label) const
+	Image* createNewLabel(String label, Colour color) const
 	{
 		const MessageManagerLock lock;
 		int width = labelFont.getStringWidth(label);
 		Image* img = new Image(Image::ARGB, width, FONT_SIZE, true);
 		Graphics g(*img);
+		g.setColour(color);
 		g.setFont(labelFont);
 		g.drawSingleLineText(label, 0, FONT_SIZE);
 		return img;
@@ -185,7 +192,7 @@ private:
 private:
 	String id;
 	Point3D<double> point;
-	int colorIndex;
+	Colour color;
 	String name;
 	double gain;
 	float rms;

@@ -22,6 +22,7 @@
 #include "EditableTextCustomComponent.h"
 #include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
+#include "../../Common/TrackColors.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
@@ -377,8 +378,8 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			{
 				ScopedPointer<Uuid> newId1 = new Uuid();
 				ScopedPointer<Uuid> newId2 = new Uuid();
-				preset->getPoints()->add(new AmbiPoint(newId1->toString(), Point3D<double>(0.0, -1.0, 0.0), "L", 0));
-				preset->getPoints()->add(new AmbiPoint(newId2->toString(), Point3D<double>(0.0, 1.0, 0.0), "R", 0));
+				preset->getPoints()->add(new AmbiPoint(newId1->toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor()));
+				preset->getPoints()->add(new AmbiPoint(newId2->toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor()));
 			}
 			else
 			{
@@ -387,7 +388,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 				for (int i = 0; i < nbChannels; i++)
 				{
 					ScopedPointer<Uuid> newId = new Uuid();
-					preset->getPoints()->add(new AmbiPoint(newId->toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), 0));
+					preset->getPoints()->add(new AmbiPoint(newId->toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor()));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
@@ -456,7 +457,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
 		ScopedPointer<Uuid> newId = new Uuid();
-		pSpeakerArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", 0));
+		pSpeakerArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
 		pPointSelection->selectPoint(pSpeakerArray->size() - 1);
 		speakerList->updateContent();
 		speakerList->repaint();
