@@ -441,7 +441,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			PresetInfo* preset = new PresetInfo();
 			preset->setName(newPresetName);
 			for (AmbiPoint* pt : *pSpeakerArray)
-				preset->getPoints()->add(new AmbiPoint(*pt));
+				preset->getPoints()->add(new AmbiPoint(pt));
 			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
 			preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
 			for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
@@ -771,7 +771,7 @@ void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 	pSpeakerArray->clear();
 	for (AmbiPoint* pt : *preset->getPoints())
 	{
-		pSpeakerArray->add(new AmbiPoint(*pt));
+		pSpeakerArray->add(new AmbiPoint(pt));
 	}
 	speakerList->updateContent();
 	speakerList->repaint();
