@@ -25,6 +25,10 @@
 class AmbiPoint
 {
 public:
+    AmbiPoint(AmbiPoint* other) : id(other->id), point(other->point), color(other->color), name(other->name)
+    {
+    }
+    
 	AmbiPoint(): color(Colour()), gain(1.0), rms(0.0f)
 	{
 	}
