@@ -71,6 +71,7 @@ private:
     std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
+    std::unique_ptr<Label> labelMessage;
 
 
     //==============================================================================
