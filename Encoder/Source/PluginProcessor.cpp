@@ -31,7 +31,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #endif
 {
 	pEncoderSettings = new EncoderSettings();
-	pOscHandler = new OSCHandler(&sourcesArray);
+	pOscHandler = new OSCHandler(&sourcesArray, &statusMessageHandler);
 	pOscSender = new AmbiOSCSender(&sourcesArray);
 	initializeOsc();
 
@@ -40,10 +40,10 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		String indexStr = String(i + 1);
 		
 		AudioParameterSet set;
-		set.pA = new AudioParameterFloatAmbi("Azimuth" + indexStr, "Azimuth " + indexStr, "Point " + indexStr + ": Azimuth", AudioProcessorParameter::genericParameter, NormalisableRange<float>(float(-PI), float(PI)), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Azimuth);
-		set.pE = new AudioParameterFloatAmbi("Elevation" + indexStr, "Elevation " + indexStr, "Point " + indexStr + ": Elevation", AudioProcessorParameter::genericParameter, NormalisableRange<float>(0.0f, float(PI)), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Elevation);
-		set.pD = new AudioParameterFloatAmbi("Distance" + indexStr, "Distance " + indexStr, "Point " + indexStr + ": Distance", AudioProcessorParameter::genericParameter, NormalisableRange<float>(0.0f, 1.0f), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Distance);
-		
+		set.pA = new AudioParameterFloatAmbi("Azimuth" + indexStr, "Azimuth " + indexStr, "Point " + indexStr + ": Azimuth", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::AzimuthRadMin, Constants::AzimuthRadMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Azimuth);
+		set.pE = new AudioParameterFloatAmbi("Elevation" + indexStr, "Elevation " + indexStr, "Point " + indexStr + ": Elevation", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ElevationRadMin, Constants::ElevationRadMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Elevation);
+		set.pD = new AudioParameterFloatAmbi("Distance" + indexStr, "Distance " + indexStr, "Point " + indexStr + ": Distance", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::DistanceMin, Constants::DistanceMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Distance);
+
 		audioParams.add(set);
 		addParameter(set.pA);
 		addParameter(set.pE);
@@ -284,6 +284,11 @@ OwnedArray<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray()
 Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()
 {
 	return &audioParams;
+}
+
+StatusMessageHandler* AmbisonicEncoderAudioProcessor::getStatusMessageHandler()
+{
+	return &statusMessageHandler;
 }
 
 EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings() const

@@ -37,6 +37,12 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="GoCWjo" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
+      <FILE id="bfp1AJ" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
+      <FILE id="tupxe4" name="StatusMessageHandler.cpp" compile="1" resource="0"
+            file="../Common/StatusMessageHandler.cpp"/>
+      <FILE id="TR1MRw" name="StatusMessageHandler.h" compile="0" resource="0"
+            file="../Common/StatusMessageHandler.h"/>
       <FILE id="WVKDPz" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
       <FILE id="v8HVwz" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>
       <FILE id="SnPl8L" name="OSCHandler.h" compile="0" resource="0" file="../Common/OSCHandler.h"/>

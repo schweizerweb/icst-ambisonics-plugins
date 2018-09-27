@@ -64,6 +64,7 @@ public:
 	EncoderSettings* getEncoderSettings() const;
 	void initializeOsc() const;
 	Array<AudioParameterSet>* getAudioParams();
+	StatusMessageHandler* getStatusMessageHandler();
 
 private:
 	OwnedArray<AmbiPoint> sourcesArray;
@@ -71,6 +72,7 @@ private:
 	ScopedPointer<OSCHandler> pOscHandler;
 	ScopedPointer<AmbiOSCSender> pOscSender;
 	Array<AudioParameterSet> audioParams;
+	StatusMessageHandler statusMessageHandler;
 	double lastCoefficients[JucePlugin_MaxNumOutputChannels];
 
     //==============================================================================

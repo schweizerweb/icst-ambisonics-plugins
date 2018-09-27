@@ -13,6 +13,7 @@
 
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
+#include "Constants.h"
 
 #define	SQRT105		10.246950766	/*sqrt(105.0)*/
 #define SQRT15		3.87298334621	/*sqrt(15.0)*/
@@ -38,7 +39,6 @@
 #define SQRT715		26.7394839142	/*sqrt(715.0)*/
 #define SQRT5005_2	50.0249937531	/*sqrt(5005.0/2.0)*/
 
-#define PI 3.1415926535897932384626433832795
 #define DISTANCE_MIN_VALUE 0.0001
 
 template <typename ValueType>
@@ -161,10 +161,10 @@ public:
 
 		/** Returns the Point3D as a string in the form "x, y". */
 	String toString()                                       { return "X:" + String(getX(), 2) + "; Y:" + String(getY(), 2) + "; Z:" + String(getZ(), 2); }
-	String toStringAed()                                       { return "A:" + String(getAzimuth()*180/PI, 2) + "; E:" + String(getElevation()*180/PI, 2) + "; D:" + String(getDistance(), 2); }
+	String toStringAed()                                       { return "A:" + String(Constants::RadToGrad(getAzimuth()), 2) + "; E:" + String(Constants::RadToGrad(getElevation()), 2) + "; D:" + String(getDistance(), 2); }
 
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
-	String toShortStringAed()	{ return String(getAzimuth()*180/PI, 2) + ", " + String(getElevation()*180/PI, 2) + ", " + String(getDistance(), 2); }
+	String toShortStringAed()	{ return String(Constants::RadToGrad(getAzimuth()), 2) + ", " + String(Constants::RadToGrad(getElevation()), 2) + ", " + String(getDistance(), 2); }
 
 	void getAmbisonicsCoefficients(int numCoefficients, ValueType* pCoefficients, bool flipDirection, bool inverseNormalisation = false)
 	{

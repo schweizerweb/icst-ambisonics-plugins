@@ -25,10 +25,10 @@
 class AmbiPoint
 {
 public:
-    AmbiPoint(AmbiPoint* other) : id(other->id), point(other->point), color(other->color), name(other->name)
-    {
-    }
-    
+    AmbiPoint(AmbiPoint* other) : id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), rms(0.0f)
+	{
+	}
+
 	AmbiPoint(): color(Colour()), gain(1.0), rms(0.0f)
 	{
 	}
@@ -184,6 +184,8 @@ private:
 	{
 		const MessageManagerLock lock;
 		int width = labelFont.getStringWidth(label);
+		if (width <= 0)
+			return new Image();
 		Image* img = new Image(Image::ARGB, width, FONT_SIZE, true);
 		Graphics g(*img);
 		g.setColour(newColor);

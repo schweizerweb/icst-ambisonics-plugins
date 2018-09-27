@@ -65,6 +65,15 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
                             ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
+    labelMessage.reset (new Label ("labelMessage",
+                                   String()));
+    addAndMakeVisible (labelMessage.get());
+    labelMessage->setFont (Font (11.70f, Font::plain).withTypefaceStyle ("Regular"));
+    labelMessage->setJustificationType (Justification::centred);
+    labelMessage->setEditable (false, false, false);
+    labelMessage->setColour (TextEditor::textColourId, Colours::black);
+    labelMessage->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
 	setResizable(true, true);
@@ -74,18 +83,21 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
+	labelVersion->setText("ZEnc " + String(ProjectInfo::versionString), dontSendNotification);
+	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
     //[/Constructor]
 }
 
 AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	processor.getStatusMessageHandler()->unregisterLabel();
     //[/Destructor_pre]
 
     radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
+    labelMessage = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -111,6 +123,7 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
     labelVersion->setBounds (getWidth() - 5 - 62, 8, 62, 24);
+    labelMessage->setBounds (40, 8, getWidth() - 108, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -169,6 +182,11 @@ BEGIN_JUCER_METADATA
                colourNormal="0" resourceOver="settings_png" opacityOver="0.40000000596046447754"
                colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.00000000000000000000"
                colourDown="c0ee1010"/>
+  <LABEL name="labelMessage" id="24478721f956d20c" memberName="labelMessage"
+         virtualName="" explicitFocusOrder="0" pos="40 8 108M 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="11.69999999999999928946"
+         kerning="0.00000000000000000000" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

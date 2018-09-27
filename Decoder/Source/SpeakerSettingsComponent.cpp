@@ -23,6 +23,7 @@
 #include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
+#include "../../Common/Constants.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
@@ -681,8 +682,8 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_X: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setX(newValue); break;
 	case COLUMN_ID_Y: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setY(newValue); break;
 	case COLUMN_ID_Z: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setZ(newValue); break;
-	case COLUMN_ID_A: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setAzimuth(newValue * PI / 180.0); break;
-	case COLUMN_ID_E: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setElevation(newValue * PI / 180.0); break;
+	case COLUMN_ID_A: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
+	case COLUMN_ID_E: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setElevation(Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_D: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setDistance(newValue); break;
 	case COLUMN_ID_DISTANCE: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setDistance(newValue / pAmbiSettings->getDistanceScaler()); break;
 	default: throw;
@@ -700,8 +701,8 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 	case COLUMN_ID_X: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getX();
 	case COLUMN_ID_Y: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getY();
 	case COLUMN_ID_Z: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getZ();
-	case COLUMN_ID_A: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getAzimuth() * 180.0 / PI;
-	case COLUMN_ID_E: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getElevation() * 180.0 / PI;
+	case COLUMN_ID_A: return Constants::RadToGrad(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getElevation());
 	case COLUMN_ID_D: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance();
 	case COLUMN_ID_DISTANCE: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
 	default: return 0.0;
@@ -724,20 +725,20 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
 	{
 	case COLUMN_ID_X:
 	case COLUMN_ID_Y:
+	case COLUMN_ID_Z:
 		return SliderRange(-1.0, 1.0, 0.001);
 
-	case COLUMN_ID_Z:
 	case COLUMN_ID_D:
-		return SliderRange(0.0, 1.0, 0.001);
+		return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
 
 	case COLUMN_ID_A:
-		return SliderRange(-360.0, 360.0, 0.1);
+		return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
 
 	case COLUMN_ID_E:
-		return SliderRange(-180.0, 180.0, 0.1);
+		return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
 
 	case COLUMN_ID_GAIN:
-		return SliderRange(-128.0, 12.0, 0.1);
+		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.1);
 
 	case COLUMN_ID_DISTANCE:
 		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);

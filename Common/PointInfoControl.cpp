@@ -20,10 +20,10 @@
 //[Headers] You can add your own extra header files here...
 #include "RadarOptions.h"
 #include "TrackColors.h"
+#include "Constants.h"
 //[/Headers]
 
 #include "PointInfoControl.h"
-
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
@@ -309,8 +309,8 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 		if (exceptField != textX->getName()) textX->setText(String(point->getPoint()->getX(), 3));
 		if (exceptField != textY->getName()) textY->setText(String(point->getPoint()->getY(), 3));
 		if (exceptField != textZ->getName()) textZ->setText(String(point->getPoint()->getZ(), 3));
-		if (exceptField != textA->getName()) textA->setText(String(RadToGrad(point->getPoint()->getAzimuth()), 2));
-		if (exceptField != textE->getName()) textE->setText(String(RadToGrad(point->getPoint()->getElevation()), 2));
+		if (exceptField != textA->getName()) textA->setText(String(Constants::RadToGrad(point->getPoint()->getAzimuth()), 2));
+		if (exceptField != textE->getName()) textE->setText(String(Constants::RadToGrad(point->getPoint()->getElevation()), 2));
 		if (exceptField != textD->getName()) textD->setText(String(point->getPoint()->getDistance(), 3));
 	}
 	else
@@ -362,11 +362,11 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 
 	if (source.getName() == textA->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setAzimuth(GradToRad(textA->getText().getFloatValue()));
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setAzimuth(Constants::GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setElevation(GradToRad(textE->getText().getFloatValue()));
+		pEditablePointsArray->getUnchecked(selection)->getPoint()->setElevation(Constants::GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
@@ -407,16 +407,6 @@ void PointInfoControl::setFieldsEnabled(bool enable) const
 	textA->setEnabled(enable);
 	textE->setEnabled(enable);
 	textD->setEnabled(enable);
-}
-
-double PointInfoControl::RadToGrad(double rad) const
-{
-	return rad * 180.0 / PI;
-}
-
-double PointInfoControl::GradToRad(float grad) const
-{
-	return grad * PI / 180.0;
 }
 
 //[/MiscUserCode]
