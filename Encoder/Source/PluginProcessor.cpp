@@ -189,11 +189,17 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
 		// create B-format
-		for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+		int numSamples = buffer.getNumSamples();
+		for (int iSample = 0; iSample < numSamples; iSample++)
 		{
+			double fractionNew = 1.0 / numSamples * iSample;
+			double fractionOld = 1.0 - fractionNew;
 			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += float(inputData[iSample] * currentCoefficients[iChannel]);
+				outputBufferPointers[iChannel][iSample] += float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iChannel]));
 		}
+
+		// keep coefficients
+		memcpy(&lastCoefficients, &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
 	}
 }
 
