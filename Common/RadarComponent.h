@@ -39,7 +39,8 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class RadarComponent  : public Component
+class RadarComponent  : public Component,
+                        public Timer
 {
 public:
     //==============================================================================
@@ -49,6 +50,7 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void setPointInfoVisible(bool visible);
+    void timerCallback() override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
