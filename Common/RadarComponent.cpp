@@ -87,11 +87,11 @@ void RadarComponent::resized()
 	}
 	else
 	{
-		//[/UserPreResize]
+    //[/UserPreResize]
 
-		radar->setBounds(0, 0 + 100, getWidth() - 0, getHeight() - 100);
-		pointInfo->setBounds(0, 0, getWidth() - 0, 100);
-		//[UserResized] Add your own custom resize handling here..
+    radar->setBounds (0, 0 + 100, getWidth() - 0, getHeight() - 100);
+    pointInfo->setBounds (0, 0, getWidth() - 0, 100);
+    //[UserResized] Add your own custom resize handling here..
 	}
     //[/UserResized]
 }
@@ -101,8 +101,14 @@ void RadarComponent::resized()
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void RadarComponent::setPointInfoVisible(bool visible)
 {
-	this->showPointInfo = visible;
-	resized();
+    this->showPointInfo = visible;
+    startTimer(100); // pseudo async resize call to avoid OSX crash
+}
+
+void RadarComponent::timerCallback()
+{
+    stopTimer();
+    resized();
 }
 //[/MiscUserCode]
 
@@ -117,7 +123,7 @@ void RadarComponent::setPointInfoVisible(bool visible)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
-                 parentClasses="public Component" constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, OwnedArray&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 parentClasses="public Component, public Timer" constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, OwnedArray&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
