@@ -171,7 +171,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
-	speakerList->getHeader().addColumn("Gain", COLUMN_ID_GAIN, 80);
+	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
@@ -567,7 +567,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 {
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: pSpeakerArray->getUnchecked(rowNumber)->setGain(newValue); break;
+	case COLUMN_ID_GAIN: pSpeakerArray->getUnchecked(rowNumber)->setGain(pow(10.0, 0.1 * newValue)); break;
 	case COLUMN_ID_X: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setX(newValue); break;
 	case COLUMN_ID_Y: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setY(newValue); break;
 	case COLUMN_ID_Z: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setZ(newValue); break;
@@ -586,7 +586,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 {
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: return pSpeakerArray->getUnchecked(rowNumber)->getGain();
+	case COLUMN_ID_GAIN: return 10.0 * log10(pSpeakerArray->getUnchecked(rowNumber)->getGain());
 	case COLUMN_ID_X: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getX();
 	case COLUMN_ID_Y: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getY();
 	case COLUMN_ID_Z: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getZ();
@@ -627,7 +627,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
 		return SliderRange(0.0, 180.0, 0.1);
 
 	case COLUMN_ID_GAIN:
-		return SliderRange(0.0, 1.2, 0.001);
+		return SliderRange(-128.0, 12.0, 0.1);
 
 	case COLUMN_ID_DISTANCE:
 		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
