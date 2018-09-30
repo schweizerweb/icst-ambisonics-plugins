@@ -733,7 +733,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
 		return SliderRange(-360.0, 360.0, 0.1);
 
 	case COLUMN_ID_E:
-		return SliderRange(0.0, 180.0, 0.1);
+		return SliderRange(-180.0, 180.0, 0.1);
 
 	case COLUMN_ID_GAIN:
 		return SliderRange(-128.0, 12.0, 0.1);
