@@ -167,7 +167,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpea
 	speakerList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
 	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 50);
 	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 50);
-	speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
+	//speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
 	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
