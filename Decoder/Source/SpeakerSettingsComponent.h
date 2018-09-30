@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
+#include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "PresetInfo.h"
 #include "SliderRange.h"
@@ -43,6 +44,7 @@
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
+                                  public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ComboBox::Listener,
                                   public Button::Listener,
@@ -50,14 +52,15 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
+    SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, ActionListener* pTestSoundListener);
+	static void showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
+    void textEditorTextChanged(TextEditor& editor) override;
 
-	// table overrides
+    // table overrides
 	int getNumRows() override;
 	void selectedRowsChanged(int lastRowSelected) override;
 	void paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override;
@@ -75,12 +78,13 @@ public:
 
 	void updateDirectionFlip() const;
 	void loadPreset(PresetInfo* preset) const;
-	void updateComboBox(String elementToSelect = String::empty) const;
+	void updateComboBox(String elementToSelect = String()) const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
 	static int fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
+	void controlDimming();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -97,28 +101,36 @@ private:
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;
+	DecoderSettings* pDecoderSettings;
 	DelayHelper delayHelper;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<GroupComponent> groupAmbisonics;
-    ScopedPointer<GroupComponent> groupSpeakers;
-    ScopedPointer<ComboBox> comboBoxChannelConfig;
-    ScopedPointer<Label> label;
-    ScopedPointer<TextButton> buttonLoad;
-    ScopedPointer<TextButton> buttonSave;
-    ScopedPointer<TableListBox> speakerList;
-    ScopedPointer<TextButton> buttonAdd;
-    ScopedPointer<TextButton> buttonRemove;
-    ScopedPointer<TextButton> buttonMoveDown;
-    ScopedPointer<TextButton> buttonMoveUp;
-    ScopedPointer<Slider> sliderDistanceScaler;
-    ScopedPointer<MultiSliderControl> ambiChannelControl;
-    ScopedPointer<TextButton> buttonBasic;
-    ScopedPointer<Label> labelChannelWeights;
-    ScopedPointer<TextButton> buttonInPhase;
-    ScopedPointer<ToggleButton> btnFlipDirection;
-    ScopedPointer<Label> labelDistanceScaler;
+    std::unique_ptr<GroupComponent> groupOsc;
+    std::unique_ptr<GroupComponent> groupAmbisonics;
+    std::unique_ptr<GroupComponent> groupSpeakers;
+    std::unique_ptr<ComboBox> comboBoxChannelConfig;
+    std::unique_ptr<Label> labelPresets;
+    std::unique_ptr<TextButton> buttonLoad;
+    std::unique_ptr<TextButton> buttonSave;
+    std::unique_ptr<TableListBox> speakerList;
+    std::unique_ptr<TextButton> buttonAdd;
+    std::unique_ptr<TextButton> buttonRemove;
+    std::unique_ptr<TextButton> buttonMoveDown;
+    std::unique_ptr<TextButton> buttonMoveUp;
+    std::unique_ptr<Slider> sliderDistanceScaler;
+    std::unique_ptr<MultiSliderControl> ambiChannelControl;
+    std::unique_ptr<TextButton> buttonBasic;
+    std::unique_ptr<Label> labelChannelWeights;
+    std::unique_ptr<TextButton> buttonInPhase;
+    std::unique_ptr<ToggleButton> btnFlipDirection;
+    std::unique_ptr<Label> labelDistanceScaler;
+    std::unique_ptr<ToggleButton> btnEditMode;
+    std::unique_ptr<TextEditor> textOscPort;
+    std::unique_ptr<Label> labelOscPort;
+    std::unique_ptr<TextEditor> textTimeout;
+    std::unique_ptr<Label> labelTimeout;
+    std::unique_ptr<ToggleButton> toggleOsc;
 
 
     //==============================================================================

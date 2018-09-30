@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.2.1
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -48,6 +48,7 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void setPointInfoVisible(bool visible);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -58,11 +59,12 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     ZoomSettings zoomSettings;
+	bool showPointInfo;
     //[/UserVariables]
 
     //==============================================================================
-    ScopedPointer<Radar3D> radar;
-    ScopedPointer<PointInfoControl> pointInfo;
+    std::unique_ptr<Radar3D> radar;
+    std::unique_ptr<PointInfoControl> pointInfo;
 
 
     //==============================================================================

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.3.0
+  Created with Projucer version: 5.3.2
 
   ------------------------------------------------------------------------------
 
@@ -33,16 +33,19 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    addAndMakeVisible (groupOscReceive = new GroupComponent ("groupOscReceive",
-                                                             TRANS("OSC Receive")));
+    groupOscReceive.reset (new GroupComponent ("groupOscReceive",
+                                               TRANS("OSC Receive")));
+    addAndMakeVisible (groupOscReceive.get());
 
-    addAndMakeVisible (toggleReceiveOsc = new ToggleButton ("toggleReceiveOsc"));
+    toggleReceiveOsc.reset (new ToggleButton ("toggleReceiveOsc"));
+    addAndMakeVisible (toggleReceiveOsc.get());
     toggleReceiveOsc->setButtonText (TRANS("Enable"));
     toggleReceiveOsc->addListener (this);
 
     toggleReceiveOsc->setBounds (18, 29, 150, 24);
 
-    addAndMakeVisible (textOscReceivePort = new TextEditor ("textOscReceivePort"));
+    textOscReceivePort.reset (new TextEditor ("textOscReceivePort"));
+    addAndMakeVisible (textOscReceivePort.get());
     textOscReceivePort->setMultiLine (false);
     textOscReceivePort->setReturnKeyStartsNewLine (false);
     textOscReceivePort->setReadOnly (false);
@@ -51,24 +54,28 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     textOscReceivePort->setPopupMenuEnabled (true);
     textOscReceivePort->setText (String());
 
-    addAndMakeVisible (labelOscPort = new Label ("labelOscPort",
-                                                 TRANS("OSC-Port:\n")));
+    labelOscPort.reset (new Label ("labelOscPort",
+                                   TRANS("OSC-Port:\n")));
+    addAndMakeVisible (labelOscPort.get());
     labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscPort->setJustificationType (Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (TextEditor::textColourId, Colours::black);
     labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (groupOscSend = new GroupComponent ("groupOscSend",
-                                                          TRANS("OSC Send")));
+    groupOscSend.reset (new GroupComponent ("groupOscSend",
+                                            TRANS("OSC Send")));
+    addAndMakeVisible (groupOscSend.get());
 
-    addAndMakeVisible (toggleSendOsc = new ToggleButton ("toggleSendOsc"));
+    toggleSendOsc.reset (new ToggleButton ("toggleSendOsc"));
+    addAndMakeVisible (toggleSendOsc.get());
     toggleSendOsc->setButtonText (TRANS("Enable"));
     toggleSendOsc->addListener (this);
 
     toggleSendOsc->setBounds (17, 101, 150, 24);
 
-    addAndMakeVisible (textOscSendIp = new TextEditor ("textOscSendIp"));
+    textOscSendIp.reset (new TextEditor ("textOscSendIp"));
+    addAndMakeVisible (textOscSendIp.get());
     textOscSendIp->setMultiLine (false);
     textOscSendIp->setReturnKeyStartsNewLine (false);
     textOscSendIp->setReadOnly (false);
@@ -77,15 +84,17 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     textOscSendIp->setPopupMenuEnabled (true);
     textOscSendIp->setText (String());
 
-    addAndMakeVisible (labelOscSendIp = new Label ("labelOscSendIp",
-                                                   TRANS("Target Host:")));
+    labelOscSendIp.reset (new Label ("labelOscSendIp",
+                                     TRANS("Target Host:")));
+    addAndMakeVisible (labelOscSendIp.get());
     labelOscSendIp->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendIp->setJustificationType (Justification::centredLeft);
     labelOscSendIp->setEditable (false, false, false);
     labelOscSendIp->setColour (TextEditor::textColourId, Colours::black);
     labelOscSendIp->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (textOscSendPort = new TextEditor ("textOscSendPort"));
+    textOscSendPort.reset (new TextEditor ("textOscSendPort"));
+    addAndMakeVisible (textOscSendPort.get());
     textOscSendPort->setMultiLine (false);
     textOscSendPort->setReturnKeyStartsNewLine (false);
     textOscSendPort->setReadOnly (false);
@@ -94,15 +103,17 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     textOscSendPort->setPopupMenuEnabled (true);
     textOscSendPort->setText (String());
 
-    addAndMakeVisible (labelOscSendPort = new Label ("labelOscSendPort",
-                                                     TRANS("OSC-Port:\n")));
+    labelOscSendPort.reset (new Label ("labelOscSendPort",
+                                       TRANS("OSC-Port:\n")));
+    addAndMakeVisible (labelOscSendPort.get());
     labelOscSendPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendPort->setJustificationType (Justification::centredLeft);
     labelOscSendPort->setEditable (false, false, false);
     labelOscSendPort->setColour (TextEditor::textColourId, Colours::black);
     labelOscSendPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (textOscSendInterval = new TextEditor ("textOscSendInterval"));
+    textOscSendInterval.reset (new TextEditor ("textOscSendInterval"));
+    addAndMakeVisible (textOscSendInterval.get());
     textOscSendInterval->setMultiLine (false);
     textOscSendInterval->setReturnKeyStartsNewLine (false);
     textOscSendInterval->setReadOnly (false);
@@ -111,24 +122,28 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     textOscSendInterval->setPopupMenuEnabled (true);
     textOscSendInterval->setText (String());
 
-    addAndMakeVisible (labelOscSendInterval = new Label ("labelOscSendInterval",
-                                                         TRANS("Interval [ms]:")));
+    labelOscSendInterval.reset (new Label ("labelOscSendInterval",
+                                           TRANS("Interval [ms]:")));
+    addAndMakeVisible (labelOscSendInterval.get());
     labelOscSendInterval->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendInterval->setJustificationType (Justification::centredLeft);
     labelOscSendInterval->setEditable (false, false, false);
     labelOscSendInterval->setColour (TextEditor::textColourId, Colours::black);
     labelOscSendInterval->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (groupDistanceEncoding = new GroupComponent ("groupDistanceEncoding",
-                                                                   TRANS("Distance Encoding")));
+    groupDistanceEncoding.reset (new GroupComponent ("groupDistanceEncoding",
+                                                     TRANS("Distance Encoding")));
+    addAndMakeVisible (groupDistanceEncoding.get());
 
-    addAndMakeVisible (toggleDistanceEncoding = new ToggleButton ("toggleDistanceEncoding"));
+    toggleDistanceEncoding.reset (new ToggleButton ("toggleDistanceEncoding"));
+    addAndMakeVisible (toggleDistanceEncoding.get());
     toggleDistanceEncoding->setButtonText (TRANS("Enable"));
     toggleDistanceEncoding->addListener (this);
 
     toggleDistanceEncoding->setBounds (17, 242, 150, 24);
 
-    addAndMakeVisible (textUnitCircleRadius = new TextEditor ("textUnitCircleRadius"));
+    textUnitCircleRadius.reset (new TextEditor ("textUnitCircleRadius"));
+    addAndMakeVisible (textUnitCircleRadius.get());
     textUnitCircleRadius->setMultiLine (false);
     textUnitCircleRadius->setReturnKeyStartsNewLine (false);
     textUnitCircleRadius->setReadOnly (false);
@@ -137,18 +152,21 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     textUnitCircleRadius->setPopupMenuEnabled (true);
     textUnitCircleRadius->setText (String());
 
-    addAndMakeVisible (labelUnitCircleRadius = new Label ("labelUnitCircleRadius",
-                                                          TRANS("Unit Circle Radius:")));
+    labelUnitCircleRadius.reset (new Label ("labelUnitCircleRadius",
+                                            TRANS("Unit Circle Radius:")));
+    addAndMakeVisible (labelUnitCircleRadius.get());
     labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelUnitCircleRadius->setJustificationType (Justification::centredLeft);
     labelUnitCircleRadius->setEditable (false, false, false);
     labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
     labelUnitCircleRadius->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    addAndMakeVisible (groupOrientation = new GroupComponent ("groupOrientation",
-                                                              TRANS("Orientation")));
+    groupOrientation.reset (new GroupComponent ("groupOrientation",
+                                                TRANS("Orientation")));
+    addAndMakeVisible (groupOrientation.get());
 
-    addAndMakeVisible (toggleDirectionFlip = new ToggleButton ("toggleDirectionFlip"));
+    toggleDirectionFlip.reset (new ToggleButton ("toggleDirectionFlip"));
+    addAndMakeVisible (toggleDirectionFlip.get());
     toggleDirectionFlip->setButtonText (TRANS("Flip Direction"));
     toggleDirectionFlip->addListener (this);
 
@@ -249,25 +267,25 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == toggleReceiveOsc)
+    if (buttonThatWasClicked == toggleReceiveOsc.get())
     {
         //[UserButtonCode_toggleReceiveOsc] -- add your button handler code here..
 		pEncoderSettings->oscReceiveFlag = toggleReceiveOsc->getToggleState();
         //[/UserButtonCode_toggleReceiveOsc]
     }
-    else if (buttonThatWasClicked == toggleSendOsc)
+    else if (buttonThatWasClicked == toggleSendOsc.get())
     {
         //[UserButtonCode_toggleSendOsc] -- add your button handler code here..
 		pEncoderSettings->oscSendFlag = toggleSendOsc->getToggleState();
         //[/UserButtonCode_toggleSendOsc]
     }
-    else if (buttonThatWasClicked == toggleDistanceEncoding)
+    else if (buttonThatWasClicked == toggleDistanceEncoding.get())
     {
         //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
 		pEncoderSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
         //[/UserButtonCode_toggleDistanceEncoding]
     }
-    else if (buttonThatWasClicked == toggleDirectionFlip)
+    else if (buttonThatWasClicked == toggleDirectionFlip.get())
     {
         //[UserButtonCode_toggleDirectionFlip] -- add your button handler code here..
 		pEncoderSettings->directionFlip = toggleDirectionFlip->getToggleState();
@@ -283,15 +301,15 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 {
-	if (&textEditor == textOscReceivePort)
+	if (&textEditor == textOscReceivePort.get())
 		checkForNumbers(&textEditor, &pEncoderSettings->oscReceivePort);
-	else if (&textEditor == textOscSendPort)
+	else if (&textEditor == textOscSendPort.get())
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendPort);
-	else if (&textEditor == textOscSendInterval)
+	else if (&textEditor == textOscSendInterval.get())
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendIntervalMs);
-	else if (&textEditor == textOscSendIp)
+	else if (&textEditor == textOscSendIp.get())
 		pEncoderSettings->oscSendTargetHost = textEditor.getText();
-	else if (&textEditor == textUnitCircleRadius)
+	else if (&textEditor == textUnitCircleRadius.get())
 		checkForNumbers(&textEditor, &pEncoderSettings->unitCircleRadius);
 }
 

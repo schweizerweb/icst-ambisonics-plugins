@@ -29,6 +29,8 @@ public:
 	int lastUIWidth;
 	int lastUIHeight;
 
+	bool editMode;
+
 	void saveToXml(XmlElement* xmlElement) const;
 	void loadFromXml(XmlElement* xmlElement);
 };

@@ -17,6 +17,8 @@ RadarOptions::RadarOptions()
 	audioParams = nullptr;
 	displayTimeout = 1000;
 	editablePointsAsSquare = false;
+	showDisplayOnlyPoints = true;
+	showEditablePoints = true;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const
