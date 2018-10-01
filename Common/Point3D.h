@@ -98,13 +98,13 @@ public:
 	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; z = newZ; if (notify) audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
-	inline void setAzimuth(ValueType newAzimuth, bool notify = true) noexcept { aedChanged = true; azimuth = newAzimuth; if (notify) audioParams.notifyA(azimuth); }
+	inline void setAzimuth(ValueType newAzimuth) noexcept { aedChanged = true; azimuth = newAzimuth; }
 
 		/** Sets the Point3D's elevation. */
-	inline void setElevation(ValueType newElevation, bool notify = true) noexcept { aedChanged = true; elevation = newElevation; if (notify) audioParams.notifyE(elevation); }
+	inline void setElevation(ValueType newElevation) noexcept { aedChanged = true; elevation = newElevation; }
 
 		/** Sets the Point3D's distance. */
-	inline void setDistance(ValueType newDistance, bool notify = true) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); if (notify) audioParams.notifyD(distance); }
+	inline void setDistance(ValueType newDistance) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
 
 		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
 	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
@@ -113,13 +113,13 @@ public:
 	Point3D withY(ValueType newY) const noexcept{ return Point3D(x, newY, z); }
 
 		/** Changes the Point3D's x and y coordinates. */
-	void setXY(ValueType newX, ValueType newY) noexcept{ xyzChanged = true; x = newX; y = newY; }
+	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { xyzChanged = true; x = newX; y = newY; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
 
 		/** Changes the Point3D's x and z coordinates. */
-	void setXZ(ValueType newX, ValueType newZ) noexcept{ xyzChanged = true; x = newX; z = newZ; }
+	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; x = newX; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
 
 		/** Changes the Point3D's y and z coordinates. */
-	void setYZ(ValueType newY, ValueType newZ) noexcept{ xyzChanged = true; y = newY; z = newZ; }
+	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; y = newY; z = newZ; if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
 		//==============================================================================
 		/** Returns a Point3D with a given offset from this one. */
@@ -325,10 +325,6 @@ private:
 		azimuth = atan2(y, x);
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
-
-		audioParams.notifyA(azimuth);
-		audioParams.notifyE(elevation);
-		audioParams.notifyD(distance);
 	}
 
 	void calculateXyz()

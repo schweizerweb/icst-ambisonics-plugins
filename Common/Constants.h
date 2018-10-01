@@ -26,6 +26,12 @@ public:
 	const static double ElevationGradMax;
 	const static double GainDbMin;
 	const static double GainDbMax;
+	const static float XMin;
+	const static float XMax;
+	const static float YMin;
+	const static float YMax;
+	const static float ZMin;
+	const static float ZMax;
 
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);

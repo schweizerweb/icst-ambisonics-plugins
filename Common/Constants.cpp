@@ -22,6 +22,13 @@ const double Constants::ElevationGradMin = -90.0;
 const double Constants::ElevationGradMax = 90.0;
 const double Constants::GainDbMin = -128.0;
 const double Constants::GainDbMax = 12.0;
+const float Constants::XMin = -1.0;
+const float Constants::XMax = 1.0;
+const float Constants::YMin = -1.0;
+const float Constants::YMax = 1.0;
+const float Constants::ZMin = -1.0;
+const float Constants::ZMax = 1.0;
+
 
 double Constants::RadToGrad(double rad)
 {
