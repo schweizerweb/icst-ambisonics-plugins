@@ -323,6 +323,7 @@ private:
 		distance = distance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : distance;
 		
 		azimuth = atan2(y, x);
+		azimuth = azimuth < 0.0 ? 2.0 * PI + azimuth : azimuth;
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
 	}
