@@ -77,6 +77,10 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     Write-Output " "
 }
 
+Write-Output "Deleting Auto-Generated jucer-files"
+Remove-Item -Path ./Encoder/*AutoGen.jucer -Force
+Remove-Item -Path ./Decoder/*AutoGen.jucer -Force
+
 #program start
 Write-Output "Generating Encoder files"
 $source = '.\Encoder\AmbisonicEncoder.jucer'
