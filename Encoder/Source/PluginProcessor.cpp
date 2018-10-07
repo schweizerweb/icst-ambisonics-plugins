@@ -173,7 +173,8 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-	const int totalNumInputChannels = getTotalNumInputChannels();
+	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sourcesArray.size());
+	const float channelScaler = 1.0f / totalNumInputChannels;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
 	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
@@ -186,7 +187,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
-	for (int iSource = 0; iSource < sourcesArray.size() && iSource < totalNumInputChannels; iSource++)
+	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
 		// keep RMS
 		sourcesArray[iSource]->setRms(inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
@@ -204,11 +205,11 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
 			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iChannel]));
+				outputBufferPointers[iChannel][iSample] += channelScaler * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
-		memcpy(&lastCoefficients, &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
+		memcpy(&lastCoefficients[iSource], &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
 	}
 }
 

@@ -73,7 +73,7 @@ private:
 	ScopedPointer<AmbiOSCSender> pOscSender;
 	Array<AudioParameterSet> audioParams;
 	StatusMessageHandler statusMessageHandler;
-	double lastCoefficients[JucePlugin_MaxNumOutputChannels];
+	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
