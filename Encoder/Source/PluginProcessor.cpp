@@ -40,14 +40,14 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		String indexStr = String(i + 1);
 		
 		AudioParameterSet set;
-		set.pA = new AudioParameterFloatAmbi("Azimuth" + indexStr, "Azimuth " + indexStr, "Point " + indexStr + ": Azimuth", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::AzimuthRadMin, Constants::AzimuthRadMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Azimuth);
-		set.pE = new AudioParameterFloatAmbi("Elevation" + indexStr, "Elevation " + indexStr, "Point " + indexStr + ": Elevation", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ElevationRadMin, Constants::ElevationRadMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Elevation);
-		set.pD = new AudioParameterFloatAmbi("Distance" + indexStr, "Distance " + indexStr, "Point " + indexStr + ": Distance", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::DistanceMin, Constants::DistanceMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Distance);
+		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::X);
+		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Y);
+		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Z);
 
 		audioParams.add(set);
-		addParameter(set.pA);
-		addParameter(set.pE);
-		addParameter(set.pD);
+		addParameter(set.pX);
+		addParameter(set.pY);
+		addParameter(set.pZ);
 	}
 }
 

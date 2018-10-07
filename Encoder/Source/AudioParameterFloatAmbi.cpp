@@ -68,12 +68,9 @@ void AudioParameterFloatAmbi::setValue(float newValue)
 		{
 			switch (type)
 			{
-			case Azimuth: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setAzimuth(value, false); break;
-			case Elevation: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setElevation(value, false); break;
-			case Distance: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setDistance(value, false); break;
-			case X: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setX(value); break;
-			case Y: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setY(value); break;
-			case Z: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setZ(value); break;
+			case X: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setX(value, false); break;
+			case Y: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setY(value, false); break;
+			case Z: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setZ(value, false); break;
 			}
 		}
 	}
