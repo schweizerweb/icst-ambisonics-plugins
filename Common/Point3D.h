@@ -121,6 +121,9 @@ public:
 		/** Changes the Point3D's y and z coordinates. */
 	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; y = newY; z = newZ; if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
+	/** Changes the Point3D's x, y and z coordinates. */
+	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { xyzChanged = true; x = newX; y = newY; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
+
 		//==============================================================================
 		/** Returns a Point3D with a given offset from this one. */
 	Point3D translated(ValueType deltaX, ValueType deltaY, ValueType deltaZ) const noexcept{ return Point3D(getX() + deltaX, getY() + deltaY, getZ() + deltaZ); }
