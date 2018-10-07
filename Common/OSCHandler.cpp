@@ -106,14 +106,12 @@ void OSCHandler::handleOwnInternalStyle(const OSCMessage& message) const
 	
 	String id = message[0].getString();
 	String name = message[1].getString();
-	float a = message[2].getFloat32();
-	float e = message[3].getFloat32();
-	float d = message[4].getFloat32();
+	float x = message[2].getFloat32();
+	float y = message[3].getFloat32();
+	float z = message[4].getFloat32();
 	float rms = message[5].getFloat32();
 	Colour color = Colour(uint32(message[6].getInt32()));
-	if (!checkAed(a, e, d))
-		return;
-
+	
 	int index = -1;
 	for (int i = 0; i < pAmbiPointArray->size(); i++)
 	{
@@ -132,9 +130,7 @@ void OSCHandler::handleOwnInternalStyle(const OSCMessage& message) const
 
 	AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(index);
 	ambiPt->setName(name);
-	ambiPt->getPoint()->setAzimuth(a);
-	ambiPt->getPoint()->setElevation(e);
-	ambiPt->getPoint()->setDistance(d);
+	ambiPt->getPoint()->setXYZ(x, y, z);
 	ambiPt->setRms(rms);
 	ambiPt->setColor(color);
 	ambiPt->setAlive(Time::currentTimeMillis());

@@ -54,7 +54,7 @@ public:
 	}
 
 	AmbiPoint(XmlElement* element) :
-		id(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_ID, Uuid().toString())),
+		id(Uuid().toString()),
 		point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
@@ -66,7 +66,7 @@ public:
 	}
 
 	AmbiPoint(XmlElement* element, AudioParameterSet audioParams) :
-		id(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_ID, Uuid().toString())),
+		id(Uuid().toString()),
 		point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_X),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Y),
 		                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z),
