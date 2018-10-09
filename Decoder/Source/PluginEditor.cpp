@@ -77,7 +77,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
-	labelVersion->setText("V. " + String(ProjectInfo::versionString), dontSendNotification);
+	labelVersion->setText("ZDec " + String(ProjectInfo::versionString), dontSendNotification);
 	updateRadarOptions();
     //[/Constructor]
 }

@@ -47,6 +47,8 @@
       <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiSettings.cpp"/>
       <FILE id="z0ap1U" name="AmbiSettings.h" compile="0" resource="0" file="../Common/AmbiSettings.h"/>
+      <FILE id="RAo2Ku" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
+      <FILE id="rdwYUW" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="clRUKZ" name="DelayBuffer.cpp" compile="1" resource="0" file="../Common/DelayBuffer.cpp"/>
       <FILE id="hhDqWe" name="DelayBuffer.h" compile="0" resource="0" file="../Common/DelayBuffer.h"/>
       <FILE id="JK1b6q" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
@@ -78,6 +80,10 @@
       <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="MoSk59" name="StatusMessageHandler.cpp" compile="1" resource="0"
+            file="../Common/StatusMessageHandler.cpp"/>
+      <FILE id="tzGooV" name="StatusMessageHandler.h" compile="0" resource="0"
+            file="../Common/StatusMessageHandler.h"/>
       <FILE id="zm8AUT" name="TestSoundGenerator.cpp" compile="1" resource="0"
             file="../Common/TestSoundGenerator.cpp"/>
       <FILE id="z8bkap" name="TestSoundGenerator.h" compile="0" resource="0"

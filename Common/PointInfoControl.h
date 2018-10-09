@@ -52,8 +52,6 @@ public:
 	void disableListeners();
 	void enableListeners();
 	void setFieldsEnabled(bool enable) const;
-	double RadToGrad(double rad) const;
-	double GradToRad(float grad) const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
