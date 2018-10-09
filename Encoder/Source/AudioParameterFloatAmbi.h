@@ -16,7 +16,7 @@
 class AudioParameterFloatAmbi : public AudioParameterFloatAmbiAbs
 {
 public:
-	enum ParamType { Azimuth, Elevation, Distance, X, Y, Z };
+	enum ParamType { X, Y, Z };
 
 	AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
 		NormalisableRange<float> r, float def, OwnedArray<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType);
