@@ -213,7 +213,7 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	ScopedPointer<PresetInfo> preset = new PresetInfo();
 	preset->setName("LastState");
 	for (AmbiPoint* pt : speakerArray)
-		preset->getPoints()->add(new AmbiPoint(*pt));
+		preset->getPoints()->add(new AmbiPoint(pt));
 	preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
 	preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
@@ -247,7 +247,7 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 				speakerArray.clear();
 				for (int i = 0; i < preset->getPoints()->size(); i++)
 				{
-					speakerArray.add(new AmbiPoint(*preset->getPoints()->getUnchecked(i)));
+					speakerArray.add(new AmbiPoint(preset->getPoints()->getUnchecked(i)));
 				}
 				pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 				pAmbiSettings->setDirectionFlip(preset->getAmbiSettings()->getDirectionFlip());

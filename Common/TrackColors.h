@@ -16,29 +16,29 @@
 class TrackColors
 {
 public:
-	TrackColors()
+	static Colour getColor(int trackNb)
 	{
-		trackColors.add(Colours::black);
-		trackColors.add(Colours::blue);
-		trackColors.add(Colours::darkgreen);
-		trackColors.add(Colours::darkred);
-		trackColors.add(Colours::magenta);
-		trackColors.add(Colours::cyan);
-		trackColors.add(Colours::darkblue);
-		trackColors.add(Colours::darkgrey);
-		trackColors.add(Colours::darkorange);
-		trackColors.add(Colours::darkgrey);
-		trackColors.add(Colours::green);
+		int index = (trackNb -1) % 10;
+		switch(index)
+		{
+		case 0: return Colours::blue;
+		case 1: return Colours::darkgreen;
+		case 2: return Colours::darkred;
+		case 3: return Colours::magenta;
+		case 4: return Colours::cyan;
+		case 5: return Colours::darkblue;
+		case 6: return Colours::darkgrey;
+		case 7: return Colours::darkorange;
+		case 8: return Colours::darkgrey;
+		case 9: return Colours::green;
+		default: return  Colours::black;
+		}
 	}
 
-	Colour getColor(int trackNb)
+	static Colour getSpeakerColor()
 	{
-		return trackColors[trackNb % trackColors.size()];
+		return Colours::darkgrey;
 	}
-
-private:
-	Array<Colour> trackColors;
-
 };
 
 #endif  // TRACKCOLORS_H_INCLUDED

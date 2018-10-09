@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "RadarOptions.h"
+#include "TrackColors.h"
 //[/Headers]
 
 #include "PointInfoControl.h"
@@ -343,7 +344,7 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 	if (source.getName() == textName->getName())
 	{
 		pEditablePointsArray->getUnchecked(selection)->setName(textName->getText());
-		pEditablePointsArray->getUnchecked(selection)->setColorIndex(textName->getText().initialSectionContainingOnly("0123456789").getIntValue());
+		pEditablePointsArray->getUnchecked(selection)->setColor(TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
 	}
 
 	if (source.getName() == textX->getName())

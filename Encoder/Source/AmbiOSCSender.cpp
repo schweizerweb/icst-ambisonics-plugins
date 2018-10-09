@@ -54,7 +54,7 @@ void AmbiOSCSender::timerCallback()
 			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getElevation())),
 			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getDistance())),
 			OSCArgument(pPoints->getUnchecked(iPoint)->getRms(true)),
-			OSCArgument(pPoints->getUnchecked(iPoint)->getColorIndex()));
+			OSCArgument(int32(pPoints->getUnchecked(iPoint)->getColor().getARGB())));
 		oscSender->send(message);
 	}
 

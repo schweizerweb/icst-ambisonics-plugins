@@ -21,13 +21,14 @@ Radar2D::Radar2D(RadarMode mode, OwnedArray<AmbiPoint>* pEditablePointsArray, Ow
 	pPointSelection(pPointSelection),
 	pRadarOptions(pRadarOptions)
 {
+	infoImage = new Image();
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(true);
 
 	pZoomSettings->addChangeListener(this);
 
-	radarColors = new RadarColors(0);
+	radarColors = new RadarColors();
 }
 
 Radar2D::~Radar2D()
@@ -70,13 +71,26 @@ float Radar2D::getFontSize() const
 	return radarViewport.getWidth() / 25.0f;
 }
 
+void Radar2D::drawRadar(Graphics* g) const
+{
+	const ScopedLock lock(radarBackgroundLock);
+	g->drawImageAt(*radarBackground, radarViewport.getX(), radarViewport.getY());
+}
+
+void Radar2D::drawInfoLabel(Graphics* g) const
+{
+	const ScopedLock lock(infoLabelLock);
+	g->drawImageAt(*infoImage, radarViewport.getX() + 3, radarViewport.getY());
+}
+
 void Radar2D::paint (Graphics&)
 {
 }
 
-void Radar2D::createRadarBackground()
+Image Radar2D::createRadarBackground() const
 {
-	radarUpdated = false;
+	const MessageManagerLock lock;
+
 	Rectangle<float> localBounds = radarViewport.toFloat();
 
 	Image img(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
@@ -98,7 +112,38 @@ void Radar2D::createRadarBackground()
 	g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
 	g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
-	radarBackground = img;
+	return img;
+}
+
+void Radar2D::updateRadarBackground()
+{
+	Image img = createRadarBackground();
+
+	const ScopedLock lock(radarBackgroundLock);
+	radarBackground = new Image(img);
+}
+
+Image Radar2D::createInfoLabel(String info)
+{
+	const MessageManagerLock lock;
+	int width = infoFont.getStringWidth(info);
+	if (width <= 0)
+		return Image();
+
+	Image img = Image(Image::ARGB, width, INFO_FONT_SIZE, true);
+	Graphics g(img);
+	g.setColour(radarColors->getInfoTextColor());
+	g.setFont(infoFont);
+	g.drawSingleLineText(info, 0, INFO_FONT_SIZE);
+	return img;
+}
+
+void Radar2D::updateInfoLabel(String info)
+{
+	Image img = createInfoLabel(info);
+
+	const ScopedLock lock(infoLabelLock);
+	infoImage = new Image(img);
 }
 
 float Radar2D::getValueToScreenRatio() const
@@ -121,17 +166,19 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
-void Radar2D::paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-	int y = int(screenPt.getY() + (screenPt.getY() < (offset + getFontSize()) ? 2.0 : -1.0) * offset);
+	int y = screenPt.getY() > offset + labelImage.getHeight()
+		? int(screenPt.getY() - offset - labelImage.getHeight())
+		: int(screenPt.getY() + offset);
 	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + text.length() * getFontSize() / 2.0f))
+		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth()))
 	{
-		g->drawSingleLineText(text, int(screenPt.getX() - offset), y, Justification::right);
+		g->drawImageAt(labelImage, int(screenPt.getX() - offset - labelImage.getWidth()), y);
 	}
 	else
 	{
-		g->drawSingleLineText(text, int(screenPt.getX() + offset), y);
+		g->drawImageAt(labelImage, int(screenPt.getX() + offset), y);
 	}
 }
 
@@ -151,7 +198,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		}
 	}
 
-	g->setColour(trackColors.getColor(point->getColorIndex()));
+	g->setColour(point->getColor());
 	
 	if(square)
 		drawSquare(g, &screenPt, pt, pointSize);
@@ -161,7 +208,8 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		g->fillEllipse(rect.withCentre(screenPt));
 	}
 	
-	paintPointLabel(g, point->getName(), screenPt, pointSize * (square ? 0.7f : 0.5f));
+	ScopedPointer<Image> labelImage = point->getLabelImage();
+	paintPointLabel(g, *labelImage, screenPt, pointSize * (square ? 0.7f : 0.5f));
 }
 
 void Radar2D::renderOpenGL()
@@ -184,11 +232,8 @@ void Radar2D::renderOpenGL()
 		g.setColour(radarColors->getRadarLineColor());
 		g.drawRect(radarViewport, 1);   // draw an outline around the component
 
-		if (radarUpdated)
-			createRadarBackground();
-
-		g.drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
-
+		drawRadar(&g);
+		
 		if (pEditablePointsArray != nullptr && pRadarOptions->showEditablePoints)
 		{
 			for (int i = 0; i < pEditablePointsArray->size(); i++)
@@ -216,8 +261,7 @@ void Radar2D::renderOpenGL()
 			}
 		}
 
-		g.setColour(radarColors->getInfoTextColor());
-		g.drawText(infoString, radarViewport.getX(), radarViewport.getY(), radarViewport.getWidth(), 30, Justification::topLeft);
+		drawInfoLabel(&g);
 	}
 }
 
@@ -231,8 +275,8 @@ void Radar2D::openGLContextClosing()
 
 void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if(source == pZoomSettings)
-		radarUpdated = true;
+	if (source == pZoomSettings)
+		updateRadarBackground();
 }
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
@@ -288,12 +332,12 @@ void Radar2D::resized()
 			int(getBounds().getWidth() / wantedRatioWidthToHeight));
 	}
 
-	radarUpdated = true;
+	updateRadarBackground();
 }
 
 void Radar2D::mouseExit(const MouseEvent&)
 {
-	infoString = "";
+	updateInfoLabel("");
 }
 
 double Radar2D::getMaxPointSelectionDist() const
@@ -395,7 +439,7 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		}
 	}
 
-	radarUpdated = true;
+	updateRadarBackground();
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
@@ -410,12 +454,14 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 
 	// add new point
 	ScopedPointer<Uuid> newId = new Uuid();
+	int index = pEditablePointsArray->size();
+	int indexForName = index + 1;
 	switch (radarMode) {
 	case XY:
-		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
 		break;
 	case ZY:
-		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(pEditablePointsArray->size())), String(pEditablePointsArray->size()+1), 0));
+		pEditablePointsArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
 		break;
 	}
 
@@ -427,7 +473,7 @@ void Radar2D::showCoordinates(const Point<float>& point)
 {
 	String str;
 	str << String(point.getX(), 2) << "; " << String(point.getY(), 2);
-	infoString = str;
+	updateInfoLabel(str);
 }
 
 void Radar2D::mouseMove(const MouseEvent& e)

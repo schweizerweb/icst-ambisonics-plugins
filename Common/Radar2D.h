@@ -12,11 +12,11 @@
 
 #include "JuceHeader.h"
 #include "AmbiPoint.h"
-#include "TrackColors.h"
 #include "ZoomSettings.h"
 #include "RadarColors.h"
 #include "PointSelection.h"
 #include "RadarOptions.h"
+#define INFO_FONT_SIZE	20
 
 //==============================================================================
 /*
@@ -43,6 +43,9 @@ public:
 	void mouseDoubleClick(const MouseEvent& e) override;
 	void showCoordinates(const Point<float>& point);
 	void mouseMove(const MouseEvent& e) override;
+	void newOpenGLContextCreated() override;
+	void openGLContextClosing() override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
@@ -53,32 +56,34 @@ private:
 	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select = false, float selectionSize = 0.0);
 	
-	void paintPointLabel(Graphics* g, String text, Point<float> screenPt, float offset) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;
+	void drawRadar(Graphics* g) const;
+	void drawInfoLabel(Graphics* g) const;
 	void renderOpenGL() override;
-	void createRadarBackground();
+	Image createRadarBackground() const;
+	void updateRadarBackground();
+	Image createInfoLabel(String info);
+	void updateInfoLabel(String info);
 
 private:
 	OpenGLContext openGLContext;
 
 	OwnedArray<AmbiPoint>* pEditablePointsArray;
 	OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray;
-	Image radarBackground;
+	ScopedPointer<Image> radarBackground;
+	ScopedPointer<Image> infoImage;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
-	String infoString;
 	PointSelection* pPointSelection;
-	bool radarUpdated;
-	TrackColors trackColors;
 	ScopedPointer<RadarColors> radarColors;
 	RadarOptions* pRadarOptions;
+	CriticalSection radarBackgroundLock;
+	CriticalSection infoLabelLock;
+	const Font infoFont = Font(INFO_FONT_SIZE);
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
-public:
-	void newOpenGLContextCreated() override;
-	void openGLContextClosing() override;
-	void changeListenerCallback(ChangeBroadcaster* source) override;
 };
