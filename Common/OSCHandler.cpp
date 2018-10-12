@@ -272,6 +272,10 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	{
 		handleOwnExternStyleIndexXyz(message);
 	}
+	else
+	{
+		reportError("Invalid OSC pattern received: " + pattern.toString());
+	}
 }
 
 void OSCHandler::reportError(String message) const
