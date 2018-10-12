@@ -191,7 +191,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 		&& message[3].isFloat32();
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index AED style)");
 		return;
 	}
 
