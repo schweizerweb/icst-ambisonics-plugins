@@ -265,7 +265,7 @@ bool OSCHandler::checkAed(double a, double e, double d) const
 		reportError("OSC-Message Elevation out of range: " + String(e));
 		return false;
 	}
-	if (d < Constants::DistanceMin || d > Constants::DistanceMax)
+	if (d < Constants::DistanceMin)
 	{
 		reportError("OSC-Message Azimuth out of range: " + String(d));
 		return false;
