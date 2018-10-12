@@ -181,7 +181,7 @@ void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
 	}
 }
 
-void OSCHandler::handleOwnExternIntStyle(const OSCMessage& message) const
+void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 {
 	bool valid =
 		message.size() == 4
@@ -191,7 +191,7 @@ void OSCHandler::handleOwnExternIntStyle(const OSCMessage& message) const
 		&& message[3].isFloat32();
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index AED style)");
 		return;
 	}
 
@@ -216,6 +216,39 @@ void OSCHandler::handleOwnExternIntStyle(const OSCMessage& message) const
 	}
 }
 
+void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
+{
+	bool valid =
+		message.size() == 4
+		&& message[0].isInt32()
+		&& message[1].isFloat32()
+		&& message[2].isFloat32()
+		&& message[3].isFloat32();
+	if (!valid)
+	{
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index XYZ style)");
+		return;
+	}
+
+	int channel = message[0].getInt32();
+	double x = message[1].getFloat32();
+	double y = message[2].getFloat32();
+	double z = message[3].getFloat32();
+	if (!checkXyz(x, y, z))
+		return;
+
+	if (pAmbiPointArray->size() >= channel && channel > 0)
+	{
+		AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(channel - 1); // 1-based in message, 0-based in plugin
+		ambiPt->getPoint()->setXYZ(x, y, z);
+		reportSuccess();
+	}
+	else
+	{
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
+	}
+}
+
 void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	OSCAddressPattern pattern = message.getAddressPattern();
@@ -231,9 +264,17 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	{
 		handleOwnExternStyle(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_INT_EXTERN)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
 	{
-		handleOwnExternIntStyle(message);
+		handleOwnExternStyleIndexAed(message);
+	}
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
+	{
+		handleOwnExternStyleIndexXyz(message);
+	}
+	else
+	{
+		reportError("Invalid OSC pattern received: " + pattern.toString());
 	}
 }
 
@@ -265,9 +306,30 @@ bool OSCHandler::checkAed(double a, double e, double d) const
 		reportError("OSC-Message Elevation out of range: " + String(e));
 		return false;
 	}
-	if (d < Constants::DistanceMin || d > Constants::DistanceMax)
+	if (d < Constants::DistanceMin)
 	{
 		reportError("OSC-Message Azimuth out of range: " + String(d));
+		return false;
+	}
+
+	return true;
+}
+
+bool OSCHandler::checkXyz(double x, double y, double z) const
+{
+	if (x < Constants::XMin || x > Constants::XMax)
+	{
+		reportError("OSC-Message X out of range: " + String(x));
+		return false;
+	}
+	if (y < Constants::YMin || y > Constants::YMax)
+	{
+		reportError("OSC-Message Y out of range: " + String(y));
+		return false;
+	}
+	if (z < Constants::ZMin || z > Constants::ZMax)
+	{
+		reportError("OSC-Message Z out of range: " + String(z));
 		return false;
 	}
 
