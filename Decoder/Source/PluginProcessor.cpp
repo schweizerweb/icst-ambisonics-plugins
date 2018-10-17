@@ -260,7 +260,7 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 			pDecoderSettings->loadFromXml(xmlState.get());
 			
 			// load last speaker preset
-			PresetInfo* preset = new PresetInfo();
+			ScopedPointer<PresetInfo> preset = new PresetInfo();
 			XmlElement* presetElement = xmlState->getChildByName(XML_TAG_PRESET_ROOT);
 			if (presetElement != nullptr && preset->LoadFromXmlRoot(presetElement))
 			{
