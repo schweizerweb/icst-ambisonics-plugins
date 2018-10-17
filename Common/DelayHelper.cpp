@@ -10,25 +10,14 @@
 
 #include "DelayHelper.h"
 
-double DelayHelper::getMaxNormalizedDistance(OwnedArray<AmbiPoint>* pPoints) const
+double DelayHelper::getTotalDelayMs(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint) const
 {
-	double maxDist = 0.0;
-	for (int i = 0; i < pPoints->size(); i++)
-	{
-		maxDist = jmax(maxDist, pPoints->getUnchecked(i)->getPoint()->getDistance());
-	}
-
-	return maxDist;
+	return pPoint->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler() * SOUND_SPEED_MS_PER_M;
 }
 
-double DelayHelper::getTotalDelayMs(AmbiSettings* pAmbiSettings, OwnedArray<AmbiPoint>* pPoints, int wantedIndex)
+double DelayHelper::getDelayCompensationMs(AmbiSettings* pAmbiSettings, double maxNormalizedDistance, AmbiPoint* pPoint) const
 {
-	return pPoints->getUnchecked(wantedIndex)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler() * SOUND_SPEED_MS_PER_M;
-}
-
-double DelayHelper::getDelayCompensationMs(AmbiSettings* pAmbiSettings, OwnedArray<AmbiPoint>* pPoints, int wantedIndex) const
-{
-	return (getMaxNormalizedDistance(pPoints) - pPoints->getUnchecked(wantedIndex)->getPoint()->getDistance())
+	return (maxNormalizedDistance - pPoint->getPoint()->getDistance())
 		* pAmbiSettings->getDistanceScaler()
 		* SOUND_SPEED_MS_PER_M;
 }

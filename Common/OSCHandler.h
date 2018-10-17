@@ -14,6 +14,7 @@
 #include "JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "StatusMessageHandler.h"
+#include "AmbiDataSet.h"
 
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS "/zhdk/ambi/source/internal"
@@ -26,7 +27,7 @@
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
-	OSCHandler(OwnedArray<AmbiPoint>* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
+	OSCHandler(AmbiDataSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
 	bool start(int portNb);
 	void stop();
 
@@ -42,7 +43,7 @@ private:
 	bool checkAed(double a, double e, double d) const;
 	bool checkXyz(double x, double y, double z) const;
 
-	OwnedArray<AmbiPoint>* pAmbiPointArray;
+	AmbiDataSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };
 

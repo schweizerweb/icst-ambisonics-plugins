@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "AmbiPoint.h"
+#include "AmbiDataSet.h"
 #include "PointSelection.h"
 //[/Headers]
 
@@ -41,7 +41,7 @@ class PointInfoControl  : public Component,
 {
 public:
     //==============================================================================
-    PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+    PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~PointInfoControl();
 
     //==============================================================================
@@ -61,7 +61,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	OwnedArray<AmbiPoint>* pEditablePointsArray;
+	AmbiDataSet* pEditablePoints;
 	PointSelection* pPointSelection;
     //[/UserVariables]
 
