@@ -11,8 +11,8 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "../../Common/AmbiSettings.h"
+#include "../../Common/AmbiDataSet.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
 #include "../../Common/DelayBuffer.h"
@@ -62,15 +62,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	// ambsonic specific
-	OwnedArray<AmbiPoint>* getSpeakerArray();
-	OwnedArray<AmbiPoint>* getMovingPointsArray();
+	AmbiDataSet* getSpeakerSet() const;
+	AmbiDataSet* getMovingPoints() const;
 	AmbiSettings* getAmbiSettings() const;
 	DecoderSettings* getDecoderSettings() const;
 	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
-	OwnedArray<AmbiPoint> speakerArray;
-	OwnedArray<AmbiPoint> movingPointsArray;
+	ScopedPointer<AmbiDataSet> speakerSet;
+	ScopedPointer<AmbiDataSet> movingPoints;
 	ScopedPointer<AmbiSettings> pAmbiSettings;
 	ScopedPointer<DecoderSettings> pDecoderSettings;
 	ScopedPointer<TestSoundGenerator> pTestSoundGenerator;

@@ -89,13 +89,13 @@ public:
 	inline ValueType getDistance() noexcept{ if (xyzChanged) calculateAed(); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; x = newX; if(notify) audioParams.notifyX(x); }
+	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); x = newX; if (notify) audioParams.notifyX(x); }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; y = newY; if (notify) audioParams.notifyY(y); }
+	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newY, Constants::YMin, Constants::YMax); y = newY; if (notify) audioParams.notifyY(y); }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; z = newZ; if (notify) audioParams.notifyZ(z); }
+	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newZ, Constants::ZMin, Constants::ZMax); z = newZ; if (notify) audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
 	inline void setAzimuth(ValueType newAzimuth) noexcept { aedChanged = true; azimuth = newAzimuth; }
@@ -106,33 +106,17 @@ public:
 		/** Sets the Point3D's distance. */
 	inline void setDistance(ValueType newDistance) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
 
-		/** Returns a Point3D which has the same Y, Z position as this one, but a new X. */
-	Point3D withX(ValueType newX) const noexcept{ return Point3D(newX, y, z); }
-
-		/** Returns a Point3D which has the same X, Z position as this one, but a new Y. */
-	Point3D withY(ValueType newY) const noexcept{ return Point3D(x, newY, z); }
-
 		/** Changes the Point3D's x and y coordinates. */
-	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { xyzChanged = true; x = newX; y = newY; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
+	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newY, Constants::YMin, Constants::YMax); x = newX; y = newY; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
 
 		/** Changes the Point3D's x and z coordinates. */
-	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; x = newX; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
+	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); x = newX; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
 
 		/** Changes the Point3D's y and z coordinates. */
-	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; y = newY; z = newZ; if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
+	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newY, Constants::YMin, Constants::YMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); y = newY; z = newZ; if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
 	/** Changes the Point3D's x, y and z coordinates. */
-	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { xyzChanged = true; x = newX; y = newY; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
-
-		//==============================================================================
-		/** Returns a Point3D with a given offset from this one. */
-	Point3D translated(ValueType deltaX, ValueType deltaY, ValueType deltaZ) const noexcept{ return Point3D(getX() + deltaX, getY() + deltaY, getZ() + deltaZ); }
-
-		/** Adds two Point3Ds together */
-	Point3D operator+ (Point3D other) const noexcept{ return Point3D(getX() + other.getX(), getY() + other.getY(), getZ() + other.getZ()); }
-
-		/** Subtracts one Point3Ds from another */
-	Point3D operator- (Point3D other) const noexcept{ return Point3D(getX() - other.getX(), getY() - other.getY(), getZ() -other.getZ()); }
+	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newY, Constants::YMin, Constants::YMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); x = newX; y = newY; z = newZ; if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
 		/** Returns a Point3D whose coordinates are multiplied by a given scalar value. */
 		template <typename FloatType>
@@ -142,16 +126,10 @@ public:
 		template <typename FloatType>
 	Point3D operator/ (FloatType divisor) const noexcept{ return Point3D((ValueType)(getX() / divisor), (ValueType)(getY() / divisor), (ValueType)(getZ() / divisor)); }
 
-		/** Returns the inverse of this Point3D. */
-	Point3D operator-() const noexcept{ return Point3D(-getX(), -getY(), -getZ()); }
-
 		//==============================================================================
 		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
 	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;
 
-	//	//==============================================================================
-		/** Casts this Point3D to a Point3D<int> object. */
-	Point3D<int> toInt() const noexcept{ return Point3D<int>(static_cast<int> (getX()), static_cast<int> (getY()), static_cast<int> (getZ())); }
 
 		/** Casts this Point3D to a Point3D<float> object. */
 	Point3D<float> toFloat() const noexcept{ return Point3D<float>(static_cast<float> (getX()), static_cast<float> (getY()), static_cast<float> (getZ())); }
@@ -159,15 +137,18 @@ public:
 		/** Casts this Point3D to a Point3D<double> object. */
 	Point3D<double> toDouble() const noexcept{ return Point3D<double>(static_cast<double> (getX()), static_cast<double> (getY()), static_cast<double> (getZ())); }
 
-		/** Casts this Point3D to a Point3D<int> object using roundToInt() to convert the values. */
-	Point3D<int> roundToInt() const noexcept{ return Point3D<int>(juce::roundToInt(getX()), juce::roundToInt(getY()), juce::roundToInt(getZ())); }
-
 		/** Returns the Point3D as a string in the form "x, y". */
 	String toString()                                       { return "X:" + String(getX(), 2) + "; Y:" + String(getY(), 2) + "; Z:" + String(getZ(), 2); }
 	String toStringAed()                                       { return "A:" + String(Constants::RadToGrad(getAzimuth()), 2) + "; E:" + String(Constants::RadToGrad(getElevation()), 2) + "; D:" + String(getDistance(), 2); }
 
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
 	String toShortStringAed()	{ return String(Constants::RadToGrad(getAzimuth()), 2) + ", " + String(Constants::RadToGrad(getElevation()), 2) + ", " + String(getDistance(), 2); }
+
+	void makeValid(ValueType* pValue, const ValueType min, const ValueType max) const
+	{
+		*pValue = jmin(*pValue, max);
+		*pValue = jmax(*pValue, min);
+	}
 
 	void getAmbisonicsCoefficients(int numCoefficients, ValueType* pCoefficients, bool flipDirection, bool inverseNormalisation = false)
 	{
@@ -336,6 +317,10 @@ private:
 		x = distance * cos(elevation) * cos(azimuth);
 		y = distance * cos(elevation) * sin(azimuth);
 		z = distance * sin(elevation);
+		makeValid(&x, Constants::XMin, Constants::XMax);
+		makeValid(&y, Constants::YMin, Constants::YMax);
+		makeValid(&z, Constants::ZMin, Constants::ZMax);
+
 		aedChanged = false;
 
 		audioParams.notifyX(x);

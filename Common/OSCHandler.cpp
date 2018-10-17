@@ -12,9 +12,9 @@
 #include "TrackColors.h"
 #include "Constants.h"
 
-OSCHandler::OSCHandler(OwnedArray<AmbiPoint>* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
+OSCHandler::OSCHandler(AmbiDataSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
 {
-	pAmbiPointArray = pAmbiPointArr;
+	pAmbiPoints = pAmbiPointArr;
 	this->pStatusMessageHandler = pStatusMessageHandler;
 }
 
@@ -56,29 +56,14 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 
 	if (channel == channelCheck)
 	{
-		String channelString = String(channel);
-		int index = -1;
-
-		for (int i = 0; i < pAmbiPointArray->size(); i++)
+		if (pAmbiPoints->setChannelNameAED(String(channel), a, e, d))
 		{
-			if (((*pAmbiPointArray)[i])->getName() == channelString)
-			{
-				index = i;
-				break;
-			}
-		}
-
-		if (index == -1)
-		{
-			reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + channelString + ")");
-		}
-		else
-		{
-			AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(index);
-			ambiPt->getPoint()->setDistance(d);
-			ambiPt->getPoint()->setAzimuth(a);
-			ambiPt->getPoint()->setElevation(e);
 			reportSuccess();
+
+		}
+		else	
+		{
+			reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
 		}
 	}
 	else
@@ -112,28 +97,7 @@ void OSCHandler::handleOwnInternalStyle(const OSCMessage& message) const
 	float rms = message[5].getFloat32();
 	Colour color = Colour(uint32(message[6].getInt32()));
 	
-	int index = -1;
-	for (int i = 0; i < pAmbiPointArray->size(); i++)
-	{
-		if ((*pAmbiPointArray)[i]->getId() == id)
-		{
-			index = i;
-			break;
-		}
-	}
-
-	if (index == -1)
-	{
-		pAmbiPointArray->add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
-		index = pAmbiPointArray->size() - 1;
-	}
-
-	AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(index);
-	ambiPt->setName(name);
-	ambiPt->getPoint()->setXYZ(x, y, z);
-	ambiPt->setRms(rms);
-	ambiPt->setColor(color);
-	ambiPt->setAlive(Time::currentTimeMillis());
+	pAmbiPoints->setChannelXYZExt(id, name, x, y, z, rms, color);
 }
 
 void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
@@ -157,22 +121,8 @@ void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
 	if(!checkAed(a, e, d))
 		return;
 
-	AmbiPoint* ambiPt = nullptr;
-
-	for (int i = 0; i < pAmbiPointArray->size(); i++)
+	if(pAmbiPoints->setChannelNameAED(channelString, a, e, d))
 	{
-		if (((*pAmbiPointArray)[i])->getName() == channelString)
-		{
-			ambiPt = pAmbiPointArray->getUnchecked(i);
-			break;
-		}
-	}
-
-	if(ambiPt != nullptr)
-	{
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
 		reportSuccess();
 	}
 	else
@@ -202,12 +152,8 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	if (!checkAed(a, e, d))
 		return;
 
-	if (pAmbiPointArray->size() >= channel && channel > 0)
+	if(pAmbiPoints->setChannelAED(channel-1, a, e, d))
 	{
-		AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(channel-1); // 1-based in message, 0-based in plugin
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
 		reportSuccess();
 	}
 	else
@@ -237,15 +183,13 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	if (!checkXyz(x, y, z))
 		return;
 
-	if (pAmbiPointArray->size() >= channel && channel > 0)
+	if(pAmbiPoints->setChannelXYZ(channel-1, x, y, z))
 	{
-		AmbiPoint* ambiPt = pAmbiPointArray->getUnchecked(channel - 1); // 1-based in message, 0-based in plugin
-		ambiPt->getPoint()->setXYZ(x, y, z);
 		reportSuccess();
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel-1) + ")");
 	}
 }
 

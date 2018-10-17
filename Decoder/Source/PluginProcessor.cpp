@@ -28,6 +28,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 	pAmbiSettings = new AmbiSettings();
 	pDecoderSettings = new DecoderSettings();
 	pTestSoundGenerator = new TestSoundGenerator();
+	speakerSet = new AmbiDataSet();
+	movingPoints = new AmbiDataSet();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
@@ -35,6 +37,8 @@ AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 	pAmbiSettings = nullptr;
 	pDecoderSettings = nullptr;
 	pTestSoundGenerator = nullptr;
+	speakerSet = nullptr;
+	movingPoints = nullptr;
 }
 
 //==============================================================================
@@ -106,19 +110,23 @@ void AmbisonicsDecoderAudioProcessor::releaseResources()
 void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 {
 	// add or remove delay buffers if number of speakers changed
-	while(speakerArray.size() > delayBuffers.size())
+	while(speakerSet->size() > delayBuffers.size())
 	{
 		delayBuffers.add(new DelayBuffer());
 	}
-	if (speakerArray.size() < delayBuffers.size())
-		delayBuffers.removeLast(delayBuffers.size() - speakerArray.size());
+	if (speakerSet->size() < delayBuffers.size())
+		delayBuffers.removeLast(delayBuffers.size() - speakerSet->size());
 
 	// check delays
-	double maxDist = delayHelper.getMaxNormalizedDistance(&speakerArray);
-	for (int i = 0; i < speakerArray.size(); i++)
+	double maxDist = speakerSet->getMaxNormalizedDistance();
+	for (int i = 0; i < speakerSet->size(); i++)
 	{
-		int requiredDelay = delayHelper.getDelayCompensationSamples(pAmbiSettings, speakerArray.getUnchecked(i), maxDist, getSampleRate());		
-		delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
+		AmbiPoint* pt = speakerSet->get(i);
+		if (pt != nullptr)
+		{
+			int requiredDelay = delayHelper.getDelayCompensationSamples(pAmbiSettings, pt, maxDist, getSampleRate());
+			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
+		}
 	}
 }
 
@@ -163,27 +171,35 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
 
 	// clear output buffers if less than #input channels used, the others will be overwritten later
-	for (int i = speakerArray.size(); i < totalNumInputChannels; ++i)
+	for (int i = speakerSet->size(); i < totalNumInputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
-	for(int iSpeaker = 0; iSpeaker < speakerArray.size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
+	for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
-		// calculate ambisonics coefficients
-		Point3D<double>* pSpeakerPoint = speakerArray.getUnchecked(iSpeaker)->getPoint();
-		double speakerGain = speakerArray.getUnchecked(iSpeaker)->getGain();
-		pSpeakerPoint->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], pAmbiSettings->getDirectionFlip());
-		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+		AmbiPoint* pt = speakerSet->get(iSpeaker);
+		if (pt == nullptr)
+			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
+		else
 		{
-			currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
-		}
-		// apply to B-format and create output
-		float* channelData = buffer.getWritePointer(iSpeaker);
-		for(int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
-		{
-			float currentSample = 0.0f;
+			// calculate ambisonics coefficients
+			double speakerGain = pt->getGain();
+			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], pAmbiSettings->getDirectionFlip());
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-				currentSample += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
-			channelData[iSample] = delayBuffers.getUnchecked(iSpeaker)->processNextSample(currentSample);
+			{
+				currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
+			}
+			// apply to B-format and create output
+			float* channelData = buffer.getWritePointer(iSpeaker);
+			for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+			{
+				float currentSample = 0.0f;
+				for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+					currentSample += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
+				
+				DelayBuffer* buf = delayBuffers[iSpeaker];
+				if(buf != nullptr)
+					channelData[iSample] = buf->processNextSample(currentSample);
+			}
 		}
 	}
 
@@ -212,8 +228,12 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	// load last speaker preset
 	ScopedPointer<PresetInfo> preset = new PresetInfo();
 	preset->setName("LastState");
-	for (AmbiPoint* pt : speakerArray)
-		preset->getPoints()->add(new AmbiPoint(pt));
+	for (int i = 0; i < speakerSet->size(); i++)
+	{
+		AmbiPoint* pt = speakerSet->get(i);
+		if(pt != nullptr)
+			preset->getPoints()->add(new AmbiPoint(pt));
+	}
 	preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
 	preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
@@ -240,14 +260,14 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 			pDecoderSettings->loadFromXml(xmlState.get());
 			
 			// load last speaker preset
-			PresetInfo* preset = new PresetInfo();
+			ScopedPointer<PresetInfo> preset = new PresetInfo();
 			XmlElement* presetElement = xmlState->getChildByName(XML_TAG_PRESET_ROOT);
 			if (presetElement != nullptr && preset->LoadFromXmlRoot(presetElement))
 			{
-				speakerArray.clear();
+				speakerSet->clear();
 				for (int i = 0; i < preset->getPoints()->size(); i++)
 				{
-					speakerArray.add(new AmbiPoint(preset->getPoints()->getUnchecked(i)));
+					speakerSet->add(new AmbiPoint(preset->getPoints()->getUnchecked(i)));
 				}
 				pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
 				pAmbiSettings->setDirectionFlip(preset->getAmbiSettings()->getDirectionFlip());
@@ -261,14 +281,14 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 	}
 }
 
-OwnedArray<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getSpeakerArray()
+AmbiDataSet* AmbisonicsDecoderAudioProcessor::getSpeakerSet() const
 {
-	return &speakerArray;
+	return speakerSet;
 }
 
-OwnedArray<AmbiPoint>* AmbisonicsDecoderAudioProcessor::getMovingPointsArray()
+AmbiDataSet* AmbisonicsDecoderAudioProcessor::getMovingPoints() const
 {
-	return &movingPointsArray;
+	return movingPoints;
 }
 
 AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
