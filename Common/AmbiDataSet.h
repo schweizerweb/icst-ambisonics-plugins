@@ -23,9 +23,9 @@ public:
 	void clear();
 	void add(AmbiPoint* pt);
 	void remove(int index);
-	void remove(String id);
 	void swap(int a, int b);
-	AmbiPoint* get(const int index, bool copyImage = false) const;
+	AmbiPoint* get(int index) const;
+	AmbiPoint* get(int index, int64 referenceTime, int timeoutMs);
 	
 	bool setChannelXYZ(int channel, double x, double y, double z) const;
 	bool setChannelAED(int channel, double a, double e, double d) const;
@@ -44,8 +44,10 @@ public:
 	void setGain(int channel, double gain) const;
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
 	double getMaxNormalizedDistance() const;
+	void cleanup();
 
 private:
 	OwnedArray<AmbiPoint> elements;
+	OwnedArray<AmbiPoint> removedElements;
 	CriticalSection cs;
 };

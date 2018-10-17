@@ -156,19 +156,19 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
-void Radar2D::paintPointLabel(Graphics* g, Image* labelImage, Point<float> screenPt, float offset) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-	int y = screenPt.getY() > offset + labelImage->getHeight()
-		? int(screenPt.getY() - offset - labelImage->getHeight())
+	int y = screenPt.getY() > offset + labelImage.getHeight()
+		? int(screenPt.getY() - offset - labelImage.getHeight())
 		: int(screenPt.getY() + offset);
 	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + labelImage->getWidth()))
+		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth()))
 	{
-		g->drawImageAt(*labelImage, int(screenPt.getX() - offset - labelImage->getWidth()), y);
+		g->drawImageAt(labelImage, int(screenPt.getX() - offset - labelImage.getWidth()), y);
 	}
 	else
 	{
-		g->drawImageAt(*labelImage, int(screenPt.getX() + offset), y);
+		g->drawImageAt(labelImage, int(screenPt.getX() + offset), y);
 	}
 }
 
@@ -198,7 +198,8 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		g->fillEllipse(rect.withCentre(screenPt));
 	}
 	
-	paintPointLabel(g, point->getLabelImage(), screenPt, pointSize * (square ? 0.7f : 0.5f));
+	Image* img = point->getLabelImage();
+	paintPointLabel(g, *img, screenPt, pointSize * (square ? 0.7f : 0.5f));
 }
 
 void Radar2D::renderOpenGL()
@@ -225,7 +226,7 @@ void Radar2D::renderOpenGL()
 		{
 			for (int i = 0; i < pEditablePoints->size(); i++)
 			{
-				ScopedPointer<AmbiPoint> pt = pEditablePoints->get(i, true);
+				AmbiPoint* pt = pEditablePoints->get(i);
 				if (pt != nullptr)
 				{
 					float scaler = 1.0f + 10.0f * pt->getRms();
@@ -239,18 +240,11 @@ void Radar2D::renderOpenGL()
 		{
 			for (int i = pDisplayOnlyPoints->size() - 1; i >= 0 ; i--)
 			{
-				ScopedPointer<AmbiPoint> pt = pDisplayOnlyPoints->get(i, true);
+				AmbiPoint* pt = pDisplayOnlyPoints->get(i, referenceTime, pRadarOptions->displayTimeout);
 				if (pt != nullptr)
 				{
-					if (pt->checkAlive(referenceTime, pRadarOptions->displayTimeout))
-					{
-						float scaler = 1.0f + 10.0f * pt->getRms();
-						paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), false);
-					}
-					else
-					{
-						pDisplayOnlyPoints->remove(pt->getId());
-					}
+					float scaler = 1.0f + 10.0f * pt->getRms();
+					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), false);
 				}
 			}
 		}
@@ -356,7 +350,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 		int minDistIndex = -1;
 		for (int i = 0; i < pEditablePoints->size(); i++)
 		{
-			ScopedPointer<AmbiPoint> pt = pEditablePoints->get(i);
+			AmbiPoint* pt = pEditablePoints->get(i);
 			double dist;
 			if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
 			{

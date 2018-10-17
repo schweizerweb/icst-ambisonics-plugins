@@ -443,7 +443,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			preset->setName(newPresetName);
 			for (int i = 0; i < pSpeakerSet->size(); i++)
 			{
-				ScopedPointer<AmbiPoint> pt = pSpeakerSet->get(i);
+				AmbiPoint* pt = pSpeakerSet->get(i);
 				if(pt != nullptr)
 					preset->getPoints()->add(new AmbiPoint(pt));
 			}
@@ -605,11 +605,10 @@ void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, in
 
 void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool)
 {
-	ScopedPointer<AmbiPoint> pt = pSpeakerSet->get(rowNumber);
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
 	if (pt == nullptr)
 		return;
 
-	
 	g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
 	String text;
 	switch(columnId)
@@ -668,9 +667,13 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 
 String SpeakerSettingsComponent::getTableText(const int columnId, const int rowNumber) const
 {
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return "";
+
 	switch(columnId)
 	{
-	case COLUMN_ID_NAME: return pSpeakerSet->get(rowNumber)->getName();
+	case COLUMN_ID_NAME: return pt->getName();
 	default: return "";
 	}
 }
@@ -705,23 +708,31 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 
 double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 {
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return 0.0;
+
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: return 10.0 * log10(pSpeakerSet->get(rowNumber)->getGain());
-	case COLUMN_ID_X: return pSpeakerSet->get(rowNumber)->getPoint()->getX();
-	case COLUMN_ID_Y: return pSpeakerSet->get(rowNumber)->getPoint()->getY();
-	case COLUMN_ID_Z: return pSpeakerSet->get(rowNumber)->getPoint()->getZ();
-	case COLUMN_ID_A: return Constants::RadToGrad(pSpeakerSet->get(rowNumber)->getPoint()->getAzimuth());
-	case COLUMN_ID_E: return Constants::RadToGrad(pSpeakerSet->get(rowNumber)->getPoint()->getElevation());
-	case COLUMN_ID_D: return pSpeakerSet->get(rowNumber)->getPoint()->getDistance();
-	case COLUMN_ID_DISTANCE: return pSpeakerSet->get(rowNumber)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+	case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
+	case COLUMN_ID_X: return pt->getPoint()->getX();
+	case COLUMN_ID_Y: return pt->getPoint()->getY();
+	case COLUMN_ID_Z: return pt->getPoint()->getZ();
+	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
+	case COLUMN_ID_D: return pt->getPoint()->getDistance();
+	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
 	default: return 0.0;
 	}
 }
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	sendActionMessage(String(pSpeakerSet->get(rowNumber)->getGain()) + ";" + String(rowNumber));
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return;
+
+	sendActionMessage(String(pt->getGain()) + ";" + String(rowNumber));
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const

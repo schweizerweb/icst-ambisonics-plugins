@@ -181,7 +181,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
-		ScopedPointer<AmbiPoint> source = sources->get(iSource);
+		AmbiPoint* source = sources->get(iSource);
 
 		// keep RMS
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
@@ -230,7 +230,7 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
 	for (int i = 0; i < sources->size(); i++)
 	{
-		ScopedPointer<AmbiPoint> pt = sources->get(i);
+		AmbiPoint* pt = sources->get(i);
 		if(pt != nullptr)
 			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
 	}

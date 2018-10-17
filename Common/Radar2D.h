@@ -56,7 +56,7 @@ private:
 	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select = false, float selectionSize = 0.0) const;
 	
-	void paintPointLabel(Graphics* g, Image* labelImage, Point<float> screenPt, float offset) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
 	float getFontSize() const;

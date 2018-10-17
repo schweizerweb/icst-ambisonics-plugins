@@ -121,7 +121,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 	double maxDist = speakerSet->getMaxNormalizedDistance();
 	for (int i = 0; i < speakerSet->size(); i++)
 	{
-		ScopedPointer<AmbiPoint> pt = speakerSet->get(i);
+		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
 		{
 			int requiredDelay = delayHelper.getDelayCompensationSamples(pAmbiSettings, pt, maxDist, getSampleRate());
@@ -176,7 +176,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 
 	for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
-		ScopedPointer<AmbiPoint> pt = speakerSet->get(iSpeaker);
+		AmbiPoint* pt = speakerSet->get(iSpeaker);
 		if (pt == nullptr)
 			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
 		else
@@ -230,7 +230,7 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	preset->setName("LastState");
 	for (int i = 0; i < speakerSet->size(); i++)
 	{
-		ScopedPointer<AmbiPoint> pt = speakerSet->get(i);
+		AmbiPoint* pt = speakerSet->get(i);
 		if(pt != nullptr)
 			preset->getPoints()->add(new AmbiPoint(pt));
 	}

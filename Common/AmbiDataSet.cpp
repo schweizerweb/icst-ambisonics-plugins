@@ -25,7 +25,11 @@ int AmbiDataSet::size() const
 
 void AmbiDataSet::clear()
 {
-	elements.clear();
+	const ScopedLock lock(cs);
+	while(elements.size() > 0)
+	{
+		remove(0);
+	}
 }
 
 void AmbiDataSet::add(AmbiPoint* pt)
@@ -36,21 +40,13 @@ void AmbiDataSet::add(AmbiPoint* pt)
 void AmbiDataSet::remove(int index)
 {
 	const ScopedLock lock(cs);
-	if (elements.size() > index)
-		elements.remove(index);
-}
+	AmbiPoint* removedPt = elements.removeAndReturn(index);
 
-void AmbiDataSet::remove(String id)
-{
-	const ScopedLock lock(cs); 
-	for (int i = 0; i < elements.size(); i++)
-	{
-		if (elements[i]->getId() == id)
-		{
-			elements.remove(i);
-			break;
-		}
-	}
+	if (removedPt != nullptr)
+		removedElements.add(removedPt);
+
+	if (removedElements.size() > 1000)
+		removedElements.removeRange(0, 500);
 }
 
 void AmbiDataSet::swap(int a, int b)
@@ -59,20 +55,22 @@ void AmbiDataSet::swap(int a, int b)
 		elements.swap(a, b);
 }
 
-AmbiPoint* AmbiDataSet::get(const int index, bool copyImage) const
+
+AmbiPoint* AmbiDataSet::get(const int index) const
 {
-	if (copyImage)
+	return elements[index];
+}
+
+AmbiPoint* AmbiDataSet::get(int index, int64 referenceTime, int timeoutMs)
+{
+	const ScopedLock lock(cs);
+	AmbiPoint* pt = elements[index];
+	if (pt != nullptr)
 	{
-		const ScopedLock lock(cs);
-		AmbiPoint* pt = elements[index];
-		if (pt != nullptr)
-			return new AmbiPoint(pt, true);
-	}
-	else
-	{
-		AmbiPoint* pt = elements[index];
-		if (pt != nullptr)
-			return new AmbiPoint(pt);
+		if (pt->checkAlive(referenceTime, timeoutMs))
+			return pt;
+
+		remove(index);
 	}
 
 	return nullptr;
@@ -240,6 +238,11 @@ double AmbiDataSet::getMaxNormalizedDistance() const
 	}
 
 	return maxDist;
+}
+
+void AmbiDataSet::cleanup()
+{
+	removedElements.clear();
 }
 
 void AmbiDataSet::setRms(int channel, float rms, bool onlyIfGreater) const

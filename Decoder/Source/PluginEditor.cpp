@@ -91,6 +91,8 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     labelVersion = nullptr;
     btnSettings = nullptr;
 
+	pMovingPoints->cleanup();
+	pSpeakerSet->cleanup();
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]

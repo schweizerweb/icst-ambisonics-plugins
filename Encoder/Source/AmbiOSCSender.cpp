@@ -46,7 +46,7 @@ void AmbiOSCSender::timerCallback()
 	stopTimer();
 	for (int i = 0; i < pPoints->size(); i++)
 	{
-		ScopedPointer<AmbiPoint> pt = pPoints->get(i);
+		AmbiPoint* pt = pPoints->get(i);
 		if (pt != nullptr)
 		{
 			OSCMessage message = OSCMessage(
