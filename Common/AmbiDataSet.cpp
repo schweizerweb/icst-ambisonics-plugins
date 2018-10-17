@@ -45,9 +45,6 @@ void AmbiDataSet::remove(int index)
 
 	if (removedPt != nullptr)
 		removedElements.add(removedPt);
-
-	if (removedElements.size() > 1000)
-		cleanup(500);
 }
 
 void AmbiDataSet::swap(int a, int b)
@@ -118,7 +115,22 @@ void AmbiDataSet::setChannelXYZExt(String id, String name, double x, double y, d
 
 	if (matchingPt == nullptr)
 	{
-		matchingPt = elements.add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
+		// try to reactivate deleted point
+		for (AmbiPoint* pt : removedElements)
+		{
+			if (pt != nullptr && pt->getId() == id)
+			{
+				matchingPt = pt;
+				break;
+			}
+		}
+		if(matchingPt != nullptr)
+		{
+			elements.add(matchingPt);
+			removedElements.removeObject(matchingPt, false);
+		}
+		else
+			matchingPt = elements.add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
 	}
 
 	matchingPt->setName(name);
