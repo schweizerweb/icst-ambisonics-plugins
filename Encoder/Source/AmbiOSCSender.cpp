@@ -50,9 +50,9 @@ void AmbiOSCSender::timerCallback()
 			OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS),
 			OSCArgument(pPoints->getUnchecked(iPoint)->getId()),
 			OSCArgument(pPoints->getUnchecked(iPoint)->getName()),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getAzimuth())),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getElevation())),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getDistance())),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getX())),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getY())),
+			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getZ())),
 			OSCArgument(pPoints->getUnchecked(iPoint)->getRms(true)),
 			OSCArgument(int32(pPoints->getUnchecked(iPoint)->getColor().getARGB())));
 		oscSender->send(message);
