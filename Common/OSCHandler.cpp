@@ -152,7 +152,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	if (!checkAed(a, e, d))
 		return;
 
-	if(pAmbiPoints->setChannelAED(channel, a, e, d))
+	if(pAmbiPoints->setChannelAED(channel-1, a, e, d))
 	{
 		reportSuccess();
 	}
@@ -183,13 +183,13 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	if (!checkXyz(x, y, z))
 		return;
 
-	if(pAmbiPoints->setChannelXYZ(channel, x, y, z))
+	if(pAmbiPoints->setChannelXYZ(channel-1, x, y, z))
 	{
 		reportSuccess();
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel-1) + ")");
 	}
 }
 

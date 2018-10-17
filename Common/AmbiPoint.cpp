@@ -177,5 +177,8 @@ Image* AmbiPoint::getLabelImage()
 void AmbiPoint::ensureLabelImage()
 {
 	if (labelImage == nullptr)
+	{
 		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
+		labelImage->duplicateIfShared();
+	}
 }

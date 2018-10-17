@@ -11,8 +11,6 @@
 #pragma once
 #include "AmbiPoint.h"
 
-#define CHANNELCHECK if (channel < 0 || channel >= elements.size()) return
-
 class AmbiDataSet
 {
 public:
@@ -21,6 +19,7 @@ public:
 
 	int size() const;
 	void clear();
+	void cleanup(int keepNbOfElements = 0);
 	void add(AmbiPoint* pt);
 	void remove(int index);
 	void swap(int a, int b);
@@ -44,7 +43,6 @@ public:
 	void setGain(int channel, double gain) const;
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
 	double getMaxNormalizedDistance() const;
-	void cleanup();
 
 private:
 	OwnedArray<AmbiPoint> elements;

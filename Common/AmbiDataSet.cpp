@@ -34,6 +34,7 @@ void AmbiDataSet::clear()
 
 void AmbiDataSet::add(AmbiPoint* pt)
 {
+	const ScopedLock lock(cs);
 	elements.add(pt);
 }
 
@@ -46,7 +47,7 @@ void AmbiDataSet::remove(int index)
 		removedElements.add(removedPt);
 
 	if (removedElements.size() > 1000)
-		removedElements.removeRange(0, 500);
+		cleanup(500);
 }
 
 void AmbiDataSet::swap(int a, int b)
@@ -78,9 +79,9 @@ AmbiPoint* AmbiDataSet::get(int index, int64 referenceTime, int timeoutMs)
 
 bool AmbiDataSet::setChannelXYZ(int channel, double x, double y, double z) const
 {
-	if (elements.size() >= channel && channel > 0)
+	AmbiPoint* ambiPt = elements[channel];
+	if(ambiPt != nullptr)
 	{
-		AmbiPoint* ambiPt = elements.getUnchecked(channel - 1); // 1-based in message, 0-based in plugin
 		ambiPt->getPoint()->setXYZ(x, y, z);
 		return true;
 	}
@@ -90,9 +91,9 @@ bool AmbiDataSet::setChannelXYZ(int channel, double x, double y, double z) const
 
 bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 {
-	if (elements.size() >= channel && channel > 0)
+	AmbiPoint* ambiPt = elements[channel];
+	if(ambiPt != nullptr)
 	{
-		AmbiPoint* ambiPt = elements.getUnchecked(channel - 1); // 1-based in message, 0-based in plugin
 		ambiPt->getPoint()->setDistance(d);
 		ambiPt->getPoint()->setAzimuth(a);
 		ambiPt->getPoint()->setElevation(e);
@@ -104,39 +105,38 @@ bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 
 void AmbiDataSet::setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color)
 {
-	int index = -1;
-	for (int i = 0; i < elements.size(); i++)
+	AmbiPoint* matchingPt = nullptr;
+
+	for (AmbiPoint* pt : elements)
 	{
-		if (elements.getUnchecked(i)->getId() == id)
+		if (pt != nullptr && pt->getId() == id)
 		{
-			index = i;
+			matchingPt = pt;
 			break;
 		}
 	}
 
-	if (index == -1)
+	if (matchingPt == nullptr)
 	{
-		elements.add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
-		index = elements.size() - 1;
+		matchingPt = elements.add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
 	}
 
-	AmbiPoint* ambiPt = elements.getUnchecked(index);
-	ambiPt->setName(name);
-	ambiPt->getPoint()->setXYZ(x, y, z);
-	ambiPt->setRms(rms);
-	ambiPt->setColor(color);
-	ambiPt->setAlive(Time::currentTimeMillis());
+	matchingPt->setName(name);
+	matchingPt->getPoint()->setXYZ(x, y, z);
+	matchingPt->setRms(rms);
+	matchingPt->setColor(color);
+	matchingPt->setAlive(Time::currentTimeMillis());
 }
 
 bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, double d) const
 {
 	AmbiPoint* ambiPt = nullptr;
 
-	for (int i = 0; i < elements.size(); i++)
+	for (AmbiPoint* pt : elements)
 	{
-		if ((elements.getUnchecked(i))->getName() == channelName)
+		if (pt != nullptr && pt->getName() == channelName)
 		{
-			ambiPt = elements.getUnchecked(i);
+			ambiPt = pt;
 			break;
 		}
 	}
@@ -154,100 +154,120 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 
 void AmbiDataSet::setChannelXY(int channel, double x, double y) const
 {
-	CHANNELCHECK;
-
-	elements[channel]->getPoint()->setXY(x, y);
+	AmbiPoint* pt = elements[channel];
+	
+	if(pt != nullptr)
+		pt->getPoint()->setXY(x, y);
 }
 
 void AmbiDataSet::setChannelYZ(int channel, double y, double z) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setYZ(y, z);
+	if (pt != nullptr)
+		pt->getPoint()->setYZ(y, z);
 }
 
 void AmbiDataSet::setChannelName(int channel, String name) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->setName(name);
+	if (pt != nullptr)
+		pt->setName(name);
 }
 
 void AmbiDataSet::setChannelColor(int channel, Colour colour) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->setColor(colour);
+	if (pt != nullptr)
+		pt->setColor(colour);
 }
 
 void AmbiDataSet::setX(int channel, double x, bool notify) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setX(x, notify);
+	if (pt != nullptr)
+		pt->getPoint()->setX(x, notify);
 }
 
 void AmbiDataSet::setY(int channel, double y, bool notify) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setY(y, notify);
+	if (pt != nullptr)
+		pt->getPoint()->setY(y, notify);
 }
 
 void AmbiDataSet::setZ(int channel, double z, bool notify) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setZ(z, notify);
+	if (pt != nullptr)
+		pt->getPoint()->setZ(z, notify);
 }
 
 void AmbiDataSet::setAzimuth(int channel, double azimuth) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setAzimuth(azimuth);
+	if (pt != nullptr)
+		pt->getPoint()->setAzimuth(azimuth);
 }
 
 void AmbiDataSet::setElevation(int channel, double elevation) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setElevation(elevation);
+	if (pt != nullptr)
+		pt->getPoint()->setElevation(elevation);
 }
 
 void AmbiDataSet::setDistance(int channel, double distance) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->getPoint()->setDistance(distance);
+	if (pt != nullptr)
+		pt->getPoint()->setDistance(distance);
 }
 
 void AmbiDataSet::setGain(int channel, double gain) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->setGain(gain);
+	if (pt != nullptr)
+		pt->setGain(gain);
 }
 
 double AmbiDataSet::getMaxNormalizedDistance() const
 {
 	double maxDist = 0.0;
-	for (int i = 0; i < elements.size(); i++)
+	for (AmbiPoint* pt : elements)
 	{
-		maxDist = jmax(maxDist, elements[i]->getPoint()->getDistance());
+		if(pt != nullptr)
+			maxDist = jmax(maxDist, pt->getPoint()->getDistance());
 	}
 
 	return maxDist;
 }
 
-void AmbiDataSet::cleanup()
+void AmbiDataSet::cleanup(int keepNbOfElements)
 {
-	removedElements.clear();
+	const ScopedLock lock(cs);
+
+	while (removedElements.size() > keepNbOfElements)
+	{
+		AmbiPoint* pt = removedElements.removeAndReturn(0);
+		if (pt != nullptr)
+			delete pt;
+	}
 }
 
 void AmbiDataSet::setRms(int channel, float rms, bool onlyIfGreater) const
 {
-	CHANNELCHECK;
+	AmbiPoint* pt = elements[channel];
 
-	elements[channel]->setRms(rms, onlyIfGreater);
+	if (pt != nullptr)
+		pt->setRms(rms, onlyIfGreater);
 }
