@@ -12,7 +12,6 @@
 #define AMBIPOINT_H_INCLUDED
 
 #include "Point3D.h"
-#include "LabelCreator.h"
 
 #define XML_ATTRIBUTE_PRESET_POINT_ID "Uuid"
 #define XML_ATTRIBUTE_PRESET_POINT_X "X"
@@ -50,9 +49,6 @@ public:
 	void setAlive(int64 currentTimeMillis);
 	Image* getLabelImage();
 	void ensureLabelImage();
-
-private:
-	static LabelCreator labelCreator;
 
 private:
 	String id;

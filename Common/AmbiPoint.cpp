@@ -9,6 +9,7 @@
 */
 
 #include "AmbiPoint.h"
+#include "LabelCreator.h"
 
 AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), rms(other->rms), lastUpdate(other->lastUpdate)
 {
@@ -95,7 +96,7 @@ void AmbiPoint::setName(String newName)
 {
 	if (name != newName)
 	{
-		Image* img = labelCreator.createNewLabel(newName, color, FONT_SIZE);
+		Image* img = LabelCreator::createNewLabel(newName, color, FONT_SIZE);
 		labelImage = img;
 	}
 
@@ -150,7 +151,7 @@ void AmbiPoint::setColor(Colour newColor)
 {
 	if (color != newColor)
 	{
-		Image* img = labelCreator.createNewLabel(name, newColor, FONT_SIZE);
+		Image* img = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
 		labelImage = img;
 	}
 
@@ -170,11 +171,11 @@ void AmbiPoint::setAlive(int64 currentTimeMillis)
 Image* AmbiPoint::getLabelImage()
 {
 	ensureLabelImage();
-	return new Image(*labelImage);
+	return labelImage;
 }
 
 void AmbiPoint::ensureLabelImage()
 {
 	if (labelImage == nullptr)
-		labelImage = labelCreator.createNewLabel(name, color, FONT_SIZE);
+		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
 }

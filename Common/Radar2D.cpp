@@ -117,33 +117,18 @@ Image Radar2D::createRadarBackground() const
 
 void Radar2D::updateRadarBackground()
 {
-	Image img = createRadarBackground();
+	ScopedPointer<Image> img = createRadarBackground();
 
 	const ScopedLock lock(radarBackgroundLock);
-	radarBackground = new Image(img);
-}
-
-Image Radar2D::createInfoLabel(String info)
-{
-	const MessageManagerLock lock;
-	int width = infoFont.getStringWidth(info);
-	if (width <= 0)
-		return Image();
-
-	Image img = Image(Image::ARGB, width, INFO_FONT_SIZE, true);
-	Graphics g(img);
-	g.setColour(radarColors->getInfoTextColor());
-	g.setFont(infoFont);
-	g.drawSingleLineText(info, 0, INFO_FONT_SIZE);
-	return img;
+	radarBackground.swapWith(img);
 }
 
 void Radar2D::updateInfoLabel(String info)
 {
-	Image img = createInfoLabel(info);
+	ScopedPointer<Image> img = LabelCreator::createNewLabel(info, radarColors->getInfoTextColor(), INFO_FONT_SIZE);
 
 	const ScopedLock lock(infoLabelLock);
-	infoImage = new Image(img);
+	infoImage.swapWith(img);
 }
 
 float Radar2D::getValueToScreenRatio() const
@@ -208,8 +193,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 		g->fillEllipse(rect.withCentre(screenPt));
 	}
 	
-	ScopedPointer<Image> labelImage = point->getLabelImage();
-	paintPointLabel(g, *labelImage, screenPt, pointSize * (square ? 0.7f : 0.5f));
+	paintPointLabel(g, point->getLabelImage(), screenPt, pointSize * (square ? 0.7f : 0.5f));
 }
 
 void Radar2D::renderOpenGL()
@@ -438,8 +422,6 @@ void Radar2D::mouseUp(const MouseEvent& e)
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
 		}
 	}
-
-	updateRadarBackground();
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
