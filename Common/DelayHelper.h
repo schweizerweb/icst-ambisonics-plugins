@@ -9,15 +9,13 @@
 */
 
 #pragma once
-#include "JuceHeader.h"
 #include "AmbiPoint.h"
 #include "AmbiSettings.h"
 
 class DelayHelper
 {
 public:
-	double getMaxNormalizedDistance(OwnedArray<AmbiPoint>* pPoints) const;
-	static double getTotalDelayMs(AmbiSettings* pAmbiSettings, OwnedArray<AmbiPoint>* pPoints, int wantedIndex);
-	double getDelayCompensationMs(AmbiSettings* pAmbiSettings, OwnedArray<AmbiPoint>* pPoints, int wantedIndex) const;
+	double getTotalDelayMs(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint) const;
+	double getDelayCompensationMs(AmbiSettings* pAmbiSettings, double maxNormalizedDistance, AmbiPoint* pPoint) const;
 	static int getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint, double maxNormalizedDistance, double samplingRate);
 };

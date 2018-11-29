@@ -27,17 +27,17 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-RadarComponent::RadarComponent (OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+RadarComponent::RadarComponent (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	showPointInfo = true;
     //[/Constructor_pre]
 
-    radar.reset (new Radar3D (pEditablePointsArray, pDisplayOnlyPointsArray, &zoomSettings, pPointSelection, pRadarOptions));
+    radar.reset (new Radar3D (pEditablePoints, pDisplayOnlyPoints, &zoomSettings, pPointSelection, pRadarOptions));
     addAndMakeVisible (radar.get());
     radar->setName ("radar");
 
-    pointInfo.reset (new PointInfoControl (pEditablePointsArray, pPointSelection, pRadarOptions));
+    pointInfo.reset (new PointInfoControl (pEditablePoints, pPointSelection, pRadarOptions));
     addAndMakeVisible (pointInfo.get());
     pointInfo->setName ("pointInfo");
 
@@ -123,16 +123,16 @@ void RadarComponent::timerCallback()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
-                 parentClasses="public Component, public Timer" constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, OwnedArray&lt;AmbiPoint&gt;* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 parentClasses="public Component, public Timer" constructorParams="AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
                     explicitFocusOrder="0" pos="0 0R 0M 100M" posRelativeY="328b0557e3704175"
-                    class="Radar3D" params="pEditablePointsArray, pDisplayOnlyPointsArray, &amp;zoomSettings, pPointSelection, pRadarOptions"/>
+                    class="Radar3D" params="pEditablePoints, pDisplayOnlyPoints, &amp;zoomSettings, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
                     virtualName="" explicitFocusOrder="0" pos="0 0 0M 100" class="PointInfoControl"
-                    params="pEditablePointsArray, pPointSelection, pRadarOptions"/>
+                    params="pEditablePoints, pPointSelection, pRadarOptions"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

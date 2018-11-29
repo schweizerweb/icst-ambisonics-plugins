@@ -22,7 +22,6 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
-#include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
 //[/Headers]
@@ -61,7 +60,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& processor;
-	OwnedArray<AmbiPoint>* pSourcesArray;
+	AmbiDataSet* pSources;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;

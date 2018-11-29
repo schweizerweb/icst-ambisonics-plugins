@@ -11,7 +11,7 @@
 #include "AmbiOSCSender.h"
 #include "../../Common/OSCHandler.h"
 
-AmbiOSCSender::AmbiOSCSender(OwnedArray<AmbiPoint>* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
+AmbiOSCSender::AmbiOSCSender(AmbiDataSet* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
 {
 	oscSender = new OSCSender();
 }
@@ -44,18 +44,23 @@ void AmbiOSCSender::stop()
 void AmbiOSCSender::timerCallback()
 {
 	stopTimer();
-	for (int iPoint = 0; iPoint < pPoints->size(); iPoint++)
+	for (int i = 0; i < pPoints->size(); i++)
 	{
-		OSCMessage message = OSCMessage(
-			OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS),
-			OSCArgument(pPoints->getUnchecked(iPoint)->getId()),
-			OSCArgument(pPoints->getUnchecked(iPoint)->getName()),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getX())),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getY())),
-			OSCArgument(float(pPoints->getUnchecked(iPoint)->getPoint()->getZ())),
-			OSCArgument(pPoints->getUnchecked(iPoint)->getRms(true)),
-			OSCArgument(int32(pPoints->getUnchecked(iPoint)->getColor().getARGB())));
-		oscSender->send(message);
+		AmbiPoint* pt = pPoints->get(i);
+		if (pt != nullptr)
+		{
+			OSCMessage message = OSCMessage(
+				OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS),
+				OSCArgument(pt->getId()),
+				OSCArgument(pt->getName()),
+				OSCArgument(float(pt->getPoint()->getX())),
+				OSCArgument(float(pt->getPoint()->getY())),
+				OSCArgument(float(pt->getPoint()->getZ())),
+				OSCArgument(pt->getRms()),
+				OSCArgument(int32(pt->getColor().getARGB())));
+			oscSender->send(message);
+			pPoints->setRms(i, 0.0f, false);
+		}
 	}
 
 	startTimer(sendIntervalMs);

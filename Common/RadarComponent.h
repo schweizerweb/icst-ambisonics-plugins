@@ -21,7 +21,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "AmbiPoint.h"
+#include "AmbiDataSet.h"
 #include "Radar3D.h"
 #include "ZoomSettings.h"
 #include "PointInfoControl.h"
@@ -44,7 +44,7 @@ class RadarComponent  : public Component,
 {
 public:
     //==============================================================================
-    RadarComponent (OwnedArray<AmbiPoint>* pEditablePointsArray, OwnedArray<AmbiPoint>* pDisplayOnlyPointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+    RadarComponent (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~RadarComponent();
 
     //==============================================================================

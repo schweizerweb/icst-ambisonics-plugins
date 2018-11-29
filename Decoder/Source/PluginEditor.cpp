@@ -32,18 +32,18 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	pSpeakerArray = ownerProc.getSpeakerArray();
-	pMovingPointsArray = ownerProc.getMovingPointsArray();
+	pSpeakerSet = ownerProc.getSpeakerSet();
+	pMovingPoints = ownerProc.getMovingPoints();
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	pDecoderSettings = ownerProc.getDecoderSettings();
-	oscHandler = new OSCHandler(pMovingPointsArray);
+	oscHandler = new OSCHandler(pMovingPoints);
 	initializeOscHandler();
 	radarOptions.nameFieldEditable = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
     //[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSpeakerArray, pMovingPointsArray, &pointSelection, &radarOptions));
+    radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -91,6 +91,8 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     labelVersion = nullptr;
     btnSettings = nullptr;
 
+	pMovingPoints->cleanup();
+	pSpeakerSet->cleanup();
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -129,7 +131,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == btnSettings.get())
     {
         //[UserButtonCode_btnSettings] -- add your button handler code here..
-		SpeakerSettingsComponent::showAsDialog(pSpeakerArray, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator());
+		SpeakerSettingsComponent::showAsDialog(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator());
 		initializeOscHandler();
 		updateRadarOptions();
         //[/UserButtonCode_btnSettings]
@@ -189,7 +191,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSpeakerArray, pMovingPointsArray, &amp;pointSelection, &amp;radarOptions"/>
+                    params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="67R 8 62 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
