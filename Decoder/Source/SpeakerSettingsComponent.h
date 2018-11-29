@@ -24,6 +24,7 @@
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
+#include "../../Common/AmbiDataSet.h"
 #include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "PresetInfo.h"
@@ -52,12 +53,12 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
+    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
+	static void showAsDialog(AmbiDataSet* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
     void textEditorTextChanged(TextEditor& editor) override;
 
     // table overrides
@@ -97,7 +98,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	OwnedArray<AmbiPoint>* pSpeakerArray;
+	AmbiDataSet* pSpeakerSet;
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;

@@ -10,7 +10,7 @@
 
 #include "AudioParameterFloatAmbi.h"
 
-AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, OwnedArray<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType)
+AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)
 	: AudioParameterFloatAmbiAbs(idToUse, nameToUse, labelToUse, categoryToUse), 
 	type(paramType),
 	value(def),
@@ -68,9 +68,9 @@ void AudioParameterFloatAmbi::setValue(float newValue)
 		{
 			switch (type)
 			{
-			case X: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setX(value, false); break;
-			case Y: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setY(value, false); break;
-			case Z: pAmbiPoints->getUnchecked(ambiIndex)->getPoint()->setZ(value, false); break;
+			case X: pAmbiPoints->setX(ambiIndex, value, false); break;
+			case Y: pAmbiPoints->setY(ambiIndex, value, false); break;
+			case Z: pAmbiPoints->setZ(ambiIndex, value, false); break;
 			}
 		}
 	}

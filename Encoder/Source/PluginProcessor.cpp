@@ -30,9 +30,10 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
                        )
 #endif
 {
+	sources = new AmbiDataSet();
 	pEncoderSettings = new EncoderSettings();
-	pOscHandler = new OSCHandler(&sourcesArray, &statusMessageHandler);
-	pOscSender = new AmbiOSCSender(&sourcesArray);
+	pOscHandler = new OSCHandler(sources, &statusMessageHandler);
+	pOscSender = new AmbiOSCSender(sources);
 	initializeOsc();
 
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
@@ -40,9 +41,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		String indexStr = String(i + 1);
 		
 		AudioParameterSet set;
-		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::X);
-		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Y);
-		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sourcesArray, i, AudioParameterFloatAmbi::Z);
+		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, sources, i, AudioParameterFloatAmbi::X);
+		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, sources, i, AudioParameterFloatAmbi::Y);
+		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, sources, i, AudioParameterFloatAmbi::Z);
 
 		audioParams.add(set);
 		addParameter(set.pX);
@@ -164,7 +165,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sourcesArray.size());
+	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const float channelScaler = 1.0f / totalNumInputChannels;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
@@ -180,11 +181,13 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
+		AmbiPoint* source = sources->get(iSource);
+
 		// keep RMS
-		sourcesArray[iSource]->setRms(inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
+		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
 
 		// calculate ambisonics coefficients
-		Point3D<double>* pSourcePoint = sourcesArray[iSource]->getPoint();
+		Point3D<double>* pSourcePoint = source->getPoint();
 		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], pEncoderSettings->directionFlip, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		const float* inputData = inputBuffer.getReadPointer(iSource);
@@ -225,8 +228,12 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	
 	// load sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
-	for (AmbiPoint* pt : sourcesArray)
-		sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
+	for (int i = 0; i < sources->size(); i++)
+	{
+		AmbiPoint* pt = sources->get(i);
+		if(pt != nullptr)
+			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
+	}
 	xml->addChildElement(sourcesElement);
 
 	copyXmlToBinary(*xml, destData);
@@ -246,7 +253,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 
 			// load last speaker preset
 			XmlElement* sourcesElement = xmlState->getChildByName(XML_TAG_SOURCES);
-			sourcesArray.clear();
+			sources->clear();
 			if (sourcesElement != nullptr)
 			{
 				int index = 0;
@@ -254,9 +261,9 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 				while (xmlPoint != nullptr)
 				{
 					if (audioParams.size() > index)
-						sourcesArray.add(new AmbiPoint(xmlPoint, audioParams[index]));
+						sources->add(new AmbiPoint(xmlPoint, audioParams[index]));
 					else
-						sourcesArray.add(new AmbiPoint(xmlPoint, AudioParameterSet()));
+						sources->add(new AmbiPoint(xmlPoint, AudioParameterSet()));
 
 					xmlPoint = xmlPoint->getNextElement();
 					index++;
@@ -268,9 +275,9 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 	initializeOsc();
 }
 
-OwnedArray<AmbiPoint>* AmbisonicEncoderAudioProcessor::getSourcesArray()
+AmbiDataSet* AmbisonicEncoderAudioProcessor::getSources() const
 {
-	return &sourcesArray;
+	return sources;
 }
 
 Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()

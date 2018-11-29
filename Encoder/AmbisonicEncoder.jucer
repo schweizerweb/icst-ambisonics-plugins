@@ -37,6 +37,12 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
+      <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
+      <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
+            file="../Common/LabelCreator.cpp"/>
+      <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
+      <FILE id="FySjhB" name="AmbiPoint.cpp" compile="1" resource="0" file="../Common/AmbiPoint.cpp"/>
       <FILE id="GoCWjo" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
       <FILE id="bfp1AJ" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="tupxe4" name="StatusMessageHandler.cpp" compile="1" resource="0"

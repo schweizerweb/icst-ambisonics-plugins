@@ -33,7 +33,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	pSourcesArray = ownerProc.getSourcesArray();
+	pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
@@ -41,7 +41,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	radarOptions.audioParams = ownerProc.getAudioParams();
     //[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSourcesArray, nullptr, &pointSelection, &radarOptions));
+    radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -169,7 +169,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="5bf6bd31c23a4886" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSourcesArray, nullptr, &amp;pointSelection, &amp;radarOptions"/>
+                    params="pSources, nullptr, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 8 62 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"

@@ -25,12 +25,13 @@
 
 #include "PointInfoControl.h"
 
+
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (OwnedArray<AmbiPoint>* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
-    : pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)
+PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+    : pEditablePoints(pEditablePoints), pPointSelection(pPointSelection)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -271,22 +272,22 @@ void PointInfoControl::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    textName->setBounds (proportionOfWidth (0.4000f) + 0, 8, proportionOfWidth (0.3500f), 24);
+    textName->setBounds (proportionOfWidth (0.4000f) + 0, 8, proportionOfWidth (0.3487f), 24);
     labelX->setBounds ((proportionOfWidth (0.4000f) + 0) + 0 - 24, (8 + 24 - -8) + 0, 24, 24);
     textX->setBounds (proportionOfWidth (0.4000f) + 0, (8 + 24 - -8) + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelY->setBounds ((proportionOfWidth (0.6200f) + 0) + 0 - 24, (8 + 24 - -8) + 0, 24, 24);
-    textY->setBounds (proportionOfWidth (0.6200f) + 0, 40, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelZ->setBounds ((proportionOfWidth (0.8400f) + 0) + 0 - 24, 40, 24, 24);
-    textZ->setBounds (proportionOfWidth (0.8400f) + 0, 40, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelY->setBounds ((proportionOfWidth (0.6205f) + 0) + 0 - 24, (8 + 24 - -8) + 0, 24, 24);
+    textY->setBounds (proportionOfWidth (0.6205f) + 0, 40, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
+    labelZ->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 24, 40, 24, 24);
+    textZ->setBounds (proportionOfWidth (0.8410f) + 0, 40, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
     labelCartesian->setBounds (0, 8 + 24 - -8, 80, 24);
     labelA->setBounds (proportionOfWidth (0.4000f) + 0 - 24, (8 + 64) + 0, 24, 24);
     textA->setBounds (proportionOfWidth (0.4000f), 72, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelE->setBounds (proportionOfWidth (0.6200f) + 0 - 24, 72, 24, 24);
-    textE->setBounds (proportionOfWidth (0.6200f), 72, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelD->setBounds (proportionOfWidth (0.8400f) + 0 - 24, 72, 24, 24);
-    textD->setBounds (proportionOfWidth (0.8400f), 72, proportionOfWidth (0.1359f), 24);
-    labelCH->setBounds ((proportionOfWidth (0.8400f) + 0) + 0 - 32, 8, 32, 24);
-    textCH->setBounds (proportionOfWidth (0.8400f) + 0, 8, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelE->setBounds (proportionOfWidth (0.6205f) + 0 - 24, 72, 24, 24);
+    textE->setBounds (proportionOfWidth (0.6205f), 72, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelD->setBounds (proportionOfWidth (0.8410f) + 0 - 24, 72, 24, 24);
+    textD->setBounds (proportionOfWidth (0.8410f), 72, proportionOfWidth (0.1359f), 24);
+    labelCH->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 32, 8, 32, 24);
+    textCH->setBounds (proportionOfWidth (0.8410f) + 0, 8, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -299,9 +300,9 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	disableListeners();
 
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection >= 0 && selection < pEditablePointsArray->size())
+	if (selection >= 0 && selection < pEditablePoints->size())
 	{
-		AmbiPoint* point = pEditablePointsArray->getUnchecked(selection);
+		AmbiPoint* point = pEditablePoints->get(selection);
 
 		setFieldsEnabled(true);
 		textName->setText(point->getName());
@@ -338,39 +339,37 @@ void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
 void PointInfoControl::textEditorTextChanged(TextEditor& source)
 {
 	int selection = pPointSelection->getSelectedPointIndex();
-	if (selection < 0 || selection >= pEditablePointsArray->size())
-		return;
 
 	if (source.getName() == textName->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->setName(textName->getText());
-		pEditablePointsArray->getUnchecked(selection)->setColor(TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
+		pEditablePoints->setChannelName(selection, textName->getText());
+		pEditablePoints->setChannelColor(selection, TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
 	}
 
 	if (source.getName() == textX->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setX(textX->getText().getFloatValue());
+		pEditablePoints->setX(selection, textX->getText().getFloatValue());
 	}
 	if (source.getName() == textY->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setY(textY->getText().getFloatValue());
+		pEditablePoints->setY(selection, textY->getText().getFloatValue());
 	}
 	if (source.getName() == textZ->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setZ(textZ->getText().getFloatValue());
+		pEditablePoints->setZ(selection, textZ->getText().getFloatValue());
 	}
 
 	if (source.getName() == textA->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setAzimuth(Constants::GradToRad(textA->getText().getFloatValue()));
+		pEditablePoints->setAzimuth(selection, Constants::GradToRad(textA->getText().getFloatValue()));
 	}
 	if (source.getName() == textE->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setElevation(Constants::GradToRad(textE->getText().getFloatValue()));
+		pEditablePoints->setElevation(selection, Constants::GradToRad(textE->getText().getFloatValue()));
 	}
 	if (source.getName() == textD->getName())
 	{
-		pEditablePointsArray->getUnchecked(selection)->getPoint()->setDistance(textD->getText().getFloatValue());
+		pEditablePoints->setDistance(selection, textD->getText().getFloatValue());
 	}
 
 	updateSelectedPoint(source.getName());
@@ -423,8 +422,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditor::Listener"
-                 constructorParams="OwnedArray&lt;AmbiPoint&gt;* pEditablePointsArray, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
-                 variableInitialisers="pEditablePointsArray(pEditablePointsArray), pPointSelection(pPointSelection)"
+                 constructorParams="AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 variableInitialisers="pEditablePoints(pEditablePoints), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="390" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>

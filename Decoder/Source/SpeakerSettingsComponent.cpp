@@ -46,8 +46,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
-    : pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
+    : pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
@@ -441,8 +441,13 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 
 			PresetInfo* preset = new PresetInfo();
 			preset->setName(newPresetName);
-			for (AmbiPoint* pt : *pSpeakerArray)
-				preset->getPoints()->add(new AmbiPoint(pt));
+			for (int i = 0; i < pSpeakerSet->size(); i++)
+			{
+				AmbiPoint* pt = pSpeakerSet->get(i);
+				if(pt != nullptr)
+					preset->getPoints()->add(new AmbiPoint(pt));
+			}
+
 			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
 			preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
 			for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
@@ -458,8 +463,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
 		ScopedPointer<Uuid> newId = new Uuid();
-		pSpeakerArray->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
-		pPointSelection->selectPoint(pSpeakerArray->size() - 1);
+		pSpeakerSet->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
+		pPointSelection->selectPoint(pSpeakerSet->size() - 1);
 		speakerList->updateContent();
 		speakerList->repaint();
         //[/UserButtonCode_buttonAdd]
@@ -468,10 +473,10 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if (selection >= 0 && selection < pSpeakerArray->size())
+		if (selection >= 0 && selection < pSpeakerSet->size())
 		{
 			pPointSelection->unselectPoint();
-			pSpeakerArray->remove(selection);
+			pSpeakerSet->remove(selection);
 			speakerList->updateContent();
 			speakerList->repaint();
 		}
@@ -481,10 +486,10 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if(selection >= 0 && selection < pSpeakerArray->size() - 1)
+		if(selection >= 0 && selection < pSpeakerSet->size() - 1)
 		{
 			pPointSelection->unselectPoint();
-			pSpeakerArray->swap(selection, selection + 1);
+			pSpeakerSet->swap(selection, selection + 1);
 			pPointSelection->selectPoint(selection + 1);
 		}
         //[/UserButtonCode_buttonMoveDown]
@@ -493,10 +498,10 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
 		int selection = pPointSelection->getSelectedPointIndex();
-		if (selection >= 1 && selection < pSpeakerArray->size())
+		if (selection >= 1 && selection < pSpeakerSet->size())
 		{
 			pPointSelection->unselectPoint();
-			pSpeakerArray->swap(selection, selection - 1);
+			pSpeakerSet->swap(selection, selection - 1);
 			pPointSelection->selectPoint(selection - 1);
 		}
         //[/UserButtonCode_buttonMoveUp]
@@ -561,9 +566,9 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
+void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
 {
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerArray, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener);
+	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerSet, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener);
 	p->setSize(850, 600);
 
 	DialogWindow::LaunchOptions options;
@@ -579,12 +584,12 @@ void SpeakerSettingsComponent::showAsDialog(OwnedArray<AmbiPoint>* pSpeakerArray
 
 int SpeakerSettingsComponent::getNumRows()
 {
-	return pSpeakerArray->size();
+	return pSpeakerSet->size();
 }
 
 void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
 {
-	if(lastRowSelected >= 0 && lastRowSelected < pSpeakerArray->size())
+	if(lastRowSelected >= 0 && lastRowSelected < pSpeakerSet->size())
 		pPointSelection->selectPoint(lastRowSelected);
 }
 
@@ -600,15 +605,19 @@ void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, in
 
 void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool)
 {
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return;
+
 	g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
 	String text;
 	switch(columnId)
 	{
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
-	case COLUMN_ID_NAME: text = pSpeakerArray->getUnchecked(rowNumber)->getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
-	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pSpeakerArray, rowNumber), 2); break;
-	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerArray, rowNumber), 2); break;
+	case COLUMN_ID_NAME: text = pt->getName(); break;
+	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
+	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pt), 2); break;
+	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -658,9 +667,13 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 
 String SpeakerSettingsComponent::getTableText(const int columnId, const int rowNumber) const
 {
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return "";
+
 	switch(columnId)
 	{
-	case COLUMN_ID_NAME: return pSpeakerArray->getUnchecked(rowNumber)->getName();
+	case COLUMN_ID_NAME: return pt->getName();
 	default: return "";
 	}
 }
@@ -669,7 +682,7 @@ void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNum
 {
 	switch(columnId)
 	{
-	case COLUMN_ID_NAME: pSpeakerArray->getUnchecked(rowNumber)->setName(newText); break;
+	case COLUMN_ID_NAME: pSpeakerSet->setChannelName(rowNumber, newText); break;
 	default: throw;
 	}
 }
@@ -678,14 +691,14 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 {
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: pSpeakerArray->getUnchecked(rowNumber)->setGain(pow(10.0, 0.1 * newValue)); break;
-	case COLUMN_ID_X: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setX(newValue); break;
-	case COLUMN_ID_Y: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setY(newValue); break;
-	case COLUMN_ID_Z: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setZ(newValue); break;
-	case COLUMN_ID_A: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
-	case COLUMN_ID_E: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setElevation(Constants::GradToRad(newValue)); break;
-	case COLUMN_ID_D: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setDistance(newValue); break;
-	case COLUMN_ID_DISTANCE: pSpeakerArray->getUnchecked(rowNumber)->getPoint()->setDistance(newValue / pAmbiSettings->getDistanceScaler()); break;
+	case COLUMN_ID_GAIN: pSpeakerSet->setGain(rowNumber, pow(10.0, 0.1 * newValue)); break;
+	case COLUMN_ID_X: pSpeakerSet->setX(rowNumber, newValue); break;
+	case COLUMN_ID_Y: pSpeakerSet->setY(rowNumber, newValue); break;
+	case COLUMN_ID_Z: pSpeakerSet->setZ(rowNumber, newValue); break;
+	case COLUMN_ID_A: pSpeakerSet->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
+	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
+	case COLUMN_ID_D: pSpeakerSet->setDistance(rowNumber, newValue); break;
+	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue / pAmbiSettings->getDistanceScaler()); break;
 	default: throw;
 	}
 
@@ -695,23 +708,31 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 
 double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 {
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return 0.0;
+
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: return 10.0 * log10(pSpeakerArray->getUnchecked(rowNumber)->getGain());
-	case COLUMN_ID_X: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getX();
-	case COLUMN_ID_Y: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getY();
-	case COLUMN_ID_Z: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getZ();
-	case COLUMN_ID_A: return Constants::RadToGrad(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getAzimuth());
-	case COLUMN_ID_E: return Constants::RadToGrad(pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getElevation());
-	case COLUMN_ID_D: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance();
-	case COLUMN_ID_DISTANCE: return pSpeakerArray->getUnchecked(rowNumber)->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+	case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
+	case COLUMN_ID_X: return pt->getPoint()->getX();
+	case COLUMN_ID_Y: return pt->getPoint()->getY();
+	case COLUMN_ID_Z: return pt->getPoint()->getZ();
+	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
+	case COLUMN_ID_D: return pt->getPoint()->getDistance();
+	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
 	default: return 0.0;
 	}
 }
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	sendActionMessage(String(pSpeakerArray->getUnchecked(rowNumber)->getGain()) + ";" + String(rowNumber));
+	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return;
+
+	sendActionMessage(String(pt->getGain()) + ";" + String(rowNumber));
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const
@@ -769,10 +790,10 @@ int SpeakerSettingsComponent::fact(int n)
 
 void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 {
-	pSpeakerArray->clear();
+	pSpeakerSet->clear();
 	for (AmbiPoint* pt : *preset->getPoints())
 	{
-		pSpeakerArray->add(new AmbiPoint(pt));
+		pSpeakerSet->add(new AmbiPoint(pt));
 	}
 	speakerList->updateContent();
 	speakerList->repaint();
@@ -917,8 +938,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster"
-                 constructorParams="OwnedArray&lt;AmbiPoint&gt;* pSpeakerArray, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener"
-                 variableInitialisers="pSpeakerArray(pSpeakerArray), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)"
+                 constructorParams="AmbiDataSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener"
+                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="800" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>

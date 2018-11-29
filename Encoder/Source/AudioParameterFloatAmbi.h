@@ -10,8 +10,8 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "../../Common/AudioParameterFloatAmbiAbs.h"
+#include "../../Common/AmbiDataSet.h"
 
 class AudioParameterFloatAmbi : public AudioParameterFloatAmbiAbs
 {
@@ -19,7 +19,7 @@ public:
 	enum ParamType { X, Y, Z };
 
 	AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
-		NormalisableRange<float> r, float def, OwnedArray<AmbiPoint>* pPointArray, int pointIndex, ParamType paramType);
+		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterFloatAmbi();
 
 	float getValue() const override;
@@ -39,6 +39,6 @@ private:
 	float defaultValue;
 	NormalisableRange<float> range;
 
-	OwnedArray<AmbiPoint>* pAmbiPoints;
+	AmbiDataSet* pAmbiPoints;
 	int ambiIndex;
 };
