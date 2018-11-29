@@ -233,7 +233,7 @@ public:
 		pCoefficients[27] = nf5 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * sin3A;
 		pCoefficients[28] = nf5 * SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * sin2A;
 		pCoefficients[29] = nf5 * SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * sinA;
-		pCoefficients[30] = nf5 * SQRT11 / 8.0 * (63.0 * sinE5 - 70.0 * sinE3 + 15.0 * sinA);
+		pCoefficients[30] = nf5 * SQRT11 / 8.0 * (63.0 * sinE5 - 70.0 * sinE3 + 15.0 * sinE);
 		pCoefficients[31] = nf5 * SQRT165 / 8.0 * (21.0 * sinE4 - 14.0 * sinE2 + 1.0) * cosE * cosA;
 		pCoefficients[32] = nf5 * SQRT1155 / 4.0 * sinE * (3.0 * sinE2 - 1.0) * cosE2 * cos2A;
 		pCoefficients[33] = nf5 / 8.0 * SQRT385_2 * (9.0 * sinE2 - 1.0) * cosE3 * cos3A;
