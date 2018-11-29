@@ -171,7 +171,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		// calculate ambisonics coefficients
 		Point3D<double>* pSpeakerPoint = speakerArray.getUnchecked(iSpeaker)->getPoint();
 		double speakerGain = speakerArray.getUnchecked(iSpeaker)->getGain();
-		pSpeakerPoint->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], pAmbiSettings->getDirectionFlip());
+		pSpeakerPoint->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !pAmbiSettings->getDirectionFlip());
 		for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 		{
 			currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);

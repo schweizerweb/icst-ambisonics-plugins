@@ -185,7 +185,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = sourcesArray[iSource]->getPoint();
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], pEncoderSettings->directionFlip, true);
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !pEncoderSettings->directionFlip, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
