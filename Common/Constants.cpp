@@ -39,3 +39,8 @@ double Constants::GradToRad(double grad)
 {
 	return grad * PI / 180.0;
 }
+
+int Constants::NormalizeAzimuthGrad(int grad)
+{
+	return (grad % 360 + 360) % 360;
+}
