@@ -47,7 +47,7 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 	}
 
 	int channel = message[0].getInt32();
-	double a = Constants::GradToRad(int(message[1].getFloat32()) % 360);
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
 	double e = Constants::GradToRad(message[2].getFloat32());
 	double d = message[3].getFloat32();
 	int channelCheck = message[4].getInt32();
@@ -115,7 +115,7 @@ void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
 	}
 
 	String channelString = message[0].getString();
-	double a = Constants::GradToRad(int(message[1].getFloat32()) % 360);
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
 	double e = Constants::GradToRad(message[2].getFloat32());
 	double d = message[3].getFloat32();
 	if(!checkAed(a, e, d))
@@ -146,7 +146,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	}
 
 	int channel = message[0].getInt32();
-	double a = Constants::GradToRad(int(message[1].getFloat32()) % 360);
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
 	double e = Constants::GradToRad(message[2].getFloat32());
 	double d = message[3].getFloat32();
 	if (!checkAed(a, e, d))
