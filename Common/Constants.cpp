@@ -3,7 +3,7 @@
 
     Constants.cpp
     Created: 27 Sep 2018 1:25:28pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
