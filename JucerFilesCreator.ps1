@@ -65,7 +65,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
         $format.targetFolder = "$($format.targetFolder)/$($code)"
         foreach($configuration in $format.CONFIGURATIONS.ChildNodes)
         {
-            $configuration.targetName = "$($node.pluginName)_$($version.Replace('.','_'))"
+            $configuration.targetName = "$($node.pluginName)"
         }
     }
 
