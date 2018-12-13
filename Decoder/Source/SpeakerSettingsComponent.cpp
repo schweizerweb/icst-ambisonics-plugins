@@ -126,7 +126,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.01));
+    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.0001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
