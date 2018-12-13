@@ -778,11 +778,11 @@ void SpeakerSettingsComponent::updateDistanceScaler() const
 	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
 }
 
-int SpeakerSettingsComponent::fact(int n)
+double SpeakerSettingsComponent::fact(int n)
 {
 	if (n == 0)
 		return 1;
-	int ret = n;
+	double ret = n;
 	for (int i = n - 1; i > 1; i--)
 		ret *= i;
 	return ret;
