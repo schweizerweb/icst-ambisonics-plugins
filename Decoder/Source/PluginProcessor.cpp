@@ -183,7 +183,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		{
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
-			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !pAmbiSettings->getDirectionFlip());
+			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !pAmbiSettings->getDirectionFlip(), true);
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 			{
 				currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
