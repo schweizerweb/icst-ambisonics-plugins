@@ -32,6 +32,7 @@ public:
 	void stop();
 
 private:
+	static double GetIntOrFloat(const OSCArgument* pOscArgument);
 	void handleMusescoreSSMNStyle(const OSCMessage& message) const;
 	void handleOwnInternalStyle(const OSCMessage& message) const;
 	void handleOwnExternStyle(const OSCMessage& message) const;
