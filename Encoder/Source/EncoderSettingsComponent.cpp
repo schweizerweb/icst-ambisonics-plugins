@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.3.2
+  Created with Projucer version: 5.4.1
 
   ------------------------------------------------------------------------------
 
@@ -57,7 +57,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscPort.reset (new Label ("labelOscPort",
                                    TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscPort->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscPort->setJustificationType (Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (TextEditor::textColourId, Colours::black);
@@ -87,7 +87,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendIp.reset (new Label ("labelOscSendIp",
                                      TRANS("Target Host:")));
     addAndMakeVisible (labelOscSendIp.get());
-    labelOscSendIp->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIp->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendIp->setJustificationType (Justification::centredLeft);
     labelOscSendIp->setEditable (false, false, false);
     labelOscSendIp->setColour (TextEditor::textColourId, Colours::black);
@@ -106,7 +106,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendPort.reset (new Label ("labelOscSendPort",
                                        TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscSendPort.get());
-    labelOscSendPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendPort->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendPort->setJustificationType (Justification::centredLeft);
     labelOscSendPort->setEditable (false, false, false);
     labelOscSendPort->setColour (TextEditor::textColourId, Colours::black);
@@ -125,7 +125,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendInterval.reset (new Label ("labelOscSendInterval",
                                            TRANS("Interval [ms]:")));
     addAndMakeVisible (labelOscSendInterval.get());
-    labelOscSendInterval->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendInterval->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendInterval->setJustificationType (Justification::centredLeft);
     labelOscSendInterval->setEditable (false, false, false);
     labelOscSendInterval->setColour (TextEditor::textColourId, Colours::black);
@@ -155,7 +155,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelUnitCircleRadius.reset (new Label ("labelUnitCircleRadius",
                                             TRANS("Unit Circle Radius:")));
     addAndMakeVisible (labelUnitCircleRadius.get());
-    labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelUnitCircleRadius->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelUnitCircleRadius->setJustificationType (Justification::centredLeft);
     labelUnitCircleRadius->setEditable (false, false, false);
     labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
@@ -369,7 +369,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
                  componentName="" parentClasses="public Component, public TextEditor::Listener"
                  constructorParams="EncoderSettings* pSettings" variableInitialisers="pEncoderSettings(pSettings)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
                  fixedSize="0" initialWidth="500" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOscReceive" id="f4cf3a53a6ef0d87" memberName="groupOscReceive"
@@ -385,8 +385,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 29 109 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOscSend" id="6e42d11d1b0564d7" memberName="groupOscSend"
                   virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send"/>
   <TOGGLEBUTTON name="toggleSendOsc" id="309574c60d08c55e" memberName="toggleSendOsc"
@@ -400,8 +400,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="165Rr 101 86 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.00000000000000000000" kerning="0.00000000000000000000"
-         bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendPort" id="c2dff2f42ed301d1" memberName="textOscSendPort"
               virtualName="" explicitFocusOrder="0" pos="21Rr 132 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -410,8 +409,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 137 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendInterval" id="2c20c78495fbd07c" memberName="textOscSendInterval"
               virtualName="" explicitFocusOrder="0" pos="21Rr 167 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -420,8 +419,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 172 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupDistanceEncoding" id="b72378bdfe4e130" memberName="groupDistanceEncoding"
                   virtualName="" explicitFocusOrder="0" pos="1 218 8M 64" title="Distance Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
@@ -435,8 +434,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="142Rr 242 109 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOrientation" id="3d25e935657cd603" memberName="groupOrientation"
                   virtualName="" explicitFocusOrder="0" pos="1 288 8M 64" title="Orientation"/>
   <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"

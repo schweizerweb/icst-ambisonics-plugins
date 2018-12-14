@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.3.2
+  Created with Projucer version: 5.4.1
 
   ------------------------------------------------------------------------------
 
@@ -50,7 +50,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     labelVersion.reset (new Label ("labelVersion",
                                    TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
     labelVersion->setJustificationType (Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (TextEditor::textColourId, Colours::black);
@@ -62,9 +62,9 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     btnSettings->addListener (this);
 
     btnSettings->setImages (false, true, true,
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0x00000000),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, Colour (0x6eee1010),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0x00000000),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.4f, Colour (0x6eee1010),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
 
@@ -91,8 +91,6 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     labelVersion = nullptr;
     btnSettings = nullptr;
 
-	pMovingPoints->cleanup();
-	pSpeakerSet->cleanup();
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -186,7 +184,7 @@ BEGIN_JUCER_METADATA
                  componentName="" parentClasses="public AudioProcessorEditor"
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
@@ -195,14 +193,14 @@ BEGIN_JUCER_METADATA
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="67R 8 62 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.00000000000000000000"
-         kerning="0.00000000000000000000" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <IMAGEBUTTON name="btnSettings" id="1c0127439cd8fab6" memberName="btnSettings"
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText=""
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="settings_png" opacityNormal="1.00000000000000000000"
-               colourNormal="0" resourceOver="settings_png" opacityOver="0.40000000596046447754"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.00000000000000000000"
+               resourceNormal="settings_png" opacityNormal="1.0" colourNormal="0"
+               resourceOver="settings_png" opacityOver="0.40000000596046447754"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
                colourDown="c0ee1010"/>
 </JUCER_COMPONENT>
 
