@@ -3,7 +3,7 @@
 
     Constants.h
     Created: 27 Sep 2018 12:37:18pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

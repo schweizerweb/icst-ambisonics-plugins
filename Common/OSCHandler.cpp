@@ -36,9 +36,9 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 	bool valid =
 		message.size() == 5
 		&& message[0].isInt32()
-		&& message[1].isFloat32()
-		&& message[2].isFloat32()
-		&& message[3].isFloat32()
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32())
 		&& message[4].isInt32();
 	if (!valid)
 	{
@@ -47,9 +47,9 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 	}
 
 	int channel = message[0].getInt32();
-	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
-	double e = Constants::GradToRad(message[2].getFloat32());
-	double d = message[3].getFloat32();
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(GetIntOrFloat(&message[1]))));
+	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
+	double d = GetIntOrFloat(&message[3]);
 	int channelCheck = message[4].getInt32();
 	if (!checkAed(a, e, d))
 		return;
@@ -105,9 +105,9 @@ void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
 	bool valid =
 		message.size() == 4
 		&& message[0].isString()
-		&& message[1].isFloat32()
-		&& message[2].isFloat32()
-		&& message[3].isFloat32();
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
 		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK string style)");
@@ -115,9 +115,9 @@ void OSCHandler::handleOwnExternStyle(const OSCMessage& message) const
 	}
 
 	String channelString = message[0].getString();
-	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
-	double e = Constants::GradToRad(message[2].getFloat32());
-	double d = message[3].getFloat32();
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(GetIntOrFloat(&message[1]))));
+	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
+	double d = GetIntOrFloat(&message[3]);
 	if(!checkAed(a, e, d))
 		return;
 
@@ -136,9 +136,9 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	bool valid =
 		message.size() == 4
 		&& message[0].isInt32()
-		&& message[1].isFloat32()
-		&& message[2].isFloat32()
-		&& message[3].isFloat32();
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32());
 	if(!valid)
 	{
 		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index AED style)");
@@ -146,9 +146,9 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	}
 
 	int channel = message[0].getInt32();
-	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(message[1].getFloat32())));
-	double e = Constants::GradToRad(message[2].getFloat32());
-	double d = message[3].getFloat32();
+	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(GetIntOrFloat(&message[1]))));
+	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
+	double d = GetIntOrFloat(&message[3]);
 	if (!checkAed(a, e, d))
 		return;
 
@@ -167,9 +167,9 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	bool valid =
 		message.size() == 4
 		&& message[0].isInt32()
-		&& message[1].isFloat32()
-		&& message[2].isFloat32()
-		&& message[3].isFloat32();
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
 		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index XYZ style)");
@@ -177,9 +177,9 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	}
 
 	int channel = message[0].getInt32();
-	double x = message[1].getFloat32();
-	double y = message[2].getFloat32();
-	double z = message[3].getFloat32();
+	double x = GetIntOrFloat(&message[1]);
+	double y = GetIntOrFloat(&message[2]);
+	double z = GetIntOrFloat(&message[3]);
 	if (!checkXyz(x, y, z))
 		return;
 
@@ -283,4 +283,9 @@ bool OSCHandler::checkXyz(double x, double y, double z) const
 void OSCHandler::stop()
 {
 	disconnect();
+}
+
+double OSCHandler::GetIntOrFloat(const OSCArgument* pOscArgument)
+{
+	return pOscArgument->isInt32() ? double(pOscArgument->getInt32()) : pOscArgument->getFloat32();
 }
