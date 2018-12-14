@@ -3,7 +3,7 @@
 
     LabelCreator.h
     Created: 15 Oct 2018 6:00:01am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

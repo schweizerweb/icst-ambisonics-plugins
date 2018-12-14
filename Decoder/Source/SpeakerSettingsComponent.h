@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.3.2
+  Created with Projucer version: 5.4.1
 
   ------------------------------------------------------------------------------
 
@@ -83,7 +83,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
-	static int fact(int n);
+	static double fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
 	void controlDimming();
     //[/UserMethods]

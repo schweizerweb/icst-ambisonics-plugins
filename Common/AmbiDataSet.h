@@ -3,7 +3,7 @@
 
     AmbiDataSet.h
     Created: 12 Oct 2018 9:35:22pm
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

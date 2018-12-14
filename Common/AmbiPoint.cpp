@@ -3,7 +3,7 @@
 
     AmbiPoint.cpp
     Created: 15 Oct 2018 5:46:32am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */

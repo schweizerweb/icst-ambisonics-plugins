@@ -3,7 +3,7 @@
 
     StatusMessageHandler.h
     Created: 27 Sep 2018 9:46:35am
-    Author:  chris
+    Author:  Christian Schweizer
 
   ==============================================================================
 */
