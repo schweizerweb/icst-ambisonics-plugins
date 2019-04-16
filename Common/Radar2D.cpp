@@ -301,6 +301,9 @@ void Radar2D::resized()
 
 	double wantedRatioWidthToHeight = (radarMode == XY) ? 1 : 2;
 
+	if (getBounds().getWidth() * getBounds().getHeight() <= 0)
+		return;
+
 	if(getBounds().getAspectRatio() >= wantedRatioWidthToHeight)
 	{
 		// add additional space left and right
