@@ -126,7 +126,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.01));
+    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.0001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -778,11 +778,11 @@ void SpeakerSettingsComponent::updateDistanceScaler() const
 	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
 }
 
-int SpeakerSettingsComponent::fact(int n)
+double SpeakerSettingsComponent::fact(int n)
 {
 	if (n == 0)
 		return 1;
-	int ret = n;
+	double ret = n;
 	for (int i = n - 1; i > 1; i--)
 		ret *= i;
 	return ret;
