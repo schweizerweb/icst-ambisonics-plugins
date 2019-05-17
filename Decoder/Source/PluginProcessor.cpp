@@ -184,6 +184,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
 			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !pAmbiSettings->getDirectionFlip(), true);
+			
+			// gain of the W-signal depends on the used ambisonic order
+			currentCoefficients[0] *= (CURRENT_AMBISONICS_ORDER / (2 * CURRENT_AMBISONICS_ORDER + 1));
+
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 			{
 				currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
