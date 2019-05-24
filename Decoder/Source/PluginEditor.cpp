@@ -114,7 +114,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 67, 8, 62, 24);
+    labelVersion->setBounds (getWidth() - 81, 8, 76, 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -191,7 +191,7 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="67R 8 62 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="81R 8 76 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
