@@ -109,17 +109,18 @@ void AmbisonicsDecoderAudioProcessor::releaseResources()
 
 void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 {
+	int size = speakerSet->size();
 	// add or remove delay buffers if number of speakers changed
-	while(speakerSet->size() > delayBuffers.size())
+	while(size > delayBuffers.size())
 	{
 		delayBuffers.add(new DelayBuffer());
 	}
-	if (speakerSet->size() < delayBuffers.size())
-		delayBuffers.removeLast(delayBuffers.size() - speakerSet->size());
+	if (size < delayBuffers.size())
+		delayBuffers.removeLast(delayBuffers.size() - size);
 
 	// check delays
 	double maxDist = speakerSet->getMaxNormalizedDistance();
-	for (int i = 0; i < speakerSet->size(); i++)
+	for (int i = 0; i < size && i < speakerSet->size(); i++)
 	{
 		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
