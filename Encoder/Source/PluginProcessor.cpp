@@ -155,7 +155,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 		return;
 
 	double scaledDistance = distance * (1.0 / pEncoderSettings->unitCircleRadius);
-	double wFactor = atan(scaledDistance * PI / 2.0) / scaledDistance * PI / 2.0;
+	double wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
 	double otherFactor = (1 - exp(-scaledDistance)) * wFactor;
 	pCoefficientArray[0] *= wFactor;
 	for (int i = 1; i < arraySize; i++)
