@@ -26,15 +26,19 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDis
 	infoImage = new Image();
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
-	openGLContext.setContinuousRepainting(true);
+	openGLContext.setContinuousRepainting(false);
 
 	pZoomSettings->addChangeListener(this);
 
 	radarColors = new RadarColors();
+
+	startTimerHz(INACTIVE_REFRESH_RATE);
 }
 
 Radar2D::~Radar2D()
 {
+	stopTimer();
+
 	openGLContext.detach();
 
 	infoImage = nullptr;
@@ -134,6 +138,11 @@ void Radar2D::updateInfoLabel(String info)
 
 	const ScopedLock lock(infoLabelLock);
 	infoImage.swapWith(img);
+}
+
+void Radar2D::timerCallback()
+{
+	openGLContext.triggerRepaint();
 }
 
 float Radar2D::getValueToScreenRatio() const
@@ -328,7 +337,13 @@ void Radar2D::resized()
 
 void Radar2D::mouseExit(const MouseEvent&)
 {
+	startTimerHz(INACTIVE_REFRESH_RATE);
 	updateInfoLabel("");
+}
+
+void Radar2D::mouseEnter(const MouseEvent&)
+{
+	startTimerHz(ACTIVE_REFRESH_RATE);
 }
 
 double Radar2D::getMaxPointSelectionDist() const
