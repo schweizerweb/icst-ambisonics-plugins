@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -48,7 +48,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     labelVersion.reset (new Label ("labelVersion",
                                    TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelVersion->setJustificationType (Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (TextEditor::textColourId, Colours::black);
@@ -60,15 +60,15 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     btnSettings->addListener (this);
 
     btnSettings->setImages (false, true, true,
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0x00000000),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.4f, Colour (0x6eee1010),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0xc0ee1010));
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0x00000000),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, Colour (0x6eee1010),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
     labelMessage.reset (new Label ("labelMessage",
                                    String()));
     addAndMakeVisible (labelMessage.get());
-    labelMessage->setFont (Font (11.7f, Font::plain).withTypefaceStyle ("Regular"));
+    labelMessage->setFont (Font (11.70f, Font::plain).withTypefaceStyle ("Regular"));
     labelMessage->setJustificationType (Justification::centred);
     labelMessage->setEditable (false, false, false);
     labelMessage->setColour (TextEditor::textColourId, Colours::black);
@@ -164,7 +164,7 @@ BEGIN_JUCER_METADATA
                  componentName="" parentClasses="public AudioProcessorEditor"
                  constructorParams="AmbisonicEncoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="5bf6bd31c23a4886" memberName="radarComponent"
@@ -173,20 +173,20 @@ BEGIN_JUCER_METADATA
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 8 79 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="34"/>
   <IMAGEBUTTON name="btnSettings" id="e4880b2ef7a6a35e" memberName="btnSettings"
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText="new button"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="settings_png" opacityNormal="1.0" colourNormal="0"
-               resourceOver="settings_png" opacityOver="0.40000000596046447754"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
+               resourceNormal="settings_png" opacityNormal="1" colourNormal="0"
+               resourceOver="settings_png" opacityOver="4.000000059604645e-1"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1"
                colourDown="c0ee1010"/>
   <LABEL name="labelMessage" id="24478721f956d20c" memberName="labelMessage"
          virtualName="" explicitFocusOrder="0" pos="40 8 124M 24" edTextCol="ff000000"
          edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="11.69999999999999928946"
-         kerning="0.0" bold="0" italic="0" justification="36"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.17e1"
+         kerning="0" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -599,3 +599,4 @@ const int AmbisonicEncoderAudioProcessorEditor::settings_pngSize = 22271;
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

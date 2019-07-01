@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZDecAU" pluginRTASCategory=""
               aaxIdentifier="com.zhdk.ambisonicdecoder" pluginAAXCategory="2"
-              jucerVersion="5.4.1" companyName="ZHdK" pluginFormats="buildAU,buildVST3">
+              jucerVersion="5.4.3" companyName="ZHdK" pluginFormats="buildAU,buildVST3">
   <MAINGROUP id="oa5A98" name="ZDec">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="roXymN" name="settings.png" compile="0" resource="1" file="../Resources/settings.png"/>
