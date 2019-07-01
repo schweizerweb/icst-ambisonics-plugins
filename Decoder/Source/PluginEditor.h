@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@
 #include "PluginProcessor.h"
 #include "PresetInfo.h"
 #include "DecoderSettings.h"
+#include "SpeakerSettingsDialog.h"
 #include "../../Common/RadarComponent.h"
 #include "../../Common/RadarOptions.h"
 #include "../../Common/OSCHandler.h"
@@ -40,7 +41,9 @@
                                                                     //[/Comments]
 */
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
-                                               public Button::Listener, ChangeListener
+                                               public ChangeListener,
+                                               public ActionListener,
+                                               public Button::Listener
 {
 public:
     //==============================================================================
@@ -51,12 +54,13 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void initializeOscHandler();
 	void updateRadarOptions();
+	void actionListenerCallback(const String& message) override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
-	void changeListenerCallback(ChangeBroadcaster* source) override;
 
     // Binary resources:
     static const char* settings_png;
@@ -74,6 +78,7 @@ private:
 	ScopedPointer<OSCHandler> oscHandler;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
+	ScopedPointer<SpeakerSettingsDialog> settingsWindow;
     //[/UserVariables]
 
     //==============================================================================
@@ -88,3 +93,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

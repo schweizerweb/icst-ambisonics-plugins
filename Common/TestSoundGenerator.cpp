@@ -10,40 +10,60 @@
 
 #include "TestSoundGenerator.h"
 
-TestSoundGenerator::TestSoundGenerator(): testSoundChannel(NO_TEST_SOUND)
+TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet): tempChannel(NO_TEST_SOUND)
 {
+	pSpeakerSet = speakerSet;
+	reset();
 }
 
 void TestSoundGenerator::process(AudioSampleBuffer* audioBuffer)
 {
-	if (testSoundChannel != NO_TEST_SOUND)
+	for(int iSpeaker = 0; iSpeaker < JucePlugin_MaxNumOutputChannels; iSpeaker++)
 	{
-		float* channelData = audioBuffer->getWritePointer(testSoundChannel);
-		for (int i = 0; i < audioBuffer->getNumSamples(); i++)
+		if(testSoundChannels[iSpeaker] || iSpeaker == tempChannel)
 		{
-			channelData[i] = float((random.nextFloat() * 0.25f - 0.125f) * testSoundGain);
+			AmbiPoint* p = pSpeakerSet->get(iSpeaker);
+			if (p != nullptr)
+			{
+				double testSoundGain = p->getGain();
+
+				float* channelData = audioBuffer->getWritePointer(iSpeaker);
+				for (int i = 0; i < audioBuffer->getNumSamples(); i++)
+				{
+					channelData[i] = float((random.nextFloat() - 0.5f) * testSoundGain);
+				}
+			}
 		}
 	}
 }
 
+void TestSoundGenerator::toggle(int speakerIndex)
+{
+	testSoundChannels[speakerIndex] = !testSoundChannels[speakerIndex];
+}
+
+void TestSoundGenerator::toggleAutoTest()
+{
+	if(isTimerRunning())
+	{
+		stopTimer();
+		tempChannel = NO_TEST_SOUND;
+	}
+	else
+	{
+		tempChannel = 0;
+		startTimer(1000);
+	}
+}
+
+void TestSoundGenerator::reset()
+{
+	stopTimer();
+	tempChannel = NO_TEST_SOUND;
+	memset(testSoundChannels, 0, JucePlugin_MaxNumOutputChannels);
+}
+
 void TestSoundGenerator::timerCallback()
 {
-	stopTimer();
-	testSoundChannel = NO_TEST_SOUND;
-}
-
-void TestSoundGenerator::startSpeakerTest(int channelNb, double gain)
-{
-	stopTimer();
-	startTimer(2000);
-	testSoundChannel = channelNb;
-	testSoundGain = gain;
-}
-
-void TestSoundGenerator::actionListenerCallback(const String& message)
-{
-	int speakerId = message.getTrailingIntValue();
-	double gain = message.initialSectionNotContaining(";").getDoubleValue();
-	if (speakerId >= 0)
-		startSpeakerTest(speakerId, gain);
+	tempChannel = (tempChannel + 1) % pSpeakerSet->size();
 }

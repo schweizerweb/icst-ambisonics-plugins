@@ -20,13 +20,14 @@
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
 #include "EditableTextCustomComponent.h"
+#include "NumericColumnCustomComponent.h"
+#include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
-#include "NumericColumnCustomComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -46,14 +47,15 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback)
     : pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
-	addActionListener(pTestSoundListener);
+	this->pTestSoundGenerator = pTestSoundListener;
+
 	addChangeListener(pCallback);
 
     //[/Constructor_pre]
@@ -213,6 +215,11 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     toggleOsc->setButtonText (TRANS("Receive OSC messages"));
     toggleOsc->addListener (this);
 
+    buttonSpeakerTest.reset (new TextButton ("buttonSpeakerTest"));
+    addAndMakeVisible (buttonSpeakerTest.get());
+    buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
+    buttonSpeakerTest->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -221,6 +228,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 
 
     //[Constructor] You can add your own custom stuff here..
+	buttonSpeakerTest->setClickingTogglesState(true);
+	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
 	speakerList->setModel(this);
 	speakerList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
 	speakerList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
@@ -256,6 +265,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 SpeakerSettingsComponent::~SpeakerSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
@@ -284,6 +294,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     textTimeout = nullptr;
     labelTimeout = nullptr;
     toggleOsc = nullptr;
+    buttonSpeakerTest = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -305,13 +316,13 @@ void SpeakerSettingsComponent::paint (Graphics& g)
 void SpeakerSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
+	//[/UserPreResize]
 
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
     groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 306);
-    comboBoxChannelConfig->setBounds (8 + 240, 0 + 24, getWidth() - 369, 24);
-    labelPresets->setBounds ((8 + 240) + 0 - 64, 0 + 24, 64, 24);
+    comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 317, 24);
+    labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
     buttonLoad->setBounds (8 + (getWidth() - 18) - 103, 0 + 24, 40, 24);
     buttonSave->setBounds (8 + (getWidth() - 18) - 55, 0 + 24, 40, 24);
     speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 306) - 96);
@@ -332,6 +343,7 @@ void SpeakerSettingsComponent::resized()
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4986f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -537,6 +549,12 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		sendChangeMessage();
         //[/UserButtonCode_toggleOsc]
     }
+    else if (buttonThatWasClicked == buttonSpeakerTest.get())
+    {
+        //[UserButtonCode_buttonSpeakerTest] -- add your button handler code here..
+		pTestSoundGenerator->toggleAutoTest();
+        //[/UserButtonCode_buttonSpeakerTest]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -561,26 +579,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 }
 
 
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback)
-{
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerSet, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener, pCallback);
-	p->setSize(850, 600);
-
-	DialogWindow::LaunchOptions options;
-	options.content.setOwned(p);
-	options.dialogTitle = "Speaker settings";
-	options.dialogBackgroundColour = Colours::white;
-	options.escapeKeyTriggersCloseButton = false;
-	options.useNativeTitleBar = false;
-	options.resizable = true;
-
-	DialogWindow* wnd = options.create();
-	wnd->setVisible(true);
-	wnd->setAlwaysOnTop(true);
-}
-
 int SpeakerSettingsComponent::getNumRows()
 {
 	return pSpeakerSet->size();
@@ -626,8 +625,7 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 
 Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
 {
-	if(columnId == COLUMN_ID_GAIN
-		|| columnId == COLUMN_ID_X
+	if(columnId == COLUMN_ID_X
 		|| columnId == COLUMN_ID_Y
 		|| columnId == COLUMN_ID_Z
 		|| columnId == COLUMN_ID_A
@@ -635,9 +633,18 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		|| columnId == COLUMN_ID_D
 		|| columnId == COLUMN_ID_DISTANCE)
 	{
-		NumericColumnCustomComponent* gainBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
+		NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
+		if (numericBox == nullptr)
+			numericBox = new NumericColumnCustomComponent(*this);
+
+		numericBox->setRowAndColumn(rowNumber, columnId);
+		return numericBox;
+	}
+	else if(columnId == COLUMN_ID_GAIN)
+	{
+		SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
 		if (gainBox == nullptr)
-			gainBox = new NumericColumnCustomComponent(*this);
+			gainBox = new SliderColumnCustomComponent(*this);
 
 		gainBox->setRowAndColumn(rowNumber, columnId);
 		return gainBox;
@@ -727,11 +734,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
-	if (pt == nullptr)
-		return;
-
-	sendActionMessage(String(pt->getGain()) + ";" + String(rowNumber));
+	pTestSoundGenerator->toggle(rowNumber);
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const
@@ -758,7 +761,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
 		return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
 
 	case COLUMN_ID_GAIN:
-		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.1);
+		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
 
 	case COLUMN_ID_DISTANCE:
 		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
@@ -893,6 +896,7 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonRemove->setEnabled(en);
 	buttonMoveUp->setEnabled(en);
 	buttonMoveDown->setEnabled(en);
+	buttonSpeakerTest->setEnabled(en);
 }
 
 void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
@@ -938,11 +942,11 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster"
-                 constructorParams="AmbiDataSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster"
+                 constructorParams="AmbiDataSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="800" initialHeight="800">
+                 fixedSize="0" initialWidth="1200" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
@@ -955,11 +959,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
                   virtualName="" explicitFocusOrder="0" pos="8 0 18M 306M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="240 24 365M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="192 24 317M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="-184r 0 64 24" posRelativeX="4b25adf5b07e9492"
+         virtualName="" explicitFocusOrder="0" pos="-8r 24 64 24" posRelativeX="4b25adf5b07e9492"
          posRelativeY="450188aa0f332e78" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
@@ -1053,6 +1057,10 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="12 24 180 24" posRelativeX="f4cf3a53a6ef0d87"
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
+              virtualName="" explicitFocusOrder="0" pos="49.779%c -8R 120 24"
+              posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

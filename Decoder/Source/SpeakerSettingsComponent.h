@@ -30,6 +30,8 @@
 #include "PresetInfo.h"
 #include "SliderRange.h"
 #include "../../Common/DelayHelper.h"
+#include "../../Common/TestSoundGenerator.h"
+
 //[/Headers]
 
 
@@ -47,19 +49,19 @@ class SpeakerSettingsComponent  : public Component,
                                   public ChangeListener,
                                   public TextEditor::Listener,
                                   public ActionBroadcaster,
+                                  public ChangeBroadcaster,
                                   public ComboBox::Listener,
                                   public Button::Listener,
-                                  public Slider::Listener, public ChangeBroadcaster
+                                  public Slider::Listener
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback);
+    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(AmbiDataSet* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback);
-    void textEditorTextChanged(TextEditor& editor) override;
+	void textEditorTextChanged(TextEditor& editor) override;
 
     // table overrides
 	int getNumRows() override;
@@ -95,7 +97,6 @@ public:
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiDataSet* pSpeakerSet;
@@ -104,6 +105,7 @@ private:
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings* pDecoderSettings;
 	DelayHelper delayHelper;
+	TestSoundGenerator* pTestSoundGenerator;
     //[/UserVariables]
 
     //==============================================================================
@@ -132,6 +134,7 @@ private:
     std::unique_ptr<TextEditor> textTimeout;
     std::unique_ptr<Label> labelTimeout;
     std::unique_ptr<ToggleButton> toggleOsc;
+    std::unique_ptr<TextButton> buttonSpeakerTest;
 
 
     //==============================================================================

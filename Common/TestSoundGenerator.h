@@ -10,23 +10,28 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "AmbiDataSet.h"
 
 #define NO_TEST_SOUND	-1
 
-class TestSoundGenerator : public Timer, public ActionListener
+class AmbiDataSet;
+
+class TestSoundGenerator : public Timer
 {
 public:
-	TestSoundGenerator();
+	TestSoundGenerator(AmbiDataSet* speakerSet);
 
 	void process(AudioSampleBuffer* audioBuffer);
-
+	void toggle(int speakerIndex);
+	void toggleAutoTest();
+	void reset();
+	
 private:
 	void timerCallback() override;
-	void startSpeakerTest(int channelNb, double gain);
-	void actionListenerCallback(const String& message) override;
 
 private:
-	int testSoundChannel;
-	double testSoundGain;
+	bool testSoundChannels[JucePlugin_MaxNumOutputChannels];
 	Random random;
+	AmbiDataSet* pSpeakerSet;
+	int tempChannel;
 };
