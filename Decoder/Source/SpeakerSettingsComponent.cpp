@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
 #include "EditableTextCustomComponent.h"
+#include "NumericColumnCustomComponent.h"
 #include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
@@ -46,14 +47,17 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback)
     : pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
-	addActionListener(pTestSoundListener);
+	this->pTestSoundGenerator = pTestSoundListener;
+
+	addChangeListener(pCallback);
+
     //[/Constructor_pre]
 
     groupOsc.reset (new GroupComponent ("groupOsc",
@@ -79,7 +83,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     labelPresets.reset (new Label ("labelPresets",
                                    TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelPresets->setJustificationType (Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
     labelPresets->setColour (TextEditor::textColourId, Colours::black);
@@ -126,7 +130,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.0001));
+    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.01));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -135,50 +139,38 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     buttonBasic->setButtonText (TRANS("reset to basic"));
     buttonBasic->addListener (this);
 
-    buttonBasic->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 64, 120, 24);
-
     labelChannelWeights.reset (new Label ("labelChannelWeights",
                                           TRANS("Channel weights")));
     addAndMakeVisible (labelChannelWeights.get());
-    labelChannelWeights->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelChannelWeights->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelChannelWeights->setJustificationType (Justification::centredLeft);
     labelChannelWeights->setEditable (false, false, false);
     labelChannelWeights->setColour (TextEditor::textColourId, Colours::black);
     labelChannelWeights->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 40, 112, 24);
 
     buttonInPhase.reset (new TextButton ("buttonInPhase"));
     addAndMakeVisible (buttonInPhase.get());
     buttonInPhase->setButtonText (TRANS("calculate in-phase"));
     buttonInPhase->addListener (this);
 
-    buttonInPhase->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 96, 120, 24);
-
     btnFlipDirection.reset (new ToggleButton ("btnFlipDirection"));
     addAndMakeVisible (btnFlipDirection.get());
     btnFlipDirection->setButtonText (TRANS("Flip direction"));
     btnFlipDirection->addListener (this);
 
-    btnFlipDirection->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 128, 120, 24);
-
     labelDistanceScaler.reset (new Label ("labelDistanceScaler",
                                           TRANS("Distance scaler")));
     addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelDistanceScaler->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelDistanceScaler->setJustificationType (Justification::centredLeft);
     labelDistanceScaler->setEditable (false, false, false);
     labelDistanceScaler->setColour (TextEditor::textColourId, Colours::black);
     labelDistanceScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelDistanceScaler->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 15, 150, 24);
-
     btnEditMode.reset (new ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
     btnEditMode->setButtonText (TRANS("Edit mode"));
     btnEditMode->addListener (this);
-
-    btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
 
     textOscPort.reset (new TextEditor ("textOscPort"));
     addAndMakeVisible (textOscPort.get());
@@ -193,7 +185,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     labelOscPort.reset (new Label ("labelOscPort",
                                    TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscPort->setJustificationType (Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (TextEditor::textColourId, Colours::black);
@@ -212,7 +204,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     labelTimeout.reset (new Label ("labelTimeout",
                                    TRANS("Timeout [ms]:")));
     addAndMakeVisible (labelTimeout.get());
-    labelTimeout->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelTimeout->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelTimeout->setJustificationType (Justification::centredLeft);
     labelTimeout->setEditable (false, false, false);
     labelTimeout->setColour (TextEditor::textColourId, Colours::black);
@@ -223,7 +215,10 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     toggleOsc->setButtonText (TRANS("Receive OSC messages"));
     toggleOsc->addListener (this);
 
-    toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
+    buttonSpeakerTest.reset (new TextButton ("buttonSpeakerTest"));
+    addAndMakeVisible (buttonSpeakerTest.get());
+    buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
+    buttonSpeakerTest->addListener (this);
 
 
     //[UserPreSize]
@@ -233,6 +228,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 
 
     //[Constructor] You can add your own custom stuff here..
+	buttonSpeakerTest->setClickingTogglesState(true);
+	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
 	speakerList->setModel(this);
 	speakerList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
 	speakerList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
@@ -268,6 +265,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 SpeakerSettingsComponent::~SpeakerSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
@@ -296,6 +294,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     textTimeout = nullptr;
     labelTimeout = nullptr;
     toggleOsc = nullptr;
+    buttonSpeakerTest = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -317,13 +316,13 @@ void SpeakerSettingsComponent::paint (Graphics& g)
 void SpeakerSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
+	//[/UserPreResize]
 
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
     groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 306);
-    comboBoxChannelConfig->setBounds (8 + 240, 0 + 24, getWidth() - 369, 24);
-    labelPresets->setBounds ((8 + 240) + 0 - 64, 0 + 24, 64, 24);
+    comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 317, 24);
+    labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
     buttonLoad->setBounds (8 + (getWidth() - 18) - 103, 0 + 24, 40, 24);
     buttonSave->setBounds (8 + (getWidth() - 18) - 55, 0 + 24, 40, 24);
     speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 306) - 96);
@@ -333,10 +332,18 @@ void SpeakerSettingsComponent::resized()
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
     sliderDistanceScaler->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 16, getWidth() - 178, 24);
     ambiChannelControl->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
+    buttonBasic->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 64, 120, 24);
+    labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 40, 112, 24);
+    buttonInPhase->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 96, 120, 24);
+    btnFlipDirection->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 128, 120, 24);
+    labelDistanceScaler->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 15, 150, 24);
+    btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
     textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 24, 130, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 19, 93, 24);
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
+    toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4986f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -532,13 +539,21 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_btnEditMode] -- add your button handler code here..
 		pDecoderSettings->editMode = btnEditMode->getToggleState();
 		controlDimming();
+		sendChangeMessage();
         //[/UserButtonCode_btnEditMode]
     }
     else if (buttonThatWasClicked == toggleOsc.get())
     {
         //[UserButtonCode_toggleOsc] -- add your button handler code here..
 		pDecoderSettings->oscReceive = toggleOsc->getToggleState();
+		sendChangeMessage();
         //[/UserButtonCode_toggleOsc]
+    }
+    else if (buttonThatWasClicked == buttonSpeakerTest.get())
+    {
+        //[UserButtonCode_buttonSpeakerTest] -- add your button handler code here..
+		pTestSoundGenerator->toggleAutoTest();
+        //[/UserButtonCode_buttonSpeakerTest]
     }
 
     //[UserbuttonClicked_Post]
@@ -564,24 +579,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 }
 
 
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
-{
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerSet, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener);
-	p->setSize(850, 600);
-
-	DialogWindow::LaunchOptions options;
-	options.content.setOwned(p);
-	options.dialogTitle = "Speaker settings";
-	options.dialogBackgroundColour = Colours::white;
-	options.escapeKeyTriggersCloseButton = false;
-	options.useNativeTitleBar = false;
-	options.resizable = true;
-
-	options.runModal();
-}
-
 int SpeakerSettingsComponent::getNumRows()
 {
 	return pSpeakerSet->size();
@@ -627,14 +625,22 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 
 Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
 {
-	if(columnId == COLUMN_ID_GAIN
-		|| columnId == COLUMN_ID_X
+	if(columnId == COLUMN_ID_X
 		|| columnId == COLUMN_ID_Y
 		|| columnId == COLUMN_ID_Z
 		|| columnId == COLUMN_ID_A
 		|| columnId == COLUMN_ID_E
 		|| columnId == COLUMN_ID_D
 		|| columnId == COLUMN_ID_DISTANCE)
+	{
+		NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
+		if (numericBox == nullptr)
+			numericBox = new NumericColumnCustomComponent(*this);
+
+		numericBox->setRowAndColumn(rowNumber, columnId);
+		return numericBox;
+	}
+	else if(columnId == COLUMN_ID_GAIN)
 	{
 		SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
 		if (gainBox == nullptr)
@@ -728,11 +734,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 {
-	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
-	if (pt == nullptr)
-		return;
-
-	sendActionMessage(String(pt->getGain()) + ";" + String(rowNumber));
+	pTestSoundGenerator->toggle(rowNumber);
 }
 
 TableListBox* SpeakerSettingsComponent::getTable() const
@@ -759,7 +761,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
 		return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
 
 	case COLUMN_ID_GAIN:
-		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.1);
+		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
 
 	case COLUMN_ID_DISTANCE:
 		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
@@ -894,6 +896,7 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonRemove->setEnabled(en);
 	buttonMoveUp->setEnabled(en);
 	buttonMoveDown->setEnabled(en);
+	buttonSpeakerTest->setEnabled(en);
 }
 
 void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
@@ -903,6 +906,7 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 		if (textOscPort->getText().containsOnly("0123456789"))
 		{
 			pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
+			sendChangeMessage();
 		}
 		else
 		{
@@ -915,6 +919,7 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 		if (textTimeout->getText().containsOnly("0123456789"))
 		{
 			pDecoderSettings->oscReceiveTimeoutMs = textTimeout->getText().getIntValue();
+			sendChangeMessage();
 		}
 		else
 		{
@@ -937,11 +942,11 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster"
-                 constructorParams="AmbiDataSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster"
+                 constructorParams="AmbiDataSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
-                 fixedSize="0" initialWidth="800" initialHeight="800">
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="1200" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
@@ -954,15 +959,15 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
                   virtualName="" explicitFocusOrder="0" pos="8 0 18M 306M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="240 24 369M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="192 24 317M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="0r 24 64 24" posRelativeX="4b25adf5b07e9492"
+         virtualName="" explicitFocusOrder="0" pos="-8r 24 64 24" posRelativeX="4b25adf5b07e9492"
          posRelativeY="450188aa0f332e78" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
               virtualName="" explicitFocusOrder="0" pos="103R 24 40 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="load" connectedEdges="0"
@@ -993,9 +998,9 @@ BEGIN_JUCER_METADATA
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
           virtualName="" explicitFocusOrder="0" pos="144 16 178M 24" posRelativeX="17eb4b418501687a"
-          posRelativeY="17eb4b418501687a" min="1.0" max="500.0" int="0.10000000000000000555"
+          posRelativeY="17eb4b418501687a" min="1" max="5e2" int="1e-1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
@@ -1008,8 +1013,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="8 40 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
               virtualName="" explicitFocusOrder="0" pos="12 96 120 24" posRelativeX="17eb4b418501687a"
               posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"
@@ -1022,8 +1027,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="8 15 150 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
                 virtualName="" explicitFocusOrder="0" pos="16 24 150 24" posRelativeX="450188aa0f332e78"
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
@@ -1036,8 +1041,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="170Rr 19 93 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textTimeout" id="337c3e6db7308866" memberName="textTimeout"
               virtualName="" explicitFocusOrder="0" pos="20Rr 58 130 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -1046,12 +1051,16 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="170Rr 53 93 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
                 virtualName="" explicitFocusOrder="0" pos="12 24 180 24" posRelativeX="f4cf3a53a6ef0d87"
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
+              virtualName="" explicitFocusOrder="0" pos="49.779%c -8R 120 24"
+              posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -1061,3 +1070,4 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
