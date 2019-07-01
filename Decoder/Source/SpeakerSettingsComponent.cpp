@@ -27,6 +27,7 @@
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
+#include "NumericColumnCustomComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -629,9 +630,9 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		|| columnId == COLUMN_ID_D
 		|| columnId == COLUMN_ID_DISTANCE)
 	{
-		SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
+		NumericColumnCustomComponent* gainBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
 		if (gainBox == nullptr)
-			gainBox = new SliderColumnCustomComponent(*this);
+			gainBox = new NumericColumnCustomComponent(*this);
 
 		gainBox->setRowAndColumn(rowNumber, columnId);
 		return gainBox;
