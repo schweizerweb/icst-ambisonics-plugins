@@ -49,16 +49,16 @@ class SpeakerSettingsComponent  : public Component,
                                   public ActionBroadcaster,
                                   public ComboBox::Listener,
                                   public Button::Listener,
-                                  public Slider::Listener
+                                  public Slider::Listener, public ChangeBroadcaster
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
+    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(AmbiDataSet* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener);
+	static void showAsDialog(AmbiDataSet* pSpeakerArray, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback);
     void textEditorTextChanged(TextEditor& editor) override;
 
     // table overrides

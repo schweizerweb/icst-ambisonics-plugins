@@ -20,7 +20,6 @@
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
 #include "EditableTextCustomComponent.h"
-#include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
@@ -47,7 +46,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback)
     : pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -55,6 +54,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
 	addActionListener(pTestSoundListener);
+	addChangeListener(pCallback);
+
     //[/Constructor_pre]
 
     groupOsc.reset (new GroupComponent ("groupOsc",
@@ -526,12 +527,14 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_btnEditMode] -- add your button handler code here..
 		pDecoderSettings->editMode = btnEditMode->getToggleState();
 		controlDimming();
+		sendChangeMessage();
         //[/UserButtonCode_btnEditMode]
     }
     else if (buttonThatWasClicked == toggleOsc.get())
     {
         //[UserButtonCode_toggleOsc] -- add your button handler code here..
 		pDecoderSettings->oscReceive = toggleOsc->getToggleState();
+		sendChangeMessage();
         //[/UserButtonCode_toggleOsc]
     }
 
@@ -560,9 +563,9 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener)
+void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, ActionListener* pTestSoundListener, ChangeListener* pCallback)
 {
-	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerSet, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener);
+	SpeakerSettingsComponent *p = new SpeakerSettingsComponent(pSpeakerSet, pPresets, pPointSelection, pAmbiSettings, pDecoderSettings, pTestSoundListener, pCallback);
 	p->setSize(850, 600);
 
 	DialogWindow::LaunchOptions options;
@@ -573,7 +576,9 @@ void SpeakerSettingsComponent::showAsDialog(AmbiDataSet* pSpeakerSet, OwnedArray
 	options.useNativeTitleBar = false;
 	options.resizable = true;
 
-	options.runModal();
+	DialogWindow* wnd = options.create();
+	wnd->setVisible(true);
+	wnd->setAlwaysOnTop(true);
 }
 
 int SpeakerSettingsComponent::getNumRows()
@@ -897,6 +902,7 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 		if (textOscPort->getText().containsOnly("0123456789"))
 		{
 			pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
+			sendChangeMessage();
 		}
 		else
 		{
@@ -909,6 +915,7 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 		if (textTimeout->getText().containsOnly("0123456789"))
 		{
 			pDecoderSettings->oscReceiveTimeoutMs = textTimeout->getText().getIntValue();
+			sendChangeMessage();
 		}
 		else
 		{

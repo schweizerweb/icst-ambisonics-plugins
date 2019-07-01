@@ -129,7 +129,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == btnSettings.get())
     {
         //[UserButtonCode_btnSettings] -- add your button handler code here..
-		SpeakerSettingsComponent::showAsDialog(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator());
+		SpeakerSettingsComponent::showAsDialog(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this);
 		initializeOscHandler();
 		updateRadarOptions();
         //[/UserButtonCode_btnSettings]
@@ -139,7 +139,11 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     //[/UserbuttonClicked_Post]
 }
 
-
+void AmbisonicsDecoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
+{
+	initializeOscHandler();
+	updateRadarOptions();
+}
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 

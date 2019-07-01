@@ -40,7 +40,7 @@
                                                                     //[/Comments]
 */
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
-                                               public Button::Listener
+                                               public Button::Listener, ChangeListener
 {
 public:
     //==============================================================================
@@ -56,6 +56,7 @@ public:
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
 
     // Binary resources:
     static const char* settings_png;
