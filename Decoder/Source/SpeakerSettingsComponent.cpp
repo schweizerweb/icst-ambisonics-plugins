@@ -224,7 +224,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (800, 800);
+    setSize (1200, 800);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -316,7 +316,7 @@ void SpeakerSettingsComponent::paint (Graphics& g)
 void SpeakerSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
-	//[/UserPreResize]
+    //[/UserPreResize]
 
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
@@ -343,7 +343,7 @@ void SpeakerSettingsComponent::resized()
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4986f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4978f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -577,6 +577,7 @@ void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
 }
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...

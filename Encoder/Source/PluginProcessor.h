@@ -15,6 +15,7 @@
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/OSCHandler.h"
 #include "AmbiOSCSender.h"
+#include "AmbiOSCSenderExt.h"
 
 
 //==============================================================================
@@ -71,6 +72,7 @@ private:
 	ScopedPointer<EncoderSettings> pEncoderSettings;
 	ScopedPointer<OSCHandler> pOscHandler;
 	ScopedPointer<AmbiOSCSender> pOscSender;
+	ScopedPointer<AmbiOSCSenderExt> pOscSenderExt;
 	Array<AudioParameterSet> audioParams;
 	StatusMessageHandler statusMessageHandler;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -81,6 +81,12 @@ private:
     std::unique_ptr<Label> labelUnitCircleRadius;
     std::unique_ptr<GroupComponent> groupOrientation;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
+    std::unique_ptr<GroupComponent> groupOscSendExt;
+    std::unique_ptr<ToggleButton> toggleSendOscExt;
+    std::unique_ptr<TextEditor> textOscSendIpExt;
+    std::unique_ptr<Label> labelOscSendIpExt;
+    std::unique_ptr<TextEditor> textOscSendPortExt;
+    std::unique_ptr<Label> labelOscSendPortExt;
 
 
     //==============================================================================
@@ -89,3 +95,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
