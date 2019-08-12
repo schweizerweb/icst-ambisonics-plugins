@@ -27,8 +27,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 {
 	pAmbiSettings = new AmbiSettings();
 	pDecoderSettings = new DecoderSettings();
-	pTestSoundGenerator = new TestSoundGenerator();
 	speakerSet = new AmbiDataSet();
+	pTestSoundGenerator = new TestSoundGenerator(speakerSet);
 	movingPoints = new AmbiDataSet();
 }
 
