@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -57,14 +57,14 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscPort.reset (new Label ("labelOscPort",
                                    TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscPort->setJustificationType (Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (TextEditor::textColourId, Colours::black);
     labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     groupOscSend.reset (new GroupComponent ("groupOscSend",
-                                            TRANS("OSC Send")));
+                                            TRANS("OSC Send for ZEnc -> ZDec communication")));
     addAndMakeVisible (groupOscSend.get());
 
     toggleSendOsc.reset (new ToggleButton ("toggleSendOsc"));
@@ -87,7 +87,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendIp.reset (new Label ("labelOscSendIp",
                                      TRANS("Target Host:")));
     addAndMakeVisible (labelOscSendIp.get());
-    labelOscSendIp->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIp->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendIp->setJustificationType (Justification::centredLeft);
     labelOscSendIp->setEditable (false, false, false);
     labelOscSendIp->setColour (TextEditor::textColourId, Colours::black);
@@ -106,7 +106,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendPort.reset (new Label ("labelOscSendPort",
                                        TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscSendPort.get());
-    labelOscSendPort->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendPort->setJustificationType (Justification::centredLeft);
     labelOscSendPort->setEditable (false, false, false);
     labelOscSendPort->setColour (TextEditor::textColourId, Colours::black);
@@ -125,7 +125,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscSendInterval.reset (new Label ("labelOscSendInterval",
                                            TRANS("Interval [ms]:")));
     addAndMakeVisible (labelOscSendInterval.get());
-    labelOscSendInterval->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendInterval->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelOscSendInterval->setJustificationType (Justification::centredLeft);
     labelOscSendInterval->setEditable (false, false, false);
     labelOscSendInterval->setColour (TextEditor::textColourId, Colours::black);
@@ -140,7 +140,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     toggleDistanceEncoding->setButtonText (TRANS("Enable"));
     toggleDistanceEncoding->addListener (this);
 
-    toggleDistanceEncoding->setBounds (17, 242, 150, 24);
+    toggleDistanceEncoding->setBounds (17, 347, 150, 24);
 
     textUnitCircleRadius.reset (new TextEditor ("textUnitCircleRadius"));
     addAndMakeVisible (textUnitCircleRadius.get());
@@ -155,7 +155,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelUnitCircleRadius.reset (new Label ("labelUnitCircleRadius",
                                             TRANS("Unit Circle Radius:")));
     addAndMakeVisible (labelUnitCircleRadius.get());
-    labelUnitCircleRadius->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelUnitCircleRadius->setJustificationType (Justification::centredLeft);
     labelUnitCircleRadius->setEditable (false, false, false);
     labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
@@ -170,7 +170,56 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     toggleDirectionFlip->setButtonText (TRANS("Flip Direction"));
     toggleDirectionFlip->addListener (this);
 
-    toggleDirectionFlip->setBounds (17, 312, 150, 24);
+    toggleDirectionFlip->setBounds (17, 417, 150, 24);
+
+    groupOscSendExt.reset (new GroupComponent ("groupOscSendExt",
+                                               TRANS("OSC Send for external usage")));
+    addAndMakeVisible (groupOscSendExt.get());
+
+    toggleSendOscExt.reset (new ToggleButton ("toggleSendOscExt"));
+    addAndMakeVisible (toggleSendOscExt.get());
+    toggleSendOscExt->setButtonText (TRANS("Enable"));
+    toggleSendOscExt->addListener (this);
+
+    toggleSendOscExt->setBounds (19, 239, 150, 24);
+
+    textOscSendIpExt.reset (new TextEditor ("textOscSendIpExt"));
+    addAndMakeVisible (textOscSendIpExt.get());
+    textOscSendIpExt->setMultiLine (false);
+    textOscSendIpExt->setReturnKeyStartsNewLine (false);
+    textOscSendIpExt->setReadOnly (false);
+    textOscSendIpExt->setScrollbarsShown (true);
+    textOscSendIpExt->setCaretVisible (true);
+    textOscSendIpExt->setPopupMenuEnabled (true);
+    textOscSendIpExt->setText (String());
+
+    labelOscSendIpExt.reset (new Label ("labelOscSendIpExt",
+                                        TRANS("Target Host:")));
+    addAndMakeVisible (labelOscSendIpExt.get());
+    labelOscSendIpExt->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIpExt->setJustificationType (Justification::centredLeft);
+    labelOscSendIpExt->setEditable (false, false, false);
+    labelOscSendIpExt->setColour (TextEditor::textColourId, Colours::black);
+    labelOscSendIpExt->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    textOscSendPortExt.reset (new TextEditor ("textOscSendPortExt"));
+    addAndMakeVisible (textOscSendPortExt.get());
+    textOscSendPortExt->setMultiLine (false);
+    textOscSendPortExt->setReturnKeyStartsNewLine (false);
+    textOscSendPortExt->setReadOnly (false);
+    textOscSendPortExt->setScrollbarsShown (true);
+    textOscSendPortExt->setCaretVisible (true);
+    textOscSendPortExt->setPopupMenuEnabled (true);
+    textOscSendPortExt->setText (String());
+
+    labelOscSendPortExt.reset (new Label ("labelOscSendPortExt",
+                                          TRANS("OSC-Port:\n")));
+    addAndMakeVisible (labelOscSendPortExt.get());
+    labelOscSendPortExt->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendPortExt->setJustificationType (Justification::centredLeft);
+    labelOscSendPortExt->setEditable (false, false, false);
+    labelOscSendPortExt->setColour (TextEditor::textColourId, Colours::black);
+    labelOscSendPortExt->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -184,14 +233,22 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
 	textOscSendPort->addListener(this);
 	textOscSendIp->addListener(this);
 	textOscSendInterval->addListener(this);
+	textOscSendPortExt->addListener(this);
+	textOscSendIpExt->addListener(this);
 	textUnitCircleRadius->addListener(this);
 
 	toggleReceiveOsc->setToggleState(pEncoderSettings->oscReceiveFlag, dontSendNotification);
+	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
+	
 	toggleSendOsc->setToggleState(pEncoderSettings->oscSendFlag, dontSendNotification);
 	textOscSendIp->setText(String(pEncoderSettings->oscSendTargetHost));
 	textOscSendPort->setText(String(pEncoderSettings->oscSendPort));
-	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
 	textOscSendInterval->setText(String(pEncoderSettings->oscSendIntervalMs));
+	
+	toggleSendOscExt->setToggleState(pEncoderSettings->oscSendExtFlag, dontSendNotification);
+	textOscSendIpExt->setText(String(pEncoderSettings->oscSendExtTargetHost));
+	textOscSendPortExt->setText(String(pEncoderSettings->oscSendExtPort));
+	
 	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
 	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
 	toggleDirectionFlip->setToggleState(pEncoderSettings->directionFlip, dontSendNotification);
@@ -221,6 +278,12 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     labelUnitCircleRadius = nullptr;
     groupOrientation = nullptr;
     toggleDirectionFlip = nullptr;
+    groupOscSendExt = nullptr;
+    toggleSendOscExt = nullptr;
+    textOscSendIpExt = nullptr;
+    labelOscSendIpExt = nullptr;
+    textOscSendPortExt = nullptr;
+    labelOscSendPortExt = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -254,10 +317,15 @@ void EncoderSettingsComponent::resized()
     labelOscSendPort->setBounds (2 + (getWidth() - 8) - 141 - 110, 137, 110, 24);
     textOscSendInterval->setBounds (2 + (getWidth() - 8) - 21 - 104, 5 + 167, 104, 24);
     labelOscSendInterval->setBounds (2 + (getWidth() - 8) - 141 - 110, 172, 110, 24);
-    groupDistanceEncoding->setBounds (1, 218, getWidth() - 8, 64);
-    textUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 21 - 105, 5 + 237, 105, 24);
-    labelUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 142 - 109, 242, 109, 24);
-    groupOrientation->setBounds (1, 288, getWidth() - 8, 64);
+    groupDistanceEncoding->setBounds (1, 323, getWidth() - 8, 64);
+    textUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 21 - 105, 5 + 342, 105, 24);
+    labelUnitCircleRadius->setBounds (2 + (getWidth() - 8) - 142 - 109, 347, 109, 24);
+    groupOrientation->setBounds (1, 393, getWidth() - 8, 64);
+    groupOscSendExt->setBounds (3, 215, getWidth() - 8, 97);
+    textOscSendIpExt->setBounds (2 + (getWidth() - 8) - 19 - 136, 5 + 234, 136, 24);
+    labelOscSendIpExt->setBounds (2 + (getWidth() - 8) - 163 - 86, 239, 86, 24);
+    textOscSendPortExt->setBounds (2 + (getWidth() - 8) - 19 - 104, 5 + 270, 104, 24);
+    labelOscSendPortExt->setBounds (2 + (getWidth() - 8) - 139 - 110, 275, 110, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -291,6 +359,12 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		pEncoderSettings->directionFlip = toggleDirectionFlip->getToggleState();
         //[/UserButtonCode_toggleDirectionFlip]
     }
+    else if (buttonThatWasClicked == toggleSendOscExt.get())
+    {
+        //[UserButtonCode_toggleSendOscExt] -- add your button handler code here..
+		pEncoderSettings->oscSendExtFlag = toggleSendOscExt->getToggleState();
+		//[/UserButtonCode_toggleSendOscExt]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -309,6 +383,10 @@ void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendIntervalMs);
 	else if (&textEditor == textOscSendIp.get())
 		pEncoderSettings->oscSendTargetHost = textEditor.getText();
+	else if (&textEditor == textOscSendPortExt.get())
+		checkForNumbers(&textEditor, &pEncoderSettings->oscSendExtPort);
+	else if (&textEditor == textOscSendIpExt.get())
+		pEncoderSettings->oscSendExtTargetHost = textEditor.getText();
 	else if (&textEditor == textUnitCircleRadius.get())
 		checkForNumbers(&textEditor, &pEncoderSettings->unitCircleRadius);
 }
@@ -316,7 +394,7 @@ void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 void EncoderSettingsComponent::showAsDialog(EncoderSettings* pSettings)
 {
 	EncoderSettingsComponent *p = new EncoderSettingsComponent(pSettings);
-	p->setSize(500, 400);
+	p->setSize(500, 465);
 
 	DialogWindow::LaunchOptions options;
 	options.content.setOwned(p);
@@ -324,7 +402,7 @@ void EncoderSettingsComponent::showAsDialog(EncoderSettings* pSettings)
 	options.dialogBackgroundColour = Colours::white;
 	options.escapeKeyTriggersCloseButton = false;
 	options.useNativeTitleBar = false;
-	options.resizable = true;
+	options.resizable = false;
 	options.runModal();
 }
 
@@ -369,7 +447,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
                  componentName="" parentClasses="public Component, public TextEditor::Listener"
                  constructorParams="EncoderSettings* pSettings" variableInitialisers="pEncoderSettings(pSettings)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="500" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOscReceive" id="f4cf3a53a6ef0d87" memberName="groupOscReceive"
@@ -385,10 +463,10 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 29 109 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         fontname="Default font" fontsize="1.5e1" kerning="0" bold="0"
          italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOscSend" id="6e42d11d1b0564d7" memberName="groupOscSend"
-                  virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send"/>
+                  virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send for ZEnc -&gt; ZDec communication"/>
   <TOGGLEBUTTON name="toggleSendOsc" id="309574c60d08c55e" memberName="toggleSendOsc"
                 virtualName="" explicitFocusOrder="0" pos="17 101 150 24" buttonText="Enable"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
@@ -400,7 +478,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="165Rr 101 86 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendPort" id="c2dff2f42ed301d1" memberName="textOscSendPort"
               virtualName="" explicitFocusOrder="0" pos="21Rr 132 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -409,8 +487,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 137 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendInterval" id="2c20c78495fbd07c" memberName="textOscSendInterval"
               virtualName="" explicitFocusOrder="0" pos="21Rr 167 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -419,28 +497,52 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 172 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupDistanceEncoding" id="b72378bdfe4e130" memberName="groupDistanceEncoding"
-                  virtualName="" explicitFocusOrder="0" pos="1 218 8M 64" title="Distance Encoding"/>
+                  virtualName="" explicitFocusOrder="0" pos="1 323 8M 64" title="Distance Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
-                virtualName="" explicitFocusOrder="0" pos="17 242 150 24" buttonText="Enable"
+                virtualName="" explicitFocusOrder="0" pos="17 347 150 24" buttonText="Enable"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textUnitCircleRadius" id="9b1288d93f3bb201" memberName="textUnitCircleRadius"
-              virtualName="" explicitFocusOrder="0" pos="21Rr 237 105 24" posRelativeX="f4cf3a53a6ef0d87"
+              virtualName="" explicitFocusOrder="0" pos="21Rr 342 105 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelUnitCircleRadius" id="efb161958642a965" memberName="labelUnitCircleRadius"
-         virtualName="" explicitFocusOrder="0" pos="142Rr 242 109 24"
+         virtualName="" explicitFocusOrder="0" pos="142Rr 347 109 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOrientation" id="3d25e935657cd603" memberName="groupOrientation"
-                  virtualName="" explicitFocusOrder="0" pos="1 288 8M 64" title="Orientation"/>
+                  virtualName="" explicitFocusOrder="0" pos="1 393 8M 64" title="Orientation"/>
   <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"
-                virtualName="" explicitFocusOrder="0" pos="17 312 150 24" buttonText="Flip Direction"
+                virtualName="" explicitFocusOrder="0" pos="17 417 150 24" buttonText="Flip Direction"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <GROUPCOMPONENT name="groupOscSendExt" id="645904a2472668e1" memberName="groupOscSendExt"
+                  virtualName="" explicitFocusOrder="0" pos="3 215 8M 97" title="OSC Send for external usage"/>
+  <TOGGLEBUTTON name="toggleSendOscExt" id="4c50ad9f06c0feaf" memberName="toggleSendOscExt"
+                virtualName="" explicitFocusOrder="0" pos="19 239 150 24" buttonText="Enable"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTEDITOR name="textOscSendIpExt" id="ed3cbf6e9d145d08" memberName="textOscSendIpExt"
+              virtualName="" explicitFocusOrder="0" pos="19Rr 234 136 24" posRelativeX="f4cf3a53a6ef0d87"
+              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+  <LABEL name="labelOscSendIpExt" id="ee4b90142f7a53f4" memberName="labelOscSendIpExt"
+         virtualName="" explicitFocusOrder="0" pos="163Rr 239 86 24" posRelativeX="f4cf3a53a6ef0d87"
+         edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
+  <TEXTEDITOR name="textOscSendPortExt" id="8f6b9c97cd3fa86f" memberName="textOscSendPortExt"
+              virtualName="" explicitFocusOrder="0" pos="19Rr 270 104 24" posRelativeX="f4cf3a53a6ef0d87"
+              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+  <LABEL name="labelOscSendPortExt" id="4d22d18a70ccb67a" memberName="labelOscSendPortExt"
+         virtualName="" explicitFocusOrder="0" pos="139Rr 275 110 24"
+         posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
+         labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -450,3 +552,4 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

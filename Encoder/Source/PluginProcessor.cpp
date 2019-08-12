@@ -34,6 +34,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pEncoderSettings = new EncoderSettings();
 	pOscHandler = new OSCHandler(sources, &statusMessageHandler);
 	pOscSender = new AmbiOSCSender(sources);
+	pOscSenderExt = new AmbiOSCSenderExt(sources);
 	initializeOsc();
 
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
@@ -57,6 +58,7 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 	pEncoderSettings = nullptr;
 	pOscHandler = nullptr;
 	pOscSender = nullptr;
+	pOscSenderExt = nullptr;
 }
 
 //==============================================================================
@@ -321,6 +323,19 @@ void AmbisonicEncoderAudioProcessor::initializeOsc() const
 	else
 	{
 		pOscSender->stop();
+	}
+
+	if (pEncoderSettings->oscSendExtFlag)
+	{
+		if (!pOscSenderExt->start(pEncoderSettings->oscSendExtTargetHost, pEncoderSettings->oscSendExtPort))
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender for external usage on " + pEncoderSettings->oscSendExtTargetHost + ":" + String(pEncoderSettings->oscSendExtPort));
+			pEncoderSettings->oscSendExtFlag = false;
+		}
+	}
+	else
+	{
+		pOscSenderExt->stop();
 	}
 }
 
