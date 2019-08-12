@@ -17,11 +17,13 @@
 #include "PointSelection.h"
 #include "RadarOptions.h"
 #define INFO_FONT_SIZE	20
+#define ACTIVE_REFRESH_RATE 25
+#define INACTIVE_REFRESH_RATE 10
 
 //==============================================================================
 /*
 */
-class Radar2D    : public Component, OpenGLRenderer, ChangeListener
+class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 {
 public:
 	enum RadarMode { XY, ZY };
@@ -35,6 +37,7 @@ public:
 	
 	void resized() override;
 	void mouseExit(const MouseEvent& e) override;
+	void mouseEnter(const MouseEvent& e) override;
 	double getMaxPointSelectionDist() const;
 	void mouseDown(const MouseEvent& e) override;
 	void mouseDrag(const MouseEvent& e) override;
@@ -66,6 +69,7 @@ private:
 	Image* createRadarBackground() const;
 	void updateRadarBackground();
 	void updateInfoLabel(String info);
+	void timerCallback() override;
 
 private:
 	OpenGLContext openGLContext;
