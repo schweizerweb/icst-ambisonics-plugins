@@ -12,6 +12,7 @@
 class SliderRange
 {
 public:
+	SliderRange() : SliderRange(0.0, 0.0, 0.0){}
 	SliderRange(double minRange, double maxRange, double intervalRange)
 	{
 		min = minRange;

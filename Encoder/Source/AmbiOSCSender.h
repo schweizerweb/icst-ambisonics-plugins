@@ -26,6 +26,6 @@ private:
 
 private:
 	AmbiDataSet* pPoints;
-	ScopedPointer<OSCSender> oscSender;
+	OSCSender* oscSender;
 	int sendIntervalMs;
 };

@@ -40,6 +40,6 @@ public:
 
 private:
 	OwnedArray<AmbiPoint> points;
-	ScopedPointer<AmbiSettings> ambiSettings;
+	AmbiSettings ambiSettings;
 	String name;
 };

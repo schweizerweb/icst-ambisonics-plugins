@@ -12,7 +12,6 @@
 
 PresetInfo::PresetInfo()
 {
-	ambiSettings = new AmbiSettings();
 }
 
 PresetInfo::~PresetInfo()
@@ -33,16 +32,16 @@ bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 		return false;
 
 	// ambisonics settings
-	ambiSettings = new AmbiSettings();
+	ambiSettings = AmbiSettings();
 	XmlElement* xmlDistanceScaler = xmlGeneral->getChildByName(XML_TAG_PRESET_DISTANCESCALER);
 	if (xmlDistanceScaler != nullptr)
 	{
-		ambiSettings->setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
+		ambiSettings.setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
 	}
 	XmlElement* xmlFlipDirection = xmlGeneral->getChildByName(XML_TAG_PRESET_FLIPDIRECTION);
 	if (xmlFlipDirection != nullptr)
 	{
-		ambiSettings->setDirectionFlip(xmlFlipDirection->getBoolAttribute(XML_VALUE));
+		ambiSettings.setDirectionFlip(xmlFlipDirection->getBoolAttribute(XML_VALUE));
 	}
 	XmlElement* xmlAmbiChannelWeight = xmlGeneral->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
 	int index = 0;
@@ -51,7 +50,7 @@ bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 		String attributeName;
 		while (xmlAmbiChannelWeight->hasAttribute(attributeName = "Order" + String(index)))
 		{
-			ambiSettings->getAmbiOrderWeightPointer()[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
+			ambiSettings.getAmbiOrderWeightPointer()[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
 			index++;
 		}
 	}
@@ -78,11 +77,12 @@ bool PresetInfo::LoadFromFile(File file)
 	if (!file.existsAsFile())
 		return false;
 
-	ScopedPointer<XmlDocument> xmlDoc = new XmlDocument(file);
+	XmlDocument* xmlDoc = new XmlDocument(file);
+	std::unique_ptr<XmlElement> root = xmlDoc->getDocumentElement();
+	bool ok = LoadFromXmlRoot(root.get());
 
-	ScopedPointer<XmlElement> root = xmlDoc->getDocumentElement();
-	
-	return LoadFromXmlRoot(root);
+	delete xmlDoc;
+	return ok;
 }
 
 void PresetInfo::CreateXmlRoot(XmlElement* xmlRoot)
@@ -93,17 +93,17 @@ void PresetInfo::CreateXmlRoot(XmlElement* xmlRoot)
 	XmlElement* xmlGeneral = new XmlElement(XML_TAG_PRESET_GENERAL);
 	
 	XmlElement* xmlDistanceScaler = new XmlElement(XML_TAG_PRESET_DISTANCESCALER);
-	xmlDistanceScaler->setAttribute(XML_VALUE, ambiSettings->getDistanceScaler());
+	xmlDistanceScaler->setAttribute(XML_VALUE, ambiSettings.getDistanceScaler());
 	xmlGeneral->addChildElement(xmlDistanceScaler);
 	
 	XmlElement* xmlFlipDirection = new XmlElement(XML_TAG_PRESET_FLIPDIRECTION);
-	xmlFlipDirection->setAttribute(XML_VALUE, ambiSettings->getDirectionFlip());
+	xmlFlipDirection->setAttribute(XML_VALUE, ambiSettings.getDirectionFlip());
 	xmlGeneral->addChildElement(xmlFlipDirection);
 
 	XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 	{
-		xmlAmbiChannelWeight->setAttribute("Order" + String(i), ambiSettings->getAmbiOrderWeightPointer()[i]);
+		xmlAmbiChannelWeight->setAttribute("Order" + String(i), ambiSettings.getAmbiOrderWeightPointer()[i]);
 	}
 	xmlGeneral->addChildElement(xmlAmbiChannelWeight);
 	xmlRoot->addChildElement(xmlGeneral);
@@ -119,17 +119,17 @@ void PresetInfo::CreateXmlRoot(XmlElement* xmlRoot)
 
 bool PresetInfo::SaveToFile(File file)
 {
-	ScopedPointer<XmlElement> xmlRoot = new XmlElement(XML_TAG_PRESET_ROOT);
+	XmlElement xmlRoot = XmlElement(XML_TAG_PRESET_ROOT);
 	
-	CreateXmlRoot(xmlRoot);
+	CreateXmlRoot(&xmlRoot);
 
-	String xmlDocStr = xmlRoot->createDocument("");
+	String xmlDocStr = xmlRoot.toString();
 	
 	bool ret = file.replaceWithText(xmlDocStr.toWideCharPointer());
 	if (!ret)
 		return false;
 
-	xmlRoot->deleteAllChildElements();
+	xmlRoot.deleteAllChildElements();
 
 	return true;
 }
@@ -151,5 +151,5 @@ void PresetInfo::setName(String newName)
 
 AmbiSettings* PresetInfo::getAmbiSettings()
 {
-	return ambiSettings;
+	return &ambiSettings;
 }

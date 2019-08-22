@@ -16,10 +16,10 @@ AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(oth
 	if (copyImage)
 	{
 		other->ensureLabelImage();
-		if (other->labelImage != nullptr)
+		if (other->labelImage != Image())
 		{
-			this->labelImage = new Image(*other->labelImage);
-			this->labelImage->duplicateIfShared();
+			this->labelImage = Image(other->labelImage);
+			this->labelImage.duplicateIfShared();
 		}
 	}
 }
@@ -96,8 +96,7 @@ void AmbiPoint::setName(String newName)
 {
 	if (name != newName)
 	{
-		Image* img = LabelCreator::createNewLabel(newName, color, FONT_SIZE);
-		labelImage = img;
+		labelImage = LabelCreator::createNewLabel(newName, color, FONT_SIZE);
 	}
 
 	name = newName;
@@ -151,8 +150,7 @@ void AmbiPoint::setColor(Colour newColor)
 {
 	if (color != newColor)
 	{
-		Image* img = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
-		labelImage = img;
+		labelImage = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
 	}
 
 	color = newColor;
@@ -171,14 +169,14 @@ void AmbiPoint::setAlive(int64 currentTimeMillis)
 Image* AmbiPoint::getLabelImage()
 {
 	ensureLabelImage();
-	return labelImage;
+	return &labelImage;
 }
 
 void AmbiPoint::ensureLabelImage()
 {
-	if (labelImage == nullptr)
+	if (labelImage == Image())
 	{
 		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
-		labelImage->duplicateIfShared();
+		labelImage.duplicateIfShared();
 	}
 }

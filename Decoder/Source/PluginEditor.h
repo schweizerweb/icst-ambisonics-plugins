@@ -75,10 +75,10 @@ private:
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
 	OwnedArray<PresetInfo> presets;
-	ScopedPointer<OSCHandler> oscHandler;
+	OSCHandler* pOscHandler;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
-	ScopedPointer<SpeakerSettingsDialog> settingsWindow;
+	SpeakerSettingsDialog* settingsWindow;
     //[/UserVariables]
 
     //==============================================================================

@@ -25,20 +25,12 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
                        )
 #endif
 {
-	pAmbiSettings = new AmbiSettings();
-	pDecoderSettings = new DecoderSettings();
-	speakerSet = new AmbiDataSet();
-	pTestSoundGenerator = new TestSoundGenerator(speakerSet);
-	movingPoints = new AmbiDataSet();
+	pTestSoundGenerator = new TestSoundGenerator(&speakerSet);
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
-	pAmbiSettings = nullptr;
-	pDecoderSettings = nullptr;
-	pTestSoundGenerator = nullptr;
-	speakerSet = nullptr;
-	movingPoints = nullptr;
+	delete pTestSoundGenerator;
 }
 
 //==============================================================================
@@ -109,7 +101,7 @@ void AmbisonicsDecoderAudioProcessor::releaseResources()
 
 void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 {
-	int size = speakerSet->size();
+	int size = speakerSet.size();
 	// add or remove delay buffers if number of speakers changed
 	while(size > delayBuffers.size())
 	{
@@ -119,13 +111,13 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 		delayBuffers.removeLast(delayBuffers.size() - size);
 
 	// check delays
-	double maxDist = speakerSet->getMaxNormalizedDistance();
-	for (int i = 0; i < size && i < speakerSet->size(); i++)
+	double maxDist = speakerSet.getMaxNormalizedDistance();
+	for (int i = 0; i < size && i < speakerSet.size(); i++)
 	{
-		AmbiPoint* pt = speakerSet->get(i);
+		AmbiPoint* pt = speakerSet.get(i);
 		if (pt != nullptr)
 		{
-			int requiredDelay = delayHelper.getDelayCompensationSamples(pAmbiSettings, pt, maxDist, getSampleRate());
+			int requiredDelay = delayHelper.getDelayCompensationSamples(&ambiSettings, pt, maxDist, getSampleRate());
 			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
 		}
 	}
@@ -172,26 +164,26 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
 
 	// clear output buffers if less than #input channels used, the others will be overwritten later
-	for (int i = speakerSet->size(); i < totalNumInputChannels; ++i)
+	for (int i = speakerSet.size(); i < totalNumInputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
-	for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
+	for(int iSpeaker = 0; iSpeaker < speakerSet.size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
-		AmbiPoint* pt = speakerSet->get(iSpeaker);
+		AmbiPoint* pt = speakerSet.get(iSpeaker);
 		if (pt == nullptr)
 			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
 		else
 		{
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
-			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !pAmbiSettings->getDirectionFlip(), true);
+			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !ambiSettings.getDirectionFlip(), true);
 			
 			// gain of the W-signal depends on the used ambisonic order
 			currentCoefficients[0] *= (CURRENT_AMBISONICS_ORDER / (2.0 * CURRENT_AMBISONICS_ORDER + 1));
 
 			for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
 			{
-				currentCoefficients[iChannel] *= pAmbiSettings->getAmbiChannelWeight(iChannel);
+				currentCoefficients[iChannel] *= ambiSettings.getAmbiChannelWeight(iChannel);
 			}
 			// apply to B-format and create output
 			float* channelData = buffer.getWritePointer(iSpeaker);
@@ -225,85 +217,85 @@ AudioProcessorEditor* AmbisonicsDecoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    ScopedPointer<XmlElement> xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
+    XmlElement* xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
 
 	// save general decoder settings
-	pDecoderSettings->saveToXml(xml.get());
+	decoderSettings.saveToXml(xml);
 	
 	// load last speaker preset
-	ScopedPointer<PresetInfo> preset = new PresetInfo();
-	preset->setName("LastState");
-	for (int i = 0; i < speakerSet->size(); i++)
+	PresetInfo preset;
+	preset.setName("LastState");
+	for (int i = 0; i < speakerSet.size(); i++)
 	{
-		AmbiPoint* pt = speakerSet->get(i);
+		AmbiPoint* pt = speakerSet.get(i);
 		if(pt != nullptr)
-			preset->getPoints()->add(new AmbiPoint(pt));
+			preset.getPoints()->add(new AmbiPoint(pt));
 	}
-	preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
-	preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
+	preset.getAmbiSettings()->setDistanceScaler(ambiSettings.getDistanceScaler());
+	preset.getAmbiSettings()->setDirectionFlip(ambiSettings.getDirectionFlip());
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-		preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i] = pAmbiSettings->getAmbiOrderWeightPointer()[i];
+		preset.getAmbiSettings()->getAmbiOrderWeightPointer()[i] = ambiSettings.getAmbiOrderWeightPointer()[i];
 	XmlElement* speakerSettings = new XmlElement(XML_TAG_PRESET_ROOT);
-	preset->CreateXmlRoot(speakerSettings);
+	preset.CreateXmlRoot(speakerSettings);
 	xml->addChildElement(speakerSettings);
 
 	copyXmlToBinary(*xml, destData);
 
 	xml->deleteAllChildElements();
-	preset = nullptr;
+	delete xml;
 }
 
 void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-    ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+	std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 	if (xmlState != nullptr)
 	{
 		// make sure that it's actually our type of XML object..
 		if (xmlState->hasTagName("AMBISONICDECODERPLUGINSETTINGS"))
 		{
 			// load general decoder settings
-			pDecoderSettings->loadFromXml(xmlState.get());
+			decoderSettings.loadFromXml(xmlState.get());
 			
 			// load last speaker preset
-			ScopedPointer<PresetInfo> preset = new PresetInfo();
+			PresetInfo preset;
 			XmlElement* presetElement = xmlState->getChildByName(XML_TAG_PRESET_ROOT);
-			if (presetElement != nullptr && preset->LoadFromXmlRoot(presetElement))
+			if (presetElement != nullptr && preset.LoadFromXmlRoot(presetElement))
 			{
-				speakerSet->clear();
-				for (int i = 0; i < preset->getPoints()->size(); i++)
+				speakerSet.clear();
+				for (int i = 0; i < preset.getPoints()->size(); i++)
 				{
-					speakerSet->add(new AmbiPoint(preset->getPoints()->getUnchecked(i)));
+					speakerSet.add(new AmbiPoint(preset.getPoints()->getUnchecked(i)));
 				}
-				pAmbiSettings->setDistanceScaler(preset->getAmbiSettings()->getDistanceScaler());
-				pAmbiSettings->setDirectionFlip(preset->getAmbiSettings()->getDirectionFlip());
+				ambiSettings.setDistanceScaler(preset.getAmbiSettings()->getDistanceScaler());
+				ambiSettings.setDirectionFlip(preset.getAmbiSettings()->getDirectionFlip());
 
 				for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 				{
-					pAmbiSettings->getAmbiOrderWeightPointer()[i] = preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i];
+					ambiSettings.getAmbiOrderWeightPointer()[i] = preset.getAmbiSettings()->getAmbiOrderWeightPointer()[i];
 				}
 			}
 		}
 	}
 }
 
-AmbiDataSet* AmbisonicsDecoderAudioProcessor::getSpeakerSet() const
+AmbiDataSet* AmbisonicsDecoderAudioProcessor::getSpeakerSet()
 {
-	return speakerSet;
+	return &speakerSet;
 }
 
-AmbiDataSet* AmbisonicsDecoderAudioProcessor::getMovingPoints() const
+AmbiDataSet* AmbisonicsDecoderAudioProcessor::getMovingPoints()
 {
-	return movingPoints;
+	return &movingPoints;
 }
 
-AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings() const
+AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings()
 {
-	return pAmbiSettings;
+	return &ambiSettings;
 }
 
-DecoderSettings* AmbisonicsDecoderAudioProcessor::getDecoderSettings() const
+DecoderSettings* AmbisonicsDecoderAudioProcessor::getDecoderSettings()
 {
-	return pDecoderSettings;
+	return &decoderSettings;
 }
 
 TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() const

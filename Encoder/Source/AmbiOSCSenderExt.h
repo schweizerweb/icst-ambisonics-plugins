@@ -52,5 +52,5 @@ private:
 
 	AmbiDataSet* pPoints;
 	OwnedArray<PointHistoryEntry> history;
-	ScopedPointer<OSCSender> oscSender;
+	OSCSender* oscSender;
 };

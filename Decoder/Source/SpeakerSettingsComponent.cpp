@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -384,10 +384,10 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			int nbChannels = comboBoxChannelConfig->getText().getIntValue();
 			if (nbChannels == 2)
 			{
-				ScopedPointer<Uuid> newId1 = new Uuid();
-				ScopedPointer<Uuid> newId2 = new Uuid();
-				preset->getPoints()->add(new AmbiPoint(newId1->toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor()));
-				preset->getPoints()->add(new AmbiPoint(newId2->toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor()));
+				Uuid newId1 = Uuid();
+				Uuid newId2 = Uuid();
+				preset->getPoints()->add(new AmbiPoint(newId1.toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor()));
+				preset->getPoints()->add(new AmbiPoint(newId2.toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor()));
 			}
 			else
 			{
@@ -395,8 +395,8 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 				projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / nbChannels));
 				for (int i = 0; i < nbChannels; i++)
 				{
-					ScopedPointer<Uuid> newId = new Uuid();
-					preset->getPoints()->add(new AmbiPoint(newId->toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor()));
+					Uuid newId = Uuid();
+					preset->getPoints()->add(new AmbiPoint(newId.toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor()));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
@@ -421,11 +421,11 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonLoad.get())
     {
         //[UserButtonCode_buttonLoad] -- add your button handler code here..
-		ScopedPointer<FileChooser> fileChooser = new FileChooser("Load Preset", File(), "*.xml");
-		if (fileChooser->browseForFileToOpen())
+		FileChooser fileChooser("Load Preset", File(), "*.xml");
+		if (fileChooser.browseForFileToOpen())
 		{
 			PresetInfo* preset = new PresetInfo();
-			if (preset->LoadFromFile(fileChooser->getResult()))
+			if (preset->LoadFromFile(fileChooser.getResult()))
 			{
 				if (CheckForExistingPreset(preset->getName()))
 					return;
@@ -439,10 +439,10 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-		ScopedPointer<FileChooser> fileChooser = new FileChooser("Save Preset", File(), "*.xml");
-		if (fileChooser->browseForFileToSave(true))
+		FileChooser fileChooser("Save Preset", File(), "*.xml");
+		if (fileChooser.browseForFileToSave(true))
 		{
-			String newPresetName = fileChooser->getResult().getFileNameWithoutExtension();
+			String newPresetName = fileChooser.getResult().getFileNameWithoutExtension();
 			if (CheckForExistingPreset(newPresetName))
 				return;
 
@@ -459,7 +459,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			preset->getAmbiSettings()->setDirectionFlip(pAmbiSettings->getDirectionFlip());
 			for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 				preset->getAmbiSettings()->getAmbiOrderWeightPointer()[i] = pAmbiSettings->getAmbiOrderWeightPointer()[i];
-			preset->SaveToFile(fileChooser->getResult());
+			preset->SaveToFile(fileChooser.getResult());
 
 			pPresets->add(preset);
 			updateComboBox(preset->getName());
@@ -469,8 +469,8 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		ScopedPointer<Uuid> newId = new Uuid();
-		pSpeakerSet->add(new AmbiPoint(newId->toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
+		Uuid newId = Uuid();
+		pSpeakerSet->add(new AmbiPoint(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
 		pPointSelection->selectPoint(pSpeakerSet->size() - 1);
 		speakerList->updateContent();
 		speakerList->repaint();
@@ -967,8 +967,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="-8r 24 64 24" posRelativeX="4b25adf5b07e9492"
          posRelativeY="450188aa0f332e78" edTextCol="ff000000" edBkgCol="0"
          labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonLoad" id="5a786eb91323df32" memberName="buttonLoad"
               virtualName="" explicitFocusOrder="0" pos="103R 24 40 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="load" connectedEdges="0"
@@ -999,9 +999,9 @@ BEGIN_JUCER_METADATA
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
           virtualName="" explicitFocusOrder="0" pos="144 16 178M 24" posRelativeX="17eb4b418501687a"
-          posRelativeY="17eb4b418501687a" min="1" max="5e2" int="1e-1"
+          posRelativeY="17eb4b418501687a" min="1.0" max="500.0" int="0.1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1" needsCallback="1"/>
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
@@ -1014,8 +1014,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="8 40 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
               virtualName="" explicitFocusOrder="0" pos="12 96 120 24" posRelativeX="17eb4b418501687a"
               posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"
@@ -1028,8 +1028,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="8 15 150 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
                 virtualName="" explicitFocusOrder="0" pos="16 24 150 24" posRelativeX="450188aa0f332e78"
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
@@ -1042,8 +1042,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="170Rr 19 93 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textTimeout" id="337c3e6db7308866" memberName="textTimeout"
               virtualName="" explicitFocusOrder="0" pos="20Rr 58 130 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -1052,8 +1052,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="170Rr 53 93 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
                 virtualName="" explicitFocusOrder="0" pos="12 24 180 24" posRelativeX="f4cf3a53a6ef0d87"
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"

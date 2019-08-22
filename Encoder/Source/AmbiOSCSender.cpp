@@ -19,7 +19,7 @@ AmbiOSCSender::AmbiOSCSender(AmbiDataSet* ambiPoints): pPoints(ambiPoints), send
 AmbiOSCSender::~AmbiOSCSender()
 {
 	stop();
-	oscSender = nullptr;
+	delete oscSender;
 }
 
 bool AmbiOSCSender::start(String targetHost, int port, int intervalMs)
