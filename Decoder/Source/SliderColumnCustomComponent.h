@@ -18,7 +18,7 @@ public:
 	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(slider);
-		slider.setSliderStyle(Slider::LinearBar);
+		slider.setSliderStyle(Slider::IncDecButtons);
 		slider.addListener(this);
 		slider.setWantsKeyboardFocus(false);
 	}

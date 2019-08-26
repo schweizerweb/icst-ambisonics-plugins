@@ -10,9 +10,13 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZEncAU" pluginRTASCategory=""
               aaxIdentifier="com.zhdk.ambisonicencoder" pluginAAXCategory="2"
-              jucerVersion="5.4.1" pluginFormats="buildAU,buildVST3">
+              jucerVersion="5.4.4" pluginFormats="buildAU,buildVST3">
   <MAINGROUP id="kUoKTp" name="ZEnc">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="XLgJC2" name="AmbiOSCSenderExt.cpp" compile="1" resource="0"
+            file="Source/AmbiOSCSenderExt.cpp"/>
+      <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
+            file="Source/AmbiOSCSenderExt.h"/>
       <FILE id="tPcKpu" name="EncoderSettingsComponent.cpp" compile="1" resource="0"
             file="Source/EncoderSettingsComponent.cpp"/>
       <FILE id="Tr1sQD" name="EncoderSettingsComponent.h" compile="0" resource="0"

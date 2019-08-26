@@ -11,6 +11,7 @@
 #include "EncoderSettings.h"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
 #define XML_TAG_OSC_SEND "OscSend"
+#define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_ORIENTATION "Orientation"
 #define XML_ATTRIBUTE_ENABLE "Enable"
@@ -27,8 +28,11 @@ EncoderSettings::EncoderSettings():
 	oscSendPort(DEFAULT_SEND_PORT),
 	oscSendTargetHost(DEFAULT_SEND_HOST),
 	oscSendIntervalMs(DEFAULT_SEND_INTERVAL),
+	oscSendExtFlag(DEFALUT_SEND_EXT_FLAG), 
+	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
+	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
 	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
-	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE), 
+	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
 	directionFlip(DEFAULT_DIRECTION_FLIP)
 {
 }
@@ -52,6 +56,12 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	oscSend->setAttribute(XML_ATTRIBUTE_IP, oscSendTargetHost);
 	oscSend->setAttribute(XML_ATTRIBUTE_INTERVAL, oscSendIntervalMs);
 	element->addChildElement(oscSend);
+
+	XmlElement* oscSendExt = new XmlElement(XML_TAG_OSC_SEND_EXT);
+	oscSendExt->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtFlag);
+	oscSendExt->setAttribute(XML_ATTRIBUTE_PORT, oscSendExtPort);
+	oscSendExt->setAttribute(XML_ATTRIBUTE_IP, oscSendExtTargetHost);
+	element->addChildElement(oscSendExt);
 
 	XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
@@ -79,6 +89,14 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
 	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_HOST);
 	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
+
+	XmlElement* oscSendExt = element->getChildByName(XML_TAG_OSC_SEND_EXT);
+	if (oscSendExt != nullptr)
+	{
+		oscSendExtFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFALUT_SEND_EXT_FLAG);
+		oscSendExtPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_PORT);
+		oscSendExtTargetHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_EXT_HOST);
+	}
 
 	XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
 	if(distanceEncoding != nullptr)

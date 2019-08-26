@@ -30,10 +30,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
                        )
 #endif
 {
-	sources = new AmbiDataSet();
-	pEncoderSettings = new EncoderSettings();
-	pOscHandler = new OSCHandler(sources, &statusMessageHandler);
-	pOscSender = new AmbiOSCSender(sources);
+	pOscHandler = new OSCHandler(&sources, &statusMessageHandler);
+	pOscSender = new AmbiOSCSender(&sources);
+	pOscSenderExt = new AmbiOSCSenderExt(&sources);
 	initializeOsc();
 
 	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
@@ -41,9 +40,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		String indexStr = String(i + 1);
 		
 		AudioParameterSet set;
-		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, sources, i, AudioParameterFloatAmbi::X);
-		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, sources, i, AudioParameterFloatAmbi::Y);
-		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, sources, i, AudioParameterFloatAmbi::Z);
+		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
+		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
+		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
 
 		audioParams.add(set);
 		addParameter(set.pX);
@@ -54,9 +53,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 {
-	pEncoderSettings = nullptr;
-	pOscHandler = nullptr;
-	pOscSender = nullptr;
+	delete pOscHandler;
+	delete pOscSender;
+	delete pOscSenderExt;
 }
 
 //==============================================================================
@@ -151,11 +150,11 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance)
 {
-	if (!pEncoderSettings->distanceEncodingFlag || pEncoderSettings->unitCircleRadius == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || encoderSettings.unitCircleRadius == 0.0)
 		return;
 
-	double scaledDistance = distance * (1.0 / pEncoderSettings->unitCircleRadius);
-	double wFactor = atan(scaledDistance * PI / 2.0) / scaledDistance * PI / 2.0;
+	double scaledDistance = distance * (1.0 / encoderSettings.unitCircleRadius);
+	double wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
 	double otherFactor = (1 - exp(-scaledDistance)) * wFactor;
 	pCoefficientArray[0] *= wFactor;
 	for (int i = 1; i < arraySize; i++)
@@ -165,7 +164,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
+	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources.size());
 	const float channelScaler = 1.0f / totalNumInputChannels;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
@@ -181,14 +180,14 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
-		AmbiPoint* source = sources->get(iSource);
+		AmbiPoint* source = sources.get(iSource);
 
 		// keep RMS
-		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), pEncoderSettings->oscSendFlag);
+		sources.setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = source->getPoint();
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !pEncoderSettings->directionFlip, true);
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !encoderSettings.directionFlip, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
@@ -221,16 +220,16 @@ AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-	ScopedPointer<XmlElement> xml = new XmlElement(XML_ROOT_TAG);
+	XmlElement* xml = new XmlElement(XML_ROOT_TAG);
 
 	// save general encoder settings
-	xml->addChildElement(pEncoderSettings->getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
+	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	
 	// load sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
-	for (int i = 0; i < sources->size(); i++)
+	for (int i = 0; i < sources.size(); i++)
 	{
-		AmbiPoint* pt = sources->get(i);
+		AmbiPoint* pt = sources.get(i);
 		if(pt != nullptr)
 			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
 	}
@@ -238,22 +237,23 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
+	delete xml;
 }
 
 void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
 {
-	ScopedPointer<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+	std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
 	if (xmlState != nullptr)
 	{
 		// make sure that it's actually our type of XML object..
 		if (xmlState->hasTagName(XML_ROOT_TAG))
 		{
 			// load general encoder settings
-			pEncoderSettings->loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
+			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
 
 			// load last speaker preset
 			XmlElement* sourcesElement = xmlState->getChildByName(XML_TAG_SOURCES);
-			sources->clear();
+			sources.clear();
 			if (sourcesElement != nullptr)
 			{
 				int index = 0;
@@ -261,9 +261,9 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 				while (xmlPoint != nullptr)
 				{
 					if (audioParams.size() > index)
-						sources->add(new AmbiPoint(xmlPoint, audioParams[index]));
+						sources.add(new AmbiPoint(xmlPoint, audioParams[index]));
 					else
-						sources->add(new AmbiPoint(xmlPoint, AudioParameterSet()));
+						sources.add(new AmbiPoint(xmlPoint, AudioParameterSet()));
 
 					xmlPoint = xmlPoint->getNextElement();
 					index++;
@@ -275,9 +275,9 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 	initializeOsc();
 }
 
-AmbiDataSet* AmbisonicEncoderAudioProcessor::getSources() const
+AmbiDataSet* AmbisonicEncoderAudioProcessor::getSources()
 {
-	return sources;
+	return &sources;
 }
 
 Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()
@@ -290,19 +290,19 @@ StatusMessageHandler* AmbisonicEncoderAudioProcessor::getStatusMessageHandler()
 	return &statusMessageHandler;
 }
 
-EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings() const
+EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 {
-	return pEncoderSettings;
+	return &encoderSettings;
 }
 
-void AmbisonicEncoderAudioProcessor::initializeOsc() const
+void AmbisonicEncoderAudioProcessor::initializeOsc()
 {
-	if(pEncoderSettings->oscReceiveFlag)
+	if(encoderSettings.oscReceiveFlag)
 	{
-		if (!pOscHandler->start(pEncoderSettings->oscReceivePort))
+		if (!pOscHandler->start(encoderSettings.oscReceivePort))
 		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(pEncoderSettings->oscReceivePort));
-			pEncoderSettings->oscReceiveFlag = false;
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(encoderSettings.oscReceivePort));
+			encoderSettings.oscReceiveFlag = false;
 		}
 	}
 	else
@@ -310,17 +310,30 @@ void AmbisonicEncoderAudioProcessor::initializeOsc() const
 		pOscHandler->stop();
 	}
 
-	if(pEncoderSettings->oscSendFlag)
+	if(encoderSettings.oscSendFlag)
 	{
-		if (!pOscSender->start(pEncoderSettings->oscSendTargetHost, pEncoderSettings->oscSendPort, pEncoderSettings->oscSendIntervalMs))
+		if (!pOscSender->start(encoderSettings.oscSendTargetHost, encoderSettings.oscSendPort, encoderSettings.oscSendIntervalMs))
 		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender on " + pEncoderSettings->oscSendTargetHost + ":" + String(pEncoderSettings->oscSendPort));
-			pEncoderSettings->oscSendFlag = false;
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender on " + encoderSettings.oscSendTargetHost + ":" + String(encoderSettings.oscSendPort));
+			encoderSettings.oscSendFlag = false;
 		}
 	}
 	else
 	{
 		pOscSender->stop();
+	}
+
+	if (encoderSettings.oscSendExtFlag)
+	{
+		if (!pOscSenderExt->start(encoderSettings.oscSendExtTargetHost, encoderSettings.oscSendExtPort))
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender for external usage on " + encoderSettings.oscSendExtTargetHost + ":" + String(encoderSettings.oscSendExtPort));
+			encoderSettings.oscSendExtFlag = false;
+		}
+	}
+	else
+	{
+		pOscSenderExt->stop();
 	}
 }
 

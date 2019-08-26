@@ -15,20 +15,18 @@ class DelayBuffer
 {
 public:
 	DelayBuffer()
-		: buffer(new AudioBuffer<float>),
-		  currentPosition(0)
+		: currentPosition(0)
 	{
 	}
 
 	~DelayBuffer()
 	{
-		buffer = nullptr;
 	}
 
 	void checkAndAdjustSize(int requiredDelay);
 	float processNextSample(float input);
 
 private:
-	ScopedPointer<AudioBuffer<float>> buffer;
+	AudioBuffer<float> buffer;
 	int currentPosition;
 };

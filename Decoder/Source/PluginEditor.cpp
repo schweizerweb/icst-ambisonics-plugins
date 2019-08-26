@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.3
 
   ------------------------------------------------------------------------------
 
@@ -29,14 +29,14 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc)
+    : AudioProcessorEditor(ownerProc), processor(ownerProc), settingsWindow(nullptr)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	pSpeakerSet = ownerProc.getSpeakerSet();
 	pMovingPoints = ownerProc.getMovingPoints();
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	pDecoderSettings = ownerProc.getDecoderSettings();
-	oscHandler = new OSCHandler(pMovingPoints);
+	pOscHandler = new OSCHandler(pMovingPoints);
 	initializeOscHandler();
 	radarOptions.nameFieldEditable = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
@@ -50,7 +50,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     labelVersion.reset (new Label ("labelVersion",
                                    TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (Font (15.0f, Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelVersion->setJustificationType (Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (TextEditor::textColourId, Colours::black);
@@ -62,9 +62,9 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     btnSettings->addListener (this);
 
     btnSettings->setImages (false, true, true,
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0x00000000),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.4f, Colour (0x6eee1010),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.0f, Colour (0xc0ee1010));
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0x00000000),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, Colour (0x6eee1010),
+                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
 
@@ -77,7 +77,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
+#ifdef DEBUG
+	labelVersion->setText("Dev" + Time::getCurrentTime().toString(false, true, true, true), dontSendNotification);
+#else
 	labelVersion->setText("ZDec " + String(ProjectInfo::versionString), dontSendNotification);
+#endif
 	updateRadarOptions();
     //[/Constructor]
 }
@@ -90,7 +94,12 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
+	if(settingsWindow != nullptr)
+	{
+		delete settingsWindow;
+	}
 
+	delete pOscHandler;
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -129,9 +138,11 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == btnSettings.get())
     {
         //[UserButtonCode_btnSettings] -- add your button handler code here..
-		SpeakerSettingsComponent::showAsDialog(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator());
-		initializeOscHandler();
-		updateRadarOptions();
+		if (settingsWindow)
+			delete settingsWindow;
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this));
+		settingsWindow->setVisible(true);
+		settingsWindow->centreWithSize(850, 600);
         //[/UserButtonCode_btnSettings]
     }
 
@@ -139,20 +150,24 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     //[/UserbuttonClicked_Post]
 }
 
-
-
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+void AmbisonicsDecoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
+{
+	initializeOscHandler();
+	updateRadarOptions();
+}
 
 void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 {
 	// update timeout
 	radarOptions.displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
 
-	oscHandler->stop();
+	pOscHandler->stop();
 
 	if (pDecoderSettings->oscReceive)
 	{
-		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
+		if (!pOscHandler->start(pDecoderSettings->oscReceivePort))
 		{
 			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
 		}
@@ -168,6 +183,15 @@ void AmbisonicsDecoderAudioProcessorEditor::updateRadarOptions()
 	radarComponent->setPointInfoVisible(pDecoderSettings->editMode);
 }
 
+void AmbisonicsDecoderAudioProcessorEditor::actionListenerCallback(const String& message)
+{
+	if (message == ACTION_CLOSE_SETTINGS)
+	{
+		delete settingsWindow;
+		settingsWindow = nullptr;
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -181,26 +205,26 @@ void AmbisonicsDecoderAudioProcessorEditor::updateRadarOptions()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AmbisonicsDecoderAudioProcessorEditor"
-                 componentName="" parentClasses="public AudioProcessorEditor"
+                 componentName="" parentClasses="public AudioProcessorEditor, public ChangeListener, public ActionListener"
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.33"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
-                    virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
+                    virtualName="" explicitFocusOrder="0" pos="0 32 320M 172M" class="RadarComponent"
                     params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="81R 8 76 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="401R 8 76 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
+         kerning="0" bold="0" italic="0" justification="34"/>
   <IMAGEBUTTON name="btnSettings" id="1c0127439cd8fab6" memberName="btnSettings"
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText=""
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="settings_png" opacityNormal="1.0" colourNormal="0"
-               resourceOver="settings_png" opacityOver="0.40000000596046447754"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
+               resourceNormal="settings_png" opacityNormal="1" colourNormal="0"
+               resourceOver="settings_png" opacityOver="4.000000059604645e-1"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1"
                colourDown="c0ee1010"/>
 </JUCER_COMPONENT>
 
@@ -614,3 +638,4 @@ const int AmbisonicsDecoderAudioProcessorEditor::settings_pngSize = 22271;
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

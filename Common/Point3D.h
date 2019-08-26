@@ -61,8 +61,8 @@ public:
 	/** Copies this Point3D from another one. */
 	Point3D& operator= (Point3D& other) noexcept { xyzChanged = true; x = other.getX(); y = other.getY(); z = other.getZ(); audioParams = other.audioParams; return *this; }
 
-	inline bool operator== (Point3D other) const noexcept{ return getX() == other.getX() && getY() == other.getY() && getZ() == other.getZ(); }
-	inline bool operator!= (Point3D other) const noexcept{ return getX() != other.getX() || getY() != other.getY() || getZ() != other.getZ(); }
+	inline bool operator== (Point3D other) noexcept{ return getX() == other.getX() && getY() == other.getY() && getZ() == other.getZ(); }
+	inline bool operator!= (Point3D other) noexcept{ return getX() != other.getX() || getY() != other.getY() || getZ() != other.getZ(); }
 
 		/** Returns true if the Point3D is (0, 0, 0). */
 	bool isOrigin() const noexcept{ return getX() == ValueType() && getY() == ValueType() && getZ() == ValueType(); }

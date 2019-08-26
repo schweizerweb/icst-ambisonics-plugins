@@ -15,6 +15,7 @@
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/OSCHandler.h"
 #include "AmbiOSCSender.h"
+#include "AmbiOSCSenderExt.h"
 
 
 //==============================================================================
@@ -60,17 +61,18 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	AmbiDataSet* getSources() const;
-	EncoderSettings* getEncoderSettings() const;
-	void initializeOsc() const;
+	AmbiDataSet* getSources();
+	EncoderSettings* getEncoderSettings();
+	void initializeOsc();
 	Array<AudioParameterSet>* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
 
 private:
-	ScopedPointer<AmbiDataSet> sources;
-	ScopedPointer<EncoderSettings> pEncoderSettings;
-	ScopedPointer<OSCHandler> pOscHandler;
-	ScopedPointer<AmbiOSCSender> pOscSender;
+	AmbiDataSet sources;
+	EncoderSettings encoderSettings;
+	OSCHandler* pOscHandler;
+	AmbiOSCSender* pOscSender;
+	AmbiOSCSenderExt* pOscSenderExt;
 	Array<AudioParameterSet> audioParams;
 	StatusMessageHandler statusMessageHandler;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];

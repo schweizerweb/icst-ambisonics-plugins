@@ -16,6 +16,9 @@
 #define DEFAULT_SEND_PORT			50000
 #define DEFAULT_SEND_HOST			"127.0.0.1"
 #define DEFAULT_SEND_INTERVAL		50
+#define DEFALUT_SEND_EXT_FLAG		false
+#define DEFAULT_SEND_EXT_PORT		50002
+#define DEFAULT_SEND_EXT_HOST	    "127.0.0.1"
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_UNIT_CIRCLE_SIZE	0.1f
 #define DEFAULT_DIRECTION_FLIP		false
@@ -36,6 +39,10 @@ public:
 	int oscSendPort;
 	String oscSendTargetHost;
 	int oscSendIntervalMs;
+	
+	bool oscSendExtFlag;
+	int oscSendExtPort;
+	String oscSendExtTargetHost;
 
 	bool distanceEncodingFlag;
 	float unitCircleRadius;
