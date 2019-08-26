@@ -56,8 +56,8 @@ void AmbiOSCSenderExt::timerCallback()
 				OSCMessage message = OSCMessage(
 					OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN),
 					OSCArgument(pt->getName()),
-					OSCArgument(float(pt->getPoint()->getAzimuth())),
-					OSCArgument(float(pt->getPoint()->getElevation())),
+					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))),
+					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getElevation())))),
 					OSCArgument(float(pt->getPoint()->getDistance())));
 				oscSender->send(message);
 			}
