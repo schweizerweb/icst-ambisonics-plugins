@@ -69,3 +69,12 @@ void ZoomSettings::setCurrentRadius(float newRadius)
 	currentRadius = newRadius;
 	sendChangeMessage();
 }
+
+int ZoomSettings::getNumberOfRings() const
+{
+	if (currentRadius < 0.15)
+		return 100;
+	if (currentRadius < 0.6)
+		return 20;
+	return 10;
+}

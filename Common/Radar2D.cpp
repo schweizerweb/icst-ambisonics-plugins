@@ -99,7 +99,7 @@ Image Radar2D::createRadarBackground() const
 	Graphics g(img);
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
-	int numberOfRings = 10;
+	int numberOfRings = pZoomSettings->getNumberOfRings();
 
 	float dist = pZoomSettings->getInitialRadius() / float(numberOfRings) * getValueToScreenRatio();
 	Point<float> centerPoint = getRelativeScreenPoint(Point<float>(0.0, 0.0));
