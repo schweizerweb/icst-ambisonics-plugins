@@ -66,7 +66,7 @@ private:
 	void drawRadar(Graphics* g) const;
 	void drawInfoLabel(Graphics* g) const;
 	void renderOpenGL() override;
-	Image* createRadarBackground() const;
+	Image createRadarBackground() const;
 	void updateRadarBackground();
 	void updateInfoLabel(String info);
 	void timerCallback() override;
@@ -76,13 +76,13 @@ private:
 
 	AmbiDataSet* pEditablePoints;
 	AmbiDataSet* pDisplayOnlyPoints;
-	ScopedPointer<Image> radarBackground;
-	ScopedPointer<Image> infoImage;
+	Image radarBackground;
+	Image infoImage;
 	Rectangle<int> radarViewport;
 	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
 	PointSelection* pPointSelection;
-	ScopedPointer<RadarColors> radarColors;
+	RadarColors radarColors;
 	RadarOptions* pRadarOptions;
 	CriticalSection radarBackgroundLock;
 	CriticalSection infoLabelLock;

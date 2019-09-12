@@ -58,7 +58,7 @@ private:
 	double gain;
 	float rms;
 	int64 lastUpdate = 0;
-	ScopedPointer<Image> labelImage;
+	Image labelImage;
 };
 
 

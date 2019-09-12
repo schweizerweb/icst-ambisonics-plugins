@@ -34,12 +34,9 @@ public:
 		else 
 		{
 			double dbl = getText().getDoubleValue();
-			if (range != nullptr)
-			{
-				dbl = jmax(range->min, dbl);
-				dbl = jmin(range->max, dbl);
-				owner.setValue(columnId, row, dbl);
-			}
+			dbl = jmax(range.min, dbl);
+			dbl = jmin(range.max, dbl);
+			owner.setValue(columnId, row, dbl);
 		}
 	}
 
@@ -47,7 +44,7 @@ public:
 	{
 		row = newRow;
 		columnId = newColumn;
-		range = new SliderRange(owner.getSliderRange(columnId));
+		range = SliderRange(owner.getSliderRange(columnId));
 		setText(String(owner.getValue(columnId, row), 3), dontSendNotification);
 	}
 
@@ -62,6 +59,6 @@ public:
 
 private:
 	SpeakerSettingsComponent& owner;
-	ScopedPointer<SliderRange> range;
+	SliderRange range;
 	int row, columnId;
 };

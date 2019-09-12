@@ -14,5 +14,5 @@
 class LabelCreator
 {
 public:
-	static Image* createNewLabel(String label, Colour newColor, float fontSize);
+	static Image createNewLabel(String label, Colour newColor, float fontSize);
 };

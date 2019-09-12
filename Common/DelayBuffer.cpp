@@ -12,15 +12,15 @@
 
 void DelayBuffer::checkAndAdjustSize(int requiredDelay)
 {
-	if (buffer->getNumSamples() != requiredDelay)
+	if (buffer.getNumSamples() != requiredDelay)
 	{
-		AudioBuffer<float>* newBuffer = new AudioBuffer<float>();
-		newBuffer->setSize(1, requiredDelay, false, true);
+		AudioBuffer<float> newBuffer;
+		newBuffer.setSize(1, requiredDelay, false, true);
 		
 		// keep old data if available
-		for (int i = 0; i < buffer->getNumSamples() && i < newBuffer->getNumSamples(); i++)
+		for (int i = 0; i < buffer.getNumSamples() && i < newBuffer.getNumSamples(); i++)
 		{
-			newBuffer->setSample(0, i, buffer->getSample(0, (currentPosition + i) % buffer->getNumSamples()));
+			newBuffer.setSample(0, i, buffer.getSample(0, (currentPosition + i) % buffer.getNumSamples()));
 		}
 		
 		buffer = newBuffer;
@@ -30,13 +30,13 @@ void DelayBuffer::checkAndAdjustSize(int requiredDelay)
 
 float DelayBuffer::processNextSample(float input)
 {
-	if (buffer->getNumSamples() == 0)
+	if (buffer.getNumSamples() == 0)
 		return input;
 
-	float output = buffer->getSample(0, currentPosition);
-	buffer->setSample(0, currentPosition, input);
+	float output = buffer.getSample(0, currentPosition);
+	buffer.setSample(0, currentPosition, input);
 
-	currentPosition = (currentPosition + 1) % buffer->getNumSamples();
+	currentPosition = (currentPosition + 1) % buffer.getNumSamples();
 
 	return output;
 }

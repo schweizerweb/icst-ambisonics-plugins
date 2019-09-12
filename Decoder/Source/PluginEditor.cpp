@@ -29,14 +29,14 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc)
+    : AudioProcessorEditor(ownerProc), processor(ownerProc), settingsWindow(nullptr)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	pSpeakerSet = ownerProc.getSpeakerSet();
 	pMovingPoints = ownerProc.getMovingPoints();
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	pDecoderSettings = ownerProc.getDecoderSettings();
-	oscHandler = new OSCHandler(pMovingPoints);
+	pOscHandler = new OSCHandler(pMovingPoints);
 	initializeOscHandler();
 	radarOptions.nameFieldEditable = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
@@ -77,7 +77,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
+#ifdef DEBUG
+	labelVersion->setText("Dev" + Time::getCurrentTime().toString(false, true, true, true), dontSendNotification);
+#else
 	labelVersion->setText("ZDec " + String(ProjectInfo::versionString), dontSendNotification);
+#endif
 	updateRadarOptions();
     //[/Constructor]
 }
@@ -90,7 +94,12 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
+	if(settingsWindow != nullptr)
+	{
+		delete settingsWindow;
+	}
 
+	delete pOscHandler;
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -129,6 +138,8 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     if (buttonThatWasClicked == btnSettings.get())
     {
         //[UserButtonCode_btnSettings] -- add your button handler code here..
+		if (settingsWindow)
+			delete settingsWindow;
 		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this));
 		settingsWindow->setVisible(true);
 		settingsWindow->centreWithSize(850, 600);
@@ -152,11 +163,11 @@ void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 	// update timeout
 	radarOptions.displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
 
-	oscHandler->stop();
+	pOscHandler->stop();
 
 	if (pDecoderSettings->oscReceive)
 	{
-		if (!oscHandler->start(pDecoderSettings->oscReceivePort))
+		if (!pOscHandler->start(pDecoderSettings->oscReceivePort))
 		{
 			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC-Handler on port " + String(pDecoderSettings->oscReceivePort), "OK");
 		}
@@ -176,6 +187,7 @@ void AmbisonicsDecoderAudioProcessorEditor::actionListenerCallback(const String&
 {
 	if (message == ACTION_CLOSE_SETTINGS)
 	{
+		delete settingsWindow;
 		settingsWindow = nullptr;
 	}
 }
