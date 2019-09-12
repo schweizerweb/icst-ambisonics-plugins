@@ -425,13 +425,13 @@ void Radar2D::mouseUp(const MouseEvent& e)
 	{
 		setCenterPoint(valuePoint);
 
-		if(e.mods.isLeftButtonDown())
-		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
-		}
-		else if(e.mods.isRightButtonDown())
+		if (e.mods.isAltDown() || e.mods.isRightButtonDown())
 		{
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
+		}
+		else
+		{
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
 		}
 	}
 }
