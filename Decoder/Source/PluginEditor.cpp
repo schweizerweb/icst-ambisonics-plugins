@@ -143,6 +143,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
 		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this));
 		settingsWindow->setVisible(true);
 		settingsWindow->centreWithSize(850, 600);
+		settingsWindow->setResizable(true, true);
         //[/UserButtonCode_btnSettings]
     }
 

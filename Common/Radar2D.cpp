@@ -99,7 +99,7 @@ Image Radar2D::createRadarBackground() const
 	Graphics g(img);
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
-	int numberOfRings = 10;
+	int numberOfRings = pZoomSettings->getNumberOfRings();
 
 	float dist = pZoomSettings->getInitialRadius() / float(numberOfRings) * getValueToScreenRatio();
 	Point<float> centerPoint = getRelativeScreenPoint(Point<float>(0.0, 0.0));
@@ -425,13 +425,13 @@ void Radar2D::mouseUp(const MouseEvent& e)
 	{
 		setCenterPoint(valuePoint);
 
-		if(e.mods.isLeftButtonDown())
-		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
-		}
-		else if(e.mods.isRightButtonDown())
+		if (e.mods.isAltDown() || e.mods.isRightButtonDown())
 		{
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
+		}
+		else
+		{
+			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
 		}
 	}
 }

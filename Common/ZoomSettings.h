@@ -25,6 +25,7 @@ public:
 	float getInitialRadius() const;
 	float getCurrentRadius() const;
 	void setCurrentRadius(float newRadius);
+	int getNumberOfRings() const;
 
 private:
 	Point3D<float> initialCenterPoint;
