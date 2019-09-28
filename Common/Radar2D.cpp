@@ -357,7 +357,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	}
 	else
 	{
-		double minDist = DBL_MAX;
+		double minDist = std::numeric_limits<double>::max();
 		int minDistIndex = -1;
 		for (int i = 0; i < pEditablePoints->size(); i++)
 		{
