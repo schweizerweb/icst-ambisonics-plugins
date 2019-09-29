@@ -357,7 +357,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	}
 	else
 	{
-		double minDist = DBL_MAX;
+		double minDist = std::numeric_limits<double>::max();
 		int minDistIndex = -1;
 		for (int i = 0; i < pEditablePoints->size(); i++)
 		{
@@ -466,7 +466,15 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 void Radar2D::showCoordinates(const Point<float>& point)
 {
 	String str;
-	str << String(point.getX(), 2) << "; " << String(point.getY(), 2);
+	if (radarMode == XY)
+	{
+		str << "X: " << String(point.getY(), 2) << "; Y: " << String(point.getX(), 2);
+	}
+	else
+	{
+		str << "Y: " << String(point.getX(), 2) << "; Z: " << String(point.getY(), 2);
+	}
+
 	updateInfoLabel(str);
 }
 

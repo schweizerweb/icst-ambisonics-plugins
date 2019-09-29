@@ -30,6 +30,7 @@ public:
 	bool setChannelAED(int channel, double a, double e, double d) const;
 	void setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color);
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
+	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
 	void setChannelXY(int channel, double x, double y) const;
 	void setChannelYZ(int channel, double y, double z) const;
 	void setChannelName(int channel, String name) const;

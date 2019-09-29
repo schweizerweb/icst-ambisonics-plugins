@@ -164,6 +164,28 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 	return false;
 }
 
+bool AmbiDataSet::setChannelNameXYZ(String channelName, double x, double y, double z) const
+{
+	AmbiPoint* ambiPt = nullptr;
+
+	for (AmbiPoint* pt : elements)
+	{
+		if (pt != nullptr && pt->getName() == channelName)
+		{
+			ambiPt = pt;
+			break;
+		}
+	}
+
+	if (ambiPt != nullptr)
+	{
+		ambiPt->getPoint()->setXYZ(x, y, z);
+		return true;
+	}
+
+	return false;
+}
+
 void AmbiDataSet::setChannelXY(int channel, double x, double y) const
 {
 	AmbiPoint* pt = elements[channel];
