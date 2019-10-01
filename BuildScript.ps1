@@ -125,7 +125,7 @@ foreach($pluginType in $pluginTypes)
 {
     $targetPath = Join-Path $targetPathBase $pluginType.Name
     $sourcesFilter = Join-Path $targetPath *.*
-    $targetZip = Join-Path $targetPathZipBase "ZAmbiPluginBundle_$($pluginType.Name)_$($releaseVersion)_$($platformString).zip"
+    $targetZip = Join-Path $targetPathZipBase "ICST_AmbiPlugins_$($pluginType.Name)_$($releaseVersion)_$($platformString).zip"
 	if(Test-Path $targetZip)
 	{
 		Remove-Item $targetZip -Force
