@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="TRwhZJ" name="ZEnc" displaySplashScreen="1" reportAppUsage="1"
+<JUCERPROJECT id="TRwhZJ" name="AmbiEnc" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" projectType="audioplug" version="0.0.0"
-              bundleIdentifier="com.yourcompany.AmbisonicEncoder" includeBinaryInAppConfig="1"
+              bundleIdentifier="com.icst.ambienc" includeBinaryInAppConfig="1"
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="ZEnc"
-              pluginDesc="Development Version" pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK"
+              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiEnc"
+              pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
               pluginCode="AAEC" pluginChannelConfigs="{1,4}" pluginIsSynth="0"
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
-              pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZEncAU" pluginRTASCategory=""
-              aaxIdentifier="com.zhdk.ambisonicencoder" pluginAAXCategory="2"
-              jucerVersion="5.4.4" pluginFormats="buildAU,buildVST3">
-  <MAINGROUP id="kUoKTp" name="ZEnc">
+              pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiEncAU"
+              pluginRTASCategory="" aaxIdentifier="com.icst.ambienc" pluginAAXCategory="2"
+              jucerVersion="5.4.4" pluginFormats="buildAU,buildVST3" companyName="ICST"
+              companyWebsite="https://www.zhdk.ch/forschung/icst">
+  <MAINGROUP id="kUoKTp" name="AmbiEnc">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
       <FILE id="XLgJC2" name="AmbiOSCSenderExt.cpp" compile="1" resource="0"
             file="Source/AmbiOSCSenderExt.cpp"/>
