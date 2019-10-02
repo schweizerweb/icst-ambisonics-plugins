@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -177,20 +177,20 @@ BEGIN_JUCER_METADATA
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 8 79 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <IMAGEBUTTON name="btnSettings" id="e4880b2ef7a6a35e" memberName="btnSettings"
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText="new button"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="settings_png" opacityNormal="1" colourNormal="0"
-               resourceOver="settings_png" opacityOver="4.000000059604645e-1"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1"
+               resourceNormal="settings_png" opacityNormal="1.0" colourNormal="0"
+               resourceOver="settings_png" opacityOver="0.4000000059604645"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
                colourDown="c0ee1010"/>
   <LABEL name="labelMessage" id="24478721f956d20c" memberName="labelMessage"
          virtualName="" explicitFocusOrder="0" pos="40 8 124M 24" edTextCol="ff000000"
          edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.17e1"
-         kerning="0" bold="0" italic="0" justification="36"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="11.7"
+         kerning="0.0" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
