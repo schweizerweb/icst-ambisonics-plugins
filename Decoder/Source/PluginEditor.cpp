@@ -29,9 +29,10 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc), settingsWindow(nullptr)
+    : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	settingsWindow = nullptr;
 	pSpeakerSet = ownerProc.getSpeakerSet();
 	pMovingPoints = ownerProc.getMovingPoints();
 	pAmbiSettings = ownerProc.getAmbiSettings();
@@ -94,15 +95,15 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
-	if(settingsWindow != nullptr)
+	
+    //[Destructor]. You can add your own custom destruction code here..
+	if (settingsWindow != nullptr)
 	{
 		delete settingsWindow;
 	}
 
 	delete pOscHandler;
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
+	//[/Destructor]
 }
 
 //==============================================================================
