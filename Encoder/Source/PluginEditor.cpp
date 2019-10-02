@@ -126,8 +126,8 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 5 - 79, 8, 79, 24);
-    labelMessage->setBounds (40, 8, getWidth() - 124, 24);
+    labelVersion->setBounds (getWidth() - 5 - 103, 8, 103, 24);
+    labelMessage->setBounds (40, 8, getWidth() - 148, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -175,7 +175,7 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSources, nullptr, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="5Rr 8 79 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="5Rr 8 103 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
@@ -187,7 +187,7 @@ BEGIN_JUCER_METADATA
                colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
                colourDown="c0ee1010"/>
   <LABEL name="labelMessage" id="24478721f956d20c" memberName="labelMessage"
-         virtualName="" explicitFocusOrder="0" pos="40 8 124M 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="40 8 148M 24" edTextCol="ff000000"
          edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="11.7"
          kerning="0.0" bold="0" italic="0" justification="36"/>
