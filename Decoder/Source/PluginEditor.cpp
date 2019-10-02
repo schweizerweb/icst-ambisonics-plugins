@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -95,7 +95,8 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     radarComponent = nullptr;
     labelVersion = nullptr;
     btnSettings = nullptr;
-	
+
+
     //[Destructor]. You can add your own custom destruction code here..
 	if (settingsWindow != nullptr)
 	{
@@ -103,7 +104,7 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
 	}
 
 	delete pOscHandler;
-	//[/Destructor]
+    //[/Destructor]
 }
 
 //==============================================================================
@@ -124,7 +125,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 81, 8, 76, 24);
+    labelVersion->setBounds (getWidth() - 5 - 103, 8, 103, 24);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();
@@ -151,6 +152,8 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
 }
+
+
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
@@ -214,19 +217,19 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
-                    virtualName="" explicitFocusOrder="0" pos="0 32 320M 172M" class="RadarComponent"
+                    virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
                     params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
-         virtualName="" explicitFocusOrder="0" pos="401R 8 76 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="5Rr 8 103 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="34"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <IMAGEBUTTON name="btnSettings" id="1c0127439cd8fab6" memberName="btnSettings"
                virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText=""
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
-               resourceNormal="settings_png" opacityNormal="1" colourNormal="0"
-               resourceOver="settings_png" opacityOver="4.000000059604645e-1"
-               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1"
+               resourceNormal="settings_png" opacityNormal="1.0" colourNormal="0"
+               resourceOver="settings_png" opacityOver="0.4000000059604645"
+               colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
                colourDown="c0ee1010"/>
 </JUCER_COMPONENT>
 
