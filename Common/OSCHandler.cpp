@@ -110,7 +110,7 @@ void OSCHandler::handleOwnExternStyleAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK string style AED)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style AED)");
 		return;
 	}
 
@@ -141,7 +141,7 @@ void OSCHandler::handleOwnExternStyleXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK string style XYZ)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style XYZ)");
 		return;
 	}
 
@@ -172,7 +172,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index AED style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index AED style)");
 		return;
 	}
 
@@ -203,7 +203,7 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ZHdK index XYZ style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index XYZ style)");
 		return;
 	}
 
@@ -231,23 +231,23 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	{
 		handleMusescoreSSMNStyle(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL)))
 	{
 		handleOwnInternalStyle(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_AED)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED)))
 	{
 		handleOwnExternStyleAed(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_XYZ)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ)))
 	{
 		handleOwnExternStyleXyz(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
 	{
 		handleOwnExternStyleIndexAed(message);
 	}
-	else if(pattern.matches(OSCAddress(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
 	{
 		handleOwnExternStyleIndexXyz(message);
 	}

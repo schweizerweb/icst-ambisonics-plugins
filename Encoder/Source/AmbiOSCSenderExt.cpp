@@ -54,7 +54,7 @@ void AmbiOSCSenderExt::timerCallback()
 			if (history[i]->update(pt))
 			{
 				OSCMessage messageAed = OSCMessage(
-					OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_AED),
+					OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED),
 					OSCArgument(pt->getName()),
 					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))),
 					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getElevation())))),
@@ -62,7 +62,7 @@ void AmbiOSCSenderExt::timerCallback()
 				oscSender->send(messageAed);
 
 				OSCMessage messageXyz = OSCMessage(
-					OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_XYZ),
+					OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ),
 					OSCArgument(pt->getName()),
 					OSCArgument(float(pt->getPoint()->getX())),
 					OSCArgument(float(pt->getPoint()->getY())),

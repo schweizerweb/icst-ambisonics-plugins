@@ -50,7 +50,7 @@ void AmbiOSCSender::timerCallback()
 		if (pt != nullptr)
 		{
 			OSCMessage message = OSCMessage(
-				OSCAddressPattern(OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS),
+				OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL),
 				OSCArgument(pt->getId()),
 				OSCArgument(pt->getName()),
 				OSCArgument(float(pt->getPoint()->getX())),
