@@ -1,17 +1,18 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="AAMgSi" name="ZDec" displaySplashScreen="1" reportAppUsage="1"
+<JUCERPROJECT id="AAMgSi" name="AmbiDecoder" displaySplashScreen="1" reportAppUsage="1"
               splashScreenColour="Dark" projectType="audioplug" version="0.0.0"
-              bundleIdentifier="com.zhdk.ambisonicdecoder" includeBinaryInAppConfig="1"
+              bundleIdentifier="com.icst.ambidecoder" includeBinaryInAppConfig="1"
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
-              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="ZDec"
-              pluginDesc="Development Version" pluginManufacturer="ZHdK" pluginManufacturerCode="ZHdK"
+              buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiDecoder"
+              pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
               pluginCode="AADC" pluginChannelConfigs="{4,32}" pluginIsSynth="0"
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
-              pluginEditorRequiresKeys="0" pluginAUExportPrefix="ZDecAU" pluginRTASCategory=""
-              aaxIdentifier="com.zhdk.ambisonicdecoder" pluginAAXCategory="2"
-              jucerVersion="5.4.4" companyName="ZHdK" pluginFormats="buildAU,buildVST3">
-  <MAINGROUP id="oa5A98" name="ZDec">
+              pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
+              pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
+              jucerVersion="5.4.4" companyName="ICST" pluginFormats="buildAU,buildVST3"
+              companyWebsite="https://www.zhdk.ch/forschung/icst">
+  <MAINGROUP id="oa5A98" name="AmbiDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="roXymN" name="settings.png" compile="0" resource="1" file="../Resources/settings.png"/>
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>

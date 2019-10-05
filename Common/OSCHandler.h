@@ -17,11 +17,11 @@
 #include "AmbiDataSet.h"
 
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
-#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS "/zhdk/ambi/source/internal"
-#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_AED "/zhdk/ambi/source/aed"
-#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_XYZ "/zhdk/ambi/source/xyz"
-#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/zhdk/ambi/channelsource/aed"
-#define OSC_ADDRESS_ZHDK_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/zhdk/ambi/channelsource/xyz"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED "/icst/ambi/source/aed"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ "/icst/ambi/source/xyz"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/channelsource/aed"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/channelsource/xyz"
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 
