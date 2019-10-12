@@ -17,7 +17,14 @@ $EncoderVersions =
 @{ Order = 4; Input = 32; Description = "4th Order Ambisonic, 32 Channel Input" },
 @{ Order = 5; Input = 32; Description = "5th Order Ambisonic, 32 Channel Input" },
 @{ Order = 6; Input = 32; Description = "6th Order Ambisonic, 32 Channel Input" },
-@{ Order = 7; Input = 32; Description = "7th Order Ambisonic, 32 Channel Input" }
+@{ Order = 7; Input = 32; Description = "7th Order Ambisonic, 32 Channel Input" },
+@{ Order = 1; Input = 64; Description = "1st Order Ambisonic, 64 Channel Input" },
+@{ Order = 2; Input = 64; Description = "2nd Order Ambisonic, 64 Channel Input" },
+@{ Order = 3; Input = 64; Description = "3rd Order Ambisonic, 64 Channel Input" },
+@{ Order = 4; Input = 64; Description = "4th Order Ambisonic, 64 Channel Input" },
+@{ Order = 5; Input = 64; Description = "5th Order Ambisonic, 64 Channel Input" },
+@{ Order = 6; Input = 64; Description = "6th Order Ambisonic, 64 Channel Input" },
+@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input" }
 )
 
 $DecoderVersions =
@@ -28,7 +35,14 @@ $DecoderVersions =
 @{ Order = 4; Output = 32; Description = "4th Order Ambisonic, 32 Channel Output" },
 @{ Order = 5; Output = 32; Description = "5th Order Ambisonic, 32 Channel Output" },
 @{ Order = 6; Output = 32; Description = "6th Order Ambisonic, 32 Channel Output" },
-@{ Order = 7; Output = 32; Description = "7th Order Ambisonic, 32 Channel Output" }
+@{ Order = 7; Output = 32; Description = "7th Order Ambisonic, 32 Channel Output" },
+@{ Order = 1; Output = 64; Description = "1st Order Ambisonic, 64 Channel Output" },
+@{ Order = 2; Output = 64; Description = "2nd Order Ambisonic, 64 Channel Output" },
+@{ Order = 3; Output = 64; Description = "3rd Order Ambisonic, 64 Channel Output" },
+@{ Order = 4; Output = 64; Description = "4th Order Ambisonic, 64 Channel Output" },
+@{ Order = 5; Output = 64; Description = "5th Order Ambisonic, 64 Channel Output" },
+@{ Order = 6; Output = 64; Description = "6th Order Ambisonic, 64 Channel Output" },
+@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output" }
 )
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
