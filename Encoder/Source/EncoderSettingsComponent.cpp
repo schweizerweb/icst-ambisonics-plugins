@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 5.4.4
 
   ------------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
     labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     groupOscSend.reset (new GroupComponent ("groupOscSend",
-                                            TRANS("OSC Send for ZEnc -> ZDec communication")));
+                                            TRANS("OSC Send for Encoder -> Decoder communication")));
     addAndMakeVisible (groupOscSend.get());
 
     toggleSendOsc.reset (new ToggleButton ("toggleSendOsc"));
@@ -239,16 +239,16 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettings* pSettings)
 
 	toggleReceiveOsc->setToggleState(pEncoderSettings->oscReceiveFlag, dontSendNotification);
 	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
-	
+
 	toggleSendOsc->setToggleState(pEncoderSettings->oscSendFlag, dontSendNotification);
 	textOscSendIp->setText(String(pEncoderSettings->oscSendTargetHost));
 	textOscSendPort->setText(String(pEncoderSettings->oscSendPort));
 	textOscSendInterval->setText(String(pEncoderSettings->oscSendIntervalMs));
-	
+
 	toggleSendOscExt->setToggleState(pEncoderSettings->oscSendExtFlag, dontSendNotification);
 	textOscSendIpExt->setText(String(pEncoderSettings->oscSendExtTargetHost));
 	textOscSendPortExt->setText(String(pEncoderSettings->oscSendExtPort));
-	
+
 	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
 	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
 	toggleDirectionFlip->setToggleState(pEncoderSettings->directionFlip, dontSendNotification);
@@ -363,7 +363,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_toggleSendOscExt] -- add your button handler code here..
 		pEncoderSettings->oscSendExtFlag = toggleSendOscExt->getToggleState();
-		//[/UserButtonCode_toggleSendOscExt]
+        //[/UserButtonCode_toggleSendOscExt]
     }
 
     //[UserbuttonClicked_Post]
@@ -463,10 +463,10 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 29 109 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="OSC-Port:&#10;"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="1.5e1" kerning="0" bold="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
          italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOscSend" id="6e42d11d1b0564d7" memberName="groupOscSend"
-                  virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send for ZEnc -&gt; ZDec communication"/>
+                  virtualName="" explicitFocusOrder="0" pos="1 77 8M 131" title="OSC Send for Encoder -&gt; Decoder communication"/>
   <TOGGLEBUTTON name="toggleSendOsc" id="309574c60d08c55e" memberName="toggleSendOsc"
                 virtualName="" explicitFocusOrder="0" pos="17 101 150 24" buttonText="Enable"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
@@ -478,7 +478,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="165Rr 101 86 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendPort" id="c2dff2f42ed301d1" memberName="textOscSendPort"
               virtualName="" explicitFocusOrder="0" pos="21Rr 132 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -487,8 +487,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 137 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendInterval" id="2c20c78495fbd07c" memberName="textOscSendInterval"
               virtualName="" explicitFocusOrder="0" pos="21Rr 167 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -497,8 +497,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="141Rr 172 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupDistanceEncoding" id="b72378bdfe4e130" memberName="groupDistanceEncoding"
                   virtualName="" explicitFocusOrder="0" pos="1 323 8M 64" title="Distance Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
@@ -512,8 +512,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="142Rr 347 109 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <GROUPCOMPONENT name="groupOrientation" id="3d25e935657cd603" memberName="groupOrientation"
                   virtualName="" explicitFocusOrder="0" pos="1 393 8M 64" title="Orientation"/>
   <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"
@@ -532,7 +532,7 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="163Rr 239 86 24" posRelativeX="f4cf3a53a6ef0d87"
          edTextCol="ff000000" edBkgCol="0" labelText="Target Host:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="1.5e1" kerning="0" bold="0" italic="0" justification="33"/>
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textOscSendPortExt" id="8f6b9c97cd3fa86f" memberName="textOscSendPortExt"
               virtualName="" explicitFocusOrder="0" pos="19Rr 270 104 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
@@ -541,8 +541,8 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="139Rr 275 110 24"
          posRelativeX="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="1.5e1"
-         kerning="0" bold="0" italic="0" justification="33"/>
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
