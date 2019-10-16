@@ -44,6 +44,8 @@ public:
 	float getRms() const;
 	String getId();
 	void setColor(Colour newColor);
+    void setSubwooferFlag(bool flag);
+    bool getSubwooferFlag();
 
 	bool checkAlive(int64 referenceTime, int timeout) const;
 	void setAlive(int64 currentTimeMillis);
@@ -56,6 +58,7 @@ private:
 	Colour color;
 	String name;
 	double gain;
+    bool isSubwoofer;
 	float rms;
 	int64 lastUpdate = 0;
 	Image labelImage;

@@ -274,6 +274,14 @@ void AmbiDataSet::setGain(int channel, double gain) const
 		pt->setGain(gain);
 }
 
+void AmbiDataSet::setSubwooferFlag(int channel, bool flag) const
+{
+    AmbiPoint* pt = elements[channel];
+
+    if (pt != nullptr)
+        pt->setSubwooferFlag(flag);
+}
+
 double AmbiDataSet::getMaxNormalizedDistance() const
 {
 	double maxDist = 0.0;

@@ -21,7 +21,7 @@ class TestSoundGenerator : public Timer
 public:
 	TestSoundGenerator(AmbiDataSet* speakerSet);
 
-	void process(AudioSampleBuffer* audioBuffer);
+	void process(float* sampleData, int sampleCount, int speakerIndex);
 	void toggle(int speakerIndex);
 	void toggleAutoTest();
 	void reset();

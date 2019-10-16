@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
 #include "EditableTextCustomComponent.h"
+#include "CheckBoxCustomComponent.h"
 #include "NumericColumnCustomComponent.h"
 #include "SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
@@ -44,6 +45,7 @@
 #define COLUMN_ID_DELAY_COMPENSATION 13
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
+#define COLUMN_ID_SUBWOOFER 14
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -244,6 +246,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, Ow
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
+    speakerList->getHeader().addColumn("SW", COLUMN_ID_SUBWOOFER, 30);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
@@ -668,6 +671,15 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		textLabel->setRowAndColumn(rowNumber, columnId);
 		return textLabel;
 	}
+    else if(columnId == COLUMN_ID_SUBWOOFER)
+    {
+        CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
+        if(checkBox == nullptr)
+            checkBox = new CheckBoxCustomComponent(*this);
+        
+        checkBox->setRowAndColumn(rowNumber, columnId);
+        return checkBox;
+    }
 
 	return nullptr;
 }
@@ -731,6 +743,31 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
 	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
 	default: return 0.0;
 	}
+}
+
+void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValue) const
+{
+    switch (columnId)
+    {
+    case COLUMN_ID_SUBWOOFER: pSpeakerSet->setSubwooferFlag(rowNumber, newValue); break;
+    default: throw;
+    }
+
+    speakerList->updateContent();
+    speakerList->repaint();
+}
+
+bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
+{
+    AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+    if (pt == nullptr)
+        return false;
+
+    switch (columnId)
+    {
+    case COLUMN_ID_SUBWOOFER: return pt->getSubwooferFlag();
+    default: return false;
+    }
 }
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const

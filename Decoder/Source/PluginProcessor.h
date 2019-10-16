@@ -37,6 +37,7 @@ public:
    #endif
 
 	void checkDelayBuffers();
+    void checkFilters();
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
@@ -76,6 +77,10 @@ private:
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
+    
+    OwnedArray<dsp::IIR::Filter<float>> iirFilters;
+    dsp::ProcessSpec iirFilterSpec;
+    
 
 	//==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessor)

@@ -180,3 +180,13 @@ void AmbiPoint::ensureLabelImage()
 		labelImage.duplicateIfShared();
 	}
 }
+
+void AmbiPoint::setSubwooferFlag(bool flag)
+{
+    isSubwoofer = flag;
+}
+
+bool AmbiPoint::getSubwooferFlag()
+{
+    return isSubwoofer;
+}

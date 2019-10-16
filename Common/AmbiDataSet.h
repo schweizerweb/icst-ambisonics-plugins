@@ -42,6 +42,7 @@ public:
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
 	void setGain(int channel, double gain) const;
+    void setSubwooferFlag(int channel, bool flag) const;
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
 	double getMaxNormalizedDistance() const;
 

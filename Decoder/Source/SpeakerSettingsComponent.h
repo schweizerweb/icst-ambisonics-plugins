@@ -75,6 +75,8 @@ public:
 	void setTableText(const int columnId, const int rowNumber, const String& newText) const;
 	void setValue(int columnId, int rowNumber, double newValue) const;
 	double getValue(int columnId, int rowNumber) const;
+    void setFlag(int columnId, int rowNumber, bool newValue) const;
+    bool getFlag(int columnId, int rowNumber) const;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() const;
 	SliderRange getSliderRange(int columnId) const;

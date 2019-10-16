@@ -16,22 +16,17 @@ TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet): tempChannel(NO_
 	reset();
 }
 
-void TestSoundGenerator::process(AudioSampleBuffer* audioBuffer)
+void TestSoundGenerator::process(float* sampleData, int sampleCount, int speakerIndex)
 {
-	for(int iSpeaker = 0; iSpeaker < JucePlugin_MaxNumOutputChannels; iSpeaker++)
+	if(testSoundChannels[speakerIndex] || speakerIndex == tempChannel)
 	{
-		if(testSoundChannels[iSpeaker] || iSpeaker == tempChannel)
+		AmbiPoint* p = pSpeakerSet->get(speakerIndex);
+		if (p != nullptr)
 		{
-			AmbiPoint* p = pSpeakerSet->get(iSpeaker);
-			if (p != nullptr)
+			double testSoundGain = p->getGain();
+			for (int i = 0; i < sampleCount; i++)
 			{
-				double testSoundGain = p->getGain();
-
-				float* channelData = audioBuffer->getWritePointer(iSpeaker);
-				for (int i = 0; i < audioBuffer->getNumSamples(); i++)
-				{
-					channelData[i] = float((random.nextFloat() - 0.5f) * testSoundGain);
-				}
+				sampleData[i] = float((random.nextFloat() - 0.5f) * testSoundGain);
 			}
 		}
 	}
