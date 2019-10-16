@@ -863,6 +863,7 @@ void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
 	comboBoxChannelConfig->addItem("8", i++);
 	comboBoxChannelConfig->addItem("16", i++);
 	comboBoxChannelConfig->addItem("32", i++);
+    comboBoxChannelConfig->addItem("64", i++);
 
 	for (i = 0; i < comboBoxChannelConfig->getNumItems(); i++)
 	{
