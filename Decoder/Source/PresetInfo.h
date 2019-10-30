@@ -11,8 +11,8 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "../../Common/AmbiSettings.h"
+#include "../../Common/AmbiSpeaker.h"
 
 #define XML_VALUE "Value"
 #define XML_TAG_PRESET_ROOT "AmbisonicsPreset"
@@ -33,13 +33,13 @@ public:
 	bool LoadFromFile(File file);
 	void CreateXmlRoot(XmlElement* xmlRoot);
 	bool SaveToFile(File file);
-	OwnedArray<AmbiPoint>* getPoints();
+	OwnedArray<AmbiSpeaker>* getPoints();
 	String getName() const;
 	void setName(String newName);
 	AmbiSettings* getAmbiSettings();
 
 private:
-	OwnedArray<AmbiPoint> points;
+	OwnedArray<AmbiSpeaker> points;
 	AmbiSettings ambiSettings;
 	String name;
 };

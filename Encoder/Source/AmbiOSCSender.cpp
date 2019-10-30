@@ -11,7 +11,7 @@
 #include "AmbiOSCSender.h"
 #include "../../Common/OSCHandler.h"
 
-AmbiOSCSender::AmbiOSCSender(AmbiDataSet* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
+AmbiOSCSender::AmbiOSCSender(AmbiSourceSet* ambiPoints): pPoints(ambiPoints), sendIntervalMs(50)
 {
 	oscSender = new OSCSender();
 }
@@ -46,7 +46,7 @@ void AmbiOSCSender::timerCallback()
 	stopTimer();
 	for (int i = 0; i < pPoints->size(); i++)
 	{
-		AmbiPoint* pt = pPoints->get(i);
+		AmbiSource* pt = pPoints->get(i);
 		if (pt != nullptr)
 		{
 			OSCMessage message = OSCMessage(

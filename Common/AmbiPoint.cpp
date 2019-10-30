@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), rms(other->rms), lastUpdate(other->lastUpdate)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate)
 {
 	if (copyImage)
 	{
@@ -24,7 +24,7 @@ AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(oth
 	}
 }
 
-AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0), rms(0.0f)
+AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0)
 {
 }
 
@@ -33,18 +33,7 @@ AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color
 	point(point),
 	color(color),
 	name(name),
-	gain(gain),
-	rms(0.0f)
-{
-}
-
-AmbiPoint::AmbiPoint(Point3D<double> point, AudioParameterSet audioParams, String name, Colour color, double gain):
-	id(Uuid().toString()),
-	point(Point3D<double>(point.getX(), point.getY(), point.getZ(), audioParams)),
-	color(color),
-	name(name),
-	gain(gain),
-	rms(0.0f)
+	gain(gain)
 {
 }
 
@@ -55,8 +44,7 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_Z))),
 	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR))).withAlpha(1.0f)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
-	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)),
-	rms(0.0f)
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0))
 {
 }
 
@@ -68,8 +56,7 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	                      audioParams)),
 	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_PRESET_POINT_COLOR))).withAlpha(1.0f)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_PRESET_POINT_NAME)),
-	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0)),
-	rms(0.0f)
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_PRESET_POINT_GAIN, 1.0))
 {
 }
 
@@ -125,17 +112,6 @@ void AmbiPoint::setGain(double newGain)
 	gain = newGain;
 }
 
-void AmbiPoint::setRms(float newRmsLevel, bool onlyIfGreater)
-{
-	if (!onlyIfGreater || newRmsLevel > rms)
-		rms = newRmsLevel;
-}
-
-float AmbiPoint::getRms() const
-{
-	return rms;
-}
-
 String AmbiPoint::getId()
 {
 	if (id.isEmpty())
@@ -179,14 +155,4 @@ void AmbiPoint::ensureLabelImage()
 		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
 		labelImage.duplicateIfShared();
 	}
-}
-
-void AmbiPoint::setSubwooferFlag(bool flag)
-{
-    isSubwoofer = flag;
-}
-
-bool AmbiPoint::getSubwooferFlag()
-{
-    return isSubwoofer;
 }

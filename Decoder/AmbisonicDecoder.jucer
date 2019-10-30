@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
-              jucerVersion="5.4.4" companyName="ICST" pluginFormats="buildAU,buildVST3"
+              jucerVersion="5.4.5" companyName="ICST" pluginFormats="buildAU,buildVST3"
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="oa5A98" name="AmbiDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
@@ -57,6 +57,17 @@
       <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiSettings.cpp"/>
       <FILE id="z0ap1U" name="AmbiSettings.h" compile="0" resource="0" file="../Common/AmbiSettings.h"/>
+      <FILE id="VdXo71" name="AmbiSource.cpp" compile="1" resource="0" file="../Common/AmbiSource.cpp"/>
+      <FILE id="tcnDd7" name="AmbiSource.h" compile="0" resource="0" file="../Common/AmbiSource.h"/>
+      <FILE id="VZM8AX" name="AmbiSourceSet.cpp" compile="1" resource="0"
+            file="../Common/AmbiSourceSet.cpp"/>
+      <FILE id="zDnF8F" name="AmbiSourceSet.h" compile="0" resource="0" file="../Common/AmbiSourceSet.h"/>
+      <FILE id="VqGV12" name="AmbiSpeaker.cpp" compile="1" resource="0" file="../Common/AmbiSpeaker.cpp"/>
+      <FILE id="YKMR4p" name="AmbiSpeaker.h" compile="0" resource="0" file="../Common/AmbiSpeaker.h"/>
+      <FILE id="xUbe8U" name="AmbiSpeakerSet.cpp" compile="1" resource="0"
+            file="../Common/AmbiSpeakerSet.cpp"/>
+      <FILE id="EzUhBa" name="AmbiSpeakerSet.h" compile="0" resource="0"
+            file="../Common/AmbiSpeakerSet.h"/>
       <FILE id="RAo2Ku" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
       <FILE id="rdwYUW" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="clRUKZ" name="DelayBuffer.cpp" compile="1" resource="0" file="../Common/DelayBuffer.cpp"/>

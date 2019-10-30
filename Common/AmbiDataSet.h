@@ -15,20 +15,19 @@ class AmbiDataSet
 {
 public:
 	AmbiDataSet();
-	~AmbiDataSet();
+	virtual ~AmbiDataSet();
 
-	int size() const;
-	void clear();
-	void cleanup(int keepNbOfElements = 0);
-	void add(AmbiPoint* pt);
-	void remove(int index);
-	void swap(int a, int b);
-	AmbiPoint* get(int index) const;
+	virtual int size() const = 0;
+	virtual void clear() = 0;
+	virtual void cleanup(int keepNbOfElements = 0) = 0;
+	virtual void remove(int index) = 0;
+	virtual void swap(int a, int b) = 0;
+	virtual AmbiPoint* get(int index) const = 0;
+	virtual void addNew(String id, Point3D<double> point, String name, Colour color) = 0;
+
 	AmbiPoint* get(int index, int64 referenceTime, int timeoutMs);
-	
 	bool setChannelXYZ(int channel, double x, double y, double z) const;
 	bool setChannelAED(int channel, double a, double e, double d) const;
-	void setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color);
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
 	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
 	void setChannelXY(int channel, double x, double y) const;
@@ -42,12 +41,7 @@ public:
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
 	void setGain(int channel, double gain) const;
-    void setSubwooferFlag(int channel, bool flag) const;
-	void setRms(int channel, float rms, bool onlyIfGreater) const;
-	double getMaxNormalizedDistance() const;
 
-private:
-	OwnedArray<AmbiPoint> elements;
-	OwnedArray<AmbiPoint> removedElements;
+protected:
 	CriticalSection cs;
 };

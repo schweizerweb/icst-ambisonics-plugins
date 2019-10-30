@@ -207,7 +207,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
     
 	for(int iSpeaker = 0; iSpeaker < speakerSet.size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
-		AmbiPoint* pt = speakerSet.get(iSpeaker);
+		AmbiSpeaker* pt = speakerSet.get(iSpeaker);
 		if (pt == nullptr)
 			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
 		else
@@ -277,9 +277,9 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	preset.setName("LastState");
 	for (int i = 0; i < speakerSet.size(); i++)
 	{
-		AmbiPoint* pt = speakerSet.get(i);
+		AmbiSpeaker* pt = speakerSet.get(i);
 		if(pt != nullptr)
-			preset.getPoints()->add(new AmbiPoint(pt));
+			preset.getPoints()->add(new AmbiSpeaker(pt));
 	}
 	preset.getAmbiSettings()->setDistanceScaler(ambiSettings.getDistanceScaler());
 	preset.getAmbiSettings()->setDirectionFlip(ambiSettings.getDirectionFlip());
@@ -314,7 +314,7 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 				speakerSet.clear();
 				for (int i = 0; i < preset.getPoints()->size(); i++)
 				{
-					speakerSet.add(new AmbiPoint(preset.getPoints()->getUnchecked(i)));
+					speakerSet.add(new AmbiSpeaker(preset.getPoints()->getUnchecked(i)));
 				}
 				ambiSettings.setDistanceScaler(preset.getAmbiSettings()->getDistanceScaler());
 				ambiSettings.setDirectionFlip(preset.getAmbiSettings()->getDirectionFlip());
@@ -328,12 +328,12 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 	}
 }
 
-AmbiDataSet* AmbisonicsDecoderAudioProcessor::getSpeakerSet()
+AmbiSpeakerSet* AmbisonicsDecoderAudioProcessor::getSpeakerSet()
 {
 	return &speakerSet;
 }
 
-AmbiDataSet* AmbisonicsDecoderAudioProcessor::getMovingPoints()
+AmbiSourceSet* AmbisonicsDecoderAudioProcessor::getMovingPoints()
 {
 	return &movingPoints;
 }

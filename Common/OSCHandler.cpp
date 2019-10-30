@@ -12,7 +12,7 @@
 #include "TrackColors.h"
 #include "Constants.h"
 
-OSCHandler::OSCHandler(AmbiDataSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
+OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
 {
 	pAmbiPoints = pAmbiPointArr;
 	this->pStatusMessageHandler = pStatusMessageHandler;

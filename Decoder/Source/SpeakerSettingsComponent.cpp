@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -49,7 +49,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback)
     : pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -389,8 +389,8 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 			{
 				Uuid newId1 = Uuid();
 				Uuid newId2 = Uuid();
-				preset->getPoints()->add(new AmbiPoint(newId1.toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor()));
-				preset->getPoints()->add(new AmbiPoint(newId2.toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor()));
+				preset->getPoints()->add(new AmbiSpeaker(newId1.toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor()));
+				preset->getPoints()->add(new AmbiSpeaker(newId2.toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor()));
 			}
 			else
 			{
@@ -399,7 +399,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
 				for (int i = 0; i < nbChannels; i++)
 				{
 					Uuid newId = Uuid();
-					preset->getPoints()->add(new AmbiPoint(newId.toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor()));
+					preset->getPoints()->add(new AmbiSpeaker(newId.toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor()));
 					projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / nbChannels));
 				}
 			}
@@ -453,9 +453,9 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			preset->setName(newPresetName);
 			for (int i = 0; i < pSpeakerSet->size(); i++)
 			{
-				AmbiPoint* pt = pSpeakerSet->get(i);
+				AmbiSpeaker* pt = pSpeakerSet->get(i);
 				if(pt != nullptr)
-					preset->getPoints()->add(new AmbiPoint(pt));
+					preset->getPoints()->add(new AmbiSpeaker(pt));
 			}
 
 			preset->getAmbiSettings()->setDistanceScaler(pAmbiSettings->getDistanceScaler());
@@ -473,7 +473,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
 		Uuid newId = Uuid();
-		pSpeakerSet->add(new AmbiPoint(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
+		pSpeakerSet->add(new AmbiSpeaker(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
 		pPointSelection->selectPoint(pSpeakerSet->size() - 1);
 		speakerList->updateContent();
 		speakerList->repaint();
@@ -676,7 +676,7 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
         CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
         if(checkBox == nullptr)
             checkBox = new CheckBoxCustomComponent(*this);
-        
+
         checkBox->setRowAndColumn(rowNumber, columnId);
         return checkBox;
     }
@@ -759,7 +759,7 @@ void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValu
 
 bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
 {
-    AmbiPoint* pt = pSpeakerSet->get(rowNumber);
+    AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
     if (pt == nullptr)
         return false;
 
@@ -831,9 +831,9 @@ double SpeakerSettingsComponent::fact(int n)
 void SpeakerSettingsComponent::loadPreset(PresetInfo* preset) const
 {
 	pSpeakerSet->clear();
-	for (AmbiPoint* pt : *preset->getPoints())
+	for (AmbiSpeaker* pt : *preset->getPoints())
 	{
-		pSpeakerSet->add(new AmbiPoint(pt));
+		pSpeakerSet->add(new AmbiSpeaker(pt));
 	}
 	speakerList->updateContent();
 	speakerList->repaint();

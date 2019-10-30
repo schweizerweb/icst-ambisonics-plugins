@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambiencoder" pluginAAXCategory="2"
-              jucerVersion="5.4.4" pluginFormats="buildAU,buildVST3" companyName="ICST"
+              jucerVersion="5.4.5" pluginFormats="buildAU,buildVST3" companyName="ICST"
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
@@ -42,6 +42,11 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="NAnUK3" name="AmbiSourceSet.cpp" compile="1" resource="0"
+            file="../Common/AmbiSourceSet.cpp"/>
+      <FILE id="abzgNg" name="AmbiSourceSet.h" compile="0" resource="0" file="../Common/AmbiSourceSet.h"/>
+      <FILE id="wCCCzr" name="AmbiSource.cpp" compile="1" resource="0" file="../Common/AmbiSource.cpp"/>
+      <FILE id="U7D481" name="AmbiSource.h" compile="0" resource="0" file="../Common/AmbiSource.h"/>
       <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
       <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
       <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"

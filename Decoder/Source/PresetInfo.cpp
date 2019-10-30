@@ -63,7 +63,7 @@ bool PresetInfo::LoadFromXmlRoot(XmlElement* root)
 	XmlElement* xmlPoint = xmlPoints->getChildByName(XML_TAG_PRESET_POINT);
 	while (xmlPoint != nullptr)
 	{
-		points.add(new AmbiPoint(xmlPoint));
+		points.add(new AmbiSpeaker(xmlPoint));
 		xmlPoint = xmlPoint->getNextElement();
 	}
 
@@ -134,7 +134,7 @@ bool PresetInfo::SaveToFile(File file)
 	return true;
 }
 
-OwnedArray<AmbiPoint>* PresetInfo::getPoints()
+OwnedArray<AmbiSpeaker>* PresetInfo::getPoints()
 {
 	return &points;
 }

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -21,7 +21,6 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
 #include "../../Common/AmbiDataSet.h"
@@ -31,6 +30,7 @@
 #include "SliderRange.h"
 #include "../../Common/DelayHelper.h"
 #include "../../Common/TestSoundGenerator.h"
+#include "../../Common/AmbiSpeakerSet.h"
 
 //[/Headers]
 
@@ -56,7 +56,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiDataSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
@@ -102,7 +102,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	AmbiDataSet* pSpeakerSet;
+	AmbiSpeakerSet* pSpeakerSet;
 	OwnedArray<PresetInfo>* pPresets;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;

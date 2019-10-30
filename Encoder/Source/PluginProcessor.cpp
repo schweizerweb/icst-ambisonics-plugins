@@ -261,9 +261,9 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 				while (xmlPoint != nullptr)
 				{
 					if (audioParams.size() > index)
-						sources.add(new AmbiPoint(xmlPoint, audioParams[index]));
+						sources.add(new AmbiSource(xmlPoint, audioParams[index]));
 					else
-						sources.add(new AmbiPoint(xmlPoint, AudioParameterSet()));
+						sources.add(new AmbiSource(xmlPoint, AudioParameterSet()));
 
 					xmlPoint = xmlPoint->getNextElement();
 					index++;
@@ -275,7 +275,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 	initializeOsc();
 }
 
-AmbiDataSet* AmbisonicEncoderAudioProcessor::getSources()
+AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
 {
 	return &sources;
 }

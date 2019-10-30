@@ -231,7 +231,7 @@ void Radar2D::renderOpenGL()
 				AmbiPoint* pt = pEditablePoints->get(i);
 				if (pt != nullptr)
 				{
-					float scaler = 1.0f + 10.0f * pt->getRms();
+					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare, i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize(scaler));
 				}
 			}
@@ -245,7 +245,7 @@ void Radar2D::renderOpenGL()
 				AmbiPoint* pt = pDisplayOnlyPoints->get(i, referenceTime, pRadarOptions->displayTimeout);
 				if (pt != nullptr)
 				{
-					float scaler = 1.0f + 10.0f * pt->getRms();
+					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), false);
 				}
 			}
@@ -452,10 +452,10 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	int indexForName = index + 1;
 	switch (radarMode) {
 	case XY:
-		pEditablePoints->add(new AmbiPoint(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName));
 		break;
 	case ZY:
-		pEditablePoints->add(new AmbiPoint(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName)));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName));
 		break;
 	}
 

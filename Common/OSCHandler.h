@@ -12,9 +12,8 @@
 #define OSCHANDLER_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "StatusMessageHandler.h"
-#include "AmbiDataSet.h"
+#include "AmbiSourceSet.h"
 
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
@@ -28,7 +27,7 @@
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
-	OSCHandler(AmbiDataSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
+	OSCHandler(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
 	bool start(int portNb);
 	void stop();
 
@@ -46,7 +45,7 @@ private:
 	bool checkAed(double a, double e, double d) const;
 	bool checkXyz(double x, double y, double z) const;
 
-	AmbiDataSet* pAmbiPoints;
+	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };
 

@@ -12,11 +12,12 @@
 
 #include "JuceHeader.h"
 #include "../../Common/AmbiSettings.h"
-#include "../../Common/AmbiDataSet.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
 #include "../../Common/DelayBuffer.h"
 #include "../../Common/DelayHelper.h"
+#include "../../Common/AmbiSpeakerSet.h"
+#include "../../Common/AmbiSourceSet.h"
 
 //==============================================================================
 /**
@@ -63,15 +64,15 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
 	// ambsonic specific
-	AmbiDataSet* getSpeakerSet();
-	AmbiDataSet* getMovingPoints();
+	AmbiSpeakerSet* getSpeakerSet();
+	AmbiSourceSet* getMovingPoints();
 	AmbiSettings* getAmbiSettings();
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 
 private:
-	AmbiDataSet speakerSet;
-	AmbiDataSet movingPoints;
+	AmbiSpeakerSet speakerSet;
+	AmbiSourceSet movingPoints;
 	AmbiSettings ambiSettings;
 	DecoderSettings decoderSettings;
 	TestSoundGenerator* pTestSoundGenerator;
