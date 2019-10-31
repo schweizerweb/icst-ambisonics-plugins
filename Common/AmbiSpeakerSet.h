@@ -24,7 +24,7 @@ public:
 	void remove(int index) override;
 	void swap(int a, int b) override;
 
-	void setSubwooferFlag(int channel, bool flag) const;
+	void setFilterInfo(int channel, FilterInfo info) const;
 	double getMaxNormalizedDistance() const;
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;

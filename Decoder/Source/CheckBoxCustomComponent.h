@@ -10,6 +10,7 @@
 
 #pragma once
 #include "SpeakerSettingsComponent.h"
+#include "FilterSettingsComponent.h"
 
 class CheckBoxCustomComponent : public Component, private  ToggleButton::Listener
 {
@@ -35,6 +36,8 @@ public:
 
     void buttonClicked(Button* b) override
     {
+		CallOutBox::launchAsynchronously(new FilterSettingsComponent(owner.getFilterInfo(row), &owner), b->getScreenBounds(), nullptr);
+
         owner.setFlag(columnId, row, b->getToggleState());
     }
     

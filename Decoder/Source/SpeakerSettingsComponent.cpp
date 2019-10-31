@@ -26,6 +26,7 @@
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
+#include "FilterSettingsComponent.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
@@ -45,7 +46,7 @@
 #define COLUMN_ID_DELAY_COMPENSATION 13
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
-#define COLUMN_ID_SUBWOOFER 14
+#define COLUMN_ID_FILTER 14
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -246,7 +247,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
-    speakerList->getHeader().addColumn("SW", COLUMN_ID_SUBWOOFER, 30);
+    speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
 	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
@@ -671,7 +672,7 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		textLabel->setRowAndColumn(rowNumber, columnId);
 		return textLabel;
 	}
-    else if(columnId == COLUMN_ID_SUBWOOFER)
+    else if(columnId == COLUMN_ID_FILTER)
     {
         CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
         if(checkBox == nullptr)
@@ -749,7 +750,10 @@ void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValu
 {
     switch (columnId)
     {
-    case COLUMN_ID_SUBWOOFER: pSpeakerSet->setSubwooferFlag(rowNumber, newValue); break;
+    case COLUMN_ID_FILTER: 
+		// do nothing
+    	break;
+    	
     default: throw;
     }
 
@@ -765,7 +769,7 @@ bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
 
     switch (columnId)
     {
-    case COLUMN_ID_SUBWOOFER: return pt->getSubwooferFlag();
+    case COLUMN_ID_FILTER: return pt->getFilterInfo()->filterType != FilterInfo::None;
     default: return false;
     }
 }
@@ -816,6 +820,15 @@ void SpeakerSettingsComponent::updateDirectionFlip() const
 void SpeakerSettingsComponent::updateDistanceScaler() const
 {
 	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
+}
+
+FilterInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber)
+{
+	AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
+	if (pt == nullptr)
+		return nullptr;
+
+	return pt->getFilterInfo();
 }
 
 double SpeakerSettingsComponent::fact(int n)
@@ -877,11 +890,12 @@ void SpeakerSettingsComponent::updateComboBox(String elementToSelect) const
 
 void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
+	speakerList->updateContent();
+	speakerList->repaint();
+	
 	if (source == pPointSelection)
 	{
-		speakerList->updateContent();
-		speakerList->repaint();
-		speakerList->selectRow(pPointSelection->getSelectedPointIndex());
+			speakerList->selectRow(pPointSelection->getSelectedPointIndex());
 	}
 }
 

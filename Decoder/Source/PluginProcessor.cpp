@@ -168,11 +168,27 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
     {
         iirFilters.removeLast();
     }
-        
-    for(dsp::IIR::Filter<float>* filter : iirFilters)
-    {
-        filter->coefficients = dsp::IIR::Coefficients<float>::makeLowPass(iirFilterSpec.sampleRate, 200);
-    }
+    
+	for(int i = 0; i < iirFilters.size() && i < speakerSet.size(); i++)
+	{
+		FilterInfo* filterInfo = speakerSet.get(i)->getFilterInfo();
+		switch (filterInfo->filterType)
+		{
+		case FilterInfo::LowPass: 
+			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeLowPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
+			break;
+		case FilterInfo::BandPass: 
+			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeBandPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
+			break;
+		case FilterInfo::HighPass:
+			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeHighPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
+			break;
+
+		case FilterInfo::None:
+		default: 
+			break;
+		}
+	}
 }
 
 void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&)
@@ -196,14 +212,14 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	for (int i = speakerSet.size(); i < totalNumInputChannels; ++i)
 		buffer.clear(i, 0, buffer.getNumSamples());
 
-    int subwooferCount = 0;
+    int lowPassCount = 0;
     for (int i = 0; i < speakerSet.size(); i++)
     {
-        if(speakerSet.get(i)->getSubwooferFlag())
-            subwooferCount++;
+        if(speakerSet.get(i)->getFilterInfo()->filterType == FilterInfo::LowPass)
+            lowPassCount++;
     }
-    int subwooferAmbisonicsOrder = subwooferCount >= 4 ? 1 : 0;
-    int subwooferAmbisonicsChannelCount = subwooferCount >= 4 ? 4 : 1;
+    int subwooferAmbisonicsOrder = lowPassCount >= 4 ? 1 : 0;
+    int subwooferAmbisonicsChannelCount = lowPassCount >= 4 ? 4 : 1;
     
 	for(int iSpeaker = 0; iSpeaker < speakerSet.size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
@@ -214,8 +230,9 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		{
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
-            int currentAmbisonicsOrder = pt->getSubwooferFlag() ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
-            int usedChannelCount = pt->getSubwooferFlag() ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
+			bool isSubwoofer = pt->getFilterInfo()->filterType == FilterInfo::LowPass;
+            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
+            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
             
 			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], !ambiSettings.getDirectionFlip(), true);
 			
@@ -242,7 +259,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
             
             pTestSoundGenerator->process(channelData, buffer.getNumSamples(), iSpeaker);
             
-            if(pt->getSubwooferFlag())
+            if(pt->getFilterInfo()->filterType != FilterInfo::None)
             {
                 for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
                 {

@@ -46,3 +46,8 @@ float AmbiSource::getDisplayScaler()
 {
 	return 1.0f + 10.0f * rms;
 }
+
+XmlElement* AmbiSource::getAsXmlElement(String tagName)
+{
+	return getBaseXmlElement(tagName);
+}

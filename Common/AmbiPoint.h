@@ -13,13 +13,13 @@
 
 #include "Point3D.h"
 
-#define XML_ATTRIBUTE_PRESET_POINT_ID "Uuid"
-#define XML_ATTRIBUTE_PRESET_POINT_X "X"
-#define XML_ATTRIBUTE_PRESET_POINT_Y "Y"
-#define XML_ATTRIBUTE_PRESET_POINT_Z "Z"
-#define XML_ATTRIBUTE_PRESET_POINT_NAME "Name"
-#define XML_ATTRIBUTE_PRESET_POINT_COLOR "Color"
-#define XML_ATTRIBUTE_PRESET_POINT_GAIN "Gain"
+#define XML_ATTRIBUTE_POINT_ID "Uuid"
+#define XML_ATTRIBUTE_POINT_X "X"
+#define XML_ATTRIBUTE_POINT_Y "Y"
+#define XML_ATTRIBUTE_POINT_Z "Z"
+#define XML_ATTRIBUTE_POINT_NAME "Name"
+#define XML_ATTRIBUTE_POINT_COLOR "Color"
+#define XML_ATTRIBUTE_POINT_GAIN "Gain"
 #define FONT_SIZE	20
 
 class AmbiPoint
@@ -31,6 +31,7 @@ protected:
 	AmbiPoint(XmlElement* element);
 	AmbiPoint(XmlElement* element, AudioParameterSet audioParams);
 	~AmbiPoint();
+	XmlElement* getBaseXmlElement(String tagName);
 
 public:
 	Point3D<double>* getPoint();
@@ -38,7 +39,6 @@ public:
 	String getName() const;
 	void setName(String newName);
 	double getGain() const;
-	XmlElement* getAsXmlElement(String tagName);
 	void setGain(double newGain);
 	String getId();
 	void setColor(Colour newColor);
@@ -48,6 +48,7 @@ public:
 	Image* getLabelImage();
 	void ensureLabelImage();
 	virtual float getDisplayScaler() = 0;
+	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
 private:
 	String id;

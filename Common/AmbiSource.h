@@ -24,6 +24,7 @@ public:
 	float getRms() const;
 
 	float getDisplayScaler() override;
+	XmlElement* getAsXmlElement(String tagName) override;
 
 private:
 	float rms;

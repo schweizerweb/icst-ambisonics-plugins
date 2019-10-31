@@ -31,6 +31,7 @@
 #include "../../Common/DelayHelper.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "../../Common/AmbiSpeakerSet.h"
+#include "FilterSettingsComponent.h"
 
 //[/Headers]
 
@@ -87,6 +88,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
+	FilterInfo* getFilterInfo(int rowNumber);
 	static double fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
 	void controlDimming();

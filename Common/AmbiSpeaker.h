@@ -10,20 +10,26 @@
 
 #pragma once
 #include "AmbiPoint.h"
+#include "FilterInfo.h"
+
+#define XML_ATTRIBUTE_POINT_FILTER_TYPE "FilterType"
+#define XML_ATTRIBUTE_POINT_FILTER_FREQUENCY "FilterFrequency"
+#define XML_ATTRIBUTE_POINT_FILTER_Q "FilterQ"
 
 class AmbiSpeaker : public AmbiPoint
 {
 public:
+	
 	virtual ~AmbiSpeaker() = default;
 	AmbiSpeaker(AmbiSpeaker* other, bool copyImage = false);
 	AmbiSpeaker(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
 	AmbiSpeaker(XmlElement* element);
 
-	void setSubwooferFlag(bool flag);
-	bool getSubwooferFlag();
+	FilterInfo* getFilterInfo();
 
 	float getDisplayScaler() override;
+	XmlElement* getAsXmlElement(String tagName) override;
 
 private:
-	bool isSubwoofer;
+	FilterInfo filterInfo;
 };

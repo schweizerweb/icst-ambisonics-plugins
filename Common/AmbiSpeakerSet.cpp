@@ -64,12 +64,12 @@ void AmbiSpeakerSet::cleanup(int keepNbOfElements)
 }
 
 
-void AmbiSpeakerSet::setSubwooferFlag(int channel, bool flag) const
+void AmbiSpeakerSet::setFilterInfo(int channel, FilterInfo info) const
 {
 	AmbiSpeaker* pt = elements[channel];
 
 	if (pt != nullptr)
-		pt->setSubwooferFlag(flag);
+		pt->getFilterInfo()->copyFrom(&info);
 }
 
 
