@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -22,6 +22,8 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "../../Common/AmbiSourceSet.h"
+#include "../../Common/PointSelection.h"
 //[/Headers]
 
 
@@ -36,19 +38,21 @@
 */
 class EncoderSettingsComponent  : public Component,
                                   public TextEditor::Listener,
+                                  public ActionBroadcaster,
+                                  public ChangeBroadcaster,
                                   public Button::Listener
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (EncoderSettings* pSettings);
+    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection);
     ~EncoderSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(EncoderSettings* encoder_settings);
 	void checkForNumbers(TextEditor* pEditor, int* pParameter) const;
 	void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
 	void textEditorTextChanged(TextEditor&) override;
+	void controlDimming() const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -60,33 +64,36 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	EncoderSettings* pEncoderSettings;
+	AmbiSourceSet* pSources;
+	PointSelection* pPointSelection;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupOscReceive;
+    std::unique_ptr<GroupComponent> groupOsc;
     std::unique_ptr<ToggleButton> toggleReceiveOsc;
     std::unique_ptr<TextEditor> textOscReceivePort;
     std::unique_ptr<Label> labelOscPort;
-    std::unique_ptr<GroupComponent> groupOscSend;
     std::unique_ptr<ToggleButton> toggleSendOsc;
     std::unique_ptr<TextEditor> textOscSendIp;
     std::unique_ptr<Label> labelOscSendIp;
     std::unique_ptr<TextEditor> textOscSendPort;
-    std::unique_ptr<Label> labelOscSendPort;
     std::unique_ptr<TextEditor> textOscSendInterval;
     std::unique_ptr<Label> labelOscSendInterval;
-    std::unique_ptr<GroupComponent> groupDistanceEncoding;
+    std::unique_ptr<GroupComponent> groupEncoding;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<TextEditor> textUnitCircleRadius;
     std::unique_ptr<Label> labelUnitCircleRadius;
-    std::unique_ptr<GroupComponent> groupOrientation;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
-    std::unique_ptr<GroupComponent> groupOscSendExt;
     std::unique_ptr<ToggleButton> toggleSendOscExt;
     std::unique_ptr<TextEditor> textOscSendIpExt;
     std::unique_ptr<Label> labelOscSendIpExt;
     std::unique_ptr<TextEditor> textOscSendPortExt;
-    std::unique_ptr<Label> labelOscSendPortExt;
+    std::unique_ptr<GroupComponent> groupSources;
+    std::unique_ptr<TableListBox> component;
+    std::unique_ptr<TextButton> buttonAdd;
+    std::unique_ptr<TextButton> buttonRemove;
+    std::unique_ptr<TextButton> buttonMoveDown;
+    std::unique_ptr<TextButton> buttonMoveUp;
 
 
     //==============================================================================

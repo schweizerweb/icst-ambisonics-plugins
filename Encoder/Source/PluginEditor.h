@@ -24,6 +24,8 @@
 #include "PluginProcessor.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
+#include "EncoderSettingsDialog.h"
+
 //[/Headers]
 
 
@@ -37,6 +39,8 @@
                                                                     //[/Comments]
 */
 class AmbisonicEncoderAudioProcessorEditor  : public AudioProcessorEditor,
+                                              public ChangeListener,
+                                              public ActionListener,
                                               public Button::Listener
 {
 public:
@@ -46,6 +50,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void actionListenerCallback(const String& message) override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -60,10 +66,11 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& processor;
-	AmbiDataSet* pSources;
+	AmbiSourceSet* pSources;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;
+	EncoderSettingsDialog* settingsWindow;
     //[/UserVariables]
 
     //==============================================================================

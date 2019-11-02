@@ -14,6 +14,8 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="AuTClw" name="EncoderSettingsDialog.h" compile="0" resource="0"
+            file="Source/EncoderSettingsDialog.h"/>
       <FILE id="XLgJC2" name="AmbiOSCSenderExt.cpp" compile="1" resource="0"
             file="Source/AmbiOSCSenderExt.cpp"/>
       <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
@@ -42,6 +44,7 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
       <FILE id="NAnUK3" name="AmbiSourceSet.cpp" compile="1" resource="0"
             file="../Common/AmbiSourceSet.cpp"/>
       <FILE id="abzgNg" name="AmbiSourceSet.h" compile="0" resource="0" file="../Common/AmbiSourceSet.h"/>

@@ -33,6 +33,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     : AudioProcessorEditor(ownerProc), processor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+	settingsWindow = nullptr;
 	pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
@@ -105,6 +106,10 @@ AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+	if (settingsWindow != nullptr)
+	{
+		delete settingsWindow;
+	}
     //[/Destructor]
 }
 
@@ -140,8 +145,11 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
     if (buttonThatWasClicked == btnSettings.get())
     {
         //[UserButtonCode_btnSettings] -- add your button handler code here..
-		EncoderSettingsComponent::showAsDialog(pEncoderSettings);
-		processor.initializeOsc();
+		if (settingsWindow)
+			delete settingsWindow;
+		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection), JucePlugin_MaxNumInputChannels > 1);
+		settingsWindow->setVisible(true);
+		settingsWindow->centreWithSize(settingsWindow->getWidth(), settingsWindow->getHeight());
         //[/UserButtonCode_btnSettings]
     }
 
@@ -152,6 +160,22 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+
+
+void AmbisonicEncoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
+{
+	processor.initializeOsc();
+}
+
+void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& message)
+{
+	if (message == ACTION_CLOSE_SETTINGS)
+	{
+		delete settingsWindow;
+		settingsWindow = nullptr;
+	}
+}
+
 //[/MiscUserCode]
 
 
@@ -165,7 +189,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AmbisonicEncoderAudioProcessorEditor"
-                 componentName="" parentClasses="public AudioProcessorEditor"
+                 componentName="" parentClasses="public AudioProcessorEditor, public ChangeListener, public ActionListener"
                  constructorParams="AmbisonicEncoderAudioProcessor&amp; ownerProc"
                  variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
