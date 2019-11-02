@@ -22,6 +22,7 @@
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_UNIT_CIRCLE_SIZE	0.1f
 #define DEFAULT_DIRECTION_FLIP		false
+#define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
 
 class EncoderSettings
 {

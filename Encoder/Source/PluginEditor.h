@@ -25,7 +25,6 @@
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsDialog.h"
-
 //[/Headers]
 
 

@@ -243,6 +243,12 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
 	toggleDirectionFlip->setToggleState(pEncoderSettings->directionFlip, dontSendNotification);
 
+	groupSources->setVisible(MULTI_ENCODER_MODE);
+	buttonAdd->setVisible(MULTI_ENCODER_MODE);
+	buttonRemove->setVisible(MULTI_ENCODER_MODE);
+	buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
+	buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
+
 	controlDimming();
     //[/Constructor]
 }
