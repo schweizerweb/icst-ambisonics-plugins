@@ -202,7 +202,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
     sourceList.reset (new TableListBox());
     addAndMakeVisible (sourceList.get());
-    sourceList->setName ("new component");
+    sourceList->setName ("sourceList");
 
     buttonAdd.reset (new TextButton ("buttonAdd"));
     addAndMakeVisible (buttonAdd.get());
@@ -353,7 +353,7 @@ void EncoderSettingsComponent::resized()
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
     groupSources->setBounds (8, 232, getWidth() - 17, getHeight() - 238);
-    component->setBounds (8 + 16, 232 + 19, (getWidth() - 17) - 31, (getHeight() - 238) - 67);
+    sourceList->setBounds (8 + 16, 232 + 19, (getWidth() - 17) - 31, (getHeight() - 238) - 67);
     buttonAdd->setBounds (8 + 17, 232 + (getHeight() - 238) - 40, 64, 24);
     buttonRemove->setBounds (8 + 89, 232 + (getHeight() - 238) - 40, 64, 24);
     buttonMoveDown->setBounds (8 + (getWidth() - 17) - 80, 232 + (getHeight() - 238) - 40, 64, 24);
@@ -478,7 +478,7 @@ int EncoderSettingsComponent::getNumRows()
 	return pSources->size();
 }
 
-void EncoderSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+void EncoderSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected)
 {
 	const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
 		.interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
@@ -488,7 +488,7 @@ void EncoderSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, in
 		g.fillAll(alternateColour);
 }
 
-void EncoderSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+void EncoderSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/)
 {
 	AmbiPoint* pt = pSources->get(rowNumber);
 	if (pt == nullptr)
@@ -770,7 +770,7 @@ BEGIN_JUCER_METADATA
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
                   virtualName="" explicitFocusOrder="0" pos="8 232 17M 238M" title="Sources"/>
-  <GENERICCOMPONENT name="new component" id="54cde0d0bf4f7a53" memberName="component"
+  <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="da4e7711e3fff0be"
                     posRelativeY="da4e7711e3fff0be" posRelativeW="da4e7711e3fff0be"
                     posRelativeH="da4e7711e3fff0be" class="TableListBox" params=""/>

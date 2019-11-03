@@ -746,7 +746,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	}
 }
 
-void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValue) const
+void SpeakerSettingsComponent::setFlag(int columnId, int /*rowNumber*/, bool /*newValue*/) const
 {
     switch (columnId)
     {
@@ -995,7 +995,7 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback"
                  constructorParams="AmbiSpeakerSet* pSpeakerSet, OwnedArray&lt;PresetInfo&gt;* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pPresets(pPresets), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"

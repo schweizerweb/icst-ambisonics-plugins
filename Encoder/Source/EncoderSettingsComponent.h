@@ -69,7 +69,7 @@ public:
 	void setTableText(const int columnId, const int rowNumber, const String& newText) override;
 	void selectedRowsChanged(int lastRowSelected) override;
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override;
-	//[/UserMethods]
+    //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
