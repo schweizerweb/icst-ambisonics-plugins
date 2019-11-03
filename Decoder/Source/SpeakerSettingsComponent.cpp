@@ -19,10 +19,10 @@
 
 //[Headers] You can add your own extra header files here...
 #include "PresetInfo.h"
-#include "EditableTextCustomComponent.h"
+#include "../../Common/EditableTextCustomComponent.h"
 #include "CheckBoxCustomComponent.h"
-#include "NumericColumnCustomComponent.h"
-#include "SliderColumnCustomComponent.h"
+#include "../../Common/NumericColumnCustomComponent.h"
+#include "../../Common/SliderColumnCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
@@ -347,7 +347,7 @@ void SpeakerSettingsComponent::resized()
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4978f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4987f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -685,7 +685,7 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 	return nullptr;
 }
 
-String SpeakerSettingsComponent::getTableText(const int columnId, const int rowNumber) const
+String SpeakerSettingsComponent::getTableText(const int columnId, const int rowNumber)
 {
 	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
 	if (pt == nullptr)
@@ -698,7 +698,7 @@ String SpeakerSettingsComponent::getTableText(const int columnId, const int rowN
 	}
 }
 
-void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNumber, const String& newText) const
+void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNumber, const String& newText)
 {
 	switch(columnId)
 	{
@@ -707,7 +707,7 @@ void SpeakerSettingsComponent::setTableText(const int columnId, const int rowNum
 	}
 }
 
-void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newValue) const
+void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newValue)
 {
 	switch (columnId)
 	{
@@ -726,7 +726,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	speakerList->repaint();
 }
 
-double SpeakerSettingsComponent::getValue(int columnId, int rowNumber) const
+double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 {
 	AmbiPoint* pt = pSpeakerSet->get(rowNumber);
 	if (pt == nullptr)
@@ -750,10 +750,10 @@ void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValu
 {
     switch (columnId)
     {
-    case COLUMN_ID_FILTER: 
+    case COLUMN_ID_FILTER:
 		// do nothing
     	break;
-    	
+
     default: throw;
     }
 
@@ -779,12 +779,12 @@ void SpeakerSettingsComponent::speakerTest(int rowNumber) const
 	pTestSoundGenerator->toggle(rowNumber);
 }
 
-TableListBox* SpeakerSettingsComponent::getTable() const
+TableListBox* SpeakerSettingsComponent::getTable()
 {
 	return speakerList.get();
 }
 
-SliderRange SpeakerSettingsComponent::getSliderRange(int columnId) const
+SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 {
 	switch(columnId)
 	{
@@ -892,7 +892,7 @@ void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
 	speakerList->updateContent();
 	speakerList->repaint();
-	
+
 	if (source == pPointSelection)
 	{
 			speakerList->selectRow(pPointSelection->getSelectedPointIndex());
@@ -1111,7 +1111,7 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.779%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.865%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>

@@ -23,11 +23,10 @@
 #include "JuceHeader.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettings.h"
-#include "../../Common/AmbiDataSet.h"
 #include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "PresetInfo.h"
-#include "SliderRange.h"
+#include "../../Common/TableColumnCallback.h"
 #include "../../Common/DelayHelper.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "../../Common/AmbiSpeakerSet.h"
@@ -51,6 +50,7 @@ class SpeakerSettingsComponent  : public Component,
                                   public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
+                                  public TableColumnCallback,
                                   public ComboBox::Listener,
                                   public Button::Listener,
                                   public Slider::Listener
@@ -72,15 +72,15 @@ public:
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override;
 
 	// table item callbacks
-	String getTableText(const int columnId, const int rowNumber) const;
-	void setTableText(const int columnId, const int rowNumber, const String& newText) const;
-	void setValue(int columnId, int rowNumber, double newValue) const;
-	double getValue(int columnId, int rowNumber) const;
+	String getTableText(const int columnId, const int rowNumber) override;
+	void setTableText(const int columnId, const int rowNumber, const String& newText) override;
+	void setValue(int columnId, int rowNumber, double newValue) override;
+	double getValue(int columnId, int rowNumber) override;
     void setFlag(int columnId, int rowNumber, bool newValue) const;
     bool getFlag(int columnId, int rowNumber) const;
 	void speakerTest(int rowNumber) const;
-	TableListBox* getTable() const;
-	SliderRange getSliderRange(int columnId) const;
+	TableListBox* getTable() override;
+	SliderRange getSliderRange(int columnId) override;
 
 	void updateDirectionFlip() const;
 	void loadPreset(PresetInfo* preset) const;

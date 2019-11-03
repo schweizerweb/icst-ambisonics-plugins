@@ -18,12 +18,25 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "../../Common/NumericColumnCustomComponent.h"
+#include "../../Common/SliderColumnCustomComponent.h"
+#include "../../Common/EditableTextCustomComponent.h"
+
 //[/Headers]
 
 #include "EncoderSettingsComponent.h"
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+#define COLUMN_ID_NB		1
+#define COLUMN_ID_NAME		2
+#define	COLUMN_ID_X			7
+#define	COLUMN_ID_Y			8
+#define	COLUMN_ID_Z			9
+#define	COLUMN_ID_A			10
+#define	COLUMN_ID_E			11
+#define	COLUMN_ID_D			12
+#define COLUMN_ID_GAIN		5
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -187,9 +200,9 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
                                             TRANS("Sources")));
     addAndMakeVisible (groupSources.get());
 
-    component.reset (new TableListBox());
-    addAndMakeVisible (component.get());
-    component->setName ("new component");
+    sourceList.reset (new TableListBox());
+    addAndMakeVisible (sourceList.get());
+    sourceList->setName ("new component");
 
     buttonAdd.reset (new TextButton ("buttonAdd"));
     addAndMakeVisible (buttonAdd.get());
@@ -249,6 +262,20 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
 	buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
 
+	// table
+	sourceList->setModel(this);
+	sourceList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
+	sourceList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
+	sourceList->getHeader().addColumn("X", COLUMN_ID_X, 50);
+	sourceList->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
+	sourceList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
+	sourceList->getHeader().addColumn("A", COLUMN_ID_A, 50);
+	sourceList->getHeader().addColumn("E", COLUMN_ID_E, 50);
+	sourceList->getHeader().addColumn("D", COLUMN_ID_D, 50);
+	sourceList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
+	sourceList->getHeader().resizeAllColumnsToFit(getWidth());
+	pPointSelection->addChangeListener(this);
+
 	controlDimming();
     //[/Constructor]
 }
@@ -278,7 +305,7 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     labelOscSendIpExt = nullptr;
     textOscSendPortExt = nullptr;
     groupSources = nullptr;
-    component = nullptr;
+    sourceList = nullptr;
     buttonAdd = nullptr;
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
@@ -435,6 +462,185 @@ void EncoderSettingsComponent::controlDimming() const
 	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 }
 
+void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
+{
+	sourceList->updateContent();
+	sourceList->repaint();
+
+	if (source == pPointSelection)
+	{
+		sourceList->selectRow(pPointSelection->getSelectedPointIndex());
+	}
+}
+
+int EncoderSettingsComponent::getNumRows()
+{
+	return pSources->size();
+}
+
+void EncoderSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected)
+{
+	const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
+		.interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+	if (rowIsSelected)
+		g.fillAll(Colours::lightblue);
+	else if (rowNumber % 2)
+		g.fillAll(alternateColour);
+}
+
+void EncoderSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool rowIsSelected)
+{
+	AmbiPoint* pt = pSources->get(rowNumber);
+	if (pt == nullptr)
+		return;
+
+	g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
+	String text;
+	switch (columnId)
+	{
+	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
+	case COLUMN_ID_NAME: text = pt->getName(); break;
+	default: text = "";
+	}
+	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
+	g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
+	g.fillRect(width - 1, 0, 1, height);
+}
+
+double EncoderSettingsComponent::getValue(int columnId, int rowNumber)
+{
+	AmbiPoint* pt = pSources->get(rowNumber);
+	if (pt == nullptr)
+		return 0.0;
+
+	switch (columnId)
+	{
+	case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
+	case COLUMN_ID_X: return pt->getPoint()->getX();
+	case COLUMN_ID_Y: return pt->getPoint()->getY();
+	case COLUMN_ID_Z: return pt->getPoint()->getZ();
+	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
+	case COLUMN_ID_D: return pt->getPoint()->getDistance();
+	default: return 0.0;
+	}
+}
+
+void EncoderSettingsComponent::setValue(int columnId, int rowNumber, double newValue)
+{
+	switch (columnId)
+	{
+	case COLUMN_ID_GAIN: pSources->setGain(rowNumber, pow(10.0, 0.1 * newValue)); break;
+	case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
+	case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
+	case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
+	case COLUMN_ID_A: pSources->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
+	case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
+	case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
+	default: throw;
+	}
+
+	sourceList->updateContent();
+	sourceList->repaint();
+}
+
+SliderRange EncoderSettingsComponent::getSliderRange(int columnId)
+{
+	switch (columnId)
+	{
+	case COLUMN_ID_X:
+	case COLUMN_ID_Y:
+	case COLUMN_ID_Z:
+		return SliderRange(-1.0, 1.0, 0.001);
+
+	case COLUMN_ID_D:
+		return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
+
+	case COLUMN_ID_A:
+		return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
+
+	case COLUMN_ID_E:
+		return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+
+	case COLUMN_ID_GAIN:
+		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
+
+	}
+
+	return SliderRange(0.0, 1.0, 0.001);
+}
+
+TableListBox* EncoderSettingsComponent::getTable()
+{
+	return sourceList.get();
+}
+
+String EncoderSettingsComponent::getTableText(const int columnId, const int rowNumber)
+{
+	AmbiPoint* pt = pSources->get(rowNumber);
+	if (pt == nullptr)
+		return "";
+
+	switch (columnId)
+	{
+	case COLUMN_ID_NAME: return pt->getName();
+	default: return "";
+	}
+}
+
+void EncoderSettingsComponent::setTableText(const int columnId, const int rowNumber, const String& newText)
+{
+	switch (columnId)
+	{
+	case COLUMN_ID_NAME: pSources->setChannelName(rowNumber, newText); break;
+	default: throw;
+	}
+}
+
+void EncoderSettingsComponent::selectedRowsChanged(int lastRowSelected)
+{
+	if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
+		pPointSelection->selectPoint(lastRowSelected);
+}
+
+Component* EncoderSettingsComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
+{
+	if (columnId == COLUMN_ID_X
+		|| columnId == COLUMN_ID_Y
+		|| columnId == COLUMN_ID_Z
+		|| columnId == COLUMN_ID_A
+		|| columnId == COLUMN_ID_E
+		|| columnId == COLUMN_ID_D)
+	{
+		NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
+		if (numericBox == nullptr)
+			numericBox = new NumericColumnCustomComponent(*this);
+
+		numericBox->setRowAndColumn(rowNumber, columnId);
+		return numericBox;
+	}
+	else if (columnId == COLUMN_ID_GAIN)
+	{
+		SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
+		if (gainBox == nullptr)
+			gainBox = new SliderColumnCustomComponent(*this);
+
+		gainBox->setRowAndColumn(rowNumber, columnId);
+		return gainBox;
+	}
+	else if (columnId == COLUMN_ID_NAME)
+	{
+		EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
+		if (textLabel == nullptr)
+			textLabel = new EditableTextCustomComponent(*this);
+
+		textLabel->setRowAndColumn(rowNumber, columnId);
+		return textLabel;
+	}
+
+	return nullptr;
+}
+
 void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, int* pParameter) const
 {
 	if (pEditor->getText().containsOnly("0123456789"))
@@ -474,7 +680,7 @@ void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, float* pPara
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
-                 componentName="" parentClasses="public Component, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster"
+                 componentName="" parentClasses="public Component, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster, public TableListBoxModel, public ChangeListener, public TableColumnCallback"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"

@@ -9,13 +9,13 @@
 */
 
 #pragma once
-#include "SpeakerSettingsComponent.h"
+#include "TableColumnCallback.h"
 
 class SliderColumnCustomComponent : public Component,
 	private Slider::Listener
 {
 public:
-	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	SliderColumnCustomComponent(TableColumnCallback& td) : owner(td)
 	{
 		addAndMakeVisible(slider);
 		slider.setSliderStyle(Slider::IncDecButtons);
@@ -44,7 +44,7 @@ public:
 
 	
 private:
-	SpeakerSettingsComponent& owner;
+	TableColumnCallback& owner;
 	Slider slider;
 	int row, columnId;
 };

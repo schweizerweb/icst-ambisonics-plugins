@@ -9,12 +9,15 @@
 */
 
 #pragma once
-#include "SpeakerSettingsComponent.h"
+#include "JuceHeader.h"
+#include "TableColumnCallback.h"
+#include "SliderRange.h"
+
 
 class NumericColumnCustomComponent : public Label
 {
 public:
-	NumericColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	NumericColumnCustomComponent(TableColumnCallback& td) : owner(td)
 	{
 		setEditable(false, true, false);
 	}
@@ -58,7 +61,7 @@ public:
 	}
 
 private:
-	SpeakerSettingsComponent& owner;
+	TableColumnCallback& owner;
 	SliderRange range;
 	int row, columnId;
 };

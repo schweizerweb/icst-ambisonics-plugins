@@ -26,19 +26,12 @@
             file="Source/CheckBoxCustomComponent.h"/>
       <FILE id="xF0pSM" name="SpeakerSettingsDialog.h" compile="0" resource="0"
             file="Source/SpeakerSettingsDialog.h"/>
-      <FILE id="HRyRYU" name="NumericColumnCustomComponent.h" compile="0"
-            resource="0" file="Source/NumericColumnCustomComponent.h"/>
-      <FILE id="EzPz5M" name="SliderRange.h" compile="0" resource="0" file="Source/SliderRange.h"/>
-      <FILE id="RtIaW7" name="SliderColumnCustomComponent.h" compile="0"
-            resource="0" file="Source/SliderColumnCustomComponent.h"/>
       <FILE id="yP0JFj" name="DecoderSettings.cpp" compile="1" resource="0"
             file="Source/DecoderSettings.cpp"/>
       <FILE id="vSACyw" name="DecoderSettings.h" compile="0" resource="0"
             file="Source/DecoderSettings.h"/>
       <FILE id="cuZVRN" name="SpeakerTestCustomComponent.h" compile="0" resource="0"
             file="Source/SpeakerTestCustomComponent.h"/>
-      <FILE id="ogZyJW" name="EditableTextCustomComponent.h" compile="0"
-            resource="0" file="Source/EditableTextCustomComponent.h"/>
       <FILE id="mzFIWk" name="SpeakerSettingsComponent.cpp" compile="1" resource="0"
             file="Source/SpeakerSettingsComponent.cpp"/>
       <FILE id="kA1i4a" name="SpeakerSettingsComponent.h" compile="0" resource="0"
@@ -78,6 +71,8 @@
       <FILE id="hhDqWe" name="DelayBuffer.h" compile="0" resource="0" file="../Common/DelayBuffer.h"/>
       <FILE id="JK1b6q" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
       <FILE id="Bo1T5o" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
+      <FILE id="ge1KYj" name="EditableTextCustomComponent.h" compile="0"
+            resource="0" file="../Common/EditableTextCustomComponent.h"/>
       <FILE id="aXFLQ3" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
       <FILE id="zdzXxV" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
@@ -86,6 +81,8 @@
             file="../Common/MultiSliderControl.cpp"/>
       <FILE id="grXjg5" name="MultiSliderControl.h" compile="0" resource="0"
             file="../Common/MultiSliderControl.h"/>
+      <FILE id="w0bIrn" name="NumericColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/NumericColumnCustomComponent.h"/>
       <FILE id="AvjHii" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>
       <FILE id="kkDzgn" name="OSCHandler.h" compile="0" resource="0" file="../Common/OSCHandler.h"/>
       <FILE id="TnVJDm" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
@@ -109,10 +106,15 @@
       <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="TSAtV3" name="SliderColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/SliderColumnCustomComponent.h"/>
+      <FILE id="G1Fvtx" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>
       <FILE id="MoSk59" name="StatusMessageHandler.cpp" compile="1" resource="0"
             file="../Common/StatusMessageHandler.cpp"/>
       <FILE id="tzGooV" name="StatusMessageHandler.h" compile="0" resource="0"
             file="../Common/StatusMessageHandler.h"/>
+      <FILE id="Pb3sC9" name="TableColumnCallback.h" compile="0" resource="0"
+            file="../Common/TableColumnCallback.h"/>
       <FILE id="zm8AUT" name="TestSoundGenerator.cpp" compile="1" resource="0"
             file="../Common/TestSoundGenerator.cpp"/>
       <FILE id="z8bkap" name="TestSoundGenerator.h" compile="0" resource="0"

@@ -44,6 +44,15 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="P4BWsP" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>
+      <FILE id="GWDlI6" name="TableColumnCallback.h" compile="0" resource="0"
+            file="../Common/TableColumnCallback.h"/>
+      <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
+            resource="0" file="../Common/EditableTextCustomComponent.h"/>
+      <FILE id="lzw3Wj" name="NumericColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/NumericColumnCustomComponent.h"/>
+      <FILE id="SJSYr5" name="SliderColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/SliderColumnCustomComponent.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
       <FILE id="NAnUK3" name="AmbiSourceSet.cpp" compile="1" resource="0"
             file="../Common/AmbiSourceSet.cpp"/>

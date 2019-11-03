@@ -24,6 +24,7 @@
 #include "EncoderSettings.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
+#include "../../Common/TableColumnCallback.h"
 //[/Headers]
 
 
@@ -40,6 +41,9 @@ class EncoderSettingsComponent  : public Component,
                                   public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
+                                  public TableListBoxModel,
+                                  public ChangeListener,
+                                  public TableColumnCallback,
                                   public Button::Listener
 {
 public:
@@ -53,7 +57,19 @@ public:
 	void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
 	void textEditorTextChanged(TextEditor&) override;
 	void controlDimming() const;
-    //[/UserMethods]
+	void changeListenerCallback(ChangeBroadcaster* source) override;
+	int getNumRows() override;
+	void paintRowBackground(Graphics&, int rowNumber, int width, int height, bool rowIsSelected) override;
+	void paintCell(Graphics&, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
+	double getValue(int columnId, int rowNumber) override;
+	void setValue(int columnId, int rowNumber, double newValue) override;
+	SliderRange getSliderRange(int columnId) override;
+	TableListBox* getTable() override;
+	String getTableText(const int columnId, const int rowNumber) override;
+	void setTableText(const int columnId, const int rowNumber, const String& newText) override;
+	void selectedRowsChanged(int lastRowSelected) override;
+	Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override;
+	//[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
@@ -89,7 +105,7 @@ private:
     std::unique_ptr<Label> labelOscSendIpExt;
     std::unique_ptr<TextEditor> textOscSendPortExt;
     std::unique_ptr<GroupComponent> groupSources;
-    std::unique_ptr<TableListBox> component;
+    std::unique_ptr<TableListBox> sourceList;
     std::unique_ptr<TextButton> buttonAdd;
     std::unique_ptr<TextButton> buttonRemove;
     std::unique_ptr<TextButton> buttonMoveDown;
