@@ -286,6 +286,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 EncoderSettingsComponent::~EncoderSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
     groupOsc = nullptr;
