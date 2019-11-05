@@ -499,6 +499,8 @@ void EncoderSettingsComponent::controlDimming() const
 	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
 	buttonRemove->setEnabled(pSources->size() > 0);
+	buttonMoveUp->setEnabled(pPointSelection->getSelectedPointIndex() > 0);
+	buttonMoveDown->setEnabled(pPointSelection->getSelectedPointIndex() < pSources->size() - 1);
 }
 
 void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -509,6 +511,7 @@ void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 	if (source == pPointSelection)
 	{
 		sourceList->selectRow(pPointSelection->getSelectedPointIndex());
+		controlDimming();
 	}
 }
 
