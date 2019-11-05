@@ -18,7 +18,7 @@ class TrackColors
 public:
 	static Colour getColor(int trackNb)
 	{
-		int index = (trackNb -1) % 10;
+		int index = (trackNb -1) % numColors;
 		switch(index)
 		{
 		case 0: return Colours::blue;
@@ -39,6 +39,8 @@ public:
 	{
 		return Colours::darkgrey;
 	}
+
+	static const int numColors = 10;
 };
 
 #endif  // TRACKCOLORS_H_INCLUDED

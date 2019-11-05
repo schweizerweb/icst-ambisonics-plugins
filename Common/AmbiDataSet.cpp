@@ -194,3 +194,28 @@ void AmbiDataSet::setGain(int channel, double gain) const
 	if (pt != nullptr)
 		pt->setGain(gain);
 }
+
+String AmbiDataSet::getNewUniqueName() const
+{
+	String nameBase = String(size() + 1);
+	String name = nameBase;
+	int iTrial = 1;
+
+	while (nameExists(name))
+	{
+		name = nameBase + "-" + String(iTrial++);
+	}
+
+	return name;
+}
+
+bool AmbiDataSet::nameExists(String name) const
+{
+	for (int i = 0; i < size(); i++)
+	{
+		if (get(i)->getName() == name)
+			return true;
+	}
+
+	return false;
+}

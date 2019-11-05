@@ -41,6 +41,10 @@ public:
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
 	void setGain(int channel, double gain) const;
+	String getNewUniqueName() const;
+
+private:
+	bool nameExists(String name) const;
 
 protected:
 	CriticalSection cs;

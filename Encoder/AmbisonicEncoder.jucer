@@ -44,6 +44,10 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="lYVTet" name="TrackColorSelector.h" compile="0" resource="0"
+            file="../Common/TrackColorSelector.h"/>
+      <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"
+            file="../Common/ColorEditorCustomComponent.h"/>
       <FILE id="P4BWsP" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>
       <FILE id="GWDlI6" name="TableColumnCallback.h" compile="0" resource="0"
             file="../Common/TableColumnCallback.h"/>

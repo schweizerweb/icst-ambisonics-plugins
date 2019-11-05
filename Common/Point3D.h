@@ -287,6 +287,16 @@ public:
 		pCoefficients[63] = nf7 * 3.0 / 32.0 * SQRT715 * cosE7 * cos7A;
 	}
 
+	AudioParameterSet getAudioParameterSet() const
+	{
+		return audioParams;
+	}
+
+	void setAudioParameterSet(AudioParameterSet set)
+	{
+		audioParams = set;
+	}
+
 private:
 	//==============================================================================
 	ValueType x; /**< The Point3D's X coordinate. */

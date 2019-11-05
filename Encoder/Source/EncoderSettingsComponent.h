@@ -48,7 +48,7 @@ class EncoderSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection);
+    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams);
     ~EncoderSettingsComponent();
 
     //==============================================================================
@@ -82,6 +82,7 @@ private:
 	EncoderSettings* pEncoderSettings;
 	AmbiSourceSet* pSources;
 	PointSelection* pPointSelection;
+	Array<AudioParameterSet>* pAudioParams;
     //[/UserVariables]
 
     //==============================================================================

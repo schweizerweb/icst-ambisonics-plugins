@@ -38,6 +38,13 @@ void AmbiSourceSet::add(AmbiSource* pt)
 void AmbiSourceSet::remove(int index)
 {
 	const ScopedLock lock(cs);
+
+	// rearrange audio parameter
+	for (int i = elements.size() - 1; i > index; i--)
+	{
+		elements[i]->getPoint()->setAudioParameterSet(elements[i-1]->getPoint()->getAudioParameterSet());
+	}
+	
 	AmbiSource* removedPt = elements.removeAndReturn(index);
 
 	if (removedPt != nullptr)
@@ -47,7 +54,16 @@ void AmbiSourceSet::remove(int index)
 void AmbiSourceSet::swap(int a, int b)
 {
 	if (elements.size() > a && elements.size() > b)
+	{
+		// keep audio parameter for index
+		Point3D<double>* pointA = elements.getUnchecked(a)->getPoint();
+		Point3D<double>* pointB = elements.getUnchecked(b)->getPoint();
+		
+		AudioParameterSet setA = pointA->getAudioParameterSet();
+		pointA->setAudioParameterSet(pointB->getAudioParameterSet());
+		pointB->setAudioParameterSet(setA);
 		elements.swap(a, b);
+	}
 }
 
 
@@ -116,3 +132,4 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 {
 	elements.add(new AmbiSource(id, point, name, color));
 }
+

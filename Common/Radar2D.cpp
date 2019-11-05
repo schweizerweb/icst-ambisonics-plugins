@@ -449,13 +449,12 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	// add new point
 	Uuid newId = Uuid();
 	int index = pEditablePoints->size();
-	int indexForName = index + 1;
 	switch (radarMode) {
 	case XY:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	case ZY:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), String(indexForName), TrackColors::getColor(indexForName));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	}
 

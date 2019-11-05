@@ -21,7 +21,8 @@
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
-
+#include "../../Common/ColorEditorCustomComponent.h"
+#include "../../Common/TrackColors.h"
 //[/Headers]
 
 #include "EncoderSettingsComponent.h"
@@ -37,11 +38,12 @@
 #define	COLUMN_ID_E			11
 #define	COLUMN_ID_D			12
 #define COLUMN_ID_GAIN		5
+#define COLUMN_ID_COLOR		13
 //[/MiscUserDefs]
 
 //==============================================================================
-EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection)
+EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams)
+    : pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	addChangeListener(pChangeListener);
@@ -273,6 +275,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	sourceList->getHeader().addColumn("E", COLUMN_ID_E, 50);
 	sourceList->getHeader().addColumn("D", COLUMN_ID_D, 50);
 	sourceList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
+	sourceList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
 	sourceList->getHeader().resizeAllColumnsToFit(getWidth());
 	pPointSelection->addChangeListener(this);
 
@@ -405,21 +408,55 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
+		if (pAudioParams != nullptr && pSources->size() < pAudioParams->size())
+		{
+			Uuid newId = Uuid();
+			pSources->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->getUnchecked(pSources->size())), pSources->getNewUniqueName(), TrackColors::getColor(pSources->size() + 1));
+			pPointSelection->selectPoint(pSources->size() - 1);
+			sourceList->updateContent();
+			sourceList->repaint();
+		}
+		else
+		{
+			AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "No more sources allowed!");
+		}
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove.get())
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
+		int selection = pPointSelection->getSelectedPointIndex();
+		if (selection >= 0 && selection < pSources->size())
+		{
+			pPointSelection->unselectPoint();
+			pSources->remove(selection);
+			sourceList->updateContent();
+			sourceList->repaint();
+		}
         //[/UserButtonCode_buttonRemove]
     }
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
+		int selection = pPointSelection->getSelectedPointIndex();
+		if (selection >= 0 && selection < pSources->size() - 1)
+		{
+			pPointSelection->unselectPoint();
+			pSources->swap(selection, selection + 1);
+			pPointSelection->selectPoint(selection + 1);
+		}
         //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
+		int selection = pPointSelection->getSelectedPointIndex();
+		if (selection >= 1 && selection < pSources->size())
+		{
+			pPointSelection->unselectPoint();
+			pSources->swap(selection, selection - 1);
+			pPointSelection->selectPoint(selection - 1);
+		}
         //[/UserButtonCode_buttonMoveUp]
     }
 
@@ -460,6 +497,8 @@ void EncoderSettingsComponent::controlDimming() const
 	textOscSendInterval->setEnabled(pEncoderSettings->oscSendFlag);
 	textOscSendIpExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
+	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
+	buttonRemove->setEnabled(pSources->size() > 0);
 }
 
 void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -522,6 +561,7 @@ double EncoderSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
 	case COLUMN_ID_D: return pt->getPoint()->getDistance();
+	case COLUMN_ID_COLOR: return pt->getColor().getARGB();
 	default: return 0.0;
 	}
 }
@@ -537,9 +577,10 @@ void EncoderSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_A: pSources->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
+	case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
 	default: throw;
 	}
-
+	
 	sourceList->updateContent();
 	sourceList->repaint();
 }
@@ -637,6 +678,15 @@ Component* EncoderSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		textLabel->setRowAndColumn(rowNumber, columnId);
 		return textLabel;
 	}
+	else if (columnId == COLUMN_ID_COLOR)
+	{
+		ColorEditorCustomComponent* colorBox = static_cast<ColorEditorCustomComponent*> (existingComponentToUpdate);
+		if (colorBox == nullptr)
+			colorBox = new ColorEditorCustomComponent(*this);
+
+		colorBox->setRowAndColumn(rowNumber, columnId);
+		return colorBox;
+	}
 
 	return nullptr;
 }
@@ -681,8 +731,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
                  componentName="" parentClasses="public Component, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster, public TableListBoxModel, public ChangeListener, public TableColumnCallback"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
+                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
