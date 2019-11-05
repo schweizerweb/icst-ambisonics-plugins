@@ -181,6 +181,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
 		AmbiPoint* source = sources.get(iSource);
+		const float sourceGain = float(source->getGain());
 
 		// keep RMS
 		sources.setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
@@ -198,7 +199,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
 			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += channelScaler * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
+				outputBufferPointers[iChannel][iSample] += sourceGain * channelScaler * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
