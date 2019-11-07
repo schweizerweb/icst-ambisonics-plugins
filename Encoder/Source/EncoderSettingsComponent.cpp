@@ -426,7 +426,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonRemove.get())
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 0 && selection < pSources->size())
 		{
 			pPointSelection->unselectPoint();
@@ -439,7 +439,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 0 && selection < pSources->size() - 1)
 		{
 			pPointSelection->unselectPoint();
@@ -451,7 +451,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 1 && selection < pSources->size())
 		{
 			pPointSelection->unselectPoint();
@@ -500,8 +500,8 @@ void EncoderSettingsComponent::controlDimming() const
 	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
 	buttonRemove->setEnabled(pSources->size() > 0);
-	buttonMoveUp->setEnabled(pPointSelection->getSelectedPointIndex() > 0);
-	buttonMoveDown->setEnabled(pPointSelection->getSelectedPointIndex() < pSources->size() - 1);
+	buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
+	buttonMoveDown->setEnabled(pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
 }
 
 void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -511,7 +511,15 @@ void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 
 	if (source == pPointSelection)
 	{
-		sourceList->selectRow(pPointSelection->getSelectedPointIndex());
+		if (pPointSelection->getSelectionMode() == PointSelection::Point)
+		{
+			sourceList->selectRow(pPointSelection->getMainSelectedPointIndex());
+		}
+		else
+		{
+			sourceList->selectRow(-1);
+		}
+
 		controlDimming();
 	}
 }

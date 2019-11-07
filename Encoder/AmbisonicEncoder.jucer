@@ -44,6 +44,8 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="QjJM5Y" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>
+      <FILE id="czc4x6" name="AmbiGroup.h" compile="0" resource="0" file="../Common/AmbiGroup.h"/>
       <FILE id="lYVTet" name="TrackColorSelector.h" compile="0" resource="0"
             file="../Common/TrackColorSelector.h"/>
       <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"

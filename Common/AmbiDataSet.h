@@ -10,6 +10,7 @@
 
 #pragma once
 #include "AmbiPoint.h"
+#include "AmbiGroup.h"
 
 class AmbiDataSet
 {
@@ -43,9 +44,20 @@ public:
 	void setGain(int channel, double gain) const;
 	String getNewUniqueName() const;
 
+	int groupCount() const;
+	AmbiGroup* getGroup(int index) const;
+	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);
+	void moveGroupXYZ(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
+	void removeGroup(int groupIndex);
+	void setGroupXYZ(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
+	void setGroupName(int groupIndex, String name) const;
+
 private:
 	bool nameExists(String name) const;
 
 protected:
 	CriticalSection cs;
+
+private:
+	OwnedArray<AmbiGroup> groups;
 };

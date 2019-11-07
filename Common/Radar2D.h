@@ -27,7 +27,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 {
 public:
 	enum RadarMode { XY, ZY };
-
+	enum Shape { Circle, Square, Star };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
@@ -57,8 +57,10 @@ private:
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
 	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
-	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select = false, float selectionSize = 0.0) const;
-	
+	void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
+	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0) const;
+	void paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const;
+
 	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;

@@ -126,6 +126,10 @@ public:
 		template <typename FloatType>
 	Point3D operator/ (FloatType divisor) const noexcept{ return Point3D((ValueType)(getX() / divisor), (ValueType)(getY() / divisor), (ValueType)(getZ() / divisor)); }
 
+		/** Returns a Point3D whose coordinates are the difference between two points. */
+		template <typename FloatType>
+	Point3D<FloatType> operator- (Point3D<FloatType> subtrahend) noexcept{ return Point3D<ValueType>((ValueType)(getX() - subtrahend.getX()), (ValueType)(getY() - subtrahend.getY()), (ValueType)(getZ() - subtrahend.getZ())); }
+
 		//==============================================================================
 		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
 	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;

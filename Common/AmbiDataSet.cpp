@@ -209,6 +209,56 @@ String AmbiDataSet::getNewUniqueName() const
 	return name;
 }
 
+int AmbiDataSet::groupCount() const
+{
+	return groups.size();
+}
+
+AmbiGroup* AmbiDataSet::getGroup(int index) const
+{
+	return groups[index];
+}
+
+void AmbiDataSet::moveGroupXYZ(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->moveXYZ(dx, dy, dz, moveSubElements);
+}
+
+void AmbiDataSet::removeGroup(int groupIndex)
+{
+	groups.remove(groupIndex);
+}
+
+void AmbiDataSet::setGroupXYZ(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setXYZ(newX, newY, newZ, moveSubElements);
+}
+
+void AmbiDataSet::setGroupName(int groupIndex, String name) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setName(name);
+}
+
+AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
+{
+	AmbiGroup* group = new AmbiGroup(id, point, name, color);
+	groups.add(group);
+
+	return group;
+}
+
 bool AmbiDataSet::nameExists(String name) const
 {
 	for (int i = 0; i < size(); i++)

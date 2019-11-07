@@ -158,6 +158,14 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
+void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const
+{
+	Path p;
+	p.addStar(*screenPt, 8, pointSize / 2, pointSize);
+	p.closeSubPath();
+	g->fillPath(p);
+}
+
 void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
 	int y = screenPt.getY() > offset + labelImage.getHeight()
@@ -174,15 +182,17 @@ void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screen
 	}
 }
 
-void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool square, bool select, float selectionSize) const
+void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize) const
 {
 	Point3D<double>* pt = point->getPoint();
 	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(pt).toFloat());
 	if (select)
 	{
 		g->setColour(radarColors.getPointSelectionColor());
-		if (square)
+		if (shape == Square)
 			drawSquare(g, &screenPt, pt, selectionSize);
+		else if (shape == Star)
+			drawStar(g, &screenPt, selectionSize);
 		else
 		{
 			Rectangle<float> rect(selectionSize, selectionSize);
@@ -192,8 +202,10 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 
 	g->setColour(point->getColor());
 	
-	if(square)
+	if(shape == Square)
 		drawSquare(g, &screenPt, pt, pointSize);
+	else if (shape == Star)
+		drawStar(g, &screenPt, pointSize);
 	else
 	{
 		Rectangle<float> rect(pointSize, pointSize);
@@ -201,7 +213,17 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, bool sq
 	}
 	
 	Image* img = point->getLabelImage();
-	paintPointLabel(g, *img, screenPt, pointSize * (square ? 0.7f : 0.5f));
+	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f));
+}
+
+void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const
+{
+	const float dashLengths[2] = { 4, 4 };
+	Point<float> screenPtA = getAbsoluteScreenPoint(getProjectedPoint(group->getPoint()).toFloat());
+	Point<float> screenPtB = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
+
+	g->setColour(group->getColor());
+	g->drawDashedLine(Line<float>(screenPtA, screenPtB), dashLengths, 2);
 }
 
 void Radar2D::renderOpenGL()
@@ -232,7 +254,23 @@ void Radar2D::renderOpenGL()
 				if (pt != nullptr)
 				{
 					float scaler = pt->getDisplayScaler();
-					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare, i == pPointSelection->getSelectedPointIndex(), getSelectedPointSize(scaler));
+					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare ? Square : Circle, pPointSelection->isPointSelected(i), getSelectedPointSize(scaler));
+				}
+			}
+
+			// paint groups
+			for(int i = 0; i < pEditablePoints->groupCount(); i++)
+			{
+				AmbiGroup* gPt = pEditablePoints->getGroup(i);
+				if(gPt != nullptr)
+				{
+					float scaler = gPt->getDisplayScaler();
+					for(int iSub = 0; iSub < gPt->groupPoints.size(); iSub++)
+					{
+						paintConnection(&g, gPt, gPt->groupPoints[iSub]);
+					}
+
+					paintPoint(&g, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler));
 				}
 			}
 		}
@@ -246,7 +284,7 @@ void Radar2D::renderOpenGL()
 				if (pt != nullptr)
 				{
 					float scaler = pt->getDisplayScaler();
-					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), false);
+					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), Circle);
 				}
 			}
 		}
@@ -351,32 +389,42 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	if (!pRadarOptions->showEditablePoints)
 		return;
 
-	if (e.mods.isShiftDown())
+	double minDist = std::numeric_limits<double>::max();
+	int minDistIndex = -1;
+	bool isGroup = false;
+	for (int i = 0; i < pEditablePoints->size(); i++)
 	{
-		
+		AmbiPoint* pt = pEditablePoints->get(i);
+		double dist;
+		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
+		{
+			minDist = dist;
+			minDistIndex = i;
+		}
+	}
+
+	// look for group points
+	for(int i = 0; i < pEditablePoints->groupCount(); i++)
+	{
+		AmbiPoint* pt = pEditablePoints->getGroup(i);
+		double dist;
+		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
+		{
+			minDist = dist;
+			minDistIndex = i;
+			isGroup = true;
+		}
+	}
+	if (minDistIndex >= 0 && minDist < getMaxPointSelectionDist())
+	{
+		if (isGroup)
+			pPointSelection->selectGroup(minDistIndex, e.mods.isShiftDown());
+		else
+			pPointSelection->selectPoint(minDistIndex, e.mods.isShiftDown());
 	}
 	else
 	{
-		double minDist = std::numeric_limits<double>::max();
-		int minDistIndex = -1;
-		for (int i = 0; i < pEditablePoints->size(); i++)
-		{
-			AmbiPoint* pt = pEditablePoints->get(i);
-			double dist;
-			if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
-			{
-				minDist = dist;
-				minDistIndex = i;
-			}
-		}
-		if (minDistIndex >= 0 && minDist < getMaxPointSelectionDist())
-		{
-			pPointSelection->selectPoint(minDistIndex);
-		}
-		else
-		{
-			pPointSelection->unselectPoint();
-		}
+		pPointSelection->unselectPoint();
 	}
 }
 
@@ -385,7 +433,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 	showCoordinates(valuePoint);
 
-	if(e.mods.isShiftDown())
+	if(e.mods.isAltDown())
 	{
 		Point<float> originPoint = getValuePointFromAbsoluteScreenPoint((e.getPosition() - e.getOffsetFromDragStart()).toFloat());
 		setCenterPoint(originPoint - valuePoint);
@@ -395,16 +443,59 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 		if (!pRadarOptions->showEditablePoints)
 			return;
 
-		int pointSelection = pPointSelection->getSelectedPointIndex();
-		switch (radarMode)
+		Array<int> selection = pPointSelection->getSelectedIndices();
+
+		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
-		case XY:
-			pEditablePoints->setChannelXY(pointSelection, valuePoint.getY(), valuePoint.getX());
-			break;
-		case ZY:
-			pEditablePoints->setChannelYZ(pointSelection, valuePoint.getX(), valuePoint.getY());
-			break;
+			AmbiPoint* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex());
+			double dx = radarMode == XY ? valuePoint.getY() - ref->getPoint()->getX() : 0.0;
+			double dy = valuePoint.getX() - ref->getPoint()->getY();
+			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getPoint()->getZ();
+
+			for (int i : selection)
+			{
+				Point3D<double>* p = pEditablePoints->get(i)->getPoint();
+				pEditablePoints->setChannelXYZ(i, p->getX() + dx, p->getY() + dy, p->getZ() + dz);
+			}
 		}
+		else if(pPointSelection->getSelectionMode() == PointSelection::Group)
+		{
+			// keep relative positions
+			int mainGroupIndex = pPointSelection->getMainSelectedPointIndex();
+			Point3D<double> referencePoint = *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
+
+			Array<Point3D<double>> relativePositions;
+			Array<int> selectedIndices;
+			for (int i : selection)
+			{
+				if (i != pPointSelection->getMainSelectedPointIndex())
+				{
+					selectedIndices.add(i);
+					relativePositions.add(*pEditablePoints->getGroup(i)->getPoint() - referencePoint);
+				}
+			}
+
+			switch (radarMode)
+			{
+			case XY:
+				pEditablePoints->setGroupXYZ(mainGroupIndex, valuePoint.getY(), valuePoint.getX(), referencePoint.getZ(), !e.mods.isShiftDown());
+				break;
+			case ZY:
+				pEditablePoints->setGroupXYZ(mainGroupIndex, referencePoint.getX(), valuePoint.getX(), valuePoint.getY(), !e.mods.isShiftDown());
+				break;
+			}
+
+			// other groups
+			Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
+			for(int i = 0; i < selectedIndices.size(); i++)
+			{
+				pEditablePoints->setGroupXYZ(selectedIndices[i], 
+					mainPt.getX() + relativePositions[i].getX(), 
+					mainPt.getY() + relativePositions[i].getY(), 
+					mainPt.getZ() + relativePositions[i].getZ(), !e.mods.isShiftDown());
+			}
+		}
+
 		pPointSelection->notifyChange();
 	}
 }
@@ -421,11 +512,11 @@ void Radar2D::mouseUp(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
-	if(e.mods.isShiftDown() && !e.mouseWasDraggedSinceMouseDown())
+	if(e.mods.isAltDown() && !e.mouseWasDraggedSinceMouseDown())
 	{
 		setCenterPoint(valuePoint);
 
-		if (e.mods.isAltDown() || e.mods.isRightButtonDown())
+		if (e.mods.isShiftDown() || e.mods.isRightButtonDown())
 		{
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
 		}

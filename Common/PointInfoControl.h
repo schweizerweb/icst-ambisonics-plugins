@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.5
 
   ------------------------------------------------------------------------------
 
@@ -37,7 +37,8 @@
 */
 class PointInfoControl  : public Component,
                           public ChangeListener,
-                          public TextEditor::Listener
+                          public TextEditor::Listener,
+                          public Button::Listener
 {
 public:
     //==============================================================================
@@ -56,7 +57,13 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
+    // Binary resources:
+    static const char* group_png;
+    static const int group_pngSize;
+    static const char* ungroup_png;
+    static const int ungroup_pngSize;
 
 
 private:
@@ -84,6 +91,8 @@ private:
     std::unique_ptr<Label> labelPolar;
     std::unique_ptr<Label> labelCH;
     std::unique_ptr<TextEditor> textCH;
+    std::unique_ptr<ImageButton> btnGroup;
+    std::unique_ptr<ImageButton> btnUngroup;
 
 
     //==============================================================================
@@ -92,3 +101,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+
