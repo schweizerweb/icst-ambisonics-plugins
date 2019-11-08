@@ -418,7 +418,22 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	if (minDistIndex >= 0 && minDist < getMaxPointSelectionDist())
 	{
 		if (isGroup)
+		{
+			if (e.mods.isShiftDown() && pPointSelection->getSelectionMode() == PointSelection::Group && !pPointSelection->isGroupSelected(minDistIndex))
+			{
+				// do not allow groups with common points
+				for (int i : pPointSelection->getSelectedIndices())
+				{
+					for (int iNewPt = 0; iNewPt < pEditablePoints->getGroup(minDistIndex)->groupPoints.size(); iNewPt++)
+					{
+						if (pEditablePoints->getGroup(i)->groupPoints.contains(pEditablePoints->getGroup(minDistIndex)->groupPoints[iNewPt]))
+							return;
+					}
+				}
+			}
+
 			pPointSelection->selectGroup(minDistIndex, e.mods.isShiftDown());
+		}
 		else
 			pPointSelection->selectPoint(minDistIndex, e.mods.isShiftDown());
 	}

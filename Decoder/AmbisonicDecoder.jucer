@@ -49,6 +49,8 @@
     <GROUP id="{9E9B66A7-A131-AF4D-B624-3D4280C67801}" name="Common">
       <FILE id="ZopgEv" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
       <FILE id="E8U6Mo" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
+      <FILE id="TRetkJ" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>
+      <FILE id="IlJYQl" name="AmbiGroup.h" compile="0" resource="0" file="../Common/AmbiGroup.h"/>
       <FILE id="UfVsqN" name="AmbiPoint.cpp" compile="1" resource="0" file="../Common/AmbiPoint.cpp"/>
       <FILE id="CdwDS7" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
       <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"

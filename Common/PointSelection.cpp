@@ -17,7 +17,7 @@ PointSelection::PointSelection() : selectionMode(None)
 void PointSelection::unselectPoint()
 {
 	selectionMode = None;
-	selectedIndices.clearQuick();
+	selectedIndices.clear();
 	notifyChange();
 }
 
@@ -80,7 +80,7 @@ void PointSelection::selectGroup(int index, bool add)
 
 	selectionMode = Group;
 	mainSelectedIndex = index;
-	selectedIndices.add(index);
+	selectedIndices.addIfNotAlreadyThere(index);
 
 	notifyChange();
 }

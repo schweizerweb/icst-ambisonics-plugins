@@ -27,9 +27,9 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
 
 	if(moveSubElements)
 	{
-		for(AmbiPoint* p : groupPoints)
+		for(AmbiPoint* sp : groupPoints)
 		{
-			p->getPoint()->setXYZ(p->getPoint()->getX() + dx, p->getPoint()->getY() + dy, p->getPoint()->getZ() + dz);
+			sp->getPoint()->setXYZ(sp->getPoint()->getX() + dx, sp->getPoint()->getY() + dy, sp->getPoint()->getZ() + dz);
 		}
 	}
 }

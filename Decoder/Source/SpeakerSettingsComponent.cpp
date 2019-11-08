@@ -483,7 +483,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonRemove.get())
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 0 && selection < pSpeakerSet->size())
 		{
 			pPointSelection->unselectPoint();
@@ -496,7 +496,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if(selection >= 0 && selection < pSpeakerSet->size() - 1)
 		{
 			pPointSelection->unselectPoint();
@@ -508,7 +508,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
-		int selection = pPointSelection->getSelectedPointIndex();
+		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 1 && selection < pSpeakerSet->size())
 		{
 			pPointSelection->unselectPoint();
@@ -895,7 +895,7 @@ void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 
 	if (source == pPointSelection)
 	{
-			speakerList->selectRow(pPointSelection->getSelectedPointIndex());
+		speakerList->selectRow(pPointSelection->getMainSelectedPointIndex());
 	}
 }
 

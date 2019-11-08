@@ -50,12 +50,10 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                                 TRANS("Name:")));
     addAndMakeVisible (labelName.get());
     labelName->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelName->setJustificationType (Justification::centredLeft);
+    labelName->setJustificationType (Justification::centredRight);
     labelName->setEditable (false, false, false);
     labelName->setColour (TextEditor::textColourId, Colours::black);
     labelName->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    labelName->setBounds (88, 8, 56, 24);
 
     labelX.reset (new Label ("labelX",
                              TRANS("X:")));
@@ -123,6 +121,8 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
     labelCartesian->setColour (TextEditor::textColourId, Colours::black);
     labelCartesian->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    labelCartesian->setBounds (0, 8, 80, 24);
+
     labelA.reset (new Label ("labelA",
                              TRANS("A:")));
     addAndMakeVisible (labelA.get());
@@ -189,6 +189,8 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
     labelPolar->setColour (TextEditor::textColourId, Colours::black);
     labelPolar->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    labelPolar->setBounds (0, 40, 80, 24);
+
     labelCH.reset (new Label ("labelCH",
                               TRANS("CH:")));
     addAndMakeVisible (labelCH.get());
@@ -217,8 +219,6 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                          ImageCache::getFromMemory (group_png, group_pngSize), 1.000f, Colour (0x00000000),
                          Image(), 1.000f, Colour (0x00000000),
                          Image(), 1.000f, Colour (0x00000000));
-    btnGroup->setBounds (0, 0, 32, 32);
-
     btnUngroup.reset (new ImageButton ("btnUngroup"));
     addAndMakeVisible (btnUngroup.get());
     btnUngroup->setButtonText (TRANS("ungroup"));
@@ -228,8 +228,6 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                            ImageCache::getFromMemory (ungroup_png, ungroup_pngSize), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
-    btnUngroup->setBounds (0, 0, 32, 32);
-
 
     //[UserPreSize]
 	textName->setReadOnly(!pRadarOptions->nameFieldEditable);
@@ -294,24 +292,29 @@ void PointInfoControl::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    textName->setBounds (proportionOfWidth (0.4000f) + 0, 8, proportionOfWidth (0.3487f), 24);
-    labelX->setBounds ((proportionOfWidth (0.4000f) + 0) + 0 - 24, (8 + 24 - -8) + 0, 24, 24);
-    textX->setBounds (proportionOfWidth (0.4000f) + 0, (8 + 24 - -8) + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelY->setBounds ((proportionOfWidth (0.6205f) + 0) + 0 - 24, (8 + 24 - -8) + 0, 24, 24);
-    textY->setBounds (proportionOfWidth (0.6205f) + 0, 40, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelZ->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 24, 40, 24, 24);
-    textZ->setBounds (proportionOfWidth (0.8410f) + 0, 40, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelCartesian->setBounds (0, 8 + 24 - -8, 80, 24);
-    labelA->setBounds (proportionOfWidth (0.4000f) + 0 - 24, (8 + 64) + 0, 24, 24);
-    textA->setBounds (proportionOfWidth (0.4000f), 72, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelE->setBounds (proportionOfWidth (0.6205f) + 0 - 24, 72, 24, 24);
-    textE->setBounds (proportionOfWidth (0.6205f), 72, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelD->setBounds (proportionOfWidth (0.8410f) + 0 - 24, 72, 24, 24);
-    textD->setBounds (proportionOfWidth (0.8410f), 72, proportionOfWidth (0.1359f), 24);
-    labelPolar->setBounds (0, 8 + 64, 80, 24);
-    labelCH->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 32, 8, 32, 24);
-    textCH->setBounds (proportionOfWidth (0.8410f) + 0, 8, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    textName->setBounds ((proportionOfWidth (0.6044f) + 0) + 0, (72 + 0) + 0, proportionOfWidth (0.3590f), 24);
+    labelName->setBounds (((proportionOfWidth (0.6044f) + 0) + 0) + 0 - 56, (72 + 0) + 0, 56, 24);
+    labelX->setBounds ((proportionOfWidth (0.3500f) + 0) + 0 - 24, 8 + 0, 24, 24);
+    textX->setBounds (proportionOfWidth (0.3500f) + 0, 8 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
+    labelY->setBounds ((proportionOfWidth (0.6044f) + 0) + 0 - 24, 8 + 0, 24, 24);
+    textY->setBounds (proportionOfWidth (0.6044f) + 0, 8 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
+    labelZ->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 24, 8 + 0, 24, 24);
+    textZ->setBounds (proportionOfWidth (0.8410f) + 0, 8 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelA->setBounds (proportionOfWidth (0.3500f) + 0 - 24, 40 + 0, 24, 24);
+    textA->setBounds (proportionOfWidth (0.3500f), 40 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelE->setBounds (proportionOfWidth (0.6044f) + 0 - 24, 40 + 0, 24, 24);
+    textE->setBounds (proportionOfWidth (0.6044f), 40 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelD->setBounds (proportionOfWidth (0.8410f) + 0 - 24, 40 + 0, 24, 24);
+    textD->setBounds (proportionOfWidth (0.8410f), 40 + 0, proportionOfWidth (0.1359f), 24);
+    labelCH->setBounds (((proportionOfWidth (0.3500f) + 0) + 0) + 0 - 32, 72 + 0, 32, 24);
+    textCH->setBounds ((proportionOfWidth (0.3500f) + 0) + 0, 72, roundToInt (proportionOfWidth (0.1359f) * 0.4528f), 24);
+    btnGroup->setBounds (0, getHeight() - 36, 36, 36);
+    btnUngroup->setBounds (0, getHeight() - 36, 36, 36);
     //[UserResized] Add your own custom resize handling here..
+
+	// workaround for labelName
+	textName->setBounds(textY->getX(), textCH->getY(), textZ->getRight() - textY->getX(), textCH->getHeight());
+
     //[/UserResized]
 }
 
@@ -515,14 +518,15 @@ BEGIN_JUCER_METADATA
                  fixedSize="1" initialWidth="390" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>
   <TEXTEDITOR name="textName" id="2b706cdb3232f1d2" memberName="textName" virtualName=""
-              explicitFocusOrder="0" pos="0 8 34.872% 24" posRelativeX="e76184fec37afbfb"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="1"
-              scrollbars="1" caret="0" popupmenu="1"/>
+              explicitFocusOrder="0" pos="0 0 35.897% 24" posRelativeX="46b4702ec60c236a"
+              posRelativeY="6db02d6b63396cba" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
   <LABEL name="labelName" id="7326de7683af8e2f" memberName="labelName"
-         virtualName="" explicitFocusOrder="0" pos="88 8 56 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Name:" editableSingleClick="0" editableDoubleClick="0"
+         virtualName="" explicitFocusOrder="0" pos="0r 0 56 24" posRelativeX="2b706cdb3232f1d2"
+         posRelativeY="6db02d6b63396cba" edTextCol="ff000000" edBkgCol="0"
+         labelText="Name:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+         kerning="0.0" bold="0" italic="0" justification="34"/>
   <LABEL name="labelX" id="6fb8ecbc6da5fa76" memberName="labelX" virtualName=""
          explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="4dcd5fc970cdce6c"
          posRelativeY="f2af390154f0c032" edTextCol="ff000000" edBkgCol="0"
@@ -541,23 +545,26 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textY" id="46b4702ec60c236a" memberName="textY" virtualName=""
-              explicitFocusOrder="0" pos="0 40 100% 24" posRelativeX="7fb39984576e614e"
-              posRelativeW="7fb39984576e614e" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+              explicitFocusOrder="0" pos="0 0 100% 24" posRelativeX="7fb39984576e614e"
+              posRelativeY="f2af390154f0c032" posRelativeW="7fb39984576e614e"
+              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
+              scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelZ" id="385e50956f13effd" memberName="labelZ" virtualName=""
-         explicitFocusOrder="0" pos="0r 40 24 24" posRelativeX="93f9644500f2da7f"
-         edTextCol="ff000000" edBkgCol="0" labelText="Z:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="93f9644500f2da7f"
+         posRelativeY="f2af390154f0c032" edTextCol="ff000000" edBkgCol="0"
+         labelText="Z:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textZ" id="93f9644500f2da7f" memberName="textZ" virtualName=""
-              explicitFocusOrder="0" pos="0 40 100% 24" posRelativeX="411a4503627ed096"
-              posRelativeW="411a4503627ed096" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+              explicitFocusOrder="0" pos="0 0 100% 24" posRelativeX="411a4503627ed096"
+              posRelativeY="f2af390154f0c032" posRelativeW="411a4503627ed096"
+              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
+              scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelCartesian" id="f2af390154f0c032" memberName="labelCartesian"
-         virtualName="" explicitFocusOrder="0" pos="0 -8R 80 24" posRelativeY="7326de7683af8e2f"
-         edTextCol="ff000000" edBkgCol="0" labelText="Cartesian:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="0 8 80 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Cartesian:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="labelA" id="c8e81a0262f1ac25" memberName="labelA" virtualName=""
          explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="e76184fec37afbfb"
          posRelativeY="41fcd21e0ce12407" edTextCol="ff000000" edBkgCol="0"
@@ -565,48 +572,51 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textA" id="e76184fec37afbfb" memberName="textA" virtualName=""
-              explicitFocusOrder="0" pos="40% 72 100% 24" posRelativeW="411a4503627ed096"
-              initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
-              scrollbars="1" caret="1" popupmenu="1"/>
+              explicitFocusOrder="0" pos="34.872% 0 100% 24" posRelativeY="41fcd21e0ce12407"
+              posRelativeW="411a4503627ed096" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelE" id="6af5bb62c259b445" memberName="labelE" virtualName=""
-         explicitFocusOrder="0" pos="0r 72 24 24" posRelativeX="7fb39984576e614e"
-         edTextCol="ff000000" edBkgCol="0" labelText="E:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="7fb39984576e614e"
+         posRelativeY="41fcd21e0ce12407" edTextCol="ff000000" edBkgCol="0"
+         labelText="E:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textE" id="7fb39984576e614e" memberName="textE" virtualName=""
-              explicitFocusOrder="0" pos="62.051% 72 100% 24" posRelativeW="411a4503627ed096"
+              explicitFocusOrder="0" pos="60.513% 0 100% 24" posRelativeY="41fcd21e0ce12407"
+              posRelativeW="411a4503627ed096" initialText="" multiline="0"
+              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
+  <LABEL name="labelD" id="b1bd9596558e6f35" memberName="labelD" virtualName=""
+         explicitFocusOrder="0" pos="0r 0 24 24" posRelativeX="411a4503627ed096"
+         posRelativeY="41fcd21e0ce12407" edTextCol="ff000000" edBkgCol="0"
+         labelText="D:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTEDITOR name="textD" id="411a4503627ed096" memberName="textD" virtualName=""
+              explicitFocusOrder="0" pos="84.103% 0 13.59% 24" posRelativeY="41fcd21e0ce12407"
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelD" id="b1bd9596558e6f35" memberName="labelD" virtualName=""
-         explicitFocusOrder="0" pos="0r 72 24 24" posRelativeX="411a4503627ed096"
-         edTextCol="ff000000" edBkgCol="0" labelText="D:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTEDITOR name="textD" id="411a4503627ed096" memberName="textD" virtualName=""
-              explicitFocusOrder="0" pos="84.103% 72 13.59% 24" initialText=""
-              multiline="0" retKeyStartsLine="0" readonly="0" scrollbars="1"
-              caret="1" popupmenu="1"/>
   <LABEL name="labelPolar" id="41fcd21e0ce12407" memberName="labelPolar"
-         virtualName="" explicitFocusOrder="0" pos="0 64 80 24" posRelativeY="7326de7683af8e2f"
-         edTextCol="ff000000" edBkgCol="0" labelText="Polar:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="0 40 80 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Polar:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="labelCH" id="6db02d6b63396cba" memberName="labelCH" virtualName=""
-         explicitFocusOrder="0" pos="0r 8 32 24" posRelativeX="d9bdcb7a01c25c33"
-         edTextCol="ff000000" edBkgCol="0" labelText="CH:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         explicitFocusOrder="0" pos="0r 0 32 24" posRelativeX="d9bdcb7a01c25c33"
+         posRelativeY="d9bdcb7a01c25c33" edTextCol="ff000000" edBkgCol="0"
+         labelText="CH:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textCH" id="d9bdcb7a01c25c33" memberName="textCH" virtualName=""
-              explicitFocusOrder="0" pos="0 8 100% 24" posRelativeX="411a4503627ed096"
+              explicitFocusOrder="0" pos="0 72 45.283% 24" posRelativeX="4dcd5fc970cdce6c"
               posRelativeW="411a4503627ed096" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
   <IMAGEBUTTON name="btnGroup" id="304aaa821d1b17f7" memberName="btnGroup" virtualName=""
-               explicitFocusOrder="0" pos="0 0 32 32" buttonText="group" connectedEdges="0"
+               explicitFocusOrder="0" pos="0 0Rr 36 36" buttonText="group" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="group_png"
                opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
                colourOver="0" resourceDown="" opacityDown="1.0" colourDown="0"/>
   <IMAGEBUTTON name="btnUngroup" id="6bdf324b7d527d88" memberName="btnUngroup"
-               virtualName="" explicitFocusOrder="0" pos="0 0 32 32" buttonText="ungroup"
+               virtualName="" explicitFocusOrder="0" pos="0 0Rr 36 36" buttonText="ungroup"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
                resourceNormal="ungroup_png" opacityNormal="1.0" colourNormal="0"
                resourceOver="" opacityOver="1.0" colourOver="0" resourceDown=""
