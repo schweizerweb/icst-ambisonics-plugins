@@ -12,6 +12,11 @@
 #include "AmbiDataSet.h"
 #include "AmbiSource.h"
 
+#define XML_TAG_SOURCES "Sources"
+#define XML_TAG_SOURCE "Source"
+#define XML_TAG_GROUPS "Groups"
+#define XML_TAG_GROUP "Group"
+
 class AmbiSourceSet : public AmbiDataSet
 {
 public:
@@ -28,6 +33,8 @@ public:
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;
+	void loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>* pAudioParams);
+	void writeToXmlElement(XmlElement* xml) const;
 
 private:
 	OwnedArray<AmbiSource> elements;

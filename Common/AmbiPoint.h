@@ -41,6 +41,7 @@ public:
 	double getGain() const;
 	void setGain(double newGain);
 	String getId();
+	void resetId();
 	void setColor(Colour newColor);
     
 	bool checkAlive(int64 referenceTime, int timeout) const;

@@ -49,7 +49,7 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 }
 
 AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
-	id(Uuid().toString()),
+	id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z),
@@ -120,6 +120,11 @@ String AmbiPoint::getId()
 	}
 
 	return id;
+}
+
+void AmbiPoint::resetId()
+{
+	id = Uuid().toString();
 }
 
 void AmbiPoint::setColor(Colour newColor)

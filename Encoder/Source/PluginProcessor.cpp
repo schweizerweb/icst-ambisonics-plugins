@@ -14,8 +14,6 @@
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
-#define XML_TAG_SOURCES "Sources"
-#define XML_TAG_SOURCE "Source"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -225,17 +223,8 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
+	sources.writeToXmlElement(xml);
 	
-	// load sources
-	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
-	for (int i = 0; i < sources.size(); i++)
-	{
-		AmbiPoint* pt = sources.get(i);
-		if(pt != nullptr)
-			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
-	}
-	xml->addChildElement(sourcesElement);
-
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
 	delete xml;
@@ -253,23 +242,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
 
 			// load last speaker preset
-			XmlElement* sourcesElement = xmlState->getChildByName(XML_TAG_SOURCES);
-			sources.clear();
-			if (sourcesElement != nullptr)
-			{
-				int index = 0;
-				XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
-				while (xmlPoint != nullptr)
-				{
-					if (audioParams.size() > index)
-						sources.add(new AmbiSource(xmlPoint, audioParams[index]));
-					else
-						sources.add(new AmbiSource(xmlPoint, AudioParameterSet()));
-
-					xmlPoint = xmlPoint->getNextElement();
-					index++;
-				}
-			}
+			sources.loadFromXml(xmlState.get(), &audioParams);
 		}
 	}
 

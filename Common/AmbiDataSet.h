@@ -57,7 +57,5 @@ private:
 
 protected:
 	CriticalSection cs;
-
-private:
 	OwnedArray<AmbiGroup> groups;
 };

@@ -506,7 +506,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
 		Uuid newId = Uuid();
-		pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "G", Colours::orangered);
+		pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "G", Colours::orange);
 		pPointSelection->selectGroup(pSources->groupCount() - 1, false);
 		groupList->updateContent();
 		groupList->repaint();

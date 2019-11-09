@@ -133,3 +133,71 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 	elements.add(new AmbiSource(id, point, name, color));
 }
 
+void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>* pAudioParams)
+{
+	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
+	clear();
+	if (sourcesElement != nullptr)
+	{
+		int index = 0;
+		XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
+		while (xmlPoint != nullptr)
+		{
+			if ( pAudioParams->size() > index)
+				add(new AmbiSource(xmlPoint, pAudioParams->getUnchecked(index)));
+			else
+				add(new AmbiSource(xmlPoint, AudioParameterSet()));
+
+			xmlPoint = xmlPoint->getNextElement();
+			index++;
+		}
+	}
+
+	// groups
+	XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
+	groups.clear();
+	if(groupsElement != nullptr)
+	{
+		int index = 0;
+		XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
+		while (xmlGroup != nullptr)
+		{
+			groups.add(new AmbiGroup(xmlGroup, &elements));
+			xmlGroup = xmlGroup->getNextElement();
+			index++;
+		}
+	}
+
+	// todo: only on load from real file
+	// set new IDs
+	for (int i = 0; i < size(); i++)
+		get(i)->resetId();
+	for (AmbiGroup* g : groups)
+		g->resetId();
+}
+
+void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
+{
+	// load sources
+	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
+	for (int i = 0; i < size(); i++)
+	{
+		AmbiPoint* pt = get(i);
+		if (pt != nullptr)
+			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
+	}
+
+	xml->addChildElement(sourcesElement);
+
+	// groups
+	XmlElement* groupsElement = new XmlElement(XML_TAG_GROUPS);
+	for(int i = 0; i < groupCount(); i++)
+	{
+		AmbiGroup* g = getGroup(i);
+		if (g != nullptr)
+			groupsElement->addChildElement(g->getAsXmlElement(XML_TAG_GROUP));
+	}
+
+	xml->addChildElement(groupsElement);
+}
+

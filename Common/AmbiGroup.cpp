@@ -10,6 +10,30 @@
 
 #include "AmbiGroup.h"
 
+AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources) : AmbiPoint(xmlElement)
+{
+	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
+	groupPoints.clear();
+	if (subPointsElement != nullptr)
+	{
+		XmlElement* xmlSubPoint = subPointsElement->getChildByName(XML_TAG_SUBPOINT);
+		while (xmlSubPoint != nullptr)
+		{
+			String idStr = xmlSubPoint->getStringAttribute(XML_ATTRIBUTE_GROUP_ID);
+			for (int i = 0; i < pSources->size(); i++)
+			{
+				if (pSources->getUnchecked(i)->getId() == idStr)
+				{
+					groupPoints.add(pSources->getUnchecked(i));
+					break;
+				}
+			}
+
+			xmlSubPoint = xmlSubPoint->getNextElement();
+		}
+	}
+}
+
 float AmbiGroup::getDisplayScaler()
 {
 	return 0.8f;
@@ -17,7 +41,14 @@ float AmbiGroup::getDisplayScaler()
 
 XmlElement* AmbiGroup::getAsXmlElement(String tagName)
 {
-	throw;
+	XmlElement* element = getBaseXmlElement(tagName);
+	XmlElement* subPoints = element->createNewChildElement(XML_TAG_SUBPOINTS);
+	for(int i = 0; i < groupPoints.size(); i++)
+	{
+		XmlElement* xmlPt = subPoints->createNewChildElement(XML_TAG_SUBPOINT);
+		xmlPt->setAttribute(XML_ATTRIBUTE_GROUP_ID, groupPoints.getUnchecked(i)->getId());
+	}
+	return element;
 }
 
 void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
