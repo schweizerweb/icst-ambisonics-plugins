@@ -75,7 +75,16 @@ public:
 			if (static_cast<ToggleButton*>(b)->getToggleState())
 				pGroup->groupPoints.add(pSources->get(index));
 			else
-				pGroup->groupPoints.remove(index);
+			{
+				for (int i = 0; i < pGroup->groupPoints.size(); i++)
+				{
+					if (pGroup->groupPoints[i] == pSources->get(index))
+					{
+						pGroup->groupPoints.remove(i);
+						break;
+					}
+				}
+			}
 		}
 	}
 
