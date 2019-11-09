@@ -39,6 +39,7 @@
 #define	COLUMN_ID_D			12
 #define COLUMN_ID_GAIN		5
 #define COLUMN_ID_COLOR		13
+
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -48,7 +49,16 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     //[Constructor_pre] You can add your own custom stuff here..
 	addChangeListener(pChangeListener);
 
+	groupModel.reset(new GroupTableListModel(pSourceSet, pPointSelection, this));
     //[/Constructor_pre]
+
+    multiEncoderElements.reset (new Component());
+    addAndMakeVisible (multiEncoderElements.get());
+    multiEncoderElements->setName ("multiEncoderElements");
+
+    groupSources.reset (new GroupComponent ("groupSources",
+                                            TRANS("Sources")));
+    addAndMakeVisible (groupSources.get());
 
     groupOsc.reset (new GroupComponent ("groupOsc",
                                         TRANS("OSC")));
@@ -198,10 +208,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     textOscSendPortExt->setPopupMenuEnabled (true);
     textOscSendPortExt->setText (String());
 
-    groupSources.reset (new GroupComponent ("groupSources",
-                                            TRANS("Sources")));
-    addAndMakeVisible (groupSources.get());
-
     sourceList.reset (new TableListBox());
     addAndMakeVisible (sourceList.get());
     sourceList->setName ("sourceList");
@@ -211,7 +217,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     buttonAdd->setButtonText (TRANS("add"));
     buttonAdd->addListener (this);
 
-    buttonRemove.reset (new TextButton ("buttonAdd"));
+    buttonRemove.reset (new TextButton ("buttonRemove"));
     addAndMakeVisible (buttonRemove.get());
     buttonRemove->setButtonText (TRANS("remove"));
     buttonRemove->addListener (this);
@@ -226,11 +232,29 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
+    groupGroups.reset (new GroupComponent ("groupGroups",
+                                           TRANS("Groups")));
+    addAndMakeVisible (groupGroups.get());
+
+    groupList.reset (new TableListBox());
+    addAndMakeVisible (groupList.get());
+    groupList->setName ("groupList");
+
+    buttonAddGroup.reset (new TextButton ("buttonAddGroup"));
+    addAndMakeVisible (buttonAddGroup.get());
+    buttonAddGroup->setButtonText (TRANS("add"));
+    buttonAddGroup->addListener (this);
+
+    buttonRemoveGroup.reset (new TextButton ("buttonRemoveGroup"));
+    addAndMakeVisible (buttonRemoveGroup.get());
+    buttonRemoveGroup->setButtonText (TRANS("remove"));
+    buttonRemoveGroup->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 300);
+    setSize (650, 300);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -263,6 +287,11 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	buttonRemove->setVisible(MULTI_ENCODER_MODE);
 	buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
 	buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
+	sourceList->setVisible(MULTI_ENCODER_MODE);
+	groupGroups->setVisible(MULTI_ENCODER_MODE);
+	groupList->setVisible(MULTI_ENCODER_MODE);
+	buttonAddGroup->setVisible(MULTI_ENCODER_MODE);
+	buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
 
 	// table
 	sourceList->setModel(this);
@@ -276,7 +305,9 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	sourceList->getHeader().addColumn("D", COLUMN_ID_D, 50);
 	sourceList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	sourceList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
-	sourceList->getHeader().resizeAllColumnsToFit(getWidth());
+	sourceList->getHeader().resizeAllColumnsToFit(sourceList->getWidth());
+
+	groupModel->initTable(groupList.get());
 	pPointSelection->addChangeListener(this);
 
 	controlDimming();
@@ -289,6 +320,8 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
 	pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
+    multiEncoderElements = nullptr;
+    groupSources = nullptr;
     groupOsc = nullptr;
     toggleReceiveOsc = nullptr;
     textOscReceivePort = nullptr;
@@ -308,15 +341,19 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     textOscSendIpExt = nullptr;
     labelOscSendIpExt = nullptr;
     textOscSendPortExt = nullptr;
-    groupSources = nullptr;
     sourceList = nullptr;
     buttonAdd = nullptr;
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
+    groupGroups = nullptr;
+    groupList = nullptr;
+    buttonAddGroup = nullptr;
+    buttonRemoveGroup = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
+	groupModel = nullptr;
     //[/Destructor]
 }
 
@@ -337,6 +374,8 @@ void EncoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
+    multiEncoderElements->setBounds (8, 152 + 80, getWidth() - 17, getHeight() - 240);
+    groupSources->setBounds (8 + 0, (152 + 80) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 240) * 0.6010f));
     groupOsc->setBounds (8, 8, getWidth() - 17, 144);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
     textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
@@ -356,12 +395,15 @@ void EncoderSettingsComponent::resized()
     textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    groupSources->setBounds (8, 232, getWidth() - 17, getHeight() - 238);
-    sourceList->setBounds (8 + 16, 232 + 19, (getWidth() - 17) - 31, (getHeight() - 238) - 67);
-    buttonAdd->setBounds (8 + 17, 232 + (getHeight() - 238) - 40, 64, 24);
-    buttonRemove->setBounds (8 + 89, 232 + (getHeight() - 238) - 40, 64, 24);
-    buttonMoveDown->setBounds (8 + (getWidth() - 17) - 80, 232 + (getHeight() - 238) - 40, 64, 24);
-    buttonMoveUp->setBounds (8 + (getWidth() - 17) - 152, 232 + (getHeight() - 238) - 40, 64, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((152 + 80) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 240) * 0.6010f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 240) * 0.3990f));
+    groupList->setBounds ((8 + 0) + 16, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 240) * 0.3990f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + (roundToInt ((getHeight() - 240) * 0.3990f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + (roundToInt ((getHeight() - 240) * 0.3990f)) - 40, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -427,7 +469,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
 		int selection = pPointSelection->getMainSelectedPointIndex();
-		if (selection >= 0 && selection < pSources->size())
+		if (pPointSelection->getSelectionMode() == PointSelection::Point && selection >= 0 && selection < pSources->size())
 		{
 			pPointSelection->unselectPoint();
 			pSources->remove(selection);
@@ -459,6 +501,30 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			pPointSelection->selectPoint(selection - 1);
 		}
         //[/UserButtonCode_buttonMoveUp]
+    }
+    else if (buttonThatWasClicked == buttonAddGroup.get())
+    {
+        //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
+		Uuid newId = Uuid();
+		pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "G", Colours::orangered);
+		pPointSelection->selectGroup(pSources->groupCount() - 1, false);
+		groupList->updateContent();
+		groupList->repaint();
+        //[/UserButtonCode_buttonAddGroup]
+    }
+    else if (buttonThatWasClicked == buttonRemoveGroup.get())
+    {
+        //[UserButtonCode_buttonRemoveGroup] -- add your button handler code here..
+		int selection = pPointSelection->getMainSelectedPointIndex();
+		if (pPointSelection->getSelectionMode() == PointSelection::Group && selection >= 0 && selection < pSources->size())
+		{
+			pPointSelection->unselectPoint();
+			pSources->removeGroup(selection);
+			groupList->updateContent();
+			groupList->repaint();
+		}
+
+        //[/UserButtonCode_buttonRemoveGroup]
     }
 
     //[UserbuttonClicked_Post]
@@ -501,23 +567,29 @@ void EncoderSettingsComponent::controlDimming() const
 	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
 	buttonRemove->setEnabled(pSources->size() > 0);
 	buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
-	buttonMoveDown->setEnabled(pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
+	buttonMoveDown->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
+	buttonAdd->setEnabled(true);
+	buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
 }
 
 void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
 	sourceList->updateContent();
 	sourceList->repaint();
+	groupList->updateContent();
+	groupList->repaint();
 
 	if (source == pPointSelection)
 	{
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
 			sourceList->selectRow(pPointSelection->getMainSelectedPointIndex());
+			groupList->selectRow(-1);
 		}
 		else
 		{
 			sourceList->selectRow(-1);
+			groupList->selectRow(pPointSelection->getMainSelectedPointIndex());
 		}
 
 		controlDimming();
@@ -592,7 +664,7 @@ void EncoderSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
 	default: throw;
 	}
-	
+
 	sourceList->updateContent();
 	sourceList->repaint();
 }
@@ -617,10 +689,8 @@ SliderRange EncoderSettingsComponent::getSliderRange(int columnId)
 
 	case COLUMN_ID_GAIN:
 		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
-
+	default: return SliderRange(0.0, 1.0, 0.001);
 	}
-
-	return SliderRange(0.0, 1.0, 0.001);
 }
 
 TableListBox* EncoderSettingsComponent::getTable()
@@ -746,8 +816,15 @@ BEGIN_JUCER_METADATA
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="300">
+                 fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
+  <GENERICCOMPONENT name="multiEncoderElements" id="73249ab85d6bba3a" memberName="multiEncoderElements"
+                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 240M" posRelativeY="b72378bdfe4e130"
+                    class="Component" params=""/>
+  <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.097%" posRelativeX="73249ab85d6bba3a"
+                  posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
+                  posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="8 8 17M 144" title="OSC"/>
   <TOGGLEBUTTON name="toggleReceiveOsc" id="8d9b70b5bf27a026" memberName="toggleReceiveOsc"
@@ -830,8 +907,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="24Rr 49 48 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="8 232 17M 238M" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="da4e7711e3fff0be"
                     posRelativeY="da4e7711e3fff0be" posRelativeW="da4e7711e3fff0be"
@@ -840,7 +915,7 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="17 40R 64 24" posRelativeX="da4e7711e3fff0be"
               posRelativeY="da4e7711e3fff0be" buttonText="add" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonAdd" id="49c8de1156e72d8c" memberName="buttonRemove"
+  <TEXTBUTTON name="buttonRemove" id="49c8de1156e72d8c" memberName="buttonRemove"
               virtualName="" explicitFocusOrder="0" pos="89 40R 64 24" posRelativeX="da4e7711e3fff0be"
               posRelativeY="da4e7711e3fff0be" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
@@ -851,6 +926,23 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
               virtualName="" explicitFocusOrder="0" pos="152R 40R 64 24" posRelativeX="da4e7711e3fff0be"
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.903%"
+                  posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
+                  posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
+                  title="Groups"/>
+  <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
+                    virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="983b0a3b2c5c945a"
+                    posRelativeY="983b0a3b2c5c945a" posRelativeW="983b0a3b2c5c945a"
+                    posRelativeH="983b0a3b2c5c945a" class="TableListBox" params=""/>
+  <TEXTBUTTON name="buttonAddGroup" id="84fdb7fb0d342ca6" memberName="buttonAddGroup"
+              virtualName="" explicitFocusOrder="0" pos="17 40R 64 24" posRelativeX="983b0a3b2c5c945a"
+              posRelativeY="983b0a3b2c5c945a" buttonText="add" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonRemoveGroup" id="4b7306753c54f44c" memberName="buttonRemoveGroup"
+              virtualName="" explicitFocusOrder="0" pos="89 40R 64 24" posRelativeX="983b0a3b2c5c945a"
+              posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

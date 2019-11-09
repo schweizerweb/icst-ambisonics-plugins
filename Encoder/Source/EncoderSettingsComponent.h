@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "GroupTableListModel.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/TableColumnCallback.h"
@@ -83,9 +84,12 @@ private:
 	AmbiSourceSet* pSources;
 	PointSelection* pPointSelection;
 	Array<AudioParameterSet>* pAudioParams;
+	std::unique_ptr<GroupTableListModel> groupModel;
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<Component> multiEncoderElements;
+    std::unique_ptr<GroupComponent> groupSources;
     std::unique_ptr<GroupComponent> groupOsc;
     std::unique_ptr<ToggleButton> toggleReceiveOsc;
     std::unique_ptr<TextEditor> textOscReceivePort;
@@ -105,12 +109,15 @@ private:
     std::unique_ptr<TextEditor> textOscSendIpExt;
     std::unique_ptr<Label> labelOscSendIpExt;
     std::unique_ptr<TextEditor> textOscSendPortExt;
-    std::unique_ptr<GroupComponent> groupSources;
     std::unique_ptr<TableListBox> sourceList;
     std::unique_ptr<TextButton> buttonAdd;
     std::unique_ptr<TextButton> buttonRemove;
     std::unique_ptr<TextButton> buttonMoveDown;
     std::unique_ptr<TextButton> buttonMoveUp;
+    std::unique_ptr<GroupComponent> groupGroups;
+    std::unique_ptr<TableListBox> groupList;
+    std::unique_ptr<TextButton> buttonAddGroup;
+    std::unique_ptr<TextButton> buttonRemoveGroup;
 
 
     //==============================================================================
