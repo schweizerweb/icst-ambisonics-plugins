@@ -324,6 +324,11 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	groupList->setVisible(MULTI_ENCODER_MODE);
 	buttonAddGroup->setVisible(MULTI_ENCODER_MODE);
 	buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
+	labelPresets->setVisible(MULTI_ENCODER_MODE);
+	comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
+	buttonSave->setVisible(MULTI_ENCODER_MODE);
+	buttonImport->setVisible(MULTI_ENCODER_MODE);
+	buttonExport->setVisible(MULTI_ENCODER_MODE);
 
 	// table
 	sourceList->setModel(this);

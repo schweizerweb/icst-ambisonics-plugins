@@ -224,6 +224,72 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	}
 }
 
+void OSCHandler::handleOwnExternStyleGroupAed(const OSCMessage& message) const
+{
+	bool valid =
+		message.size() == 5
+		&& message[0].isString()
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32())
+		&& message[4].isInt32();
+	if (!valid)
+	{
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group AED)");
+		return;
+	}
+
+	String groupString = message[0].getString();
+	double a = Constants::GradToRad(GetIntOrFloat(&message[1]));
+	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
+	double d = GetIntOrFloat(&message[3]);
+	bool movePoints = message[4].getInt32();
+	if (!checkAed(a, e, d))
+		return;
+
+	if (pAmbiPoints->setGroupAed(groupString, a, e, d, movePoints))
+	{
+		reportSuccess();
+	}
+	else
+	{
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")");
+	}
+}
+
+void OSCHandler::handleOwnExternStyleGroupXyz(const OSCMessage& message) const
+{
+	bool valid =
+		message.size() == 5
+		&& message[0].isString()
+		&& (message[1].isInt32() || message[1].isFloat32())
+		&& (message[2].isInt32() || message[2].isFloat32())
+		&& (message[3].isInt32() || message[3].isFloat32())
+		&& message[4].isInt32();
+	if (!valid)
+	{
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group XYZ)");
+		return;
+	}
+
+	String groupString = message[0].getString();
+	double x = GetIntOrFloat(&message[1]);
+	double y = GetIntOrFloat(&message[2]);
+	double z = GetIntOrFloat(&message[3]);
+	bool movePoints = message[4].getInt32();
+	if (!checkXyz(x, y, z))
+		return;
+
+	if (pAmbiPoints->setGroupXyz(groupString, x, y, z, movePoints))
+	{
+		reportSuccess();
+	}
+	else
+	{
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")");
+	}
+}
+
 void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	OSCAddressPattern pattern = message.getAddressPattern();
@@ -242,6 +308,14 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ)))
 	{
 		handleOwnExternStyleXyz(message);
+	}
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED)))
+	{
+		handleOwnExternStyleGroupAed(message);
+	}
+	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ)))
+	{
+		handleOwnExternStyleGroupXyz(message);
 	}
 	else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
 	{

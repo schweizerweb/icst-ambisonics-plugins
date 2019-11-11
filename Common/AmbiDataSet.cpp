@@ -59,11 +59,11 @@ bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 	return false;
 }
 
-bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, double d) const
+AmbiPoint* AmbiDataSet::getPointByName(String channelName) const
 {
 	AmbiPoint* ambiPt = nullptr;
 
-	for(int i = 0; i < size(); i++)
+	for (int i = 0; i < size(); i++)
 	{
 		AmbiPoint* pt = get(i);
 		if (pt != nullptr && pt->getName() == channelName)
@@ -72,6 +72,13 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 			break;
 		}
 	}
+
+	return ambiPt;
+}
+
+bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, double d) const
+{
+	AmbiPoint* ambiPt = getPointByName(channelName);
 
 	if (ambiPt != nullptr)
 	{
@@ -86,17 +93,7 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 
 bool AmbiDataSet::setChannelNameXYZ(String channelName, double x, double y, double z) const
 {
-	AmbiPoint* ambiPt = nullptr;
-
-	for (int i = 0; i < size(); i++)
-	{
-		AmbiPoint* pt = get(i);
-		if (pt != nullptr && pt->getName() == channelName)
-		{
-			ambiPt = pt;
-			break;
-		}
-	}
+	AmbiPoint* ambiPt = getPointByName(channelName);
 
 	if (ambiPt != nullptr)
 	{
@@ -219,7 +216,7 @@ AmbiGroup* AmbiDataSet::getGroup(int index) const
 	return groups[index];
 }
 
-void AmbiDataSet::moveGroupXYZ(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
+void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
 {
 	const ScopedLock lock(cs);
 
@@ -233,13 +230,22 @@ void AmbiDataSet::removeGroup(int groupIndex)
 	groups.remove(groupIndex);
 }
 
-void AmbiDataSet::setGroupXYZ(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
+void AmbiDataSet::setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
 {
 	const ScopedLock lock(cs);
 
 	AmbiGroup* group = groups[groupIndex];
 	if (group != nullptr)
 		group->setXYZ(newX, newY, newZ, moveSubElements);
+}
+
+void AmbiDataSet::setGroupAed(int groupIndex, double newA, double newE, double newD, bool moveSubElements) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setAED(newA, newE, newD, moveSubElements);
 }
 
 void AmbiDataSet::setGroupName(int groupIndex, String name) const
@@ -251,12 +257,42 @@ void AmbiDataSet::setGroupName(int groupIndex, String name) const
 		group->setName(name);
 }
 
+bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bool moveSubElements)
+{
+	bool found = false;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		if (getGroup(i)->getName() == groupName)
+		{
+			setGroupAed(i, a, e, d, moveSubElements);
+			found = true;
+		}
+	}
+
+	return found;
+}
+
 AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
 {
 	AmbiGroup* group = new AmbiGroup(id, point, name, color);
 	groups.add(group);
 
 	return group;
+}
+
+bool AmbiDataSet::setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const
+{
+	bool found = false;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		if (getGroup(i)->getName() == groupName)
+		{
+			setGroupXyz(i, x, y, z, moveSubElements);
+			found = true;
+		}
+	}
+
+	return found;
 }
 
 bool AmbiDataSet::nameExists(String name) const

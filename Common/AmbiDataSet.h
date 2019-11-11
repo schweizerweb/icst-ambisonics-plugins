@@ -29,6 +29,7 @@ public:
 	AmbiPoint* get(int index, int64 referenceTime, int timeoutMs);
 	bool setChannelXYZ(int channel, double x, double y, double z) const;
 	bool setChannelAED(int channel, double a, double e, double d) const;
+	AmbiPoint* getPointByName(String string) const;
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
 	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
 	void setChannelXY(int channel, double x, double y) const;
@@ -47,10 +48,13 @@ public:
 	int groupCount() const;
 	AmbiGroup* getGroup(int index) const;
 	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);
-	void moveGroupXYZ(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
+	void moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
 	void removeGroup(int groupIndex);
-	void setGroupXYZ(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
+	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
+	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;
+	bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
+	bool setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const;
 
 private:
 	bool nameExists(String name) const;

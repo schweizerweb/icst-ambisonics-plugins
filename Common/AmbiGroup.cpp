@@ -81,3 +81,27 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
 		}
 	}
 }
+
+void AmbiGroup::setAED(double newA, double newE, double newD, bool moveSubElements)
+{
+	double da = newA - getPoint()->getAzimuth();
+	double de = newE - getPoint()->getElevation();
+	double dd = newD - getPoint()->getDistance();
+
+	getPoint()->setAzimuth(newA);
+	getPoint()->setElevation(newE);
+	getPoint()->setDistance(newD);
+
+	if (moveSubElements)
+	{
+		for (AmbiPoint* p : groupPoints)
+		{
+			double a = p->getPoint()->getAzimuth() + da;
+			double e = p->getPoint()->getElevation() + de;
+			double d = p->getPoint()->getDistance() + dd;
+			p->getPoint()->setAzimuth(a);
+			p->getPoint()->setElevation(e);
+			p->getPoint()->setDistance(d);
+		}
+	}
+}

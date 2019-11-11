@@ -493,10 +493,10 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 			switch (radarMode)
 			{
 			case XY:
-				pEditablePoints->setGroupXYZ(mainGroupIndex, valuePoint.getY(), valuePoint.getX(), referencePoint.getZ(), !e.mods.isShiftDown());
+				pEditablePoints->setGroupXyz(mainGroupIndex, valuePoint.getY(), valuePoint.getX(), referencePoint.getZ(), !e.mods.isShiftDown());
 				break;
 			case ZY:
-				pEditablePoints->setGroupXYZ(mainGroupIndex, referencePoint.getX(), valuePoint.getX(), valuePoint.getY(), !e.mods.isShiftDown());
+				pEditablePoints->setGroupXyz(mainGroupIndex, referencePoint.getX(), valuePoint.getX(), valuePoint.getY(), !e.mods.isShiftDown());
 				break;
 			}
 
@@ -504,7 +504,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 			Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
 			for(int i = 0; i < selectedIndices.size(); i++)
 			{
-				pEditablePoints->setGroupXYZ(selectedIndices[i], 
+				pEditablePoints->setGroupXyz(selectedIndices[i], 
 					mainPt.getX() + relativePositions[i].getX(), 
 					mainPt.getY() + relativePositions[i].getY(), 
 					mainPt.getZ() + relativePositions[i].getZ(), !e.mods.isShiftDown());
