@@ -29,7 +29,7 @@
 #define COLUMN_ID_GROUP_POINTS	114
 
 
-class GroupTableListModel : public TableListBoxModel, public TableColumnCallback
+class GroupTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
 	GroupTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent): pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr)
@@ -68,6 +68,13 @@ public:
 		default: text = "";
 		}
 		g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
+
+		if(columnId == COLUMN_ID_GROUP_POINTS)
+		{
+			g.setColour(pParentComponent->getLookAndFeel().findColour(HyperlinkButton::textColourId));
+			g.drawText("Edit...", 20, 0, width - 22, height, Justification::centredRight, true);
+		}
+
 		g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId));
 		g.fillRect(width - 1, 0, 1, height);
 	}
@@ -224,8 +231,14 @@ public:
 	{
 		if(columnId == COLUMN_ID_GROUP_POINTS)
 		{
-			CallOutBox::launchAsynchronously(new GroupPointsSelectionComponent(pSources, rowNumber), pTableListBox->getCellPosition(columnId, rowNumber, true).translated(pTableListBox->getScreenX(), pTableListBox->getScreenY()), nullptr);
+			CallOutBox::launchAsynchronously(new GroupPointsSelectionComponent(pSources, rowNumber, this), pTableListBox->getCellPosition(columnId, rowNumber, true).translated(pTableListBox->getScreenX(), pTableListBox->getScreenY()), nullptr);
 		}
+	}
+
+	void changeListenerCallback(ChangeBroadcaster* /*source*/) override
+	{
+		getTable()->updateContent();
+		getTable()->repaint();
 	}
 
 private:

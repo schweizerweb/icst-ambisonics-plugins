@@ -17,15 +17,17 @@
 //==============================================================================
 /*
 */
-class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener
+class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:
-    GroupPointsSelectionComponent(AmbiSourceSet* pSources, int groupIndex): pSources(pSources)
+    GroupPointsSelectionComponent(AmbiSourceSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources)
     {
 	    // In your constructor, you should add any child components, and
 	    // initialise any special settings that your component needs.
-
-		pGroup = pSources->getGroup(groupIndex);
+		
+    	this->addChangeListener(pListener);
+		
+    	pGroup = pSources->getGroup(groupIndex);
 
 		for (int i = 0; i < pSources->size(); i++)
 		{
@@ -54,10 +56,7 @@ public:
 
     void resized() override
     {
-        // This method is where you should set the bounds of any child
-        // components that your component contains..
-
-		int y = 0;
+        int y = 0;
 
 		for(ToggleButton* b : toggleButtons)
 		{
@@ -85,6 +84,8 @@ public:
 					}
 				}
 			}
+
+			sendChangeMessage();
 		}
 	}
 
