@@ -45,7 +45,8 @@ class EncoderSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
                                   public TableColumnCallback,
-                                  public Button::Listener
+                                  public Button::Listener,
+                                  public ComboBox::Listener
 {
 public:
     //==============================================================================
@@ -70,11 +71,13 @@ public:
 	void setTableText(const int columnId, const int rowNumber, const String& newText) override;
 	void selectedRowsChanged(int lastRowSelected) override;
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override;
+	void initializePresets();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
+    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -85,6 +88,8 @@ private:
 	PointSelection* pPointSelection;
 	Array<AudioParameterSet>* pAudioParams;
 	std::unique_ptr<GroupTableListModel> groupModel;
+	Array<File> presets;
+	File presetDirectory;
     //[/UserVariables]
 
     //==============================================================================
@@ -118,6 +123,11 @@ private:
     std::unique_ptr<TableListBox> groupList;
     std::unique_ptr<TextButton> buttonAddGroup;
     std::unique_ptr<TextButton> buttonRemoveGroup;
+    std::unique_ptr<ComboBox> comboBoxPresets;
+    std::unique_ptr<Label> labelPresets;
+    std::unique_ptr<TextButton> buttonImport;
+    std::unique_ptr<TextButton> buttonSave;
+    std::unique_ptr<TextButton> buttonExport;
 
 
     //==============================================================================

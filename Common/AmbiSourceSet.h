@@ -34,7 +34,9 @@ public:
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;
 	void loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>* pAudioParams);
+	bool loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams = nullptr);
 	void writeToXmlElement(XmlElement* xml) const;
+	bool writeToXmlFile(const File file) const;
 
 private:
 	OwnedArray<AmbiSource> elements;

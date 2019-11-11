@@ -250,6 +250,38 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     buttonRemoveGroup->setButtonText (TRANS("remove"));
     buttonRemoveGroup->addListener (this);
 
+    comboBoxPresets.reset (new ComboBox ("comboBoxPresets"));
+    addAndMakeVisible (comboBoxPresets.get());
+    comboBoxPresets->setEditableText (false);
+    comboBoxPresets->setJustificationType (Justification::centredLeft);
+    comboBoxPresets->setTextWhenNothingSelected (TRANS("-"));
+    comboBoxPresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxPresets->addListener (this);
+
+    labelPresets.reset (new Label ("labelPresets",
+                                   TRANS("Presets:")));
+    addAndMakeVisible (labelPresets.get());
+    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setEditable (false, false, false);
+    labelPresets->setColour (TextEditor::textColourId, Colours::black);
+    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    buttonImport.reset (new TextButton ("buttonImport"));
+    addAndMakeVisible (buttonImport.get());
+    buttonImport->setButtonText (TRANS("import"));
+    buttonImport->addListener (this);
+
+    buttonSave.reset (new TextButton ("buttonSave"));
+    addAndMakeVisible (buttonSave.get());
+    buttonSave->setButtonText (TRANS("save"));
+    buttonSave->addListener (this);
+
+    buttonExport.reset (new TextButton ("buttonExport"));
+    addAndMakeVisible (buttonExport.get());
+    buttonExport->setButtonText (TRANS("export"));
+    buttonExport->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -310,6 +342,10 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	groupModel->initTable(groupList.get());
 	pPointSelection->addChangeListener(this);
 
+	// load stored presets
+
+	initializePresets();
+
 	controlDimming();
     //[/Constructor]
 }
@@ -350,6 +386,11 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     groupList = nullptr;
     buttonAddGroup = nullptr;
     buttonRemoveGroup = nullptr;
+    comboBoxPresets = nullptr;
+    labelPresets = nullptr;
+    buttonImport = nullptr;
+    buttonSave = nullptr;
+    buttonExport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -374,8 +415,8 @@ void EncoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    multiEncoderElements->setBounds (8, 152 + 80, getWidth() - 17, getHeight() - 240);
-    groupSources->setBounds (8 + 0, (152 + 80) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 240) * 0.6010f));
+    multiEncoderElements->setBounds (8, 152 + 80, getWidth() - 17, getHeight() - 271);
+    groupSources->setBounds (8 + 0, (152 + 80) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.6011f));
     groupOsc->setBounds (8, 8, getWidth() - 17, 144);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
     textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
@@ -395,15 +436,20 @@ void EncoderSettingsComponent::resized()
     textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    sourceList->setBounds ((8 + 0) + 16, ((152 + 80) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 240) * 0.6010f)) - 67);
-    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
-    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
-    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
-    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 80) + 0) + (roundToInt ((getHeight() - 240) * 0.6010f)) - 40, 64, 24);
-    groupGroups->setBounds (8 + 0, (152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 240) * 0.3990f));
-    groupList->setBounds ((8 + 0) + 16, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 240) * 0.3990f)) - 67);
-    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + (roundToInt ((getHeight() - 240) * 0.3990f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 80) + (getHeight() - 240) - (roundToInt ((getHeight() - 240) * 0.3990f))) + (roundToInt ((getHeight() - 240) * 0.3990f)) - 40, 64, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((152 + 80) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.6011f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 80) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 80) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 80) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 80) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (152 + 80) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.3989f));
+    groupList->setBounds ((8 + 0) + 16, ((152 + 80) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.3989f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 80) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + (roundToInt ((getHeight() - 271) * 0.3989f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 80) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + (roundToInt ((getHeight() - 271) * 0.3989f)) - 40, 64, 24);
+    comboBoxPresets->setBounds (83, getHeight() - 34, getWidth() - 312, 24);
+    labelPresets->setBounds (8, getHeight() - 34, 64, 24);
+    buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
+    buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 34, 64, 24);
+    buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 34, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -526,15 +572,148 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 
         //[/UserButtonCode_buttonRemoveGroup]
     }
+    else if (buttonThatWasClicked == buttonImport.get())
+    {
+        //[UserButtonCode_buttonImport] -- add your button handler code here..
+		FileChooser chooser("Select preset XML to import...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
+		if (chooser.browseForFileToOpen())
+		{
+			File importFile(chooser.getResult());
+			AmbiSourceSet testSet;
+			if(testSet.loadFromXmlFile(importFile))
+			{
+				importFile.copyFileTo(presetDirectory.getFullPathName() + "/" + importFile.getFileName());
+				initializePresets();
+				comboBoxPresets->setText(importFile.getFileNameWithoutExtension(), sendNotificationAsync);
+			}
+			else
+			{
+				AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading preset " + importFile.getFullPathName());
+			}
+		}
+        //[/UserButtonCode_buttonImport]
+    }
+    else if (buttonThatWasClicked == buttonSave.get())
+    {
+        //[UserButtonCode_buttonSave] -- add your button handler code here..
+		AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
+		Array<String> existingPresets;
+		existingPresets.add("");
+		for (File preset : presets)
+    		existingPresets.add(preset.getFileNameWithoutExtension());
+
+		alert.addComboBox("existing", existingPresets, "Overwrite existing");
+		alert.addTextEditor("text", "", "Or enter new name", false);
+		alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+		alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+		alert.getComboBoxComponent("existing")->setText(comboBoxPresets->getText());
+
+		int returnValue = alert.runModalLoop();
+		if(returnValue == 1)
+		{
+			String presetName = alert.getComboBoxComponent("existing")->getText();
+			if(presetName.isEmpty())
+				presetName = alert.getTextEditorContents("text");
+
+			if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
+			{
+				AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
+				return;
+			}
+
+			File newFile(presetDirectory.getFullPathName() + "/" + presetName + ".xml");
+
+			if (newFile.existsAsFile())
+			{
+				AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
+				confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+				confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
+				if (confirm.runModalLoop() == 0)
+				{
+					return;
+				}
+			}
+
+			pSources->writeToXmlFile(newFile);
+			initializePresets();
+			comboBoxPresets->setText(presetName, dontSendNotification);
+		}
+        //[/UserButtonCode_buttonSave]
+    }
+    else if (buttonThatWasClicked == buttonExport.get())
+    {
+        //[UserButtonCode_buttonExport] -- add your button handler code here..
+		FileChooser chooser("Select filename to export...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
+		if (chooser.browseForFileToSave(true))
+		{
+			File exportFile(chooser.getResult());
+			if(!pSources->writeToXmlFile(exportFile))
+			{
+				AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + exportFile.getFullPathName());
+			}
+		}
+        //[/UserButtonCode_buttonExport]
+    }
 
     //[UserbuttonClicked_Post]
 	controlDimming();
     //[/UserbuttonClicked_Post]
 }
 
+void EncoderSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+{
+    //[UsercomboBoxChanged_Pre]
+    //[/UsercomboBoxChanged_Pre]
+
+    if (comboBoxThatHasChanged == comboBoxPresets.get())
+    {
+        //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
+		String presetToLoad = comboBoxPresets->getText();
+		for (File preset : presets)
+		{
+			if (preset.getFileNameWithoutExtension() == presetToLoad)
+			{
+				pSources->loadFromXmlFile(preset, pAudioParams);
+				sourceList->updateContent();
+				sourceList->repaint();
+				groupList->updateContent();
+				groupList->repaint();
+			}
+		}
+        //[/UserComboBoxCode_comboBoxPresets]
+    }
+
+    //[UsercomboBoxChanged_Post]
+    //[/UsercomboBoxChanged_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void EncoderSettingsComponent::initializePresets()
+{
+	presetDirectory = File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder");
+	if (!presetDirectory.exists())
+		presetDirectory.createDirectory();
+
+	presets.clear();
+	comboBoxPresets->clear();
+
+	int id = 1;
+	DirectoryIterator iterator(presetDirectory, false, "*.xml");
+	while (iterator.next())
+	{
+		// try to load preset
+		AmbiSourceSet test;
+		if (test.loadFromXmlFile(iterator.getFile()))
+		{
+			String name = iterator.getFile().getFileNameWithoutExtension();
+			presets.add(iterator.getFile());
+			comboBoxPresets->addItem(name, id++);
+		}
+	}
+}
+
 void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 {
 	if (&textEditor == textOscReceivePort.get())
@@ -819,10 +998,10 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="multiEncoderElements" id="73249ab85d6bba3a" memberName="multiEncoderElements"
-                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 240M" posRelativeY="b72378bdfe4e130"
+                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 271M" posRelativeY="b72378bdfe4e130"
                     class="Component" params=""/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.097%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.106%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
@@ -928,7 +1107,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.903%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.894%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -943,6 +1122,27 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="buttonRemoveGroup" id="4b7306753c54f44c" memberName="buttonRemoveGroup"
               virtualName="" explicitFocusOrder="0" pos="89 40R 64 24" posRelativeX="983b0a3b2c5c945a"
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
+            virtualName="" explicitFocusOrder="0" pos="83 34R 312M 24" posRelativeX="450188aa0f332e78"
+            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
+            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
+  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
+         virtualName="" explicitFocusOrder="0" pos="8 34R 64 24" posRelativeY="450188aa0f332e78"
+         edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonImport" id="5a786eb91323df32" memberName="buttonImport"
+              virtualName="" explicitFocusOrder="0" pos="81Rr 34R 64 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="import" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
+              virtualName="" explicitFocusOrder="0" pos="153Rr 34R 64 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonExport" id="92cbcfe3e89f89e" memberName="buttonExport"
+              virtualName="" explicitFocusOrder="0" pos="9Rr 34R 64 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

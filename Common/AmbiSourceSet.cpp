@@ -143,7 +143,7 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>
 		XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
 		while (xmlPoint != nullptr)
 		{
-			if ( pAudioParams->size() > index)
+			if ( pAudioParams != nullptr && pAudioParams->size() > index)
 				add(new AmbiSource(xmlPoint, pAudioParams->getUnchecked(index)));
 			else
 				add(new AmbiSource(xmlPoint, AudioParameterSet()));
@@ -168,12 +168,21 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>
 		}
 	}
 
-	// todo: only on load from real file
+	
+}
+
+bool AmbiSourceSet::loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams)
+{
+	XmlDocument doc(file);
+	loadFromXml(doc.getDocumentElement().get(), pAudioParams);
+	
 	// set new IDs
 	for (int i = 0; i < size(); i++)
 		get(i)->resetId();
 	for (AmbiGroup* g : groups)
 		g->resetId();
+
+	return size() > 0;
 }
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
@@ -199,5 +208,15 @@ void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 	}
 
 	xml->addChildElement(groupsElement);
+}
+
+bool AmbiSourceSet::writeToXmlFile(const File file) const
+{
+	XmlElement* xml = new XmlElement("AmbiSourceSet");
+	writeToXmlElement(xml);
+	bool success = xml->writeTo(file);
+	delete xml;
+
+	return success;
 }
 
