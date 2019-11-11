@@ -406,7 +406,12 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 
 	btnGroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1);
 	btnUngroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1);
-
+	textX->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textY->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textZ->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textA->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textE->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textD->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
 	enableListeners();
 }
 
