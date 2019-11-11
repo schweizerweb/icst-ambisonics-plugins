@@ -490,9 +490,9 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 				}
 			}
 
-			Point3D<double>* newPoint = radarMode == XY
-				? new Point3D<double>(valuePoint.getY(), valuePoint.getX(), referencePoint.getZ())
-				: new Point3D<double>(referencePoint.getX(), valuePoint.getX(), valuePoint.getY());
+			std::unique_ptr<Point3D<double>> newPoint = radarMode == XY
+				? std::make_unique<Point3D<double>>(valuePoint.getY(), valuePoint.getX(), referencePoint.getZ())
+				: std::make_unique<Point3D<double>>(referencePoint.getX(), valuePoint.getX(), valuePoint.getY());
 
 			if(e.mods.isCtrlDown())
 				pEditablePoints->setGroupAed(mainGroupIndex, newPoint->getAzimuth(), newPoint->getElevation(), newPoint->getDistance(), !e.mods.isShiftDown());
