@@ -337,6 +337,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	sourceList->getHeader().addColumn("D", COLUMN_ID_D, 50);
 	sourceList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	sourceList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
+	sourceList->getHeader().setStretchToFitActive(true);
 	sourceList->getHeader().resizeAllColumnsToFit(sourceList->getWidth());
 
 	groupModel->initTable(groupList.get());

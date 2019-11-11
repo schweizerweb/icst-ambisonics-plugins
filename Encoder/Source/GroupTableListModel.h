@@ -214,8 +214,9 @@ public:
 		tableListBox->getHeader().addColumn("A", COLUMN_ID_GROUP_A, 50);
 		tableListBox->getHeader().addColumn("E", COLUMN_ID_GROUP_E, 50);
 		tableListBox->getHeader().addColumn("D", COLUMN_ID_GROUP_D, 50);
-		tableListBox->getHeader().addColumn("Color", COLUMN_ID_GROUP_COLOR, 60);
 		tableListBox->getHeader().addColumn("# Points", COLUMN_ID_GROUP_POINTS, 60);
+		tableListBox->getHeader().addColumn("Color", COLUMN_ID_GROUP_COLOR, 60);
+		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
 

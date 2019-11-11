@@ -248,7 +248,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
     speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
-	speakerList->getHeader().resizeAllColumnsToFit(getWidth());
+	speakerList->getHeader().setStretchToFitActive(true);
+	speakerList->getHeader().resizeAllColumnsToFit(speakerList->getWidth());
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
 	updateDistanceScaler();
