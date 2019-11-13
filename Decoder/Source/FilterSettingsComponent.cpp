@@ -43,7 +43,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, Chang
 
     sliderFrequency.reset (new Slider ("sliderFrequency"));
     addAndMakeVisible (sliderFrequency.get());
-    sliderFrequency->setRange (20, 30000, 0);
+    sliderFrequency->setRange (20, 15000, 0);
     sliderFrequency->setSliderStyle (Slider::LinearBar);
     sliderFrequency->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderFrequency->addListener (this);
@@ -83,16 +83,20 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, Chang
 
     sliderQ.reset (new Slider ("sliderQ"));
     addAndMakeVisible (sliderQ.get());
-    sliderQ->setRange (0, 100, 0);
+    sliderQ->setRange (0.001, 100, 0);
     sliderQ->setSliderStyle (Slider::LinearBar);
     sliderQ->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderQ->addListener (this);
+
+    filterGraph.reset (new IIRFilterGraph (pFilterInfo));
+    addAndMakeVisible (filterGraph.get());
+    filterGraph->setName ("filterGraph");
 
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (300, 110);
+    setSize (400, 400);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -101,11 +105,15 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, Chang
 	comboBoxType->addItem("Low-Pass", 1+FilterInfo::FilterType::LowPass);
 	comboBoxType->addItem("Band-Pass", 1+FilterInfo::FilterType::BandPass);
 	comboBoxType->addItem("High-Pass", 1+FilterInfo::FilterType::HighPass);
+	comboBoxType->addItem("Low-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderLowPass);
+	comboBoxType->addItem("High-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderHighPass);
 	comboBoxType->setSelectedId(1+pFilterInfo->filterType, dontSendNotification);
 
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);
+	sliderFrequency->setSkewFactorFromMidPoint(500);
 	sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
-	sliderQ->setNumDecimalPlacesToDisplay(2);
+	sliderQ->setNumDecimalPlacesToDisplay(3);
+	sliderQ->setSkewFactorFromMidPoint(1.0);
 	sliderQ->setValue(pFilterInfo->qValue);
     //[/Constructor]
 }
@@ -121,6 +129,7 @@ FilterSettingsComponent::~FilterSettingsComponent()
     labelFilterType = nullptr;
     labelQ = nullptr;
     sliderQ = nullptr;
+    filterGraph = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -147,6 +156,7 @@ void FilterSettingsComponent::resized()
     comboBoxType->setBounds (168, 8, getWidth() - 176, 24);
     sliderFrequency->setBounds (168, 40, getWidth() - 176, 24);
     sliderQ->setBounds (168, 72, getWidth() - 176, 24);
+    filterGraph->setBounds (8, 104, getWidth() - 16, getHeight() - 112);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -160,11 +170,13 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_comboBoxType] -- add your combo box handling code here..
 		pFilterInfo->filterType = FilterInfo::FilterType(comboBoxType->getSelectedId()-1);
+		sliderQ->setEnabled(pFilterInfo->qRequired());
 		sendChangeMessage();
         //[/UserComboBoxCode_comboBoxType]
     }
 
     //[UsercomboBoxChanged_Post]
+	filterGraph->repaint();
     //[/UsercomboBoxChanged_Post]
 }
 
@@ -187,6 +199,7 @@ void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     }
 
     //[UsersliderValueChanged_Post]
+	filterGraph->repaint();
     //[/UsersliderValueChanged_Post]
 }
 
@@ -209,14 +222,14 @@ BEGIN_JUCER_METADATA
                  componentName="" parentClasses="public Component, public ChangeBroadcaster"
                  constructorParams="FilterInfo* pFilterInfo, ChangeListener* pChangeListener"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="300" initialHeight="110">
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="400" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="comboBoxType" id="8896d80d8503e534" memberName="comboBoxType"
             virtualName="" explicitFocusOrder="0" pos="168 8 176M 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderFrequency" id="f23e9b966efc9df5" memberName="sliderFrequency"
           virtualName="" explicitFocusOrder="0" pos="168 40 176M 24" min="20.0"
-          max="30000.0" int="0.0" style="LinearBar" textBoxPos="TextBoxLeft"
+          max="15000.0" int="0.0" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelFrequency" id="2b4b513621db1c33" memberName="labelFrequency"
@@ -235,9 +248,12 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderQ" id="d75dd45147568a5" memberName="sliderQ" virtualName=""
-          explicitFocusOrder="0" pos="168 72 176M 24" min="0.0" max="100.0"
+          explicitFocusOrder="0" pos="168 72 176M 24" min="0.001" max="100.0"
           int="0.0" style="LinearBar" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
+                    virtualName="" explicitFocusOrder="0" pos="8 104 16M 112M" class="IIRFilterGraph"
+                    params="pFilterInfo"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

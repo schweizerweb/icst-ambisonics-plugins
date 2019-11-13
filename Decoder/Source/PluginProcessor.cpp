@@ -171,23 +171,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
     
 	for(int i = 0; i < iirFilters.size() && i < speakerSet.size(); i++)
 	{
-		FilterInfo* filterInfo = speakerSet.get(i)->getFilterInfo();
-		switch (filterInfo->filterType)
-		{
-		case FilterInfo::LowPass: 
-			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeLowPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
-			break;
-		case FilterInfo::BandPass: 
-			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeBandPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
-			break;
-		case FilterInfo::HighPass:
-			iirFilters[i]->coefficients = dsp::IIR::Coefficients<float>::makeHighPass(iirFilterSpec.sampleRate, filterInfo->cutOffFrequencyHz, filterInfo->qValue);
-			break;
-
-		case FilterInfo::None:
-		default: 
-			break;
-		}
+		iirFilters[i]->coefficients = speakerSet.get(i)->getFilterInfo()->getCoefficients(iirFilterSpec.sampleRate);
 	}
 }
 

@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/FilterInfo.h"
+#include "IIRFilterGraph.h"
 //[/Headers]
 
 
@@ -67,6 +68,7 @@ private:
     std::unique_ptr<Label> labelFilterType;
     std::unique_ptr<Label> labelQ;
     std::unique_ptr<Slider> sliderQ;
+    std::unique_ptr<IIRFilterGraph> filterGraph;
 
 
     //==============================================================================

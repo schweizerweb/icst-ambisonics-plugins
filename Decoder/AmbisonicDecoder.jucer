@@ -18,6 +18,10 @@
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
+      <FILE id="wDQCw3" name="IIRFilterGraph.cpp" compile="1" resource="0"
+            file="Source/IIRFilterGraph.cpp"/>
+      <FILE id="fGuaWX" name="IIRFilterGraph.h" compile="0" resource="0"
+            file="Source/IIRFilterGraph.h"/>
       <FILE id="JkZG8i" name="FilterSettingsComponent.cpp" compile="1" resource="0"
             file="Source/FilterSettingsComponent.cpp"/>
       <FILE id="LyqETC" name="FilterSettingsComponent.h" compile="0" resource="0"
@@ -108,6 +112,8 @@
       <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="dukqlN" name="SimpleGraph.cpp" compile="1" resource="0" file="../Common/SimpleGraph.cpp"/>
+      <FILE id="KcvV3b" name="SimpleGraph.h" compile="0" resource="0" file="../Common/SimpleGraph.h"/>
       <FILE id="TSAtV3" name="SliderColumnCustomComponent.h" compile="0"
             resource="0" file="../Common/SliderColumnCustomComponent.h"/>
       <FILE id="G1Fvtx" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>

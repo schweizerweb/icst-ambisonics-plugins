@@ -19,7 +19,32 @@ public:
 	{
 	}
 
-	enum FilterType { None, LowPass, BandPass, HighPass } filterType;
+	dsp::IIR::Coefficients<float>::Ptr getCoefficients(double sampleRate) const
+	{
+		switch (filterType)
+		{
+		case LowPass:
+			return dsp::IIR::Coefficients<float>::makeLowPass(sampleRate, cutOffFrequencyHz, qValue);
+		case BandPass:
+			return dsp::IIR::Coefficients<float>::makeBandPass(sampleRate, cutOffFrequencyHz, qValue);
+		case HighPass:
+			return dsp::IIR::Coefficients<float>::makeHighPass(sampleRate, cutOffFrequencyHz, qValue);
+		case FirstOrderLowPass:
+			return dsp::IIR::Coefficients<float>::makeFirstOrderLowPass(sampleRate, cutOffFrequencyHz);
+		case FirstOrderHighPass:
+			return dsp::IIR::Coefficients<float>::makeFirstOrderHighPass(sampleRate, cutOffFrequencyHz);
+		case None:
+		default:
+			return nullptr;
+		}
+	}
+
+	bool qRequired() const
+	{
+		return filterType == LowPass || filterType == BandPass || filterType == HighPass;
+	}
+
+	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass } filterType;
 	float cutOffFrequencyHz;
 	float qValue;
 	void copyFrom(FilterInfo* info);
