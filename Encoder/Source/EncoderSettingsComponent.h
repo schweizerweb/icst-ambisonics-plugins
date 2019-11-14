@@ -128,6 +128,7 @@ private:
     std::unique_ptr<TextButton> buttonImport;
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TextButton> buttonExport;
+    std::unique_ptr<Label> labelDevelopmentVersion;
 
 
     //==============================================================================

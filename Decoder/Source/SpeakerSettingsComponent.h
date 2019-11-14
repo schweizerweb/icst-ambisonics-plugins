@@ -142,6 +142,7 @@ private:
     std::unique_ptr<Label> labelTimeout;
     std::unique_ptr<ToggleButton> toggleOsc;
     std::unique_ptr<TextButton> buttonSpeakerTest;
+    std::unique_ptr<Label> labelDevelopmentVersion;
 
 
     //==============================================================================

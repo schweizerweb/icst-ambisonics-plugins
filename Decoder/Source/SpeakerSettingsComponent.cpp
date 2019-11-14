@@ -223,6 +223,18 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
     buttonSpeakerTest->addListener (this);
 
+    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
+                                              TRANS("Unofficial Pre-Release")));
+    addAndMakeVisible (labelDevelopmentVersion.get());
+    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setJustificationType (Justification::centred);
+    labelDevelopmentVersion->setEditable (false, false, false);
+    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
+    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
+    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -231,6 +243,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 
     //[Constructor] You can add your own custom stuff here..
+	labelDevelopmentVersion->setVisible(String(JucePlugin_VersionString).contains("a"));
 	buttonSpeakerTest->setClickingTogglesState(true);
 	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
 	speakerList->setModel(this);
@@ -300,6 +313,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     labelTimeout = nullptr;
     toggleOsc = nullptr;
     buttonSpeakerTest = nullptr;
+    labelDevelopmentVersion = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -349,6 +363,7 @@ void SpeakerSettingsComponent::resized()
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4981f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.4000f) / 2), 0, proportionOfWidth (0.4000f), 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
@@ -1120,6 +1135,12 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="49.812%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
+         virtualName="" explicitFocusOrder="0" pos="50.038%c 0 39.97% 24"
+         bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
+         edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

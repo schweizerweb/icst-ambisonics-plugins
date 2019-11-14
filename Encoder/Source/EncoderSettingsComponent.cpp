@@ -282,6 +282,18 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     buttonExport->setButtonText (TRANS("export"));
     buttonExport->addListener (this);
 
+    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
+                                              TRANS("Unofficial Pre-Release")));
+    addAndMakeVisible (labelDevelopmentVersion.get());
+    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setJustificationType (Justification::centred);
+    labelDevelopmentVersion->setEditable (false, false, false);
+    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
+    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
+    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -290,6 +302,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
 
     //[Constructor] You can add your own custom stuff here..
+	labelDevelopmentVersion->setVisible(String(JucePlugin_VersionString).contains("a"));
 	textOscReceivePort->addListener(this);
 	textOscSendPort->addListener(this);
 	textOscSendIp->addListener(this);
@@ -397,6 +410,7 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     buttonImport = nullptr;
     buttonSave = nullptr;
     buttonExport = nullptr;
+    labelDevelopmentVersion = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -456,6 +470,7 @@ void EncoderSettingsComponent::resized()
     buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
     buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 34, 64, 24);
     buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 34, 64, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.4000f) / 2), 8, proportionOfWidth (0.4000f), 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -1150,6 +1165,12 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="9Rr 34R 64 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
+         virtualName="" explicitFocusOrder="0" pos="50.038%c 8 39.97% 24"
+         bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
+         edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
