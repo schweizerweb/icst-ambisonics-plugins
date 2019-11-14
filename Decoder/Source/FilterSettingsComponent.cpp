@@ -108,6 +108,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 	comboBoxType->addItem("High-Pass", 1+FilterInfo::FilterType::HighPass);
 	comboBoxType->addItem("Low-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderLowPass);
 	comboBoxType->addItem("High-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderHighPass);
+	comboBoxType->addItem("Notch", 1+FilterInfo::FilterType::Notch);
 	comboBoxType->setSelectedId(1+pFilterInfo->filterType, dontSendNotification);
 
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);

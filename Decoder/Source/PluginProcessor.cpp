@@ -199,7 +199,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
     int lowPassCount = 0;
     for (int i = 0; i < speakerSet.size(); i++)
     {
-        if(speakerSet.get(i)->getFilterInfo()->filterType == FilterInfo::LowPass)
+        if(speakerSet.get(i)->getFilterInfo()->isLowPass())
             lowPassCount++;
     }
     int subwooferAmbisonicsOrder = lowPassCount >= 4 ? 1 : 0;

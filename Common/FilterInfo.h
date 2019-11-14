@@ -33,6 +33,8 @@ public:
 			return dsp::IIR::Coefficients<float>::makeFirstOrderLowPass(sampleRate, cutOffFrequencyHz);
 		case FirstOrderHighPass:
 			return dsp::IIR::Coefficients<float>::makeFirstOrderHighPass(sampleRate, cutOffFrequencyHz);
+		case Notch:
+			return dsp::IIR::Coefficients<float>::makeNotch(sampleRate, cutOffFrequencyHz, qValue);
 		case None:
 		default:
 			return nullptr;
@@ -41,10 +43,15 @@ public:
 
 	bool qRequired() const
 	{
-		return filterType == LowPass || filterType == BandPass || filterType == HighPass;
+		return filterType == LowPass || filterType == BandPass || filterType == HighPass || filterType == Notch;
 	}
 
-	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass } filterType;
+	bool isLowPass() const
+	{
+		return filterType == LowPass || filterType == FirstOrderLowPass;
+	}
+
+	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch } filterType;
 	float cutOffFrequencyHz;
 	float qValue;
 	void copyFrom(FilterInfo* info);
