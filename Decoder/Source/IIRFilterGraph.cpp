@@ -13,8 +13,9 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo): pFilterInfo(pFilterInfo) 
+IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo) 
 {
+    sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
 	while(currentFrequency < MAX_FREQUENCY)
 	{
@@ -22,7 +23,7 @@ IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo): pFilterInfo(pFilterInfo
 		currentFrequency *= FREQUENCY_STEP;
 	}
 	
-	magnitudes = (double*)calloc(frequencies.size(), sizeof(double));
+	magnitudes = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
 
 	setDisplayRange(Logarithmic, Range<double>(20, MAX_FREQUENCY), Linear, Range<double>(-20, 20));
 	fullGridFlag = true;
@@ -38,7 +39,7 @@ void IIRFilterGraph::paint (Graphics& g)
 	SimpleGraph::paint(g);
 	
 	// draw curve
-	dsp::IIR::Coefficients<float>::Ptr coeff = pFilterInfo->getCoefficients(44100);
+	dsp::IIR::Coefficients<float>::Ptr coeff = pFilterInfo->getCoefficients(sampleRate);
 	Path path;
 
 	if(coeff == nullptr)

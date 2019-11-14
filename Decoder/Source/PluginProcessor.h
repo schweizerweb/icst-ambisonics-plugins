@@ -69,6 +69,7 @@ public:
 	AmbiSettings* getAmbiSettings();
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
+	dsp::ProcessSpec* getFilterSpecification();
 
 private:
 	AmbiSpeakerSet speakerSet;

@@ -57,7 +57,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
@@ -88,7 +88,8 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool CheckForExistingPreset(String newPresetName) const;
 	void updateDistanceScaler() const;
-	FilterInfo* getFilterInfo(int rowNumber);
+	FilterInfo* getFilterInfo(int rowNumber) const;
+	dsp::ProcessSpec* getFilterSpecification() const;
 	static double fact(int n);
 	void setInPhaseWeighting(AmbiSettings* pSettings) const;
 	void controlDimming();
@@ -111,6 +112,7 @@ private:
 	DecoderSettings* pDecoderSettings;
 	DelayHelper delayHelper;
 	TestSoundGenerator* pTestSoundGenerator;
+	dsp::ProcessSpec* pFilterSpecification;
     //[/UserVariables]
 
     //==============================================================================

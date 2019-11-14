@@ -36,7 +36,7 @@ public:
 
     void buttonClicked(Button* b) override
     {
-		CallOutBox::launchAsynchronously(new FilterSettingsComponent(owner.getFilterInfo(row), &owner), b->getScreenBounds(), nullptr);
+		CallOutBox::launchAsynchronously(new FilterSettingsComponent(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner), b->getScreenBounds(), nullptr);
 
         owner.setFlag(columnId, row, b->getToggleState());
     }

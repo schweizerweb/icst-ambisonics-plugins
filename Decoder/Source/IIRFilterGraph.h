@@ -24,7 +24,7 @@
 class IIRFilterGraph    : public SimpleGraph
 {
 public:
-    IIRFilterGraph(FilterInfo* pFilterInfo);
+    IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
     ~IIRFilterGraph();
 
     void paint (Graphics&) override;
@@ -33,6 +33,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
 	FilterInfo* pFilterInfo;
 	Array<double> frequencies;
-	double sampleRate = 44100;
+	double sampleRate;
 	double* magnitudes;
 };

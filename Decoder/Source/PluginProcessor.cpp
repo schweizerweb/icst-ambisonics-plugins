@@ -354,6 +354,11 @@ TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() con
 	return pTestSoundGenerator;
 }
 
+dsp::ProcessSpec* AmbisonicsDecoderAudioProcessor::getFilterSpecification()
+{
+	return &iirFilterSpec;
+}
+
 //==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()

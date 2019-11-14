@@ -27,10 +27,11 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, ChangeListener* pChangeListener)
+FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	this->pFilterInfo = pFilterInfo;
+
     //[/Constructor_pre]
 
     comboBoxType.reset (new ComboBox ("comboBoxType"));
@@ -88,7 +89,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, Chang
     sliderQ->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderQ->addListener (this);
 
-    filterGraph.reset (new IIRFilterGraph (pFilterInfo));
+    filterGraph.reset (new IIRFilterGraph (pFilterInfo, pFilterSpecification));
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
 
@@ -111,6 +112,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, Chang
 
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);
 	sliderFrequency->setSkewFactorFromMidPoint(500);
+	sliderFrequency->setRange(20, int(pFilterSpecification->sampleRate / 2.0));
 	sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
 	sliderQ->setNumDecimalPlacesToDisplay(3);
 	sliderQ->setSkewFactorFromMidPoint(1.0);
@@ -220,7 +222,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster"
-                 constructorParams="FilterInfo* pFilterInfo, ChangeListener* pChangeListener"
+                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="400" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
@@ -253,7 +255,7 @@ BEGIN_JUCER_METADATA
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
                     virtualName="" explicitFocusOrder="0" pos="8 104 16M 112M" class="IIRFilterGraph"
-                    params="pFilterInfo"/>
+                    params="pFilterInfo, pFilterSpecification"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

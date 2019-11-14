@@ -42,7 +42,7 @@ class FilterSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    FilterSettingsComponent (FilterInfo* pFilterInfo, ChangeListener* pChangeListener);
+    FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener);
     ~FilterSettingsComponent();
 
     //==============================================================================
