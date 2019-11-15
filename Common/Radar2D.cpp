@@ -289,6 +289,13 @@ void Radar2D::renderOpenGL()
 			}
 		}
 
+		if(selectionRectangleActive)
+		{
+			g.setColour(radarColors.getPointSelectionColor());
+			Rectangle<float> rectangle(getAbsoluteScreenPoint(selectionRectangleStart), getAbsoluteScreenPoint(selectionRectangleEnd));
+			g.drawRoundedRectangle(rectangle, 5.0f, 3.0f);
+		}
+
 		drawInfoLabel(&g);
 	}
 }
@@ -440,6 +447,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	else
 	{
 		pPointSelection->unselectPoint();
+		selectionRectangleStart = valuePoint;
+		selectionRectangleEnd = valuePoint;
+		selectionRectangleActive = true;
 	}
 }
 
@@ -509,7 +519,10 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 					mainPt.getZ() + relativePositions[i].getZ(), !e.mods.isShiftDown());
 			}
 		}
-
+		else
+		{
+			selectionRectangleEnd = valuePoint;
+		}
 		pPointSelection->notifyChange();
 	}
 }
@@ -539,6 +552,25 @@ void Radar2D::mouseUp(const MouseEvent& e)
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
 		}
 	}
+
+	if(e.mouseWasDraggedSinceMouseDown())
+	{
+		// select all points withing rectangle
+		Rectangle<float> rectangle(selectionRectangleStart, selectionRectangleEnd);
+		for(int i = 0; i < pEditablePoints->size(); i++)
+		{
+			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
+			Point<float> realCoords;
+			realCoords.x = float(radarMode == XY ? p->getY() : p->getY());
+			realCoords.y = float(radarMode == XY ? p->getX() : p->getZ());
+			if(rectangle.contains(realCoords))
+			{
+				pPointSelection->selectPoint(i, true);
+			}
+		}
+	}
+
+	selectionRectangleActive = false;
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)

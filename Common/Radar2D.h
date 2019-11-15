@@ -88,6 +88,9 @@ private:
 	RadarOptions* pRadarOptions;
 	CriticalSection radarBackgroundLock;
 	CriticalSection infoLabelLock;
-	
+	Point<float> selectionRectangleEnd;
+	Point<float> selectionRectangleStart;
+	bool selectionRectangleActive;
+
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };
