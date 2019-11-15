@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
+#include "../../Common/TrackColors.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
@@ -47,6 +48,16 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		addParameter(set.pY);
 		addParameter(set.pZ);
 	}
+
+#if(!MULTI_ENCODER_MODE)
+	// initialize mono encoder with one source
+	if (sources.size() == 0)
+	{
+		String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
+		Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
+		sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams[0]), name, color);
+	}
+#endif
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -216,7 +227,7 @@ bool AmbisonicEncoderAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 {
-    return new AmbisonicEncoderAudioProcessorEditor (*this);
+	return new AmbisonicEncoderAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -266,6 +277,25 @@ StatusMessageHandler* AmbisonicEncoderAudioProcessor::getStatusMessageHandler()
 {
 	return &statusMessageHandler;
 }
+
+DawParameter* AmbisonicEncoderAudioProcessor::getDawParameter()
+{
+	return &dawParameter;
+}
+
+#if (!MULTI_ENCODER_MODE)
+void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
+{
+	dawParameter.updateTrackPropertiesWorking = true;
+	dawParameter.lastTrackProperties = properties;
+
+	if (sources.size() > 0)
+	{
+		sources.get(0)->setName(properties.name);
+		sources.get(0)->setColor(properties.colour);
+	}
+}
+#endif
 
 EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 {

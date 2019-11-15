@@ -40,7 +40,8 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pFilterSpecification = ownerProc.getFilterSpecification();
 	pOscHandler = new OSCHandler(pMovingPoints);
 	initializeOscHandler();
-	radarOptions.nameFieldEditable = false;
+	radarOptions.nameFieldEditable = true;
+	radarOptions.setTrackColorAccordingToName = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
     //[/Constructor_pre]

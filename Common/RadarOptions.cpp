@@ -19,6 +19,8 @@ RadarOptions::RadarOptions()
 	editablePointsAsSquare = false;
 	showDisplayOnlyPoints = true;
 	showEditablePoints = true;
+	dawParameter = nullptr;
+	setTrackColorAccordingToName = true;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const

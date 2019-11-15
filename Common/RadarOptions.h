@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
+#include "DawParameter.h"
 
 class RadarOptions
 {
@@ -25,6 +26,8 @@ public:
 	int displayTimeout;
 	bool showEditablePoints;
 	bool showDisplayOnlyPoints;
+	bool setTrackColorAccordingToName;
 
 	Array<AudioParameterSet>* audioParams;
+	DawParameter* dawParameter;
 };

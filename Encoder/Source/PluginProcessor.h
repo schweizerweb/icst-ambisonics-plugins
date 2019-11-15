@@ -14,9 +14,9 @@
 #include "EncoderSettings.h"
 #include "../../Common/AmbiPoint.h"
 #include "../../Common/OSCHandler.h"
+#include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
 #include "AmbiOSCSenderExt.h"
-
 
 //==============================================================================
 /**
@@ -66,6 +66,11 @@ public:
 	void initializeOsc();
 	Array<AudioParameterSet>* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
+	DawParameter* getDawParameter();
+
+#if (!MULTI_ENCODER_MODE)
+	void updateTrackProperties(const TrackProperties& properties) override;
+#endif
 
 private:
 	AmbiSourceSet sources;
@@ -75,6 +80,7 @@ private:
 	AmbiOSCSenderExt* pOscSenderExt;
 	Array<AudioParameterSet> audioParams;
 	StatusMessageHandler statusMessageHandler;
+	DawParameter dawParameter;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 
     //==============================================================================

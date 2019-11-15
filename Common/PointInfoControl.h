@@ -23,6 +23,8 @@
 #include "JuceHeader.h"
 #include "AmbiDataSet.h"
 #include "PointSelection.h"
+#include "DawParameter.h"
+
 //[/Headers]
 
 
@@ -70,6 +72,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiDataSet* pEditablePoints;
 	PointSelection* pPointSelection;
+	RadarOptions* pRadarOptions;
     //[/UserVariables]
 
     //==============================================================================

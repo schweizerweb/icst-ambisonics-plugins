@@ -31,7 +31,7 @@
 
 //==============================================================================
 PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
-    : pEditablePoints(pEditablePoints), pPointSelection(pPointSelection)
+    : pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -412,6 +412,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	textA->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
 	textE->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
 	textD->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
+	textName->setReadOnly(!pRadarOptions->nameFieldEditable || (pRadarOptions->dawParameter != nullptr && pRadarOptions->dawParameter->updateTrackPropertiesWorking));
 	enableListeners();
 }
 
@@ -437,7 +438,10 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 		if (source.getName() == textName->getName())
 		{
 			pEditablePoints->setChannelName(selection, textName->getText());
-			pEditablePoints->setChannelColor(selection, TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
+			if (pRadarOptions->setTrackColorAccordingToName)
+			{
+				pEditablePoints->setChannelColor(selection, TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
+			}
 		}
 
 		if (source.getName() == textX->getName())
@@ -518,7 +522,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditor::Listener"
                  constructorParams="AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
-                 variableInitialisers="pEditablePoints(pEditablePoints), pPointSelection(pPointSelection)"
+                 variableInitialisers="pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="390" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>
