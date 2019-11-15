@@ -553,7 +553,7 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		}
 	}
 
-	if(e.mouseWasDraggedSinceMouseDown())
+	if(e.mouseWasDraggedSinceMouseDown() && selectionRectangleActive)
 	{
 		// select all points withing rectangle
 		Rectangle<float> rectangle(selectionRectangleStart, selectionRectangleEnd);
