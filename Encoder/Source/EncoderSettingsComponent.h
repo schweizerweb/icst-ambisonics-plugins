@@ -46,7 +46,8 @@ class EncoderSettingsComponent  : public Component,
                                   public ChangeListener,
                                   public TableColumnCallback,
                                   public Button::Listener,
-                                  public ComboBox::Listener
+                                  public ComboBox::Listener,
+                                  public Slider::Listener
 {
 public:
     //==============================================================================
@@ -78,6 +79,7 @@ public:
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void sliderValueChanged (Slider* sliderThatWasMoved) override;
 
 
 
@@ -129,6 +131,9 @@ private:
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TextButton> buttonExport;
     std::unique_ptr<Label> labelDevelopmentVersion;
+    std::unique_ptr<ToggleButton> toggleDoppler;
+    std::unique_ptr<Slider> sliderDistanceScaler;
+    std::unique_ptr<Label> labelDistanceScaler;
 
 
     //==============================================================================

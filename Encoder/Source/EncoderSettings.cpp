@@ -13,6 +13,7 @@
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
+#define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
 #define XML_TAG_ORIENTATION "Orientation"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
@@ -20,6 +21,7 @@
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
 #define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
+#define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
@@ -32,8 +34,9 @@ EncoderSettings::EncoderSettings():
 	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
 	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
+	dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
 	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
-	directionFlip(DEFAULT_DIRECTION_FLIP)
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP)
 {
 }
 
@@ -68,8 +71,13 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, unitCircleRadius);
 	element->addChildElement(distanceEncoding);
 
+	XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
+	dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
+	dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
+	element->addChildElement(dopplerEncoding);
+
 	XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
-	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, directionFlip);
+	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, getDirectionFlip());
 	element->addChildElement(orientation);
 
 	return element;
@@ -105,9 +113,16 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
 	}
 
+	XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);
+	if(dopplerEncoding != nullptr)
+	{
+		dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
+		setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
+	}
+
 	XmlElement* orientation = element->getChildByName(XML_TAG_ORIENTATION);
 	if(orientation != nullptr)
 	{
-		directionFlip = orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP);
+		setDirectionFlip(orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP));
 	}
 }
