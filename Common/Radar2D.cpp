@@ -28,6 +28,8 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDis
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(false);
 
+	setWantsKeyboardFocus(true);
+
 	pZoomSettings->addChangeListener(this);
 
 	startTimerHz(INACTIVE_REFRESH_RATE);
@@ -312,6 +314,76 @@ void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 {
 	if (source == pZoomSettings)
 		updateRadarBackground();
+}
+
+bool Radar2D::keyPressed(const KeyPress& key)
+{
+	if (pPointSelection->getSelectionMode() == PointSelection::None || pPointSelection->getSelectedIndices().size() == 0)
+		return false;
+
+	Array<int> selection = pPointSelection->getSelectedIndices();
+	bool keyHandled = false;
+	double dx = 0.0, dy = 0.0, dz = 0.0;
+
+	if (key.isKeyCode(KeyPress::upKey))
+	{
+		if (radarMode == XY)
+		{
+			dx = NUDGE_VALUE;
+		}
+		else
+		{
+			dz = NUDGE_VALUE;
+		}
+
+		keyHandled = true;
+	}
+
+	else if (key.isKeyCode(KeyPress::downKey))
+	{
+		if (radarMode == XY)
+		{
+			dx = - NUDGE_VALUE;
+		}
+		else
+		{
+			dz = - NUDGE_VALUE;
+		}
+
+		keyHandled = true;
+	}
+
+	else if (key.isKeyCode(KeyPress::leftKey))
+	{
+		dy = - NUDGE_VALUE;
+		keyHandled = true;
+	}
+
+	else if (key.isKeyCode(KeyPress::rightKey))
+	{
+		dy = NUDGE_VALUE;
+		keyHandled = true;
+	}
+
+	if(pPointSelection->getSelectionMode() == PointSelection::Group)
+	{
+		for (int i : selection)
+		{
+			pEditablePoints->getGroup(i)->moveXYZ(dx, dy, dz, !key.getModifiers().isShiftDown());
+		}
+	}
+	else if(pPointSelection->getSelectionMode() == PointSelection::Point)
+	{
+		for (int i : selection)
+		{
+			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
+			p->setXYZ(p->getX() + dx, p->getY() + dy, p->getZ() + dz);
+		}
+	}
+
+	pPointSelection->notifyChange();
+
+	return keyHandled;
 }
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
