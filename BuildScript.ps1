@@ -138,6 +138,6 @@ foreach($pluginType in $pluginTypes)
 }
 
 # create installer
-. Setup/$($buildInstallerScript) "ICST_AmbiPlugins_$($releaseVersion)_$($platformString)" 
+. Setup/$($buildInstallerScript) "ICST_AmbiPlugins_$($releaseVersion)_$($platformString)" "$($releaseVersion)" 
 
 Write-Output "All Done"
