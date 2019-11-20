@@ -22,6 +22,7 @@ void VarDelayBuffer::process(int requiredBufferSize, float* buffer, int numSampl
 			float* tempBuffer = (float*)calloc(samplesToAdd, sizeof(float));
 			interpolator.process(double(numSamples) / samplesToAdd, buffer, tempBuffer, samplesToAdd);
 			audioBuffer.addArray(tempBuffer, samplesToAdd);
+			free(tempBuffer);
 		}
 	}
 	else
