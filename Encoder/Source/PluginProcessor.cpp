@@ -200,10 +200,18 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = source->getPoint();
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !encoderSettings.directionFlip, true);
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !encoderSettings.getDirectionFlip(), true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
-		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
+		if (encoderSettings.dopplerEncodingFlag)
+		{
+			// check doppler delay buffers
+			int currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance() * encoderSettings.getDistanceScaler(), getSampleRate());
+			delayBuffers[iSource].process(currentDelayInSamples, inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
+		}
+
+		const float* inputData = inputBuffer.getReadPointer(iSource);
+
 		// create B-format
 		int numSamples = buffer.getNumSamples();
 		for (int iSample = 0; iSample < numSamples; iSample++)

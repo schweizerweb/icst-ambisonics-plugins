@@ -17,6 +17,8 @@
 #include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
 #include "AmbiOSCSenderExt.h"
+#include "../../Common/VarDelayBuffer.h"
+#include "../../Common/DelayHelper.h"
 
 //==============================================================================
 /**
@@ -82,6 +84,7 @@ private:
 	StatusMessageHandler statusMessageHandler;
 	DawParameter dawParameter;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
+	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
