@@ -19,6 +19,7 @@
 #define INFO_FONT_SIZE	15
 #define ACTIVE_REFRESH_RATE 25
 #define INACTIVE_REFRESH_RATE 10
+#define NUDGE_VALUE 0.01
 
 //==============================================================================
 /*
@@ -49,6 +50,7 @@ public:
 	void newOpenGLContextCreated() override;
 	void openGLContextClosing() override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+	bool keyPressed(const KeyPress& key) override;
 
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
