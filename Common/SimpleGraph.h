@@ -39,6 +39,8 @@ private:
 protected:
 	std::unique_ptr<Rectangle<int>> graphArea;
 	bool fullGridFlag;
+	String labelAxisX;
+	String labelAxisY;
 
 private:
 	std::unique_ptr<Range<double>> displayRangeX;

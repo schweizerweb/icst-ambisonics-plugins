@@ -23,6 +23,7 @@
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
 #include "../../Common/TrackColors.h"
+#include "DistanceEncodingComponent.h"
 //[/Headers]
 
 #include "EncoderSettingsComponent.h"
@@ -149,25 +150,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     addAndMakeVisible (toggleDistanceEncoding.get());
     toggleDistanceEncoding->setButtonText (TRANS("Enable Distance Encoding"));
     toggleDistanceEncoding->addListener (this);
-
-    textUnitCircleRadius.reset (new TextEditor ("textUnitCircleRadius"));
-    addAndMakeVisible (textUnitCircleRadius.get());
-    textUnitCircleRadius->setMultiLine (false);
-    textUnitCircleRadius->setReturnKeyStartsNewLine (false);
-    textUnitCircleRadius->setReadOnly (false);
-    textUnitCircleRadius->setScrollbarsShown (true);
-    textUnitCircleRadius->setCaretVisible (true);
-    textUnitCircleRadius->setPopupMenuEnabled (true);
-    textUnitCircleRadius->setText (String());
-
-    labelUnitCircleRadius.reset (new Label ("labelUnitCircleRadius",
-                                            TRANS("Unit Circle Radius:")));
-    addAndMakeVisible (labelUnitCircleRadius.get());
-    labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelUnitCircleRadius->setJustificationType (Justification::centredRight);
-    labelUnitCircleRadius->setEditable (false, false, false);
-    labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
-    labelUnitCircleRadius->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
     toggleDirectionFlip.reset (new ToggleButton ("toggleDirectionFlip"));
     addAndMakeVisible (toggleDirectionFlip.get());
@@ -315,6 +297,11 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     labelDistanceScaler->setColour (TextEditor::textColourId, Colours::black);
     labelDistanceScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
+    btnEditDistanceEncoding.reset (new TextButton ("btnEditDistanceEncoding"));
+    addAndMakeVisible (btnEditDistanceEncoding.get());
+    btnEditDistanceEncoding->setButtonText (TRANS("edit..."));
+    btnEditDistanceEncoding->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -330,7 +317,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	textOscSendInterval->addListener(this);
 	textOscSendPortExt->addListener(this);
 	textOscSendIpExt->addListener(this);
-	textUnitCircleRadius->addListener(this);
 
 	toggleReceiveOsc->setToggleState(pEncoderSettings->oscReceiveFlag, dontSendNotification);
 	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
@@ -345,7 +331,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	textOscSendPortExt->setText(String(pEncoderSettings->oscSendExtPort));
 
 	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
-	textUnitCircleRadius->setText(String(pEncoderSettings->unitCircleRadius));
 	toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
 
 	toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
@@ -413,8 +398,6 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     labelOscSendInterval = nullptr;
     groupEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
-    textUnitCircleRadius = nullptr;
-    labelUnitCircleRadius = nullptr;
     toggleDirectionFlip = nullptr;
     toggleSendOscExt = nullptr;
     textOscSendIpExt = nullptr;
@@ -438,6 +421,7 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     toggleDoppler = nullptr;
     sliderDistanceScaler = nullptr;
     labelDistanceScaler = nullptr;
+    btnEditDistanceEncoding = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -463,7 +447,7 @@ void EncoderSettingsComponent::resized()
     //[/UserPreResize]
 
     multiEncoderElements->setBounds (8, 152 + 112, getWidth() - 17, getHeight() - 271);
-    groupSources->setBounds (8 + 0, (152 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.6011f));
+    groupSources->setBounds (8 + 0, (152 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.6006f));
     groupOsc->setBounds (8, 8, getWidth() - 17, 144);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
     textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
@@ -476,31 +460,30 @@ void EncoderSettingsComponent::resized()
     labelOscSendInterval->setBounds (8 + (getWidth() - 17) - 76 - 110, 8 + 109, 110, 24);
     groupEncoding->setBounds (8, 152, getWidth() - 17, 112);
     toggleDistanceEncoding->setBounds (8 + 14, 152 + 19, 199, 24);
-    textUnitCircleRadius->setBounds (8 + (getWidth() - 17) - 24 - 48, 152 + 19, 48, 24);
-    labelUnitCircleRadius->setBounds (8 + (getWidth() - 17) - 75 - 141, 152 + 19, 141, 24);
     toggleDirectionFlip->setBounds (8 + 14, 152 + 79, 207, 24);
     toggleSendOscExt->setBounds (8 + 14, 8 + 49, 245, 24);
     textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    sourceList->setBounds ((8 + 0) + 16, ((152 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.6011f)) - 67);
-    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
-    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
-    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
-    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6011f)) - 40, 64, 24);
-    groupGroups->setBounds (8 + 0, (152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.3989f));
-    groupList->setBounds ((8 + 0) + 16, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.3989f)) - 67);
-    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + (roundToInt ((getHeight() - 271) * 0.3989f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3989f))) + (roundToInt ((getHeight() - 271) * 0.3989f)) - 40, 64, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((152 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.6006f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.3994f));
+    groupList->setBounds ((8 + 0) + 16, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.3994f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + (roundToInt ((getHeight() - 271) * 0.3994f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + (roundToInt ((getHeight() - 271) * 0.3994f)) - 40, 64, 24);
     comboBoxPresets->setBounds (83, getHeight() - 34, getWidth() - 312, 24);
     labelPresets->setBounds (8, getHeight() - 34, 64, 24);
     buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
     buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 34, 64, 24);
     buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 34, 64, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5004f) - (proportionOfWidth (0.3997f) / 2), 8, proportionOfWidth (0.3997f), 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3984f) / 2), 8, proportionOfWidth (0.3984f), 24);
     toggleDoppler->setBounds (8 + 14, 152 + 49, 199, 24);
     sliderDistanceScaler->setBounds (8 + (getWidth() - 17) - 24 - 202, 152 + 49, 202, 24);
     labelDistanceScaler->setBounds (8 + (getWidth() - 17) - 229 - 109, 152 + 49, 109, 24);
+    btnEditDistanceEncoding->setBounds (8 + (getWidth() - 17) - 24 - 86, 152 + 19, 86, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -712,6 +695,12 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		sendChangeMessage();
         //[/UserButtonCode_toggleDoppler]
     }
+    else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
+    {
+        //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
+		CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams), getScreenBounds(), nullptr);
+        //[/UserButtonCode_btnEditDistanceEncoding]
+    }
 
     //[UserbuttonClicked_Post]
 	controlDimming();
@@ -803,15 +792,13 @@ void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 		checkForNumbers(&textEditor, &pEncoderSettings->oscSendExtPort);
 	else if (&textEditor == textOscSendIpExt.get())
 		pEncoderSettings->oscSendExtTargetHost = textEditor.getText();
-	else if (&textEditor == textUnitCircleRadius.get())
-		checkForNumbers(&textEditor, &pEncoderSettings->unitCircleRadius);
 
 	sendChangeMessage();
 }
 
 void EncoderSettingsComponent::controlDimming() const
 {
-	textUnitCircleRadius->setEnabled(pEncoderSettings->distanceEncodingFlag);
+	btnEditDistanceEncoding->setEnabled(pEncoderSettings->distanceEncodingFlag);
 	textOscReceivePort->setEnabled(pEncoderSettings->oscReceiveFlag);
 	textOscSendIp->setEnabled(pEncoderSettings->oscSendFlag);
 	textOscSendPort->setEnabled(pEncoderSettings->oscSendFlag);
@@ -1076,7 +1063,7 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="8 0R 17M 271M" posRelativeY="b72378bdfe4e130"
                     class="Component" params=""/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.215%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.062%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
@@ -1129,16 +1116,6 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTEDITOR name="textUnitCircleRadius" id="9b1288d93f3bb201" memberName="textUnitCircleRadius"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 19 48 24" posRelativeX="b72378bdfe4e130"
-              posRelativeY="b72378bdfe4e130" initialText="" multiline="0" retKeyStartsLine="0"
-              readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelUnitCircleRadius" id="efb161958642a965" memberName="labelUnitCircleRadius"
-         virtualName="" explicitFocusOrder="0" pos="75Rr 19 141 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Unit Circle Radius:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
   <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"
                 virtualName="" explicitFocusOrder="0" pos="14 79 207 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Flip Direction (Orientation)"
@@ -1182,7 +1159,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.785%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.938%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -1220,7 +1197,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 8 39.919% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 8 39.845% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1240,6 +1217,10 @@ BEGIN_JUCER_METADATA
          labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
+  <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
+              virtualName="" explicitFocusOrder="0" pos="24Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

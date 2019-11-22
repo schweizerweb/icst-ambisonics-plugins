@@ -13,7 +13,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo) 
+IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -27,6 +27,8 @@ IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilte
 
 	setDisplayRange(Logarithmic, Range<double>(20, MAX_FREQUENCY), Linear, Range<double>(-20, 20));
 	fullGridFlag = true;
+	labelAxisY = "Gain [dB]";
+	labelAxisX = "Frequency [Hz]";
 }
 
 IIRFilterGraph::~IIRFilterGraph()

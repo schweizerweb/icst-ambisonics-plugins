@@ -109,8 +109,6 @@ private:
     std::unique_ptr<Label> labelOscSendInterval;
     std::unique_ptr<GroupComponent> groupEncoding;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
-    std::unique_ptr<TextEditor> textUnitCircleRadius;
-    std::unique_ptr<Label> labelUnitCircleRadius;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
     std::unique_ptr<ToggleButton> toggleSendOscExt;
     std::unique_ptr<TextEditor> textOscSendIpExt;
@@ -134,6 +132,7 @@ private:
     std::unique_ptr<ToggleButton> toggleDoppler;
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<Label> labelDistanceScaler;
+    std::unique_ptr<TextButton> btnEditDistanceEncoding;
 
 
     //==============================================================================

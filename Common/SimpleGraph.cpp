@@ -55,11 +55,11 @@ void SimpleGraph::drawXAxis(Graphics& g) const
 	double currentStep = stepSize * int(displayRangeX->getStart() / stepSize - 1);
 	while (currentStep < upperLim) {
 		if (currentStep >= displayRangeX->getStart()) {
-			double realValue = pow(10.0, currentStep);
+			double realValue = scalingModeX == Logarithmic ? pow(10.0, currentStep) : currentStep;
 			Point<float> xy = mapValues(realValue, displayRangeY->getStart()).toFloat();
 			g.drawLine(xy.getX(), xy.getY() + 3, xy.getX(), fullGridFlag ? graphArea->getY() : xy.getY() - 3, 1.0f);
 			//String buffer = "10^" + String::formatted(annotationFormat, currentStep);
-			String buffer = String::formatted("%.0f", realValue);
+			String buffer = String::formatted(scalingModeX == Logarithmic ? "%.0f" : annotationFormat, realValue);
 			g.drawSingleLineText(buffer, int(xy.getX()), int(xy.getY()) + 14, Justification::horizontallyCentred);
 		}
 		currentStep += stepSize;
@@ -78,11 +78,11 @@ void SimpleGraph::paint (Graphics& g)
 
 	// draw axes
 	g.drawArrow(Line<int>(graphArea->getBottomLeft(), graphArea->getTopLeft().translated(0, -10)).toFloat(), 2, 8, 7);
-	g.drawSingleLineText("Gain [dB]", graphArea->getX() + 7, graphArea->getY() - 5, Justification::left);
+	g.drawSingleLineText(labelAxisY, graphArea->getX() + 7, graphArea->getY() - 5, Justification::left);
 	drawYAxis(g);
 
 	g.drawArrow(Line<int>(graphArea->getBottomLeft(), graphArea->getBottomRight().translated(10, 0)).toFloat(), 2, 8, 7);
-	g.drawSingleLineText("Frequency [Hz]", graphArea->getRight(), graphArea->getBottom() - 8, Justification::right);
+	g.drawSingleLineText(labelAxisX, graphArea->getRight(), graphArea->getBottom() - 8, Justification::right);
 	drawXAxis(g);
 }
 

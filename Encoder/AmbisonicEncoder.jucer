@@ -14,6 +14,16 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="ExW4LU" name="DistanceEncodingParams.h" compile="0" resource="0"
+            file="Source/DistanceEncodingParams.h"/>
+      <FILE id="V5YI5c" name="DistanceEncodingGraph.cpp" compile="1" resource="0"
+            file="Source/DistanceEncodingGraph.cpp"/>
+      <FILE id="hFEmfb" name="DistanceEncodingGraph.h" compile="0" resource="0"
+            file="Source/DistanceEncodingGraph.h"/>
+      <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
+            resource="0" file="Source/DistanceEncodingComponent.cpp"/>
+      <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"
+            file="Source/DistanceEncodingComponent.h"/>
       <FILE id="wzVHPY" name="GroupPointsSelectionComponent.h" compile="0"
             resource="0" file="Source/GroupPointsSelectionComponent.h"/>
       <FILE id="qLSobP" name="GroupTableListModel.h" compile="0" resource="0"

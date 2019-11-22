@@ -35,7 +35,7 @@ EncoderSettings::EncoderSettings():
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
 	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
 	dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
+	distanceEncodingParams(DistanceEncodingParams()),
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP)
 {
 }
@@ -68,7 +68,7 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 
 	XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, unitCircleRadius);
+	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.unitCircleRadius);
 	element->addChildElement(distanceEncoding);
 
 	XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
@@ -110,7 +110,7 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	if(distanceEncoding != nullptr)
 	{
 		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
+		distanceEncodingParams.unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
 	}
 
 	XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);

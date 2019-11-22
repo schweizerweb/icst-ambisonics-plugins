@@ -157,14 +157,14 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 }
 #endif
 
-void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance)
+void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
-	if (!encoderSettings.distanceEncodingFlag || encoderSettings.unitCircleRadius == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.unitCircleRadius == 0.0)
 		return;
 
-	double scaledDistance = distance * (1.0 / encoderSettings.unitCircleRadius);
-	double wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
-	double otherFactor = (1 - exp(-scaledDistance)) * wFactor;
+	double wFactor, otherFactor;
+	encoderSettings.distanceEncodingParams.calculateAttenuation(distance, &wFactor, &otherFactor);
+
 	pCoefficientArray[0] *= wFactor;
 	for (int i = 1; i < arraySize; i++)
 		pCoefficientArray[i] *= otherFactor;
