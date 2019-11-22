@@ -27,7 +27,7 @@
 class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 {
 public:
-	enum RadarMode { XY, ZY };
+	enum RadarMode { XY, ZY_Half, ZY_Full };
 	enum Shape { Circle, Square, Star };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
@@ -51,6 +51,7 @@ public:
 	void openGLContextClosing() override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool keyPressed(const KeyPress& key) override;
+	void setRadarMode(RadarMode radarMode);
 
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;

@@ -48,7 +48,8 @@ Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
 	{
 	case XY:
 		return Point<double>(point3_d->getY(), point3_d->getX());
-	case ZY:
+	case ZY_Half:
+	case ZY_Full:
 		return Point<double>(point3_d->getY(), point3_d->getZ());
 	}
 
@@ -386,9 +387,18 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	return keyHandled;
 }
 
+void Radar2D::setRadarMode(RadarMode radarMode)
+{
+	if (radarMode == XY)
+		return;
+
+	this->radarMode = radarMode;
+	resized();
+}
+
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode == ZY);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != ZY_Half);
 
 	Point<float> convertedPoint(
 		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
@@ -399,7 +409,7 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 
 Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode == ZY);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != ZY_Half);
 
 	Point<float> convertedPoint(
 		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
@@ -418,7 +428,7 @@ void Radar2D::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-	double wantedRatioWidthToHeight = (radarMode == XY) ? 1 : 2;
+	double wantedRatioWidthToHeight = (radarMode == ZY_Half) ? 2 : 1;
 
 	if (getBounds().getWidth() * getBounds().getHeight() <= 0)
 		return;
@@ -437,7 +447,7 @@ void Radar2D::resized()
 		// add space on top or bottom, depending on radar mode
 		radarViewport = Rectangle<int>(
 			0,
-			(radarMode == XY) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
+			(radarMode != ZY_Half) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
 			getBounds().getWidth(),
 			int(getBounds().getWidth() / wantedRatioWidthToHeight));
 	}
@@ -601,10 +611,16 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
 void Radar2D::setCenterPoint(Point<float> valuePoint) const
 {
-	if (radarMode == XY)
+	switch (radarMode)
+	{
+	case XY:
 		pZoomSettings->setCurrentCenterPointXY(valuePoint.getY(), valuePoint.getX());
-	else if (radarMode == ZY)
+		break;
+	case ZY_Half:
+	case ZY_Full:
 		pZoomSettings->setCurrentCenterPointYZ(valuePoint.getX(), valuePoint.getY());
+		break;
+	}
 }
 
 void Radar2D::mouseUp(const MouseEvent& e)
@@ -662,7 +678,8 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	case XY:
 		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
-	case ZY:
+	case ZY_Half:
+	case ZY_Full:
 		pEditablePoints->addNew(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	}
