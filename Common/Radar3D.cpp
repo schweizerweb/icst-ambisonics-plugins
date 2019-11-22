@@ -100,7 +100,7 @@ void Radar3D::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-	int secondRadarHeight = (getHeight() - 3) * (fullRadarFlag ? 0.5 : 0.3333f);
+	int secondRadarHeight = int((getHeight() - 3) / (fullRadarFlag ? 2.0 : 3.0));
 	int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
 	xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
 	zyRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
