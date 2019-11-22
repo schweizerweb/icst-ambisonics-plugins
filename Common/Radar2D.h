@@ -43,6 +43,7 @@ public:
 	void mouseDown(const MouseEvent& e) override;
 	void mouseDrag(const MouseEvent& e) override;
 	void setCenterPoint(Point<float> valuePoint) const;
+	void moveCenterPoint(Point<float> delta) const;
 	void mouseUp(const MouseEvent& e) override;
 	void mouseDoubleClick(const MouseEvent& e) override;
 	void showCoordinates(const Point<float>& point);

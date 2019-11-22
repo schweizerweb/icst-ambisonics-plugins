@@ -543,7 +543,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	if(e.mods.isAltDown())
 	{
 		Point<float> originPoint = getValuePointFromAbsoluteScreenPoint((e.getPosition() - e.getOffsetFromDragStart()).toFloat());
-		setCenterPoint(originPoint - valuePoint);
+		moveCenterPoint(originPoint - valuePoint);
 	}
 	else
 	{
@@ -619,6 +619,20 @@ void Radar2D::setCenterPoint(Point<float> valuePoint) const
 	case ZY_Half:
 	case ZY_Full:
 		pZoomSettings->setCurrentCenterPointYZ(valuePoint.getX(), valuePoint.getY());
+		break;
+	}
+}
+
+void Radar2D::moveCenterPoint(Point<float> delta) const
+{
+	switch (radarMode)
+	{
+	case XY:
+		pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + delta.getY(), pZoomSettings->getCurrentCenterPoint().getY() + delta.getX());
+		break;
+	case ZY_Half:
+	case ZY_Full:
+		pZoomSettings->setCurrentCenterPointYZ(pZoomSettings->getCurrentCenterPoint().getY() + delta.getX(), pZoomSettings->getCurrentCenterPoint().getZ() + delta.getY());
 		break;
 	}
 }
