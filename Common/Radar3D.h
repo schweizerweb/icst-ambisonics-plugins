@@ -52,8 +52,10 @@ public:
     void buttonClicked (Button* buttonThatWasClicked) override;
 
     // Binary resources:
-    static const char* flatArrowDown_png;
-    static const int flatArrowDown_pngSize;
+    static const char* flatArrowDownT_png;
+    static const int flatArrowDownT_pngSize;
+    static const char* flatArrowUpT_png;
+    static const int flatArrowUpT_pngSize;
 
 
 private:

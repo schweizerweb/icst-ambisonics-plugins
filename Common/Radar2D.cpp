@@ -387,12 +387,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	return keyHandled;
 }
 
-void Radar2D::setRadarMode(RadarMode radarMode)
+void Radar2D::setRadarMode(RadarMode mode)
 {
-	if (radarMode == XY)
+	if (mode == XY)
 		return;
 
-	this->radarMode = radarMode;
+	this->radarMode = mode;
 	resized();
 }
 

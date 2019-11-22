@@ -121,7 +121,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
     labelCartesian->setColour (TextEditor::textColourId, Colours::black);
     labelCartesian->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelCartesian->setBounds (0, 8, 80, 24);
+    labelCartesian->setBounds (0, 40, 80, 24);
 
     labelA.reset (new Label ("labelA",
                              TRANS("A:")));
@@ -189,7 +189,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
     labelPolar->setColour (TextEditor::textColourId, Colours::black);
     labelPolar->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelPolar->setBounds (0, 40, 80, 24);
+    labelPolar->setBounds (0, 72, 80, 24);
 
     labelCH.reset (new Label ("labelCH",
                               TRANS("CH:")));
@@ -219,6 +219,8 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                          ImageCache::getFromMemory (group_png, group_pngSize), 1.000f, Colour (0x00000000),
                          Image(), 1.000f, Colour (0x00000000),
                          Image(), 1.000f, Colour (0x00000000));
+    btnGroup->setBounds (0, 0, 36, 36);
+
     btnUngroup.reset (new ImageButton ("btnUngroup"));
     addAndMakeVisible (btnUngroup.get());
     btnUngroup->setButtonText (TRANS("ungroup"));
@@ -228,6 +230,8 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                            ImageCache::getFromMemory (ungroup_png, ungroup_pngSize), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000),
                            Image(), 1.000f, Colour (0x00000000));
+    btnUngroup->setBounds (0, 0, 36, 36);
+
 
     //[UserPreSize]
 	textName->setReadOnly(!pRadarOptions->nameFieldEditable);
@@ -292,24 +296,22 @@ void PointInfoControl::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    textName->setBounds ((proportionOfWidth (0.6044f) + 0) + 0, (72 + 0) + 0, proportionOfWidth (0.3590f), 24);
-    labelName->setBounds (((proportionOfWidth (0.6044f) + 0) + 0) + 0 - 56, (72 + 0) + 0, 56, 24);
-    labelX->setBounds ((proportionOfWidth (0.3500f) + 0) + 0 - 24, 8 + 0, 24, 24);
-    textX->setBounds (proportionOfWidth (0.3500f) + 0, 8 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelY->setBounds ((proportionOfWidth (0.6044f) + 0) + 0 - 24, 8 + 0, 24, 24);
-    textY->setBounds (proportionOfWidth (0.6044f) + 0, 8 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
-    labelZ->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 24, 8 + 0, 24, 24);
-    textZ->setBounds (proportionOfWidth (0.8410f) + 0, 8 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelA->setBounds (proportionOfWidth (0.3500f) + 0 - 24, 40 + 0, 24, 24);
-    textA->setBounds (proportionOfWidth (0.3500f), 40 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelE->setBounds (proportionOfWidth (0.6044f) + 0 - 24, 40 + 0, 24, 24);
-    textE->setBounds (proportionOfWidth (0.6044f), 40 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
-    labelD->setBounds (proportionOfWidth (0.8410f) + 0 - 24, 40 + 0, 24, 24);
-    textD->setBounds (proportionOfWidth (0.8410f), 40 + 0, proportionOfWidth (0.1359f), 24);
-    labelCH->setBounds (((proportionOfWidth (0.3500f) + 0) + 0) + 0 - 32, 72 + 0, 32, 24);
-    textCH->setBounds ((proportionOfWidth (0.3500f) + 0) + 0, 72, roundToInt (proportionOfWidth (0.1359f) * 0.4528f), 24);
-    btnGroup->setBounds (0, getHeight() - 36, 36, 36);
-    btnUngroup->setBounds (0, getHeight() - 36, 36, 36);
+    textName->setBounds ((proportionOfWidth (0.6051f) + 0) + 0, (8 + 0) + 0, proportionOfWidth (0.3590f), 24);
+    labelName->setBounds (((proportionOfWidth (0.6051f) + 0) + 0) + 0 - 56, (8 + 0) + 0, 56, 24);
+    labelX->setBounds ((proportionOfWidth (0.3487f) + 0) + 0 - 24, 40 + 0, 24, 24);
+    textX->setBounds (proportionOfWidth (0.3487f) + 0, 40 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
+    labelY->setBounds ((proportionOfWidth (0.6051f) + 0) + 0 - 24, 40 + 0, 24, 24);
+    textY->setBounds (proportionOfWidth (0.6051f) + 0, 40 + 0, roundToInt ((roundToInt (proportionOfWidth (0.1359f) * 1.0000f)) * 1.0000f), 24);
+    labelZ->setBounds ((proportionOfWidth (0.8410f) + 0) + 0 - 24, 40 + 0, 24, 24);
+    textZ->setBounds (proportionOfWidth (0.8410f) + 0, 40 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelA->setBounds (proportionOfWidth (0.3487f) + 0 - 24, 72 + 0, 24, 24);
+    textA->setBounds (proportionOfWidth (0.3487f), 72 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelE->setBounds (proportionOfWidth (0.6051f) + 0 - 24, 72 + 0, 24, 24);
+    textE->setBounds (proportionOfWidth (0.6051f), 72 + 0, roundToInt (proportionOfWidth (0.1359f) * 1.0000f), 24);
+    labelD->setBounds (proportionOfWidth (0.8410f) + 0 - 24, 72 + 0, 24, 24);
+    textD->setBounds (proportionOfWidth (0.8410f), 72 + 0, proportionOfWidth (0.1359f), 24);
+    labelCH->setBounds (((proportionOfWidth (0.3487f) + 0) + 0) + 0 - 32, 8 + 0, 32, 24);
+    textCH->setBounds ((proportionOfWidth (0.3487f) + 0) + 0, 8, roundToInt (proportionOfWidth (0.1359f) * 0.4528f), 24);
     //[UserResized] Add your own custom resize handling here..
 
 	// workaround for labelName
@@ -570,7 +572,7 @@ BEGIN_JUCER_METADATA
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelCartesian" id="f2af390154f0c032" memberName="labelCartesian"
-         virtualName="" explicitFocusOrder="0" pos="0 8 80 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="0 40 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Cartesian:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -605,7 +607,7 @@ BEGIN_JUCER_METADATA
               initialText="" multiline="0" retKeyStartsLine="0" readonly="0"
               scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelPolar" id="41fcd21e0ce12407" memberName="labelPolar"
-         virtualName="" explicitFocusOrder="0" pos="0 40 80 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="0 72 80 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Polar:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -616,16 +618,16 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textCH" id="d9bdcb7a01c25c33" memberName="textCH" virtualName=""
-              explicitFocusOrder="0" pos="0 72 45.283% 24" posRelativeX="4dcd5fc970cdce6c"
+              explicitFocusOrder="0" pos="0 8 45.283% 24" posRelativeX="4dcd5fc970cdce6c"
               posRelativeW="411a4503627ed096" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
   <IMAGEBUTTON name="btnGroup" id="304aaa821d1b17f7" memberName="btnGroup" virtualName=""
-               explicitFocusOrder="0" pos="0 0Rr 36 36" buttonText="group" connectedEdges="0"
+               explicitFocusOrder="0" pos="0 0 36 36" buttonText="group" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="group_png"
                opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
                colourOver="0" resourceDown="" opacityDown="1.0" colourDown="0"/>
   <IMAGEBUTTON name="btnUngroup" id="6bdf324b7d527d88" memberName="btnUngroup"
-               virtualName="" explicitFocusOrder="0" pos="0 0Rr 36 36" buttonText="ungroup"
+               virtualName="" explicitFocusOrder="0" pos="0 0 36 36" buttonText="ungroup"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
                resourceNormal="ungroup_png" opacityNormal="1.0" colourNormal="0"
                resourceOver="" opacityOver="1.0" colourOver="0" resourceDown=""
