@@ -86,11 +86,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 
 
     //[Constructor] You can add your own custom stuff here..
-#ifdef DEBUG
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " DEV", dontSendNotification);
-#else
 	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
-#endif
 	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
     //[/Constructor]
 }

@@ -9,6 +9,7 @@
 */
 
 #include "Constants.h"
+#include "JuceHeader.h"
 
 const float Constants::AzimuthRadMin = float(0);
 const float Constants::AzimuthRadMax = float(2.0*PI);
@@ -43,4 +44,9 @@ double Constants::GradToRad(double grad)
 int Constants::NormalizeAzimuthGrad(int grad)
 {
 	return (grad % 360 + 360) % 360;
+}
+
+bool Constants::isDevelopmentVersion()
+{
+	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");
 }

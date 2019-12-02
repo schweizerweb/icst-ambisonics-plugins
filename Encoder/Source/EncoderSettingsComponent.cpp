@@ -310,7 +310,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelDevelopmentVersion->setVisible(String(JucePlugin_VersionString).contains("a"));
+	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
 	textOscReceivePort->addListener(this);
 	textOscSendPort->addListener(this);
 	textOscSendIp->addListener(this);

@@ -243,7 +243,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelDevelopmentVersion->setVisible(String(JucePlugin_VersionString).contains("a"));
+	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
 	buttonSpeakerTest->setClickingTogglesState(true);
 	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
 	speakerList->setModel(this);

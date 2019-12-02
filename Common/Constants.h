@@ -36,4 +36,6 @@ public:
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);
 	static int NormalizeAzimuthGrad(int grad);
+
+	static bool isDevelopmentVersion();
 };
