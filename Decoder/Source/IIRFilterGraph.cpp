@@ -36,10 +36,8 @@ IIRFilterGraph::~IIRFilterGraph()
 	free(magnitudes);
 }
 
-void IIRFilterGraph::paint (Graphics& g)
+void IIRFilterGraph::paintData(Graphics& g)
 {
-	SimpleGraph::paint(g);
-	
 	// draw curve
 	dsp::IIR::Coefficients<float>::Ptr coeff = pFilterInfo->getCoefficients(sampleRate);
 	Path path;

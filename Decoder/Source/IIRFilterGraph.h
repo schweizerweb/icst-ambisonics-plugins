@@ -27,10 +27,12 @@ public:
     IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
     ~IIRFilterGraph();
 
-    void paint (Graphics&) override;
+	void paintData(Graphics&) override;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
+
+private:
 	FilterInfo* pFilterInfo;
 	Array<double> frequencies;
 	double sampleRate;
