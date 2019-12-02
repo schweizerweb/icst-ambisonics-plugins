@@ -446,8 +446,8 @@ void EncoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    multiEncoderElements->setBounds (8, 152 + 112, getWidth() - 17, getHeight() - 271);
-    groupSources->setBounds (8 + 0, (152 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.6006f));
+    multiEncoderElements->setBounds (8, 152 + 112, getWidth() - 17, getHeight() - 303);
+    groupSources->setBounds (8 + 0, (152 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 303) * 0.6000f));
     groupOsc->setBounds (8, 8, getWidth() - 17, 144);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
     textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
@@ -465,15 +465,15 @@ void EncoderSettingsComponent::resized()
     textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    sourceList->setBounds ((8 + 0) + 16, ((152 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.6006f)) - 67);
-    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
-    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
-    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
-    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112) + 0) + (roundToInt ((getHeight() - 271) * 0.6006f)) - 40, 64, 24);
-    groupGroups->setBounds (8 + 0, (152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 271) * 0.3994f));
-    groupList->setBounds ((8 + 0) + 16, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 271) * 0.3994f)) - 67);
-    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + (roundToInt ((getHeight() - 271) * 0.3994f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112) + (getHeight() - 271) - (roundToInt ((getHeight() - 271) * 0.3994f))) + (roundToInt ((getHeight() - 271) * 0.3994f)) - 40, 64, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((152 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 303) * 0.6000f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 303) * 0.4000f));
+    groupList->setBounds ((8 + 0) + 16, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 303) * 0.4000f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + (roundToInt ((getHeight() - 303) * 0.4000f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + (roundToInt ((getHeight() - 303) * 0.4000f)) - 40, 64, 24);
     comboBoxPresets->setBounds (83, getHeight() - 34, getWidth() - 312, 24);
     labelPresets->setBounds (8, getHeight() - 34, 64, 24);
     buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
@@ -1060,10 +1060,10 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="multiEncoderElements" id="73249ab85d6bba3a" memberName="multiEncoderElements"
-                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 271M" posRelativeY="b72378bdfe4e130"
+                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 303M" posRelativeY="b72378bdfe4e130"
                     class="Component" params=""/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.062%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.038%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
@@ -1159,7 +1159,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.938%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.962%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -1197,7 +1197,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 8 39.845% 24"
+         virtualName="" explicitFocusOrder="0" pos="49.962%c 8 39.82% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
