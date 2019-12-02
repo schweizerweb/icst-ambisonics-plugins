@@ -52,7 +52,7 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
     btnFull->setImages (false, true, false,
                         ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, Colour (0x00000000),
-                        Image(), 1.000f, Colour (0xa0b21f1f),
+                        Image(), 1.000f, Colour (0xffdd6060),
                         ImageCache::getFromMemory (flatArrowUpT_png, flatArrowUpT_pngSize), 1.000f, Colour (0x00000000));
     btnFull->setBounds (0, 360, 336, 6);
 
@@ -158,7 +158,7 @@ BEGIN_JUCER_METADATA
                explicitFocusOrder="0" pos="0 360 336 6" buttonText="new button"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="0"
                resourceNormal="flatArrowDownT_png" opacityNormal="1.0" colourNormal="0"
-               resourceOver="" opacityOver="1.0" colourOver="a0b21f1f" resourceDown="flatArrowUpT_png"
+               resourceOver="" opacityOver="1.0" colourOver="ffdd6060" resourceDown="flatArrowUpT_png"
                opacityDown="1.0" colourDown="0"/>
 </JUCER_COMPONENT>
 
