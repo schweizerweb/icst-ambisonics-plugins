@@ -24,6 +24,7 @@ public:
 	virtual ~SimpleGraph();
 
 	void paint (Graphics&) override;
+	virtual void paintData(Graphics&) = 0;
     void resized() override;
 
 protected:

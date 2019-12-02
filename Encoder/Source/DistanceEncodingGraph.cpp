@@ -22,37 +22,49 @@ DistanceEncodingGraph::~DistanceEncodingGraph()
 {
 }
 
-void DistanceEncodingGraph::paint(Graphics& g)
+void DistanceEncodingGraph::paintData(Graphics& g)
 {
-	SimpleGraph::paint(g);
-
 	Path pathW;
 	Path pathOther;
+	bool firstW = true;
+	bool firstOther = true;
 
-	for(int step = 1; step <= NB_STEPS; step++)
+	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
-		double distance = 1.0 / NB_STEPS * step;
+		double distance = 0.00001 + 1.0 / NB_STEPS * step;
 		pParams->calculateAttenuation(distance, &wFactor, &otherFactor);
 
 		Point<float> displayPointW = mapValues(distance, Decibels::gainToDecibels(wFactor)).toFloat();
 		Point<float> displayPointOther = mapValues(distance, Decibels::gainToDecibels(otherFactor)).toFloat();
 
-		if (step == 1)
+		if (firstW == true)
 		{
+			firstW = false;
 			pathW.startNewSubPath(displayPointW);
-			pathOther.startNewSubPath(displayPointOther);
+
 		}
 		else
 		{
 			pathW.lineTo(displayPointW);
+		}
+
+		if (firstOther)
+		{
+			firstOther = false;
+			pathOther.startNewSubPath(displayPointOther);
+		}
+		else
+		{
 			pathOther.lineTo(displayPointOther);
 		}
 	}
 
 	g.setColour(Colours::darkgreen);
 	g.strokePath(pathW, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
-	
+	g.drawSingleLineText("W-Signal", graphArea->getRight() - 100, graphArea->getY() - 5, Justification::right);
+
 	g.setColour(Colours::darkred);
 	g.strokePath(pathOther, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
+	g.drawSingleLineText("Other Signals", graphArea->getRight(), graphArea->getY() - 5, Justification::right);
 }

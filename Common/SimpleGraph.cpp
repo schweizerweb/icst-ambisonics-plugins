@@ -73,6 +73,12 @@ void SimpleGraph::paint (Graphics& g)
 	// draw graph basics
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 
+	paintData(g);
+
+	g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
+	g.fillRect(0, 0, graphArea->getX(), getHeight());
+	g.fillRect(0, graphArea->getBottom(), getWidth(), getBottom() - graphArea->getBottom());
+
 	g.setColour(Colours::grey);
 	g.drawRect(getLocalBounds(), 1);   // draw an outline around the component
 

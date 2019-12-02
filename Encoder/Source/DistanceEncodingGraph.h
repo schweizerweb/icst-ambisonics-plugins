@@ -11,7 +11,7 @@
 #pragma once
 #include "../../Common/SimpleGraph.h"
 #include "DistanceEncodingParams.h"
-#define NB_STEPS 100
+#define NB_STEPS 200
 
 class DistanceEncodingGraph : public SimpleGraph
 {
@@ -19,7 +19,7 @@ public:
 	DistanceEncodingGraph(DistanceEncodingParams* params);
 	~DistanceEncodingGraph();
 
-	void paint(Graphics&) override;
+	void paintData(Graphics&) override;
 
 private:
 	DistanceEncodingParams* pParams;
