@@ -806,11 +806,11 @@ void EncoderSettingsComponent::controlDimming() const
 	textOscSendIpExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
-	buttonRemove->setEnabled(pSources->size() > 0);
+	buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pSources->size() > 0);
 	buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
 	buttonMoveDown->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
 	buttonAdd->setEnabled(true);
-	buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
+	buttonRemoveGroup->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
 }
 
 void EncoderSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
