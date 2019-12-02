@@ -129,6 +129,7 @@ void AmbiPoint::resetId()
 
 void AmbiPoint::setColor(Colour newColor)
 {
+	newColor = newColor.withAlpha(1.0f);
 	if (color != newColor)
 	{
 		labelImage = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
