@@ -4,48 +4,48 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input" },
-@{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input" },
-@{ Order = 3; Input = 1; Description = "3rd Order Ambisonic, 1 Channel Input" },
-@{ Order = 4; Input = 1; Description = "4th Order Ambisonic, 1 Channel Input" },
-@{ Order = 5; Input = 1; Description = "5th Order Ambisonic, 1 Channel Input" },
-@{ Order = 6; Input = 1; Description = "6th Order Ambisonic, 1 Channel Input" },
-@{ Order = 7; Input = 1; Description = "7th Order Ambisonic, 1 Channel Input" },
-@{ Order = 1; Input = 32; Description = "1st Order Ambisonic, 32 Channel Input" },
-@{ Order = 2; Input = 32; Description = "2nd Order Ambisonic, 32 Channel Input" },
-@{ Order = 3; Input = 32; Description = "3rd Order Ambisonic, 32 Channel Input" },
-@{ Order = 4; Input = 32; Description = "4th Order Ambisonic, 32 Channel Input" },
-@{ Order = 5; Input = 32; Description = "5th Order Ambisonic, 32 Channel Input" },
-@{ Order = 6; Input = 32; Description = "6th Order Ambisonic, 32 Channel Input" },
-@{ Order = 7; Input = 32; Description = "7th Order Ambisonic, 32 Channel Input" },
-@{ Order = 1; Input = 64; Description = "1st Order Ambisonic, 64 Channel Input" },
-@{ Order = 2; Input = 64; Description = "2nd Order Ambisonic, 64 Channel Input" },
-@{ Order = 3; Input = 64; Description = "3rd Order Ambisonic, 64 Channel Input" },
-@{ Order = 4; Input = 64; Description = "4th Order Ambisonic, 64 Channel Input" },
-@{ Order = 5; Input = 64; Description = "5th Order Ambisonic, 64 Channel Input" },
-@{ Order = 6; Input = 64; Description = "6th Order Ambisonic, 64 Channel Input" },
-@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input" }
+@{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input"; PluginCode = "AE1S" },
+@{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input"; PluginCode = "AE2S" },
+@{ Order = 3; Input = 1; Description = "3rd Order Ambisonic, 1 Channel Input"; PluginCode = "AE3S" },
+@{ Order = 4; Input = 1; Description = "4th Order Ambisonic, 1 Channel Input"; PluginCode = "AE4S" },
+@{ Order = 5; Input = 1; Description = "5th Order Ambisonic, 1 Channel Input"; PluginCode = "AE5S" },
+@{ Order = 6; Input = 1; Description = "6th Order Ambisonic, 1 Channel Input"; PluginCode = "AE6S" },
+@{ Order = 7; Input = 1; Description = "7th Order Ambisonic, 1 Channel Input"; PluginCode = "AE7S" },
+@{ Order = 1; Input = 32; Description = "1st Order Ambisonic, 32 Channel Input"; PluginCode = "AE1M" },
+@{ Order = 2; Input = 32; Description = "2nd Order Ambisonic, 32 Channel Input"; PluginCode = "AE2M" },
+@{ Order = 3; Input = 32; Description = "3rd Order Ambisonic, 32 Channel Input"; PluginCode = "AE3M" },
+@{ Order = 4; Input = 32; Description = "4th Order Ambisonic, 32 Channel Input"; PluginCode = "AE4M" },
+@{ Order = 5; Input = 32; Description = "5th Order Ambisonic, 32 Channel Input"; PluginCode = "AE5M" },
+@{ Order = 6; Input = 32; Description = "6th Order Ambisonic, 32 Channel Input"; PluginCode = "AE6M" },
+@{ Order = 7; Input = 32; Description = "7th Order Ambisonic, 32 Channel Input"; PluginCode = "AE7M" },
+@{ Order = 1; Input = 64; Description = "1st Order Ambisonic, 64 Channel Input"; PluginCode = "AE1F" },
+@{ Order = 2; Input = 64; Description = "2nd Order Ambisonic, 64 Channel Input"; PluginCode = "AE2F" },
+@{ Order = 3; Input = 64; Description = "3rd Order Ambisonic, 64 Channel Input"; PluginCode = "AE3F" },
+@{ Order = 4; Input = 64; Description = "4th Order Ambisonic, 64 Channel Input"; PluginCode = "AE4F" },
+@{ Order = 5; Input = 64; Description = "5th Order Ambisonic, 64 Channel Input"; PluginCode = "AE5F" },
+@{ Order = 6; Input = 64; Description = "6th Order Ambisonic, 64 Channel Input"; PluginCode = "AE6F" },
+@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input"; PluginCode = "AE7F" }
 )
 
 $DecoderVersions =
 @(
-@{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output" },
-@{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output" },
-@{ Order = 3; Output = 32; Description = "3rd Order Ambisonic, 32 Channel Output" },
-@{ Order = 4; Output = 32; Description = "4th Order Ambisonic, 32 Channel Output" },
-@{ Order = 5; Output = 32; Description = "5th Order Ambisonic, 32 Channel Output" },
-@{ Order = 6; Output = 32; Description = "6th Order Ambisonic, 32 Channel Output" },
-@{ Order = 7; Output = 32; Description = "7th Order Ambisonic, 32 Channel Output" },
-@{ Order = 1; Output = 64; Description = "1st Order Ambisonic, 64 Channel Output" },
-@{ Order = 2; Output = 64; Description = "2nd Order Ambisonic, 64 Channel Output" },
-@{ Order = 3; Output = 64; Description = "3rd Order Ambisonic, 64 Channel Output" },
-@{ Order = 4; Output = 64; Description = "4th Order Ambisonic, 64 Channel Output" },
-@{ Order = 5; Output = 64; Description = "5th Order Ambisonic, 64 Channel Output" },
-@{ Order = 6; Output = 64; Description = "6th Order Ambisonic, 64 Channel Output" },
-@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output" }
+@{ Order = 1; Output = 32; Description = "1st Order Ambisonic, 32 Channel Output"; PluginCode = "AD1M" },
+@{ Order = 2; Output = 32; Description = "2nd Order Ambisonic, 32 Channel Output"; PluginCode = "AD2M" },
+@{ Order = 3; Output = 32; Description = "3rd Order Ambisonic, 32 Channel Output"; PluginCode = "AD3M" },
+@{ Order = 4; Output = 32; Description = "4th Order Ambisonic, 32 Channel Output"; PluginCode = "AD4M" },
+@{ Order = 5; Output = 32; Description = "5th Order Ambisonic, 32 Channel Output"; PluginCode = "AD5M" },
+@{ Order = 6; Output = 32; Description = "6th Order Ambisonic, 32 Channel Output"; PluginCode = "AD6M" },
+@{ Order = 7; Output = 32; Description = "7th Order Ambisonic, 32 Channel Output"; PluginCode = "AD7M" },
+@{ Order = 1; Output = 64; Description = "1st Order Ambisonic, 64 Channel Output"; PluginCode = "AD1F" },
+@{ Order = 2; Output = 64; Description = "2nd Order Ambisonic, 64 Channel Output"; PluginCode = "AD2F" },
+@{ Order = 3; Output = 64; Description = "3rd Order Ambisonic, 64 Channel Output"; PluginCode = "AD3F" },
+@{ Order = 4; Output = 64; Description = "4th Order Ambisonic, 64 Channel Output"; PluginCode = "AD4F" },
+@{ Order = 5; Output = 64; Description = "5th Order Ambisonic, 64 Channel Output"; PluginCode = "AD5F" },
+@{ Order = 6; Output = 64; Description = "6th Order Ambisonic, 64 Channel Output"; PluginCode = "AD6F" },
+@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output"; PluginCode = "AD7F" }
 )
 
-function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description)
+function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
 {
     $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
     $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
@@ -72,6 +72,8 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     $node.pluginName = "$($node.pluginName)_$($code)"
     $node.pluginDesc = $description
     $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
+	$node.pluginCode = $pluginUniqueCode
+	$node.bundleIdentifier = "$($node.bundleIdentifier)_$(($code).ToLower())"
     
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
@@ -101,7 +103,7 @@ $source = '.\Encoder\AmbisonicEncoder.jucer'
 foreach ($element in $EncoderVersions) 
 {
     $output = $ChannelsPerOrder[$element.Order]
-    createFile $source $element.Input $output $element.Order $element.Input $element.Description
+    createFile $source $element.Input $output $element.Order $element.Input $element.Description $element.PluginCode
 }
 
 Write-Output "Generating Decoder files"
@@ -109,7 +111,7 @@ $source = '.\Decoder\AmbisonicDecoder.jucer'
 foreach ($element in $DecoderVersions) 
 {
     $input = $ChannelsPerOrder[$element.Order]
-    createFile $source $input $element.Output $element.Order $element.Output $element.Description
+    createFile $source $input $element.Output $element.Order $element.Output $element.Description $element.PluginCode
 }
 return 0
 # program end
