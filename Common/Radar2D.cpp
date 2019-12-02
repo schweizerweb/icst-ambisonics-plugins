@@ -319,6 +319,15 @@ void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 
 bool Radar2D::keyPressed(const KeyPress& key)
 {
+	if(key.isKeyCode(KeyPress::homeKey))
+	{
+		// reset zoom
+		pZoomSettings->setCurrentCenterPointXY(0.0f, 0.0f);
+		pZoomSettings->setCurrentCenterPointYZ(0.0f, 0.0f);
+		pZoomSettings->setCurrentRadius(1.0f);
+		return true;
+	}
+
 	if (pPointSelection->getSelectionMode() == PointSelection::None || pPointSelection->getSelectedIndices().size() == 0)
 		return false;
 
