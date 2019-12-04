@@ -65,11 +65,41 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
 	}
 }
 
+bool AmbiGroup::checkXYZ(double x, double y, double z)
+{
+    return (Constants::XMin <= x && x <= Constants::XMax)
+        && (Constants::YMin <= y && y <= Constants::YMax)
+        && (Constants::ZMin <= z && z <= Constants::ZMax);
+}
+
+bool AmbiGroup::checkAED(double a, double e, double d)
+{
+    double x = d * cos(e) * cos(a);
+    double y = d * cos(e) * sin(a);
+    double z = d * sin(e);
+
+    return checkXYZ(x, y, z);
+}
+
 void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElements)
 {
 	double dx = newX - getPoint()->getX();
 	double dy = newY - getPoint()->getY();
 	double dz = newZ - getPoint()->getZ();
+
+    // check new coordinates first
+    if (!checkXYZ(newX, newY, newZ))
+        return;
+
+    if (moveSubElements)
+    {
+        // bounding box
+        for (AmbiPoint* p : groupPoints)
+        {
+            if (!checkXYZ(p->getPoint()->getX() + dx, p->getPoint()->getY() + dy, p->getPoint()->getZ() + dz))
+                return;
+        }
+    }
 
 	getPoint()->setXYZ(newX, newY, newZ);
 
@@ -87,6 +117,20 @@ void AmbiGroup::setAED(double newA, double newE, double newD, bool moveSubElemen
 	double da = newA - getPoint()->getAzimuth();
 	double de = newE - getPoint()->getElevation();
 	double dd = newD - getPoint()->getDistance();
+
+    // check new coordinates first
+    if (!checkAED(newA, newE, newD))
+        return;
+
+    if (moveSubElements)
+    {
+        // bounding box
+        for (AmbiPoint* p : groupPoints)
+        {
+            if (!checkAED(p->getPoint()->getAzimuth() + da, p->getPoint()->getElevation() + de, p->getPoint()->getDistance() + dd))
+                return;
+        }
+    }
 
 	getPoint()->setAzimuth(newA);
 	getPoint()->setElevation(newE);

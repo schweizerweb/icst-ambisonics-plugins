@@ -26,8 +26,10 @@ public:
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
 	void moveXYZ(double dx, double dy, double dz, bool moveSubElements);
-	void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
-	void setAED(double newA, double newE, double newD, bool moveSubElements);
+    static bool checkXYZ(double x, double y, double z);
+    static bool checkAED(double a, double e, double d);
+    void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
+    void setAED(double newA, double newE, double newD, bool moveSubElements);
 
 	Array<AmbiPoint*> groupPoints;
 };
