@@ -331,10 +331,12 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 		Array<int> selection = pPointSelection->getSelectedIndices();
 		if (pPointSelection->getSelectionMode() == PointSelection::Point && selection.size() > 1)
 		{
-			double minX = 1;
-			double maxX = -1;
-			double minY = 1;
-			double maxY = -1;
+			double minX = Constants::XMax;
+			double maxX = Constants::XMin;
+			double minY = Constants::YMax;
+			double maxY = Constants::YMin;
+            double minZ = Constants::ZMax;
+            double maxZ = Constants::ZMin;
 
 			for (int i : selection)
 			{
@@ -342,10 +344,13 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 				maxX = jmax(maxX, pEditablePoints->get(i)->getPoint()->getX());
 				minY = jmin(minY, pEditablePoints->get(i)->getPoint()->getY());
 				maxY = jmax(maxY, pEditablePoints->get(i)->getPoint()->getY());
+                minZ = jmin(minZ, pEditablePoints->get(i)->getPoint()->getZ());
+                maxZ = jmax(maxZ, pEditablePoints->get(i)->getPoint()->getZ());
 			}
-			Point<double> center = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
+			Point<double> centerXY = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
+            double centerZ = (minZ + maxZ) / 2.0;
 
-			AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(center.getX(), center.getY(), 0.0), "G", Colours::orange);
+			AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(centerXY.getX(), centerXY.getY(), centerZ), "G", Colours::orange);
 			for (int i : selection)
 			{
 				g->groupPoints.add(pEditablePoints->get(i));
