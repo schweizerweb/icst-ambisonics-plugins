@@ -58,6 +58,10 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
     if(moveSubElements)
     {
         // check borders first
+        checkAndAdjustDeltaXYZ(p.getX(), &dx, p.getY(), &dy, p.getZ(), &dz);
+        for (AmbiPoint* sp : groupPoints)
+            checkAndAdjustDeltaXYZ(sp->getPoint()->getX(), &dx, sp->getPoint()->getY(), &dy, sp->getPoint()->getZ(), &dz);
+
         if (!checkXYZ(p.getX() + dx, p.getY() + dy, p.getZ() + dz))
             return;
         
@@ -95,6 +99,16 @@ bool AmbiGroup::checkAED(double a, double e, double d)
     return checkXYZ(x, y, z);
 }
 
+void AmbiGroup::checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz)
+{
+    *dx = (x + *dx) < Constants::XMin ? Constants::XMin - x : *dx;
+    *dx = (x + *dx) > Constants::XMax ? Constants::XMax - x : *dx;
+    *dy = (y + *dy) < Constants::YMin ? Constants::YMin - y : *dy;
+    *dy = (y + *dy) > Constants::YMax ? Constants::YMax - y : *dy;
+    *dz = (z + *dz) < Constants::ZMin ? Constants::ZMin - z : *dz;
+    *dz = (z + *dz) > Constants::ZMax ? Constants::ZMax - z : *dz;
+}
+
 void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElements)
 {
 	double dx = newX - getPoint()->getX();
@@ -102,6 +116,14 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
 	double dz = newZ - getPoint()->getZ();
 
     // check new coordinates first
+    checkAndAdjustDeltaXYZ(getPoint()->getX(), &dx, getPoint()->getY(), &dy, getPoint()->getZ(), &dz);
+    for (AmbiPoint* sp : groupPoints)
+        checkAndAdjustDeltaXYZ(sp->getPoint()->getX(), &dx, sp->getPoint()->getY(), &dy, sp->getPoint()->getZ(), &dz);
+
+    newX = getPoint()->getX() + dx;
+    newY = getPoint()->getY() + dy;
+    newZ = getPoint()->getZ() + dz;
+
     if (!checkXYZ(newX, newY, newZ))
         return;
 
