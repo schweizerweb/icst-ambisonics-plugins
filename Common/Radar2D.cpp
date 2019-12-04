@@ -563,16 +563,18 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
-			AmbiPoint* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex());
-			double dx = radarMode == XY ? valuePoint.getY() - ref->getPoint()->getX() : 0.0;
-			double dy = valuePoint.getX() - ref->getPoint()->getY();
-			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getPoint()->getZ();
+		    Point3D<double>* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex())->getPoint();
+            std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack));
+            for (int i : selection)
+            {
+                localGroup->groupPoints.add(pEditablePoints->get(i));
+            }
 
-			for (int i : selection)
-			{
-				Point3D<double>* p = pEditablePoints->get(i)->getPoint();
-				pEditablePoints->setChannelXYZ(i, p->getX() + dx, p->getY() + dy, p->getZ() + dz);
-			}
+			double dx = radarMode == XY ? valuePoint.getY() - ref->getX() : 0.0;
+			double dy = valuePoint.getX() - ref->getY();
+			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getZ();
+
+            localGroup->moveXYZ(dx, dy, dz, true);
 		}
 		else if(pPointSelection->getSelectionMode() == PointSelection::Group)
 		{

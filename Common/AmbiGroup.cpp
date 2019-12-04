@@ -54,6 +54,20 @@ XmlElement* AmbiGroup::getAsXmlElement(String tagName)
 void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
 {
 	Point3D<double> p = *getPoint();
+
+    if(moveSubElements)
+    {
+        // check borders first
+        if (!checkXYZ(p.getX() + dx, p.getY() + dy, p.getZ() + dz))
+            return;
+        
+        for (AmbiPoint* sp : groupPoints)
+        {
+            if(!checkXYZ(sp->getPoint()->getX() + dx, sp->getPoint()->getY() + dy, sp->getPoint()->getZ() + dz))
+                return;
+        }
+    }
+
 	getPoint()->setXYZ(p.getX() + dx, p.getY() + dy, p.getZ() + dz);
 
 	if(moveSubElements)
