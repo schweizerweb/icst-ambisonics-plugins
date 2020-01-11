@@ -128,23 +128,41 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
 
     labelCenterCurve->setBounds (8, 80, 140, 24);
 
-    sliderCenterAttenuation.reset (new Slider ("sliderCenterAttenuation"));
-    addAndMakeVisible (sliderCenterAttenuation.get());
-    sliderCenterAttenuation->setRange (0, 50, 0.01);
-    sliderCenterAttenuation->setSliderStyle (Slider::LinearHorizontal);
-    sliderCenterAttenuation->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    sliderCenterAttenuation->addListener (this);
+    sliderExperimentalFactor.reset (new Slider ("sliderExperimentalFactor"));
+    addAndMakeVisible (sliderExperimentalFactor.get());
+    sliderExperimentalFactor->setRange (0, 5, 0.01);
+    sliderExperimentalFactor->setSliderStyle (Slider::LinearHorizontal);
+    sliderExperimentalFactor->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderExperimentalFactor->addListener (this);
 
-    labelCenterAttenuation.reset (new Label ("labelCenterAttenuation",
-                                             TRANS("Center Attenuation")));
-    addAndMakeVisible (labelCenterAttenuation.get());
-    labelCenterAttenuation->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelCenterAttenuation->setJustificationType (Justification::centredLeft);
-    labelCenterAttenuation->setEditable (false, false, false);
-    labelCenterAttenuation->setColour (TextEditor::textColourId, Colours::black);
-    labelCenterAttenuation->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelExperimentalFact.reset (new Label ("labelExperimentalFact",
+                                            TRANS("Experimental Factor")));
+    addAndMakeVisible (labelExperimentalFact.get());
+    labelExperimentalFact->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelExperimentalFact->setJustificationType (Justification::centredLeft);
+    labelExperimentalFact->setEditable (false, false, false);
+    labelExperimentalFact->setColour (TextEditor::textColourId, Colours::black);
+    labelExperimentalFact->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelCenterAttenuation->setBounds (8, 128, 140, 24);
+    labelExperimentalFact->setBounds (8, 128, 140, 24);
+
+    sliderExperimentalPower.reset (new Slider ("sliderExperimentalPower"));
+    addAndMakeVisible (sliderExperimentalPower.get());
+    sliderExperimentalPower->setRange (0, 20, 0.01);
+    sliderExperimentalPower->setSliderStyle (Slider::LinearHorizontal);
+    sliderExperimentalPower->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderExperimentalPower->addListener (this);
+
+    labelExperimentalPower.reset (new Label ("labelExperimentalPower",
+                                             TRANS("Experimental Power")));
+    addAndMakeVisible (labelExperimentalPower.get());
+    labelExperimentalPower->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelExperimentalPower->setJustificationType (Justification::centredLeft);
+    labelExperimentalPower->setEditable (false, false, false);
+    labelExperimentalPower->setColour (TextEditor::textColourId, Colours::black);
+    labelExperimentalPower->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelExperimentalPower->setBounds (8, 152, 140, 24);
 
 
     //[UserPreSize]
@@ -157,6 +175,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem("Standard", DistanceEncodingParams::Standard);
     comboBoxEncodingMode->addItem("Exponential", DistanceEncodingParams::Exponential);
     comboBoxEncodingMode->addItem("Inverse Proportional", DistanceEncodingParams::InverseProportional);
+    comboBoxEncodingMode->addItem("Experimental", DistanceEncodingParams::Experimental);
     comboBoxEncodingMode->setSelectedId(pParams->encodingMode, dontSendNotification);
 	sliderUnitCircleRadius->setValue(pParams->unitCircleRadius, dontSendNotification);
     sliderDbUnit->setSkewFactorFromMidPoint(5.0);
@@ -164,7 +183,8 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderDistanceAttenuation->setValue(pParams->inverseProportionalDistanceAttenuation, dontSendNotification);
     sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
     sliderCenterCurve->setValue(pParams->centerCurve, dontSendNotification);
-    sliderCenterAttenuation->setValue(pParams->centerAttenuation, dontSendNotification);
+    sliderExperimentalFactor->setValue(pParams->experimentalFactor, dontSendNotification);
+    sliderExperimentalPower->setValue(pParams->experimentalPower, dontSendNotification);
     controlDimming();
     //[/Constructor]
 }
@@ -185,8 +205,10 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     labelDistanceAttenuation = nullptr;
     sliderCenterCurve = nullptr;
     labelCenterCurve = nullptr;
-    sliderCenterAttenuation = nullptr;
-    labelCenterAttenuation = nullptr;
+    sliderExperimentalFactor = nullptr;
+    labelExperimentalFact = nullptr;
+    sliderExperimentalPower = nullptr;
+    labelExperimentalPower = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -210,13 +232,14 @@ void DistanceEncodingComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    distanceEncodingGraph->setBounds (0, 160, proportionOfWidth (1.0000f), getHeight() - 160);
+    distanceEncodingGraph->setBounds (0, 184, proportionOfWidth (1.0000f), getHeight() - 184);
     sliderUnitCircleRadius->setBounds (152, 32, getWidth() - 165, 24);
     comboBoxEncodingMode->setBounds (152, 8, getWidth() - 165, 24);
     sliderDbUnit->setBounds (153, 56, getWidth() - 165, 24);
     sliderDistanceAttenuation->setBounds (153, 104, getWidth() - 165, 24);
     sliderCenterCurve->setBounds (153, 80, getWidth() - 165, 24);
-    sliderCenterAttenuation->setBounds (153, 128, getWidth() - 165, 24);
+    sliderExperimentalFactor->setBounds (153, 128, getWidth() - 165, 24);
+    sliderExperimentalPower->setBounds (153, 152, getWidth() - 165, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -250,11 +273,17 @@ void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         pParams->centerCurve = float(sliderCenterCurve->getValue());
         //[/UserSliderCode_sliderCenterCurve]
     }
-    else if (sliderThatWasMoved == sliderCenterAttenuation.get())
+    else if (sliderThatWasMoved == sliderExperimentalFactor.get())
     {
-        //[UserSliderCode_sliderCenterAttenuation] -- add your slider handling code here..
-        pParams->centerAttenuation = float(sliderCenterAttenuation->getValue());
-        //[/UserSliderCode_sliderCenterAttenuation]
+        //[UserSliderCode_sliderExperimentalFactor] -- add your slider handling code here..
+        pParams->experimentalFactor = float(sliderExperimentalFactor->getValue());
+        //[/UserSliderCode_sliderExperimentalFactor]
+    }
+    else if (sliderThatWasMoved == sliderExperimentalPower.get())
+    {
+        //[UserSliderCode_sliderExperimentalPower] -- add your slider handling code here..
+        pParams->experimentalPower = float(sliderExperimentalPower->getValue());
+        //[/UserSliderCode_sliderExperimentalPower]
     }
 
     //[UsersliderValueChanged_Post]
@@ -285,14 +314,17 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void DistanceEncodingComponent::controlDimming() const
 {
-    sliderCenterCurve->setEnabled(pParams->encodingMode != DistanceEncodingParams::Standard);
-    labelCenterCurve->setEnabled(pParams->encodingMode != DistanceEncodingParams::Standard);
-    sliderDbUnit->setEnabled(pParams->encodingMode != DistanceEncodingParams::Standard);
-    labelDbUnit->setEnabled(pParams->encodingMode != DistanceEncodingParams::Standard);
+    bool inverseProportionalOrExponential = pParams->encodingMode == DistanceEncodingParams::Exponential || pParams->encodingMode == DistanceEncodingParams::InverseProportional;
+    sliderCenterCurve->setEnabled(inverseProportionalOrExponential);
+    labelCenterCurve->setEnabled(inverseProportionalOrExponential);
+    sliderDbUnit->setEnabled(inverseProportionalOrExponential);
+    labelDbUnit->setEnabled(inverseProportionalOrExponential);
     sliderDistanceAttenuation->setEnabled(pParams->encodingMode == DistanceEncodingParams::InverseProportional);
     labelDistanceAttenuation->setEnabled(pParams->encodingMode == DistanceEncodingParams::InverseProportional);
-    sliderCenterAttenuation->setEnabled(false);
-    labelCenterAttenuation->setEnabled(false);
+    sliderExperimentalFactor->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
+    labelExperimentalFact->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
+    sliderExperimentalPower->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
+    labelExperimentalPower->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
 }
 
 //[/MiscUserCode]
@@ -314,7 +346,7 @@ BEGIN_JUCER_METADATA
                  initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
-                    virtualName="" explicitFocusOrder="0" pos="0 160 100% 160M" class="DistanceEncodingGraph"
+                    virtualName="" explicitFocusOrder="0" pos="0 184 100% 184M" class="DistanceEncodingGraph"
                     params="pParams"/>
   <SLIDER name="sliderUnitCircleRadius" id="33a23e1d161c87b2" memberName="sliderUnitCircleRadius"
           virtualName="" explicitFocusOrder="0" pos="152 32 165M 24" min="0.01"
@@ -364,14 +396,24 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Center Curve" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderCenterAttenuation" id="acaa669a372543dd" memberName="sliderCenterAttenuation"
+  <SLIDER name="sliderExperimentalFactor" id="acaa669a372543dd" memberName="sliderExperimentalFactor"
           virtualName="" explicitFocusOrder="0" pos="153 128 165M 24" min="0.0"
-          max="50.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          max="5.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="labelCenterAttenuation" id="11f4879337765cab" memberName="labelCenterAttenuation"
+  <LABEL name="labelExperimentalFact" id="11f4879337765cab" memberName="labelExperimentalFact"
          virtualName="" explicitFocusOrder="0" pos="8 128 140 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Center Attenuation" editableSingleClick="0"
+         edBkgCol="0" labelText="Experimental Factor" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="sliderExperimentalPower" id="848239971373225d" memberName="sliderExperimentalPower"
+          virtualName="" explicitFocusOrder="0" pos="153 152 165M 24" min="0.0"
+          max="20.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="labelExperimentalPower" id="5f0682ceb4e79610" memberName="labelExperimentalPower"
+         virtualName="" explicitFocusOrder="0" pos="8 152 140 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Experimental Power" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>

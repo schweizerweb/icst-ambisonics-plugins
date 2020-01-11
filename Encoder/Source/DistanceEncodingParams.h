@@ -14,13 +14,14 @@
 #define DEFAULT_DB_UNIT         	    10.0f
 #define DEFAULT_DISTANCE_ATTENUATION	5.0f
 #define DEFAULT_CENTER_CURVE        	0.02f
-#define DEFAULT_CENTER_ATTENUATION  	20.0f
+#define DEFAULT_EXPERIMENTAL_FACTOR  	1.0f
+#define DEFAULT_EXPERIMENTAL_POWER  	1.0f
 #define DEFAULT_DISTANCE_ENCODING_MODE  DistanceEncodingParams::Standard
 
 class DistanceEncodingParams
 {
 public:
-    enum EncodingMode { None, Standard, Exponential, InverseProportional };
+    enum EncodingMode { None, Standard, Exponential, InverseProportional, Experimental };
 
 	DistanceEncodingParams(): 
         encodingMode(Standard), 
@@ -28,7 +29,8 @@ public:
         dbUnit(DEFAULT_DB_UNIT), 
         inverseProportionalDistanceAttenuation(DEFAULT_DISTANCE_ATTENUATION), 
         centerCurve(DEFAULT_CENTER_CURVE),
-        centerAttenuation(DEFAULT_CENTER_ATTENUATION)
+        experimentalFactor(DEFAULT_EXPERIMENTAL_FACTOR),
+        experimentalPower(DEFAULT_EXPERIMENTAL_POWER)
     {
     }
 
@@ -37,12 +39,21 @@ public:
     float dbUnit;
     float inverseProportionalDistanceAttenuation;
     float centerCurve;
-    float centerAttenuation;
+    float experimentalFactor;
+    float experimentalPower;
 
 	void calculateAttenuation(double distance, double* wFactor, double* otherFactor) const
 	{
         if (encodingMode == Standard)
         {
+            double scaledDistance = distance * (1.0 / unitCircleRadius);
+            *wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
+            *otherFactor = (1 - exp(-scaledDistance)) * (*wFactor);
+        }
+        else if(encodingMode == Experimental)
+        {
+            // factor 0-5; power 0-20
+            double scaler = distance < unitCircleRadius ? 1.0 : pow(1 - experimentalFactor * (distance - unitCircleRadius), experimentalPower);
             double scaledDistance = distance * (1.0 / unitCircleRadius);
             *wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0) * scaler;
             *otherFactor = (1 - exp(-scaledDistance)) * (*wFactor);

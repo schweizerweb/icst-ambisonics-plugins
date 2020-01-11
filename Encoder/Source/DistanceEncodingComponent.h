@@ -74,8 +74,10 @@ private:
     std::unique_ptr<Label> labelDistanceAttenuation;
     std::unique_ptr<Slider> sliderCenterCurve;
     std::unique_ptr<Label> labelCenterCurve;
-    std::unique_ptr<Slider> sliderCenterAttenuation;
-    std::unique_ptr<Label> labelCenterAttenuation;
+    std::unique_ptr<Slider> sliderExperimentalFactor;
+    std::unique_ptr<Label> labelExperimentalFact;
+    std::unique_ptr<Slider> sliderExperimentalPower;
+    std::unique_ptr<Label> labelExperimentalPower;
 
 
     //==============================================================================
