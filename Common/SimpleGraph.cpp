@@ -94,7 +94,7 @@ void SimpleGraph::paint (Graphics& g)
 
 void SimpleGraph::resized()
 {
-	graphArea.reset(new Rectangle<int>(30, 30, getWidth() - 50, getHeight() - 55));
+	graphArea.reset(new Rectangle<int>(40, 30, getWidth() - 60, getHeight() - 55));
 	repaint();
 }
 
