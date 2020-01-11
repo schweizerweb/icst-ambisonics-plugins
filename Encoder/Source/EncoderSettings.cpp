@@ -20,6 +20,11 @@
 #define XML_ATTRIBUTE_IP "Ip"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_MODE "DistEncMode"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT "DistEncDbUnit"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION "DistEncDistanceAttenuation"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE "DistEncCenterCurve"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_ATTENUATION "DistEncCenterAttenuation"
 #define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 
@@ -69,6 +74,11 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
 	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.unitCircleRadius);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, distanceEncodingParams.encodingMode);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, distanceEncodingParams.dbUnit);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, distanceEncodingParams.inverseProportionalDistanceAttenuation);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, distanceEncodingParams.centerCurve);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_ATTENUATION, distanceEncodingParams.centerAttenuation);
 	element->addChildElement(distanceEncoding);
 
 	XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
@@ -111,6 +121,11 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	{
 		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
 		distanceEncodingParams.unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
+		distanceEncodingParams.encodingMode = DistanceEncodingParams::EncodingMode(distanceEncoding->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
+		distanceEncodingParams.dbUnit = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT));
+		distanceEncodingParams.inverseProportionalDistanceAttenuation = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION));
+		distanceEncodingParams.centerCurve = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
+		distanceEncodingParams.centerAttenuation = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_ATTENUATION, DEFAULT_CENTER_ATTENUATION));
 	}
 
 	XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);

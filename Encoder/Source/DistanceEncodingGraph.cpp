@@ -29,6 +29,10 @@ void DistanceEncodingGraph::paintData(Graphics& g)
 	bool firstW = true;
 	bool firstOther = true;
 
+    double w, o;
+    pParams->calculateAttenuation(1.0, &w, &o);
+    setDisplayRange(Linear, Range<double>(0.0, 1.0), Linear, Range<double>(jmin(-20.0, Decibels::gainToDecibels(w), Decibels::gainToDecibels(o)), 0));
+
 	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
