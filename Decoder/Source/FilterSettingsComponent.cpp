@@ -93,6 +93,24 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
 
+    labelGain.reset (new Label ("labelGain",
+                                TRANS("Gain Factor")));
+    addAndMakeVisible (labelGain.get());
+    labelGain->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelGain->setJustificationType (Justification::centredLeft);
+    labelGain->setEditable (false, false, false);
+    labelGain->setColour (TextEditor::textColourId, Colours::black);
+    labelGain->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelGain->setBounds (8, 104, 150, 24);
+
+    sliderGain.reset (new Slider ("sliderGain"));
+    addAndMakeVisible (sliderGain.get());
+    sliderGain->setRange (0.001, 100, 0);
+    sliderGain->setSliderStyle (Slider::LinearBar);
+    sliderGain->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderGain->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -109,7 +127,9 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 	comboBoxType->addItem("Low-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderLowPass);
 	comboBoxType->addItem("High-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderHighPass);
 	comboBoxType->addItem("Notch", 1+FilterInfo::FilterType::Notch);
-	comboBoxType->setSelectedId(1+pFilterInfo->filterType, dontSendNotification);
+    comboBoxType->addItem("Low Shelf", 1+FilterInfo::FilterType::LowShelf);
+    comboBoxType->addItem("High Shelf", 1+FilterInfo::FilterType::HighShelf);
+	comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
 
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);
 	sliderFrequency->setSkewFactorFromMidPoint(500);
@@ -118,6 +138,9 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 	sliderQ->setNumDecimalPlacesToDisplay(3);
 	sliderQ->setSkewFactorFromMidPoint(1.0);
 	sliderQ->setValue(pFilterInfo->qValue);
+    sliderGain->setNumDecimalPlacesToDisplay(3);
+    sliderGain->setSkewFactor(1.0);
+    sliderGain->setValue(pFilterInfo->gainFactor);
     //[/Constructor]
 }
 
@@ -133,6 +156,8 @@ FilterSettingsComponent::~FilterSettingsComponent()
     labelQ = nullptr;
     sliderQ = nullptr;
     filterGraph = nullptr;
+    labelGain = nullptr;
+    sliderGain = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -159,7 +184,8 @@ void FilterSettingsComponent::resized()
     comboBoxType->setBounds (168, 8, getWidth() - 176, 24);
     sliderFrequency->setBounds (168, 40, getWidth() - 176, 24);
     sliderQ->setBounds (168, 72, getWidth() - 176, 24);
-    filterGraph->setBounds (8, 104, getWidth() - 16, getHeight() - 112);
+    filterGraph->setBounds (8, 136, getWidth() - 16, getHeight() - 144);
+    sliderGain->setBounds (168, 104, getWidth() - 176, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -174,6 +200,7 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_comboBoxType] -- add your combo box handling code here..
 		pFilterInfo->filterType = FilterInfo::FilterType(comboBoxType->getSelectedId()-1);
 		sliderQ->setEnabled(pFilterInfo->qRequired());
+        sliderGain->setEnabled(pFilterInfo->gainRequired());
 		sendChangeMessage();
         //[/UserComboBoxCode_comboBoxType]
     }
@@ -199,6 +226,12 @@ void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         //[UserSliderCode_sliderQ] -- add your slider handling code here..
 		pFilterInfo->qValue = float(sliderQ->getValue());
         //[/UserSliderCode_sliderQ]
+    }
+    else if (sliderThatWasMoved == sliderGain.get())
+    {
+        //[UserSliderCode_sliderGain] -- add your slider handling code here..
+        pFilterInfo->gainFactor = float(sliderGain->getValue());
+        //[/UserSliderCode_sliderGain]
     }
 
     //[UsersliderValueChanged_Post]
@@ -255,8 +288,18 @@ BEGIN_JUCER_METADATA
           int="0.0" style="LinearBar" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
-                    virtualName="" explicitFocusOrder="0" pos="8 104 16M 112M" class="IIRFilterGraph"
+                    virtualName="" explicitFocusOrder="0" pos="8 136 16M 144M" class="IIRFilterGraph"
                     params="pFilterInfo, pFilterSpecification"/>
+  <LABEL name="labelGain" id="5e0ece6555401094" memberName="labelGain"
+         virtualName="" explicitFocusOrder="0" pos="8 104 150 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Gain Factor" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="sliderGain" id="6dc6c3b4f1230227" memberName="sliderGain"
+          virtualName="" explicitFocusOrder="0" pos="168 104 176M 24" min="0.001"
+          max="100.0" int="0.0" style="LinearBar" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

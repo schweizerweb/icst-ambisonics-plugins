@@ -69,6 +69,8 @@ private:
     std::unique_ptr<Label> labelQ;
     std::unique_ptr<Slider> sliderQ;
     std::unique_ptr<IIRFilterGraph> filterGraph;
+    std::unique_ptr<Label> labelGain;
+    std::unique_ptr<Slider> sliderGain;
 
 
     //==============================================================================
