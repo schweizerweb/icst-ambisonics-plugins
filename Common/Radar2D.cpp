@@ -63,12 +63,14 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 
 float Radar2D::getEditablePointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 30.0f * scaler;
+    double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
+	return radarViewport.getWidth() / 30.0f * scaler * baseScaler;
 }
 
 float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 50.0f * scaler;
+	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
+    return radarViewport.getWidth() / 50.0f * scaler * baseScaler;
 }
 
 float Radar2D::getFontSize() const

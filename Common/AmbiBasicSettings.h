@@ -14,17 +14,20 @@
 #define SOUND_SPEED_S_PER_M (1.0 / SOUND_SPEED_M_PER_S)
 
 #define DEFAULT_DISTANCE_SCALER	1.0
+#define DEFAULT_POINT_SCALER 1.0
 
 class AmbiBasicSettings
 {
 public:
-	AmbiBasicSettings(double distanceScaler, bool directionFlip);
+	AmbiBasicSettings(double distanceScaler, bool directionFlip, double pointScaler);
 
 	double getDistanceScaler() const;
 	void setDistanceScaler(double newDistanceScaler);
 
 	bool getDirectionFlip() const;
 	void setDirectionFlip(bool flip);
+
+    double pointScaler;
 
 private:
 	double distanceScaler;

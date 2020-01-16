@@ -15,6 +15,7 @@
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
 #define XML_TAG_ORIENTATION "Orientation"
+#define XML_TAG_DISPLAY "Display"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_IP "Ip"
@@ -28,6 +29,7 @@
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER "DistEncExperimentalPower"
 #define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
+#define XML_ATTRIBUTE_POINT_SCALER "PointScaler"
 
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
@@ -42,7 +44,7 @@ EncoderSettings::EncoderSettings():
 	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
 	dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
 	distanceEncodingParams(DistanceEncodingParams()),
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP)
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP, DEFAULT_POINT_SCALER)
 {
 }
 
@@ -92,6 +94,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, getDirectionFlip());
 	element->addChildElement(orientation);
 
+    XmlElement* display = new XmlElement(XML_TAG_DISPLAY);
+    display->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
+    element->addChildElement(display);
+    
 	return element;
 }
 
@@ -143,4 +149,10 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	{
 		setDirectionFlip(orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP));
 	}
+    
+    XmlElement* display = element->getChildByName(XML_TAG_DISPLAY);
+    if(display != nullptr)
+    {
+        pointScaler = display->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
+    }
 }

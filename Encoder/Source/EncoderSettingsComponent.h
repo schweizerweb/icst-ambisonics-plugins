@@ -133,6 +133,9 @@ private:
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<TextButton> btnEditDistanceEncoding;
+    std::unique_ptr<GroupComponent> groupDisplay;
+    std::unique_ptr<Slider> sliderPointScaler;
+    std::unique_ptr<Label> labelPointScaler;
 
 
     //==============================================================================

@@ -302,6 +302,26 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     btnEditDistanceEncoding->setButtonText (TRANS("edit..."));
     btnEditDistanceEncoding->addListener (this);
 
+    groupDisplay.reset (new GroupComponent ("groupDisplay",
+                                            TRANS("Display")));
+    addAndMakeVisible (groupDisplay.get());
+
+    sliderPointScaler.reset (new Slider ("sliderPointScaler"));
+    addAndMakeVisible (sliderPointScaler.get());
+    sliderPointScaler->setRange (0.1, 10, 0.01);
+    sliderPointScaler->setSliderStyle (Slider::LinearHorizontal);
+    sliderPointScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
+    sliderPointScaler->addListener (this);
+
+    labelPointScaler.reset (new Label ("labelPointScaler",
+                                       TRANS("Point Scaler:")));
+    addAndMakeVisible (labelPointScaler.get());
+    labelPointScaler->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPointScaler->setJustificationType (Justification::centredLeft);
+    labelPointScaler->setEditable (false, false, false);
+    labelPointScaler->setColour (TextEditor::textColourId, Colours::black);
+    labelPointScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -336,6 +356,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
 	sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
 
+    sliderPointScaler->setValue(pEncoderSettings->pointScaler);
+    sliderPointScaler->setSkewFactorFromMidPoint(1.0);
 	groupSources->setVisible(MULTI_ENCODER_MODE);
 	buttonAdd->setVisible(MULTI_ENCODER_MODE);
 	buttonRemove->setVisible(MULTI_ENCODER_MODE);
@@ -422,6 +444,9 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     sliderDistanceScaler = nullptr;
     labelDistanceScaler = nullptr;
     btnEditDistanceEncoding = nullptr;
+    groupDisplay = nullptr;
+    sliderPointScaler = nullptr;
+    labelPointScaler = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -446,8 +471,8 @@ void EncoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    multiEncoderElements->setBounds (8, 152 + 112, getWidth() - 17, getHeight() - 303);
-    groupSources->setBounds (8 + 0, (152 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 303) * 0.6000f));
+    multiEncoderElements->setBounds (8, 152 + 112 - -48, getWidth() - 17, getHeight() - 351);
+    groupSources->setBounds (8 + 0, (152 + 112 - -48) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.5993f));
     groupOsc->setBounds (8, 8, getWidth() - 17, 144);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
     textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
@@ -465,25 +490,28 @@ void EncoderSettingsComponent::resized()
     textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
     labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    sourceList->setBounds ((8 + 0) + 16, ((152 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 303) * 0.6000f)) - 67);
-    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
-    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
-    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
-    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112) + 0) + (roundToInt ((getHeight() - 303) * 0.6000f)) - 40, 64, 24);
-    groupGroups->setBounds (8 + 0, (152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 303) * 0.4000f));
-    groupList->setBounds ((8 + 0) + 16, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 303) * 0.4000f)) - 67);
-    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + (roundToInt ((getHeight() - 303) * 0.4000f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112) + (getHeight() - 303) - (roundToInt ((getHeight() - 303) * 0.4000f))) + (roundToInt ((getHeight() - 303) * 0.4000f)) - 40, 64, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((152 + 112 - -48) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.5993f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.4007f));
+    groupList->setBounds ((8 + 0) + 16, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.4007f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + (roundToInt ((getHeight() - 351) * 0.4007f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + (roundToInt ((getHeight() - 351) * 0.4007f)) - 40, 64, 24);
     comboBoxPresets->setBounds (83, getHeight() - 34, getWidth() - 312, 24);
     labelPresets->setBounds (8, getHeight() - 34, 64, 24);
     buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
     buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 34, 64, 24);
     buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 34, 64, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3984f) / 2), 8, proportionOfWidth (0.3984f), 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3983f) / 2), 8, proportionOfWidth (0.3983f), 24);
     toggleDoppler->setBounds (8 + 14, 152 + 49, 199, 24);
     sliderDistanceScaler->setBounds (8 + (getWidth() - 17) - 24 - 202, 152 + 49, 202, 24);
     labelDistanceScaler->setBounds (8 + (getWidth() - 17) - 229 - 109, 152 + 49, 109, 24);
     btnEditDistanceEncoding->setBounds (8 + (getWidth() - 17) - 24 - 86, 152 + 19, 86, 24);
+    groupDisplay->setBounds (8, 264, getWidth() - 17, 48);
+    sliderPointScaler->setBounds (8 + (getWidth() - 17) - 26 - ((getWidth() - 17) - 163), 264 + 17, (getWidth() - 17) - 163, 24);
+    labelPointScaler->setBounds (8 + 8, 264 + 17, 109, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -745,6 +773,13 @@ void EncoderSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 		pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
 		sendChangeMessage();
         //[/UserSliderCode_sliderDistanceScaler]
+    }
+    else if (sliderThatWasMoved == sliderPointScaler.get())
+    {
+        //[UserSliderCode_sliderPointScaler] -- add your slider handling code here..
+        pEncoderSettings->pointScaler = sliderPointScaler->getValue();
+        sendChangeMessage();
+        //[/UserSliderCode_sliderPointScaler]
     }
 
     //[UsersliderValueChanged_Post]
@@ -1060,10 +1095,10 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="multiEncoderElements" id="73249ab85d6bba3a" memberName="multiEncoderElements"
-                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 303M" posRelativeY="b72378bdfe4e130"
+                    virtualName="" explicitFocusOrder="0" pos="8 -48R 17M 351M" posRelativeY="b72378bdfe4e130"
                     class="Component" params=""/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.038%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.929%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
@@ -1159,7 +1194,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.962%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.071%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -1197,7 +1232,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="49.962%c 8 39.82% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 8 39.835% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1221,6 +1256,20 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="24Rr 19 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <GROUPCOMPONENT name="groupDisplay" id="6c4c7585300838d8" memberName="groupDisplay"
+                  virtualName="" explicitFocusOrder="0" pos="8 264 17M 48" title="Display"/>
+  <SLIDER name="sliderPointScaler" id="e67c3f12c44da8fb" memberName="sliderPointScaler"
+          virtualName="" explicitFocusOrder="0" pos="26Rr 17 163M 24" posRelativeX="6c4c7585300838d8"
+          posRelativeY="6c4c7585300838d8" posRelativeW="6c4c7585300838d8"
+          min="0.1" max="10.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="labelPointScaler" id="36bfe3e1aa4822af" memberName="labelPointScaler"
+         virtualName="" explicitFocusOrder="0" pos="8 17 109 24" posRelativeX="6c4c7585300838d8"
+         posRelativeY="6c4c7585300838d8" edTextCol="ff000000" edBkgCol="0"
+         labelText="Point Scaler:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
