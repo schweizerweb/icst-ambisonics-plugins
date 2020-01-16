@@ -217,7 +217,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
 
     btnGroup->setImages (false, true, true,
                          ImageCache::getFromMemory (group_png, group_pngSize), 1.000f, Colour (0x00000000),
-                         Image(), 1.000f, Colour (0x00000000),
+                         Image(), 1.000f, Colour (0xa0a01313),
                          Image(), 1.000f, Colour (0x00000000));
     btnGroup->setBounds (0, 0, 36, 36);
 
@@ -228,7 +228,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
 
     btnUngroup->setImages (false, true, true,
                            ImageCache::getFromMemory (ungroup_png, ungroup_pngSize), 1.000f, Colour (0x00000000),
-                           Image(), 1.000f, Colour (0x00000000),
+                           Image(), 1.000f, Colour (0xa0a01313),
                            Image(), 1.000f, Colour (0x00000000));
     btnUngroup->setBounds (0, 0, 36, 36);
 
@@ -630,12 +630,12 @@ BEGIN_JUCER_METADATA
                explicitFocusOrder="0" pos="0 0 36 36" buttonText="group" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="1" resourceNormal="group_png"
                opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
-               colourOver="0" resourceDown="" opacityDown="1.0" colourDown="0"/>
+               colourOver="a0a01313" resourceDown="" opacityDown="1.0" colourDown="0"/>
   <IMAGEBUTTON name="btnUngroup" id="6bdf324b7d527d88" memberName="btnUngroup"
                virtualName="" explicitFocusOrder="0" pos="0 0 36 36" buttonText="ungroup"
                connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
                resourceNormal="ungroup_png" opacityNormal="1.0" colourNormal="0"
-               resourceOver="" opacityOver="1.0" colourOver="0" resourceDown=""
+               resourceOver="" opacityOver="1.0" colourOver="a0a01313" resourceDown=""
                opacityDown="1.0" colourDown="0"/>
 </JUCER_COMPONENT>
 
