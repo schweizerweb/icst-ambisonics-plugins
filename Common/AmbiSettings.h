@@ -21,7 +21,7 @@ class AmbiSettings: public AmbiBasicSettings
 {
 public:
 	AmbiSettings();
-	AmbiSettings(double distanceScaler, bool directionFlip);
+	AmbiSettings(double distanceScaler, bool directionFlip, double pointScaler);
 
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();

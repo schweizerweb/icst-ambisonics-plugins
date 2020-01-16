@@ -88,7 +88,7 @@ private:
     std::unique_ptr<ImageButton> btnSettings;
 
 
-	//==============================================================================
+    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
 };
 

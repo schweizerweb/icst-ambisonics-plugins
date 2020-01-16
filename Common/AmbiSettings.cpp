@@ -10,12 +10,12 @@
 
 #include "AmbiSettings.h"
 
-AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER, false)
+AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER, false, DEFAULT_POINT_SCALER)
 {
 	
 }
 
-AmbiSettings::AmbiSettings(double distanceScaler, bool directionFlip) : AmbiBasicSettings(distanceScaler, directionFlip)
+AmbiSettings::AmbiSettings(double distanceScaler, bool directionFlip, double pointScaler) : AmbiBasicSettings(distanceScaler, directionFlip, pointScaler)
 {
 	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
 		ambiOrderWeights[i] = 1.0;
