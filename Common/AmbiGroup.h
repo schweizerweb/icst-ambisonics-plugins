@@ -31,6 +31,7 @@ public:
     static void checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz);
     void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
     void setAED(double newA, double newE, double newD, bool moveSubElements);
+    void setChildrenColor();
 
 	Array<AmbiPoint*> groupPoints;
 };

@@ -108,7 +108,7 @@ public:
 		{
 			ColorEditorCustomComponent* colorBox = static_cast<ColorEditorCustomComponent*> (existingComponentToUpdate);
 			if (colorBox == nullptr)
-				colorBox = new ColorEditorCustomComponent(*this);
+				colorBox = new ColorEditorCustomComponent(*this, true);
 
 			colorBox->setRowAndColumn(rowNumber, columnId);
 			return colorBox;
@@ -153,7 +153,17 @@ public:
 		case COLUMN_ID_GROUP_A: pSources->getGroup(rowNumber)->getPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
 		case COLUMN_ID_GROUP_E: pSources->getGroup(rowNumber)->getPoint()->setElevation(Constants::GradToRad(newValue)); break;
 		case COLUMN_ID_GROUP_D: pSources->getGroup(rowNumber)->getPoint()->setDistance(newValue); break;
-		case COLUMN_ID_GROUP_COLOR: pSources->getGroup(rowNumber)->setColor(Colour(uint32(newValue))); break;
+		case COLUMN_ID_GROUP_COLOR:
+            if(newValue < 0) // code for setting children
+            {
+                pSources->getGroup(rowNumber)->setChildrenColor();
+                pPointSelection->notifyChange();
+            }
+            else
+            {
+                pSources->getGroup(rowNumber)->setColor(Colour(uint32(newValue)));
+            }
+            break;
 		default: throw;
 		}
 

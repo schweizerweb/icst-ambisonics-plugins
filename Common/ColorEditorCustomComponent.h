@@ -11,10 +11,10 @@
 #pragma once
 #include "TableColumnCallback.h"
 
-class ColorEditorCustomComponent : public Label, public ChangeListener
+class ColorEditorCustomComponent : public Label, public ChangeListener, public Button::Listener
 {
 public:
-	ColorEditorCustomComponent(TableColumnCallback& td) : owner(td), row(0), columnId(0)
+	ColorEditorCustomComponent(TableColumnCallback& td, bool groupFlag = false) : owner(td), row(0), columnId(0), groupFlag(groupFlag)
 	{
 	}
 
@@ -27,7 +27,21 @@ public:
 		selector->addChangeListener(this);
 		selector->setColour(ColourSelector::backgroundColourId, Colours::transparentBlack);
 		selector->setSize(200, 200);
-		CallOutBox::launchAsynchronously(selector, getScreenBounds(), nullptr);
+        
+        Component* c = new Component();
+        c->setSize(200, groupFlag ? 230 : 200);
+        c->addAndMakeVisible(selector);
+        
+        if(groupFlag)
+        {
+            TextButton* btn = new TextButton("Apply color to sub-points");
+            btn->addListener(this);
+            btn->setSize(200, 25);
+            btn->setTopLeftPosition(0, 202);
+            c->addAndMakeVisible(btn);
+        }
+        
+        CallOutBox::launchAsynchronously(c, getScreenBounds(), nullptr);
 	}
 
 	void setRowAndColumn(const int newRow, const int newColumn)
@@ -52,9 +66,14 @@ public:
 		}
 	}
 
-	
+	void buttonClicked(Button *) override
+    {
+        owner.setValue(columnId, row, -1);
+    }
+    
 private:
 	TableColumnCallback& owner;
 	int row, columnId;
 	Colour color;
+    bool groupFlag;
 };

@@ -185,3 +185,11 @@ void AmbiGroup::setAED(double newA, double newE, double newD, bool moveSubElemen
 		}
 	}
 }
+
+void AmbiGroup::setChildrenColor()
+{
+    for (AmbiPoint* p : groupPoints)
+    {
+        p->setColor(getColor());
+    }
+}
