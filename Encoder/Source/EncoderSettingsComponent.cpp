@@ -397,6 +397,13 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	initializePresets();
 
 	controlDimming();
+    
+    // TODO: Doppler temporarily deactivated
+    toggleDoppler->setToggleState(false, dontSendNotification);
+    toggleDoppler->setEnabled(false);
+    labelDistanceScaler->setEnabled(false);
+    sliderDistanceScaler->setEnabled(false);
+    
     //[/Constructor]
 }
 
