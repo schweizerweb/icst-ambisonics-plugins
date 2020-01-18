@@ -308,7 +308,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
     sliderPointScaler.reset (new Slider ("sliderPointScaler"));
     addAndMakeVisible (sliderPointScaler.get());
-    sliderPointScaler->setRange (0.1, 10, 0.01);
+    sliderPointScaler->setRange (0.2, 2, 0.01);
     sliderPointScaler->setSliderStyle (Slider::LinearHorizontal);
     sliderPointScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderPointScaler->addListener (this);
@@ -397,13 +397,13 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	initializePresets();
 
 	controlDimming();
-    
+
     // TODO: Doppler temporarily deactivated
     toggleDoppler->setToggleState(false, dontSendNotification);
     toggleDoppler->setEnabled(false);
     labelDistanceScaler->setEnabled(false);
     sliderDistanceScaler->setEnabled(false);
-    
+
     //[/Constructor]
 }
 
@@ -1268,7 +1268,7 @@ BEGIN_JUCER_METADATA
   <SLIDER name="sliderPointScaler" id="e67c3f12c44da8fb" memberName="sliderPointScaler"
           virtualName="" explicitFocusOrder="0" pos="26Rr 17 163M 24" posRelativeX="6c4c7585300838d8"
           posRelativeY="6c4c7585300838d8" posRelativeW="6c4c7585300838d8"
-          min="0.1" max="10.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          min="0.2" max="2.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelPointScaler" id="36bfe3e1aa4822af" memberName="labelPointScaler"

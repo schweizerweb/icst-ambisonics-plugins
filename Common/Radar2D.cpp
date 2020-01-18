@@ -173,17 +173,19 @@ void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) con
 
 void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-	int y = screenPt.getY() > offset + labelImage.getHeight()
-		? int(screenPt.getY() - offset - labelImage.getHeight())
+	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
+    
+    int y = screenPt.getY() > offset + labelImage.getHeight() * baseScaler
+		? int(screenPt.getY() - offset - labelImage.getHeight() * baseScaler)
 		: int(screenPt.getY() + offset);
 	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth()))
+		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth() * baseScaler))
 	{
-		g->drawImageAt(labelImage, int(screenPt.getX() - offset - labelImage.getWidth()), y);
+		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - labelImage.getWidth() * baseScaler), y, labelImage.getWidth() * baseScaler, labelImage.getHeight() * baseScaler, RectanglePlacement::stretchToFit);
 	}
 	else
 	{
-		g->drawImageAt(labelImage, int(screenPt.getX() + offset), y);
+		g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, labelImage.getWidth() * baseScaler, labelImage.getHeight() * baseScaler, RectanglePlacement::stretchToFit);
 	}
 }
 
