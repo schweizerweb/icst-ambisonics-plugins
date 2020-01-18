@@ -44,7 +44,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 
     sliderFrequency.reset (new Slider ("sliderFrequency"));
     addAndMakeVisible (sliderFrequency.get());
-    sliderFrequency->setRange (20, 15000, 0);
+    sliderFrequency->setRange (20, 15000, 1);
     sliderFrequency->setSliderStyle (Slider::LinearBar);
     sliderFrequency->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderFrequency->addListener (this);
@@ -106,7 +106,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 
     sliderGain.reset (new Slider ("sliderGain"));
     addAndMakeVisible (sliderGain.get());
-    sliderGain->setRange (0.001, 100, 0);
+    sliderGain->setRange (0.1, 10, 0.001);
     sliderGain->setSliderStyle (Slider::LinearBar);
     sliderGain->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderGain->addListener (this);
@@ -131,15 +131,15 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     comboBoxType->addItem("High Shelf", 1+FilterInfo::FilterType::HighShelf);
 	comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
 
-	sliderFrequency->setNumDecimalPlacesToDisplay(0);
 	sliderFrequency->setSkewFactorFromMidPoint(500);
 	sliderFrequency->setRange(20, int(pFilterSpecification->sampleRate / 2.0));
 	sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
-	sliderQ->setNumDecimalPlacesToDisplay(3);
+	sliderFrequency->setNumDecimalPlacesToDisplay(0);
+    sliderQ->setNumDecimalPlacesToDisplay(3);
 	sliderQ->setSkewFactorFromMidPoint(1.0);
 	sliderQ->setValue(pFilterInfo->qValue);
     sliderGain->setNumDecimalPlacesToDisplay(3);
-    sliderGain->setSkewFactor(1.0);
+    sliderGain->setSkewFactorFromMidPoint(1.0);
     sliderGain->setValue(pFilterInfo->gainFactor);
     //[/Constructor]
 }
@@ -265,7 +265,7 @@ BEGIN_JUCER_METADATA
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderFrequency" id="f23e9b966efc9df5" memberName="sliderFrequency"
           virtualName="" explicitFocusOrder="0" pos="168 40 176M 24" min="20.0"
-          max="15000.0" int="0.0" style="LinearBar" textBoxPos="TextBoxLeft"
+          max="15000.0" int="1.0" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelFrequency" id="2b4b513621db1c33" memberName="labelFrequency"
@@ -296,8 +296,8 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderGain" id="6dc6c3b4f1230227" memberName="sliderGain"
-          virtualName="" explicitFocusOrder="0" pos="168 104 176M 24" min="0.001"
-          max="100.0" int="0.0" style="LinearBar" textBoxPos="TextBoxLeft"
+          virtualName="" explicitFocusOrder="0" pos="168 104 176M 24" min="0.1"
+          max="10.0" int="0.001" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
 </JUCER_COMPONENT>
