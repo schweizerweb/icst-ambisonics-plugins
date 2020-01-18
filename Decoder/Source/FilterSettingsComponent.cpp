@@ -50,8 +50,9 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     sliderFrequency->addListener (this);
 
     labelFrequency.reset (new Label ("labelFrequency",
-                                     TRANS("Cut-off Frequency [Hz]")));
+                                     TRANS("Frequency [Hz]")));
     addAndMakeVisible (labelFrequency.get());
+    labelFrequency->setTooltip (TRANS("Frequency [Hz] (Cut-off / Center)"));
     labelFrequency->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
     labelFrequency->setJustificationType (Justification::centredLeft);
     labelFrequency->setEditable (false, false, false);
@@ -129,6 +130,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 	comboBoxType->addItem("Notch", 1+FilterInfo::FilterType::Notch);
     comboBoxType->addItem("Low Shelf", 1+FilterInfo::FilterType::LowShelf);
     comboBoxType->addItem("High Shelf", 1+FilterInfo::FilterType::HighShelf);
+    comboBoxType->addItem("Peak", 1+FilterInfo::FilterType::Peak);
 	comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
 
 	sliderFrequency->setSkewFactorFromMidPoint(500);
@@ -181,11 +183,11 @@ void FilterSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxType->setBounds (168, 8, getWidth() - 176, 24);
-    sliderFrequency->setBounds (168, 40, getWidth() - 176, 24);
-    sliderQ->setBounds (168, 72, getWidth() - 176, 24);
+    comboBoxType->setBounds (136, 8, getWidth() - 144, 24);
+    sliderFrequency->setBounds (136, 40, getWidth() - 144, 24);
+    sliderQ->setBounds (136, 72, getWidth() - 144, 24);
     filterGraph->setBounds (8, 136, getWidth() - 16, getHeight() - 144);
-    sliderGain->setBounds (168, 104, getWidth() - 176, 24);
+    sliderGain->setBounds (136, 104, getWidth() - 144, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -261,18 +263,19 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="400" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="comboBoxType" id="8896d80d8503e534" memberName="comboBoxType"
-            virtualName="" explicitFocusOrder="0" pos="168 8 176M 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="136 8 144M 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderFrequency" id="f23e9b966efc9df5" memberName="sliderFrequency"
-          virtualName="" explicitFocusOrder="0" pos="168 40 176M 24" min="20.0"
+          virtualName="" explicitFocusOrder="0" pos="136 40 144M 24" min="20.0"
           max="15000.0" int="1.0" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelFrequency" id="2b4b513621db1c33" memberName="labelFrequency"
-         virtualName="" explicitFocusOrder="0" pos="8 40 152 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Cut-off Frequency [Hz]" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+         virtualName="" explicitFocusOrder="0" pos="8 40 152 24" tooltip="Frequency [Hz] (Cut-off / Center)"
+         edTextCol="ff000000" edBkgCol="0" labelText="Frequency [Hz]"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="33"/>
   <LABEL name="labelFilterType" id="45be7377944657a2" memberName="labelFilterType"
          virtualName="" explicitFocusOrder="0" pos="8 8 150 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Filter Type" editableSingleClick="0"
@@ -284,7 +287,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderQ" id="d75dd45147568a5" memberName="sliderQ" virtualName=""
-          explicitFocusOrder="0" pos="168 72 176M 24" min="0.001" max="100.0"
+          explicitFocusOrder="0" pos="136 72 144M 24" min="0.001" max="100.0"
           int="0.0" style="LinearBar" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
@@ -296,7 +299,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderGain" id="6dc6c3b4f1230227" memberName="sliderGain"
-          virtualName="" explicitFocusOrder="0" pos="168 104 176M 24" min="0.1"
+          virtualName="" explicitFocusOrder="0" pos="136 104 144M 24" min="0.1"
           max="10.0" int="0.001" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>

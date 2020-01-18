@@ -40,6 +40,8 @@ public:
             return dsp::IIR::Coefficients<float>::makeLowShelf(sampleRate, cutOffFrequencyHz, qValue, gainFactor);
         case HighShelf:
             return dsp::IIR::Coefficients<float>::makeHighShelf(sampleRate, cutOffFrequencyHz, qValue, gainFactor);
+        case Peak:
+            return dsp::IIR::Coefficients<float>::makePeakFilter(sampleRate, cutOffFrequencyHz, qValue, gainFactor);
 		case None:
 		default:
 			return nullptr;
@@ -48,12 +50,12 @@ public:
 
 	bool qRequired() const
 	{
-		return filterType == LowPass || filterType == BandPass || filterType == HighPass || filterType == Notch || filterType == LowShelf || filterType == HighShelf;
+		return filterType == LowPass || filterType == BandPass || filterType == HighPass || filterType == Notch || filterType == LowShelf || filterType == HighShelf || filterType == Peak;
 	}
 
     bool gainRequired() const
     {
-        return filterType == HighShelf || filterType == LowShelf;
+        return filterType == HighShelf || filterType == LowShelf || filterType == Peak;
     }
     
 	bool isLowPass() const
@@ -61,7 +63,7 @@ public:
 		return filterType == LowPass || filterType == FirstOrderLowPass;
 	}
 
-	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf } filterType;
+	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf, Peak } filterType;
 	float cutOffFrequencyHz;
 	float qValue;
     float gainFactor;
