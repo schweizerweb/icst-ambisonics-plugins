@@ -27,9 +27,10 @@ public:
 	bool getDirectionFlip() const;
 	void setDirectionFlip(bool flip);
 
-    double pointScaler;
-
 private:
 	double distanceScaler;
 	bool directionFlip;
+    
+public:
+    double pointScaler;
 };
