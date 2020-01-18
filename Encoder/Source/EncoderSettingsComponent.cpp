@@ -675,14 +675,13 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		alert.addTextEditor("text", "", "Or enter new name", false);
 		alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 		alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-		alert.getComboBoxComponent("existing")->setText(comboBoxPresets->getText());
-
+		
 		int returnValue = alert.runModalLoop();
 		if(returnValue == 1)
 		{
-			String presetName = alert.getComboBoxComponent("existing")->getText();
+			String presetName = alert.getTextEditorContents("text");
 			if(presetName.isEmpty())
-				presetName = alert.getTextEditorContents("text");
+				presetName = alert.getComboBoxComponent("existing")->getText();
 
 			if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
 			{
