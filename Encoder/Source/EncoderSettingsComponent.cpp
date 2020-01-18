@@ -24,6 +24,8 @@
 #include "../../Common/ColorEditorCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "DistanceEncodingComponent.h"
+#include "OSCSettingsComponent.h"
+#include "RadarSettingsComponent.h"
 //[/Headers]
 
 #include "EncoderSettingsComponent.h"
@@ -61,87 +63,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
                                             TRANS("Sources")));
     addAndMakeVisible (groupSources.get());
 
-    groupOsc.reset (new GroupComponent ("groupOsc",
-                                        TRANS("OSC")));
-    addAndMakeVisible (groupOsc.get());
-
-    toggleReceiveOsc.reset (new ToggleButton ("toggleReceiveOsc"));
-    addAndMakeVisible (toggleReceiveOsc.get());
-    toggleReceiveOsc->setButtonText (TRANS("Receive OSC"));
-    toggleReceiveOsc->addListener (this);
-
-    textOscReceivePort.reset (new TextEditor ("textOscReceivePort"));
-    addAndMakeVisible (textOscReceivePort.get());
-    textOscReceivePort->setMultiLine (false);
-    textOscReceivePort->setReturnKeyStartsNewLine (false);
-    textOscReceivePort->setReadOnly (false);
-    textOscReceivePort->setScrollbarsShown (true);
-    textOscReceivePort->setCaretVisible (true);
-    textOscReceivePort->setPopupMenuEnabled (true);
-    textOscReceivePort->setText (String());
-
-    labelOscPort.reset (new Label ("labelOscPort",
-                                   TRANS("Port:\n")));
-    addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelOscPort->setJustificationType (Justification::centredRight);
-    labelOscPort->setEditable (false, false, false);
-    labelOscPort->setColour (TextEditor::textColourId, Colours::black);
-    labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    toggleSendOsc.reset (new ToggleButton ("toggleSendOsc"));
-    addAndMakeVisible (toggleSendOsc.get());
-    toggleSendOsc->setButtonText (TRANS("Send Positions to Decoder"));
-    toggleSendOsc->addListener (this);
-
-    textOscSendIp.reset (new TextEditor ("textOscSendIp"));
-    addAndMakeVisible (textOscSendIp.get());
-    textOscSendIp->setMultiLine (false);
-    textOscSendIp->setReturnKeyStartsNewLine (false);
-    textOscSendIp->setReadOnly (false);
-    textOscSendIp->setScrollbarsShown (true);
-    textOscSendIp->setCaretVisible (true);
-    textOscSendIp->setPopupMenuEnabled (true);
-    textOscSendIp->setText (String());
-
-    labelOscSendIp.reset (new Label ("labelOscSendIp",
-                                     TRANS("Target Host/Port:")));
-    addAndMakeVisible (labelOscSendIp.get());
-    labelOscSendIp->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelOscSendIp->setJustificationType (Justification::centredRight);
-    labelOscSendIp->setEditable (false, false, false);
-    labelOscSendIp->setColour (TextEditor::textColourId, Colours::black);
-    labelOscSendIp->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    textOscSendPort.reset (new TextEditor ("textOscSendPort"));
-    addAndMakeVisible (textOscSendPort.get());
-    textOscSendPort->setMultiLine (false);
-    textOscSendPort->setReturnKeyStartsNewLine (false);
-    textOscSendPort->setReadOnly (false);
-    textOscSendPort->setScrollbarsShown (true);
-    textOscSendPort->setCaretVisible (true);
-    textOscSendPort->setPopupMenuEnabled (true);
-    textOscSendPort->setText (String());
-
-    textOscSendInterval.reset (new TextEditor ("textOscSendInterval"));
-    addAndMakeVisible (textOscSendInterval.get());
-    textOscSendInterval->setMultiLine (false);
-    textOscSendInterval->setReturnKeyStartsNewLine (false);
-    textOscSendInterval->setReadOnly (false);
-    textOscSendInterval->setScrollbarsShown (true);
-    textOscSendInterval->setCaretVisible (true);
-    textOscSendInterval->setPopupMenuEnabled (true);
-    textOscSendInterval->setText (String());
-
-    labelOscSendInterval.reset (new Label ("labelOscSendInterval",
-                                           TRANS("Interval [ms]:")));
-    addAndMakeVisible (labelOscSendInterval.get());
-    labelOscSendInterval->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelOscSendInterval->setJustificationType (Justification::centredRight);
-    labelOscSendInterval->setEditable (false, false, false);
-    labelOscSendInterval->setColour (TextEditor::textColourId, Colours::black);
-    labelOscSendInterval->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
     groupEncoding.reset (new GroupComponent ("groupEncoding",
                                              TRANS("Encoding")));
     addAndMakeVisible (groupEncoding.get());
@@ -155,40 +76,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     addAndMakeVisible (toggleDirectionFlip.get());
     toggleDirectionFlip->setButtonText (TRANS("Flip Direction (Orientation)"));
     toggleDirectionFlip->addListener (this);
-
-    toggleSendOscExt.reset (new ToggleButton ("toggleSendOscExt"));
-    addAndMakeVisible (toggleSendOscExt.get());
-    toggleSendOscExt->setButtonText (TRANS("Send Positions for External Usage"));
-    toggleSendOscExt->addListener (this);
-
-    textOscSendIpExt.reset (new TextEditor ("textOscSendIpExt"));
-    addAndMakeVisible (textOscSendIpExt.get());
-    textOscSendIpExt->setMultiLine (false);
-    textOscSendIpExt->setReturnKeyStartsNewLine (false);
-    textOscSendIpExt->setReadOnly (false);
-    textOscSendIpExt->setScrollbarsShown (true);
-    textOscSendIpExt->setCaretVisible (true);
-    textOscSendIpExt->setPopupMenuEnabled (true);
-    textOscSendIpExt->setText (String());
-
-    labelOscSendIpExt.reset (new Label ("labelOscSendIpExt",
-                                        TRANS("Target Host/Port:")));
-    addAndMakeVisible (labelOscSendIpExt.get());
-    labelOscSendIpExt->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelOscSendIpExt->setJustificationType (Justification::centredRight);
-    labelOscSendIpExt->setEditable (false, false, false);
-    labelOscSendIpExt->setColour (TextEditor::textColourId, Colours::black);
-    labelOscSendIpExt->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    textOscSendPortExt.reset (new TextEditor ("textOscSendPortExt"));
-    addAndMakeVisible (textOscSendPortExt.get());
-    textOscSendPortExt->setMultiLine (false);
-    textOscSendPortExt->setReturnKeyStartsNewLine (false);
-    textOscSendPortExt->setReadOnly (false);
-    textOscSendPortExt->setScrollbarsShown (true);
-    textOscSendPortExt->setCaretVisible (true);
-    textOscSendPortExt->setPopupMenuEnabled (true);
-    textOscSendPortExt->setText (String());
 
     sourceList.reset (new TableListBox());
     addAndMakeVisible (sourceList.get());
@@ -264,18 +151,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     buttonExport->setButtonText (TRANS("export"));
     buttonExport->addListener (this);
 
-    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
-                                              TRANS("Unofficial Pre-Release")));
-    addAndMakeVisible (labelDevelopmentVersion.get());
-    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDevelopmentVersion->setJustificationType (Justification::centred);
-    labelDevelopmentVersion->setEditable (false, false, false);
-    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
-    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
-    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
     toggleDoppler.reset (new ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
     toggleDoppler->setButtonText (TRANS("Enable Doppler"));
@@ -302,25 +177,25 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     btnEditDistanceEncoding->setButtonText (TRANS("edit..."));
     btnEditDistanceEncoding->addListener (this);
 
-    groupDisplay.reset (new GroupComponent ("groupDisplay",
-                                            TRANS("Display")));
-    addAndMakeVisible (groupDisplay.get());
+    tabbedComponent.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    addAndMakeVisible (tabbedComponent.get());
+    tabbedComponent->setTabBarDepth (35);
+    tabbedComponent->addTab (TRANS("Encoding"), Colours::lightgrey, 0, false);
+    tabbedComponent->addTab (TRANS("Radar"), Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pSettings), true);
+    tabbedComponent->addTab (TRANS("OSC"), Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings), true);
+    tabbedComponent->setCurrentTabIndex (0);
 
-    sliderPointScaler.reset (new Slider ("sliderPointScaler"));
-    addAndMakeVisible (sliderPointScaler.get());
-    sliderPointScaler->setRange (0.2, 2, 0.01);
-    sliderPointScaler->setSliderStyle (Slider::LinearHorizontal);
-    sliderPointScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
-    sliderPointScaler->addListener (this);
-
-    labelPointScaler.reset (new Label ("labelPointScaler",
-                                       TRANS("Point Scaler:")));
-    addAndMakeVisible (labelPointScaler.get());
-    labelPointScaler->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelPointScaler->setJustificationType (Justification::centredLeft);
-    labelPointScaler->setEditable (false, false, false);
-    labelPointScaler->setColour (TextEditor::textColourId, Colours::black);
-    labelPointScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
+                                              TRANS("Unofficial Pre-Release")));
+    addAndMakeVisible (labelDevelopmentVersion.get());
+    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setJustificationType (Justification::centred);
+    labelDevelopmentVersion->setEditable (false, false, false);
+    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
+    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
+    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
+    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -331,24 +206,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
     //[Constructor] You can add your own custom stuff here..
 	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
-	textOscReceivePort->addListener(this);
-	textOscSendPort->addListener(this);
-	textOscSendIp->addListener(this);
-	textOscSendInterval->addListener(this);
-	textOscSendPortExt->addListener(this);
-	textOscSendIpExt->addListener(this);
-
-	toggleReceiveOsc->setToggleState(pEncoderSettings->oscReceiveFlag, dontSendNotification);
-	textOscReceivePort->setText(String(pEncoderSettings->oscReceivePort));
-
-	toggleSendOsc->setToggleState(pEncoderSettings->oscSendFlag, dontSendNotification);
-	textOscSendIp->setText(String(pEncoderSettings->oscSendTargetHost));
-	textOscSendPort->setText(String(pEncoderSettings->oscSendPort));
-	textOscSendInterval->setText(String(pEncoderSettings->oscSendIntervalMs));
-
-	toggleSendOscExt->setToggleState(pEncoderSettings->oscSendExtFlag, dontSendNotification);
-	textOscSendIpExt->setText(String(pEncoderSettings->oscSendExtTargetHost));
-	textOscSendPortExt->setText(String(pEncoderSettings->oscSendExtPort));
 
 	toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
 	toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
@@ -356,9 +213,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 	toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
 	sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
 
-    sliderPointScaler->setValue(pEncoderSettings->pointScaler);
-    sliderPointScaler->setSkewFactorFromMidPoint(1.0);
-	groupSources->setVisible(MULTI_ENCODER_MODE);
+    groupSources->setVisible(MULTI_ENCODER_MODE);
 	buttonAdd->setVisible(MULTI_ENCODER_MODE);
 	buttonRemove->setVisible(MULTI_ENCODER_MODE);
 	buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
@@ -415,23 +270,9 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
 
     multiEncoderElements = nullptr;
     groupSources = nullptr;
-    groupOsc = nullptr;
-    toggleReceiveOsc = nullptr;
-    textOscReceivePort = nullptr;
-    labelOscPort = nullptr;
-    toggleSendOsc = nullptr;
-    textOscSendIp = nullptr;
-    labelOscSendIp = nullptr;
-    textOscSendPort = nullptr;
-    textOscSendInterval = nullptr;
-    labelOscSendInterval = nullptr;
     groupEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDirectionFlip = nullptr;
-    toggleSendOscExt = nullptr;
-    textOscSendIpExt = nullptr;
-    labelOscSendIpExt = nullptr;
-    textOscSendPortExt = nullptr;
     sourceList = nullptr;
     buttonAdd = nullptr;
     buttonRemove = nullptr;
@@ -446,14 +287,12 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
     buttonImport = nullptr;
     buttonSave = nullptr;
     buttonExport = nullptr;
-    labelDevelopmentVersion = nullptr;
     toggleDoppler = nullptr;
     sliderDistanceScaler = nullptr;
     labelDistanceScaler = nullptr;
     btnEditDistanceEncoding = nullptr;
-    groupDisplay = nullptr;
-    sliderPointScaler = nullptr;
-    labelPointScaler = nullptr;
+    tabbedComponent = nullptr;
+    labelDevelopmentVersion = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -478,47 +317,31 @@ void EncoderSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    multiEncoderElements->setBounds (8, 152 + 112 - -48, getWidth() - 17, getHeight() - 351);
-    groupSources->setBounds (8 + 0, (152 + 112 - -48) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.5993f));
-    groupOsc->setBounds (8, 8, getWidth() - 17, 144);
-    toggleReceiveOsc->setBounds (8 + 14, 8 + 19, 150, 24);
-    textOscReceivePort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 19, 48, 24);
-    labelOscPort->setBounds (8 + (getWidth() - 17) - 75 - 49, 8 + 19, 49, 24);
-    toggleSendOsc->setBounds (8 + 14, 8 + 79, 199, 24);
-    textOscSendIp->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 79, 106, 24);
-    labelOscSendIp->setBounds (8 + (getWidth() - 17) - 188 - 124, 8 + 79, 124, 24);
-    textOscSendPort->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 79, 48, 24);
-    textOscSendInterval->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 109, 48, 24);
-    labelOscSendInterval->setBounds (8 + (getWidth() - 17) - 76 - 110, 8 + 109, 110, 24);
-    groupEncoding->setBounds (8, 152, getWidth() - 17, 112);
-    toggleDistanceEncoding->setBounds (8 + 14, 152 + 19, 199, 24);
-    toggleDirectionFlip->setBounds (8 + 14, 152 + 79, 207, 24);
-    toggleSendOscExt->setBounds (8 + 14, 8 + 49, 245, 24);
-    textOscSendIpExt->setBounds (8 + (getWidth() - 17) - 78 - 106, 8 + 49, 106, 24);
-    labelOscSendIpExt->setBounds (8 + (getWidth() - 17) - 188 - 126, 8 + 49, 126, 24);
-    textOscSendPortExt->setBounds (8 + (getWidth() - 17) - 24 - 48, 8 + 49, 48, 24);
-    sourceList->setBounds ((8 + 0) + 16, ((152 + 112 - -48) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.5993f)) - 67);
-    buttonAdd->setBounds ((8 + 0) + 17, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
-    buttonRemove->setBounds ((8 + 0) + 89, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
-    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
-    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((152 + 112 - -48) + 0) + (roundToInt ((getHeight() - 351) * 0.5993f)) - 40, 64, 24);
-    groupGroups->setBounds (8 + 0, (152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.4007f));
-    groupList->setBounds ((8 + 0) + 16, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.4007f)) - 67);
-    buttonAddGroup->setBounds ((8 + 0) + 17, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + (roundToInt ((getHeight() - 351) * 0.4007f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((152 + 112 - -48) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.4007f))) + (roundToInt ((getHeight() - 351) * 0.4007f)) - 40, 64, 24);
+    multiEncoderElements->setBounds (8, 200 + 112, getWidth() - 17, getHeight() - 351);
+    groupSources->setBounds (8 + 0, (200 + 112) + 0, (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.6007f));
+    groupEncoding->setBounds (8, 200, getWidth() - 17, 112);
+    toggleDistanceEncoding->setBounds (8 + 14, 200 + 19, 199, 24);
+    toggleDirectionFlip->setBounds (8 + 14, 200 + 79, 207, 24);
+    sourceList->setBounds ((8 + 0) + 16, ((200 + 112) + 0) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.6007f)) - 67);
+    buttonAdd->setBounds ((8 + 0) + 17, ((200 + 112) + 0) + (roundToInt ((getHeight() - 351) * 0.6007f)) - 40, 64, 24);
+    buttonRemove->setBounds ((8 + 0) + 89, ((200 + 112) + 0) + (roundToInt ((getHeight() - 351) * 0.6007f)) - 40, 64, 24);
+    buttonMoveDown->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 80, ((200 + 112) + 0) + (roundToInt ((getHeight() - 351) * 0.6007f)) - 40, 64, 24);
+    buttonMoveUp->setBounds ((8 + 0) + ((getWidth() - 17) - 0) - 152, ((200 + 112) + 0) + (roundToInt ((getHeight() - 351) * 0.6007f)) - 40, 64, 24);
+    groupGroups->setBounds (8 + 0, (200 + 112) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.3993f)), (getWidth() - 17) - 0, roundToInt ((getHeight() - 351) * 0.3993f));
+    groupList->setBounds ((8 + 0) + 16, ((200 + 112) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.3993f))) + 19, ((getWidth() - 17) - 0) - 31, (roundToInt ((getHeight() - 351) * 0.3993f)) - 67);
+    buttonAddGroup->setBounds ((8 + 0) + 17, ((200 + 112) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.3993f))) + (roundToInt ((getHeight() - 351) * 0.3993f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds ((8 + 0) + 89, ((200 + 112) + (getHeight() - 351) - (roundToInt ((getHeight() - 351) * 0.3993f))) + (roundToInt ((getHeight() - 351) * 0.3993f)) - 40, 64, 24);
     comboBoxPresets->setBounds (83, getHeight() - 34, getWidth() - 312, 24);
     labelPresets->setBounds (8, getHeight() - 34, 64, 24);
     buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 34, 64, 24);
     buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 34, 64, 24);
     buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 34, 64, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3983f) / 2), 8, proportionOfWidth (0.3983f), 24);
-    toggleDoppler->setBounds (8 + 14, 152 + 49, 199, 24);
-    sliderDistanceScaler->setBounds (8 + (getWidth() - 17) - 24 - 202, 152 + 49, 202, 24);
-    labelDistanceScaler->setBounds (8 + (getWidth() - 17) - 229 - 109, 152 + 49, 109, 24);
-    btnEditDistanceEncoding->setBounds (8 + (getWidth() - 17) - 24 - 86, 152 + 19, 86, 24);
-    groupDisplay->setBounds (8, 264, getWidth() - 17, 48);
-    sliderPointScaler->setBounds (8 + (getWidth() - 17) - 26 - ((getWidth() - 17) - 163), 264 + 17, (getWidth() - 17) - 163, 24);
-    labelPointScaler->setBounds (8 + 8, 264 + 17, 109, 24);
+    toggleDoppler->setBounds (8 + 14, 200 + 49, 199, 24);
+    sliderDistanceScaler->setBounds (8 + (getWidth() - 17) - 24 - 202, 200 + 49, 202, 24);
+    labelDistanceScaler->setBounds (8 + (getWidth() - 17) - 229 - 109, 200 + 49, 109, 24);
+    btnEditDistanceEncoding->setBounds (8 + (getWidth() - 17) - 24 - 86, 200 + 19, 86, 24);
+    tabbedComponent->setBounds (8, 8, getWidth() - 15, 184);
+    labelDevelopmentVersion->setBounds (getWidth() - 10 - 245, 8, 245, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -528,21 +351,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == toggleReceiveOsc.get())
-    {
-        //[UserButtonCode_toggleReceiveOsc] -- add your button handler code here..
-		pEncoderSettings->oscReceiveFlag = toggleReceiveOsc->getToggleState();
-		sendChangeMessage();
-        //[/UserButtonCode_toggleReceiveOsc]
-    }
-    else if (buttonThatWasClicked == toggleSendOsc.get())
-    {
-        //[UserButtonCode_toggleSendOsc] -- add your button handler code here..
-		pEncoderSettings->oscSendFlag = toggleSendOsc->getToggleState();
-		sendChangeMessage();
-        //[/UserButtonCode_toggleSendOsc]
-    }
-    else if (buttonThatWasClicked == toggleDistanceEncoding.get())
+    if (buttonThatWasClicked == toggleDistanceEncoding.get())
     {
         //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
 		pEncoderSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
@@ -555,13 +364,6 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		pEncoderSettings->setDirectionFlip(toggleDirectionFlip->getToggleState());
 		sendChangeMessage();
         //[/UserButtonCode_toggleDirectionFlip]
-    }
-    else if (buttonThatWasClicked == toggleSendOscExt.get())
-    {
-        //[UserButtonCode_toggleSendOscExt] -- add your button handler code here..
-		pEncoderSettings->oscSendExtFlag = toggleSendOscExt->getToggleState();
-		sendChangeMessage();
-        //[/UserButtonCode_toggleSendOscExt]
     }
     else if (buttonThatWasClicked == buttonAdd.get())
     {
@@ -675,7 +477,7 @@ void EncoderSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 		alert.addTextEditor("text", "", "Or enter new name", false);
 		alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
 		alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-		
+
 		int returnValue = alert.runModalLoop();
 		if(returnValue == 1)
 		{
@@ -780,13 +582,6 @@ void EncoderSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 		sendChangeMessage();
         //[/UserSliderCode_sliderDistanceScaler]
     }
-    else if (sliderThatWasMoved == sliderPointScaler.get())
-    {
-        //[UserSliderCode_sliderPointScaler] -- add your slider handling code here..
-        pEncoderSettings->pointScaler = sliderPointScaler->getValue();
-        sendChangeMessage();
-        //[/UserSliderCode_sliderPointScaler]
-    }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
@@ -819,33 +614,9 @@ void EncoderSettingsComponent::initializePresets()
 	}
 }
 
-void EncoderSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
-{
-	if (&textEditor == textOscReceivePort.get())
-		checkForNumbers(&textEditor, &pEncoderSettings->oscReceivePort);
-	else if (&textEditor == textOscSendPort.get())
-		checkForNumbers(&textEditor, &pEncoderSettings->oscSendPort);
-	else if (&textEditor == textOscSendInterval.get())
-		checkForNumbers(&textEditor, &pEncoderSettings->oscSendIntervalMs);
-	else if (&textEditor == textOscSendIp.get())
-		pEncoderSettings->oscSendTargetHost = textEditor.getText();
-	else if (&textEditor == textOscSendPortExt.get())
-		checkForNumbers(&textEditor, &pEncoderSettings->oscSendExtPort);
-	else if (&textEditor == textOscSendIpExt.get())
-		pEncoderSettings->oscSendExtTargetHost = textEditor.getText();
-
-	sendChangeMessage();
-}
-
 void EncoderSettingsComponent::controlDimming() const
 {
 	btnEditDistanceEncoding->setEnabled(pEncoderSettings->distanceEncodingFlag);
-	textOscReceivePort->setEnabled(pEncoderSettings->oscReceiveFlag);
-	textOscSendIp->setEnabled(pEncoderSettings->oscSendFlag);
-	textOscSendPort->setEnabled(pEncoderSettings->oscSendFlag);
-	textOscSendInterval->setEnabled(pEncoderSettings->oscSendFlag);
-	textOscSendIpExt->setEnabled(pEncoderSettings->oscSendExtFlag);
-	textOscSendPortExt->setEnabled(pEncoderSettings->oscSendExtFlag);
 	buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
 	buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pSources->size() > 0);
 	buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
@@ -1055,32 +826,6 @@ Component* EncoderSettingsComponent::refreshComponentForCell(int rowNumber, int 
 	return nullptr;
 }
 
-void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, int* pParameter) const
-{
-	if (pEditor->getText().containsOnly("0123456789"))
-	{
-		*pParameter = pEditor->getText().getIntValue();
-	}
-	else
-	{
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid number");
-		pEditor->undo();
-	}
-}
-
-void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, float* pParameter) const
-{
-	if (pEditor->getText().containsOnly("0123456789."))
-	{
-		*pParameter = pEditor->getText().getFloatValue();
-	}
-	else
-	{
-		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid number");
-		pEditor->undo();
-	}
-}
-
 //[/MiscUserCode]
 
 
@@ -1094,65 +839,21 @@ void EncoderSettingsComponent::checkForNumbers(TextEditor* pEditor, float* pPara
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
-                 componentName="" parentClasses="public Component, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster, public TableListBoxModel, public ChangeListener, public TableColumnCallback"
+                 componentName="" parentClasses="public Component, public ActionBroadcaster, public ChangeBroadcaster, public TableListBoxModel, public ChangeListener, public TableColumnCallback"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="multiEncoderElements" id="73249ab85d6bba3a" memberName="multiEncoderElements"
-                    virtualName="" explicitFocusOrder="0" pos="8 -48R 17M 351M" posRelativeY="b72378bdfe4e130"
+                    virtualName="" explicitFocusOrder="0" pos="8 0R 17M 351M" posRelativeY="b72378bdfe4e130"
                     class="Component" params=""/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.929%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60.072%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
-  <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
-                  explicitFocusOrder="0" pos="8 8 17M 144" title="OSC"/>
-  <TOGGLEBUTTON name="toggleReceiveOsc" id="8d9b70b5bf27a026" memberName="toggleReceiveOsc"
-                virtualName="" explicitFocusOrder="0" pos="14 19 150 24" posRelativeX="f4cf3a53a6ef0d87"
-                posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTEDITOR name="textOscReceivePort" id="ef3c7d2594795ec7" memberName="textOscReceivePort"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 19 48 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="75Rr 19 49 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
-  <TOGGLEBUTTON name="toggleSendOsc" id="309574c60d08c55e" memberName="toggleSendOsc"
-                virtualName="" explicitFocusOrder="0" pos="14 79 199 24" posRelativeX="f4cf3a53a6ef0d87"
-                posRelativeY="f4cf3a53a6ef0d87" buttonText="Send Positions to Decoder"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTEDITOR name="textOscSendIp" id="f5d167c87a68db4c" memberName="textOscSendIp"
-              virtualName="" explicitFocusOrder="0" pos="78Rr 79 106 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscSendIp" id="ba6c86d4711d8bd0" memberName="labelOscSendIp"
-         virtualName="" explicitFocusOrder="0" pos="188Rr 79 124 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
-  <TEXTEDITOR name="textOscSendPort" id="c2dff2f42ed301d1" memberName="textOscSendPort"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 79 48 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <TEXTEDITOR name="textOscSendInterval" id="2c20c78495fbd07c" memberName="textOscSendInterval"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 109 48 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscSendInterval" id="104391e6ca4d3f12" memberName="labelOscSendInterval"
-         virtualName="" explicitFocusOrder="0" pos="76Rr 109 110 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
   <GROUPCOMPONENT name="groupEncoding" id="b72378bdfe4e130" memberName="groupEncoding"
-                  virtualName="" explicitFocusOrder="0" pos="8 152 17M 112" title="Encoding"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 200 17M 112" title="Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
@@ -1161,24 +862,6 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="14 79 207 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Flip Direction (Orientation)"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TOGGLEBUTTON name="toggleSendOscExt" id="4c50ad9f06c0feaf" memberName="toggleSendOscExt"
-                virtualName="" explicitFocusOrder="0" pos="14 49 245 24" posRelativeX="f4cf3a53a6ef0d87"
-                posRelativeY="f4cf3a53a6ef0d87" buttonText="Send Positions for External Usage"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTEDITOR name="textOscSendIpExt" id="ed3cbf6e9d145d08" memberName="textOscSendIpExt"
-              virtualName="" explicitFocusOrder="0" pos="78Rr 49 106 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscSendIpExt" id="ee4b90142f7a53f4" memberName="labelOscSendIpExt"
-         virtualName="" explicitFocusOrder="0" pos="188Rr 49 126 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
-  <TEXTEDITOR name="textOscSendPortExt" id="8f6b9c97cd3fa86f" memberName="textOscSendPortExt"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 49 48 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="da4e7711e3fff0be"
                     posRelativeY="da4e7711e3fff0be" posRelativeW="da4e7711e3fff0be"
@@ -1200,7 +883,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.071%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 39.928%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -1237,12 +920,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="9Rr 34R 64 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 8 39.835% 24"
-         bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
-         edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
   <TOGGLEBUTTON name="toggleDoppler" id="8a9ea68cd17e7a8c" memberName="toggleDoppler"
                 virtualName="" explicitFocusOrder="0" pos="14 49 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
@@ -1262,20 +939,22 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="24Rr 19 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <GROUPCOMPONENT name="groupDisplay" id="6c4c7585300838d8" memberName="groupDisplay"
-                  virtualName="" explicitFocusOrder="0" pos="8 264 17M 48" title="Display"/>
-  <SLIDER name="sliderPointScaler" id="e67c3f12c44da8fb" memberName="sliderPointScaler"
-          virtualName="" explicitFocusOrder="0" pos="26Rr 17 163M 24" posRelativeX="6c4c7585300838d8"
-          posRelativeY="6c4c7585300838d8" posRelativeW="6c4c7585300838d8"
-          min="0.2" max="2.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <LABEL name="labelPointScaler" id="36bfe3e1aa4822af" memberName="labelPointScaler"
-         virtualName="" explicitFocusOrder="0" pos="8 17 109 24" posRelativeX="6c4c7585300838d8"
-         posRelativeY="6c4c7585300838d8" edTextCol="ff000000" edBkgCol="0"
-         labelText="Point Scaler:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TABBEDCOMPONENT name="new tabbed component" id="3a0bd97c3580beb3" memberName="tabbedComponent"
+                   virtualName="" explicitFocusOrder="0" pos="8 8 15M 184" orientation="top"
+                   tabBarDepth="35" initialTab="0">
+    <TAB name="Encoding" colour="ffd3d3d3" useJucerComp="0" contentClassName=""
+         constructorParams="" jucerComponentFile=""/>
+    <TAB name="Radar" colour="ffd3d3d3" useJucerComp="0" contentClassName="RadarSettingsComponent"
+         constructorParams="pChangeListener, pSettings" jucerComponentFile=""/>
+    <TAB name="OSC" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCSettingsComponent"
+         constructorParams="pChangeListener, pSettings" jucerComponentFile=""/>
+  </TABBEDCOMPONENT>
+  <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
+         virtualName="" explicitFocusOrder="0" pos="10Rr 8 245 24" bkgCol="bded0d0d"
+         textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
+         edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

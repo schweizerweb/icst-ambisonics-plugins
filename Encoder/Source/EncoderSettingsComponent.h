@@ -39,7 +39,6 @@
                                                                     //[/Comments]
 */
 class EncoderSettingsComponent  : public Component,
-                                  public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
                                   public TableListBoxModel,
@@ -56,9 +55,6 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void checkForNumbers(TextEditor* pEditor, int* pParameter) const;
-	void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
-	void textEditorTextChanged(TextEditor&) override;
 	void controlDimming() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	int getNumRows() override;
@@ -97,23 +93,9 @@ private:
     //==============================================================================
     std::unique_ptr<Component> multiEncoderElements;
     std::unique_ptr<GroupComponent> groupSources;
-    std::unique_ptr<GroupComponent> groupOsc;
-    std::unique_ptr<ToggleButton> toggleReceiveOsc;
-    std::unique_ptr<TextEditor> textOscReceivePort;
-    std::unique_ptr<Label> labelOscPort;
-    std::unique_ptr<ToggleButton> toggleSendOsc;
-    std::unique_ptr<TextEditor> textOscSendIp;
-    std::unique_ptr<Label> labelOscSendIp;
-    std::unique_ptr<TextEditor> textOscSendPort;
-    std::unique_ptr<TextEditor> textOscSendInterval;
-    std::unique_ptr<Label> labelOscSendInterval;
     std::unique_ptr<GroupComponent> groupEncoding;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
-    std::unique_ptr<ToggleButton> toggleSendOscExt;
-    std::unique_ptr<TextEditor> textOscSendIpExt;
-    std::unique_ptr<Label> labelOscSendIpExt;
-    std::unique_ptr<TextEditor> textOscSendPortExt;
     std::unique_ptr<TableListBox> sourceList;
     std::unique_ptr<TextButton> buttonAdd;
     std::unique_ptr<TextButton> buttonRemove;
@@ -128,14 +110,12 @@ private:
     std::unique_ptr<TextButton> buttonImport;
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TextButton> buttonExport;
-    std::unique_ptr<Label> labelDevelopmentVersion;
     std::unique_ptr<ToggleButton> toggleDoppler;
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<TextButton> btnEditDistanceEncoding;
-    std::unique_ptr<GroupComponent> groupDisplay;
-    std::unique_ptr<Slider> sliderPointScaler;
-    std::unique_ptr<Label> labelPointScaler;
+    std::unique_ptr<TabbedComponent> tabbedComponent;
+    std::unique_ptr<Label> labelDevelopmentVersion;
 
 
     //==============================================================================
