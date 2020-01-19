@@ -19,9 +19,6 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/NumericColumnCustomComponent.h"
-#include "../../Common/SliderColumnCustomComponent.h"
-#include "../../Common/EditableTextCustomComponent.h"
-#include "../../Common/ColorEditorCustomComponent.h"
 #include "../../Common/TrackColors.h"
 //[/Headers]
 
@@ -154,16 +151,16 @@ void SourceDefinitionComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4007f), getWidth() - 0, proportionOfHeight (0.4007f));
-    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4007f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4007f) - 67);
-    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4007f)) + proportionOfHeight (0.4007f) - 40, 64, 24);
-    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4007f)) + proportionOfHeight (0.4007f) - 40, 64, 24);
-    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5993f));
-    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5993f) - 67);
-    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
-    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
-    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
+    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4000f), getWidth() - 0, proportionOfHeight (0.4000f));
+    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4000f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4000f) - 67);
+    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4000f)) + proportionOfHeight (0.4000f) - 40, 64, 24);
+    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4000f)) + proportionOfHeight (0.4000f) - 40, 64, 24);
+    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.6000f));
+    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.6000f) - 67);
+    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
+    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
+    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
+    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
