@@ -29,16 +29,6 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-#define COLUMN_ID_NB        1
-#define COLUMN_ID_NAME        2
-#define    COLUMN_ID_X            7
-#define    COLUMN_ID_Y            8
-#define    COLUMN_ID_Z            9
-#define    COLUMN_ID_A            10
-#define    COLUMN_ID_E            11
-#define    COLUMN_ID_D            12
-#define COLUMN_ID_GAIN        5
-#define COLUMN_ID_COLOR        13
 
 //[/MiscUserDefs]
 
@@ -48,8 +38,8 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
-
     groupModel.reset(new GroupTableListModel(pSourceSet, pPointSelection, this));
+    sourceModel.reset(new SourceTableListModel(pSourceSet, pPointSelection, this));
     //[/Constructor_pre]
 
     groupGroups.reset (new GroupComponent ("groupGroups",
@@ -106,7 +96,6 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
 
 
     //[Constructor] You can add your own custom stuff here..
-
     groupSources->setVisible(MULTI_ENCODER_MODE);
     buttonAdd->setVisible(MULTI_ENCODER_MODE);
     buttonRemove->setVisible(MULTI_ENCODER_MODE);
@@ -118,24 +107,9 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
     buttonAddGroup->setVisible(MULTI_ENCODER_MODE);
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
 
-    // table
-    sourceList->setModel(this);
-    sourceList->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
-    sourceList->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
-    sourceList->getHeader().addColumn("X", COLUMN_ID_X, 50);
-    sourceList->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
-    sourceList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
-    sourceList->getHeader().addColumn("A", COLUMN_ID_A, 50);
-    sourceList->getHeader().addColumn("E", COLUMN_ID_E, 50);
-    sourceList->getHeader().addColumn("D", COLUMN_ID_D, 50);
-    sourceList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
-    sourceList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
-    sourceList->getHeader().setStretchToFitActive(true);
-    sourceList->getHeader().resizeAllColumnsToFit(sourceList->getWidth());
-
+    sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
     pPointSelection->addChangeListener(this);
-
     controlDimming();
     //[/Constructor]
 }
@@ -290,189 +264,9 @@ void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-int SourceDefinitionComponent::getNumRows()
-{
-    return pSources->size();
-}
-
-void SourceDefinitionComponent::paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected)
-{
-    const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
-        .interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
-    if (rowIsSelected)
-        g.fillAll(Colours::lightblue);
-    else if (rowNumber % 2)
-        g.fillAll(alternateColour);
-}
-
-void SourceDefinitionComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/)
-{
-    AmbiPoint* pt = pSources->get(rowNumber);
-    if (pt == nullptr)
-        return;
-
-    g.setColour(getLookAndFeel().findColour(ListBox::textColourId));
-    String text;
-    switch (columnId)
-    {
-    case COLUMN_ID_NB: text = String(rowNumber + 1); break;
-    case COLUMN_ID_NAME: text = pt->getName(); break;
-    default: text = "";
-    }
-    g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
-    g.setColour(getLookAndFeel().findColour(ListBox::backgroundColourId));
-    g.fillRect(width - 1, 0, 1, height);
-}
-
-double SourceDefinitionComponent::getValue(int columnId, int rowNumber)
-{
-    AmbiPoint* pt = pSources->get(rowNumber);
-    if (pt == nullptr)
-        return 0.0;
-
-    switch (columnId)
-    {
-    case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
-    case COLUMN_ID_X: return pt->getPoint()->getX();
-    case COLUMN_ID_Y: return pt->getPoint()->getY();
-    case COLUMN_ID_Z: return pt->getPoint()->getZ();
-    case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-    case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-    case COLUMN_ID_D: return pt->getPoint()->getDistance();
-    case COLUMN_ID_COLOR: return pt->getColor().getARGB();
-    default: return 0.0;
-    }
-}
-
-void SourceDefinitionComponent::setValue(int columnId, int rowNumber, double newValue)
-{
-    switch (columnId)
-    {
-    case COLUMN_ID_GAIN: pSources->setGain(rowNumber, pow(10.0, 0.1 * newValue)); break;
-    case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
-    case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
-    case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
-    case COLUMN_ID_A: pSources->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
-    case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
-    case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
-    case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-    default: throw;
-    }
-
-    sourceList->updateContent();
-    sourceList->repaint();
-}
-
-SliderRange SourceDefinitionComponent::getSliderRange(int columnId)
-{
-    switch (columnId)
-    {
-    case COLUMN_ID_X:
-    case COLUMN_ID_Y:
-    case COLUMN_ID_Z:
-        return SliderRange(-1.0, 1.0, 0.001);
-
-    case COLUMN_ID_D:
-        return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
-
-    case COLUMN_ID_A:
-        return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
-
-    case COLUMN_ID_E:
-        return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
-
-    case COLUMN_ID_GAIN:
-        return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
-    default: return SliderRange(0.0, 1.0, 0.001);
-    }
-}
-
-TableListBox* SourceDefinitionComponent::getTable()
-{
-    return sourceList.get();
-}
-
-String SourceDefinitionComponent::getTableText(const int columnId, const int rowNumber)
-{
-    AmbiPoint* pt = pSources->get(rowNumber);
-    if (pt == nullptr)
-        return "";
-
-    switch (columnId)
-    {
-    case COLUMN_ID_NAME: return pt->getName();
-    default: return "";
-    }
-}
-
-void SourceDefinitionComponent::setTableText(const int columnId, const int rowNumber, const String& newText)
-{
-    switch (columnId)
-    {
-    case COLUMN_ID_NAME: pSources->setChannelName(rowNumber, newText); break;
-    default: throw;
-    }
-}
-
-void SourceDefinitionComponent::selectedRowsChanged(int lastRowSelected)
-{
-    if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
-        pPointSelection->selectPoint(lastRowSelected);
-}
-
-Component* SourceDefinitionComponent::refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate)
-{
-    if (columnId == COLUMN_ID_X
-        || columnId == COLUMN_ID_Y
-        || columnId == COLUMN_ID_Z
-        || columnId == COLUMN_ID_A
-        || columnId == COLUMN_ID_E
-        || columnId == COLUMN_ID_D)
-    {
-        NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
-        if (numericBox == nullptr)
-            numericBox = new NumericColumnCustomComponent(*this);
-
-        numericBox->setRowAndColumn(rowNumber, columnId);
-        return numericBox;
-    }
-    else if (columnId == COLUMN_ID_GAIN)
-    {
-        SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
-        if (gainBox == nullptr)
-            gainBox = new SliderColumnCustomComponent(*this);
-
-        gainBox->setRowAndColumn(rowNumber, columnId);
-        return gainBox;
-    }
-    else if (columnId == COLUMN_ID_NAME)
-    {
-        EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
-        if (textLabel == nullptr)
-            textLabel = new EditableTextCustomComponent(*this);
-
-        textLabel->setRowAndColumn(rowNumber, columnId);
-        return textLabel;
-    }
-    else if (columnId == COLUMN_ID_COLOR)
-    {
-        ColorEditorCustomComponent* colorBox = static_cast<ColorEditorCustomComponent*> (existingComponentToUpdate);
-        if (colorBox == nullptr)
-            colorBox = new ColorEditorCustomComponent(*this);
-
-        colorBox->setRowAndColumn(rowNumber, columnId);
-        return colorBox;
-    }
-
-    return nullptr;
-}
-
 void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
-    sourceList->updateContent();
-    sourceList->repaint();
-    groupList->updateContent();
-    groupList->repaint();
+    refresh();
 
     if (source == pPointSelection)
     {
@@ -501,7 +295,7 @@ void SourceDefinitionComponent::controlDimming() const
     buttonRemoveGroup->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
 }
 
-void SourceDefinitionComponent::refresh()
+void SourceDefinitionComponent::refresh() const
 {
     sourceList->updateContent();
     sourceList->repaint();
@@ -521,14 +315,14 @@ void SourceDefinitionComponent::refresh()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public TableColumnCallback, public ChangeListener, public ChangeBroadcaster"
+                 componentName="" parentClasses="public Component, public ChangeListener, public ChangeBroadcaster"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.038%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.068%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -545,7 +339,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.962%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.932%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"

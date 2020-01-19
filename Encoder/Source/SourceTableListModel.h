@@ -1,0 +1,248 @@
+/*
+  ==============================================================================
+
+    SourceTableListModel.h
+    Created: 19 Jan 2020 8:28:59pm
+    Author:  Christian Schweizer
+
+  ==============================================================================
+*/
+
+#pragma once
+#include "JuceHeader.h"
+#include "../../Common/AmbiSourceSet.h"
+#include "../../Common/PointSelection.h"
+#include "../../Common/NumericColumnCustomComponent.h"
+#include "../../Common/EditableTextCustomComponent.h"
+#include "../../Common/ColorEditorCustomComponent.h"
+#include "../../Common/SliderColumnCustomComponent.h"
+
+#define COLUMN_ID_NB        1
+#define COLUMN_ID_NAME        2
+#define COLUMN_ID_X            7
+#define COLUMN_ID_Y            8
+#define COLUMN_ID_Z            9
+#define COLUMN_ID_A            10
+#define COLUMN_ID_E            11
+#define COLUMN_ID_D            12
+#define COLUMN_ID_GAIN        5
+#define COLUMN_ID_COLOR        13
+
+
+class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
+{
+public:
+    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr)
+    {
+    }
+
+    ~SourceTableListModel() override {}
+
+    void initTable(TableListBox* tableListBox)
+    {
+        pTableListBox = tableListBox;
+        tableListBox->setModel(this);
+        tableListBox->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
+        tableListBox->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
+        tableListBox->getHeader().addColumn("X", COLUMN_ID_X, 50);
+        tableListBox->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
+        tableListBox->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
+        tableListBox->getHeader().addColumn("A", COLUMN_ID_A, 50);
+        tableListBox->getHeader().addColumn("E", COLUMN_ID_E, 50);
+        tableListBox->getHeader().addColumn("D", COLUMN_ID_D, 50);
+        tableListBox->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
+        tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
+        tableListBox->getHeader().setStretchToFitActive(true);
+        tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
+    }
+
+private:
+    int getNumRows() override
+    {
+        return pSources->size();
+    }
+
+    void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
+    {
+        const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
+            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+        if (rowIsSelected)
+            g.fillAll(Colours::lightblue);
+        else if (rowNumber % 2)
+            g.fillAll(alternateColour);
+    }
+
+    void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override
+    {
+        AmbiPoint* pt = pSources->get(rowNumber);
+        if (pt == nullptr)
+            return;
+
+        g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId));
+        String text;
+        switch (columnId)
+        {
+        case COLUMN_ID_NB: text = String(rowNumber + 1); break;
+        case COLUMN_ID_NAME: text = pt->getName(); break;
+        default: text = "";
+        }
+        g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
+        g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId));
+        g.fillRect(width - 1, 0, 1, height);
+    }
+
+    void selectedRowsChanged(int lastRowSelected) override
+    {
+        if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
+            pPointSelection->selectPoint(lastRowSelected);
+    }
+
+    Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override
+    {
+        if (columnId == COLUMN_ID_X
+            || columnId == COLUMN_ID_Y
+            || columnId == COLUMN_ID_Z
+            || columnId == COLUMN_ID_A
+            || columnId == COLUMN_ID_E
+            || columnId == COLUMN_ID_D)
+        {
+            NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
+            if (numericBox == nullptr)
+                numericBox = new NumericColumnCustomComponent(*this);
+
+            numericBox->setRowAndColumn(rowNumber, columnId);
+            return numericBox;
+        }
+        else if (columnId == COLUMN_ID_GAIN)
+        {
+            SliderColumnCustomComponent* gainBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
+            if (gainBox == nullptr)
+                gainBox = new SliderColumnCustomComponent(*this);
+
+            gainBox->setRowAndColumn(rowNumber, columnId);
+            return gainBox;
+        }
+        else if (columnId == COLUMN_ID_NAME)
+        {
+            EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
+            if (textLabel == nullptr)
+                textLabel = new EditableTextCustomComponent(*this);
+
+            textLabel->setRowAndColumn(rowNumber, columnId);
+            return textLabel;
+        }
+        else if (columnId == COLUMN_ID_COLOR)
+        {
+            ColorEditorCustomComponent* colorBox = static_cast<ColorEditorCustomComponent*> (existingComponentToUpdate);
+            if (colorBox == nullptr)
+                colorBox = new ColorEditorCustomComponent(*this);
+
+            colorBox->setRowAndColumn(rowNumber, columnId);
+            return colorBox;
+        }
+
+        return nullptr;
+    }
+
+    double getValue(int columnId, int rowNumber) override
+    {
+        AmbiPoint* pt = pSources->get(rowNumber);
+        if (pt == nullptr)
+            return 0.0;
+
+        switch (columnId)
+        {
+        case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
+        case COLUMN_ID_X: return pt->getPoint()->getX();
+        case COLUMN_ID_Y: return pt->getPoint()->getY();
+        case COLUMN_ID_Z: return pt->getPoint()->getZ();
+        case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
+        case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
+        case COLUMN_ID_D: return pt->getPoint()->getDistance();
+        case COLUMN_ID_COLOR: return pt->getColor().getARGB();
+        default: return 0.0;
+        }
+    }
+
+    void setValue(int columnId, int rowNumber, double newValue) override
+    {
+        switch (columnId)
+        {
+        case COLUMN_ID_GAIN: pSources->setGain(rowNumber, pow(10.0, 0.1 * newValue)); break;
+        case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
+        case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
+        case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
+        case COLUMN_ID_A: pSources->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
+        case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
+        case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
+        case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
+        default: throw;
+        }
+
+        getTable()->updateContent();
+        getTable()->repaint();
+    }
+
+    SliderRange getSliderRange(int columnId) override
+    {
+        switch (columnId)
+        {
+        case COLUMN_ID_X:
+        case COLUMN_ID_Y:
+        case COLUMN_ID_Z:
+            return SliderRange(-1.0, 1.0, 0.001);
+
+        case COLUMN_ID_D:
+            return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
+
+        case COLUMN_ID_A:
+            return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
+
+        case COLUMN_ID_E:
+            return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+
+        case COLUMN_ID_GAIN:
+            return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
+        default: return SliderRange(0.0, 1.0, 0.001);
+        }
+    }
+
+    TableListBox* getTable() override
+    {
+        return pTableListBox;
+    }
+
+    String getTableText(const int columnId, const int rowNumber) override
+    {
+        AmbiPoint* pt = pSources->get(rowNumber);
+        if (pt == nullptr)
+            return "";
+
+        switch (columnId)
+        {
+        case COLUMN_ID_NAME: return pt->getName();
+        default: return "";
+        }
+    }
+
+    void setTableText(const int columnId, const int rowNumber, const String& newText) override
+    {
+        switch (columnId)
+        {
+        case COLUMN_ID_NAME: pSources->setChannelName(rowNumber, newText); break;
+        default: throw;
+        }
+    }
+
+    void changeListenerCallback(ChangeBroadcaster* /*source*/) override
+    {
+        getTable()->updateContent();
+        getTable()->repaint();
+    }
+
+private:
+    AmbiSourceSet* pSources;
+    PointSelection* pPointSelection;
+    Component* pParentComponent;
+    TableListBox* pTableListBox;
+};

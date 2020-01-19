@@ -22,11 +22,11 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "GroupTableListModel.h"
+#include "SourceTableListModel.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/TableColumnCallback.h"
 #include "EncoderSettings.h"
-
 //[/Headers]
 
 
@@ -40,8 +40,6 @@
                                                                     //[/Comments]
 */
 class SourceDefinitionComponent  : public Component,
-                                   public TableListBoxModel,
-                                   public TableColumnCallback,
                                    public ChangeListener,
                                    public ChangeBroadcaster,
                                    public Button::Listener
@@ -53,20 +51,9 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    int getNumRows() override;
-    void paintRowBackground(Graphics&, int rowNumber, int width, int height, bool rowIsSelected) override;
-    void paintCell(Graphics&, int rowNumber, int columnId, int width, int height, bool rowIsSelected) override;
-    double getValue(int columnId, int rowNumber) override;
-    void setValue(int columnId, int rowNumber, double newValue) override;
-    SliderRange getSliderRange(int columnId) override;
-    TableListBox* getTable() override;
-    String getTableText(const int columnId, const int rowNumber) override;
-    void setTableText(const int columnId, const int rowNumber, const String& newText) override;
-    void selectedRowsChanged(int lastRowSelected) override;
-    Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void controlDimming() const;
-    void refresh();
+    void refresh() const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -81,6 +68,7 @@ private:
     PointSelection* pPointSelection;
     Array<AudioParameterSet>* pAudioParams;
     std::unique_ptr<GroupTableListModel> groupModel;
+    std::unique_ptr<SourceTableListModel> sourceModel;
     EncoderSettings* pEncoderSettings;
     //[/UserVariables]
 

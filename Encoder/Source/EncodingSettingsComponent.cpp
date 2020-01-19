@@ -121,14 +121,13 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
 
     //[Constructor] You can add your own custom stuff here..
-
     toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
     toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
 
     toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
     sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
 
-        labelPresets->setVisible(MULTI_ENCODER_MODE);
+    labelPresets->setVisible(MULTI_ENCODER_MODE);
     comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
     buttonSave->setVisible(MULTI_ENCODER_MODE);
     buttonImport->setVisible(MULTI_ENCODER_MODE);
@@ -217,7 +216,6 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
                 sourceDefinition->refresh();
             }
         }
-
         //[/UserComboBoxCode_comboBoxPresets]
     }
 
@@ -249,7 +247,6 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
                 AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading preset " + importFile.getFullPathName());
             }
         }
-
         //[/UserButtonCode_buttonImport]
     }
     else if (buttonThatWasClicked == buttonSave.get())
@@ -296,7 +293,6 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
             initializePresets();
             comboBoxPresets->setText(presetName, dontSendNotification);
         }
-
         //[/UserButtonCode_buttonSave]
     }
     else if (buttonThatWasClicked == buttonExport.get())
@@ -311,7 +307,6 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
                 AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + exportFile.getFullPathName());
             }
         }
-
         //[/UserButtonCode_buttonExport]
     }
     else if (buttonThatWasClicked == toggleDistanceEncoding.get())
@@ -326,7 +321,6 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_toggleDirectionFlip] -- add your button handler code here..
         pEncoderSettings->setDirectionFlip(toggleDirectionFlip->getToggleState());
         sendChangeMessage();
-
         //[/UserButtonCode_toggleDirectionFlip]
     }
     else if (buttonThatWasClicked == toggleDoppler.get())
@@ -334,14 +328,12 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_toggleDoppler] -- add your button handler code here..
         pEncoderSettings->dopplerEncodingFlag = toggleDoppler->getToggleState();
         sendChangeMessage();
-
         //[/UserButtonCode_toggleDoppler]
     }
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
         CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams), getScreenBounds(), nullptr);
-
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
 
@@ -360,7 +352,6 @@ void EncodingSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
         pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
         sendChangeMessage();
-
         //[/UserSliderCode_sliderDistanceScaler]
     }
 
@@ -399,8 +390,6 @@ void EncodingSettingsComponent::initializePresets()
         }
     }
 }
-
-
 //[/MiscUserCode]
 
 

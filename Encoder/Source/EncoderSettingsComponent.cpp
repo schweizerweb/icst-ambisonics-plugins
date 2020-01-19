@@ -63,7 +63,6 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
 
     //[Constructor] You can add your own custom stuff here..
 	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
-
     //[/Constructor]
 }
 
