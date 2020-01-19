@@ -154,16 +154,16 @@ void SourceDefinitionComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4004f), getWidth() - 0, proportionOfHeight (0.4004f));
-    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4004f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4004f) - 67);
-    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4004f)) + proportionOfHeight (0.4004f) - 40, 64, 24);
-    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4004f)) + proportionOfHeight (0.4004f) - 40, 64, 24);
-    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5996f));
-    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5996f) - 67);
-    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5996f) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5996f) - 40, 64, 24);
-    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5996f) - 40, 64, 24);
-    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5996f) - 40, 64, 24);
+    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4007f), getWidth() - 0, proportionOfHeight (0.4007f));
+    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4007f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4007f) - 67);
+    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4007f)) + proportionOfHeight (0.4007f) - 40, 64, 24);
+    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4007f)) + proportionOfHeight (0.4007f) - 40, 64, 24);
+    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5993f));
+    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5993f) - 67);
+    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
+    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
+    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
+    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5993f) - 40, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -322,10 +322,9 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.068%"
-                  posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
-                  posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
-                  title="Groups"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40%" posRelativeX="73249ab85d6bba3a"
+                  posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
+                  posRelativeH="73249ab85d6bba3a" title="Groups"/>
   <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="983b0a3b2c5c945a"
                     posRelativeY="983b0a3b2c5c945a" posRelativeW="983b0a3b2c5c945a"
@@ -339,7 +338,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.932%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
