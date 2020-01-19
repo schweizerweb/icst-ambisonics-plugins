@@ -76,7 +76,6 @@ private:
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TextButton> buttonExport;
     std::unique_ptr<SourceDefinitionComponent> sourceDefinition;
-    std::unique_ptr<GroupComponent> groupEncoding;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
     std::unique_ptr<ToggleButton> toggleDoppler;

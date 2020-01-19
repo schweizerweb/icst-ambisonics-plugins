@@ -10,6 +10,7 @@
 
 #pragma once
 #include "TableColumnCallback.h"
+#include "ColorSelectionComponent.h"
 
 class ColorEditorCustomComponent : public Label, public ChangeListener, public Button::Listener
 {
@@ -21,27 +22,7 @@ public:
 	void mouseDown(const MouseEvent& event) override
 	{
 		owner.getTable()->selectRowsBasedOnModifierKeys(row, event.mods, false);
-		ColourSelector* selector = new ColourSelector(ColourSelector::showColourspace);
-		selector->setName("Colour");
-		selector->setCurrentColour(color);
-		selector->addChangeListener(this);
-		selector->setColour(ColourSelector::backgroundColourId, Colours::transparentBlack);
-		selector->setSize(200, 200);
-        
-        Component* c = new Component();
-        c->setSize(200, groupFlag ? 230 : 200);
-        c->addAndMakeVisible(selector);
-        
-        if(groupFlag)
-        {
-            TextButton* btn = new TextButton("Apply color to sub-points");
-            btn->addListener(this);
-            btn->setSize(200, 25);
-            btn->setTopLeftPosition(0, 202);
-            c->addAndMakeVisible(btn);
-        }
-        
-        CallOutBox::launchAsynchronously(c, getScreenBounds(), nullptr);
+        CallOutBox::launchAsynchronously(new ColorSelectionComponent(color, this, this, groupFlag), getScreenBounds(), nullptr);
 	}
 
 	void setRowAndColumn(const int newRow, const int newColumn)

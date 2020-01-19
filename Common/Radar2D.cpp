@@ -64,13 +64,13 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 float Radar2D::getEditablePointSize(float scaler) const
 {
     double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
-	return radarViewport.getWidth() / 30.0f * scaler * baseScaler;
+	return radarViewport.getWidth() / 30.0f * scaler * float(baseScaler);
 }
 
 float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
 	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
-    return radarViewport.getWidth() / 50.0f * scaler * baseScaler;
+    return radarViewport.getWidth() / 50.0f * scaler * float(baseScaler);
 }
 
 float Radar2D::getFontSize() const
@@ -174,18 +174,19 @@ void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) con
 void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
 	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
-    
-    int y = screenPt.getY() > offset + labelImage.getHeight() * baseScaler
-		? int(screenPt.getY() - offset - labelImage.getHeight() * baseScaler)
+    int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
+    int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
+    int y = screenPt.getY() > offset + scaledImageHeight
+		? int(screenPt.getY() - offset - scaledImageHeight)
 		: int(screenPt.getY() + offset);
 	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + labelImage.getWidth() * baseScaler))
+		&& screenPt.getX() > getWidth() - (offset + scaledImageWidth))
 	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - labelImage.getWidth() * baseScaler), y, labelImage.getWidth() * baseScaler, labelImage.getHeight() * baseScaler, RectanglePlacement::stretchToFit);
+		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
 	}
 	else
 	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, labelImage.getWidth() * baseScaler, labelImage.getHeight() * baseScaler, RectanglePlacement::stretchToFit);
+		g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
 	}
 }
 

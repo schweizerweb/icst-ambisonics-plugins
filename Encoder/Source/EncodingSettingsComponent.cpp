@@ -29,11 +29,11 @@
 
 //==============================================================================
 EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams)
-    : pSources(pSourceSet), pAudioParams(pAudioParams)
+    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
-//[/Constructor_pre]
+    //[/Constructor_pre]
 
     comboBoxPresets.reset (new ComboBox ("comboBoxPresets"));
     addAndMakeVisible (comboBoxPresets.get());
@@ -71,24 +71,26 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     addAndMakeVisible (sourceDefinition.get());
     sourceDefinition->setName ("sourceDefinition");
 
-    groupEncoding.reset (new GroupComponent ("groupEncoding",
-                                             TRANS("Encoding")));
-    addAndMakeVisible (groupEncoding.get());
-
     toggleDistanceEncoding.reset (new ToggleButton ("toggleDistanceEncoding"));
     addAndMakeVisible (toggleDistanceEncoding.get());
     toggleDistanceEncoding->setButtonText (TRANS("Enable Distance Encoding"));
     toggleDistanceEncoding->addListener (this);
+
+    toggleDistanceEncoding->setBounds (14, 19, 199, 24);
 
     toggleDirectionFlip.reset (new ToggleButton ("toggleDirectionFlip"));
     addAndMakeVisible (toggleDirectionFlip.get());
     toggleDirectionFlip->setButtonText (TRANS("Flip Direction (Orientation)"));
     toggleDirectionFlip->addListener (this);
 
+    toggleDirectionFlip->setBounds (14, 79, 207, 24);
+
     toggleDoppler.reset (new ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
     toggleDoppler->setButtonText (TRANS("Enable Doppler"));
     toggleDoppler->addListener (this);
+
+    toggleDoppler->setBounds (14, 49, 199, 24);
 
     sliderDistanceScaler.reset (new Slider ("sliderDistanceScaler"));
     addAndMakeVisible (sliderDistanceScaler.get());
@@ -156,7 +158,6 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     buttonSave = nullptr;
     buttonExport = nullptr;
     sourceDefinition = nullptr;
-    groupEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDirectionFlip = nullptr;
     toggleDoppler = nullptr;
@@ -186,19 +187,15 @@ void EncodingSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxPresets->setBounds (83, getHeight() - 618, getWidth() - 312, 24);
-    labelPresets->setBounds (8, getHeight() - 618, 64, 24);
-    buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 618, 64, 24);
-    buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 618, 64, 24);
-    buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 618, 64, 24);
-    sourceDefinition->setBounds (8, 48, getWidth() - 16, getHeight() - 165);
-    groupEncoding->setBounds (8, getHeight() - 117, getWidth() - 16, 112);
-    toggleDistanceEncoding->setBounds (8 + 14, (getHeight() - 117) + 19, 199, 24);
-    toggleDirectionFlip->setBounds (8 + 14, (getHeight() - 117) + 79, 207, 24);
-    toggleDoppler->setBounds (8 + 14, (getHeight() - 117) + 49, 199, 24);
-    sliderDistanceScaler->setBounds (8 + (getWidth() - 16) - 24 - 202, (getHeight() - 117) + 49, 202, 24);
-    labelDistanceScaler->setBounds (8 + (getWidth() - 16) - 229 - 109, (getHeight() - 117) + 49, 109, 24);
-    btnEditDistanceEncoding->setBounds (8 + (getWidth() - 16) - 24 - 86, (getHeight() - 117) + 19, 86, 24);
+    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 312, 24);
+    labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
+    buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 8 - 24, 64, 24);
+    buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 8 - 24, 64, 24);
+    buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 8 - 24, 64, 24);
+    sourceDefinition->setBounds (8, 112, getWidth() - 16, getHeight() - 154);
+    sliderDistanceScaler->setBounds (getWidth() - 24 - 202, 49, 202, 24);
+    labelDistanceScaler->setBounds (getWidth() - 229 - 109, 49, 109, 24);
+    btnEditDistanceEncoding->setBounds (getWidth() - 24 - 86, 19, 86, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -419,36 +416,34 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
-                 variableInitialisers="pSources(pSourceSet), pAudioParams(pAudioParams)"
+                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
-            virtualName="" explicitFocusOrder="0" pos="83 618R 312M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="83 8Rr 312M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="8 618R 64 24" posRelativeY="450188aa0f332e78"
+         virtualName="" explicitFocusOrder="0" pos="8 8Rr 64 24" posRelativeY="450188aa0f332e78"
          edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonImport" id="5a786eb91323df32" memberName="buttonImport"
-              virtualName="" explicitFocusOrder="0" pos="81Rr 618R 64 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="81Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="import" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="153Rr 618R 64 24"
-              posRelativeX="450188aa0f332e78" posRelativeY="450188aa0f332e78"
-              buttonText="save" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+              virtualName="" explicitFocusOrder="0" pos="153Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonExport" id="92cbcfe3e89f89e" memberName="buttonExport"
-              virtualName="" explicitFocusOrder="0" pos="9Rr 618R 64 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="9Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
-                    virtualName="" explicitFocusOrder="0" pos="8 48 16M 165M" class="SourceDefinitionComponent"
+                    virtualName="" explicitFocusOrder="0" pos="8 112 16M 154M" class="SourceDefinitionComponent"
                     params="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams"/>
-  <GROUPCOMPONENT name="groupEncoding" id="b72378bdfe4e130" memberName="groupEncoding"
-                  virtualName="" explicitFocusOrder="0" pos="8 117R 16M 112" title="Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
