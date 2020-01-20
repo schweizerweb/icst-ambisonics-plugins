@@ -20,8 +20,8 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../JuceLibraryCode/JuceHeader.h"
-#include "EncoderSettings.h"
+#include "JuceHeader.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 
@@ -36,31 +36,47 @@
 */
 class RadarSettingsComponent  : public Component,
                                 public ChangeBroadcaster,
-                                public Slider::Listener
+                                public ChangeListener,
+                                public Slider::Listener,
+                                public Button::Listener
 {
 public:
     //==============================================================================
-    RadarSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings);
+    RadarSettingsComponent (ChangeListener* pChangeListener, ZoomSettings* pZoomSettings);
     ~RadarSettingsComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void displaySettings();
+    void changeListenerCallback(ChangeBroadcaster *source) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    EncoderSettings* pSettings;
+    ZoomSettings* pZoomSettings;
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<GroupComponent> groupZoom;
+    std::unique_ptr<Slider> sliderCenterPointX;
+    std::unique_ptr<Label> labelCenterPointX;
+    std::unique_ptr<Slider> sliderCenterPointY;
+    std::unique_ptr<Label> labelCenterPointY;
+    std::unique_ptr<Slider> sliderCenterPointZ;
+    std::unique_ptr<Label> labelCenterPointZ;
+    std::unique_ptr<GroupComponent> groupDisplay;
     std::unique_ptr<Slider> sliderPointScaler;
     std::unique_ptr<Label> labelPointScaler;
+    std::unique_ptr<Slider> sliderRadius;
+    std::unique_ptr<Label> labelRadius;
+    std::unique_ptr<TextButton> btnReset;
 
 
     //==============================================================================

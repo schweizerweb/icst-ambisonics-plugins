@@ -51,6 +51,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void setPointInfoVisible(bool visible);
     void timerCallback() override;
+    ZoomSettings* getZoomSettingsPointer() {return &zoomSettings;}
     //[/UserMethods]
 
     void paint (Graphics& g) override;

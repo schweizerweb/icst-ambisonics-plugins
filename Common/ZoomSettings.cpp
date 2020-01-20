@@ -14,7 +14,8 @@ ZoomSettings::ZoomSettings() :
 	initialCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
 	currentCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
 	initialRadius(1.0),
-	currentRadius(1.0)
+	currentRadius(1.0),
+    pointScaler(DEFAULT_POINT_SCALER)
 {
 }
 
@@ -50,6 +51,17 @@ void ZoomSettings::setCurrentCenterPointYZ(float y, float z)
 {
 	currentCenterPoint.setYZ(y, z);
 	sendChangeMessage();
+}
+
+double ZoomSettings::getPointScaler()
+{
+    return pointScaler;
+}
+
+void ZoomSettings::setPointScaler(double newScaler)
+{
+    pointScaler = newScaler;
+    sendChangeMessage();
 }
 
 float ZoomSettings::getInitialRadius() const

@@ -29,7 +29,6 @@
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER "DistEncExperimentalPower"
 #define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
-#define XML_ATTRIBUTE_POINT_SCALER "PointScaler"
 
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
@@ -44,7 +43,7 @@ EncoderSettings::EncoderSettings():
 	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
 	dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
 	distanceEncodingParams(DistanceEncodingParams()),
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP, DEFAULT_POINT_SCALER)
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP)
 {
 }
 
@@ -76,10 +75,6 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 
     writeToPresetXmlElement(element);
 	
-    XmlElement* display = new XmlElement(XML_TAG_DISPLAY);
-    display->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
-    element->addChildElement(display);
-    
 	return element;
 }
 
@@ -107,12 +102,6 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	}
 
     loadFromPresetXml(element);
-	
-    XmlElement* display = element->getChildByName(XML_TAG_DISPLAY);
-    if(display != nullptr)
-    {
-        pointScaler = display->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
-    }
 }
 
 void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const

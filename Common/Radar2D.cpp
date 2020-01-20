@@ -63,14 +63,12 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 
 float Radar2D::getEditablePointSize(float scaler) const
 {
-    double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
-	return radarViewport.getWidth() / 30.0f * scaler * float(baseScaler);
+	return radarViewport.getWidth() / 30.0f * scaler * float(pZoomSettings->getPointScaler());
 }
 
 float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
-	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
-    return radarViewport.getWidth() / 50.0f * scaler * float(baseScaler);
+    return radarViewport.getWidth() / 50.0f * scaler * float(pZoomSettings->getPointScaler());
 }
 
 float Radar2D::getFontSize() const
@@ -173,7 +171,7 @@ void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) con
 
 void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-	double baseScaler = pRadarOptions->pPointScaler == nullptr ? 1.0 : *pRadarOptions->pPointScaler;
+    double baseScaler = pZoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
     int y = screenPt.getY() > offset + scaledImageHeight

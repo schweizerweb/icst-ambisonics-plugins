@@ -21,7 +21,6 @@ RadarOptions::RadarOptions()
 	showEditablePoints = true;
 	dawParameter = nullptr;
 	setTrackColorAccordingToName = true;
-    pPointScaler = nullptr;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const

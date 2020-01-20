@@ -28,7 +28,6 @@ public:
 	bool showDisplayOnlyPoints;
 	bool setTrackColorAccordingToName;
 
-    double* pPointScaler;
-	Array<AudioParameterSet>* audioParams;
+    Array<AudioParameterSet>* audioParams;
 	DawParameter* dawParameter;
 };

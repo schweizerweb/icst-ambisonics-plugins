@@ -10,7 +10,7 @@
 
 #include "AmbiBasicSettings.h"
 
-AmbiBasicSettings::AmbiBasicSettings(double distanceScaler, bool directionFlip, double pointScaler): distanceScaler(distanceScaler), directionFlip(directionFlip), pointScaler(pointScaler)
+AmbiBasicSettings::AmbiBasicSettings(double distanceScaler, bool directionFlip): distanceScaler(distanceScaler), directionFlip(directionFlip)
 {
 }
 
