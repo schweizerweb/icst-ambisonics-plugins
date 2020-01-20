@@ -171,20 +171,6 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>
 	
 }
 
-bool AmbiSourceSet::loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams)
-{
-	XmlDocument doc(file);
-	loadFromXml(doc.getDocumentElement().get(), pAudioParams);
-	
-	// set new IDs
-	for (int i = 0; i < size(); i++)
-		get(i)->resetId();
-	for (AmbiGroup* g : groups)
-		g->resetId();
-
-	return size() > 0;
-}
-
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 {
 	// load sources
@@ -210,13 +196,11 @@ void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 	xml->addChildElement(groupsElement);
 }
 
-bool AmbiSourceSet::writeToXmlFile(const File file) const
+void AmbiSourceSet::resetIds()
 {
-	XmlElement* xml = new XmlElement("AmbiSourceSet");
-	writeToXmlElement(xml);
-	bool success = xml->writeTo(file);
-	delete xml;
-
-	return success;
+    // set new IDs
+    for (int i = 0; i < size(); i++)
+        get(i)->resetId();
+    for (AmbiGroup* g : groups)
+        g->resetId();
 }
-

@@ -14,6 +14,7 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="zbf72D" name="EncoderPreset.h" compile="0" resource="0" file="Source/EncoderPreset.h"/>
       <FILE id="HbYSNl" name="SourceTableListModel.h" compile="0" resource="0"
             file="Source/SourceTableListModel.h"/>
       <FILE id="nlQSsS" name="SourceDefinitionComponent.cpp" compile="1"

@@ -35,6 +35,8 @@ public:
 	~EncoderSettings();
 	XmlElement* getAsXmlElement(String tagName) const;
 	void loadFromXml(XmlElement* xml_element);
+    void writeToPresetXmlElement(XmlElement* xmlElement) const;
+    void loadFromPresetXml(XmlElement* xmlElement);
 
 public:
 	bool oscReceiveFlag;

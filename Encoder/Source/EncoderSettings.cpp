@@ -74,26 +74,8 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	oscSendExt->setAttribute(XML_ATTRIBUTE_IP, oscSendExtTargetHost);
 	element->addChildElement(oscSendExt);
 
-	XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
-	distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.unitCircleRadius);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, distanceEncodingParams.encodingMode);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, distanceEncodingParams.dbUnit);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, distanceEncodingParams.inverseProportionalDistanceAttenuation);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, distanceEncodingParams.centerCurve);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, distanceEncodingParams.experimentalFactor);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, distanceEncodingParams.experimentalPower);
-	element->addChildElement(distanceEncoding);
-
-	XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
-	dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
-	dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
-	element->addChildElement(dopplerEncoding);
-
-	XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
-	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, getDirectionFlip());
-	element->addChildElement(orientation);
-
+    writeToPresetXmlElement(element);
+	
     XmlElement* display = new XmlElement(XML_TAG_DISPLAY);
     display->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
     element->addChildElement(display);
@@ -124,35 +106,65 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		oscSendExtTargetHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_EXT_HOST);
 	}
 
-	XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
-	if(distanceEncoding != nullptr)
-	{
-		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-		distanceEncodingParams.unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
-		distanceEncodingParams.encodingMode = DistanceEncodingParams::EncodingMode(distanceEncoding->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
-		distanceEncodingParams.dbUnit = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT));
-		distanceEncodingParams.inverseProportionalDistanceAttenuation = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION));
-		distanceEncodingParams.centerCurve = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
-		distanceEncodingParams.experimentalFactor = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, DEFAULT_EXPERIMENTAL_FACTOR));
-		distanceEncodingParams.experimentalPower = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, DEFAULT_EXPERIMENTAL_POWER));
-	}
-
-	XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);
-	if(dopplerEncoding != nullptr)
-	{
-		dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
-		setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
-	}
-
-	XmlElement* orientation = element->getChildByName(XML_TAG_ORIENTATION);
-	if(orientation != nullptr)
-	{
-		setDirectionFlip(orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP));
-	}
-    
+    loadFromPresetXml(element);
+	
     XmlElement* display = element->getChildByName(XML_TAG_DISPLAY);
     if(display != nullptr)
     {
         pointScaler = display->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
     }
+}
+
+void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
+{
+    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.unitCircleRadius);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, distanceEncodingParams.encodingMode);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, distanceEncodingParams.dbUnit);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, distanceEncodingParams.inverseProportionalDistanceAttenuation);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, distanceEncodingParams.centerCurve);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, distanceEncodingParams.experimentalFactor);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, distanceEncodingParams.experimentalPower);
+    xmlElement->addChildElement(distanceEncoding);
+
+    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
+    xmlElement->addChildElement(dopplerEncoding);
+
+    XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
+    orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, getDirectionFlip());
+    xmlElement->addChildElement(orientation);
+}
+
+void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
+{
+    XmlElement* distanceEncoding = xmlElement->getChildByName(XML_TAG_DISTANCE_ENCODING);
+    if (distanceEncoding != nullptr)
+    {
+        distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
+        distanceEncodingParams.unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
+        distanceEncodingParams.encodingMode = DistanceEncodingParams::EncodingMode(distanceEncoding->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
+        distanceEncodingParams.dbUnit = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT));
+        distanceEncodingParams.inverseProportionalDistanceAttenuation = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION));
+        distanceEncodingParams.centerCurve = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
+        distanceEncodingParams.experimentalFactor = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, DEFAULT_EXPERIMENTAL_FACTOR));
+        distanceEncodingParams.experimentalPower = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, DEFAULT_EXPERIMENTAL_POWER));
+    }
+
+    XmlElement* dopplerEncoding = xmlElement->getChildByName(XML_TAG_DOPPLER_ENCODING);
+    if (dopplerEncoding != nullptr)
+    {
+        dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
+        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
+    }
+
+    XmlElement* orientation = xmlElement->getChildByName(XML_TAG_ORIENTATION);
+    if (orientation != nullptr)
+    {
+        setDirectionFlip(orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP));
+    }
+
+
 }

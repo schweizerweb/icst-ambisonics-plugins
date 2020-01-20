@@ -22,7 +22,7 @@
 //[/Headers]
 
 #include "EncodingSettingsComponent.h"
-
+#include "EncoderPreset.h"
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
@@ -212,7 +212,7 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
         {
             if (preset.getFileNameWithoutExtension() == presetToLoad)
             {
-                pSources->loadFromXmlFile(preset, pAudioParams);
+                EncoderPreset::loadFromXmlFile(preset, pAudioParams, pSources, pEncoderSettings);
                 sourceDefinition->refresh();
             }
         }
@@ -236,7 +236,8 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         {
             File importFile(chooser.getResult());
             AmbiSourceSet testSet;
-            if(testSet.loadFromXmlFile(importFile))
+            EncoderSettings testSettings;
+            if(EncoderPreset::loadFromXmlFile(importFile, nullptr, &testSet, &testSettings))
             {
                 importFile.copyFileTo(presetDirectory.getFullPathName() + "/" + importFile.getFileName());
                 initializePresets();
@@ -289,7 +290,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
                 }
             }
 
-            pSources->writeToXmlFile(newFile);
+            EncoderPreset::writeToXmlFile(newFile, pSources, pEncoderSettings);
             initializePresets();
             comboBoxPresets->setText(presetName, dontSendNotification);
         }
@@ -302,7 +303,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         if (chooser.browseForFileToSave(true))
         {
             File exportFile(chooser.getResult());
-            if(!pSources->writeToXmlFile(exportFile))
+            if(!EncoderPreset::writeToXmlFile(exportFile, pSources, pEncoderSettings))
             {
                 AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + exportFile.getFullPathName());
             }
@@ -381,8 +382,9 @@ void EncodingSettingsComponent::initializePresets()
     while (iterator.next())
     {
         // try to load preset
-        AmbiSourceSet test;
-        if (test.loadFromXmlFile(iterator.getFile()))
+        AmbiSourceSet testSet;
+        EncoderSettings testSettings;
+        if (EncoderPreset::loadFromXmlFile(iterator.getFile(), nullptr, &testSet, &testSettings))
         {
             String name = iterator.getFile().getFileNameWithoutExtension();
             presets.add(iterator.getFile());
