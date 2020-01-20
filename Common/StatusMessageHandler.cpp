@@ -27,6 +27,18 @@ void StatusMessageHandler::unregisterLabel()
 	pLabel = nullptr;
 }
 
+void StatusMessageHandler::registerDetailLog(TextEditor *editor)
+{
+    const ScopedLock lock(cs);
+    pTextEditor = editor;
+}
+
+void StatusMessageHandler::unregisterDetailLog()
+{
+    const ScopedLock lock(cs);
+    pTextEditor = nullptr;
+}
+
 void StatusMessageHandler::showMessage(String message, MessageStyle style)
 {
 	if (pLabel != nullptr)
@@ -51,6 +63,13 @@ void StatusMessageHandler::showMessage(String message, MessageStyle style)
 		pLabel->setText(message, sendNotification);
 		startTimer(timeout);
 	}
+    
+    if(pTextEditor != nullptr)
+    {
+        const ScopedLock lock(cs);
+        pTextEditor->insertTextAtCaret(message);
+        pTextEditor->insertTextAtCaret("\r\n");
+    }
 }
 
 void StatusMessageHandler::timerCallback()

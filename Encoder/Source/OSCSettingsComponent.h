@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "EncoderSettings.h"
+#include "../../Common/StatusMessageHandler.h"
 //[/Headers]
 
 
@@ -41,7 +42,7 @@ class OSCSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings);
+    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler);
     ~OSCSettingsComponent();
 
     //==============================================================================
@@ -62,9 +63,12 @@ private:
     void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
 
     EncoderSettings* pSettings;
+    StatusMessageHandler* pStatusMessageHandler;
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<GroupComponent> groupExternal;
+    std::unique_ptr<GroupComponent> groupInternal;
     std::unique_ptr<ToggleButton> toggleReceiveOsc;
     std::unique_ptr<TextEditor> textOscReceivePort;
     std::unique_ptr<Label> labelOscPort;
@@ -78,6 +82,8 @@ private:
     std::unique_ptr<TextEditor> textOscSendIpExt;
     std::unique_ptr<Label> labelOscSendIpExt;
     std::unique_ptr<TextEditor> textOscSendPortExt;
+    std::unique_ptr<GroupComponent> groupLog;
+    std::unique_ptr<TextEditor> textLog;
 
 
     //==============================================================================
