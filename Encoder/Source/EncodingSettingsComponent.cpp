@@ -121,12 +121,8 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
 
     //[Constructor] You can add your own custom stuff here..
-    toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
-    toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
-
-    toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
-    sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
-
+    updateEncodingUiElements();
+    
     labelPresets->setVisible(MULTI_ENCODER_MODE);
     comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
     buttonSave->setVisible(MULTI_ENCODER_MODE);
@@ -136,13 +132,6 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     // load stored presets
     initializePresets();
     controlDimming();
-
-    // TODO: Doppler temporarily deactivated
-    toggleDoppler->setToggleState(false, dontSendNotification);
-    toggleDoppler->setEnabled(false);
-    labelDistanceScaler->setEnabled(false);
-    sliderDistanceScaler->setEnabled(false);
-
     //[/Constructor]
 }
 
@@ -169,6 +158,20 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     //[/Destructor]
 }
 
+void EncodingSettingsComponent::updateEncodingUiElements()
+{
+    toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
+    toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
+
+    toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
+    sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
+
+    // TODO: Doppler temporarily deactivated
+    toggleDoppler->setToggleState(false, dontSendNotification);
+    toggleDoppler->setEnabled(false);
+    labelDistanceScaler->setEnabled(false);
+    sliderDistanceScaler->setEnabled(false);
+}
 //==============================================================================
 void EncodingSettingsComponent::paint (Graphics& g)
 {
@@ -214,6 +217,9 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
             {
                 EncoderPreset::loadFromXmlFile(preset, pAudioParams, pSources, pEncoderSettings);
                 sourceDefinition->refresh();
+                updateEncodingUiElements();
+                controlDimming();
+                sendChangeMessage();
             }
         }
         //[/UserComboBoxCode_comboBoxPresets]
