@@ -262,11 +262,11 @@ void RadarSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void RadarSettingsComponent::displaySettings()
 {
-    sliderPointScaler->setValue(pZoomSettings->getPointScaler());
-    sliderCenterPointX->setValue(pZoomSettings->getCurrentCenterPoint().getX());
-    sliderCenterPointY->setValue(pZoomSettings->getCurrentCenterPoint().getY());
-    sliderCenterPointZ->setValue(pZoomSettings->getCurrentCenterPoint().getZ());
-    sliderRadius->setValue(pZoomSettings->getCurrentRadius());
+    sliderPointScaler->setValue(pZoomSettings->getPointScaler(), dontSendNotification);
+    sliderCenterPointX->setValue(pZoomSettings->getCurrentCenterPoint().getX(), dontSendNotification);
+    sliderCenterPointY->setValue(pZoomSettings->getCurrentCenterPoint().getY(), dontSendNotification);
+    sliderCenterPointZ->setValue(pZoomSettings->getCurrentCenterPoint().getZ(), dontSendNotification);
+    sliderRadius->setValue(pZoomSettings->getCurrentRadius(), dontSendNotification);
 }
 
 void RadarSettingsComponent::changeListenerCallback(ChangeBroadcaster *source)
