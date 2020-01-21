@@ -44,11 +44,11 @@ private:
 	void handleOwnExternStyleGroupAed(const OSCMessage& message) const;
 	void handleOwnExternStyleGroupXyz(const OSCMessage& message) const;
 	void oscMessageReceived(const OSCMessage& message) override;
-	void reportError(String message) const;
-	void reportSuccess() const;
-	bool checkAed(double a, double e, double d) const;
-	bool checkXyz(double x, double y, double z) const;
-
+	void reportError(String message, const OSCMessage* pMsg) const;
+	void reportSuccess(const OSCMessage* pMsg) const;
+	bool checkAed(double a, double e, double d, String* errorString) const;
+	bool checkXyz(double x, double y, double z, String* errorString) const;
+    String oscMessageToString(const OSCMessage* pMsg) const;
 	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };

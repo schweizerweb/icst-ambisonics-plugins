@@ -23,7 +23,7 @@ public:
     void registerDetailLog(TextEditor* editor);
     void unregisterDetailLog();
     
-	void showMessage(String message, MessageStyle style);
+	void showMessage(String message, String detailMessage, MessageStyle style);
 	
 private:
 	void timerCallback() override;

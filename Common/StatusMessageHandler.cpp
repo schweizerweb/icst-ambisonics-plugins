@@ -39,7 +39,7 @@ void StatusMessageHandler::unregisterDetailLog()
     pTextEditor = nullptr;
 }
 
-void StatusMessageHandler::showMessage(String message, MessageStyle style)
+void StatusMessageHandler::showMessage(String message, String detailMessage, MessageStyle style)
 {
 	if (pLabel != nullptr)
 	{
@@ -66,9 +66,11 @@ void StatusMessageHandler::showMessage(String message, MessageStyle style)
     
     if(pTextEditor != nullptr)
     {
+        pTextEditor->setColour(TextEditor::textColourId, style == Error ? Colours::red : Colours::limegreen);
+        
         const ScopedLock lock(cs);
-        pTextEditor->insertTextAtCaret(message);
-        pTextEditor->insertTextAtCaret("\r\n");
+        pTextEditor->moveCaretToEnd();
+        pTextEditor->insertTextAtCaret(Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n");
     }
 }
 

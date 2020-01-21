@@ -42,7 +42,7 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 		&& message[4].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(MuseScoreSSMN style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(MuseScoreSSMN style)", &message);
 		return;
 	}
 
@@ -51,24 +51,28 @@ void OSCHandler::handleMusescoreSSMNStyle(const OSCMessage& message) const
 	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
 	double d = GetIntOrFloat(&message[3]);
 	int channelCheck = message[4].getInt32();
-	if (!checkAed(a, e, d))
-		return;
-
+    String errorString;
+	if (!checkAed(a, e, d, &errorString))
+    {
+        reportError(errorString, &message);
+        return;
+    }
+    
 	if (channel == channelCheck)
 	{
 		if (pAmbiPoints->setChannelNameAED(String(channel), a, e, d))
 		{
-			reportSuccess();
+			reportSuccess(&message);
 
 		}
 		else	
 		{
-			reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
+			reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")", &message);
 		}
 	}
 	else
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(MuseScoreSSMN style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(MuseScoreSSMN style)", &message);
 	}
 }
 
@@ -85,7 +89,7 @@ void OSCHandler::handleOwnInternalStyle(const OSCMessage& message) const
 		&& message[6].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(internal style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(internal style)", &message);
 		return;
 	}
 	
@@ -110,7 +114,7 @@ void OSCHandler::handleOwnExternStyleAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style AED)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style AED)", &message);
 		return;
 	}
 
@@ -118,16 +122,20 @@ void OSCHandler::handleOwnExternStyleAed(const OSCMessage& message) const
 	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(GetIntOrFloat(&message[1]))));
 	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
 	double d = GetIntOrFloat(&message[3]);
-	if(!checkAed(a, e, d))
-		return;
-
+    String errorMessage;
+	if(!checkAed(a, e, d, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if(pAmbiPoints->setChannelNameAED(channelString, a, e, d))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + channelString + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + channelString + ")", &message);
 	}
 }
 
@@ -141,7 +149,7 @@ void OSCHandler::handleOwnExternStyleXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style XYZ)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style XYZ)", &message);
 		return;
 	}
 
@@ -149,16 +157,20 @@ void OSCHandler::handleOwnExternStyleXyz(const OSCMessage& message) const
 	double x = GetIntOrFloat(&message[1]);
 	double y = GetIntOrFloat(&message[2]);
 	double z = GetIntOrFloat(&message[3]);
-	if (!checkXyz(x, y, z))
-		return;
-
+    String errorMessage;
+	if (!checkXyz(x, y, z, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if (pAmbiPoints->setChannelNameXYZ(channelString, x, y, z))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + channelString + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + channelString + ")", &message);
 	}
 }
 
@@ -172,7 +184,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index AED style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index AED style)", &message);
 		return;
 	}
 
@@ -180,16 +192,20 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 	double a = Constants::GradToRad(Constants::NormalizeAzimuthGrad(int(GetIntOrFloat(&message[1]))));
 	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
 	double d = GetIntOrFloat(&message[3]);
-	if (!checkAed(a, e, d))
-		return;
-
+    String errorMessage;
+	if (!checkAed(a, e, d, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if(pAmbiPoints->setChannelAED(channel-1, a, e, d))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")", &message);
 	}
 }
 
@@ -203,7 +219,7 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index XYZ style)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index XYZ style)", &message);
 		return;
 	}
 
@@ -211,16 +227,20 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	double x = GetIntOrFloat(&message[1]);
 	double y = GetIntOrFloat(&message[2]);
 	double z = GetIntOrFloat(&message[3]);
-	if (!checkXyz(x, y, z))
-		return;
-
+    String errorMessage;
+	if (!checkXyz(x, y, z, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if(pAmbiPoints->setChannelXYZ(channel-1, x, y, z))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel-1) + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel-1) + ")", &message);
 	}
 }
 
@@ -235,7 +255,7 @@ void OSCHandler::handleOwnExternStyleGroupAed(const OSCMessage& message) const
 		&& message[4].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group AED)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group AED)", &message);
 		return;
 	}
 
@@ -244,16 +264,20 @@ void OSCHandler::handleOwnExternStyleGroupAed(const OSCMessage& message) const
 	double e = Constants::GradToRad(GetIntOrFloat(&message[2]));
 	double d = GetIntOrFloat(&message[3]);
 	bool movePoints = message[4].getInt32();
-	if (!checkAed(a, e, d))
-		return;
-
+    String errorMessage;
+	if (!checkAed(a, e, d, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if (pAmbiPoints->setGroupAed(groupString, a, e, d, movePoints))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
 	}
 }
 
@@ -268,7 +292,7 @@ void OSCHandler::handleOwnExternStyleGroupXyz(const OSCMessage& message) const
 		&& message[4].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group XYZ)");
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group XYZ)", &message);
 		return;
 	}
 
@@ -277,16 +301,20 @@ void OSCHandler::handleOwnExternStyleGroupXyz(const OSCMessage& message) const
 	double y = GetIntOrFloat(&message[2]);
 	double z = GetIntOrFloat(&message[3]);
 	bool movePoints = message[4].getInt32();
-	if (!checkXyz(x, y, z))
-		return;
-
+    String errorMessage;
+	if (!checkXyz(x, y, z, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
 	if (pAmbiPoints->setGroupXyz(groupString, x, y, z, movePoints))
 	{
-		reportSuccess();
+		reportSuccess(&message);
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")");
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
 	}
 }
 
@@ -327,62 +355,79 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	}
 	else
 	{
-		reportError("Invalid OSC pattern received: " + pattern.toString());
+		reportError("Invalid OSC pattern received: " + pattern.toString(), &message);
 	}
 }
 
-void OSCHandler::reportError(String message) const
+void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 {
 	if(pStatusMessageHandler != nullptr)
 	{
-		pStatusMessageHandler->showMessage(message, StatusMessageHandler::Error);
+		pStatusMessageHandler->showMessage(message, oscMessageToString(pMsg) + "\r\n\t" + message, StatusMessageHandler::Error);
 	}
 }
 
-void OSCHandler::reportSuccess() const
+void OSCHandler::reportSuccess(const OSCMessage* pMsg) const
 {
-	if (pStatusMessageHandler != nullptr)
+    if (pStatusMessageHandler != nullptr)
 	{
-		pStatusMessageHandler->showMessage("OSC", StatusMessageHandler::Success);
+		pStatusMessageHandler->showMessage("OSC", oscMessageToString(pMsg), StatusMessageHandler::Success);
 	}
 }
 
-bool OSCHandler::checkAed(double a, double e, double d) const
+String OSCHandler::oscMessageToString(const OSCMessage *pMsg) const
+{
+    String detailString = pMsg->getAddressPattern().toString();
+    for(int i = 0; i < pMsg->size(); i++)
+    {
+        if((*pMsg)[i].isString())
+        {
+            detailString += " \"" + ((*pMsg)[i].getString()) + "\"";
+        }
+        else if((*pMsg)[i].isInt32() || (*pMsg)[i].isFloat32())
+        {
+            detailString += " " + String(GetIntOrFloat(&((*pMsg)[i])));
+        }
+    }
+    return detailString;
+}
+
+bool OSCHandler::checkAed(double a, double e, double d, String* errorString) const
 {
 	if(a < Constants::AzimuthRadMin || a > Constants::AzimuthRadMax)
 	{
-		reportError("OSC-Message Azimuth out of range: " + String(a));
+        *errorString = "OSC-Message Azimuth out of range: " + String(a);
 		return false;
 	}
 	if(e < Constants::ElevationRadMin || e > Constants::ElevationRadMax)
 	{
-		reportError("OSC-Message Elevation out of range: " + String(e));
+		*errorString = "OSC-Message Elevation out of range: " + String(e);
 		return false;
 	}
 	if (d < Constants::DistanceMin)
 	{
-		reportError("OSC-Message Azimuth out of range: " + String(d));
+		*errorString = "OSC-Message Azimuth out of range: " + String(d);
 		return false;
 	}
 
 	return true;
 }
 
-bool OSCHandler::checkXyz(double x, double y, double z) const
+bool OSCHandler::checkXyz(double x, double y, double z, String* errorString) const
 {
 	if (x < Constants::XMin || x > Constants::XMax)
 	{
-		reportError("OSC-Message X out of range: " + String(x));
+		*errorString = "OSC-Message X out of range: " + String(x);
 		return false;
 	}
 	if (y < Constants::YMin || y > Constants::YMax)
 	{
-		reportError("OSC-Message Y out of range: " + String(y));
+		*errorString = "OSC-Message Y out of range: " + String(y);
 		return false;
 	}
 	if (z < Constants::ZMin || z > Constants::ZMax)
 	{
-		reportError("OSC-Message Z out of range: " + String(z));
+		*errorString = "OSC-Message Z out of range: " + String(z);
 		return false;
 	}
 
