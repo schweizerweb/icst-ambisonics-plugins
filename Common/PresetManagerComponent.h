@@ -51,12 +51,15 @@ public:
     void tryDeleteFiles(Array<File> files);
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
     int showOverwriteDialog(String filename);
+    void controlDimming();
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void buttonClicked (Button* buttonThatWasClicked) override;
     void filesDropped (const StringArray& filenames, int mouseX, int mouseY) override;
+
+
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.

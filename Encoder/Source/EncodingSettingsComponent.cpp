@@ -106,7 +106,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
     buttonManagePresets.reset (new TextButton ("buttonManagePresets"));
     addAndMakeVisible (buttonManagePresets.get());
-    buttonManagePresets->setButtonText (TRANS("Manage..."));
+    buttonManagePresets->setButtonText (TRANS("manage..."));
     buttonManagePresets->addListener (this);
 
 
@@ -123,7 +123,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
     buttonSave->setVisible(MULTI_ENCODER_MODE);
     buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
-    
+
     // load stored presets
     initializePresets();
     controlDimming();
@@ -169,14 +169,14 @@ void EncodingSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 247, 24);
+    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 290, 24);
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
-    buttonSave->setBounds (getWidth() - 92 - 64, getHeight() - 8 - 24, 64, 24);
+    buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
     sourceDefinition->setBounds (8, 112, getWidth() - 16, getHeight() - 154);
     sliderDistanceScaler->setBounds (getWidth() - 24 - 202, 49, 202, 24);
     labelDistanceScaler->setBounds (getWidth() - 229 - 109, 49, 109, 24);
     btnEditDistanceEncoding->setBounds (getWidth() - 24 - 86, 19, 86, 24);
-    buttonManagePresets->setBounds (getWidth() - 12 - 72, getHeight() - 8 - 24, 72, 24);
+    buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -391,7 +391,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
-            virtualName="" explicitFocusOrder="0" pos="83 8Rr 247M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="83 8Rr 290M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
@@ -400,7 +400,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="92Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="110Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
@@ -434,8 +434,8 @@ BEGIN_JUCER_METADATA
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
-              virtualName="" explicitFocusOrder="0" pos="12Rr 8Rr 72 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="Manage..." connectedEdges="0"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

@@ -67,6 +67,7 @@ private:
 
     void selectedRowsChanged(int lastRowSelected) override
     {
+        pParentComponent->repaint();
     }
 
     Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override

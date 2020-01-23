@@ -66,7 +66,7 @@ PresetManagerComponent::PresetManagerComponent (Array<File>* pPresetFiles, File 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (500, 400);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -102,6 +102,7 @@ void PresetManagerComponent::paint (Graphics& g)
     g.fillAll (Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
+    controlDimming();
     //[/UserPaint]
 }
 
@@ -134,7 +135,6 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
             filesToDelete.add((*pPresetFiles)[selectedRows[i]]);
         }
         tryDeleteFiles(filesToDelete);
-        
         //[/UserButtonCode_btnRemove]
     }
     else if (buttonThatWasClicked == btnRemoveAll.get())
@@ -200,12 +200,14 @@ void PresetManagerComponent::filesDropped (const StringArray& filenames, int mou
     //[/UserCode_filesDropped]
 }
 
+
+
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void PresetManagerComponent::tryImportFiles(Array<File> files)
 {
     bool overwriteAll = false;
     String errorMessage;
-    
+
     for(File file : files)
     {
         if(pPresetHelper->checkValid(file))
@@ -224,7 +226,7 @@ void PresetManagerComponent::tryImportFiles(Array<File> files)
                     break;
                 }
             }
-            
+
             file.copyFileTo(newFile);
             pPresetFiles->addIfNotAlreadyThere(newFile);
             sendActionMessage(ACTION_MESSAGE_PRESETS_CHANGED);
@@ -234,13 +236,13 @@ void PresetManagerComponent::tryImportFiles(Array<File> files)
             errorMessage += file.getFullPathName() + "\r\n";
         }
     }
-    
+
     if(!errorMessage.isEmpty())
     {
         AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading presets: \r\n" + errorMessage);
     }
-    
-    
+
+
     presetTable->updateContent();
     presetTable->repaint();
 }
@@ -253,7 +255,7 @@ void PresetManagerComponent::tryDeleteFiles(Array<File> files)
         message += file.getFileNameWithoutExtension() + "\r\n";
     }
     message += "\r\nProceed?";
-    
+
     if(AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Confirm Delete", message))
     {
         for(File file : files)
@@ -262,10 +264,10 @@ void PresetManagerComponent::tryDeleteFiles(Array<File> files)
             pPresetFiles->remove(index);
             file.deleteFile();
         }
-        
+
         sendActionMessage(ACTION_MESSAGE_PRESETS_CHANGED);
     }
-    
+
     presetTable->updateContent();
     presetTable->repaint();
 }
@@ -278,7 +280,7 @@ bool PresetManagerComponent::isInterestedInFileDrag(const juce::StringArray &fil
         if(!testFile.exists() || testFile.getFileExtension() != ".xml")
             return false;
     }
-    
+
     return true;
 }
 
@@ -290,6 +292,13 @@ int PresetManagerComponent::showOverwriteDialog(String filename)
     alert.addButton("Yes for All", RETURN_TYPE_YESFORALL);
     alert.addButton("Cancel", RETURN_TYPE_CANCEL);
     return alert.runModalLoop();
+}
+
+void PresetManagerComponent::controlDimming()
+{
+    btnRemove->setEnabled(presetTable->getSelectedRows().size() > 0);
+    btnRemoveAll->setEnabled(pPresetFiles->size() > 0);
+    btnExportAll->setEnabled(pPresetFiles->size() > 0);
 }
 //[/MiscUserCode]
 
@@ -308,7 +317,7 @@ BEGIN_JUCER_METADATA
                  constructorParams="Array&lt;File&gt;* pPresetFiles, File presetDirectory, ActionListener* pActionListener, PresetHelper* pPresetHelper"
                  variableInitialisers="pPresetFiles(pPresetFiles), presetDirectory(presetDirectory), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 fixedSize="0" initialWidth="500" initialHeight="400">
   <METHODS>
     <METHOD name="filesDropped (const StringArray&amp; filenames, int mouseX, int mouseY)"/>
   </METHODS>
