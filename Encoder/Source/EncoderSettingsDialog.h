@@ -18,7 +18,6 @@ public:
 	EncoderSettingsDialog(ActionListener* actionListener, Component* pComponent)
 		: DialogWindow("Encoder settings", Colours::white, false, true)
 	{
-		setAlwaysOnTop(true);
 		setContentOwned(pComponent, true);
 		addActionListener(actionListener);
 		setUsingNativeTitleBar(false);
