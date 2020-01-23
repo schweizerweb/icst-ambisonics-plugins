@@ -19,10 +19,11 @@
 
 //[Headers] You can add your own extra header files here...
 #include "DistanceEncodingComponent.h"
+#include "EncoderPresetHelper.h"
 //[/Headers]
 
 #include "EncodingSettingsComponent.h"
-#include "EncoderPreset.h"
+
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 //[/MiscUserDefs]
@@ -52,20 +53,10 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     labelPresets->setColour (TextEditor::textColourId, Colours::black);
     labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    buttonImport.reset (new TextButton ("buttonImport"));
-    addAndMakeVisible (buttonImport.get());
-    buttonImport->setButtonText (TRANS("import"));
-    buttonImport->addListener (this);
-
     buttonSave.reset (new TextButton ("buttonSave"));
     addAndMakeVisible (buttonSave.get());
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
-
-    buttonExport.reset (new TextButton ("buttonExport"));
-    addAndMakeVisible (buttonExport.get());
-    buttonExport->setButtonText (TRANS("export"));
-    buttonExport->addListener (this);
 
     sourceDefinition.reset (new SourceDefinitionComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams));
     addAndMakeVisible (sourceDefinition.get());
@@ -113,6 +104,11 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     btnEditDistanceEncoding->setButtonText (TRANS("edit..."));
     btnEditDistanceEncoding->addListener (this);
 
+    buttonManagePresets.reset (new TextButton ("buttonManagePresets"));
+    addAndMakeVisible (buttonManagePresets.get());
+    buttonManagePresets->setButtonText (TRANS("Manage..."));
+    buttonManagePresets->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -122,13 +118,12 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
     //[Constructor] You can add your own custom stuff here..
     updateEncodingUiElements();
-    
+
     labelPresets->setVisible(MULTI_ENCODER_MODE);
     comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
     buttonSave->setVisible(MULTI_ENCODER_MODE);
-    buttonImport->setVisible(MULTI_ENCODER_MODE);
-    buttonExport->setVisible(MULTI_ENCODER_MODE);
-
+    buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
+    
     // load stored presets
     initializePresets();
     controlDimming();
@@ -142,9 +137,7 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
 
     comboBoxPresets = nullptr;
     labelPresets = nullptr;
-    buttonImport = nullptr;
     buttonSave = nullptr;
-    buttonExport = nullptr;
     sourceDefinition = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDirectionFlip = nullptr;
@@ -152,26 +145,13 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     sliderDistanceScaler = nullptr;
     labelDistanceScaler = nullptr;
     btnEditDistanceEncoding = nullptr;
+    buttonManagePresets = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
 }
 
-void EncodingSettingsComponent::updateEncodingUiElements()
-{
-    toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
-    toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
-
-    toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
-    sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
-
-    // TODO: Doppler temporarily deactivated
-    toggleDoppler->setToggleState(false, dontSendNotification);
-    toggleDoppler->setEnabled(false);
-    labelDistanceScaler->setEnabled(false);
-    sliderDistanceScaler->setEnabled(false);
-}
 //==============================================================================
 void EncodingSettingsComponent::paint (Graphics& g)
 {
@@ -189,15 +169,14 @@ void EncodingSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 312, 24);
+    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 247, 24);
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
-    buttonImport->setBounds (getWidth() - 81 - 64, getHeight() - 8 - 24, 64, 24);
-    buttonSave->setBounds (getWidth() - 153 - 64, getHeight() - 8 - 24, 64, 24);
-    buttonExport->setBounds (getWidth() - 9 - 64, getHeight() - 8 - 24, 64, 24);
+    buttonSave->setBounds (getWidth() - 92 - 64, getHeight() - 8 - 24, 64, 24);
     sourceDefinition->setBounds (8, 112, getWidth() - 16, getHeight() - 154);
     sliderDistanceScaler->setBounds (getWidth() - 24 - 202, 49, 202, 24);
     labelDistanceScaler->setBounds (getWidth() - 229 - 109, 49, 109, 24);
     btnEditDistanceEncoding->setBounds (getWidth() - 24 - 86, 19, 86, 24);
+    buttonManagePresets->setBounds (getWidth() - 12 - 72, getHeight() - 8 - 24, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -215,7 +194,7 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
         {
             if (preset.getFileNameWithoutExtension() == presetToLoad)
             {
-                EncoderPreset::loadFromXmlFile(preset, pAudioParams, pSources, pEncoderSettings);
+                presetHelper.loadFromXmlFile(preset, pAudioParams, pSources, pEncoderSettings);
                 sourceDefinition->refresh();
                 updateEncodingUiElements();
                 controlDimming();
@@ -234,29 +213,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == buttonImport.get())
-    {
-        //[UserButtonCode_buttonImport] -- add your button handler code here..
-        FileChooser chooser("Select preset XML to import...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
-        if (chooser.browseForFileToOpen())
-        {
-            File importFile(chooser.getResult());
-            AmbiSourceSet testSet;
-            EncoderSettings testSettings;
-            if(EncoderPreset::loadFromXmlFile(importFile, nullptr, &testSet, &testSettings))
-            {
-                importFile.copyFileTo(presetDirectory.getFullPathName() + "/" + importFile.getFileName());
-                initializePresets();
-                comboBoxPresets->setText(importFile.getFileNameWithoutExtension(), sendNotificationAsync);
-            }
-            else
-            {
-                AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading preset " + importFile.getFullPathName());
-            }
-        }
-        //[/UserButtonCode_buttonImport]
-    }
-    else if (buttonThatWasClicked == buttonSave.get())
+    if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
         AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
@@ -296,25 +253,11 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
                 }
             }
 
-            EncoderPreset::writeToXmlFile(newFile, pSources, pEncoderSettings);
+            presetHelper.writeToXmlFile(newFile, pSources, pEncoderSettings);
             initializePresets();
             comboBoxPresets->setText(presetName, dontSendNotification);
         }
         //[/UserButtonCode_buttonSave]
-    }
-    else if (buttonThatWasClicked == buttonExport.get())
-    {
-        //[UserButtonCode_buttonExport] -- add your button handler code here..
-        FileChooser chooser("Select filename to export...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
-        if (chooser.browseForFileToSave(true))
-        {
-            File exportFile(chooser.getResult());
-            if(!EncoderPreset::writeToXmlFile(exportFile, pSources, pEncoderSettings))
-            {
-                AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + exportFile.getFullPathName());
-            }
-        }
-        //[/UserButtonCode_buttonExport]
     }
     else if (buttonThatWasClicked == toggleDistanceEncoding.get())
     {
@@ -343,6 +286,13 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams), getScreenBounds(), nullptr);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
+    else if (buttonThatWasClicked == buttonManagePresets.get())
+    {
+        //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
+        presetManagerComponent.reset(new PresetManagerComponent(&presets, presetDirectory, this, &presetHelper));
+        DialogWindow::showDialog("Preset Manager", presetManagerComponent.get(), this, Colours::black, true);
+        //[/UserButtonCode_buttonManagePresets]
+    }
 
     //[UserbuttonClicked_Post]
     controlDimming();
@@ -369,6 +319,21 @@ void EncodingSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void EncodingSettingsComponent::updateEncodingUiElements()
+{
+    toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
+    toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
+
+    toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
+    sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
+
+    // TODO: Doppler temporarily deactivated
+    toggleDoppler->setToggleState(false, dontSendNotification);
+    toggleDoppler->setEnabled(false);
+    labelDistanceScaler->setEnabled(false);
+    sliderDistanceScaler->setEnabled(false);
+}
+
 void EncodingSettingsComponent::controlDimming() const
 {
     btnEditDistanceEncoding->setEnabled(pEncoderSettings->distanceEncodingFlag);
@@ -390,12 +355,20 @@ void EncodingSettingsComponent::initializePresets()
         // try to load preset
         AmbiSourceSet testSet;
         EncoderSettings testSettings;
-        if (EncoderPreset::loadFromXmlFile(iterator.getFile(), nullptr, &testSet, &testSettings))
+        if (presetHelper.loadFromXmlFile(iterator.getFile(), nullptr, &testSet, &testSettings))
         {
             String name = iterator.getFile().getFileNameWithoutExtension();
             presets.add(iterator.getFile());
             comboBoxPresets->addItem(name, id++);
         }
+    }
+}
+
+void EncodingSettingsComponent::actionListenerCallback(const String &message)
+{
+    if(message == ACTION_MESSAGE_PRESETS_CHANGED)
+    {
+        initializePresets();
     }
 }
 //[/MiscUserCode]
@@ -411,14 +384,14 @@ void EncodingSettingsComponent::initializePresets()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
-                 componentName="" parentClasses="public Component, public ChangeBroadcaster"
+                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
-            virtualName="" explicitFocusOrder="0" pos="83 8Rr 312M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="83 8Rr 247M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
@@ -426,17 +399,9 @@ BEGIN_JUCER_METADATA
          edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonImport" id="5a786eb91323df32" memberName="buttonImport"
-              virtualName="" explicitFocusOrder="0" pos="81Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="import" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="153Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="92Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonExport" id="92cbcfe3e89f89e" memberName="buttonExport"
-              virtualName="" explicitFocusOrder="0" pos="9Rr 8Rr 64 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
                     virtualName="" explicitFocusOrder="0" pos="8 112 16M 154M" class="SourceDefinitionComponent"
@@ -467,6 +432,10 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
               virtualName="" explicitFocusOrder="0" pos="24Rr 19 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
+              virtualName="" explicitFocusOrder="0" pos="12Rr 8Rr 72 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="Manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

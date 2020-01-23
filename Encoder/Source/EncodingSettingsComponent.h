@@ -22,7 +22,8 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SourceDefinitionComponent.h"
-
+#include "EncoderPresetHelper.h"
+#include "../../Common/PresetManagerComponent.h"
 //[/Headers]
 
 
@@ -37,6 +38,7 @@
 */
 class EncodingSettingsComponent  : public Component,
                                    public ChangeBroadcaster,
+                                   public ActionListener,
                                    public ComboBox::Listener,
                                    public Button::Listener,
                                    public Slider::Listener
@@ -51,6 +53,7 @@ public:
     void controlDimming() const;
     void initializePresets();
     void updateEncodingUiElements();
+    void actionListenerCallback(const String &message) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -68,14 +71,14 @@ private:
     EncoderSettings* pEncoderSettings;
     AmbiSourceSet* pSources;
     Array<AudioParameterSet>* pAudioParams;
+    EncoderPresetHelper presetHelper;
+    std::unique_ptr<PresetManagerComponent> presetManagerComponent;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<ComboBox> comboBoxPresets;
     std::unique_ptr<Label> labelPresets;
-    std::unique_ptr<TextButton> buttonImport;
     std::unique_ptr<TextButton> buttonSave;
-    std::unique_ptr<TextButton> buttonExport;
     std::unique_ptr<SourceDefinitionComponent> sourceDefinition;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<ToggleButton> toggleDirectionFlip;
@@ -83,6 +86,7 @@ private:
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<TextButton> btnEditDistanceEncoding;
+    std::unique_ptr<TextButton> buttonManagePresets;
 
 
     //==============================================================================

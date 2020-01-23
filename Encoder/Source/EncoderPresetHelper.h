@@ -12,12 +12,14 @@
 #include "JuceHeader.h"
 #include "../../Common/AudioParameterSet.h"
 #include "../../Common/AmbiSourceSet.h"
+#include "../../Common/PresetHelper.h"
 #include "EncoderSettings.h"
 
-class EncoderPreset
+class EncoderPresetHelper : public PresetHelper
 {
 public:
-    static bool loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    
+    bool loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {
         XmlDocument doc(file);
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("EncoderPreset");
@@ -33,7 +35,7 @@ public:
         return pSourceSet->size() > 0;
     }
 
-    static bool writeToXmlFile(const File file, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    bool writeToXmlFile(const File file, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {
         XmlElement* rootElement = new XmlElement("EncoderPreset");
 
@@ -49,4 +51,16 @@ public:
         delete rootElement;
         return success;
     }
+    
+    bool checkValid(File presetFile) override {
+        AmbiSourceSet testSet;
+        EncoderSettings testSettings;
+        if(loadFromXmlFile(presetFile, nullptr, &testSet, &testSettings))
+        {
+            return true;
+        }
+        
+        return false;
+    }
+    
 };
