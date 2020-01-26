@@ -58,6 +58,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams[0]), name, color);
 	}
 #endif
+    
+    presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
+    presetHelper->initialize();
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -291,6 +294,11 @@ DawParameter* AmbisonicEncoderAudioProcessor::getDawParameter()
 	return &dawParameter;
 }
 
+EncoderPresetHelper* AmbisonicEncoderAudioProcessor::getPresetHelper()
+{
+    return presetHelper.get();
+}
+
 #if (!MULTI_ENCODER_MODE)
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
 {
@@ -350,6 +358,16 @@ void AmbisonicEncoderAudioProcessor::initializeOsc()
 	{
 		pOscSenderExt->stop();
 	}
+}
+
+void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &message)
+{
+    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    {
+        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        presetHelper->loadFromXmlFile(presetFile, &audioParams, &sources, &encoderSettings);
+        presetHelper->notifyPresetChanged();
+    }
 }
 
 //==============================================================================

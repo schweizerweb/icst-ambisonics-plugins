@@ -45,7 +45,7 @@ class EncodingSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams);
+    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper);
     ~EncodingSettingsComponent();
 
     //==============================================================================
@@ -66,13 +66,11 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    Array<File> presets;
-    File presetDirectory;
     EncoderSettings* pEncoderSettings;
     AmbiSourceSet* pSources;
     Array<AudioParameterSet>* pAudioParams;
-    EncoderPresetHelper presetHelper;
     std::unique_ptr<PresetManagerComponent> presetManagerComponent;
+    EncoderPresetHelper* pPresetHelper;
     //[/UserVariables]
 
     //==============================================================================

@@ -24,15 +24,11 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-#define RETURN_TYPE_NO          1
-#define RETURN_TYPE_YES         2
-#define RETURN_TYPE_YESFORALL   3
-#define RETURN_TYPE_CANCEL      0
 //[/MiscUserDefs]
 
 //==============================================================================
-PresetManagerComponent::PresetManagerComponent (Array<File>* pPresetFiles, File presetDirectory, ActionListener* pActionListener, PresetHelper* pPresetHelper)
-    : pPresetFiles(pPresetFiles), presetDirectory(presetDirectory), pPresetHelper(pPresetHelper)
+PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper)
+    : pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 
@@ -70,16 +66,17 @@ PresetManagerComponent::PresetManagerComponent (Array<File>* pPresetFiles, File 
 
 
     //[Constructor] You can add your own custom stuff here..
-    addActionListener(pActionListener);
-    tableModel.reset(new PresetTableModel(pPresetFiles, this));
+    tableModel.reset(new PresetTableModel(pPresetHelper, this));
     tableModel->initTable(presetTable.get());
     presetTable->setMultipleSelectionEnabled(true);
+    pPresetHelper->addActionListener(this);
     //[/Constructor]
 }
 
 PresetManagerComponent::~PresetManagerComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
     presetTable = nullptr;
@@ -128,19 +125,23 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == btnRemove.get())
     {
         //[UserButtonCode_btnRemove] -- add your button handler code here..
-        Array<File> filesToDelete;
+        Array<String> presetsToDelete;
         SparseSet<int> selectedRows = presetTable->getSelectedRows();
-        for(int i = 0; i < selectedRows.size(); i++)
+        for(int i = 0; i < presetTable->getNumRows(); i++)
         {
-            filesToDelete.add((*pPresetFiles)[selectedRows[i]]);
+            if(presetTable->isRowSelected(i))
+            {
+                presetsToDelete.add(pPresetHelper->presetFiles[i].getFileNameWithoutExtension());
+            }
         }
-        tryDeleteFiles(filesToDelete);
+        
+        pPresetHelper->tryDeletePresets(presetsToDelete);
         //[/UserButtonCode_btnRemove]
     }
     else if (buttonThatWasClicked == btnRemoveAll.get())
     {
         //[UserButtonCode_btnRemoveAll] -- add your button handler code here..
-        tryDeleteFiles(*pPresetFiles);
+        pPresetHelper->tryDeleteAll();
         //[/UserButtonCode_btnRemoveAll]
     }
     else if (buttonThatWasClicked == btnExportAll.get())
@@ -150,12 +151,12 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
         FileChooser chooser("Select directory to export...", File::getSpecialLocation(File::userHomeDirectory));
         if (chooser.browseForDirectory())
         {
-            for(File file : (*pPresetFiles))
+            for(File file : pPresetHelper->presetFiles)
             {
                 File target(chooser.getResult().getFullPathName() + "/" + file.getFileName());
                 if(target.exists() && !overwriteAll)
                 {
-                    int returnType = showOverwriteDialog(target.getFullPathName());
+                    int returnType = pPresetHelper->showOverwriteDialog(target.getFullPathName());
                     if(returnType == RETURN_TYPE_NO)
                         continue;
                     else if(returnType == RETURN_TYPE_YESFORALL)
@@ -179,7 +180,7 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
         FileChooser chooser("Select preset XML to import...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
         if (chooser.browseForMultipleFilesToOpen())
         {
-            tryImportFiles(chooser.getResults());
+            pPresetHelper->tryImportFiles(chooser.getResults());
         }
         //[/UserButtonCode_btnImport]
     }
@@ -196,82 +197,14 @@ void PresetManagerComponent::filesDropped (const StringArray& filenames, int mou
     {
         fileArray.add(File(name));
     }
-    tryImportFiles(fileArray);
+
+    pPresetHelper->tryImportFiles(fileArray);
     //[/UserCode_filesDropped]
 }
 
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void PresetManagerComponent::tryImportFiles(Array<File> files)
-{
-    bool overwriteAll = false;
-    String errorMessage;
-
-    for(File file : files)
-    {
-        if(pPresetHelper->checkValid(file))
-        {
-            File newFile(presetDirectory.getFullPathName() + "/" + file.getFileName());
-            if(newFile.exists() && !overwriteAll)
-            {
-                int returnType = showOverwriteDialog(newFile.getFileNameWithoutExtension());
-                if(returnType == RETURN_TYPE_NO)
-                    continue;
-                else if(returnType == RETURN_TYPE_YESFORALL)
-                    overwriteAll = true;
-                else if(returnType == RETURN_TYPE_CANCEL)
-                {
-                    errorMessage += "Import cancelled!";
-                    break;
-                }
-            }
-
-            file.copyFileTo(newFile);
-            pPresetFiles->addIfNotAlreadyThere(newFile);
-            sendActionMessage(ACTION_MESSAGE_PRESETS_CHANGED);
-        }
-        else
-        {
-            errorMessage += file.getFullPathName() + "\r\n";
-        }
-    }
-
-    if(!errorMessage.isEmpty())
-    {
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading presets: \r\n" + errorMessage);
-    }
-
-
-    presetTable->updateContent();
-    presetTable->repaint();
-}
-
-void PresetManagerComponent::tryDeleteFiles(Array<File> files)
-{
-    String message = "Following Presets will be deleted and cannot be restored:\r\n\r\n";
-    for(File file : files)
-    {
-        message += file.getFileNameWithoutExtension() + "\r\n";
-    }
-    message += "\r\nProceed?";
-
-    if(AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Confirm Delete", message))
-    {
-        for(File file : files)
-        {
-            int index = pPresetFiles->indexOf(file);
-            pPresetFiles->remove(index);
-            file.deleteFile();
-        }
-
-        sendActionMessage(ACTION_MESSAGE_PRESETS_CHANGED);
-    }
-
-    presetTable->updateContent();
-    presetTable->repaint();
-}
-
 bool PresetManagerComponent::isInterestedInFileDrag(const juce::StringArray &files)
 {
     for(String file : files)
@@ -284,21 +217,20 @@ bool PresetManagerComponent::isInterestedInFileDrag(const juce::StringArray &fil
     return true;
 }
 
-int PresetManagerComponent::showOverwriteDialog(String filename)
-{
-    AlertWindow alert("Existing file(s)", filename + " already exists, overwrite?", AlertWindow::AlertIconType::WarningIcon);
-    alert.addButton("No", RETURN_TYPE_NO);
-    alert.addButton("Yes", RETURN_TYPE_YES);
-    alert.addButton("Yes for All", RETURN_TYPE_YESFORALL);
-    alert.addButton("Cancel", RETURN_TYPE_CANCEL);
-    return alert.runModalLoop();
-}
-
 void PresetManagerComponent::controlDimming()
 {
     btnRemove->setEnabled(presetTable->getSelectedRows().size() > 0);
-    btnRemoveAll->setEnabled(pPresetFiles->size() > 0);
-    btnExportAll->setEnabled(pPresetFiles->size() > 0);
+    btnRemoveAll->setEnabled(pPresetHelper->presetFiles.size() > 0);
+    btnExportAll->setEnabled(pPresetHelper->presetFiles.size() > 0);
+}
+
+void PresetManagerComponent::actionListenerCallback(const String &message)
+{
+    if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
+    {
+        presetTable->updateContent();
+        presetTable->repaint();
+    }
 }
 //[/MiscUserCode]
 
@@ -313,9 +245,8 @@ void PresetManagerComponent::controlDimming()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PresetManagerComponent" componentName=""
-                 parentClasses="public Component, public ActionBroadcaster, public FileDragAndDropTarget"
-                 constructorParams="Array&lt;File&gt;* pPresetFiles, File presetDirectory, ActionListener* pActionListener, PresetHelper* pPresetHelper"
-                 variableInitialisers="pPresetFiles(pPresetFiles), presetDirectory(presetDirectory), pPresetHelper(pPresetHelper)"
+                 parentClasses="public Component, public FileDragAndDropTarget, ActionListener"
+                 constructorParams="PresetHelper* pPresetHelper" variableInitialisers="pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="500" initialHeight="400">
   <METHODS>

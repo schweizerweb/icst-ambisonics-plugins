@@ -29,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams)
+EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper)
+    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -125,6 +125,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
 
     // load stored presets
+    pPresetHelper->addActionListener(this);
     initializePresets();
     controlDimming();
     //[/Constructor]
@@ -133,6 +134,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 EncodingSettingsComponent::~EncodingSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
     comboBoxPresets = nullptr;
@@ -189,18 +191,7 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
     if (comboBoxThatHasChanged == comboBoxPresets.get())
     {
         //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
-        String presetToLoad = comboBoxPresets->getText();
-        for (File preset : presets)
-        {
-            if (preset.getFileNameWithoutExtension() == presetToLoad)
-            {
-                presetHelper.loadFromXmlFile(preset, pAudioParams, pSources, pEncoderSettings);
-                sourceDefinition->refresh();
-                updateEncodingUiElements();
-                controlDimming();
-                sendChangeMessage();
-            }
-        }
+        pPresetHelper->selectPresetName(comboBoxPresets->getText());
         //[/UserComboBoxCode_comboBoxPresets]
     }
 
@@ -219,8 +210,8 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
         Array<String> existingPresets;
         existingPresets.add("");
-        for (File preset : presets)
-            existingPresets.add(preset.getFileNameWithoutExtension());
+        for (File file : pPresetHelper->presetFiles)
+            existingPresets.add(file.getFileNameWithoutExtension());
 
         alert.addComboBox("existing", existingPresets, "Overwrite existing");
         alert.addTextEditor("text", "", "Or enter new name", false);
@@ -240,20 +231,11 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
                 return;
             }
 
-            File newFile(presetDirectory.getFullPathName() + "/" + presetName + ".xml");
+            File newFile;
+            if(!pPresetHelper->tryCreateNewPreset(presetName, &newFile))
+                return;
+            pPresetHelper->writeToXmlFile(newFile, pSources, pEncoderSettings);
 
-            if (newFile.existsAsFile())
-            {
-                AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
-                confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-                confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
-                if (confirm.runModalLoop() == 0)
-                {
-                    return;
-                }
-            }
-
-            presetHelper.writeToXmlFile(newFile, pSources, pEncoderSettings);
             initializePresets();
             comboBoxPresets->setText(presetName, dontSendNotification);
         }
@@ -289,7 +271,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonManagePresets.get())
     {
         //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
-        presetManagerComponent.reset(new PresetManagerComponent(&presets, presetDirectory, this, &presetHelper));
+        presetManagerComponent.reset(new PresetManagerComponent(pPresetHelper));
         DialogWindow::showDialog("Preset Manager", presetManagerComponent.get(), this, Colours::black, true);
         //[/UserButtonCode_buttonManagePresets]
     }
@@ -341,34 +323,28 @@ void EncodingSettingsComponent::controlDimming() const
 
 void EncodingSettingsComponent::initializePresets()
 {
-    presetDirectory = File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder");
-    if (!presetDirectory.exists())
-        presetDirectory.createDirectory();
-
-    presets.clear();
     comboBoxPresets->clear();
 
     int id = 1;
-    DirectoryIterator iterator(presetDirectory, false, "*.xml");
-    while (iterator.next())
+    for(File file : pPresetHelper->presetFiles)
     {
-        // try to load preset
-        AmbiSourceSet testSet;
-        EncoderSettings testSettings;
-        if (presetHelper.loadFromXmlFile(iterator.getFile(), nullptr, &testSet, &testSettings))
-        {
-            String name = iterator.getFile().getFileNameWithoutExtension();
-            presets.add(iterator.getFile());
-            comboBoxPresets->addItem(name, id++);
-        }
+        comboBoxPresets->addItem(file.getFileNameWithoutExtension(), id++);
     }
 }
 
 void EncodingSettingsComponent::actionListenerCallback(const String &message)
 {
-    if(message == ACTION_MESSAGE_PRESETS_CHANGED)
+    if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
     {
         initializePresets();
+    }
+    
+    if(message == ACTION_MESSAGE_PRESET_CHANGED)
+    {
+        sourceDefinition->refresh();
+        updateEncodingUiElements();
+        controlDimming();
+        sendChangeMessage();
     }
 }
 //[/MiscUserCode]
@@ -385,8 +361,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams, EncoderPresetHelper* pPresetHelper"
+                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

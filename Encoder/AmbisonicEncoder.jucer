@@ -78,9 +78,11 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="wBCHGM" name="PresetHelper.cpp" compile="1" resource="0"
+            file="../Common/PresetHelper.cpp"/>
+      <FILE id="hrDMMM" name="PresetHelper.h" compile="0" resource="0" file="../Common/PresetHelper.h"/>
       <FILE id="d4ssP2" name="PresetTableModel.h" compile="0" resource="0"
             file="../Common/PresetTableModel.h"/>
-      <FILE id="hrDMMM" name="PresetHelper.h" compile="0" resource="0" file="../Common/PresetHelper.h"/>
       <FILE id="aJ9g5J" name="PresetManagerComponent.cpp" compile="1" resource="0"
             file="../Common/PresetManagerComponent.cpp"/>
       <FILE id="gbUnDC" name="PresetManagerComponent.h" compile="0" resource="0"

@@ -14,12 +14,17 @@
 #include "EditableTextCustomComponent.h"
 #include "ColorEditorCustomComponent.h"
 #include "SliderColumnCustomComponent.h"
-#define COLUMN_ID_PRESET_NAME 1
+#include "PresetHelper.h"
+#include "PresetComparators.h"
 
-class PresetTableModel : public TableListBoxModel
+#define COLUMN_ID_PRESET_NAME 1
+#define COLUMN_ID_PRESET_DATE 2
+#define COLUMN_ID_PRESET_APPLY 3
+
+class PresetTableModel : public TableListBoxModel, Button::Listener
 {
 public:
-    PresetTableModel(Array<File>* pPresetFiles, Component* pParentComponent) : pPresetFiles(pPresetFiles), pParentComponent(pParentComponent)
+    PresetTableModel(PresetHelper* pPresetHelper, Component* pParentComponent) : pPresetHelper(pPresetHelper), pParentComponent(pParentComponent)
     {
     }
 
@@ -29,6 +34,8 @@ public:
     {
         tableListBox->setModel(this);
         tableListBox->getHeader().addColumn("Name", COLUMN_ID_PRESET_NAME, 100);
+        tableListBox->getHeader().addColumn("Creation Date", COLUMN_ID_PRESET_DATE, 100);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_PRESET_APPLY, 40);
         tableListBox->getHeader().setStretchToFitActive(true);
         tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
     }
@@ -36,7 +43,7 @@ public:
 private:
     int getNumRows() override
     {
-        return pPresetFiles->size();
+        return pPresetHelper->presetFiles.size();
     }
 
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -51,13 +58,14 @@ private:
 
     void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override
     {
-        File file = pPresetFiles->getReference(rowNumber);
+        File file = pPresetHelper->presetFiles.getReference(rowNumber);
         
         g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId));
         String text;
         switch (columnId)
         {
         case COLUMN_ID_PRESET_NAME: text = file.getFileNameWithoutExtension(); break;
+        case COLUMN_ID_PRESET_DATE: text = file.getCreationTime().toString(true, true); break;
         default: text = "";
         }
         g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -70,6 +78,11 @@ private:
         pParentComponent->repaint();
     }
 
+    void buttonClicked(Button* button) override
+    {
+        pPresetHelper->selectPresetName(button->getComponentID());
+    }
+    
     Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override
     {
         /*if (columnId == COLUMN_ID_PRESET_NAME)
@@ -82,9 +95,53 @@ private:
             return textLabel;
         }
         */
+        if(columnId == COLUMN_ID_PRESET_APPLY)
+        {
+            TextButton* button = static_cast<TextButton*>(existingComponentToUpdate);
+            if(button == nullptr)
+            {
+                button = new TextButton("Apply");
+                button->addListener(this);
+            }
+            
+            button->setComponentID(pPresetHelper->presetFiles[rowNumber].getFileNameWithoutExtension());
+            return button;
+        }
         return nullptr;
     }
 
+    void sortOrderChanged(int newSortColumnId, bool isForwards) override
+    {
+        if(newSortColumnId == COLUMN_ID_PRESET_NAME)
+        {
+            if(isForwards)
+            {
+                PresetNameComparatorAscending comparator;
+                pPresetHelper->presetFiles.sort(comparator);
+            }
+            else
+            {
+                PresetNameComparatorDescending comparator;
+                pPresetHelper->presetFiles.sort(comparator);
+            }
+        }
+        else if(newSortColumnId == COLUMN_ID_PRESET_DATE)
+        {
+            if(isForwards)
+            {
+                PresetDateComparatorAscending comparator;
+                pPresetHelper->presetFiles.sort(comparator);
+            }
+            else
+            {
+                PresetDateComparatorDescending comparator;
+                pPresetHelper->presetFiles.sort(comparator);
+            }
+        }
+        
+        pPresetHelper->notifyPresetListChanged();
+    }
+    
     /*
     String getTableText(const int columnId, const int rowNumber) override
     {
@@ -101,6 +158,6 @@ private:
 */
     
 private:
-    Array<File>* pPresetFiles;
+    PresetHelper* pPresetHelper;
     Component* pParentComponent;
 };

@@ -36,22 +36,20 @@
                                                                     //[/Comments]
 */
 class PresetManagerComponent  : public Component,
-                                public ActionBroadcaster,
                                 public FileDragAndDropTarget,
+                                ActionListener,
                                 public Button::Listener
 {
 public:
     //==============================================================================
-    PresetManagerComponent (Array<File>* pPresetFiles, File presetDirectory, ActionListener* pActionListener, PresetHelper* pPresetHelper);
+    PresetManagerComponent (PresetHelper* pPresetHelper);
     ~PresetManagerComponent();
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void tryImportFiles(Array<File> files);
-    void tryDeleteFiles(Array<File> files);
     bool isInterestedInFileDrag(const juce::StringArray &files) override;
-    int showOverwriteDialog(String filename);
     void controlDimming();
+    void actionListenerCallback(const String &message) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -63,8 +61,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    Array<File>* pPresetFiles;
-    File presetDirectory;
     PresetHelper* pPresetHelper;
     std::unique_ptr<PresetTableModel> tableModel;
     //[/UserVariables]

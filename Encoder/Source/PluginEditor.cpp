@@ -145,7 +145,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler()));
+		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper()));
 		settingsWindow->setVisible(true);
 		settingsWindow->centreWithSize(settingsWindow->getWidth(), settingsWindow->getHeight());
         //[/UserButtonCode_btnSettings]

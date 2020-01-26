@@ -18,6 +18,9 @@
 class EncoderPresetHelper : public PresetHelper
 {
 public:
+    EncoderPresetHelper(File presetDirectory, ActionListener* pActionListener) : PresetHelper(presetDirectory, pActionListener)
+    {
+    }
     
     bool loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {

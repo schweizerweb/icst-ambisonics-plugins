@@ -19,11 +19,12 @@
 #include "AmbiOSCSenderExt.h"
 #include "../../Common/VarDelayBuffer.h"
 #include "../../Common/DelayHelper.h"
+#include "EncoderPresetHelper.h"
 
 //==============================================================================
 /**
 */
-class AmbisonicEncoderAudioProcessor  : public AudioProcessor
+class AmbisonicEncoderAudioProcessor  : public AudioProcessor, ActionListener
 {
 public:
     //==============================================================================
@@ -63,12 +64,15 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void actionListenerCallback(const juce::String &message) override;
+    
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
 	void initializeOsc();
 	Array<AudioParameterSet>* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
 	DawParameter* getDawParameter();
+    EncoderPresetHelper* getPresetHelper();
 
 #if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
@@ -83,6 +87,7 @@ private:
 	Array<AudioParameterSet> audioParams;
 	StatusMessageHandler statusMessageHandler;
 	DawParameter dawParameter;
+    std::unique_ptr<EncoderPresetHelper> presetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
 
