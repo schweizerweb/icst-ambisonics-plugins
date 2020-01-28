@@ -51,26 +51,50 @@ void PresetHelper::notifyPresetListChanged()
     sendActionMessage(ACTION_MESSAGE_PRESET_LIST_CHANGED);
 }
 
-bool PresetHelper::tryCreateNewPreset(String presetName, File* pNewFile)
+File* PresetHelper::tryCreateNewPreset()
 {
-    File newFile(presetDirectory.getFullPathName() + "/" + presetName + ".xml");
+    AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
+    Array<String> existingPresets;
+    existingPresets.add("");
+    for (File file : presetFiles)
+        existingPresets.add(file.getFileNameWithoutExtension());
 
-    if (newFile.existsAsFile())
+    alert.addComboBox("existing", existingPresets, "Overwrite existing");
+    alert.addTextEditor("text", "", "Or enter new name", false);
+    alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+    alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+
+    int returnValue = alert.runModalLoop();
+    if(returnValue == 1)
     {
-        AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
-        confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-        confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
-        if (confirm.runModalLoop() == 0)
+        String presetName = alert.getTextEditorContents("text");
+        if(presetName.isEmpty())
+            presetName = alert.getComboBoxComponent("existing")->getText();
+
+        if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
         {
-            return false;
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
+            return nullptr;
         }
+
+        File newFile(presetDirectory.getFullPathName() + "/" + presetName + ".xml");
+        if (newFile.existsAsFile())
+        {
+            AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
+            confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+            confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
+            if (confirm.runModalLoop() == 0)
+            {
+                return nullptr;
+            }
+        }
+    
+        presetFiles.addIfNotAlreadyThere(newFile);
+        notifyPresetListChanged();
+        return new File(newFile);
     }
     
-    *pNewFile = newFile;
-    presetFiles.add(newFile);
-    notifyPresetListChanged();
-    
-    return true;
+    return nullptr;
 }
 
 void PresetHelper::tryDeletePresets(Array<String> presetNames)

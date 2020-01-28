@@ -31,7 +31,7 @@ public:
     
     void selectPresetName(String name);
     
-    bool tryCreateNewPreset(String presetName, File* pNewFile);
+    File* tryCreateNewPreset();
     void tryDeletePresets(Array<String> presetNames);
     void tryDeleteAll();
     void tryImportFiles(Array<File> files);

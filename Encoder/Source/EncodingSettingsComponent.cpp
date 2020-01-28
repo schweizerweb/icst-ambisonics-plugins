@@ -192,6 +192,7 @@ void EncodingSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
     {
         //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
         pPresetHelper->selectPresetName(comboBoxPresets->getText());
+        comboBoxPresets->setText("", dontSendNotification);
         //[/UserComboBoxCode_comboBoxPresets]
     }
 
@@ -207,38 +208,13 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-        AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
-        Array<String> existingPresets;
-        existingPresets.add("");
-        for (File file : pPresetHelper->presetFiles)
-            existingPresets.add(file.getFileNameWithoutExtension());
-
-        alert.addComboBox("existing", existingPresets, "Overwrite existing");
-        alert.addTextEditor("text", "", "Or enter new name", false);
-        alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-        alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-
-        int returnValue = alert.runModalLoop();
-        if(returnValue == 1)
-        {
-            String presetName = alert.getTextEditorContents("text");
-            if(presetName.isEmpty())
-                presetName = alert.getComboBoxComponent("existing")->getText();
-
-            if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
-            {
-                AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
+        File* newFile = pPresetHelper->tryCreateNewPreset();
+        if(newFile == nullptr)
                 return;
-            }
-
-            File newFile;
-            if(!pPresetHelper->tryCreateNewPreset(presetName, &newFile))
-                return;
-            pPresetHelper->writeToXmlFile(newFile, pSources, pEncoderSettings);
-
-            initializePresets();
-            comboBoxPresets->setText(presetName, dontSendNotification);
-        }
+        
+        pPresetHelper->writeToXmlFile(*newFile, pSources, pEncoderSettings);
+        comboBoxPresets->setText("", dontSendNotification);
+        delete newFile;
         //[/UserButtonCode_buttonSave]
     }
     else if (buttonThatWasClicked == toggleDistanceEncoding.get())
