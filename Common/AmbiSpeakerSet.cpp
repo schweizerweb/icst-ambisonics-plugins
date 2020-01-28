@@ -90,3 +90,23 @@ void AmbiSpeakerSet::addNew(String id, Point3D<double> point, String name, Colou
 {
 	elements.add(new AmbiSpeaker(id, point, name, TrackColors::getSpeakerColor()));	// override color
 }
+
+void AmbiSpeakerSet::loadFromXml(XmlElement *xmlElement)
+{
+    clear();
+    
+    XmlElement* xmlPoint = xmlElement->getChildByName(XML_TAG_PRESET_POINT);
+    while (xmlPoint != nullptr)
+    {
+        elements.add(new AmbiSpeaker(xmlPoint));
+        xmlPoint = xmlPoint->getNextElement();
+    }
+}
+
+void AmbiSpeakerSet::writeToXmlElement(XmlElement *xml) const
+{
+    for (AmbiPoint* pt : elements)
+    {
+        xml->addChildElement(pt->getAsXmlElement(XML_TAG_PRESET_POINT));
+    }
+}

@@ -25,13 +25,13 @@
 #include "../../Common/AmbiSettings.h"
 #include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
-#include "PresetInfo.h"
 #include "../../Common/TableColumnCallback.h"
 #include "../../Common/DelayHelper.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "FilterSettingsComponent.h"
-
+#include "DecoderPresetHelper.h"
+#include "../../Common/PresetManagerComponent.h"
 //[/Headers]
 
 
@@ -51,13 +51,14 @@ class SpeakerSettingsComponent  : public Component,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
+                                  ActionListener,
                                   public ComboBox::Listener,
                                   public Button::Listener,
                                   public Slider::Listener
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, OwnedArray<PresetInfo>* pPresets, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification);
     ~SpeakerSettingsComponent();
 
     //==============================================================================
@@ -83,11 +84,11 @@ public:
 	SliderRange getSliderRange(int columnId) override;
 
 	void updateDirectionFlip() const;
-	void loadPreset(PresetInfo* preset) const;
-	void updateComboBox(String elementToSelect = String()) const;
+	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
-	bool CheckForExistingPreset(String newPresetName) const;
+    void actionListenerCallback(const String &message) override;
 	void updateDistanceScaler() const;
+    void updateUI() const;
 	FilterInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	static double fact(int n);
@@ -106,13 +107,14 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiSpeakerSet* pSpeakerSet;
-	OwnedArray<PresetInfo>* pPresets;
+	DecoderPresetHelper* pPresetHelper;
 	PointSelection* pPointSelection;
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings* pDecoderSettings;
 	DelayHelper delayHelper;
 	TestSoundGenerator* pTestSoundGenerator;
 	dsp::ProcessSpec* pFilterSpecification;
+    std::unique_ptr<PresetManagerComponent> presetManagerComponent;
     //[/UserVariables]
 
     //==============================================================================
@@ -121,7 +123,6 @@ private:
     std::unique_ptr<GroupComponent> groupSpeakers;
     std::unique_ptr<ComboBox> comboBoxChannelConfig;
     std::unique_ptr<Label> labelPresets;
-    std::unique_ptr<TextButton> buttonLoad;
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<TableListBox> speakerList;
     std::unique_ptr<TextButton> buttonAdd;
@@ -143,6 +144,7 @@ private:
     std::unique_ptr<ToggleButton> toggleOsc;
     std::unique_ptr<TextButton> buttonSpeakerTest;
     std::unique_ptr<Label> labelDevelopmentVersion;
+    std::unique_ptr<TextButton> buttonManage;
 
 
     //==============================================================================

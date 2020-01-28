@@ -77,7 +77,7 @@ File* PresetHelper::tryCreateNewPreset()
             return nullptr;
         }
 
-        File newFile(presetDirectory.getFullPathName() + "/" + presetName + ".xml");
+        File newFile = getPathForPresetName(presetName);
         if (newFile.existsAsFile())
         {
             AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
@@ -144,7 +144,7 @@ void PresetHelper::tryImportFiles(Array<File> files)
     {
         if(checkValid(file))
         {
-            File newFile(presetDirectory.getFullPathName() + "/" + file.getFileName());
+            File newFile = getPathForPresetName(file.getFileNameWithoutExtension());
             if(newFile.exists() && !overwriteAll)
             {
                 int returnType = showOverwriteDialog(newFile.getFileNameWithoutExtension());
@@ -194,4 +194,9 @@ int PresetHelper::showOverwriteDialog(String filename)
 void PresetHelper::selectPreset(File file)
 {
     sendActionMessage(String(ACTION_MESSAGE_SELECT_PRESET) + file.getFullPathName());
+}
+
+File PresetHelper::getPathForPresetName(String name)
+{
+    return File(presetDirectory.getFullPathName() + "/" + name + ".xml");
 }

@@ -43,6 +43,9 @@ public:
 
     Array<File> presetFiles;
     
+protected:
+    File getPathForPresetName(String name);
+    
 private:
     void selectPreset(File file);
     

@@ -10,6 +10,7 @@
 
 #pragma once
 #include "SliderRange.h"
+#include "JuceHeader.h"
 
 class TableColumnCallback
 {

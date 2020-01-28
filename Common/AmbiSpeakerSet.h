@@ -12,6 +12,8 @@
 #include "AmbiDataSet.h"
 #include "AmbiSpeaker.h"
 
+#define XML_TAG_PRESET_POINT "Point"
+
 class AmbiSpeakerSet : public AmbiDataSet
 {
 public:
@@ -29,6 +31,9 @@ public:
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;
 
+    void loadFromXml(XmlElement* xmlElement);
+    void writeToXmlElement(XmlElement* xml) const;
+    
 private:
 	OwnedArray<AmbiSpeaker> elements;
 	OwnedArray<AmbiSpeaker> removedElements;

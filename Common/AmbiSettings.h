@@ -17,6 +17,11 @@
 #define CURRENT_AMBISONICS_ORDER_NB_OF_GAINS	int(sqrt(JucePlugin_MaxNumInputChannels))
 #define CURRENT_AMBISONICS_ORDER	(CURRENT_AMBISONICS_ORDER_NB_OF_GAINS - 1)
 
+#define XML_TAG_PRESET_DISTANCESCALER "DistanceScaler"
+#define XML_TAG_PRESET_FLIPDIRECTION "DirectionFlip"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
+#define XML_VALUE "Value"
+
 class AmbiSettings: public AmbiBasicSettings
 {
 public:
@@ -25,6 +30,10 @@ public:
 
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();
+        
+    void writeToPresetXmlElement(XmlElement* xmlElement) const;
+    void loadFromPresetXml(XmlElement* xmlElement);
+
 	
 private:
 	double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];

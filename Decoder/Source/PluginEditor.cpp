@@ -140,7 +140,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWas
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, &presets, &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification));
 		settingsWindow->setVisible(true);
 		settingsWindow->centreWithSize(850, 600);
 		settingsWindow->setResizable(true, true);

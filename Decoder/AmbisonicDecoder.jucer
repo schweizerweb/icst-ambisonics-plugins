@@ -18,6 +18,8 @@
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
+      <FILE id="PtkidA" name="DecoderPresetHelper.h" compile="0" resource="0"
+            file="Source/DecoderPresetHelper.h"/>
       <FILE id="wDQCw3" name="IIRFilterGraph.cpp" compile="1" resource="0"
             file="Source/IIRFilterGraph.cpp"/>
       <FILE id="fGuaWX" name="IIRFilterGraph.h" compile="0" resource="0"
@@ -40,8 +42,6 @@
             file="Source/SpeakerSettingsComponent.cpp"/>
       <FILE id="kA1i4a" name="SpeakerSettingsComponent.h" compile="0" resource="0"
             file="Source/SpeakerSettingsComponent.h"/>
-      <FILE id="SbImea" name="PresetInfo.cpp" compile="1" resource="0" file="Source/PresetInfo.cpp"/>
-      <FILE id="fhc3q5" name="PresetInfo.h" compile="0" resource="0" file="Source/PresetInfo.h"/>
       <FILE id="kamJfG" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="wQqsru" name="PluginProcessor.h" compile="0" resource="0"
@@ -104,6 +104,13 @@
             file="../Common/PointSelection.cpp"/>
       <FILE id="mUBX1O" name="PointSelection.h" compile="0" resource="0"
             file="../Common/PointSelection.h"/>
+      <FILE id="CCdeoN" name="PresetHelper.cpp" compile="1" resource="0"
+            file="../Common/PresetHelper.cpp"/>
+      <FILE id="l23M8B" name="PresetHelper.h" compile="0" resource="0" file="../Common/PresetHelper.h"/>
+      <FILE id="J2lW6N" name="PresetManagerComponent.cpp" compile="1" resource="0"
+            file="../Common/PresetManagerComponent.cpp"/>
+      <FILE id="OBetgm" name="PresetManagerComponent.h" compile="0" resource="0"
+            file="../Common/PresetManagerComponent.h"/>
       <FILE id="Avj0Bb" name="Radar2D.cpp" compile="1" resource="0" file="../Common/Radar2D.cpp"/>
       <FILE id="W2rMLr" name="Radar2D.h" compile="0" resource="0" file="../Common/Radar2D.h"/>
       <FILE id="VQZqca" name="Radar3D.cpp" compile="1" resource="0" file="../Common/Radar3D.cpp"/>

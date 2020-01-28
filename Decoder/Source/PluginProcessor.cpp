@@ -26,6 +26,9 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 #endif
 {
 	pTestSoundGenerator = new TestSoundGenerator(&speakerSet);
+    
+    presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this));
+    presetHelper->initialize();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
@@ -273,22 +276,16 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	// save general decoder settings
 	decoderSettings.saveToXml(xml);
 	
-	// load last speaker preset
-	PresetInfo preset;
-	preset.setName("LastState");
-	for (int i = 0; i < speakerSet.size(); i++)
-	{
-		AmbiSpeaker* pt = speakerSet.get(i);
-		if(pt != nullptr)
-			preset.getPoints()->add(new AmbiSpeaker(pt));
-	}
-	preset.getAmbiSettings()->setDistanceScaler(ambiSettings.getDistanceScaler());
-	preset.getAmbiSettings()->setDirectionFlip(ambiSettings.getDirectionFlip());
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-		preset.getAmbiSettings()->getAmbiOrderWeightPointer()[i] = ambiSettings.getAmbiOrderWeightPointer()[i];
-	XmlElement* speakerSettings = new XmlElement(XML_TAG_PRESET_ROOT);
-	preset.CreateXmlRoot(speakerSettings);
-	xml->addChildElement(speakerSettings);
+    XmlElement* speakerSettings = new XmlElement("Points");
+    speakerSet.writeToXmlElement(speakerSettings);
+    
+    XmlElement* ambiSettingsXml = new XmlElement("General");
+    ambiSettings.writeToPresetXmlElement(ambiSettingsXml);
+    
+    XmlElement* presetSettings = new XmlElement("AmbisonicsPreset");
+    presetSettings->addChildElement(speakerSettings);
+    presetSettings->addChildElement(ambiSettingsXml);
+    xml->addChildElement(presetSettings);
 
 	copyXmlToBinary(*xml, destData);
 
@@ -307,24 +304,21 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 			// load general decoder settings
 			decoderSettings.loadFromXml(xmlState.get());
 			
-			// load last speaker preset
-			PresetInfo preset;
-			XmlElement* presetElement = xmlState->getChildByName(XML_TAG_PRESET_ROOT);
-			if (presetElement != nullptr && preset.LoadFromXmlRoot(presetElement))
-			{
-				speakerSet.clear();
-				for (int i = 0; i < preset.getPoints()->size(); i++)
-				{
-					speakerSet.add(new AmbiSpeaker(preset.getPoints()->getUnchecked(i)));
-				}
-				ambiSettings.setDistanceScaler(preset.getAmbiSettings()->getDistanceScaler());
-				ambiSettings.setDirectionFlip(preset.getAmbiSettings()->getDirectionFlip());
-
-				for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-				{
-					ambiSettings.getAmbiOrderWeightPointer()[i] = preset.getAmbiSettings()->getAmbiOrderWeightPointer()[i];
-				}
-			}
+            XmlElement* presetElement = xmlState->getChildByName("AmbisonicsPreset");
+            if (presetElement != nullptr)
+            {
+                XmlElement* speakerXml = presetElement->getChildByName("Points");
+                if(speakerXml != nullptr)
+                {
+                    speakerSet.loadFromXml(speakerXml);
+                }
+                
+                XmlElement* ambiXml = presetElement->getChildByName("General");
+                if(ambiXml != nullptr)
+                {
+                    ambiSettings.loadFromPresetXml(ambiXml);
+                }
+            }
 		}
 	}
 }
@@ -357,6 +351,21 @@ TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() con
 dsp::ProcessSpec* AmbisonicsDecoderAudioProcessor::getFilterSpecification()
 {
 	return &iirFilterSpec;
+}
+
+DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
+{
+    return presetHelper.get();
+}
+
+void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)
+{
+    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    {
+        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        presetHelper->loadFromXmlFile(presetFile, &speakerSet, &ambiSettings);
+        presetHelper->notifyPresetChanged();
+    }
 }
 
 //==============================================================================

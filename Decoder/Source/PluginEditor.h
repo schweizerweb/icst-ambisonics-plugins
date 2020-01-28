@@ -22,7 +22,6 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
-#include "PresetInfo.h"
 #include "DecoderSettings.h"
 #include "SpeakerSettingsDialog.h"
 #include "../../Common/RadarComponent.h"
@@ -74,7 +73,7 @@ private:
 	AmbiSourceSet* pMovingPoints;
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
-	OwnedArray<PresetInfo> presets;
+	DecoderPresetHelper* pPresetHelper;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;

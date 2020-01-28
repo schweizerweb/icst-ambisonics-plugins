@@ -18,11 +18,12 @@
 #include "../../Common/DelayHelper.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/AmbiSourceSet.h"
+#include "DecoderPresetHelper.h"
 
 //==============================================================================
 /**
 */
-class AmbisonicsDecoderAudioProcessor  : public AudioProcessor
+class AmbisonicsDecoderAudioProcessor  : public AudioProcessor, ActionListener
 {
 public:
     //==============================================================================
@@ -63,6 +64,8 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
+    void actionListenerCallback(const String &message) override;
+    
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();
 	AmbiSourceSet* getMovingPoints();
@@ -70,6 +73,7 @@ public:
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
+    DecoderPresetHelper* getPresetHelper();
 
 private:
 	AmbiSpeakerSet speakerSet;
@@ -79,6 +83,7 @@ private:
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
+    std::unique_ptr<DecoderPresetHelper> presetHelper;
     
     OwnedArray<dsp::IIR::Filter<float>> iirFilters;
     dsp::ProcessSpec iirFilterSpec;
