@@ -17,31 +17,43 @@ AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER, false)
 
 AmbiSettings::AmbiSettings(double distanceScaler, bool directionFlip) : AmbiBasicSettings(distanceScaler, directionFlip)
 {
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-		ambiOrderWeights[i] = 1.0;
-
 	// create mapping table
 	int order = 0;
 	for (int i = 0; i < NB_OF_AMBISONICS_CHANNELS; i++)
 	{
 		if (i == (order + 1)*(order + 1))
 			order++;
-		ambiChannelWeights[i] = &ambiOrderWeights[order];
+		ambiChannelOrder[i] = order;
 	}
+    
+    loadWarningFlag = false;
+    prepareInPhaseWeighting();
+    prepareStandardWeighting();
+    prepareManualWeighting();
 }
 
 double AmbiSettings::getAmbiChannelWeight(int ambiChannel)
 {
-	return *ambiChannelWeights[ambiChannel];
+    switch(weightMode)
+    {
+        case INPHASE:
+            return inPhaseWeights[ambiChannelOrder[ambiChannel]];
+        case STANDARD:
+            return standardWeights[ambiChannelOrder[ambiChannel]];
+        case MANUAL:
+        default:
+            return manualOrderWeights[ambiChannelOrder[ambiChannel]];
+    }
 }
 
 double* AmbiSettings::getAmbiOrderWeightPointer()
 {
-	return ambiOrderWeights;
+	return manualOrderWeights;
 }
 
 void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
 {
+    loadWarningFlag = false;
     // ambisonics settings
     XmlElement* xmlDistanceScaler = xmlElement->getChildByName(XML_TAG_PRESET_DISTANCESCALER);
     if (xmlDistanceScaler != nullptr)
@@ -56,15 +68,23 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
     }
     
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
+    weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, AmbiSettings::INPHASE));
     int index = 0;
-    if (xmlAmbiChannelWeight != nullptr)
+    if (xmlAmbiChannelWeight != nullptr && weightMode == MANUAL)
     {
         String attributeName;
         while (xmlAmbiChannelWeight->hasAttribute(attributeName = "Order" + String(index)))
         {
-            ambiOrderWeights[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
+            manualOrderWeights[index] = xmlAmbiChannelWeight->getDoubleAttribute(attributeName);
             index++;
         }
+    
+        int presetOrder = xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER, -1);
+        loadWarningFlag = (presetOrder != CURRENT_AMBISONICS_ORDER);
+    }
+    else
+    {
+        setWeightMode(weightMode);
     }
 }
 
@@ -79,14 +99,35 @@ void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
     xmlElement->addChildElement(xmlFlipDirection);
 
     XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
-    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, int(weightMode));
+    if(weightMode == MANUAL)
     {
-        xmlAmbiChannelWeight->setAttribute("Order" + String(i), ambiOrderWeights[i]);
+        for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+        {
+            xmlAmbiChannelWeight->setAttribute("Order" + String(i), manualOrderWeights[i]);
+        }
+        xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER, CURRENT_AMBISONICS_ORDER);
     }
     xmlElement->addChildElement(xmlAmbiChannelWeight);
 }
 
-void AmbiSettings::setInPhaseWeighting()
+void AmbiSettings::prepareManualWeighting()
+{
+    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    {
+        manualOrderWeights[i] = 1.0;
+    }
+}
+
+void AmbiSettings::prepareStandardWeighting()
+{
+    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    {
+        standardWeights[i] = 1.0;
+    }
+}
+
+void AmbiSettings::prepareInPhaseWeighting()
 {
     for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
     {
@@ -94,11 +135,11 @@ void AmbiSettings::setInPhaseWeighting()
         {
             double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
             double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
-            ambiOrderWeights[i] = nom / denom;
+            inPhaseWeights[i] = nom / denom;
         }
         else
         {
-            ambiOrderWeights[i] = 0.0;
+            inPhaseWeights[i] = 0.0;
         }
     }
 }
@@ -112,4 +153,26 @@ double AmbiSettings::fact(int n)
     for (int i = n - 1; i > 1; i--)
         ret *= i;
     return ret;
+}
+
+
+AmbiSettings::AmbiWeightMode AmbiSettings::getWeightMode()
+{
+    return weightMode;
+}
+
+bool AmbiSettings::getWarningFlag()
+{
+    return loadWarningFlag;
+}
+
+void AmbiSettings::setWeightMode(AmbiSettings::AmbiWeightMode mode)
+{
+    weightMode = mode;
+    
+    // copy values to the manual value array for display purpose
+    if(mode == INPHASE)
+        memcpy(&manualOrderWeights, &inPhaseWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
+    else if(mode == STANDARD)
+        memcpy(&manualOrderWeights, &standardWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
 }

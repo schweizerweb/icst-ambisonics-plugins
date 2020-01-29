@@ -20,6 +20,8 @@
 #define XML_TAG_PRESET_DISTANCESCALER "DistanceScaler"
 #define XML_TAG_PRESET_FLIPDIRECTION "DirectionFlip"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
 #define XML_VALUE "Value"
 
 class AmbiSettings: public AmbiBasicSettings
@@ -28,16 +30,30 @@ public:
 	AmbiSettings();
 	AmbiSettings(double distanceScaler, bool directionFlip);
 
+    enum AmbiWeightMode { STANDARD = 1, INPHASE = 2, MANUAL = 3 };
+    
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();
-        
+    AmbiWeightMode getWeightMode();
+    void setWeightMode(AmbiWeightMode mode);
+    
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
     void loadFromPresetXml(XmlElement* xmlElement);
 
-    void setInPhaseWeighting();
+    bool getWarningFlag();
     
 private:
 	double fact(int n);
-    double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];
-	double ambiOrderWeights[NB_OF_AMBISONICS_GAINS];
+    void prepareInPhaseWeighting();
+    void prepareStandardWeighting();
+    void prepareManualWeighting();
+    
+    int ambiChannelOrder[NB_OF_AMBISONICS_CHANNELS];
+	double manualOrderWeights[NB_OF_AMBISONICS_GAINS];
+    
+    double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
+    double standardWeights[NB_OF_AMBISONICS_GAINS];
+    
+    AmbiWeightMode weightMode;
+    bool loadWarningFlag;
 };

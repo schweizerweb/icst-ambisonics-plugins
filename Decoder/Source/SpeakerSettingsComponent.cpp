@@ -132,11 +132,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
-    buttonBasic.reset (new TextButton ("buttonBasic"));
-    addAndMakeVisible (buttonBasic.get());
-    buttonBasic->setButtonText (TRANS("reset to basic"));
-    buttonBasic->addListener (this);
-
     labelChannelWeights.reset (new Label ("labelChannelWeights",
                                           TRANS("Channel weights")));
     addAndMakeVisible (labelChannelWeights.get());
@@ -145,11 +140,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelChannelWeights->setEditable (false, false, false);
     labelChannelWeights->setColour (TextEditor::textColourId, Colours::black);
     labelChannelWeights->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
-
-    buttonInPhase.reset (new TextButton ("buttonInPhase"));
-    addAndMakeVisible (buttonInPhase.get());
-    buttonInPhase->setButtonText (TRANS("calculate in-phase"));
-    buttonInPhase->addListener (this);
 
     btnFlipDirection.reset (new ToggleButton ("btnFlipDirection"));
     addAndMakeVisible (btnFlipDirection.get());
@@ -235,6 +225,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonManage->setButtonText (TRANS("manage..."));
     buttonManage->addListener (this);
 
+    comboBoxChannelWeightingMode.reset (new ComboBox ("comboBoxChannelWeightingMode"));
+    addAndMakeVisible (comboBoxChannelWeightingMode.get());
+    comboBoxChannelWeightingMode->setEditableText (false);
+    comboBoxChannelWeightingMode->setJustificationType (Justification::centredLeft);
+    comboBoxChannelWeightingMode->setTextWhenNothingSelected (String());
+    comboBoxChannelWeightingMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxChannelWeightingMode->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -243,7 +241,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
+    labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
+
+    // prepare weighting comboBox
+    comboBoxChannelWeightingMode->addItem("Standard", AmbiSettings::STANDARD);
+    comboBoxChannelWeightingMode->addItem("In-Phase", AmbiSettings::INPHASE);
+    comboBoxChannelWeightingMode->addItem("Manual", AmbiSettings::MANUAL);
+
+    // speaker list elements
 	buttonSpeakerTest->setClickingTogglesState(true);
 	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
 	speakerList->setModel(this);
@@ -301,9 +306,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonMoveUp = nullptr;
     sliderDistanceScaler = nullptr;
     ambiChannelControl = nullptr;
-    buttonBasic = nullptr;
     labelChannelWeights = nullptr;
-    buttonInPhase = nullptr;
     btnFlipDirection = nullptr;
     labelDistanceScaler = nullptr;
     btnEditMode = nullptr;
@@ -315,6 +318,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonSpeakerTest = nullptr;
     labelDevelopmentVersion = nullptr;
     buttonManage = nullptr;
+    comboBoxChannelWeightingMode = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -351,9 +355,7 @@ void SpeakerSettingsComponent::resized()
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
     sliderDistanceScaler->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 16, getWidth() - 178, 24);
     ambiChannelControl->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
-    buttonBasic->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 64, 120, 24);
     labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 40, 112, 24);
-    buttonInPhase->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 96, 120, 24);
     btnFlipDirection->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 128, 120, 24);
     labelDistanceScaler->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 15, 150, 24);
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
@@ -365,12 +367,12 @@ void SpeakerSettingsComponent::resized()
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3995f) / 2), 0, proportionOfWidth (0.3995f), 24);
     buttonManage->setBounds (8 + (getWidth() - 18) - 16 - 80, 0 + 24, 80, 24);
+    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 68, 120, 24);
     //[UserResized] Add your own custom resize handling here..
 	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
 	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
 	labelChannelWeights->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 40, 112, 24);
-	buttonBasic->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 64, 120, 24);
-	buttonInPhase->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 96, 120, 24);
+    comboBoxChannelWeightingMode->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 64, 120, 24);
 	btnFlipDirection->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 128, 120, 24);
 	toggleOsc->setBounds((8 + 12) + 0, (0 + (getHeight() - 306)) + 220, 150, 30);	// needed because of JUCE bug
     //[/UserResized]
@@ -388,6 +390,14 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
         pPresetHelper->selectPresetName(presetName);
 
         //[/UserComboBoxCode_comboBoxChannelConfig]
+    }
+    else if (comboBoxThatHasChanged == comboBoxChannelWeightingMode.get())
+    {
+        //[UserComboBoxCode_comboBoxChannelWeightingMode] -- add your combo box handling code here..
+        pAmbiSettings->setWeightMode(AmbiSettings::AmbiWeightMode( comboBoxChannelWeightingMode->getSelectedId()));
+        ambiChannelControl->updateValues();
+        controlDimming();
+        //[/UserComboBoxCode_comboBoxChannelWeightingMode]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -457,21 +467,6 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			pPointSelection->selectPoint(selection - 1);
 		}
         //[/UserButtonCode_buttonMoveUp]
-    }
-    else if (buttonThatWasClicked == buttonBasic.get())
-    {
-        //[UserButtonCode_buttonBasic] -- add your button handler code here..
-		for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-			pAmbiSettings->getAmbiOrderWeightPointer()[i] = 1.0;
-		ambiChannelControl->updateValues();
-        //[/UserButtonCode_buttonBasic]
-    }
-    else if (buttonThatWasClicked == buttonInPhase.get())
-    {
-        //[UserButtonCode_buttonInPhase] -- add your button handler code here..
-		pAmbiSettings->setInPhaseWeighting();
-		ambiChannelControl->updateValues();
-        //[/UserButtonCode_buttonInPhase]
     }
     else if (buttonThatWasClicked == btnFlipDirection.get())
     {
@@ -792,6 +787,7 @@ void SpeakerSettingsComponent::updateUI() const
 	updateDistanceScaler();
 	updateDirectionFlip();
 	ambiChannelControl->updateValues();
+    comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
 
 void SpeakerSettingsComponent::updateComboBox() const
@@ -826,6 +822,10 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
         updateUI();
         controlDimming();
         sendChangeMessage();
+        if(pAmbiSettings->getWarningFlag())
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Inconsistent Ambisonic Order", "This preset was saved using a different order plugin. Ambisonic channel weighting may have to be adjusted.");
+        }
     }
 }
 
@@ -843,6 +843,8 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonMoveUp->setEnabled(en);
 	buttonMoveDown->setEnabled(en);
 	buttonSpeakerTest->setEnabled(en);
+
+    ambiChannelControl->setEnabled(pAmbiSettings->getWeightMode() == AmbiSettings::MANUAL);
 }
 
 void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
@@ -947,20 +949,12 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.01"/>
-  <TEXTBUTTON name="buttonBasic" id="d53e1a131a389be4" memberName="buttonBasic"
-              virtualName="" explicitFocusOrder="0" pos="12 64 120 24" posRelativeX="17eb4b418501687a"
-              posRelativeY="17eb4b418501687a" buttonText="reset to basic" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
          virtualName="" explicitFocusOrder="0" pos="8 40 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonInPhase" id="434ed99be63f9ea5" memberName="buttonInPhase"
-              virtualName="" explicitFocusOrder="0" pos="12 96 120 24" posRelativeX="17eb4b418501687a"
-              posRelativeY="17eb4b418501687a" buttonText="calculate in-phase"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TOGGLEBUTTON name="btnFlipDirection" id="b6567f77e6a2e40e" memberName="btnFlipDirection"
                 virtualName="" explicitFocusOrder="0" pos="12 128 120 24" posRelativeX="17eb4b418501687a"
                 posRelativeY="17eb4b418501687a" buttonText="Flip direction" connectedEdges="0"
@@ -1013,6 +1007,10 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="16Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <COMBOBOX name="comboBoxChannelWeightingMode" id="e9f5f23a259dd1c0" memberName="comboBoxChannelWeightingMode"
+            virtualName="" explicitFocusOrder="0" pos="16 68 120 24" posRelativeX="17eb4b418501687a"
+            posRelativeY="17eb4b418501687a" editable="0" layout="33" items=""
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

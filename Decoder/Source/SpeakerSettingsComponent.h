@@ -129,9 +129,7 @@ private:
     std::unique_ptr<TextButton> buttonMoveUp;
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
-    std::unique_ptr<TextButton> buttonBasic;
     std::unique_ptr<Label> labelChannelWeights;
-    std::unique_ptr<TextButton> buttonInPhase;
     std::unique_ptr<ToggleButton> btnFlipDirection;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<ToggleButton> btnEditMode;
@@ -143,6 +141,7 @@ private:
     std::unique_ptr<TextButton> buttonSpeakerTest;
     std::unique_ptr<Label> labelDevelopmentVersion;
     std::unique_ptr<TextButton> buttonManage;
+    std::unique_ptr<ComboBox> comboBoxChannelWeightingMode;
 
 
     //==============================================================================

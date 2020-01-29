@@ -81,7 +81,7 @@ public:
         
         settings.setDistanceScaler(DEFAULT_DISTANCE_SCALER);
         settings.setDirectionFlip(false);
-        settings.setInPhaseWeighting();
+        settings.setWeightMode(AmbiSettings::INPHASE);
             
         return settings;
     }
