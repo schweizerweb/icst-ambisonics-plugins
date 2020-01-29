@@ -34,8 +34,10 @@ public:
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
     void loadFromPresetXml(XmlElement* xmlElement);
 
-	
+    void setInPhaseWeighting();
+    
 private:
-	double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];
+	double fact(int n);
+    double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];
 	double ambiOrderWeights[NB_OF_AMBISONICS_GAINS];
 };

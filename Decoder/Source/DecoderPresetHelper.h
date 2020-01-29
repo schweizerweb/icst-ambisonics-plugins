@@ -10,6 +10,7 @@
 
 #pragma once
 #include "../../Common/PresetHelper.h"
+#include "../../Common/TrackColors.h"
 
 class DecoderPresetHelper : public PresetHelper
 {
@@ -32,8 +33,12 @@ public:
     
     void restoreDefaults() override
     {
-        createPreset("Stereo", 2);
-        createPreset("4", 4);
+        createPreset("Stereo (2)", 2);
+        createPreset("Square (4)", 4);
+        createPreset("Hexagon (6)", 6);
+        createPreset("Octagon (8)", 8);
+        createPreset("Hexadecagon (16)", 16);
+        createPreset("Triacontakaidigon (32)", 32);
         
         notifyPresetListChanged();
     }
@@ -73,6 +78,11 @@ public:
     AmbiSettings getDefaultAmbiSettings()
     {
         AmbiSettings settings;
+        
+        settings.setDistanceScaler(DEFAULT_DISTANCE_SCALER);
+        settings.setDirectionFlip(false);
+        settings.setInPhaseWeighting();
+            
         return settings;
     }
     
@@ -85,12 +95,18 @@ public:
         
         if(numberOfSpeakers == 2)
         {
-            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, -1.0, 0.0), "L", Colours::black);
-            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, 1.0, 0.0), "R", Colours::black);
+            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor());
+            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor());
         }
         else
         {
-            
+            Point<float> projectedPoint(1.0, 0.0);
+            projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / numberOfSpeakers));
+            for (int i = 0; i < numberOfSpeakers; i++)
+            {
+                speakerSet.addNew(Uuid().toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor());
+                projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / numberOfSpeakers));
+            }
         }
         
         writeToXmlFile(file, &speakerSet, &defaultAmbiSettings);

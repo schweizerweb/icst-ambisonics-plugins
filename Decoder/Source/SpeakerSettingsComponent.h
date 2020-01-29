@@ -91,8 +91,6 @@ public:
     void updateUI() const;
 	FilterInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
-	static double fact(int n);
-	void setInPhaseWeighting(AmbiSettings* pSettings) const;
 	void controlDimming();
     //[/UserMethods]
 

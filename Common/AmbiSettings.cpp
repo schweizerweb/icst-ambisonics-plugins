@@ -85,3 +85,31 @@ void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
     }
     xmlElement->addChildElement(xmlAmbiChannelWeight);
 }
+
+void AmbiSettings::setInPhaseWeighting()
+{
+    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    {
+        if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
+        {
+            double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
+            double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
+            ambiOrderWeights[i] = nom / denom;
+        }
+        else
+        {
+            ambiOrderWeights[i] = 0.0;
+        }
+    }
+}
+
+
+double AmbiSettings::fact(int n)
+{
+    if (n == 0)
+        return 1;
+    double ret = n;
+    for (int i = n - 1; i > 1; i--)
+        ret *= i;
+    return ret;
+}

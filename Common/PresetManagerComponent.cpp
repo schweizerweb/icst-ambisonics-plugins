@@ -58,11 +58,16 @@ PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper)
     btnImport->setButtonText (TRANS("Import"));
     btnImport->addListener (this);
 
+    btnRestoreDefaults.reset (new TextButton ("btnRestoreDefaults"));
+    addAndMakeVisible (btnRestoreDefaults.get());
+    btnRestoreDefaults->setButtonText (TRANS("Restore Defaults"));
+    btnRestoreDefaults->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (500, 400);
+    setSize (700, 400);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -84,6 +89,7 @@ PresetManagerComponent::~PresetManagerComponent()
     btnRemoveAll = nullptr;
     btnExportAll = nullptr;
     btnImport = nullptr;
+    btnRestoreDefaults = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -113,6 +119,7 @@ void PresetManagerComponent::resized()
     btnRemoveAll->setBounds (120, getHeight() - 8 - 24, 104, 24);
     btnExportAll->setBounds (getWidth() - 8 - 104, getHeight() - 8 - 24, 104, 24);
     btnImport->setBounds (getWidth() - 118 - 104, getHeight() - 8 - 24, 104, 24);
+    btnRestoreDefaults->setBounds (232, getHeight() - 8 - 24, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -134,7 +141,7 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
                 presetsToDelete.add(pPresetHelper->presetFiles[i].getFileNameWithoutExtension());
             }
         }
-        
+
         pPresetHelper->tryDeletePresets(presetsToDelete);
         //[/UserButtonCode_btnRemove]
     }
@@ -183,6 +190,12 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
             pPresetHelper->tryImportFiles(chooser.getResults());
         }
         //[/UserButtonCode_btnImport]
+    }
+    else if (buttonThatWasClicked == btnRestoreDefaults.get())
+    {
+        //[UserButtonCode_btnRestoreDefaults] -- add your button handler code here..
+        pPresetHelper->restoreDefaults();
+        //[/UserButtonCode_btnRestoreDefaults]
     }
 
     //[UserbuttonClicked_Post]
@@ -248,7 +261,7 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component, public FileDragAndDropTarget, ActionListener"
                  constructorParams="PresetHelper* pPresetHelper" variableInitialisers="pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="500" initialHeight="400">
+                 fixedSize="0" initialWidth="700" initialHeight="400">
   <METHODS>
     <METHOD name="filesDropped (const StringArray&amp; filenames, int mouseX, int mouseY)"/>
   </METHODS>
@@ -268,6 +281,9 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="btnImport" id="8bf69d278e8d3cf0" memberName="btnImport"
               virtualName="" explicitFocusOrder="0" pos="118Rr 8Rr 104 24"
               buttonText="Import" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="btnRestoreDefaults" id="c5da3bad1b135575" memberName="btnRestoreDefaults"
+              virtualName="" explicitFocusOrder="0" pos="232 8Rr 120 24" buttonText="Restore Defaults"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

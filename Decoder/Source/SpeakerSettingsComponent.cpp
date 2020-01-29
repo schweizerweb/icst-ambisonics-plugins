@@ -469,7 +469,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonInPhase.get())
     {
         //[UserButtonCode_buttonInPhase] -- add your button handler code here..
-		setInPhaseWeighting(pAmbiSettings);
+		pAmbiSettings->setInPhaseWeighting();
 		ambiChannelControl->updateValues();
         //[/UserButtonCode_buttonInPhase]
     }
@@ -784,16 +784,6 @@ dsp::ProcessSpec* SpeakerSettingsComponent::getFilterSpecification() const
 	return pFilterSpecification;
 }
 
-double SpeakerSettingsComponent::fact(int n)
-{
-	if (n == 0)
-		return 1;
-	double ret = n;
-	for (int i = n - 1; i > 1; i--)
-		ret *= i;
-	return ret;
-}
-
 void SpeakerSettingsComponent::updateUI() const
 {
 	speakerList->updateContent();
@@ -837,23 +827,6 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
         controlDimming();
         sendChangeMessage();
     }
-}
-
-void SpeakerSettingsComponent::setInPhaseWeighting(AmbiSettings* pSettings) const
-{
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-	{
-		if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
-		{
-			double nom = fact(CURRENT_AMBISONICS_ORDER) * fact(CURRENT_AMBISONICS_ORDER + 1);
-			double denom = fact(CURRENT_AMBISONICS_ORDER + i + 1)*fact(CURRENT_AMBISONICS_ORDER - i);
-			pSettings->getAmbiOrderWeightPointer()[i] = nom / denom;
-		}
-		else
-		{
-			pSettings->getAmbiOrderWeightPointer()[i] = 0.0;
-		}
-	}
 }
 
 void SpeakerSettingsComponent::controlDimming()

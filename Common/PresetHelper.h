@@ -26,6 +26,7 @@ public:
     PresetHelper(File presetDirectory, ActionListener* pActionListener);
     virtual ~PresetHelper() {};
     virtual bool checkValid(File presetFile) = 0;
+    virtual void restoreDefaults() = 0;
     
     void initialize();
     

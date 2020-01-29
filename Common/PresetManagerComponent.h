@@ -71,6 +71,7 @@ private:
     std::unique_ptr<TextButton> btnRemoveAll;
     std::unique_ptr<TextButton> btnExportAll;
     std::unique_ptr<TextButton> btnImport;
+    std::unique_ptr<TextButton> btnRestoreDefaults;
 
 
     //==============================================================================

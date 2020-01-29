@@ -20,13 +20,20 @@ PresetHelper::PresetHelper(File presetDirectory, ActionListener* pActionListener
 
 void PresetHelper::initialize()
 {
+    bool hasPresets = false;
     DirectoryIterator iterator(presetDirectory, false, "*.xml");
     while (iterator.next())
     {
         // try to load preset
         if(checkValid(iterator.getFile()))
+        {
             presetFiles.add(iterator.getFile());
+            hasPresets = true;
+        }
     }
+    
+    if(!hasPresets)
+        restoreDefaults();
 }
 
 void PresetHelper::selectPresetName(String name)
