@@ -29,6 +29,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this));
     presetHelper->initialize();
+    presetHelper->loadDefaultPreset(&speakerSet, &ambiSettings);
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()

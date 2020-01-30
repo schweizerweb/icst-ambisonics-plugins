@@ -12,6 +12,8 @@
 #include "../../Common/PresetHelper.h"
 #include "../../Common/TrackColors.h"
 
+#define DEFAULT_PRESET_NAME "Stereo (2)"
+
 class DecoderPresetHelper : public PresetHelper
 {
 public:
@@ -33,7 +35,7 @@ public:
     
     void restoreDefaults() override
     {
-        createPreset("Stereo (2)", 2);
+        createPreset(DEFAULT_PRESET_NAME, 2);
         createPreset("Square (4)", 4);
         createPreset("Hexagon (6)", 6);
         createPreset("Octagon (8)", 8);
@@ -41,6 +43,18 @@ public:
         createPreset("Triacontakaidigon (32)", 32);
         
         notifyPresetListChanged();
+    }
+    
+    void loadDefaultPreset(AmbiSpeakerSet *pSpeakerSet, AmbiSettings *pAmbiSettings)
+    {
+        for(File f : presetFiles)
+        {
+            if(f.getFileNameWithoutExtension() == DEFAULT_PRESET_NAME)
+            {
+                loadFromXmlFile(f, pSpeakerSet, pAmbiSettings);
+                break;
+            }
+        }
     }
     
     bool loadFromXmlFile(const File file, AmbiSpeakerSet* pSpeakerSet, AmbiSettings* pAmbiSettings)
