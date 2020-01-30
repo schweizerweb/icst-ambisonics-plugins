@@ -48,6 +48,12 @@ void PresetHelper::selectPresetName(String name)
     }
 }
 
+void PresetHelper::restoreDefaults()
+{
+    restoreDefaultsInternal();
+    notifyPresetListChanged();
+}
+
 void PresetHelper::notifyPresetChanged()
 {
     sendActionMessage(ACTION_MESSAGE_PRESET_CHANGED);

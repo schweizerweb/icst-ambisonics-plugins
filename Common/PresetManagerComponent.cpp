@@ -194,7 +194,10 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnRestoreDefaults.get())
     {
         //[UserButtonCode_btnRestoreDefaults] -- add your button handler code here..
-        pPresetHelper->restoreDefaults();
+        if(AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Restore Defaults", "All user changes to default presets will be overwritten, continue?"))
+        {
+            pPresetHelper->restoreDefaults();
+        }
         //[/UserButtonCode_btnRestoreDefaults]
     }
 

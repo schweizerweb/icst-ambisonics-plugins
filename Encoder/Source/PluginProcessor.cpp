@@ -48,19 +48,21 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		addParameter(set.pY);
 		addParameter(set.pZ);
 	}
-
-#if(!MULTI_ENCODER_MODE)
-	// initialize mono encoder with one source
-	if (sources.size() == 0)
-	{
-		String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
-		Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
-		sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams[0]), name, color);
-	}
-#endif
     
     presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
     presetHelper->initialize();
+    
+#if(!MULTI_ENCODER_MODE)
+    // initialize mono encoder with one source
+    if (sources.size() == 0)
+    {
+        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
+        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
+        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams[0]), name, color);
+    }
+#else
+    presetHelper->loadDefaultPreset(&audioParams, &sources, &encoderSettings);
+#endif
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()

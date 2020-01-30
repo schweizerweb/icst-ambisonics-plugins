@@ -26,8 +26,8 @@ public:
     PresetHelper(File presetDirectory, ActionListener* pActionListener);
     virtual ~PresetHelper() {};
     virtual bool checkValid(File presetFile) = 0;
-    virtual void restoreDefaults() = 0;
     
+    void restoreDefaults();
     void initialize();
     
     void selectPresetName(String name);
@@ -49,6 +49,7 @@ protected:
     
 private:
     void selectPreset(File file);
+    virtual void restoreDefaultsInternal() = 0;
     
 private:
     File presetDirectory;

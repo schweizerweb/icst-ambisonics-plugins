@@ -13,7 +13,11 @@
 #include "../../Common/AudioParameterSet.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PresetHelper.h"
+#include "../../Common/TrackColors.h"
 #include "EncoderSettings.h"
+
+#define DEFAULT_PRESET_NAME "Single Source"
+
 
 class EncoderPresetHelper : public PresetHelper
 {
@@ -64,6 +68,33 @@ public:
         }
         
         return false;
+    }
+    
+    void restoreDefaultsInternal() override {
+        AmbiSourceSet sources;
+        EncoderSettings settings;
+        
+        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0), "1", TrackColors::getColor(1));
+        settings.distanceEncodingFlag = true;
+        settings.distanceEncodingParams.encodingMode = DistanceEncodingParams::Standard;
+        settings.distanceEncodingParams.unitCircleRadius = 0.1;
+        
+        File file = getPathForPresetName(DEFAULT_PRESET_NAME);
+        
+        writeToXmlFile(file, &sources, &settings);
+        presetFiles.addIfNotAlreadyThere(file);
+    }
+    
+    void loadDefaultPreset(Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    {
+        for(File f : presetFiles)
+        {
+            if(f.getFileNameWithoutExtension() == DEFAULT_PRESET_NAME)
+            {
+                loadFromXmlFile(f, pAudioParams, pSourceSet, pEncoderSettings);
+                break;
+            }
+        }
     }
     
 };

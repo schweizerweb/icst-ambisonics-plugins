@@ -33,7 +33,7 @@ public:
         return false;
     }
     
-    void restoreDefaults() override
+    void restoreDefaultsInternal() override
     {
         createPreset(DEFAULT_PRESET_NAME, 2);
         createPreset("Square (4)", 4);
@@ -45,7 +45,7 @@ public:
         notifyPresetListChanged();
     }
     
-    void loadDefaultPreset(AmbiSpeakerSet *pSpeakerSet, AmbiSettings *pAmbiSettings)
+    void loadDefaultPreset(AmbiSpeakerSet* pSpeakerSet, AmbiSettings* pAmbiSettings)
     {
         for(File f : presetFiles)
         {
