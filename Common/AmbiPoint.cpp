@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams)
 {
 	if (copyImage)
 	{
@@ -56,7 +56,8 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	                      audioParams)),
 	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR))).withAlpha(1.0f)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
-	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0))
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
+    audioParams(audioParams)
 {
 }
 
@@ -107,9 +108,12 @@ double AmbiPoint::getGain() const
 	return gain;
 }
 
-void AmbiPoint::setGain(double newGain)
+void AmbiPoint::setGain(double newGain, bool notify)
 {
 	gain = newGain;
+    
+    if(notify)
+        audioParams.notifyGain(gain);
 }
 
 String AmbiPoint::getId()

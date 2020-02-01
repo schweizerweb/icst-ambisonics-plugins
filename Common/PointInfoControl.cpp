@@ -251,6 +251,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
 PointInfoControl::~PointInfoControl()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
     textName = nullptr;

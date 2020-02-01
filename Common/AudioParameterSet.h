@@ -10,6 +10,7 @@
 
 #pragma once
 #include "AudioParameterFloatAmbiAbs.h"
+#include "Constants.h"
 
 class AudioParameterSet
 {
@@ -17,6 +18,7 @@ public:
 	AudioParameterFloatAmbiAbs* pX = nullptr;
 	AudioParameterFloatAmbiAbs* pY = nullptr;
 	AudioParameterFloatAmbiAbs* pZ = nullptr;
+    AudioParameterFloatAmbiAbs* pGain = nullptr;
 	
 	void notifyX(double x) const
 	{
@@ -32,4 +34,9 @@ public:
 	{
 		if (pZ != nullptr) { pZ->setUnscaledValue(float(z)); }
 	}
+    
+    void notifyGain(double gain)
+    {
+        if (pGain != nullptr) { pGain->setUnscaledValue(Constants::GainFactorToDb(float(gain))); }
+    }
 };

@@ -184,12 +184,12 @@ void AmbiDataSet::setDistance(int channel, double distance) const
 		pt->getPoint()->setDistance(distance);
 }
 
-void AmbiDataSet::setGain(int channel, double gain) const
+void AmbiDataSet::setGain(int channel, double gain, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
-		pt->setGain(gain);
+		pt->setGain(gain, notify);
 }
 
 String AmbiDataSet::getNewUniqueName() const

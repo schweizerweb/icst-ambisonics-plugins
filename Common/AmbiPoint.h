@@ -39,7 +39,7 @@ public:
 	String getName() const;
 	void setName(String newName);
 	double getGain() const;
-	void setGain(double newGain);
+	void setGain(double newGain, bool notify);
 	String getId();
 	void resetId();
 	void setColor(Colour newColor);
@@ -59,6 +59,7 @@ private:
 	double gain;
 	int64 lastUpdate = 0;
 	Image labelImage;
+    AudioParameterSet audioParams;
 };
 
 

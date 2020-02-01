@@ -46,6 +46,16 @@ int Constants::NormalizeAzimuthGrad(int grad)
 	return (grad % 360 + 360) % 360;
 }
 
+double Constants::GainFactorToDb(double factor)
+{
+     return 10.0 * log10(factor);
+}
+
+double Constants::GainDbToFactor(double db)
+{
+    return pow(10.0, 0.1 * db);
+}
+
 bool Constants::isDevelopmentVersion()
 {
 	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");

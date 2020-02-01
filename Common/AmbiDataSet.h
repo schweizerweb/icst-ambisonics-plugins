@@ -42,7 +42,7 @@ public:
 	void setAzimuth(int channel, double azimuth) const;
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
-	void setGain(int channel, double gain) const;
+	void setGain(int channel, double gain, bool notify = true) const;
 	String getNewUniqueName() const;
 
 	int groupCount() const;
