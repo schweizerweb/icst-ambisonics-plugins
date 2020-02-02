@@ -11,7 +11,9 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
+#include "AudioParameterDistanceEncodingFloat.h"
 #include "../../Common/TrackColors.h"
+#include "EncoderConstants.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
@@ -34,24 +36,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pOscSenderExt = new AmbiOSCSenderExt(&sources);
 	initializeOsc();
 
-	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
-	{
-		String indexStr = String(i + 1);
-		
-		AudioParameterSet set;
-		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
-		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
-		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
-        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::GainDbMin, Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
-
-		audioParams.add(set);
-		addParameter(set.pX);
-		addParameter(set.pY);
-		addParameter(set.pZ);
-        addParameter(set.pGain);
-	}
+    initializeAudioParameter();
     
-    presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
+    presetHelper.reset(new  EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
     presetHelper->initialize();
     
 #if(!MULTI_ENCODER_MODE)
@@ -72,6 +59,38 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 	delete pOscHandler;
 	delete pOscSender;
 	delete pOscSenderExt;
+    
+    DistanceEncodingParameterSet::deleteInstance();
+}
+
+void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
+{
+    // audio parameter
+    // distance encoding
+    DistanceEncodingParameterSet::getInstance()->pEncodingMode = new AudioParameterDistanceEncodingFloat("EncodingMode", "Encoding Mode", "Distance Encoding: Mode", AudioProcessorParameter::genericParameter, NormalisableRange<float>(EncoderConstants::EncodingModeMin, EncoderConstants::EncodingModeMax), 0, &encoderSettings.distanceEncodingParams, AudioParameterDistanceEncodingFloat::EncodingMode);
+    addParameter(DistanceEncodingParameterSet::getInstance()->pEncodingMode);
+    
+    DistanceEncodingParameterSet::getInstance()->pUnitCircle = new AudioParameterDistanceEncodingFloat("UnitCircleRadius", "Unit Circle Radius", "Distance Encoding: Unit Circle Radius", AudioProcessorParameter::genericParameter, NormalisableRange<float>(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax), 0.1f, &encoderSettings.distanceEncodingParams, AudioParameterDistanceEncodingFloat::UnitCircleRadius);
+    addParameter(DistanceEncodingParameterSet::getInstance()->pUnitCircle);
+    
+    
+    // points (X, Y, Z, Gain)
+     for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+     {
+         String indexStr = String(i + 1);
+         
+         AudioParameterSet set;
+         set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
+         set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
+         set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
+         set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::GainDbMin, Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
+
+         audioParams.add(set);
+         addParameter(set.pX);
+         addParameter(set.pY);
+         addParameter(set.pZ);
+         addParameter(set.pGain);
+     }
 }
 
 //==============================================================================
@@ -166,7 +185,7 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
-	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.unitCircleRadius == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.getUnitCircleRadius() == 0.0)
 		return;
 
 	double wFactor, otherFactor;

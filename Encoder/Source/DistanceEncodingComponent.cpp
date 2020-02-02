@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "EncoderConstants.h"
 //[/Headers]
 
 #include "DistanceEncodingComponent.h"
@@ -176,8 +177,9 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem("Exponential", DistanceEncodingParams::Exponential);
     comboBoxEncodingMode->addItem("Inverse Proportional", DistanceEncodingParams::InverseProportional);
     comboBoxEncodingMode->addItem("Experimental", DistanceEncodingParams::Experimental);
-    comboBoxEncodingMode->setSelectedId(pParams->encodingMode, dontSendNotification);
-	sliderUnitCircleRadius->setValue(pParams->unitCircleRadius, dontSendNotification);
+    comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
+    sliderUnitCircleRadius->setRange(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax);
+	sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
     sliderDbUnit->setSkewFactorFromMidPoint(5.0);
     sliderDbUnit->setValue(pParams->dbUnit, dontSendNotification);
     sliderDistanceAttenuation->setValue(pParams->inverseProportionalDistanceAttenuation, dontSendNotification);
@@ -252,7 +254,7 @@ void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == sliderUnitCircleRadius.get())
     {
         //[UserSliderCode_sliderUnitCircleRadius] -- add your slider handling code here..
-		pParams->unitCircleRadius = float(sliderUnitCircleRadius->getValue());
+		pParams->setUnitCircleRadius(float(sliderUnitCircleRadius->getValue()));
         //[/UserSliderCode_sliderUnitCircleRadius]
     }
     else if (sliderThatWasMoved == sliderDbUnit.get())
@@ -299,7 +301,7 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
     if (comboBoxThatHasChanged == comboBoxEncodingMode.get())
     {
         //[UserComboBoxCode_comboBoxEncodingMode] -- add your combo box handling code here..
-        pParams->encodingMode = DistanceEncodingParams::EncodingMode(comboBoxEncodingMode->getSelectedId());
+        pParams->setEncodingMode(DistanceEncodingParams::EncodingMode(comboBoxEncodingMode->getSelectedId()));
         controlDimming();
         distanceEncodingGraph->repaint();
         //[/UserComboBoxCode_comboBoxEncodingMode]
@@ -314,17 +316,18 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void DistanceEncodingComponent::controlDimming() const
 {
-    bool inverseProportionalOrExponential = pParams->encodingMode == DistanceEncodingParams::Exponential || pParams->encodingMode == DistanceEncodingParams::InverseProportional;
+    DistanceEncodingParams::EncodingMode mode = pParams->getEncodingMode();
+    bool inverseProportionalOrExponential = mode == DistanceEncodingParams::Exponential || mode == DistanceEncodingParams::InverseProportional;
     sliderCenterCurve->setEnabled(inverseProportionalOrExponential);
     labelCenterCurve->setEnabled(inverseProportionalOrExponential);
     sliderDbUnit->setEnabled(inverseProportionalOrExponential);
     labelDbUnit->setEnabled(inverseProportionalOrExponential);
-    sliderDistanceAttenuation->setEnabled(pParams->encodingMode == DistanceEncodingParams::InverseProportional);
-    labelDistanceAttenuation->setEnabled(pParams->encodingMode == DistanceEncodingParams::InverseProportional);
-    sliderExperimentalFactor->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
-    labelExperimentalFact->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
-    sliderExperimentalPower->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
-    labelExperimentalPower->setEnabled(pParams->encodingMode == DistanceEncodingParams::Experimental);
+    sliderDistanceAttenuation->setEnabled(mode == DistanceEncodingParams::InverseProportional);
+    labelDistanceAttenuation->setEnabled(mode == DistanceEncodingParams::InverseProportional);
+    sliderExperimentalFactor->setEnabled(mode == DistanceEncodingParams::Experimental);
+    labelExperimentalFact->setEnabled(mode == DistanceEncodingParams::Experimental);
+    sliderExperimentalPower->setEnabled(mode == DistanceEncodingParams::Experimental);
+    labelExperimentalPower->setEnabled(mode == DistanceEncodingParams::Experimental);
 }
 
 //[/MiscUserCode]

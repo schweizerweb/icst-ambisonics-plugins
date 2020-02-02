@@ -10,6 +10,8 @@
 
 #pragma once
 #include "../../Common/Constants.h"
+#include "DistanceEncodingParameterSet.h"
+
 #define DEFAULT_UNIT_CIRCLE_SIZE	    0.1f
 #define DEFAULT_DB_UNIT         	    10.0f
 #define DEFAULT_DISTANCE_ATTENUATION	5.0f
@@ -21,9 +23,10 @@
 class DistanceEncodingParams
 {
 public:
+    // WARNING: if changed, min/max values in EncoderConstants have to be updated!!!
     enum EncodingMode { None, Standard, Exponential, InverseProportional, Experimental };
 
-	DistanceEncodingParams(): 
+	DistanceEncodingParams():
         encodingMode(Standard), 
         unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE), 
         dbUnit(DEFAULT_DB_UNIT), 
@@ -34,8 +37,6 @@ public:
     {
     }
 
-    EncodingMode encodingMode;
-	float unitCircleRadius;
     float dbUnit;
     float inverseProportionalDistanceAttenuation;
     float centerCurve;
@@ -84,4 +85,36 @@ public:
             }
         }
 	}
+
+    float getUnitCircleRadius() const
+    {
+        return unitCircleRadius;
+    }
+    
+    void setUnitCircleRadius(float radius, bool notify = true)
+    {
+        unitCircleRadius = radius;
+        if(notify)
+        {
+            DistanceEncodingParameterSet::getInstance()->notifyUnitCircle(unitCircleRadius);
+        }
+    }
+    
+    EncodingMode getEncodingMode() const
+    {
+        return encodingMode;
+    }
+    
+    void setEncodingMode(EncodingMode mode, bool notify = true)
+    {
+        encodingMode = mode;
+        if(notify)
+        {
+            DistanceEncodingParameterSet::getInstance()->notifyMode(encodingMode);
+        }
+    }
+    
+private:
+    EncodingMode encodingMode;
+    float unitCircleRadius;
 };

@@ -69,6 +69,7 @@ public:
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
 	void initializeOsc();
+    void initializeAudioParameter();
 	Array<AudioParameterSet>* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
 	DawParameter* getDawParameter();

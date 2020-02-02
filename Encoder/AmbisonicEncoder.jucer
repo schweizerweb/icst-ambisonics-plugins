@@ -14,6 +14,18 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="F7eoPa" name="EncoderConstants.cpp" compile="1" resource="0"
+            file="Source/EncoderConstants.cpp"/>
+      <FILE id="g37xg9" name="EncoderConstants.h" compile="0" resource="0"
+            file="Source/EncoderConstants.h"/>
+      <FILE id="I9wzPF" name="AudioParameterDistanceEncodingFloat.cpp" compile="1"
+            resource="0" file="Source/AudioParameterDistanceEncodingFloat.cpp"/>
+      <FILE id="XWWVGm" name="AudioParameterDistanceEncodingFloat.h" compile="0"
+            resource="0" file="Source/AudioParameterDistanceEncodingFloat.h"/>
+      <FILE id="gJeZQw" name="DistanceEncodingParameterSet.cpp" compile="1"
+            resource="0" file="Source/DistanceEncodingParameterSet.cpp"/>
+      <FILE id="ylk2Gv" name="DistanceEncodingParameterSet.h" compile="0"
+            resource="0" file="Source/DistanceEncodingParameterSet.h"/>
       <FILE id="zbf72D" name="EncoderPresetHelper.h" compile="0" resource="0"
             file="Source/EncoderPresetHelper.h"/>
       <FILE id="HbYSNl" name="SourceTableListModel.h" compile="0" resource="0"

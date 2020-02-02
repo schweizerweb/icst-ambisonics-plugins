@@ -108,8 +108,8 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
 {
     XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
     distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.unitCircleRadius);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, distanceEncodingParams.encodingMode);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, distanceEncodingParams.getUnitCircleRadius());
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, distanceEncodingParams.getEncodingMode());
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, distanceEncodingParams.dbUnit);
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, distanceEncodingParams.inverseProportionalDistanceAttenuation);
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, distanceEncodingParams.centerCurve);
@@ -133,8 +133,9 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
     if (distanceEncoding != nullptr)
     {
         distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-        distanceEncodingParams.unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
-        distanceEncodingParams.encodingMode = DistanceEncodingParams::EncodingMode(distanceEncoding->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
+        distanceEncodingParams.setUnitCircleRadius(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE)));
+        distanceEncodingParams.setEncodingMode(DistanceEncodingParams::EncodingMode(distanceEncoding->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE)));
+        
         distanceEncodingParams.dbUnit = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT));
         distanceEncodingParams.inverseProportionalDistanceAttenuation = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION));
         distanceEncodingParams.centerCurve = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
