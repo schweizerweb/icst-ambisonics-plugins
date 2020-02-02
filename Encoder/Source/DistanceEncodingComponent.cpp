@@ -173,20 +173,27 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
 
 
     //[Constructor] You can add your own custom stuff here..
-    comboBoxEncodingMode->addItem("Standard", DistanceEncodingParams::Standard);
-    comboBoxEncodingMode->addItem("Exponential", DistanceEncodingParams::Exponential);
-    comboBoxEncodingMode->addItem("Inverse Proportional", DistanceEncodingParams::InverseProportional);
-    comboBoxEncodingMode->addItem("Experimental", DistanceEncodingParams::Experimental);
+    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Standard], EncoderConstants::Standard);
+    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
+    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
+    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Experimental], EncoderConstants::Experimental);
     comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
-    sliderUnitCircleRadius->setRange(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax);
-	sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
+    sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
     sliderDbUnit->setSkewFactorFromMidPoint(5.0);
-    sliderDbUnit->setValue(pParams->dbUnit, dontSendNotification);
-    sliderDistanceAttenuation->setValue(pParams->inverseProportionalDistanceAttenuation, dontSendNotification);
+    sliderDbUnit->setValue(pParams->getDbUnit(), dontSendNotification);
+    sliderDistanceAttenuation->setValue(pParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
     sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
-    sliderCenterCurve->setValue(pParams->centerCurve, dontSendNotification);
-    sliderExperimentalFactor->setValue(pParams->experimentalFactor, dontSendNotification);
-    sliderExperimentalPower->setValue(pParams->experimentalPower, dontSendNotification);
+    sliderCenterCurve->setValue(pParams->getCenterCurve(), dontSendNotification);
+    sliderExperimentalFactor->setValue(pParams->getExperimentalFactor(), dontSendNotification);
+    sliderExperimentalPower->setValue(pParams->getExperimentalPower(), dontSendNotification);
+    
+    // set slider ranges according to constants
+    sliderUnitCircleRadius->setRange(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax, EncoderConstants::UnitCircleRadiusResolution);
+    sliderDbUnit->setRange(EncoderConstants::DbUnitMin, EncoderConstants::DbUnitMax, EncoderConstants::DbUnitResolution);
+    sliderDistanceAttenuation->setRange(EncoderConstants::DistanceAttenuationMin, EncoderConstants::DistanceAttenuationMax, EncoderConstants::DistanceAttenuationResolution);
+    sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
+    sliderExperimentalFactor->setRange(EncoderConstants::ExperimentalFactorMin, EncoderConstants::ExperimentalFactorMax, EncoderConstants::ExperimentalFactorResolution);
+    sliderExperimentalPower->setRange(EncoderConstants::ExperimentalPowerMin, EncoderConstants::ExperimentalPowerMax, EncoderConstants::ExperimentalPowerResolution);
     controlDimming();
     //[/Constructor]
 }
@@ -260,31 +267,31 @@ void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == sliderDbUnit.get())
     {
         //[UserSliderCode_sliderDbUnit] -- add your slider handling code here..
-        pParams->dbUnit = float(sliderDbUnit->getValue());
+        pParams->setDbUnit(float(sliderDbUnit->getValue()));
         //[/UserSliderCode_sliderDbUnit]
     }
     else if (sliderThatWasMoved == sliderDistanceAttenuation.get())
     {
         //[UserSliderCode_sliderDistanceAttenuation] -- add your slider handling code here..
-        pParams->inverseProportionalDistanceAttenuation = float(sliderDistanceAttenuation->getValue());
+        pParams->setInverseProportionalDistanceAttenuation(float(sliderDistanceAttenuation->getValue()));
         //[/UserSliderCode_sliderDistanceAttenuation]
     }
     else if (sliderThatWasMoved == sliderCenterCurve.get())
     {
         //[UserSliderCode_sliderCenterCurve] -- add your slider handling code here..
-        pParams->centerCurve = float(sliderCenterCurve->getValue());
+        pParams->setCenterCurve(float(sliderCenterCurve->getValue()));
         //[/UserSliderCode_sliderCenterCurve]
     }
     else if (sliderThatWasMoved == sliderExperimentalFactor.get())
     {
         //[UserSliderCode_sliderExperimentalFactor] -- add your slider handling code here..
-        pParams->experimentalFactor = float(sliderExperimentalFactor->getValue());
+        pParams->setExperimentalFactor(float(sliderExperimentalFactor->getValue()));
         //[/UserSliderCode_sliderExperimentalFactor]
     }
     else if (sliderThatWasMoved == sliderExperimentalPower.get())
     {
         //[UserSliderCode_sliderExperimentalPower] -- add your slider handling code here..
-        pParams->experimentalPower = float(sliderExperimentalPower->getValue());
+        pParams->setExperimentalPower(float(sliderExperimentalPower->getValue()));
         //[/UserSliderCode_sliderExperimentalPower]
     }
 
@@ -301,7 +308,7 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
     if (comboBoxThatHasChanged == comboBoxEncodingMode.get())
     {
         //[UserComboBoxCode_comboBoxEncodingMode] -- add your combo box handling code here..
-        pParams->setEncodingMode(DistanceEncodingParams::EncodingMode(comboBoxEncodingMode->getSelectedId()));
+        pParams->setEncodingMode(EncoderConstants::EncodingMode(comboBoxEncodingMode->getSelectedId()));
         controlDimming();
         distanceEncodingGraph->repaint();
         //[/UserComboBoxCode_comboBoxEncodingMode]
@@ -316,18 +323,18 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void DistanceEncodingComponent::controlDimming() const
 {
-    DistanceEncodingParams::EncodingMode mode = pParams->getEncodingMode();
-    bool inverseProportionalOrExponential = mode == DistanceEncodingParams::Exponential || mode == DistanceEncodingParams::InverseProportional;
+    EncoderConstants::EncodingMode mode = pParams->getEncodingMode();
+    bool inverseProportionalOrExponential = mode == EncoderConstants::Exponential || mode == EncoderConstants::InverseProportional;
     sliderCenterCurve->setEnabled(inverseProportionalOrExponential);
     labelCenterCurve->setEnabled(inverseProportionalOrExponential);
     sliderDbUnit->setEnabled(inverseProportionalOrExponential);
     labelDbUnit->setEnabled(inverseProportionalOrExponential);
-    sliderDistanceAttenuation->setEnabled(mode == DistanceEncodingParams::InverseProportional);
-    labelDistanceAttenuation->setEnabled(mode == DistanceEncodingParams::InverseProportional);
-    sliderExperimentalFactor->setEnabled(mode == DistanceEncodingParams::Experimental);
-    labelExperimentalFact->setEnabled(mode == DistanceEncodingParams::Experimental);
-    sliderExperimentalPower->setEnabled(mode == DistanceEncodingParams::Experimental);
-    labelExperimentalPower->setEnabled(mode == DistanceEncodingParams::Experimental);
+    sliderDistanceAttenuation->setEnabled(mode == EncoderConstants::InverseProportional);
+    labelDistanceAttenuation->setEnabled(mode == EncoderConstants::InverseProportional);
+    sliderExperimentalFactor->setEnabled(mode == EncoderConstants::Experimental);
+    labelExperimentalFact->setEnabled(mode == EncoderConstants::Experimental);
+    sliderExperimentalPower->setEnabled(mode == EncoderConstants::Experimental);
+    labelExperimentalPower->setEnabled(mode == EncoderConstants::Experimental);
 }
 
 //[/MiscUserCode]

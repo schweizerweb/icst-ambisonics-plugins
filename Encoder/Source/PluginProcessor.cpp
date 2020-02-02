@@ -65,15 +65,8 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
-    // audio parameter
-    // distance encoding
-    DistanceEncodingParameterSet::getInstance()->pEncodingMode = new AudioParameterDistanceEncodingFloat("EncodingMode", "Encoding Mode", "Distance Encoding: Mode", AudioProcessorParameter::genericParameter, NormalisableRange<float>(EncoderConstants::EncodingModeMin, EncoderConstants::EncodingModeMax), 0, &encoderSettings.distanceEncodingParams, AudioParameterDistanceEncodingFloat::EncodingMode);
-    addParameter(DistanceEncodingParameterSet::getInstance()->pEncodingMode);
-    
-    DistanceEncodingParameterSet::getInstance()->pUnitCircle = new AudioParameterDistanceEncodingFloat("UnitCircleRadius", "Unit Circle Radius", "Distance Encoding: Unit Circle Radius", AudioProcessorParameter::genericParameter, NormalisableRange<float>(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax), 0.1f, &encoderSettings.distanceEncodingParams, AudioParameterDistanceEncodingFloat::UnitCircleRadius);
-    addParameter(DistanceEncodingParameterSet::getInstance()->pUnitCircle);
-    
-    
+    encoderSettings.distanceEncodingParams.initialize(this);
+
     // points (X, Y, Z, Gain)
      for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
      {
