@@ -11,7 +11,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
-#include "AudioParameterDistanceEncodingFloat.h"
 #include "../../Common/TrackColors.h"
 #include "EncoderConstants.h"
 
@@ -59,8 +58,6 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 	delete pOscHandler;
 	delete pOscSender;
 	delete pOscSenderExt;
-    
-    DistanceEncodingParameterSet::deleteInstance();
 }
 
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()

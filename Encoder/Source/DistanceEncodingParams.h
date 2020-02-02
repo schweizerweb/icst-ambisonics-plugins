@@ -10,7 +10,6 @@
 
 #pragma once
 #include "../../Common/Constants.h"
-#include "DistanceEncodingParameterSet.h"
 #include "EncoderConstants.h"
 
 #define DEFAULT_UNIT_CIRCLE_SIZE	    0.1f
