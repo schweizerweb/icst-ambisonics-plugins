@@ -134,7 +134,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 	comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
 
 	sliderFrequency->setSkewFactorFromMidPoint(500);
-	sliderFrequency->setRange(20, int(pFilterSpecification->sampleRate / 2.0));
+	sliderFrequency->setRange(20, jmin(int(pFilterSpecification->sampleRate / 2.0), 22000));
 	sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);
     sliderQ->setNumDecimalPlacesToDisplay(3);

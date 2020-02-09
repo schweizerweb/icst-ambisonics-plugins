@@ -17,7 +17,7 @@ IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilte
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
-	while(currentFrequency < MAX_FREQUENCY)
+	while(currentFrequency < pFilterSpecification->sampleRate / 2.0)
 	{
 		frequencies.add(currentFrequency);
 		currentFrequency *= FREQUENCY_STEP;
@@ -25,7 +25,7 @@ IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilte
 	
 	magnitudes = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
 
-	setDisplayRange(Logarithmic, Range<double>(20, MAX_FREQUENCY), Linear, Range<double>(-20, 20));
+	setDisplayRange(Logarithmic, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-20, 20));
 	fullGridFlag = true;
 	labelAxisY = "Gain [dB]";
 	labelAxisX = "Frequency [Hz]";

@@ -15,7 +15,6 @@
 #include "../../Common/SimpleGraph.h"
 
 #define MIN_FREQUENCY	1
-#define MAX_FREQUENCY	10000
 #define FREQUENCY_STEP 1.01
 
 //==============================================================================
