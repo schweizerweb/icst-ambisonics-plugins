@@ -144,6 +144,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
 RadarSettingsComponent::~RadarSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pZoomSettings->removeChangeListener(this);
     //[/Destructor_pre]
 
     groupZoom = nullptr;
