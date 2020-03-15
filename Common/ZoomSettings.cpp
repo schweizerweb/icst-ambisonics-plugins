@@ -19,15 +19,15 @@ ZoomSettings::ZoomSettings() :
 {
 }
 
-Rectangle<float> ZoomSettings::getVisibleArea(bool isZY, bool isFull)
+Rectangle<float> ZoomSettings::getVisibleArea(bool isXZ, bool isFull)
 {
-	if(isZY)
+	if(isXZ)
 	{
-		Point<float> projectedPoint(currentCenterPoint.getY(), currentCenterPoint.getZ());
+		Point<float> projectedPoint(currentCenterPoint.getX(), currentCenterPoint.getZ());
 		return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY() - (isFull ? currentRadius : 0), 2 * currentRadius, currentRadius * (isFull ? 2 : 1));
 	}
 	
-	Point<float> projectedPoint(currentCenterPoint.getY(), currentCenterPoint.getX());
+	Point<float> projectedPoint(currentCenterPoint.getX(), currentCenterPoint.getY());
 	return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY() - (isFull ? currentRadius : 0), 2 * currentRadius, currentRadius * (isFull ? 2 : 1));
 }
 
@@ -47,9 +47,9 @@ void ZoomSettings::setCurrentCenterPointXY(float x, float y)
 	sendChangeMessage();
 }
 
-void ZoomSettings::setCurrentCenterPointYZ(float y, float z)
+void ZoomSettings::setCurrentCenterPointXZ(float x, float z)
 {
-	currentCenterPoint.setYZ(y, z);
+	currentCenterPoint.setXZ(x, z);
 	sendChangeMessage();
 }
 

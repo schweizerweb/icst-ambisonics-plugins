@@ -27,7 +27,7 @@
 class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 {
 public:
-	enum RadarMode { XY, ZY_Half, ZY_Full };
+	enum RadarMode { XY, XZ_Half, XZ_Full };
 	enum Shape { Circle, Square, Star };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
@@ -43,7 +43,6 @@ public:
 	void mouseDown(const MouseEvent& e) override;
 	void mouseDrag(const MouseEvent& e) override;
 	void setCenterPoint(Point<float> valuePoint) const;
-	void moveCenterPoint(Point<float> delta) const;
 	void mouseUp(const MouseEvent& e) override;
 	void mouseDoubleClick(const MouseEvent& e) override;
 	void showCoordinates(const Point<float>& point);
@@ -94,6 +93,7 @@ private:
 	CriticalSection infoLabelLock;
 	Point<float> selectionRectangleEnd;
 	Point<float> selectionRectangleStart;
+    Point<float> lastRadarMovePoint;
 	bool selectionRectangleActive;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)

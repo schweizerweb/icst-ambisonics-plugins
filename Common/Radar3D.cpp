@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -33,11 +33,11 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 	fullRadarFlag = false;
     //[/Constructor_pre]
 
-    zyRadar.reset (new Radar2D (Radar2D::ZY_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions));
-    addAndMakeVisible (zyRadar.get());
-    zyRadar->setName ("zyRadar");
+    xzRadar.reset (new Radar2D (Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions));
+    addAndMakeVisible (xzRadar.get());
+    xzRadar->setName ("xzRadar");
 
-    zyRadar->setBounds (0, 240, 336, 120);
+    xzRadar->setBounds (0, 240, 336, 120);
 
     xyRadar.reset (new Radar2D (Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions));
     addAndMakeVisible (xyRadar.get());
@@ -73,7 +73,7 @@ Radar3D::~Radar3D()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    zyRadar = nullptr;
+    xzRadar = nullptr;
     xyRadar = nullptr;
     btnFull = nullptr;
 
@@ -103,7 +103,7 @@ void Radar3D::resized()
 	int secondRadarHeight = int((getHeight() - 3) / (fullRadarFlag ? 2.0 : 3.0));
 	int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
 	xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
-	zyRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
+	xzRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
 	btnFull->setBounds(0, topRadarHeight + secondRadarHeight, getWidth(), getHeight() - topRadarHeight - secondRadarHeight);
     //[/UserResized]
 }
@@ -129,7 +129,7 @@ void Radar3D::buttonClicked (Button* buttonThatWasClicked)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void Radar3D::setRadarMode(bool fullRadar)
 {
-	zyRadar->setRadarMode(fullRadar ? Radar2D::ZY_Full : Radar2D::ZY_Half);
+	xzRadar->setRadarMode(fullRadar ? Radar2D::XZ_Full : Radar2D::XZ_Half);
 	fullRadarFlag = fullRadar;
 	resized();
 }
@@ -150,8 +150,8 @@ BEGIN_JUCER_METADATA
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
-  <GENERICCOMPONENT name="zyRadar" id="9b35aa2c2da622df" memberName="zyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 240 336 120" class="Radar2D" params="Radar2D::ZY_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
+  <GENERICCOMPONENT name="xzRadar" id="9b35aa2c2da622df" memberName="xzRadar" virtualName=""
+                    explicitFocusOrder="0" pos="0 240 336 120" class="Radar2D" params="Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
                     explicitFocusOrder="0" pos="0 0 336 240" class="Radar2D" params="Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
   <IMAGEBUTTON name="btnFull" id="7f9ff0bdbe393e2c" memberName="btnFull" virtualName=""

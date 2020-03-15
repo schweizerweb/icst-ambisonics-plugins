@@ -47,10 +47,10 @@ Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
 	switch(radarMode)
 	{
 	case XY:
-		return Point<double>(point3_d->getY(), point3_d->getX());
-	case ZY_Half:
-	case ZY_Full:
-		return Point<double>(point3_d->getY(), point3_d->getZ());
+		return Point<double>(point3_d->getX(), point3_d->getY());
+	case XZ_Half:
+	case XZ_Full:
+		return Point<double>(point3_d->getX(), point3_d->getZ());
 	}
 
 	return Point<double>();
@@ -153,7 +153,7 @@ float Radar2D::getSelectedPointSize(float scaler) const
 
 void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const
 {
-	double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getY(), pt->getZ())) + PI * 0.25;
+	double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getX(), pt->getZ())) + PI * 0.25;
 
 	Path p;
 	p.addPolygon(*screenPt, 4, pointSize, float(angle));
@@ -326,7 +326,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	{
 		// reset zoom
 		pZoomSettings->setCurrentCenterPointXY(0.0f, 0.0f);
-		pZoomSettings->setCurrentCenterPointYZ(0.0f, 0.0f);
+		pZoomSettings->setCurrentCenterPointXZ(0.0f, 0.0f);
 		pZoomSettings->setCurrentRadius(1.0f);
 		return true;
 	}
@@ -342,7 +342,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	{
 		if (radarMode == XY)
 		{
-			dx = NUDGE_VALUE;
+			dy = NUDGE_VALUE;
 		}
 		else
 		{
@@ -356,7 +356,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	{
 		if (radarMode == XY)
 		{
-			dx = - NUDGE_VALUE;
+			dy = - NUDGE_VALUE;
 		}
 		else
 		{
@@ -368,13 +368,13 @@ bool Radar2D::keyPressed(const KeyPress& key)
 
 	else if (key.isKeyCode(KeyPress::leftKey))
 	{
-		dy = - NUDGE_VALUE;
+		dx = - NUDGE_VALUE;
 		keyHandled = true;
 	}
 
 	else if (key.isKeyCode(KeyPress::rightKey))
 	{
-		dy = NUDGE_VALUE;
+		dx = NUDGE_VALUE;
 		keyHandled = true;
 	}
 
@@ -410,7 +410,7 @@ void Radar2D::setRadarMode(RadarMode mode)
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != ZY_Half);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
 		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
@@ -421,7 +421,7 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 
 Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != ZY_Half);
+	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
 		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
@@ -440,7 +440,7 @@ void Radar2D::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-	double wantedRatioWidthToHeight = (radarMode == ZY_Half) ? 2 : 1;
+	double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
 
 	if (getBounds().getWidth() * getBounds().getHeight() <= 0)
 		return;
@@ -459,7 +459,7 @@ void Radar2D::resized()
 		// add space on top or bottom, depending on radar mode
 		radarViewport = Rectangle<int>(
 			0,
-			(radarMode != ZY_Half) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
+			(radarMode != XZ_Half) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
 			getBounds().getWidth(),
 			int(getBounds().getWidth() / wantedRatioWidthToHeight));
 	}
@@ -490,6 +490,12 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	if (!pRadarOptions->showEditablePoints)
 		return;
 
+    if(e.mods.isAltDown())
+    {
+        lastRadarMovePoint = e.getPosition().toFloat();
+        return;
+    }
+    
 	double minDist = std::numeric_limits<double>::max();
 	int minDistIndex = -1;
 	bool isGroup = false;
@@ -554,8 +560,26 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
 	if(e.mods.isAltDown())
 	{
-		Point<float> originPoint = getValuePointFromAbsoluteScreenPoint((e.getPosition() - e.getOffsetFromDragStart()).toFloat());
-		moveCenterPoint(originPoint - valuePoint);
+        Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
+            
+        if(move.getDistanceFromOrigin() > 3)
+        {
+            move.setX(move.getX() / radarViewport.getWidth() * 2.0f);
+            move.setY(move.getY() / radarViewport.getHeight() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
+            
+            switch (radarMode)
+            {
+            case XY:
+                pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getY() - move.getY());
+                break;
+            case XZ_Half:
+            case XZ_Full:
+                pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getZ() - move.getY());
+                break;
+            }
+            
+            lastRadarMovePoint = e.getPosition().toFloat();
+        }
 	}
 	else
 	{
@@ -573,8 +597,8 @@ void Radar2D::mouseDrag(const MouseEvent& e)
                 localGroup->groupPoints.add(pEditablePoints->get(i));
             }
 
-			double dx = radarMode == XY ? valuePoint.getY() - ref->getX() : 0.0;
-			double dy = valuePoint.getX() - ref->getY();
+			double dx = valuePoint.getX() - ref->getX();
+			double dy = radarMode == XY ? valuePoint.getY() - ref->getY() : 0.0;
 			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getZ();
 
             localGroup->moveXYZ(dx, dy, dz, true);
@@ -597,8 +621,8 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 			}
 
 			std::unique_ptr<Point3D<double>> newPoint = radarMode == XY
-				? std::make_unique<Point3D<double>>(valuePoint.getY(), valuePoint.getX(), referencePoint.getZ())
-				: std::make_unique<Point3D<double>>(referencePoint.getX(), valuePoint.getX(), valuePoint.getY());
+				? std::make_unique<Point3D<double>>(valuePoint.getX(), valuePoint.getY(), referencePoint.getZ())
+				: std::make_unique<Point3D<double>>(valuePoint.getX(), referencePoint.getY(), valuePoint.getY());
 
 			if(e.mods.isCtrlDown())
 				pEditablePoints->setGroupAed(mainGroupIndex, newPoint->getAzimuth(), newPoint->getElevation(), newPoint->getDistance(), !e.mods.isShiftDown());
@@ -628,25 +652,11 @@ void Radar2D::setCenterPoint(Point<float> valuePoint) const
 	switch (radarMode)
 	{
 	case XY:
-		pZoomSettings->setCurrentCenterPointXY(valuePoint.getY(), valuePoint.getX());
+		pZoomSettings->setCurrentCenterPointXY(valuePoint.getX(), valuePoint.getY());
 		break;
-	case ZY_Half:
-	case ZY_Full:
-		pZoomSettings->setCurrentCenterPointYZ(valuePoint.getX(), valuePoint.getY());
-		break;
-	}
-}
-
-void Radar2D::moveCenterPoint(Point<float> delta) const
-{
-	switch (radarMode)
-	{
-	case XY:
-		pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + delta.getY(), pZoomSettings->getCurrentCenterPoint().getY() + delta.getX());
-		break;
-	case ZY_Half:
-	case ZY_Full:
-		pZoomSettings->setCurrentCenterPointYZ(pZoomSettings->getCurrentCenterPoint().getY() + delta.getX(), pZoomSettings->getCurrentCenterPoint().getZ() + delta.getY());
+	case XZ_Half:
+	case XZ_Full:
+		pZoomSettings->setCurrentCenterPointXZ(valuePoint.getX(), valuePoint.getY());
 		break;
 	}
 }
@@ -677,8 +687,8 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		{
 			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
 			Point<float> realCoords;
-			realCoords.x = float(radarMode == XY ? p->getY() : p->getY());
-			realCoords.y = float(radarMode == XY ? p->getX() : p->getZ());
+			realCoords.x = float(radarMode == XY ? p->getX() : p->getX());
+			realCoords.y = float(radarMode == XY ? p->getY() : p->getZ());
 			if(rectangle.contains(realCoords))
 			{
 				pPointSelection->selectPoint(i, true);
@@ -704,11 +714,11 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	int index = pEditablePoints->size();
 	switch (radarMode) {
 	case XY:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getY(), valuePoint.getX(), 0.0, pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
-	case ZY_Half:
-	case ZY_Full:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(0.0, valuePoint.getX(), valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+	case XZ_Half:
+	case XZ_Full:
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	}
 
@@ -721,11 +731,11 @@ void Radar2D::showCoordinates(const Point<float>& point)
 	String str;
 	if (radarMode == XY)
 	{
-		str << "X: " << String(point.getY(), 2) << "; Y: " << String(point.getX(), 2);
+		str << "X: " << String(point.getX(), 2) << "; Y: " << String(point.getY(), 2);
 	}
 	else
 	{
-		str << "Y: " << String(point.getX(), 2) << "; Z: " << String(point.getY(), 2);
+		str << "X: " << String(point.getX(), 2) << "; Z: " << String(point.getY(), 2);
 	}
 
 	updateInfoLabel(str);

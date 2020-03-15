@@ -18,11 +18,11 @@ class ZoomSettings : public ChangeBroadcaster
 public:
 	ZoomSettings();
 
-	Rectangle<float> getVisibleArea(bool isZY, bool isFull);
+	Rectangle<float> getVisibleArea(bool isXZ, bool isFull);
 	Point3D<float> getInitialCenterPoint() const;
 	Point3D<float> getCurrentCenterPoint() const;
 	void setCurrentCenterPointXY(float x, float y);
-	void setCurrentCenterPointYZ(float y, float z);
+	void setCurrentCenterPointXZ(float x, float z);
 	
 	float getInitialRadius() const;
 	float getCurrentRadius() const;

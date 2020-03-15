@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -220,7 +220,7 @@ void RadarSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == sliderCenterPointZ.get())
     {
         //[UserSliderCode_sliderCenterPointZ] -- add your slider handling code here..
-        pZoomSettings->setCurrentCenterPointYZ(pZoomSettings->getCurrentCenterPoint().getY(), sliderCenterPointZ->getValue());
+        pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX(), sliderCenterPointZ->getValue());
         //[/UserSliderCode_sliderCenterPointZ]
     }
     else if (sliderThatWasMoved == sliderPointScaler.get())
@@ -249,7 +249,7 @@ void RadarSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     {
         //[UserButtonCode_btnReset] -- add your button handler code here..
         pZoomSettings->setCurrentCenterPointXY(0.0, 0.0);
-        pZoomSettings->setCurrentCenterPointYZ(0.0, 0.0);
+        pZoomSettings->setCurrentCenterPointXZ(0.0, 0.0);
         pZoomSettings->setCurrentRadius(1.0);
         //[/UserButtonCode_btnReset]
     }

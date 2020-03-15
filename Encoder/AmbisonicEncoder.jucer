@@ -10,7 +10,7 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambiencoder" pluginAAXCategory="2"
-              jucerVersion="5.4.6" pluginFormats="buildAU,buildVST3" companyName="ICST"
+              jucerVersion="5.4.7" pluginFormats="buildAU,buildVST3" companyName="ICST"
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
