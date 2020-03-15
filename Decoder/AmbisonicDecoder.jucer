@@ -6,7 +6,7 @@
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiDecoder"
               pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
-              pluginCode="AADC" pluginChannelConfigs="{4,32}" pluginIsSynth="0"
+              pluginCode="AADC" pluginChannelConfigs="{4,8}" pluginIsSynth="0"
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
