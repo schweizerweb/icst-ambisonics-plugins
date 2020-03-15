@@ -24,7 +24,8 @@ $EncoderVersions =
 @{ Order = 4; Input = 64; Description = "4th Order Ambisonic, 64 Channel Input"; PluginCode = "AE4F" },
 @{ Order = 5; Input = 64; Description = "5th Order Ambisonic, 64 Channel Input"; PluginCode = "AE5F" },
 @{ Order = 6; Input = 64; Description = "6th Order Ambisonic, 64 Channel Input"; PluginCode = "AE6F" },
-@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input"; PluginCode = "AE7F" }
+@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input"; PluginCode = "AE7F" },
+@{ Order = 1; Input = 8; Description = "1st Order Ambisonic, 8 Channel Input"; PluginCode = "AE18" }
 )
 
 $DecoderVersions =
@@ -42,7 +43,8 @@ $DecoderVersions =
 @{ Order = 4; Output = 64; Description = "4th Order Ambisonic, 64 Channel Output"; PluginCode = "AD4F" },
 @{ Order = 5; Output = 64; Description = "5th Order Ambisonic, 64 Channel Output"; PluginCode = "AD5F" },
 @{ Order = 6; Output = 64; Description = "6th Order Ambisonic, 64 Channel Output"; PluginCode = "AD6F" },
-@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output"; PluginCode = "AD7F" }
+@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output"; PluginCode = "AD7F" },
+@{ Order = 1; Output = 8; Description = "1st Order Ambisonic, 8 Channel Output"; PluginCode = "AD18" }
 )
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
