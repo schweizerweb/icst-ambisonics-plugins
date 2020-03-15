@@ -115,8 +115,12 @@ Image Radar2D::createRadarBackground() const
 	}
 	
 	g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
-	g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
+    g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
+    g.setColour(radarColors.getRadarAxisColor());
+    g.drawSingleLineText("X", localBounds.getWidth()-12, centerPoint.getY() - 2);
+    g.drawSingleLineText(radarMode == XY ? "Y" : "Z", centerPoint.getX() - 10, 15);
+    
 	return img;
 }
 
