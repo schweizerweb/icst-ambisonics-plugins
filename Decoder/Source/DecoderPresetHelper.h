@@ -109,17 +109,17 @@ public:
         
         if(numberOfSpeakers == 2)
         {
-            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, -1.0, 0.0), "L", TrackColors::getSpeakerColor());
-            speakerSet.addNew(Uuid().toString(), Point3D<double>(0.0, 1.0, 0.0), "R", TrackColors::getSpeakerColor());
+            speakerSet.addNew(Uuid().toString(), Point3D<double>(-1.0, 0.0, 0.0), "L", TrackColors::getSpeakerColor());
+            speakerSet.addNew(Uuid().toString(), Point3D<double>(1.0, 0.0, 0.0), "R", TrackColors::getSpeakerColor());
         }
         else
         {
-            Point<float> projectedPoint(1.0, 0.0);
+            Point<float> projectedPoint(0.0, 1.0);
             projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / numberOfSpeakers));
             for (int i = 0; i < numberOfSpeakers; i++)
             {
                 speakerSet.addNew(Uuid().toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor());
-                projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI * 2 / numberOfSpeakers));
+                projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI * 2 / numberOfSpeakers));
             }
         }
         

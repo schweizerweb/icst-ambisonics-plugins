@@ -562,24 +562,21 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
             
-        if(move.getDistanceFromOrigin() > 3)
+        move.setX(move.getX() / radarViewport.getWidth() * 2.0f);
+        move.setY(move.getY() / radarViewport.getHeight() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
+            
+        switch (radarMode)
         {
-            move.setX(move.getX() / radarViewport.getWidth() * 2.0f);
-            move.setY(move.getY() / radarViewport.getHeight() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
-            
-            switch (radarMode)
-            {
-            case XY:
-                pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getY() - move.getY());
-                break;
-            case XZ_Half:
-            case XZ_Full:
-                pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getZ() - move.getY());
-                break;
-            }
-            
-            lastRadarMovePoint = e.getPosition().toFloat();
+        case XY:
+            pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getY() - move.getY());
+            break;
+        case XZ_Half:
+        case XZ_Full:
+            pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getZ() - move.getY());
+            break;
         }
+            
+        lastRadarMovePoint = e.getPosition().toFloat();
 	}
 	else
 	{

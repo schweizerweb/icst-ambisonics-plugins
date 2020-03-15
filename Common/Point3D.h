@@ -320,7 +320,7 @@ private:
 		distance = sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
 		distance = distance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : distance;
 		
-		azimuth = atan2(y, x);
+		azimuth = atan2(x, y);
 		azimuth = azimuth < 0.0 ? 2.0 * PI + azimuth : azimuth;
 		elevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
 		xyzChanged = false;
@@ -328,8 +328,8 @@ private:
 
 	void calculateXyz()
 	{
-		x = distance * cos(elevation) * cos(azimuth);
-		y = distance * cos(elevation) * sin(azimuth);
+		x = distance * cos(elevation) * sin(azimuth);
+		y = distance * cos(elevation) * cos(azimuth);
 		z = distance * sin(elevation);
 		makeValid(&x, Constants::XMin, Constants::XMax);
 		makeValid(&y, Constants::YMin, Constants::YMax);
