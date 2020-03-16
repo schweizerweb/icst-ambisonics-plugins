@@ -32,6 +32,9 @@ public:
 	const static float YMax;
 	const static float ZMin;
 	const static float ZMax;
+    
+    const static double CompressedMin;
+    const static double CompressedMax;
 
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);
