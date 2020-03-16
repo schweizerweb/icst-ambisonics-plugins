@@ -702,6 +702,11 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
 {
+    if(e.mods.isAltDown())
+    {
+        return;
+    }
+    
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
 	if (!pRadarOptions->showEditablePoints)
