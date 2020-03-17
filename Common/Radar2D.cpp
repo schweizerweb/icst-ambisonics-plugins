@@ -584,8 +584,8 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
             
-        move.setX(move.getX() / radarViewport.getWidth() * 2.0f);
-        move.setY(move.getY() / radarViewport.getHeight() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
+        move.setX(move.getX() / radarViewport.getWidth() * pZoomSettings->getCurrentRadius() * 2.0f);
+        move.setY(move.getY() / radarViewport.getHeight() * pZoomSettings->getCurrentRadius() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
             
         switch (radarMode)
         {
