@@ -52,6 +52,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool keyPressed(const KeyPress& key) override;
 	void setRadarMode(RadarMode radarMode);
+    void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) override;
 
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
