@@ -10,6 +10,7 @@
 
 #pragma once
 #define DEFAULT_POINT_SCALER 1.0
+#define MIN_ZOOM_RADIUS 0.001f
 
 #include "Point3D.h"
 
@@ -28,6 +29,7 @@ public:
 	float getCurrentRadius() const;
 	void setCurrentRadius(float newRadius);
 	int getNumberOfRings() const;
+    float getRingResolution() const;
     
     void setPointScaler(double newScaler);
     double getPointScaler();

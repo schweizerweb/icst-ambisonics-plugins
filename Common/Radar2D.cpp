@@ -102,21 +102,39 @@ Image Radar2D::createRadarBackground() const
 	Graphics g(img);
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
-	int numberOfRings = pZoomSettings->getNumberOfRings();
-
-	float dist = pZoomSettings->getInitialRadius() / float(numberOfRings) * getValueToScreenRatio();
+    
+    float ringResolution = pZoomSettings->getRingResolution();
+    float dist = ringResolution * getValueToScreenRatio();
 	Point<float> centerPoint = getRelativeScreenPoint(Point<float>(0.0, 0.0));
-	for (int i = 0; i < numberOfRings; i++)
-	{
-		float absDist = (i + 1) * dist;
+    int nbRings = 0;
+    bool labelUp = centerPoint.getY() >= localBounds.getHeight()/2;
+    
+    for(int i = 1; i * ringResolution < Constants::DistanceMax; i++)
+    {
+        float absDist = i * dist;
+        float ringValue = i * ringResolution;
 		Rectangle<float> ellipseRect(centerPoint.getX() - absDist, centerPoint.getY() - absDist, 2 * absDist, 2 * absDist);
-		g.drawEllipse(ellipseRect, 1.0f);
-		g.drawSingleLineText(String((i + 1) * pZoomSettings->getInitialRadius() / numberOfRings), int(centerPoint.getX()), int(centerPoint.getY() - absDist));
-	}
+        
+        // check if circle is in visible area
+        if(localBounds.intersects(ellipseRect) && !ellipseRect.withSizeKeepingCentre(ellipseRect.getWidth()/2, ellipseRect.getHeight()/2).contains(localBounds))
+        {
+            g.drawEllipse(ellipseRect, ringValue == 1.0f ? 3.0f : 1.0f);
+            if(-20<=centerPoint.getX() && localBounds.getWidth()>= centerPoint.getX())
+            {
+                g.drawSingleLineText(String(ringValue), int(centerPoint.getX() + 2), int(centerPoint.getY() + (labelUp?-1:1)* absDist));
+            }
+            
+            nbRings++;
+        }
+        else if(nbRings > 0)
+            break;
+    }
 	
-	g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
+    // axis
+    g.drawLine(centerPoint.getX(), 0.0f, centerPoint.getX(), localBounds.getHeight(), 2.0f);
     g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
+    // axis label
     g.setColour(radarColors.getRadarAxisColor());
     g.drawSingleLineText("X", localBounds.getWidth()-12, centerPoint.getY() - 2);
     g.drawSingleLineText(radarMode == XY ? "Y" : "Z", centerPoint.getX() - 10, 15);
