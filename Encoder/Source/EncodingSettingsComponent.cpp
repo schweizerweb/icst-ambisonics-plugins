@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -211,7 +211,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         File* newFile = pPresetHelper->tryCreateNewPreset();
         if(newFile == nullptr)
                 return;
-        
+
         pPresetHelper->writeToXmlFile(*newFile, pSources, pEncoderSettings);
         comboBoxPresets->setText("", dontSendNotification);
         delete newFile;
@@ -314,7 +314,7 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
     {
         initializePresets();
     }
-    
+
     if(message == ACTION_MESSAGE_PRESET_CHANGED)
     {
         sourceDefinition->refresh();
