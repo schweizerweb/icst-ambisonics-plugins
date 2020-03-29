@@ -520,7 +520,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	if (!pRadarOptions->showEditablePoints)
 		return;
 
-    if(e.mods.isAltDown())
+    if(checkMouseActionMode(e.mods, RadarMove))
     {
         lastRadarMovePoint = e.getPosition().toFloat();
         return;
@@ -556,7 +556,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	{
 		if (isGroup)
 		{
-			if (e.mods.isShiftDown() && pPointSelection->getSelectionMode() == PointSelection::Group && !pPointSelection->isGroupSelected(minDistIndex))
+			if (checkMouseActionMode(e.mods, MoveGroupPointOnly) && pPointSelection->getSelectionMode() == PointSelection::Group && !pPointSelection->isGroupSelected(minDistIndex))
 			{
 				// do not allow groups with common points
 				for (int i : pPointSelection->getSelectedIndices())
@@ -569,10 +569,10 @@ void Radar2D::mouseDown(const MouseEvent& e)
 				}
 			}
 
-			pPointSelection->selectGroup(minDistIndex, e.mods.isShiftDown());
+			pPointSelection->selectGroup(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
 		}
 		else
-			pPointSelection->selectPoint(minDistIndex, e.mods.isShiftDown());
+			pPointSelection->selectPoint(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
 	}
 	else
 	{
@@ -588,7 +588,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 	showCoordinates(valuePoint);
 
-	if(e.mods.isAltDown())
+	if(checkMouseActionMode(e.mods, RadarMove))
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
             
@@ -651,10 +651,10 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 				? std::make_unique<Point3D<double>>(valuePoint.getX(), valuePoint.getY(), referencePoint.getZ())
 				: std::make_unique<Point3D<double>>(valuePoint.getX(), referencePoint.getY(), valuePoint.getY());
 
-			if(e.mods.isCtrlDown())
-				pEditablePoints->setGroupAed(mainGroupIndex, newPoint->getAzimuth(), newPoint->getElevation(), newPoint->getDistance(), !e.mods.isShiftDown());
+			if(checkMouseActionMode(e.mods, ExtendedPointMove))
+				pEditablePoints->setGroupAed(mainGroupIndex, newPoint->getAzimuth(), newPoint->getElevation(), newPoint->getDistance(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
 			else
-				pEditablePoints->setGroupXyz(mainGroupIndex, newPoint->getX(), newPoint->getY(), newPoint->getZ(), !e.mods.isShiftDown());
+				pEditablePoints->setGroupXyz(mainGroupIndex, newPoint->getX(), newPoint->getY(), newPoint->getZ(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
 
 			// other groups
 			Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
@@ -663,7 +663,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 				pEditablePoints->setGroupXyz(selectedIndices[i], 
 					mainPt.getX() + relativePositions[i].getX(), 
 					mainPt.getY() + relativePositions[i].getY(), 
-					mainPt.getZ() + relativePositions[i].getZ(), !e.mods.isShiftDown());
+					mainPt.getZ() + relativePositions[i].getZ(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
 			}
 		}
 		else
@@ -692,11 +692,11 @@ void Radar2D::mouseUp(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 
-	if(e.mods.isAltDown() && !e.mouseWasDraggedSinceMouseDown())
+	if(checkMouseActionMode(e.mods, RadarMove) && !e.mouseWasDraggedSinceMouseDown())
 	{
 		setCenterPoint(valuePoint);
 
-		if (e.mods.isShiftDown() || e.mods.isRightButtonDown())
+		if (checkMouseActionMode(e.mods, RadarZoomOut))
 		{
 			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
 		}
@@ -728,7 +728,7 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
 {
-    if(e.mods.isAltDown())
+    if(checkMouseActionMode(e.mods, RadarMove))
     {
         return;
     }
@@ -776,4 +776,18 @@ void Radar2D::showCoordinates(const Point<float>& point)
 void Radar2D::mouseMove(const MouseEvent& e)
 {
 	showCoordinates(getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat()));
+}
+
+bool Radar2D::checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode)
+{
+    if(modifiers.isCtrlDown() || modifiers.isRightButtonDown())
+        return (modifiers.isShiftDown() && mode == RadarZoomOut) || (mode == RadarMove);
+    
+    if(modifiers.isShiftDown())
+        return mode == MoveGroupPointOnly;
+    
+    if(modifiers.isAltDown())
+        return mode == ExtendedPointMove;
+    
+    return mode == Standard;
 }

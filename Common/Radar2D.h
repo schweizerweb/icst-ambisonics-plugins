@@ -29,6 +29,7 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 public:
 	enum RadarMode { XY, XZ_Half, XZ_Full };
 	enum Shape { Circle, Square, Star };
+    enum MouseActionMode { Standard, RadarMove, RadarZoomOut, MoveGroupPointOnly, ExtendedPointMove };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
@@ -76,7 +77,8 @@ private:
 	void updateRadarBackground();
 	void updateInfoLabel(String info);
 	void timerCallback() override;
-
+    bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
+    
 private:
 	OpenGLContext openGLContext;
 
