@@ -30,7 +30,7 @@ public:
 	AmbiSettings();
 	AmbiSettings(double distanceScaler, bool directionFlip);
 
-    enum AmbiWeightMode { STANDARD = 1, INPHASE = 2, MANUAL = 3 };
+    enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3 };
     
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();

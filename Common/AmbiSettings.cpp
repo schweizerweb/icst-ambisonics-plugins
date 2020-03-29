@@ -38,7 +38,7 @@ double AmbiSettings::getAmbiChannelWeight(int ambiChannel)
     {
         case INPHASE:
             return inPhaseWeights[ambiChannelOrder[ambiChannel]];
-        case STANDARD:
+        case BASIC:
             return standardWeights[ambiChannelOrder[ambiChannel]];
         case MANUAL:
         default:
@@ -173,6 +173,6 @@ void AmbiSettings::setWeightMode(AmbiSettings::AmbiWeightMode mode)
     // copy values to the manual value array for display purpose
     if(mode == INPHASE)
         memcpy(&manualOrderWeights, &inPhaseWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
-    else if(mode == STANDARD)
+    else if(mode == BASIC)
         memcpy(&manualOrderWeights, &standardWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
 }

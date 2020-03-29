@@ -244,7 +244,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
 
     // prepare weighting comboBox
-    comboBoxChannelWeightingMode->addItem("Standard", AmbiSettings::STANDARD);
+    comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);
     comboBoxChannelWeightingMode->addItem("In-Phase", AmbiSettings::INPHASE);
     comboBoxChannelWeightingMode->addItem("Manual", AmbiSettings::MANUAL);
 
