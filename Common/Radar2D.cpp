@@ -588,6 +588,9 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
 	showCoordinates(valuePoint);
 
+    if(!e.mouseWasDraggedSinceMouseDown())
+        return;
+    
 	if(checkMouseActionMode(e.mods, RadarMove))
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
