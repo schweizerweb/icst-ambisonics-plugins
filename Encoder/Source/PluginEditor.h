@@ -25,6 +25,7 @@
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsDialog.h"
+#include "../../Common/HelpDialog.h"
 //[/Headers]
 
 
@@ -60,6 +61,8 @@ public:
     // Binary resources:
     static const char* settings_png;
     static const int settings_pngSize;
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
@@ -70,6 +73,7 @@ private:
 	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;
 	EncoderSettingsDialog* settingsWindow;
+    HelpDialog* helpWindow;
     //[/UserVariables]
 
     //==============================================================================
@@ -77,6 +81,7 @@ private:
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
     std::unique_ptr<Label> labelMessage;
+    std::unique_ptr<ImageButton> btnHelp;
 
 
     //==============================================================================

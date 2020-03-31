@@ -82,6 +82,25 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
+        <FILE id="qWOGcI" name="HelpDialog.h" compile="0" resource="0" file="../Common/HelpDialog.h"/>
+        <FILE id="qwN2tl" name="HelpComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpComponent.cpp"/>
+        <FILE id="UvFr8H" name="HelpComponent.h" compile="0" resource="0" file="../Common/HelpComponent.h"/>
+        <FILE id="fTGTzC" name="HelpOscSyntax.cpp" compile="1" resource="0"
+              file="../Common/HelpOscSyntax.cpp"/>
+        <FILE id="C4HMxt" name="HelpOscSyntax.h" compile="0" resource="0" file="../Common/HelpOscSyntax.h"/>
+        <FILE id="mgNxDd" name="HelpRadarInteraction.cpp" compile="1" resource="0"
+              file="../Common/HelpRadarInteraction.cpp"/>
+        <FILE id="GvlxDH" name="HelpRadarInteraction.h" compile="0" resource="0"
+              file="../Common/HelpRadarInteraction.h"/>
+        <FILE id="YkjIi1" name="TreeViewItemHelp.h" compile="0" resource="0"
+              file="../Common/TreeViewItemHelp.h"/>
+        <FILE id="T8TqZC" name="HelpWebBrowserComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpWebBrowserComponent.cpp"/>
+        <FILE id="T7ZWD0" name="HelpWebBrowserComponent.h" compile="0" resource="0"
+              file="../Common/HelpWebBrowserComponent.h"/>
+      </GROUP>
       <FILE id="bTewUG" name="PresetComparators.h" compile="0" resource="0"
             file="../Common/PresetComparators.h"/>
       <FILE id="wBCHGM" name="PresetHelper.cpp" compile="1" resource="0"

@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OSCSyntax>
+<PointInteraction name="Point Interaction (in and out)">
+<SetPositionAED name="Set Source Position AED">
+<Syntax desc="/icst/ambi/source/aed [ChannelName] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/source/aed 'S1' 45 10 0.8" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+</Parameter>
+</SetPositionAED>
+<SetPositionXYZ name="Set Source Position XYZ">
+<Syntax desc="/icst/ambi/source/xyz [ChannelName] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/source/xyz 'S2' 0.2 0.2 0.0" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+</Parameter>
+</SetPositionXYZ>
+</PointInteraction>
+<GroupManipulation name="Group Manipulation (in only)">
+<SetGroupPoisitonAED name="Set Group Position AED">
+<Syntax desc="/icst/ambi/group/aed [GroupName] [Azimuth] [Elevation] [Distance] [Mode]" />
+<Example desc="/icst/ambi/group/aed 'G1' 135 0 0.1 1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</SetGroupPositionAED>
+<SetGroupPoisitonXYZ name="Set Group Position XYZ">
+<Syntax desc="/icst/ambi/group/xyz [GroupName] [X] [Y] [Z] [Mode]" />
+<Example desc="/icst/ambi/group/xyz 'G2' 0.1 0.1 0 0" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</SetGroupPositionXYZ>
+</GroupManipulation>
+</OSCSyntax>

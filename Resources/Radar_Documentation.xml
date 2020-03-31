@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Documentation>
+<Radar>
+<Move>Right Mouse Button Drag-Drop</Move>
+<ZoomIn name="Zoom In">Right Mouse Button Click / MouseWheel</ZoomIn>
+<ZoomOut name="Zoom Out">Shift + Right Mouse Button Click / MouseWheel</ZoomOut>
+<ResetZoom name="Reset Zoom">Home-Button (OSX: Cmd + Left Arrow)</ResetZoom>
+</Radar>
+<Point>
+<SelectPoint name="Select Point">Click Point</SelectPoint>
+<SelectMultiplePoints name = "Select Multiple Points">Shift + Click Multiple Points or Select rectangular Region using Drag-Drop</SelectMultiplePoints>
+<MovePoint name="Move Point(s)">Drag-Drop Selected Point(s)</MovePoint>
+<AddNew name="Add New">Doubleclick on desired Position (only available if maximum not yet reached)</AddNew>
+</Point>
+<Group>
+<SelectGroup name="Select Group">Click Group Point</SelectGroup>
+<SelectMultipleGroups name = "Select Multiple Groups">Shift + Click Multiple Group Points</SelectMultipleGroups>
+<MoveGroup name="Move Group(s)">Drag-Drop Selected Group Point(s)</MoveGroup>
+<GroupMoveAed name="Move Group(s) relative to AED-Space">Alt + Drag-Drop Selected Group Points</GroupMoveAed>
+</Group>
+</Documentation>
