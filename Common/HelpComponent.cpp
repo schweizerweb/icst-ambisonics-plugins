@@ -30,7 +30,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-HelpComponent::HelpComponent ()
+HelpComponent::HelpComponent (bool isEncoder)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -39,13 +39,22 @@ HelpComponent::HelpComponent ()
     addAndMakeVisible (tabHelp.get());
     tabHelp->setTabBarDepth (30);
     tabHelp->addTab (TRANS("Radar Interaction"), Colours::lightgrey, new HelpRadarInteraction(), true);
-    tabHelp->addTab (TRANS("OSC Syntax"), Colours::lightgrey, new HelpOscSyntax(), true);
-    tabHelp->addTab (TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent (HelpWebBrowserComponent::Documentation), true);
-    tabHelp->addTab (TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent (HelpWebBrowserComponent::Tutorials), true);
     tabHelp->setCurrentTabIndex (0);
 
 
     //[UserPreSize]
+    if(isEncoder)
+    {
+        tabHelp->addTab (TRANS("OSC Syntax"), Colours::lightgrey, new HelpOscSyntax(), true);
+    }
+    
+    String documentationUrl = isEncoder
+    ? "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Encoder_specification"
+    : "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Decoder_specification";
+    tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
+    tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.postach.io"), true);
+
+    
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -105,21 +114,15 @@ void HelpComponent::resized()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="HelpComponent" componentName=""
-                 parentClasses="public Component" constructorParams="" variableInitialisers=""
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 parentClasses="public Component" constructorParams="bool isEncoder"
+                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <TABBEDCOMPONENT name="tabHelp" id="7fe78fa9ebb609cc" memberName="tabHelp" virtualName=""
                    explicitFocusOrder="0" pos="0 0 0M 0M" orientation="top" tabBarDepth="30"
                    initialTab="0">
     <TAB name="Radar Interaction" colour="ffd3d3d3" useJucerComp="0" contentClassName="HelpRadarInteraction"
          constructorParams="" jucerComponentFile=""/>
-    <TAB name="OSC Syntax" colour="ffd3d3d3" useJucerComp="0" contentClassName="HelpOscSyntax"
-         constructorParams="" jucerComponentFile=""/>
-    <TAB name="Documentation" colour="ffd3d3d3" useJucerComp="0" contentClassName="HelpWebBrowserComponent"
-         constructorParams="HelpWebBrowserComponent::Documentation" jucerComponentFile=""/>
-    <TAB name="Tutorials" colour="ffd3d3d3" useJucerComp="0" contentClassName="HelpWebBrowserComponent"
-         constructorParams="HelpWebBrowserComponent::Tutorials" jucerComponentFile=""/>
   </TABBEDCOMPONENT>
 </JUCER_COMPONENT>
 

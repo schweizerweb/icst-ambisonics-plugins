@@ -37,7 +37,7 @@ class HelpComponent  : public Component
 {
 public:
     //==============================================================================
-    HelpComponent ();
+    HelpComponent (bool isEncoder);
     ~HelpComponent() override;
 
     //==============================================================================

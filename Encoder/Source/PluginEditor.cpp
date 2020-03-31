@@ -173,7 +173,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
         //[UserButtonCode_btnHelp] -- add your button handler code here..
         if(helpWindow)
             delete helpWindow;
-        helpWindow = new HelpDialog(this, new HelpComponent());
+        helpWindow = new HelpDialog(this, new HelpComponent(true));
         helpWindow->setVisible(true);
         helpWindow->centreWithSize(helpWindow->getWidth(), helpWindow->getHeight());
         //[/UserButtonCode_btnHelp]

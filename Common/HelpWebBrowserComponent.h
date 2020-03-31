@@ -14,6 +14,5 @@
 class HelpWebBrowserComponent : public WebBrowserComponent
 {
 public:
-    enum BrowserMode { Documentation, Tutorials };
-    HelpWebBrowserComponent(BrowserMode mode);
+    HelpWebBrowserComponent(String url);
 };
