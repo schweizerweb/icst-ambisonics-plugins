@@ -25,7 +25,7 @@
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsDialog.h"
-#include "../../Common/HelpDialog.h"
+#include "../../Common/HelpDialogManager.h"
 //[/Headers]
 
 
@@ -73,7 +73,7 @@ private:
 	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;
 	EncoderSettingsDialog* settingsWindow;
-    HelpDialog* helpWindow;
+    HelpDialogManager helpDialogManager;
     //[/UserVariables]
 
     //==============================================================================

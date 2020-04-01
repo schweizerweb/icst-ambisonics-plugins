@@ -14,6 +14,7 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="oa5A98" name="AmbiDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
+      <FILE id="VcLCoa" name="help.png" compile="0" resource="1" file="../Resources/help.png"/>
       <FILE id="roXymN" name="settings.png" compile="0" resource="1" file="../Resources/settings.png"/>
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
@@ -51,6 +52,27 @@
       <FILE id="G0z6Dt" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{9E9B66A7-A131-AF4D-B624-3D4280C67801}" name="Common">
+      <GROUP id="{AFE3E96F-D9B9-9EE4-3A82-B3EF7EABC9DD}" name="Help">
+        <FILE id="hvT5vq" name="HelpComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpComponent.cpp"/>
+        <FILE id="YfHj6Q" name="HelpComponent.h" compile="0" resource="0" file="../Common/HelpComponent.h"/>
+        <FILE id="TEdIci" name="HelpDialog.h" compile="0" resource="0" file="../Common/HelpDialog.h"/>
+        <FILE id="UeNy0o" name="HelpDialogManager.h" compile="0" resource="0"
+              file="../Common/HelpDialogManager.h"/>
+        <FILE id="HjArhR" name="HelpOscSyntax.cpp" compile="1" resource="0"
+              file="../Common/HelpOscSyntax.cpp"/>
+        <FILE id="XVZ7Vf" name="HelpOscSyntax.h" compile="0" resource="0" file="../Common/HelpOscSyntax.h"/>
+        <FILE id="sI2BM5" name="HelpRadarInteraction.cpp" compile="1" resource="0"
+              file="../Common/HelpRadarInteraction.cpp"/>
+        <FILE id="LnGXun" name="HelpRadarInteraction.h" compile="0" resource="0"
+              file="../Common/HelpRadarInteraction.h"/>
+        <FILE id="E5MCch" name="HelpWebBrowserComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpWebBrowserComponent.cpp"/>
+        <FILE id="vYZXPM" name="HelpWebBrowserComponent.h" compile="0" resource="0"
+              file="../Common/HelpWebBrowserComponent.h"/>
+        <FILE id="G0rG6I" name="TreeViewItemHelp.h" compile="0" resource="0"
+              file="../Common/TreeViewItemHelp.h"/>
+      </GROUP>
       <FILE id="ahivly" name="AmbiBasicSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiBasicSettings.cpp"/>
       <FILE id="YlGBqj" name="AmbiBasicSettings.h" compile="0" resource="0"

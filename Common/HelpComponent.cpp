@@ -47,14 +47,14 @@ HelpComponent::HelpComponent (bool isEncoder)
     {
         tabHelp->addTab (TRANS("OSC Syntax"), Colours::lightgrey, new HelpOscSyntax(), true);
     }
-    
+
     String documentationUrl = isEncoder
     ? "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Encoder_specification"
     : "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Decoder_specification";
     tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
     tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.postach.io"), true);
 
-    
+
     //[/UserPreSize]
 
     setSize (600, 400);

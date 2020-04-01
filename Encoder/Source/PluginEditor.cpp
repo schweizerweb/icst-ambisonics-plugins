@@ -20,7 +20,6 @@
 //[Headers] You can add your own extra header files here...
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsComponent.h"
-#include "../../Common/HelpComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -35,8 +34,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	settingsWindow = nullptr;
-    helpWindow = nullptr;
-	pSources = ownerProc.getSources();
+    pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
@@ -122,10 +120,6 @@ AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 	{
 		delete settingsWindow;
 	}
-    if(helpWindow != nullptr)
-    {
-        delete helpWindow;
-    }
     //[/Destructor]
 }
 
@@ -148,7 +142,7 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
     labelVersion->setBounds (getWidth() - 5 - 111, 8, 111, 24);
-    labelMessage->setBounds (72, 8, getWidth() - 196, 24);
+    labelMessage->setBounds (64, 8, getWidth() - 188, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -171,11 +165,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
     else if (buttonThatWasClicked == btnHelp.get())
     {
         //[UserButtonCode_btnHelp] -- add your button handler code here..
-        if(helpWindow)
-            delete helpWindow;
-        helpWindow = new HelpDialog(this, new HelpComponent(true));
-        helpWindow->setVisible(true);
-        helpWindow->centreWithSize(helpWindow->getWidth(), helpWindow->getHeight());
+        helpDialogManager.show(true);
         //[/UserButtonCode_btnHelp]
     }
 
@@ -200,11 +190,6 @@ void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& 
 		delete settingsWindow;
 		settingsWindow = nullptr;
 	}
-    if(message == ACTION_CLOSE_HELP)
-    {
-        delete helpWindow;
-        helpWindow = nullptr;
-    }
 }
 
 //[/MiscUserCode]
@@ -242,7 +227,7 @@ BEGIN_JUCER_METADATA
                colourOver="6eee1010" resourceDown="settings_png" opacityDown="1.0"
                colourDown="c0ee1010"/>
   <LABEL name="labelMessage" id="24478721f956d20c" memberName="labelMessage"
-         virtualName="" explicitFocusOrder="0" pos="72 8 196M 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="64 8 188M 24" edTextCol="ff000000"
          edBkgCol="0" labelText="" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="11.7"
          kerning="0.0" bold="0" italic="0" justification="36"/>

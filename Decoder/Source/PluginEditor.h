@@ -27,6 +27,7 @@
 #include "../../Common/RadarComponent.h"
 #include "../../Common/RadarOptions.h"
 #include "../../Common/OSCHandler.h"
+#include "../../Common/HelpDialogManager.h"
 //[/Headers]
 
 
@@ -64,6 +65,8 @@ public:
     // Binary resources:
     static const char* settings_png;
     static const int settings_pngSize;
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
@@ -79,12 +82,14 @@ private:
 	RadarOptions radarOptions;
 	SpeakerSettingsDialog* settingsWindow;
 	dsp::ProcessSpec* pFilterSpecification;
+    HelpDialogManager helpDialogManager;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
+    std::unique_ptr<ImageButton> btnHelp;
 
 
     //==============================================================================
