@@ -216,7 +216,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = source->getPoint();
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !encoderSettings.getDirectionFlip(), true);
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		
 		if (encoderSettings.dopplerEncodingFlag)
@@ -278,8 +278,8 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		{
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
-
-			// load last speaker preset
+            Globals::SetScaler(encoderSettings.getDistanceScaler());
+			// load last source preset
 			sources.loadFromXml(xmlState.get(), &audioParams);
 		}
 	}

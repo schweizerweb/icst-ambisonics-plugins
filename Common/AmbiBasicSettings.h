@@ -18,15 +18,11 @@
 class AmbiBasicSettings
 {
 public:
-	AmbiBasicSettings(double distanceScaler, bool directionFlip);
+	AmbiBasicSettings(double distanceScaler);
 
 	double getDistanceScaler() const;
 	void setDistanceScaler(double newDistanceScaler);
 
-	bool getDirectionFlip() const;
-	void setDirectionFlip(bool flip);
-
 private:
 	double distanceScaler;
-	bool directionFlip;
 };

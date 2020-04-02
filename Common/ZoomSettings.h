@@ -33,6 +33,8 @@ public:
     
     void setPointScaler(double newScaler);
     double getPointScaler();
+    
+    void Reset();
 
 private:
 	Point3D<float> initialCenterPoint;

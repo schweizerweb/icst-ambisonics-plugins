@@ -34,11 +34,14 @@ public:
         if (rootElement == nullptr || rootElement->getTagName() != "EncoderPreset")
             return false;
         
+        pEncoderSettings->loadFromPresetXml(rootElement->getChildByName("EncoderSettings"));
+        // apply scaler if audio params attached
+        if(pAudioParams != nullptr)
+            Globals::SetScaler(pEncoderSettings->getDistanceScaler());
+        
         pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
         pSourceSet->resetIds();
         
-        pEncoderSettings->loadFromPresetXml(rootElement->getChildByName("EncoderSettings"));
-
         return pSourceSet->size() > 0;
     }
 

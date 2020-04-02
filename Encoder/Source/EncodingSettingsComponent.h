@@ -24,6 +24,7 @@
 #include "SourceDefinitionComponent.h"
 #include "EncoderPresetHelper.h"
 #include "../../Common/PresetManagerComponent.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 
@@ -45,7 +46,7 @@ class EncodingSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper);
+    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
     ~EncodingSettingsComponent() override;
 
     //==============================================================================
@@ -71,6 +72,7 @@ private:
     Array<AudioParameterSet>* pAudioParams;
     std::unique_ptr<PresetManagerComponent> presetManagerComponent;
     EncoderPresetHelper* pPresetHelper;
+    ZoomSettings* pZoomSettings;
     //[/UserVariables]
 
     //==============================================================================
@@ -79,12 +81,12 @@ private:
     std::unique_ptr<TextButton> buttonSave;
     std::unique_ptr<SourceDefinitionComponent> sourceDefinition;
     std::unique_ptr<ToggleButton> toggleDistanceEncoding;
-    std::unique_ptr<ToggleButton> toggleDirectionFlip;
     std::unique_ptr<ToggleButton> toggleDoppler;
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<TextButton> btnEditDistanceEncoding;
     std::unique_ptr<TextButton> buttonManagePresets;
+    std::unique_ptr<ToggleButton> toggleInfiniteDistance;
 
 
     //==============================================================================

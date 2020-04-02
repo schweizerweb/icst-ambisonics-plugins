@@ -109,7 +109,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
 
     sliderRadius.reset (new Slider ("sliderRadius"));
     addAndMakeVisible (sliderRadius.get());
-    sliderRadius->setRange (0.01, 5, 0.01);
+    sliderRadius->setRange (0.01, 100000, 0.01);
     sliderRadius->setSliderStyle (Slider::LinearHorizontal);
     sliderRadius->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderRadius->addListener (this);
@@ -137,6 +137,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
 
     //[Constructor] You can add your own custom stuff here..
     sliderPointScaler->setSkewFactorFromMidPoint(1.0);
+    sliderRadius->setSkewFactorFromMidPoint(100.0);
     displaySettings();
     //[/Constructor]
 }
@@ -248,9 +249,7 @@ void RadarSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == btnReset.get())
     {
         //[UserButtonCode_btnReset] -- add your button handler code here..
-        pZoomSettings->setCurrentCenterPointXY(0.0, 0.0);
-        pZoomSettings->setCurrentCenterPointXZ(0.0, 0.0);
-        pZoomSettings->setCurrentRadius(1.0);
+        pZoomSettings->Reset();
         //[/UserButtonCode_btnReset]
     }
 
@@ -351,9 +350,9 @@ BEGIN_JUCER_METADATA
   <SLIDER name="sliderRadius" id="607378851a94aeae" memberName="sliderRadius"
           virtualName="" explicitFocusOrder="0" pos="8Rr 120 136M 24" posRelativeX="b29e8cd8e89263e2"
           posRelativeY="b29e8cd8e89263e2" posRelativeW="b29e8cd8e89263e2"
-          min="0.01" max="5.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          min="0.01" max="100000.0" int="0.01" style="LinearHorizontal"
+          textBoxPos="TextBoxRight" textBoxEditable="1" textBoxWidth="80"
+          textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <LABEL name="labelRadius" id="2c8c3f9ef419042b" memberName="labelRadius"
          virtualName="" explicitFocusOrder="0" pos="16 120 109 24" posRelativeX="b29e8cd8e89263e2"
          posRelativeY="b29e8cd8e89263e2" edTextCol="ff000000" edBkgCol="0"

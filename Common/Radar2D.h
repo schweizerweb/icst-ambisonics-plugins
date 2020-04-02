@@ -98,6 +98,7 @@ private:
 	Point<float> selectionRectangleStart;
     Point<float> lastRadarMovePoint;
 	bool selectionRectangleActive;
+    float lastCartesianLimit;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };

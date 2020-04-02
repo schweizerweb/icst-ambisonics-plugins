@@ -85,9 +85,9 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
 
 bool AmbiGroup::checkXYZ(double x, double y, double z)
 {
-    return (Constants::XMin <= x && x <= Constants::XMax)
-        && (Constants::YMin <= y && y <= Constants::YMax)
-        && (Constants::ZMin <= z && z <= Constants::ZMax);
+    return (Globals::CartesianMin() <= x && x <= Globals::CartesianMax())
+        && (Globals::CartesianMin() <= y && y <= Globals::CartesianMax())
+        && (Globals::CartesianMin() <= z && z <= Globals::CartesianMax());
 }
 
 bool AmbiGroup::checkAED(double a, double e, double d)
@@ -101,12 +101,12 @@ bool AmbiGroup::checkAED(double a, double e, double d)
 
 void AmbiGroup::checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz)
 {
-    *dx = (x + *dx) < Constants::XMin ? Constants::XMin - x : *dx;
-    *dx = (x + *dx) > Constants::XMax ? Constants::XMax - x : *dx;
-    *dy = (y + *dy) < Constants::YMin ? Constants::YMin - y : *dy;
-    *dy = (y + *dy) > Constants::YMax ? Constants::YMax - y : *dy;
-    *dz = (z + *dz) < Constants::ZMin ? Constants::ZMin - z : *dz;
-    *dz = (z + *dz) > Constants::ZMax ? Constants::ZMax - z : *dz;
+    *dx = (x + *dx) < Globals::CartesianMin() ? Globals::CartesianMin() - x : *dx;
+    *dx = (x + *dx) > Globals::CartesianMax() ? Globals::CartesianMax() - x : *dx;
+    *dy = (y + *dy) < Globals::CartesianMin() ? Globals::CartesianMin() - y : *dy;
+    *dy = (y + *dy) > Globals::CartesianMax() ? Globals::CartesianMax() - y : *dy;
+    *dz = (z + *dz) < Globals::CartesianMin() ? Globals::CartesianMin() - z : *dz;
+    *dz = (z + *dz) > Globals::CartesianMax() ? Globals::CartesianMax() - z : *dz;
 }
 
 void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElements)

@@ -332,12 +332,12 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 		Array<int> selection = pPointSelection->getSelectedIndices();
 		if (pPointSelection->getSelectionMode() == PointSelection::Point && selection.size() > 1)
 		{
-			double minX = Constants::XMax;
-			double maxX = Constants::XMin;
-			double minY = Constants::YMax;
-			double maxY = Constants::YMin;
-            double minZ = Constants::ZMax;
-            double maxZ = Constants::ZMin;
+			double minX = Globals::CartesianMax();
+            double maxX = Globals::CartesianMin();
+			double minY = Globals::CartesianMax();
+			double maxY = Globals::CartesianMin();
+            double minZ = Globals::CartesianMax();
+            double maxZ = Globals::CartesianMin();
 
 			for (int i : selection)
 			{

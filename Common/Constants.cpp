@@ -16,22 +16,15 @@ const float Constants::AzimuthRadMax = float(2.0*PI);
 const float Constants::ElevationRadMin = float(-PI / 2.0);
 const float Constants::ElevationRadMax = float(PI / 2.0);
 const float Constants::DistanceMin = 0.0f;
-const float Constants::DistanceMax = 100000.0f;
 const double Constants::AzimuthGradMin = 0.0;
 const double Constants::AzimuthGradMax = 360.0;
 const double Constants::ElevationGradMin = -90.0;
 const double Constants::ElevationGradMax = 90.0;
 const double Constants::GainDbMin = -128.0;
 const double Constants::GainDbMax = 12.0;
-const float Constants::XMin = -100000.0;
-const float Constants::XMax = 100000.0;
-const float Constants::YMin = -100000.0;
-const float Constants::YMax = 100000.0;
-const float Constants::ZMin = -100000.0;
-const float Constants::ZMax = 100000.0;
 
-const double Constants::CompressedMin = -PI/2;
-const double Constants::CompressedMax = PI/2;
+const double Constants::CompressedMin = -1.0;
+const double Constants::CompressedMax = 1.0;
 
 double Constants::RadToGrad(double rad)
 {

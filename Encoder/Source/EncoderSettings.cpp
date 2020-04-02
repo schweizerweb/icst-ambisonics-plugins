@@ -14,7 +14,6 @@
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
-#define XML_TAG_ORIENTATION "Orientation"
 #define XML_TAG_DISPLAY "Display"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
@@ -27,11 +26,11 @@
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE "DistEncCenterCurve"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR "DistEncExperimentalFactor"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER "DistEncExperimentalPower"
-#define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 
 EncoderSettings::EncoderSettings():
-	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
+    oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFALUT_RECEIVE_PORT),
 	oscSendFlag(DEFALUT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
@@ -40,10 +39,9 @@ EncoderSettings::EncoderSettings():
 	oscSendExtFlag(DEFALUT_SEND_EXT_FLAG), 
 	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
-	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
-	dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-	distanceEncodingParams(DistanceEncodingParams()),
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_DIRECTION_FLIP)
+    distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
+    distanceEncodingParams(DistanceEncodingParams()),
+    dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG)
 {
 }
 
@@ -121,10 +119,6 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
     xmlElement->addChildElement(dopplerEncoding);
-
-    XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
-    orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, getDirectionFlip());
-    xmlElement->addChildElement(orientation);
 }
 
 void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
@@ -148,12 +142,4 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
         setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
     }
-
-    XmlElement* orientation = xmlElement->getChildByName(XML_TAG_ORIENTATION);
-    if (orientation != nullptr)
-    {
-        setDirectionFlip(orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP));
-    }
-
-
 }

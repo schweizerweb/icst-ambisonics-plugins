@@ -9,10 +9,11 @@
 */
 
 #include "DistanceEncodingGraph.h"
+#include "../../Common/Globals.h"
 
 DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params) : pParams(params)
 {
-	setDisplayRange(Linear, Range<double>(0.0, 1.0), Linear, Range<double>(-20, 0));
+	setDisplayRange(Linear, Range<double>(0.0, Globals::CartesianMax()), Linear, Range<double>(-20, 0));
 	fullGridFlag = true;
 	labelAxisX = "Rel. Distance";
 	labelAxisY = "Attenuation [dB]";
@@ -30,13 +31,13 @@ void DistanceEncodingGraph::paintData(Graphics& g)
 	bool firstOther = true;
 
     double w, o;
-    pParams->calculateAttenuation(1.0, &w, &o);
-    setDisplayRange(Linear, Range<double>(0.0, 1.0), Linear, Range<double>(jmin(-20.0, Decibels::gainToDecibels(w), Decibels::gainToDecibels(o)), 0));
+    pParams->calculateAttenuation(Globals::CartesianMax(), &w, &o);
+    setDisplayRange(Linear, Range<double>(0.0, Globals::CartesianMax()), Linear, Range<double>(jmin(-20.0, Decibels::gainToDecibels(w), Decibels::gainToDecibels(o)), 0));
 
 	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
-		double distance = 0.00001 + 1.0 / NB_STEPS * step;
+		double distance = 0.00001 + Globals::CartesianMax() / NB_STEPS * step;
 		pParams->calculateAttenuation(distance, &wFactor, &otherFactor);
 
 		Point<float> displayPointW = mapValues(distance, Decibels::gainToDecibels(wFactor)).toFloat();

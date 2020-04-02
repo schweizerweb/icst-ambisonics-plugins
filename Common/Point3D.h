@@ -14,6 +14,7 @@
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
 #include "Constants.h"
+#include "Globals.h"
 
 #define	SQRT105		10.246950766	/*sqrt(105.0)*/
 #define SQRT15		3.87298334621	/*sqrt(15.0)*/
@@ -89,13 +90,13 @@ public:
 	inline ValueType getDistance() noexcept{ if (xyzChanged) calculateAed(); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); x = notify ? compress(newX) : newX; if (notify) audioParams.notifyX(x); }
+	inline void setX(ValueType newX, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); x = notify ? compress(newX) : newX; if (notify) audioParams.notifyX(x); }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newY, Constants::YMin, Constants::YMax); y = notify ? compress(newY) : newY; if (notify) audioParams.notifyY(y); }
+	inline void setY(ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); y = notify ? compress(newY) : newY; if (notify) audioParams.notifyY(y); }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newZ, Constants::ZMin, Constants::ZMax); z = notify ? compress(newZ) : newZ; if (notify) audioParams.notifyZ(z); }
+	inline void setZ(ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); z = notify ? compress(newZ) : newZ; if (notify) audioParams.notifyZ(z); }
 
 		/** Sets the Point3D's azimuth. */
 	inline void setAzimuth(ValueType newAzimuth) noexcept { aedChanged = true; azimuth = newAzimuth; }
@@ -107,16 +108,16 @@ public:
 	inline void setDistance(ValueType newDistance) noexcept { aedChanged = true; distance = (newDistance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : newDistance); }
 
 		/** Changes the Point3D's x and y coordinates. */
-	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newY, Constants::YMin, Constants::YMax); x = compress(newX); y = compress(newY); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
+	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); y = compress(newY); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
 
 		/** Changes the Point3D's x and z coordinates. */
-	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); x = compress(newX); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
+	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
 
 		/** Changes the Point3D's y and z coordinates. */
-	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newY, Constants::YMin, Constants::YMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
+	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ xyzChanged = true; makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
 	/** Changes the Point3D's x, y and z coordinates. */
-	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Constants::XMin, Constants::XMax); makeValid(&newY, Constants::YMin, Constants::YMax); makeValid(&newZ, Constants::ZMin, Constants::ZMax); x = compress(newX); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
+	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { xyzChanged = true; makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
 
 		/** Returns a Point3D whose coordinates are multiplied by a given scalar value. */
 		template <typename FloatType>
@@ -334,9 +335,9 @@ private:
 		ValueType xDecompressed = distance * cos(elevation) * sin(azimuth);
 		ValueType yDecompressed = distance * cos(elevation) * cos(azimuth);
 		ValueType zDecompressed = distance * sin(elevation);
-		makeValid(&xDecompressed, Constants::XMin, Constants::XMax);
-		makeValid(&yDecompressed, Constants::YMin, Constants::YMax);
-		makeValid(&zDecompressed, Constants::ZMin, Constants::ZMax);
+		makeValid(&xDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
+		makeValid(&yDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
+		makeValid(&zDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
 
         x = compress(xDecompressed);
         y = compress(yDecompressed);
@@ -351,12 +352,20 @@ private:
     
     ValueType compress(ValueType value)
     {
-        return atan(value);
+        if(Globals::IsInfinite())
+            return atan(value) / (PI/2.0);
+        
+        return value / Globals::GetScaler();
     }
     
     ValueType decompress(ValueType value)
     {
-        return tan(value);
+        if(Globals::IsInfinite())
+            return tan(value*(PI/2.0));
+        
+        return value * Globals::GetScaler();
+        
+        
     }
 };
 

@@ -415,17 +415,17 @@ bool OSCHandler::checkAed(double a, double e, double d, String* errorString) con
 
 bool OSCHandler::checkXyz(double x, double y, double z, String* errorString) const
 {
-	if (x < Constants::XMin || x > Constants::XMax)
+	if (x < Globals::CartesianMin() || x > Globals::CartesianMax())
 	{
 		*errorString = "OSC-Message X out of range: " + String(x);
 		return false;
 	}
-	if (y < Constants::YMin || y > Constants::YMax)
+	if (y < Globals::CartesianMin() || y > Globals::CartesianMax())
 	{
 		*errorString = "OSC-Message Y out of range: " + String(y);
 		return false;
 	}
-	if (z < Constants::ZMin || z > Constants::ZMax)
+	if (z < Globals::CartesianMin() || z > Globals::CartesianMax())
 	{
 		*errorString = "OSC-Message Z out of range: " + String(z);
 		return false;

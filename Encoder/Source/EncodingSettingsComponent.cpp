@@ -29,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper)
+EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
+    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -69,13 +69,6 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
     toggleDistanceEncoding->setBounds (14, 19, 199, 24);
 
-    toggleDirectionFlip.reset (new ToggleButton ("toggleDirectionFlip"));
-    addAndMakeVisible (toggleDirectionFlip.get());
-    toggleDirectionFlip->setButtonText (TRANS("Flip Direction (Orientation)"));
-    toggleDirectionFlip->addListener (this);
-
-    toggleDirectionFlip->setBounds (14, 79, 207, 24);
-
     toggleDoppler.reset (new ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
     toggleDoppler->setButtonText (TRANS("Enable Doppler"));
@@ -85,7 +78,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
     sliderDistanceScaler.reset (new Slider ("sliderDistanceScaler"));
     addAndMakeVisible (sliderDistanceScaler.get());
-    sliderDistanceScaler->setRange (1, 1000, 0);
+    sliderDistanceScaler->setRange (1, 1000, 0.1);
     sliderDistanceScaler->setSliderStyle (Slider::LinearHorizontal);
     sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
@@ -94,10 +87,12 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
                                           TRANS("Distance Scaler:")));
     addAndMakeVisible (labelDistanceScaler.get());
     labelDistanceScaler->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceScaler->setJustificationType (Justification::centredRight);
+    labelDistanceScaler->setJustificationType (Justification::centredLeft);
     labelDistanceScaler->setEditable (false, false, false);
     labelDistanceScaler->setColour (TextEditor::textColourId, Colours::black);
     labelDistanceScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    labelDistanceScaler->setBounds (14, 80, 109, 24);
 
     btnEditDistanceEncoding.reset (new TextButton ("btnEditDistanceEncoding"));
     addAndMakeVisible (btnEditDistanceEncoding.get());
@@ -109,6 +104,11 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonManagePresets->setButtonText (TRANS("manage..."));
     buttonManagePresets->addListener (this);
 
+    toggleInfiniteDistance.reset (new ToggleButton ("toggleInfiniteDistance"));
+    addAndMakeVisible (toggleInfiniteDistance.get());
+    toggleInfiniteDistance->setButtonText (TRANS("Infinite"));
+    toggleInfiniteDistance->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -117,6 +117,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 
 
     //[Constructor] You can add your own custom stuff here..
+    sliderDistanceScaler->setSkewFactorFromMidPoint(50.0);
     updateEncodingUiElements();
 
     labelPresets->setVisible(MULTI_ENCODER_MODE);
@@ -142,12 +143,12 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     buttonSave = nullptr;
     sourceDefinition = nullptr;
     toggleDistanceEncoding = nullptr;
-    toggleDirectionFlip = nullptr;
     toggleDoppler = nullptr;
     sliderDistanceScaler = nullptr;
     labelDistanceScaler = nullptr;
     btnEditDistanceEncoding = nullptr;
     buttonManagePresets = nullptr;
+    toggleInfiniteDistance = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -175,10 +176,10 @@ void EncodingSettingsComponent::resized()
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
     sourceDefinition->setBounds (8, 112, getWidth() - 16, getHeight() - 154);
-    sliderDistanceScaler->setBounds (getWidth() - 24 - 202, 49, 202, 24);
-    labelDistanceScaler->setBounds (getWidth() - 229 - 109, 49, 109, 24);
-    btnEditDistanceEncoding->setBounds (getWidth() - 24 - 86, 19, 86, 24);
+    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 80, getWidth() - 301, 24);
+    btnEditDistanceEncoding->setBounds (getWidth() - 12 - 86, 19, 86, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
+    toggleInfiniteDistance->setBounds (getWidth() - 82, 80, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -224,13 +225,6 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         sendChangeMessage();
         //[/UserButtonCode_toggleDistanceEncoding]
     }
-    else if (buttonThatWasClicked == toggleDirectionFlip.get())
-    {
-        //[UserButtonCode_toggleDirectionFlip] -- add your button handler code here..
-        pEncoderSettings->setDirectionFlip(toggleDirectionFlip->getToggleState());
-        sendChangeMessage();
-        //[/UserButtonCode_toggleDirectionFlip]
-    }
     else if (buttonThatWasClicked == toggleDoppler.get())
     {
         //[UserButtonCode_toggleDoppler] -- add your button handler code here..
@@ -251,6 +245,15 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         DialogWindow::showDialog("Preset Manager", presetManagerComponent.get(), this, Colours::black, true);
         //[/UserButtonCode_buttonManagePresets]
     }
+    else if (buttonThatWasClicked == toggleInfiniteDistance.get())
+    {
+        //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
+        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? 0.0 : sliderDistanceScaler->getValue());
+        Globals::SetScaler(pEncoderSettings->getDistanceScaler());
+        sourceDefinition->refresh();
+        updateEncodingUiElements();
+        //[/UserButtonCode_toggleInfiniteDistance]
+    }
 
     //[UserbuttonClicked_Post]
     controlDimming();
@@ -266,7 +269,9 @@ void EncodingSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     {
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
         pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
+        Globals::SetScaler(pEncoderSettings->getDistanceScaler());
         sendChangeMessage();
+        sourceDefinition->refresh();
         //[/UserSliderCode_sliderDistanceScaler]
     }
 
@@ -280,16 +285,18 @@ void EncodingSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 void EncodingSettingsComponent::updateEncodingUiElements()
 {
     toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
-    toggleDirectionFlip->setToggleState(pEncoderSettings->getDirectionFlip(), dontSendNotification);
 
     toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
-    sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
+
+    toggleInfiniteDistance->setToggleState(pEncoderSettings->getDistanceScaler() == 0.0, dontSendNotification);
+    labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
+    sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
+    if(!toggleInfiniteDistance->getToggleState())
+        sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
 
     // TODO: Doppler temporarily deactivated
     toggleDoppler->setToggleState(false, dontSendNotification);
     toggleDoppler->setEnabled(false);
-    labelDistanceScaler->setEnabled(false);
-    sliderDistanceScaler->setEnabled(false);
 }
 
 void EncodingSettingsComponent::controlDimming() const
@@ -319,6 +326,7 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
     {
         sourceDefinition->refresh();
         updateEncodingUiElements();
+        pZoomSettings->Reset();
         controlDimming();
         sendChangeMessage();
     }
@@ -337,8 +345,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams, EncoderPresetHelper* pPresetHelper"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
+                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -362,33 +370,32 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TOGGLEBUTTON name="toggleDirectionFlip" id="261d6104440c6519" memberName="toggleDirectionFlip"
-                virtualName="" explicitFocusOrder="0" pos="14 79 207 24" posRelativeX="b72378bdfe4e130"
-                posRelativeY="b72378bdfe4e130" buttonText="Flip Direction (Orientation)"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TOGGLEBUTTON name="toggleDoppler" id="8a9ea68cd17e7a8c" memberName="toggleDoppler"
                 virtualName="" explicitFocusOrder="0" pos="14 49 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="24Rr 49 202 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.0"
+          virtualName="" explicitFocusOrder="0" pos="90Rr 80 301M 24" posRelativeX="b72378bdfe4e130"
+          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="229Rr 49 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="14 80 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
+         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
-              virtualName="" explicitFocusOrder="0" pos="24Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              virtualName="" explicitFocusOrder="0" pos="12Rr 19 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
               virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
+                virtualName="" explicitFocusOrder="0" pos="82R 80 72 24" buttonText="Infinite"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

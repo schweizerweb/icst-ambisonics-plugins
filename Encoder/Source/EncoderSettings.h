@@ -25,7 +25,6 @@
 #define DEFAULT_SEND_EXT_HOST	    "127.0.0.1"
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
-#define DEFAULT_DIRECTION_FLIP		false
 #define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
 
 class EncoderSettings : public AmbiBasicSettings

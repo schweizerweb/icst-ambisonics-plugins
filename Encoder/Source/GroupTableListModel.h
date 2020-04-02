@@ -178,10 +178,10 @@ public:
 		case COLUMN_ID_GROUP_X:
 		case COLUMN_ID_GROUP_Y:
 		case COLUMN_ID_GROUP_Z:
-			return SliderRange(-1.0, 1.0, 0.001);
+			return SliderRange(Globals::CartesianMin(), Globals::CartesianMax(), 0.001);
 
 		case COLUMN_ID_GROUP_D:
-			return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
+			return SliderRange(Constants::DistanceMin, Globals::DistanceMax(), 0.001);
 
 		case COLUMN_ID_GROUP_A:
 			return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);

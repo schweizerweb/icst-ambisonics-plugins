@@ -37,7 +37,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     tabbedComponent.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (tabbedComponent.get());
     tabbedComponent->setTabBarDepth (35);
-    tabbedComponent->addTab (TRANS("Encoding"), Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper), true);
+    tabbedComponent->addTab (TRANS("Encoding"), Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings), true);
     tabbedComponent->addTab (TRANS("Radar"), Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pZoomSettings), true);
     tabbedComponent->addTab (TRANS("OSC"), Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler), true);
     tabbedComponent->setCurrentTabIndex (0);
@@ -127,7 +127,7 @@ BEGIN_JUCER_METADATA
                    virtualName="" explicitFocusOrder="0" pos="8 8 15M 13M" orientation="top"
                    tabBarDepth="35" initialTab="0">
     <TAB name="Encoding" colour="ffd3d3d3" useJucerComp="0" contentClassName="EncodingSettingsComponent"
-         constructorParams="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper"
+         constructorParams="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings"
          jucerComponentFile=""/>
     <TAB name="Radar" colour="ffd3d3d3" useJucerComp="0" contentClassName="RadarSettingsComponent"
          constructorParams="pChangeListener, pZoomSettings" jucerComponentFile=""/>

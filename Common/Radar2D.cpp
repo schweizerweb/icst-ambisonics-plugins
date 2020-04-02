@@ -109,7 +109,7 @@ Image Radar2D::createRadarBackground() const
     int nbRings = 0;
     bool labelUp = centerPoint.getY() >= localBounds.getHeight()/2;
     
-    for(int i = 1; i * ringResolution < Constants::DistanceMax; i++)
+    for(int i = 1; i * ringResolution < Globals::DistanceMax(); i++)
     {
         float absDist = i * dist;
         float ringValue = i * ringResolution;
@@ -118,7 +118,7 @@ Image Radar2D::createRadarBackground() const
         // check if circle is in visible area
         if(localBounds.intersects(ellipseRect) && !ellipseRect.withSizeKeepingCentre(ellipseRect.getWidth()/2, ellipseRect.getHeight()/2).contains(localBounds))
         {
-            g.drawEllipse(ellipseRect, ringValue == 1.0f ? 3.0f : 1.0f);
+            g.drawEllipse(ellipseRect, 1.0f);
             if(-20<=centerPoint.getX() && localBounds.getWidth()>= centerPoint.getX())
             {
                 g.drawSingleLineText(String(ringValue), int(centerPoint.getX() + 2), int(centerPoint.getY() + (labelUp?-1:1)* absDist));
@@ -138,6 +138,16 @@ Image Radar2D::createRadarBackground() const
     g.setColour(radarColors.getRadarAxisColor());
     g.drawSingleLineText("X", localBounds.getWidth()-12, centerPoint.getY() - 2);
     g.drawSingleLineText(radarMode == XY ? "Y" : "Z", centerPoint.getX() - 10, 15);
+    
+    if(!Globals::IsInfinite())
+    {
+        // draw cartesian limits
+        g.setColour(radarColors.getValidRangeColor());
+        float x = centerPoint.getX() + Globals::CartesianMin() * getValueToScreenRatio();
+        float y = centerPoint.getY() + Globals::CartesianMin() * getValueToScreenRatio();
+        float squareSize = (Globals::CartesianMax() - Globals::CartesianMin()) * getValueToScreenRatio();
+        g.fillRect(x, y, squareSize, squareSize);
+    }
     
 	return img;
 }
@@ -214,6 +224,10 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 {
 	Point3D<double>* pt = point->getPoint();
 	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(pt).toFloat());
+    
+    if(!radarViewport.contains(screenPt.toInt()))
+        return;
+    
 	if (select)
 	{
 		g->setColour(radarColors.getPointSelectionColor());
@@ -260,13 +274,19 @@ void Radar2D::renderOpenGL()
 
 	const float desktopScale = (float)openGLContext.getRenderingScale();
 
-	OpenGLHelpers::clear(radarColors.getRadarBackground());
+    OpenGLHelpers::clear(radarColors.getRadarBackground());
+    
 	std::unique_ptr<LowLevelGraphicsContext> glRenderer(createOpenGLGraphicsContext(openGLContext,
 	                                                                                roundToInt(desktopScale * getWidth()),
 	                                                                                roundToInt(desktopScale * getHeight())));
-
 	if (glRenderer != nullptr)
 	{
+        if(lastCartesianLimit != Globals::CartesianMax())
+        {
+            updateRadarBackground();
+            lastCartesianLimit = Globals::CartesianMax();
+        }
+        
 		Graphics g(*glRenderer);
 		g.addTransform(AffineTransform::scale(desktopScale));
 		g.setColour(radarColors.getRadarLineColor());
@@ -347,9 +367,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	if(key.isKeyCode(KeyPress::homeKey))
 	{
 		// reset zoom
-		pZoomSettings->setCurrentCenterPointXY(0.0f, 0.0f);
-		pZoomSettings->setCurrentCenterPointXZ(0.0f, 0.0f);
-		pZoomSettings->setCurrentRadius(1.0f);
+        pZoomSettings->Reset();
 		return true;
 	}
 

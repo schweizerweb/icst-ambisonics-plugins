@@ -82,6 +82,8 @@
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
+      <FILE id="EoX5QX" name="Globals.cpp" compile="1" resource="0" file="../Common/Globals.cpp"/>
+      <FILE id="No8HNU" name="Globals.h" compile="0" resource="0" file="../Common/Globals.h"/>
       <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
         <FILE id="n75RM5" name="HelpDialogManager.h" compile="0" resource="0"
               file="../Common/HelpDialogManager.h"/>

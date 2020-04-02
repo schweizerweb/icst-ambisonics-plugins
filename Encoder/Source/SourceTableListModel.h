@@ -190,10 +190,10 @@ private:
         case COLUMN_ID_X:
         case COLUMN_ID_Y:
         case COLUMN_ID_Z:
-            return SliderRange(-1.0, 1.0, 0.001);
+            return SliderRange(Globals::CartesianMin(), Globals::CartesianMax(), 0.001);
 
         case COLUMN_ID_D:
-            return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
+            return SliderRange(Constants::DistanceMin, Globals::DistanceMax(), 0.001);
 
         case COLUMN_ID_A:
             return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);

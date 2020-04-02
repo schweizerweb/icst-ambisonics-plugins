@@ -9,8 +9,10 @@
 */
 
 #include "AmbiBasicSettings.h"
+#include "Constants.h"
+#include "Globals.h"
 
-AmbiBasicSettings::AmbiBasicSettings(double distanceScaler, bool directionFlip): distanceScaler(distanceScaler), directionFlip(directionFlip)
+AmbiBasicSettings::AmbiBasicSettings(double distanceScaler): distanceScaler(distanceScaler)
 {
 }
 
@@ -22,14 +24,4 @@ double AmbiBasicSettings::getDistanceScaler() const
 void AmbiBasicSettings::setDistanceScaler(double newDistanceScaler)
 {
 	distanceScaler = newDistanceScaler;
-}
-
-bool AmbiBasicSettings::getDirectionFlip() const
-{
-	return directionFlip;
-}
-
-void AmbiBasicSettings::setDirectionFlip(bool flip)
-{
-	directionFlip = flip;
 }
