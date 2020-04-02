@@ -24,8 +24,8 @@
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT "DistEncDbUnit"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION "DistEncDistanceAttenuation"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE "DistEncCenterCurve"
-#define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR "DistEncExperimentalFactor"
-#define XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER "DistEncExperimentalPower"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR "DistEncAdvancedFactor"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT "DistEncAdvancedExponent"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 
 EncoderSettings::EncoderSettings():
@@ -111,8 +111,8 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, distanceEncodingParams.getDbUnit());
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, distanceEncodingParams.getInverseProportionalDistanceAttenuation());
     distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, distanceEncodingParams.getCenterCurve());
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, distanceEncodingParams.getExperimentalFactor());
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, distanceEncodingParams.getExperimentalPower());
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, distanceEncodingParams.getAdvancedFactor());
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, distanceEncodingParams.getAdvancedExponent());
     xmlElement->addChildElement(distanceEncoding);
 
     XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
@@ -132,8 +132,8 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
         distanceEncodingParams.setDbUnit(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT)));
         distanceEncodingParams.setInverseProportionalDistanceAttenuation(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION)));
         distanceEncodingParams.setCenterCurve(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE)));
-        distanceEncodingParams.setExperimentalFactor(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_FACTOR, DEFAULT_EXPERIMENTAL_FACTOR)));
-        distanceEncodingParams.setExperimentalPower(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_EXPERIMENTAL_POWER, DEFAULT_EXPERIMENTAL_POWER)));
+        distanceEncodingParams.setAdvancedFactor(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, DEFAULT_ADVANCED_FACTOR)));
+        distanceEncodingParams.setAdvancedExponent(float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, DEFAULT_ADVANCED_EXPONENT)));
     }
 
     XmlElement* dopplerEncoding = xmlElement->getChildByName(XML_TAG_DOPPLER_ENCODING);

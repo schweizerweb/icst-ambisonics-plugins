@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ class DistanceEncodingComponent  : public Component,
 public:
     //==============================================================================
     DistanceEncodingComponent (DistanceEncodingParams* pParams);
-    ~DistanceEncodingComponent();
+    ~DistanceEncodingComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -74,10 +74,10 @@ private:
     std::unique_ptr<Label> labelDistanceAttenuation;
     std::unique_ptr<Slider> sliderCenterCurve;
     std::unique_ptr<Label> labelCenterCurve;
-    std::unique_ptr<Slider> sliderExperimentalFactor;
-    std::unique_ptr<Label> labelExperimentalFact;
-    std::unique_ptr<Slider> sliderExperimentalPower;
-    std::unique_ptr<Label> labelExperimentalPower;
+    std::unique_ptr<Slider> sliderAdvancedFactor;
+    std::unique_ptr<Label> labelAdvancedFact;
+    std::unique_ptr<Slider> sliderAdvancedExponent;
+    std::unique_ptr<Label> labelAdvancedExponent;
 
 
     //==============================================================================

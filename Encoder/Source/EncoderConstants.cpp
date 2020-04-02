@@ -26,13 +26,13 @@ const float EncoderConstants::CenterCurveMin = 0;
 const float EncoderConstants::CenterCurveMax = 1;
 const float EncoderConstants::CenterCurveResolution = 0.0001;
 
-const float EncoderConstants::ExperimentalFactorMin = 0;
-const float EncoderConstants::ExperimentalFactorMax = 5;
-const float EncoderConstants::ExperimentalFactorResolution = 0.01;
+const float EncoderConstants::AdvancedFactorMin = 0;
+const float EncoderConstants::AdvancedFactorMax = 5;
+const float EncoderConstants::AdvancedFactorResolution = 0.01;
 
-const float EncoderConstants::ExperimentalPowerMin = 0;
-const float EncoderConstants::ExperimentalPowerMax = 20;
-const float EncoderConstants::ExperimentalPowerResolution = 0.01;
+const float EncoderConstants::AdvancedExponentMin = 0;
+const float EncoderConstants::AdvancedExponentMax = 20;
+const float EncoderConstants::AdvancedExponentResolution = 0.01;
 
-const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Exponential", "Inverse Proportional", "Experimental"};
+const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Advanced", "Exponential", "Inverse Proportional"};
     

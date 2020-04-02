@@ -16,8 +16,8 @@
 #define DEFAULT_DB_UNIT         	    10.0f
 #define DEFAULT_DISTANCE_ATTENUATION	5.0f
 #define DEFAULT_CENTER_CURVE        	0.02f
-#define DEFAULT_EXPERIMENTAL_FACTOR  	1.0f
-#define DEFAULT_EXPERIMENTAL_POWER  	1.0f
+#define DEFAULT_ADVANCED_FACTOR  	    1.0f
+#define DEFAULT_ADVANCED_EXPONENT  	    1.0f
 #define DEFAULT_DISTANCE_ENCODING_MODE  EncoderConstants::Standard
 
 class DistanceEncodingParams
@@ -30,15 +30,15 @@ public:
         dbUnit(nullptr),
         inverseProportionalDistanceAttenuation(nullptr),
         centerCurve(nullptr),
-        experimentalFactor(nullptr),
-        experimentalPower(nullptr),
+        advancedFactor(nullptr),
+        advancedExponent(nullptr),
         localEncodingMode(DEFAULT_DISTANCE_ENCODING_MODE),
         localUnitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
         localDbUnit(DEFAULT_DB_UNIT),
         localInverseProportionalDistanceAttenuation(DEFAULT_DISTANCE_ATTENUATION),
         localCenterCurve(DEFAULT_CENTER_CURVE),
-        localExperimentalFactor(DEFAULT_EXPERIMENTAL_FACTOR),
-        localExperimentalPower(DEFAULT_EXPERIMENTAL_POWER)
+        localAdvancedFactor(DEFAULT_ADVANCED_FACTOR),
+        localAdvancedExponent(DEFAULT_ADVANCED_EXPONENT)
     {
     }
 
@@ -54,17 +54,17 @@ public:
         
         centerCurve = new AudioParameterFloat("CenterCurve", "Center Curve", NormalisableRange<float>(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax), localCenterCurve, "Distance Encoding: Center Curve");
         
-        experimentalFactor = new AudioParameterFloat("ExperimentalFactor", "Experimental Factor", NormalisableRange<float>(EncoderConstants::ExperimentalFactorMin, EncoderConstants::ExperimentalFactorMax), localExperimentalFactor, "Distance Encoding: Experimental Factor");
+        advancedFactor = new AudioParameterFloat("AdvancedFactor", "Advanced Factor", NormalisableRange<float>(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax), localAdvancedFactor, "Distance Encoding: Advanced Factor");
         
-        experimentalPower = new AudioParameterFloat("ExperimentalPower", "Experimental Power", NormalisableRange<float>(EncoderConstants::ExperimentalPowerMin, EncoderConstants::ExperimentalPowerMax), localExperimentalPower, "Distance Encoding: Experimental Power");
+        advancedExponent = new AudioParameterFloat("AdvancedExponent", "Advanced Exponent", NormalisableRange<float>(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax), localAdvancedExponent, "Distance Encoding: Advanced Exponent");
         
         pProcessor->addParameter(encodingMode);
         pProcessor->addParameter(unitCircleRadius);
         pProcessor->addParameter(dbUnit);
         pProcessor->addParameter(inverseProportionalDistanceAttenuation);
         pProcessor->addParameter(centerCurve);
-        pProcessor->addParameter(experimentalFactor);
-        pProcessor->addParameter(experimentalPower);
+        pProcessor->addParameter(advancedFactor);
+        pProcessor->addParameter(advancedExponent);
     }
     
 	void calculateAttenuation(double distance, double* wFactor, double* otherFactor) const
@@ -74,8 +74,8 @@ public:
         float dbUnitValue = getDbUnit();
         float inverseProportionalDistanceAttenuationValue = getInverseProportionalDistanceAttenuation();
         float centerCurveValue = getCenterCurve();
-        float experimentalFactorValue = getExperimentalFactor();
-        float experimentalPowerValue = getExperimentalPower();
+        float advancedFactorValue = getAdvancedFactor();
+        float advancedExponentValue = getAdvancedExponent();
         
         if (mode == EncoderConstants::Standard)
         {
@@ -83,10 +83,10 @@ public:
             *wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
             *otherFactor = (1 - exp(-scaledDistance)) * (*wFactor);
         }
-        else if(mode == EncoderConstants::Experimental)
+        else if(mode == EncoderConstants::Advanced)
         {
             // factor 0-5; power 0-20
-            double scaler = distance < unitCircle ? 1.0 : pow(1 - experimentalFactorValue * (distance - unitCircle), experimentalPowerValue);
+            double scaler = distance < unitCircle ? 1.0 : pow(1 - advancedFactorValue * (distance - unitCircle), advancedExponentValue);
             double scaledDistance = distance * (1.0 / unitCircle);
             *wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0) * scaler;
             *otherFactor = (1 - exp(-scaledDistance)) * (*wFactor);
@@ -183,30 +183,30 @@ public:
             localCenterCurve = newValue;
     }
     
-    float getExperimentalFactor() const
+    float getAdvancedFactor() const
     {
-        return experimentalFactor != nullptr ? experimentalFactor->get() : localExperimentalFactor;
+        return advancedFactor != nullptr ? advancedFactor->get() : localAdvancedFactor;
     }
     
-    void setExperimentalFactor(float newFactor)
+    void setAdvancedFactor(float newFactor)
     {
-        if(experimentalFactor != nullptr)
-            *experimentalFactor = newFactor;
+        if(advancedFactor != nullptr)
+            *advancedFactor = newFactor;
         else
-            localExperimentalFactor = newFactor;
+            localAdvancedFactor = newFactor;
     }
     
-    float getExperimentalPower() const
+    float getAdvancedExponent() const
     {
-        return experimentalPower != nullptr ? experimentalPower->get() : localExperimentalPower;
+        return advancedExponent != nullptr ? advancedExponent->get() : localAdvancedExponent;
     }
     
-    void setExperimentalPower(float newPower)
+    void setAdvancedExponent(float newPower)
     {
-        if(experimentalPower != nullptr)
-            *experimentalPower = newPower;
+        if(advancedExponent != nullptr)
+            *advancedExponent = newPower;
         else
-            localExperimentalPower = newPower;
+            localAdvancedExponent = newPower;
     }
     
     
@@ -216,8 +216,8 @@ private:
     AudioParameterFloat* dbUnit;
     AudioParameterFloat* inverseProportionalDistanceAttenuation;
     AudioParameterFloat* centerCurve;
-    AudioParameterFloat* experimentalFactor;
-    AudioParameterFloat* experimentalPower;
+    AudioParameterFloat* advancedFactor;
+    AudioParameterFloat* advancedExponent;
 
     // local fields for usage as temporary settings, not connected with audio processor
     EncoderConstants::EncodingMode localEncodingMode;
@@ -225,6 +225,6 @@ private:
     float localDbUnit;
     float localInverseProportionalDistanceAttenuation;
     float localCenterCurve;
-    float localExperimentalFactor;
-    float localExperimentalPower;
+    float localAdvancedFactor;
+    float localAdvancedExponent;
 };

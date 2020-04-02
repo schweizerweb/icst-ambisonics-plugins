@@ -30,16 +30,16 @@ public:
     const static float CenterCurveMax;
     const static float CenterCurveResolution;
     
-    const static float ExperimentalFactorMin;
-    const static float ExperimentalFactorMax;
-    const static float ExperimentalFactorResolution;
+    const static float AdvancedFactorMin;
+    const static float AdvancedFactorMax;
+    const static float AdvancedFactorResolution;
     
-    const static float ExperimentalPowerMin;
-    const static float ExperimentalPowerMax;
-    const static float ExperimentalPowerResolution;
+    const static float AdvancedExponentMin;
+    const static float AdvancedExponentMax;
+    const static float AdvancedExponentResolution;
     
     // make sure enum EncodingMode and StringArray encodingModeString are in sync!
-    enum EncodingMode { None, Standard, Exponential, InverseProportional, Experimental };
+    enum EncodingMode { None, Standard, Advanced, Exponential, InverseProportional };
     const static StringArray encodingModeStrings;
     
 };

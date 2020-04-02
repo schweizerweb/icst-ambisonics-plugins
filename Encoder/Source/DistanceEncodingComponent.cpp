@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -91,7 +91,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     labelDbUnit->setColour (TextEditor::textColourId, Colours::black);
     labelDbUnit->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelDbUnit->setBounds (8, 56, 140, 24);
+    labelDbUnit->setBounds (8, 104, 140, 24);
 
     sliderDistanceAttenuation.reset (new Slider ("sliderDistanceAttenuation"));
     addAndMakeVisible (sliderDistanceAttenuation.get());
@@ -109,7 +109,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     labelDistanceAttenuation->setColour (TextEditor::textColourId, Colours::black);
     labelDistanceAttenuation->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelDistanceAttenuation->setBounds (8, 104, 140, 24);
+    labelDistanceAttenuation->setBounds (8, 152, 140, 24);
 
     sliderCenterCurve.reset (new Slider ("sliderCenterCurve"));
     addAndMakeVisible (sliderCenterCurve.get());
@@ -127,43 +127,43 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     labelCenterCurve->setColour (TextEditor::textColourId, Colours::black);
     labelCenterCurve->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelCenterCurve->setBounds (8, 80, 140, 24);
+    labelCenterCurve->setBounds (8, 128, 140, 24);
 
-    sliderExperimentalFactor.reset (new Slider ("sliderExperimentalFactor"));
-    addAndMakeVisible (sliderExperimentalFactor.get());
-    sliderExperimentalFactor->setRange (0, 5, 0.01);
-    sliderExperimentalFactor->setSliderStyle (Slider::LinearHorizontal);
-    sliderExperimentalFactor->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    sliderExperimentalFactor->addListener (this);
+    sliderAdvancedFactor.reset (new Slider ("sliderAdvancedFactor"));
+    addAndMakeVisible (sliderAdvancedFactor.get());
+    sliderAdvancedFactor->setRange (0, 5, 0.01);
+    sliderAdvancedFactor->setSliderStyle (Slider::LinearHorizontal);
+    sliderAdvancedFactor->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderAdvancedFactor->addListener (this);
 
-    labelExperimentalFact.reset (new Label ("labelExperimentalFact",
-                                            TRANS("Experimental Factor")));
-    addAndMakeVisible (labelExperimentalFact.get());
-    labelExperimentalFact->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelExperimentalFact->setJustificationType (Justification::centredLeft);
-    labelExperimentalFact->setEditable (false, false, false);
-    labelExperimentalFact->setColour (TextEditor::textColourId, Colours::black);
-    labelExperimentalFact->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelAdvancedFact.reset (new Label ("labelAdvancedFact",
+                                        TRANS("Advanced Factor")));
+    addAndMakeVisible (labelAdvancedFact.get());
+    labelAdvancedFact->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelAdvancedFact->setJustificationType (Justification::centredLeft);
+    labelAdvancedFact->setEditable (false, false, false);
+    labelAdvancedFact->setColour (TextEditor::textColourId, Colours::black);
+    labelAdvancedFact->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelExperimentalFact->setBounds (8, 128, 140, 24);
+    labelAdvancedFact->setBounds (8, 56, 140, 24);
 
-    sliderExperimentalPower.reset (new Slider ("sliderExperimentalPower"));
-    addAndMakeVisible (sliderExperimentalPower.get());
-    sliderExperimentalPower->setRange (0, 20, 0.01);
-    sliderExperimentalPower->setSliderStyle (Slider::LinearHorizontal);
-    sliderExperimentalPower->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
-    sliderExperimentalPower->addListener (this);
+    sliderAdvancedExponent.reset (new Slider ("sliderAdvancedExponent"));
+    addAndMakeVisible (sliderAdvancedExponent.get());
+    sliderAdvancedExponent->setRange (0, 20, 0.01);
+    sliderAdvancedExponent->setSliderStyle (Slider::LinearHorizontal);
+    sliderAdvancedExponent->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderAdvancedExponent->addListener (this);
 
-    labelExperimentalPower.reset (new Label ("labelExperimentalPower",
-                                             TRANS("Experimental Power")));
-    addAndMakeVisible (labelExperimentalPower.get());
-    labelExperimentalPower->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelExperimentalPower->setJustificationType (Justification::centredLeft);
-    labelExperimentalPower->setEditable (false, false, false);
-    labelExperimentalPower->setColour (TextEditor::textColourId, Colours::black);
-    labelExperimentalPower->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelAdvancedExponent.reset (new Label ("labelAdvancedExponent",
+                                            TRANS("Advanced Exponent")));
+    addAndMakeVisible (labelAdvancedExponent.get());
+    labelAdvancedExponent->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelAdvancedExponent->setJustificationType (Justification::centredLeft);
+    labelAdvancedExponent->setEditable (false, false, false);
+    labelAdvancedExponent->setColour (TextEditor::textColourId, Colours::black);
+    labelAdvancedExponent->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    labelExperimentalPower->setBounds (8, 152, 140, 24);
+    labelAdvancedExponent->setBounds (8, 80, 140, 24);
 
 
     //[UserPreSize]
@@ -174,9 +174,9 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
 
     //[Constructor] You can add your own custom stuff here..
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Standard], EncoderConstants::Standard);
+    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Advanced], EncoderConstants::Advanced);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
-    comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Experimental], EncoderConstants::Experimental);
     comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
     sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
     sliderDbUnit->setSkewFactorFromMidPoint(5.0);
@@ -184,16 +184,16 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderDistanceAttenuation->setValue(pParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
     sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
     sliderCenterCurve->setValue(pParams->getCenterCurve(), dontSendNotification);
-    sliderExperimentalFactor->setValue(pParams->getExperimentalFactor(), dontSendNotification);
-    sliderExperimentalPower->setValue(pParams->getExperimentalPower(), dontSendNotification);
-    
+    sliderAdvancedFactor->setValue(pParams->getAdvancedFactor(), dontSendNotification);
+    sliderAdvancedExponent->setValue(pParams->getAdvancedExponent(), dontSendNotification);
+
     // set slider ranges according to constants
     sliderUnitCircleRadius->setRange(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax, EncoderConstants::UnitCircleRadiusResolution);
     sliderDbUnit->setRange(EncoderConstants::DbUnitMin, EncoderConstants::DbUnitMax, EncoderConstants::DbUnitResolution);
     sliderDistanceAttenuation->setRange(EncoderConstants::DistanceAttenuationMin, EncoderConstants::DistanceAttenuationMax, EncoderConstants::DistanceAttenuationResolution);
     sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
-    sliderExperimentalFactor->setRange(EncoderConstants::ExperimentalFactorMin, EncoderConstants::ExperimentalFactorMax, EncoderConstants::ExperimentalFactorResolution);
-    sliderExperimentalPower->setRange(EncoderConstants::ExperimentalPowerMin, EncoderConstants::ExperimentalPowerMax, EncoderConstants::ExperimentalPowerResolution);
+    sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
+    sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
     controlDimming();
     //[/Constructor]
 }
@@ -214,10 +214,10 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     labelDistanceAttenuation = nullptr;
     sliderCenterCurve = nullptr;
     labelCenterCurve = nullptr;
-    sliderExperimentalFactor = nullptr;
-    labelExperimentalFact = nullptr;
-    sliderExperimentalPower = nullptr;
-    labelExperimentalPower = nullptr;
+    sliderAdvancedFactor = nullptr;
+    labelAdvancedFact = nullptr;
+    sliderAdvancedExponent = nullptr;
+    labelAdvancedExponent = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -244,11 +244,11 @@ void DistanceEncodingComponent::resized()
     distanceEncodingGraph->setBounds (0, 184, proportionOfWidth (1.0000f), getHeight() - 184);
     sliderUnitCircleRadius->setBounds (152, 32, getWidth() - 165, 24);
     comboBoxEncodingMode->setBounds (152, 8, getWidth() - 165, 24);
-    sliderDbUnit->setBounds (153, 56, getWidth() - 165, 24);
-    sliderDistanceAttenuation->setBounds (153, 104, getWidth() - 165, 24);
-    sliderCenterCurve->setBounds (153, 80, getWidth() - 165, 24);
-    sliderExperimentalFactor->setBounds (153, 128, getWidth() - 165, 24);
-    sliderExperimentalPower->setBounds (153, 152, getWidth() - 165, 24);
+    sliderDbUnit->setBounds (153, 104, getWidth() - 165, 24);
+    sliderDistanceAttenuation->setBounds (153, 152, getWidth() - 165, 24);
+    sliderCenterCurve->setBounds (153, 128, getWidth() - 165, 24);
+    sliderAdvancedFactor->setBounds (153, 56, getWidth() - 165, 24);
+    sliderAdvancedExponent->setBounds (153, 80, getWidth() - 165, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -282,17 +282,17 @@ void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         pParams->setCenterCurve(float(sliderCenterCurve->getValue()));
         //[/UserSliderCode_sliderCenterCurve]
     }
-    else if (sliderThatWasMoved == sliderExperimentalFactor.get())
+    else if (sliderThatWasMoved == sliderAdvancedFactor.get())
     {
-        //[UserSliderCode_sliderExperimentalFactor] -- add your slider handling code here..
-        pParams->setExperimentalFactor(float(sliderExperimentalFactor->getValue()));
-        //[/UserSliderCode_sliderExperimentalFactor]
+        //[UserSliderCode_sliderAdvancedFactor] -- add your slider handling code here..
+        pParams->setAdvancedFactor(float(sliderAdvancedFactor->getValue()));
+        //[/UserSliderCode_sliderAdvancedFactor]
     }
-    else if (sliderThatWasMoved == sliderExperimentalPower.get())
+    else if (sliderThatWasMoved == sliderAdvancedExponent.get())
     {
-        //[UserSliderCode_sliderExperimentalPower] -- add your slider handling code here..
-        pParams->setExperimentalPower(float(sliderExperimentalPower->getValue()));
-        //[/UserSliderCode_sliderExperimentalPower]
+        //[UserSliderCode_sliderAdvancedExponent] -- add your slider handling code here..
+        pParams->setAdvancedExponent(float(sliderAdvancedExponent->getValue()));
+        //[/UserSliderCode_sliderAdvancedExponent]
     }
 
     //[UsersliderValueChanged_Post]
@@ -331,10 +331,10 @@ void DistanceEncodingComponent::controlDimming() const
     labelDbUnit->setEnabled(inverseProportionalOrExponential);
     sliderDistanceAttenuation->setEnabled(mode == EncoderConstants::InverseProportional);
     labelDistanceAttenuation->setEnabled(mode == EncoderConstants::InverseProportional);
-    sliderExperimentalFactor->setEnabled(mode == EncoderConstants::Experimental);
-    labelExperimentalFact->setEnabled(mode == EncoderConstants::Experimental);
-    sliderExperimentalPower->setEnabled(mode == EncoderConstants::Experimental);
-    labelExperimentalPower->setEnabled(mode == EncoderConstants::Experimental);
+    sliderAdvancedFactor->setEnabled(mode == EncoderConstants::Advanced);
+    labelAdvancedFact->setEnabled(mode == EncoderConstants::Advanced);
+    sliderAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
+    labelAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
 }
 
 //[/MiscUserCode]
@@ -377,53 +377,53 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="152 8 165M 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderDbUnit" id="10e905f78cc1a4e8" memberName="sliderDbUnit"
-          virtualName="" explicitFocusOrder="0" pos="153 56 165M 24" min="0.01"
+          virtualName="" explicitFocusOrder="0" pos="153 104 165M 24" min="0.01"
           max="100.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelDbUnit" id="e622db3c11547177" memberName="labelDbUnit"
-         virtualName="" explicitFocusOrder="0" pos="8 56 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="8 104 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="dB Unit" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceAttenuation" id="670b6b956458dbf0" memberName="sliderDistanceAttenuation"
-          virtualName="" explicitFocusOrder="0" pos="153 104 165M 24" min="0.01"
+          virtualName="" explicitFocusOrder="0" pos="153 152 165M 24" min="0.01"
           max="20.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelDistanceAttenuation" id="86897181d955aad6" memberName="labelDistanceAttenuation"
-         virtualName="" explicitFocusOrder="0" pos="8 104 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="8 152 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Distance Attenuation" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderCenterCurve" id="c8ebd57ab2ec2a1d" memberName="sliderCenterCurve"
-          virtualName="" explicitFocusOrder="0" pos="153 80 165M 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="153 128 165M 24" min="0.0"
           max="1.0" int="0.0001" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelCenterCurve" id="ee0374a11fdb34bf" memberName="labelCenterCurve"
-         virtualName="" explicitFocusOrder="0" pos="8 80 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="8 128 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Center Curve" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderExperimentalFactor" id="acaa669a372543dd" memberName="sliderExperimentalFactor"
-          virtualName="" explicitFocusOrder="0" pos="153 128 165M 24" min="0.0"
+  <SLIDER name="sliderAdvancedFactor" id="acaa669a372543dd" memberName="sliderAdvancedFactor"
+          virtualName="" explicitFocusOrder="0" pos="153 56 165M 24" min="0.0"
           max="5.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="labelExperimentalFact" id="11f4879337765cab" memberName="labelExperimentalFact"
-         virtualName="" explicitFocusOrder="0" pos="8 128 140 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Experimental Factor" editableSingleClick="0"
+  <LABEL name="labelAdvancedFact" id="11f4879337765cab" memberName="labelAdvancedFact"
+         virtualName="" explicitFocusOrder="0" pos="8 56 140 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Advanced Factor" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderExperimentalPower" id="848239971373225d" memberName="sliderExperimentalPower"
-          virtualName="" explicitFocusOrder="0" pos="153 152 165M 24" min="0.0"
+  <SLIDER name="sliderAdvancedExponent" id="848239971373225d" memberName="sliderAdvancedExponent"
+          virtualName="" explicitFocusOrder="0" pos="153 80 165M 24" min="0.0"
           max="20.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="labelExperimentalPower" id="5f0682ceb4e79610" memberName="labelExperimentalPower"
-         virtualName="" explicitFocusOrder="0" pos="8 152 140 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Experimental Power" editableSingleClick="0"
+  <LABEL name="labelAdvancedExponent" id="5f0682ceb4e79610" memberName="labelAdvancedExponent"
+         virtualName="" explicitFocusOrder="0" pos="8 80 140 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Advanced Exponent" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
