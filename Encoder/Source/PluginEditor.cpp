@@ -159,13 +159,13 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
 			delete settingsWindow;
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper()));
 		settingsWindow->setVisible(true);
-		settingsWindow->centreWithSize(settingsWindow->getWidth(), settingsWindow->getHeight());
+        settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
     }
     else if (buttonThatWasClicked == btnHelp.get())
     {
         //[UserButtonCode_btnHelp] -- add your button handler code here..
-        helpDialogManager.show(true);
+        helpDialogManager.show(true, this);
         //[/UserButtonCode_btnHelp]
     }
 

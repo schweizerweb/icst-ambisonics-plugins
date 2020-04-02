@@ -10,14 +10,15 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "AdditionalWindow.h"
 
 #define ACTION_CLOSE_HELP	"CloseHelp"
 
-class HelpDialog : public DialogWindow, public ActionBroadcaster
+class HelpDialog : public AdditionalWindow, public ActionBroadcaster
 {
 public:
 	HelpDialog(ActionListener* actionListener, Component* pComponent)
-		: DialogWindow("Help", Colours::white, false, true)
+		: AdditionalWindow("Help", pComponent)
 	{
 		setAlwaysOnTop(true);
         setContentOwned(pComponent, true);

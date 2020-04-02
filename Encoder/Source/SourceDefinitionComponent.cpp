@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -31,7 +31,7 @@
 
 //==============================================================================
 SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)
+    : pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -314,12 +314,12 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
                  componentName="" parentClasses="public Component, public ChangeListener, public ChangeBroadcaster"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams)"
+                 variableInitialisers="pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.03%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Groups"/>
   <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
@@ -335,7 +335,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 60%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.97%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"

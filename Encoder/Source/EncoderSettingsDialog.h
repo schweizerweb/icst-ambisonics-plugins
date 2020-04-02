@@ -10,15 +10,16 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "../../Common/AdditionalWindow.h"
 #define ACTION_CLOSE_SETTINGS	"CloseSettings"
 
-class EncoderSettingsDialog : public DialogWindow, public ActionBroadcaster
+class EncoderSettingsDialog : public ActionBroadcaster, public AdditionalWindow
 {
 public:
 	EncoderSettingsDialog(ActionListener* actionListener, Component* pComponent)
-		: DialogWindow("Encoder settings", Colours::white, false, true)
+		: AdditionalWindow("Encoder  Settings", pComponent)
 	{
-		setAlwaysOnTop(true);
+        setAlwaysOnTop(true);
         setContentOwned(pComponent, true);
 		addActionListener(actionListener);
         setResizable(true, true);

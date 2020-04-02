@@ -37,13 +37,13 @@ public:
         }
     }
     
-    void show(bool isEncoder)
+    void show(bool isEncoder, Component* pParent)
     {
         if(helpWindow)
             delete helpWindow;
         helpWindow = new HelpDialog(this, new HelpComponent(isEncoder));
         helpWindow->setVisible(true);
-        helpWindow->centreWithSize(helpWindow->getWidth(), helpWindow->getHeight());
+        helpWindow->updatePosition(pParent->getScreenBounds());
     }
 private:
     HelpDialog* helpWindow;

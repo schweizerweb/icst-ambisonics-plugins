@@ -23,7 +23,7 @@ void PointSelection::unselectPoint()
 
 void PointSelection::selectPoint(int index, bool add)
 {
-	if(selectionMode == Group || selectionMode == Point && !add && !selectedIndices.contains(index))
+	if(selectionMode == Group || (selectionMode == Point && !add && !selectedIndices.contains(index)))
 	{
 		unselectPoint();
 	}
@@ -73,7 +73,7 @@ Array<int> PointSelection::getSelectedIndices() const
 
 void PointSelection::selectGroup(int index, bool add)
 {
-	if(selectionMode == Point || selectionMode == Group && !add && !selectedIndices.contains(index))
+	if(selectionMode == Point || (selectionMode == Group && !add && !selectedIndices.contains(index)))
 	{
 		unselectPoint();
 	}

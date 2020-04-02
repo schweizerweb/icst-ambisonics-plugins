@@ -73,6 +73,8 @@
         <FILE id="G0rG6I" name="TreeViewItemHelp.h" compile="0" resource="0"
               file="../Common/TreeViewItemHelp.h"/>
       </GROUP>
+      <FILE id="A4by6z" name="AdditionalWindow.h" compile="0" resource="0"
+            file="../Common/AdditionalWindow.h"/>
       <FILE id="ahivly" name="AmbiBasicSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiBasicSettings.cpp"/>
       <FILE id="YlGBqj" name="AmbiBasicSettings.h" compile="0" resource="0"
