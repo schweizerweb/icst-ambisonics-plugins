@@ -21,6 +21,7 @@ public:
     
     void updatePosition (const Rectangle<int>& newAreaToPointTo)
     {
+        // based on juce CallOutBox
         Rectangle<int> targetArea = newAreaToPointTo;
         Rectangle<int> newAreaToFitIn = Desktop::getInstance().getDisplays().findDisplayForRect(newAreaToPointTo).userArea;
         
