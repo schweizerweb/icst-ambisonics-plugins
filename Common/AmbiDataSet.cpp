@@ -50,9 +50,7 @@ bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 	AmbiPoint* ambiPt = get(channel);
 	if(ambiPt != nullptr)
 	{
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
+        ambiPt->getPoint()->setAed(a, e, d);
 		return true;
 	}
 
@@ -82,9 +80,7 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 
 	if (ambiPt != nullptr)
 	{
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
+        ambiPt->getPoint()->setAed(a, e, d);
 		return true;
 	}
 
