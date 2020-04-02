@@ -10,12 +10,12 @@
 
 #include "AmbiSettings.h"
 
-AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER, false)
+AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER)
 {
 	
 }
 
-AmbiSettings::AmbiSettings(double distanceScaler, bool directionFlip) : AmbiBasicSettings(distanceScaler, directionFlip)
+AmbiSettings::AmbiSettings(double distanceScaler) : AmbiBasicSettings(distanceScaler)
 {
 	// create mapping table
 	int order = 0;
@@ -61,12 +61,6 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
        setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
     }
     
-    XmlElement* xmlFlipDirection = xmlElement->getChildByName(XML_TAG_PRESET_FLIPDIRECTION);
-    if (xmlFlipDirection != nullptr)
-    {
-        setDirectionFlip(xmlFlipDirection->getBoolAttribute(XML_VALUE));
-    }
-    
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, AmbiSettings::INPHASE));
     int index = 0;
@@ -94,10 +88,6 @@ void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
     xmlDistanceScaler->setAttribute(XML_VALUE, getDistanceScaler());
     xmlElement->addChildElement(xmlDistanceScaler);
     
-    XmlElement* xmlFlipDirection = new XmlElement(XML_TAG_PRESET_FLIPDIRECTION);
-    xmlFlipDirection->setAttribute(XML_VALUE, getDirectionFlip());
-    xmlElement->addChildElement(xmlFlipDirection);
-
     XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, int(weightMode));
     if(weightMode == MANUAL)

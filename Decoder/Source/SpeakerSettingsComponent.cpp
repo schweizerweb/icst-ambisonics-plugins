@@ -141,11 +141,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelChannelWeights->setColour (TextEditor::textColourId, Colours::black);
     labelChannelWeights->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
 
-    btnFlipDirection.reset (new ToggleButton ("btnFlipDirection"));
-    addAndMakeVisible (btnFlipDirection.get());
-    btnFlipDirection->setButtonText (TRANS("Flip direction"));
-    btnFlipDirection->addListener (this);
-
     labelDistanceScaler.reset (new Label ("labelDistanceScaler",
                                           TRANS("Distance scaler")));
     addAndMakeVisible (labelDistanceScaler.get());
@@ -307,7 +302,6 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     sliderDistanceScaler = nullptr;
     ambiChannelControl = nullptr;
     labelChannelWeights = nullptr;
-    btnFlipDirection = nullptr;
     labelDistanceScaler = nullptr;
     btnEditMode = nullptr;
     textOscPort = nullptr;
@@ -353,11 +347,10 @@ void SpeakerSettingsComponent::resized()
     buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
     buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
-    sliderDistanceScaler->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 16, getWidth() - 178, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 144, (0 + (getHeight() - 306)) + 40, ((getWidth() - 18) - 0) - 160, 200 - 56);
-    labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 40, 112, 24);
-    btnFlipDirection->setBounds ((8 + 0) + 12, (0 + (getHeight() - 306)) + 128, 120, 24);
-    labelDistanceScaler->setBounds ((8 + 0) + 8, (0 + (getHeight() - 306)) + 15, 150, 24);
+    sliderDistanceScaler->setBounds ((8 + 0) + 424, (0 + (getHeight() - 306)) + 20, getWidth() - 458, 24);
+    ambiChannelControl->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 52, ((getWidth() - 18) - 0) - 32, 200 - 68);
+    labelChannelWeights->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 20, 112, 24);
+    labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 306)) + 20, 104, 24);
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
     textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 24, 130, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 19, 93, 24);
@@ -367,15 +360,9 @@ void SpeakerSettingsComponent::resized()
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3995f) / 2), 0, proportionOfWidth (0.3995f), 24);
     buttonManage->setBounds (8 + (getWidth() - 18) - 16 - 80, 0 + 24, 80, 24);
-    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 68, 120, 24);
+    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 306)) + 20, 120, 24);
     //[UserResized] Add your own custom resize handling here..
-	Rectangle<int> groupBounds = groupAmbisonics->getBounds();
-	labelDistanceScaler->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 12, 150, 24);
-	labelChannelWeights->setBounds(groupBounds.getX() + 8, groupBounds.getY() + 40, 112, 24);
-    comboBoxChannelWeightingMode->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 64, 120, 24);
-	btnFlipDirection->setBounds(groupBounds.getX() + 12, groupBounds.getY() + 128, 120, 24);
-	toggleOsc->setBounds((8 + 12) + 0, (0 + (getHeight() - 306)) + 220, 150, 30);	// needed because of JUCE bug
-    //[/UserResized]
+	//[/UserResized]
 }
 
 void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -467,12 +454,6 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
 			pPointSelection->selectPoint(selection - 1);
 		}
         //[/UserButtonCode_buttonMoveUp]
-    }
-    else if (buttonThatWasClicked == btnFlipDirection.get())
-    {
-        //[UserButtonCode_btnFlipDirection] -- add your button handler code here..
-		pAmbiSettings->setDirectionFlip(btnFlipDirection->getToggleState());
-        //[/UserButtonCode_btnFlipDirection]
     }
     else if (buttonThatWasClicked == btnEditMode.get())
     {
@@ -737,7 +718,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 		return SliderRange(-1.0, 1.0, 0.001);
 
 	case COLUMN_ID_D:
-		return SliderRange(Constants::DistanceMin, Constants::DistanceMax, 0.001);
+		return SliderRange(Constants::DistanceMin, sqrt(2.0), 0.001);
 
 	case COLUMN_ID_A:
 		return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
@@ -753,11 +734,6 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 	}
 
 	return SliderRange(0.0, 1.0, 0.001);
-}
-
-void SpeakerSettingsComponent::updateDirectionFlip() const
-{
-	btnFlipDirection->setToggleState(pAmbiSettings->getDirectionFlip(), dontSendNotification);
 }
 
 void SpeakerSettingsComponent::updateDistanceScaler() const
@@ -785,7 +761,6 @@ void SpeakerSettingsComponent::updateUI() const
 	speakerList->repaint();
 
 	updateDistanceScaler();
-	updateDirectionFlip();
 	ambiChannelControl->updateValues();
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
@@ -941,26 +916,22 @@ BEGIN_JUCER_METADATA
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="144 16 178M 24" posRelativeX="17eb4b418501687a"
+          virtualName="" explicitFocusOrder="0" pos="424 20 458M 24" posRelativeX="17eb4b418501687a"
           posRelativeY="17eb4b418501687a" min="1.0" max="500.0" int="0.1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
-                    virtualName="" explicitFocusOrder="0" pos="144 40 160M 56M" posRelativeX="17eb4b418501687a"
+                    virtualName="" explicitFocusOrder="0" pos="16 52 32M 68M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.001"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
-         virtualName="" explicitFocusOrder="0" pos="8 40 112 24" posRelativeX="17eb4b418501687a"
+         virtualName="" explicitFocusOrder="0" pos="16 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="btnFlipDirection" id="b6567f77e6a2e40e" memberName="btnFlipDirection"
-                virtualName="" explicitFocusOrder="0" pos="12 128 120 24" posRelativeX="17eb4b418501687a"
-                posRelativeY="17eb4b418501687a" buttonText="Flip direction" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelDistanceScaler" id="bbbf87bcedfbda85" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="8 15 150 24" posRelativeX="17eb4b418501687a"
+         virtualName="" explicitFocusOrder="0" pos="312 20 104 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -1008,7 +979,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="comboBoxChannelWeightingMode" id="e9f5f23a259dd1c0" memberName="comboBoxChannelWeightingMode"
-            virtualName="" explicitFocusOrder="0" pos="16 68 120 24" posRelativeX="17eb4b418501687a"
+            virtualName="" explicitFocusOrder="0" pos="136 20 120 24" posRelativeX="17eb4b418501687a"
             posRelativeY="17eb4b418501687a" editable="0" layout="33" items=""
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>

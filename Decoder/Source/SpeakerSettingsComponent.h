@@ -83,7 +83,6 @@ public:
 	TableListBox* getTable() override;
 	SliderRange getSliderRange(int columnId) override;
 
-	void updateDirectionFlip() const;
 	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
@@ -130,7 +129,6 @@ private:
     std::unique_ptr<Slider> sliderDistanceScaler;
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
     std::unique_ptr<Label> labelChannelWeights;
-    std::unique_ptr<ToggleButton> btnFlipDirection;
     std::unique_ptr<Label> labelDistanceScaler;
     std::unique_ptr<ToggleButton> btnEditMode;
     std::unique_ptr<TextEditor> textOscPort;

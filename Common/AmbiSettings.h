@@ -18,7 +18,6 @@
 #define CURRENT_AMBISONICS_ORDER	(CURRENT_AMBISONICS_ORDER_NB_OF_GAINS - 1)
 
 #define XML_TAG_PRESET_DISTANCESCALER "DistanceScaler"
-#define XML_TAG_PRESET_FLIPDIRECTION "DirectionFlip"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
@@ -28,7 +27,7 @@ class AmbiSettings: public AmbiBasicSettings
 {
 public:
 	AmbiSettings();
-	AmbiSettings(double distanceScaler, bool directionFlip);
+	AmbiSettings(double distanceScaler);
 
     enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3 };
     

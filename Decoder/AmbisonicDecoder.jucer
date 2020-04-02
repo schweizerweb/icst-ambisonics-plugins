@@ -106,6 +106,8 @@
       <FILE id="ge1KYj" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
       <FILE id="aXFLQ3" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="MrEBYI" name="Globals.cpp" compile="1" resource="0" file="../Common/Globals.cpp"/>
+      <FILE id="nNZ3wi" name="Globals.h" compile="0" resource="0" file="../Common/Globals.h"/>
       <FILE id="zdzXxV" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="VrrN86" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
