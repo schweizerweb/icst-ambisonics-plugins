@@ -22,7 +22,7 @@ public:
 		setAlwaysOnTop(true);
 		setContentOwned(pComponent, true);
 		addActionListener(actionListener);
-		setResizable(false, false);
+		setResizable(true, true);
 		setUsingNativeTitleBar(false);
         setResizeLimits(800, 500, 10000, 10000);
 	}

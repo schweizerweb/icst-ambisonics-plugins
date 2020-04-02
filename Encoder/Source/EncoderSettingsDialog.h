@@ -18,10 +18,11 @@ public:
 	EncoderSettingsDialog(ActionListener* actionListener, Component* pComponent)
 		: DialogWindow("Encoder settings", Colours::white, false, true)
 	{
-		setContentOwned(pComponent, true);
+		setAlwaysOnTop(true);
+        setContentOwned(pComponent, true);
 		addActionListener(actionListener);
+        setResizable(true, true);
 		setUsingNativeTitleBar(false);
-		setResizable(true, true);
 #if MULTI_ENCODER_MODE
 		setResizeLimits(600, 600, 3000, 3000);
 #else
