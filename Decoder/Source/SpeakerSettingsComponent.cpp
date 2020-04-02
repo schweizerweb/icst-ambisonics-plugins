@@ -336,33 +336,33 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 306)) + 200, ((getWidth() - 18) - 0) - 0, 96);
-    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 306), (getWidth() - 18) - 0, 200);
-    groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 306);
+    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 267)) + 199, ((getWidth() - 18) - 0) - 0, 60);
+    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 267), (getWidth() - 18) - 0, 199);
+    groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 267);
     comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 411, 24);
     labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
     buttonSave->setBounds (8 + (getWidth() - 18) - 108 - 80, 0 + 24, 80, 24);
-    speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 306) - 96);
-    buttonAdd->setBounds ((8 + 16) + 0, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 306) - 96) - -8, 64, 24);
-    sliderDistanceScaler->setBounds ((8 + 0) + 424, (0 + (getHeight() - 306)) + 20, getWidth() - 458, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 52, ((getWidth() - 18) - 0) - 32, 200 - 68);
-    labelChannelWeights->setBounds ((8 + 0) + 16, (0 + (getHeight() - 306)) + 20, 112, 24);
-    labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 306)) + 20, 104, 24);
+    speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 267) - 96);
+    buttonAdd->setBounds ((8 + 16) + 0, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    sliderDistanceScaler->setBounds ((8 + 0) + 424, (0 + (getHeight() - 267)) + 20, getWidth() - 458, 24);
+    ambiChannelControl->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 52, ((getWidth() - 18) - 0) - 32, 199 - 68);
+    labelChannelWeights->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 20, 112, 24);
+    labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 267)) + 20, 104, 24);
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
-    textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 24, 130, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 19, 93, 24);
-    textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 20 - 130, ((0 + (getHeight() - 306)) + 200) + 58, 130, 24);
-    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 170 - 93, ((0 + (getHeight() - 306)) + 200) + 53, 93, 24);
-    toggleOsc->setBounds (((8 + 0) + 0) + 12, ((0 + (getHeight() - 306)) + 200) + 24, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 306) - 96) - -8, 120, 24);
+    textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 217 - 88, ((0 + (getHeight() - 267)) + 199) + 20, 88, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 313 - 72, ((0 + (getHeight() - 267)) + 199) + 20, 72, 24);
+    textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 15 - 82, ((0 + (getHeight() - 267)) + 199) + 20, 82, 24);
+    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
+    toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3995f) / 2), 0, proportionOfWidth (0.3995f), 24);
     buttonManage->setBounds (8 + (getWidth() - 18) - 16 - 80, 0 + 24, 80, 24);
-    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 306)) + 20, 120, 24);
+    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
     //[UserResized] Add your own custom resize handling here..
-	//[/UserResized]
+    //[/UserResized]
 }
 
 void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
@@ -872,15 +872,15 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="1200" initialHeight="800">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
-                  explicitFocusOrder="0" pos="0 0R 0M 96" posRelativeX="17eb4b418501687a"
+                  explicitFocusOrder="0" pos="0 0R 0M 60" posRelativeX="17eb4b418501687a"
                   posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                   title="OSC"/>
   <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
-                  virtualName="" explicitFocusOrder="0" pos="0 0R 0M 200" posRelativeX="450188aa0f332e78"
+                  virtualName="" explicitFocusOrder="0" pos="0 0R 0M 199" posRelativeX="450188aa0f332e78"
                   posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                   title="Ambisonics"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 0 18M 306M" title="Speakers"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 0 18M 267M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="192 24 411M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
@@ -941,35 +941,35 @@ BEGIN_JUCER_METADATA
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscPort" id="ef3c7d2594795ec7" memberName="textOscPort"
-              virtualName="" explicitFocusOrder="0" pos="20Rr 24 130 24" posRelativeX="f4cf3a53a6ef0d87"
+              virtualName="" explicitFocusOrder="0" pos="217Rr 20 88 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="170Rr 19 93 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="313Rr 20 72 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTEDITOR name="textTimeout" id="337c3e6db7308866" memberName="textTimeout"
-              virtualName="" explicitFocusOrder="0" pos="20Rr 58 130 24" posRelativeX="f4cf3a53a6ef0d87"
+              virtualName="" explicitFocusOrder="0" pos="15Rr 20 82 24" posRelativeX="f4cf3a53a6ef0d87"
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelTimeout" id="628a0500d66bc466" memberName="labelTimeout"
-         virtualName="" explicitFocusOrder="0" pos="170Rr 53 93 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="108Rr 20 93 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
-                virtualName="" explicitFocusOrder="0" pos="12 24 180 24" posRelativeX="f4cf3a53a6ef0d87"
+                virtualName="" explicitFocusOrder="0" pos="16 20 180 24" posRelativeX="f4cf3a53a6ef0d87"
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.824%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.797%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50.059%c 0 39.953% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.919% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"

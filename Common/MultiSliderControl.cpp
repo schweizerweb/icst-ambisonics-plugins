@@ -55,18 +55,18 @@ void MultiSliderControl::paint (Graphics& g)
 
 void MultiSliderControl::resized()
 {
-    int compWidth = getWidth() / (sliders.size() + 1);
+    int compWidth = getWidth() / (sliders.size());
 	int labelHeight = 30;
-	int sliderHeight = getHeight() - labelHeight;
+	int sliderHeight = getHeight() - labelHeight - 8;
 	
 	for(int i = 0; i < labels.size(); i++)
 	{
-		labels[i]->setBounds((i+1) * compWidth, 0, compWidth, labelHeight);
+		labels[i]->setBounds(i * compWidth, 0, compWidth, labelHeight);
 	}
 	
 	for(int i = 0; i < sliders.size(); i++)
 	{
-		sliders[i]->setBounds((i+1) * compWidth, labelHeight, compWidth, sliderHeight);
+		sliders[i]->setBounds(i * compWidth, labelHeight, compWidth, sliderHeight);
 	}
 }
 
