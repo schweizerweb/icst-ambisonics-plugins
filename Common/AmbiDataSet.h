@@ -53,8 +53,13 @@ public:
 	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
 	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;
-	bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
+	void stretchGroup(int groupIndex, double stretchValue);
+    void rotateGroup(int groupIndex, double angleRad);
+    
+    bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
 	bool setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const;
+    bool stretchGroup(String groupName, double stretchValue);
+    bool rotateGroup(String groupName, double angleRad);
 
 private:
 	bool nameExists(String name) const;

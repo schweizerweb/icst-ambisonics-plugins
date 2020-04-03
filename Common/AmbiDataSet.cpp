@@ -244,6 +244,54 @@ void AmbiDataSet::setGroupAed(int groupIndex, double newA, double newE, double n
 		group->setAED(newA, newE, newD, moveSubElements);
 }
 
+void AmbiDataSet::stretchGroup(int groupIndex, double stretchValue)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->stretch(stretchValue);
+}
+
+bool AmbiDataSet::stretchGroup(String groupName, double stretchValue)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            stretchGroup(i, stretchValue);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
+void AmbiDataSet::rotateGroup(int groupIndex, double angleRad)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->rotate(angleRad);
+}
+
+bool AmbiDataSet::rotateGroup(String groupName, double angleRad)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            rotateGroup(i, angleRad);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
 void AmbiDataSet::setGroupName(int groupIndex, String name) const
 {
 	const ScopedLock lock(cs);

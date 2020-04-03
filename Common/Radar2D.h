@@ -20,6 +20,7 @@
 #define ACTIVE_REFRESH_RATE 25
 #define INACTIVE_REFRESH_RATE 10
 #define NUDGE_VALUE 0.01
+#define SIN45 0.70710678118
 
 //==============================================================================
 /*
@@ -29,7 +30,8 @@ class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 public:
 	enum RadarMode { XY, XZ_Half, XZ_Full };
 	enum Shape { Circle, Square, Star };
-    enum MouseActionMode { Standard, RadarMove, RadarZoomOut, MoveGroupPointOnly, ExtendedPointMove };
+    enum MouseActionMode { Standard, RadarMove, RadarZoomOut, MoveGroupPointOnly };
+    enum SpecialHandlingMode { None, Stretch, RotateAroundGroupPoint, RotateInAedSpace };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
@@ -42,7 +44,9 @@ public:
 	void mouseEnter(const MouseEvent& e) override;
 	double getMaxPointSelectionDist() const;
 	void mouseDown(const MouseEvent& e) override;
-	void mouseDrag(const MouseEvent& e) override;
+    std::unique_ptr<Point3D<double> > extracted(Point3D<double> &referencePoint, const Point<float> &valuePoint);
+    
+    void mouseDrag(const MouseEvent& e) override;
 	void setCenterPoint(Point<float> valuePoint) const;
 	void mouseUp(const MouseEvent& e) override;
 	void mouseDoubleClick(const MouseEvent& e) override;
@@ -52,6 +56,7 @@ public:
 	void openGLContextClosing() override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	bool keyPressed(const KeyPress& key) override;
+    void modifierKeysChanged(const ModifierKeys &modifiers) override;
 	void setRadarMode(RadarMode radarMode);
     void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) override;
 
@@ -61,9 +66,12 @@ private:
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
-	void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
+	Point<float> getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const;
+    void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
 	void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
-	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0) const;
+    void drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const;
+    void drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const;
+	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
 	void paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const;
 
 	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
@@ -78,6 +86,8 @@ private:
 	void updateInfoLabel(String info);
 	void timerCallback() override;
     bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
+    
+    
     
 private:
 	OpenGLContext openGLContext;
@@ -98,6 +108,10 @@ private:
 	Point<float> selectionRectangleStart;
     Point<float> lastRadarMovePoint;
 	bool selectionRectangleActive;
+    bool specialGroupManipulationMode;
+    SpecialHandlingMode currentSpecialHandlingMode;
+    Point<float> specialHandlingOffset;
+    Point<int> lastStretchPosition;
     float lastCartesianLimit;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)

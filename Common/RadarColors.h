@@ -26,6 +26,8 @@ public:
 	Colour getPointSelectionColor() const { return pointSelectionColor[colorScheme]; }
     Colour getRadarAxisColor() const { return radarAxisColor[colorScheme]; }
     Colour getValidRangeColor() const { return radarValidRangeColor[colorScheme]; }
+    Colour getExtendedHandleColor() const { return extendedHandleColor[colorScheme]; }
+    Colour getExtendedHandleSelectionColor() const { return extendedHandleSelectionColor[colorScheme]; }
 	void setColorScheme(int scheme) { colorScheme = jmin(scheme, NUMBER_OF_SCHEMES - 1); }
 
 private:
@@ -35,5 +37,8 @@ private:
 	Colour pointSelectionColor[NUMBER_OF_SCHEMES] { Colours::white, Colours::yellow };
     Colour radarAxisColor[NUMBER_OF_SCHEMES] { Colours::darkgreen, Colours::darkblue };
     Colour radarValidRangeColor[NUMBER_OF_SCHEMES] { Colours::lightgreen.withAlpha(0.2f), Colours::lightpink.withAlpha(0.2f) };
+    Colour extendedHandleColor[NUMBER_OF_SCHEMES] { Colours::lightcoral, Colours::lightblue };
+    Colour extendedHandleSelectionColor[NUMBER_OF_SCHEMES] { Colours::red, Colours::blue };
+    
 	int colorScheme;
 };

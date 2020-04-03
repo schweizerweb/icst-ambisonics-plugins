@@ -168,9 +168,7 @@ void AmbiGroup::setAED(double newA, double newE, double newD, bool moveSubElemen
         }
     }
 
-	getPoint()->setAzimuth(newA);
-	getPoint()->setElevation(newE);
-	getPoint()->setDistance(newD);
+	getPoint()->setAed(newA, newE, newD);
 
 	if (moveSubElements)
 	{
@@ -179,13 +177,21 @@ void AmbiGroup::setAED(double newA, double newE, double newD, bool moveSubElemen
 			double a = p->getPoint()->getAzimuth() + da;
 			double e = p->getPoint()->getElevation() + de;
 			double d = p->getPoint()->getDistance() + dd;
-			p->getPoint()->setAzimuth(a);
-			p->getPoint()->setElevation(e);
-			p->getPoint()->setDistance(d);
+            p->getPoint()->setAed(a, e, d);
 		}
 	}
 }
 
+void AmbiGroup::stretch(double stretchValue)
+{
+    for (AmbiPoint* p : groupPoints)
+    {
+        Point3D<double> delta = *(p->getPoint())-(*getPoint());
+        delta.setDistance(delta.getDistance() + stretchValue);
+        Point3D<double> newPoint = *getPoint() + delta;
+        p->getPoint()->setAed(newPoint.getAzimuth(), newPoint.getElevation(), newPoint.getDistance());
+    }
+}
 void AmbiGroup::setChildrenColor()
 {
     for (AmbiPoint* p : groupPoints)

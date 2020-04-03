@@ -32,6 +32,8 @@ public:
     void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
     void setAED(double newA, double newE, double newD, bool moveSubElements);
     void setChildrenColor();
+    void stretch(double stretchValue);
+    void rotate(double angleRad);
 
 	Array<AmbiPoint*> groupPoints;
 };

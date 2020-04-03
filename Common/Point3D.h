@@ -132,6 +132,10 @@ public:
 		/** Returns a Point3D whose coordinates are the difference between two points. */
 		template <typename FloatType>
 	Point3D<FloatType> operator- (Point3D<FloatType> subtrahend) noexcept{ return Point3D<ValueType>((ValueType)(getX() - subtrahend.getX()), (ValueType)(getY() - subtrahend.getY()), (ValueType)(getZ() - subtrahend.getZ())); }
+    
+        /** Returns a Point3D whose coordinates are the sum of two points. */
+        template <typename FloatType>
+    Point3D<FloatType> operator+ (Point3D<FloatType> summand) noexcept{ return Point3D<ValueType>((ValueType)(getX() + summand.getX()), (ValueType)(getY() + summand.getY()), (ValueType)(getZ() + summand.getZ())); }
 
 		//==============================================================================
 		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
