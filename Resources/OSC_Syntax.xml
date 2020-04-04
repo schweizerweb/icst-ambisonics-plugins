@@ -66,6 +66,35 @@
 <Mode desc="1 to move attached sources, 0 to move group point only" />
 </Parameter>
 </SetGroupPositionXYZ>
+<StretchGroup name="Stretch Group">
+<Syntax desc="/icst/ambi/group/stretch [GroupName] [Distance]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/stretch 'G3' -0.1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Distance desc="Distance to stretch/shrink Distance of attached Sources to Group Point as Int/Float" /> 
+</Parameter>
+</StretchGroup>
+<Rotate name="Rotate around Group Point">
+<Syntax desc="/icst/ambi/group/rotate [GroupName] [X] [Y] [Z]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/rotate 'G4' 0 0.01 0.1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="Rotation angle around the X-Axis in Grad as Int/Float" />
+<Y desc="Rotation angle around the Y-Axis in Grad as Int/Float" />
+<Z desc="Rotation angle around the Z-Axis in Grad as Int/Float" />
+</Parameter>
+</Rotate>
+<RotateAroundOrigin name="Rotate around Origin (0,0,0)">
+<Syntax desc="/icst/ambi/group/rotateorigin [GroupName] [X] [Y] [Z] [Mode]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/rotateorigin 'G5' 0 0 0.05 1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="Rotation angle around the X-Axis in Grad as Int/Float" />
+<Y desc="Rotation angle around the Y-Axis in Grad as Int/Float" />
+<Z desc="Rotation angle around the Z-Axis in Grad as Int/Float" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</RotateAroundOrigin>
 </GroupManipulation>
 
 <PointInfoOutput name="Point Info Output">
