@@ -86,7 +86,7 @@ private:
 	void updateInfoLabel(String info);
 	void timerCallback() override;
     bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
-    
+    void calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ);
     
     
 private:
@@ -111,7 +111,7 @@ private:
     bool specialGroupManipulationMode;
     SpecialHandlingMode currentSpecialHandlingMode;
     Point<float> specialHandlingOffset;
-    Point<int> lastStretchPosition;
+    Point<int> lastSpecialModePosition;
     float lastCartesianLimit;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)

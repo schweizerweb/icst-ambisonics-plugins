@@ -268,23 +268,47 @@ bool AmbiDataSet::stretchGroup(String groupName, double stretchValue)
     return found;
 }
 
-void AmbiDataSet::rotateGroup(int groupIndex, double angleRad)
+void AmbiDataSet::rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis)
 {
     const ScopedLock lock(cs);
 
     AmbiGroup* group = groups[groupIndex];
     if (group != nullptr)
-        group->rotate(angleRad);
+        group->rotate(angleAroundXAxis, angleAroundYAxis, angleAroundZAxis);
 }
 
-bool AmbiDataSet::rotateGroup(String groupName, double angleRad)
+bool AmbiDataSet::rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis)
 {
     bool found = false;
     for (int i = 0; i < groups.size(); i++)
     {
         if (getGroup(i)->getName() == groupName)
         {
-            rotateGroup(i, angleRad);
+            rotateGroup(i, angleAroundXAxis, angleAroundYAxis, angleAroundZAxis);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
+void AmbiDataSet::rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->rotateAroundOrigin(angleAroundXAxis, angleAroundYAxis, angleAroundZAxis, moveSubElements);
+}
+
+bool AmbiDataSet::rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            rotateGroupAroundOrigin(i, angleAroundXAxis, angleAroundYAxis, angleAroundZAxis, moveSubElements);
             found = true;
         }
     }

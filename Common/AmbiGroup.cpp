@@ -192,6 +192,86 @@ void AmbiGroup::stretch(double stretchValue)
         p->getPoint()->setAed(newPoint.getAzimuth(), newPoint.getElevation(), newPoint.getDistance());
     }
 }
+
+void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis)
+{
+    double sx = sin(-angleAroundXAxis);
+    double cx = cos(-angleAroundXAxis);
+    double sy = sin(-angleAroundYAxis);
+    double cy = cos(-angleAroundYAxis);
+    double sz = sin(-angleAroundZAxis);
+    double cz = cos(-angleAroundZAxis);
+    
+    for (AmbiPoint* p : groupPoints)
+    {
+        Point3D<double> center = *getPoint();
+        Point3D<double> child = *(p->getPoint());
+        
+        Point3D<double> relativeChild = child-center;
+        
+        if(angleAroundXAxis != 0.0)
+        {
+            p->getPoint()->setYZ(
+                                 center.getY() + relativeChild.getY() * cx - relativeChild.getZ() * sx,
+                                 center.getZ() + relativeChild.getY() * sx + relativeChild.getZ() * cx);
+        }
+        
+        if(angleAroundYAxis != 0.0)
+        {
+            p->getPoint()->setXZ(
+                                center.getX() + relativeChild.getX() * cy - relativeChild.getZ() * sy,
+                                center.getZ() + relativeChild.getX() * sy + relativeChild.getZ() * cy);
+        }
+        
+        if(angleAroundZAxis != 0.0)
+        {
+            p->getPoint()->setXY(
+                                 center.getX() + relativeChild.getX() * cz - relativeChild.getY() * sz,
+                                 center.getY() + relativeChild.getX() * sz + relativeChild.getY() * cz);
+        }
+    }
+}
+
+void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
+{
+    Point3D<double> point = *getPoint();
+ 
+    if(angleAroundXAxis != 0.0)
+    {
+        double sx = sin(-angleAroundXAxis);
+        double cx = cos(-angleAroundXAxis);
+        
+        setXYZ(point.getX(),
+               point.getY() * cx - point.getZ() * sx,
+               point.getY() * sx + point.getZ() * cx,
+               moveSubElements);
+    }
+    
+    if(angleAroundYAxis != 0.0)
+    {
+        double sy = sin(-angleAroundYAxis);
+        double cy = cos(-angleAroundYAxis);
+        
+        setXYZ(
+               point.getX() * cy - point.getZ() * sy,
+               point.getY(),
+               point.getX() * sy + point.getZ() * cy,
+               moveSubElements);
+    }
+    
+    if(angleAroundZAxis != 0.0)
+    {
+        double sz = sin(-angleAroundZAxis);
+        double cz = cos(-angleAroundZAxis);
+        
+        setXYZ(
+               point.getX() * cz - point.getY() * sz,
+               point.getX() * sz + point.getY() * cz,
+               point.getZ(),
+               moveSubElements);
+    }
+}
+
 void AmbiGroup::setChildrenColor()
 {
     for (AmbiPoint* p : groupPoints)

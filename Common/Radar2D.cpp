@@ -590,6 +590,7 @@ void Radar2D::mouseExit(const MouseEvent&)
 	startTimerHz(INACTIVE_REFRESH_RATE);
 	updateInfoLabel("");
     specialGroupManipulationMode = false;
+    currentSpecialHandlingMode = None;
 }
 
 void Radar2D::mouseEnter(const MouseEvent&)
@@ -699,7 +700,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 
 			pPointSelection->selectGroup(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
             currentSpecialHandlingMode = specialHandlingMode;
-            lastStretchPosition = e.getPosition();
+            lastSpecialModePosition = e.getPosition();
             Point<float> originalGroupPointPosition = getProjectedPoint(pEditablePoints->getGroup(minDistIndex)->getPoint()).toFloat();
             specialHandlingOffset = getSpecialIconPositionForCenter(originalGroupPointPosition, specialHandlingMode) - originalGroupPointPosition;
 		}
@@ -713,6 +714,18 @@ void Radar2D::mouseDown(const MouseEvent& e)
 		selectionRectangleEnd = valuePoint;
 		selectionRectangleActive = true;
 	}
+}
+
+void Radar2D::calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ) {
+    Point<float> referencePointScreenCoordinates = getAbsoluteScreenPoint(getProjectedPoint(&referencePoint).toFloat());
+    Point<float> relativeOld = lastSpecialModePosition.toFloat() - referencePointScreenCoordinates;
+    Point<float> relativeNew = currentMousePosition.toFloat() - referencePointScreenCoordinates;
+    
+    double angleOld = atan2(relativeOld.getX(), relativeOld.getY());
+    double angleNew = atan2(relativeNew.getX(), relativeNew.getY());
+    double angle = angleOld - angleNew;
+    *rotationZ = radarMode == XY ? angle : 0.0;
+    *rotationY = radarMode != XY ? angle : 0.0;
 }
 
 void Radar2D::mouseDrag(const MouseEvent& e)
@@ -779,23 +792,39 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 				? std::make_unique<Point3D<double>>(valuePoint.getX(), valuePoint.getY(), referencePoint.getZ())
 				: std::make_unique<Point3D<double>>(valuePoint.getX(), referencePoint.getY(), valuePoint.getY());
 
-            if(currentSpecialHandlingMode == RotateInAedSpace)
+            if(currentSpecialHandlingMode == Stretch)
             {
-                pEditablePoints->setGroupAed(mainGroupIndex, newPoint->getAzimuth(), newPoint->getElevation(), newPoint->getDistance(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
-            }
-            else if(currentSpecialHandlingMode == Stretch)
-            {
-                pEditablePoints->stretchGroup(mainGroupIndex, (lastStretchPosition.getY() - e.getPosition().getY()) * pZoomSettings->getCurrentRadius() * 0.005);
-                lastStretchPosition = e.getPosition();
+                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pZoomSettings->getCurrentRadius() * 0.005;
+                for(int i : selection)
+                    pEditablePoints->stretchGroup(i, stretchFactor);
+                
+                lastSpecialModePosition = e.getPosition();
             }
             else if(currentSpecialHandlingMode == RotateAroundGroupPoint)
             {
-                Point3D<double> diff = *newPoint.get() - referencePoint;
-                pEditablePoints->rotateGroup(mainGroupIndex, 0.01);
+                double rotationZ;
+                double rotationY;
+                calculateRotationAroundReference(e.getPosition(), referencePoint, &rotationY, &rotationZ);
+                
+                for(int i : selection)
+                    pEditablePoints->rotateGroup(i, 0.0, rotationY, rotationZ);
+                
+                lastSpecialModePosition = e.getPosition();
             }
-			else
+            else if(currentSpecialHandlingMode == RotateInAedSpace)
             {
-                // multiple group manipulation allowed for XYZ translations only
+                Point3D<double> zeroPoint(0.0, 0.0, 0.0);
+                double rotationZ;
+                double rotationY;
+                calculateRotationAroundReference(e.getPosition(), zeroPoint, &rotationY, &rotationZ);
+                    
+                for (int i : selection)
+                    pEditablePoints->rotateGroupAroundOrigin(i, 0.0, rotationY, rotationZ, !checkMouseActionMode(e.mods, MoveGroupPointOnly));
+                
+                lastSpecialModePosition = e.getPosition();
+            }
+            else
+            {
                 Array<Point3D<double>> relativePositions;
                 Array<int> selectedIndices;
                 for (int i : selection)
@@ -808,7 +837,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
                 }
 
                 pEditablePoints->setGroupXyz(mainGroupIndex, newPoint->getX(), newPoint->getY(), newPoint->getZ(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
-
+                
                 // other groups
                 Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
                 for(int i = 0; i < selectedIndices.size(); i++)

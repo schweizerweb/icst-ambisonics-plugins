@@ -33,7 +33,8 @@ public:
     void setAED(double newA, double newE, double newD, bool moveSubElements);
     void setChildrenColor();
     void stretch(double stretchValue);
-    void rotate(double angleRad);
+    void rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
+    void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
 
 	Array<AmbiPoint*> groupPoints;
 };

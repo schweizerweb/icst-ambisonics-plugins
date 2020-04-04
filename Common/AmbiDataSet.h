@@ -54,12 +54,14 @@ public:
 	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;
 	void stretchGroup(int groupIndex, double stretchValue);
-    void rotateGroup(int groupIndex, double angleRad);
+    void rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
+    void rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     
     bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
 	bool setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const;
     bool stretchGroup(String groupName, double stretchValue);
-    bool rotateGroup(String groupName, double angleRad);
+    bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
+    bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
 
 private:
 	bool nameExists(String name) const;
