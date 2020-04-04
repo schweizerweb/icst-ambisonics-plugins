@@ -21,8 +21,9 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ "/icst/ambi/source/xyz"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED "/icst/ambi/group/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ "/icst/ambi/group/xyz"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/channelsource/aed"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/channelsource/xyz"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/sourceindex/aed"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/sourceindex/xyz"
+
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 

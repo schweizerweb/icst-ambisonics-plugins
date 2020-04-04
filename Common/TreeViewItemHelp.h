@@ -45,7 +45,7 @@ public:
             g.setColour (Colour (xml.getStringAttribute ("colour", "ffeeeeee").getHexValue32()));
         else
         {
-            if(getUniqueName() == "Syntax")
+            if(getUniqueName() == "Syntax" || xml.isTextElement())
                 g.setColour(Colours::lightblue);
             else if(getUniqueName() == "Example")
                 g.setColour(Colours::lightgreen);
@@ -53,7 +53,6 @@ public:
                 g.setColour(Colours::lightgrey);
         }
 
-        
         g.setFont (height * 0.7f);
 
         // draw the xml element's tag name..
@@ -61,7 +60,7 @@ public:
         if(xml.hasAttribute("desc"))
             g.drawText (xml.getStringAttribute("desc"), 100, 0, width - 104, height, Justification::centredLeft, true);
         if(xml.isTextElement())
-            g.drawText (xml.getText(), 100, 0, width - 104, height, Justification::centredLeft, true);
+            g.drawText (xml.getText(), 10, 0, width - 14, height, Justification::centredLeft, true);
     }
 
     void itemOpennessChanged (bool isNowOpen)

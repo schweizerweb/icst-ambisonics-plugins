@@ -184,7 +184,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index AED style)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index style AED)", &message);
 		return;
 	}
 
@@ -219,7 +219,7 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index XYZ style)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index style XYZ)", &message);
 		return;
 	}
 
@@ -240,7 +240,7 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 	}
 	else
 	{
-		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel-1) + ")", &message);
+		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")", &message);
 	}
 }
 

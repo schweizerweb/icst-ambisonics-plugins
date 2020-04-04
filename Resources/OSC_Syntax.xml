@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <OSCSyntax>
-<PointInteraction name="Point Interaction (in and out)">
+<PointManipulation name="Point Manipulation">
 <SetPositionAED name="Set Source Position AED">
 <Syntax desc="/icst/ambi/source/aed [ChannelName] [Azimuth] [Elevation] [Distance]" />
 <Example desc="/icst/ambi/source/aed 'S1' 45 10 0.8" />
@@ -21,8 +21,29 @@
 <Z desc="Z coordinate as Int/Float (limits according to scaler)" />
 </Parameter>
 </SetPositionXYZ>
-</PointInteraction>
-<GroupManipulation name="Group Manipulation (in only)">
+<SetPositionIndexXYZ name="Set Source (Index) Position XYZ">
+<Syntax desc="/icst/ambi/sourceindex/xyz [ChannelIndex] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/sourceindex/xyz 2 0.2 0.2 0.0" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+</Parameter>
+</SetPositionIndexXYZ>
+<SetPositionIndexAED name="Set Source (Index) Position AED">
+<Syntax desc="/icst/ambi/sourceindex/aed [ChannelIndex] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/sourceindex/aed 1 45 10 0.8" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+</Parameter>
+</SetPositionIndexAED>
+</PointManipulation>
+
+<GroupManipulation name="Group Manipulation">
 <SetGroupPoisitonAED name="Set Group Position AED">
 <Syntax desc="/icst/ambi/group/aed [GroupName] [Azimuth] [Elevation] [Distance] [Mode]" />
 <Example desc="/icst/ambi/group/aed 'G1' 135 0 0.1 1" />
@@ -46,4 +67,28 @@
 </Parameter>
 </SetGroupPositionXYZ>
 </GroupManipulation>
+
+<PointInfoOutput name="Point Info Output">
+<PositionAED name="Source Position AED">
+<Syntax desc="/icst/ambi/source/aed [ChannelName] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/source/aed 'S1' 45 10 0.8" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float" />
+</Parameter>
+</PositionAED>
+<PositionXYZ name="Source Position XYZ">
+<Syntax desc="/icst/ambi/source/xyz [ChannelName] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/source/xyz 'S2' 0.2 0.2 0.0" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<X desc="X coordinate as Int/Float" />
+<Y desc="Y coordinate as Int/Float" />
+<Z desc="Z coordinate as Int/Float" />
+</Parameter>
+</PositionXYZ>
+</PointInfoOutput>
+
 </OSCSyntax>
