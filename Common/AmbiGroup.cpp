@@ -205,12 +205,10 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
     for (AmbiPoint* p : groupPoints)
     {
         Point3D<double> center = *getPoint();
-        Point3D<double> child = *(p->getPoint());
-        
-        Point3D<double> relativeChild = child-center;
         
         if(angleAroundXAxis != 0.0)
         {
+            Point3D<double> relativeChild = *(p->getPoint())-center;
             p->getPoint()->setYZ(
                                  center.getY() + relativeChild.getY() * cx - relativeChild.getZ() * sx,
                                  center.getZ() + relativeChild.getY() * sx + relativeChild.getZ() * cx);
@@ -218,6 +216,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
         
         if(angleAroundYAxis != 0.0)
         {
+            Point3D<double> relativeChild = *(p->getPoint())-center;
             p->getPoint()->setXZ(
                                 center.getX() + relativeChild.getX() * cy - relativeChild.getZ() * sy,
                                 center.getZ() + relativeChild.getX() * sy + relativeChild.getZ() * cy);
@@ -225,6 +224,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
         
         if(angleAroundZAxis != 0.0)
         {
+            Point3D<double> relativeChild = *(p->getPoint())-center;
             p->getPoint()->setXY(
                                  center.getX() + relativeChild.getX() * cz - relativeChild.getY() * sz,
                                  center.getY() + relativeChild.getX() * sz + relativeChild.getY() * cz);
@@ -234,16 +234,14 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
 
 void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
 {
-    Point3D<double> point = *getPoint();
- 
     if(angleAroundXAxis != 0.0)
     {
         double sx = sin(-angleAroundXAxis);
         double cx = cos(-angleAroundXAxis);
         
-        setXYZ(point.getX(),
-               point.getY() * cx - point.getZ() * sx,
-               point.getY() * sx + point.getZ() * cx,
+        setXYZ(getPoint()->getX(),
+               getPoint()->getY() * cx - getPoint()->getZ() * sx,
+               getPoint()->getY() * sx + getPoint()->getZ() * cx,
                moveSubElements);
     }
     
@@ -253,9 +251,9 @@ void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYA
         double cy = cos(-angleAroundYAxis);
         
         setXYZ(
-               point.getX() * cy - point.getZ() * sy,
-               point.getY(),
-               point.getX() * sy + point.getZ() * cy,
+               getPoint()->getX() * cy - getPoint()->getZ() * sy,
+               getPoint()->getY(),
+               getPoint()->getX() * sy + getPoint()->getZ() * cy,
                moveSubElements);
     }
     
@@ -265,9 +263,9 @@ void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYA
         double cz = cos(-angleAroundZAxis);
         
         setXYZ(
-               point.getX() * cz - point.getY() * sz,
-               point.getX() * sz + point.getY() * cz,
-               point.getZ(),
+               getPoint()->getX() * cz - getPoint()->getY() * sz,
+               getPoint()->getX() * sz + getPoint()->getY() * cz,
+               getPoint()->getZ(),
                moveSubElements);
     }
 }
