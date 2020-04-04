@@ -333,9 +333,9 @@ void OSCHandler::handleOwnExternStyleGroupRotate(const OSCMessage& message) cons
     }
 
     String groupString = message[0].getString();
-    double x = GetIntOrFloat(&message[1]);
-    double y = GetIntOrFloat(&message[2]);
-    double z = GetIntOrFloat(&message[3]);
+    double x = Constants::GradToRad(GetIntOrFloat(&message[1]));
+    double y = Constants::GradToRad(GetIntOrFloat(&message[2]));
+    double z = Constants::GradToRad(GetIntOrFloat(&message[3]));
     
     if (pAmbiPoints->rotateGroup(groupString, x, y, z))
     {
@@ -363,9 +363,9 @@ void OSCHandler::handleOwnExternStyleGroupRotateOrigin(const OSCMessage& message
     }
 
     String groupString = message[0].getString();
-    double x = GetIntOrFloat(&message[1]);
-    double y = GetIntOrFloat(&message[2]);
-    double z = GetIntOrFloat(&message[3]);
+    double x = Constants::GradToRad(GetIntOrFloat(&message[1]));
+    double y = Constants::GradToRad(GetIntOrFloat(&message[2]));
+    double z = Constants::GradToRad(GetIntOrFloat(&message[3]));
     bool movePoints = message[4].getInt32();
     
     if (pAmbiPoints->rotateGroupAroundOrigin(groupString, x, y, z, movePoints))
