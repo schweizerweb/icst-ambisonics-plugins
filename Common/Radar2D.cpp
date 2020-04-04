@@ -186,7 +186,7 @@ float Radar2D::getSelectedPointSize(float scaler) const
 
 Point<float> Radar2D::getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const
 {
-    float offset = getEditablePointSize(1.0)*2.0;
+    float offset = getEditablePointSize(1.0)*2.1;
     switch(mode)
     {
         case Stretch:
@@ -309,23 +309,14 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
     
     if(extendedHandles)
     {
-        const float dashLengths[2] = { 1, 1 };
-        Point<float> center;
+        g->setColour(select && currentSpecialHandlingMode == Stretch ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
+        drawStrechIcon(g, getSpecialIconPositionForCenter(screenPt, Stretch), pointSize);
         
-        g->setColour(currentSpecialHandlingMode == Stretch ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
-        center = getSpecialIconPositionForCenter(screenPt, Stretch);
-        drawStrechIcon(g, center, pointSize);
-        g->drawDashedLine(Line<float>(screenPt, center), dashLengths, 2);
+        g->setColour(select && currentSpecialHandlingMode == RotateAroundGroupPoint ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
+        drawRotateIcon(g, getSpecialIconPositionForCenter(screenPt, RotateAroundGroupPoint), pointSize, true);
         
-        g->setColour(currentSpecialHandlingMode == RotateAroundGroupPoint ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
-        center = getSpecialIconPositionForCenter(screenPt, RotateAroundGroupPoint);
-        drawRotateIcon(g, center, pointSize, true);
-        g->drawDashedLine(Line<float>(screenPt, center), dashLengths, 2);
-        
-        g->setColour(currentSpecialHandlingMode == RotateInAedSpace ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
-        center = getSpecialIconPositionForCenter(screenPt, RotateInAedSpace);
-        drawRotateIcon(g, center, pointSize, false);
-        g->drawDashedLine(Line<float>(screenPt, center), dashLengths, 2);
+        g->setColour(select && currentSpecialHandlingMode == RotateInAedSpace ? radarColors.getExtendedHandleSelectionColor() : radarColors.getExtendedHandleColor());
+        drawRotateIcon(g, getSpecialIconPositionForCenter(screenPt, RotateInAedSpace), pointSize, false);
     }
 	
 	Image* img = point->getLabelImage();
