@@ -114,7 +114,7 @@ void OSCHandler::handleOwnExternStyleAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style AED)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(AED)", &message);
 		return;
 	}
 
@@ -149,7 +149,7 @@ void OSCHandler::handleOwnExternStyleXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style XYZ)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(XYZ)", &message);
 		return;
 	}
 
@@ -184,7 +184,7 @@ void OSCHandler::handleOwnExternStyleIndexAed(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if(!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index style AED)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(AED index style)", &message);
 		return;
 	}
 
@@ -219,7 +219,7 @@ void OSCHandler::handleOwnExternStyleIndexXyz(const OSCMessage& message) const
 		&& (message[3].isInt32() || message[3].isFloat32());
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST index style XYZ)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(XYZ index style)", &message);
 		return;
 	}
 
@@ -255,7 +255,7 @@ void OSCHandler::handleOwnExternStyleGroupAed(const OSCMessage& message) const
 		&& message[4].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group AED)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(group AED)", &message);
 		return;
 	}
 
@@ -292,7 +292,7 @@ void OSCHandler::handleOwnExternStyleGroupXyz(const OSCMessage& message) const
 		&& message[4].isInt32();
 	if (!valid)
 	{
-		reportError(ERROR_STRING_MALFORMATTED_OSC + "(ICST string style group XYZ)", &message);
+		reportError(ERROR_STRING_MALFORMATTED_OSC + "(group XYZ)", &message);
 		return;
 	}
 
@@ -316,6 +316,91 @@ void OSCHandler::handleOwnExternStyleGroupXyz(const OSCMessage& message) const
 	{
 		reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
 	}
+}
+
+void OSCHandler::handleOwnExternStyleGroupRotate(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 4
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32())
+        && (message[3].isInt32() || message[3].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(group rotation)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double x = GetIntOrFloat(&message[1]);
+    double y = GetIntOrFloat(&message[2]);
+    double z = GetIntOrFloat(&message[3]);
+    
+    if (pAmbiPoints->rotateGroup(groupString, x, y, z))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
+}
+
+void OSCHandler::handleOwnExternStyleGroupRotateOrigin(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 5
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32())
+        && (message[3].isInt32() || message[3].isFloat32())
+        && message[4].isInt32();
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(group origin rotation)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double x = GetIntOrFloat(&message[1]);
+    double y = GetIntOrFloat(&message[2]);
+    double z = GetIntOrFloat(&message[3]);
+    bool movePoints = message[4].getInt32();
+    
+    if (pAmbiPoints->rotateGroupAroundOrigin(groupString, x, y, z, movePoints))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
+}
+
+void OSCHandler::handleOwnExternStyleGroupStretch(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 2
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(group stretch)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double x = GetIntOrFloat(&message[1]);
+    
+    if (pAmbiPoints->stretchGroup(groupString, x))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
 }
 
 void OSCHandler::oscMessageReceived(const OSCMessage & message)
@@ -353,6 +438,18 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	{
 		handleOwnExternStyleIndexXyz(message);
 	}
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE)))
+    {
+        handleOwnExternStyleGroupRotate(message);
+    }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN)))
+    {
+        handleOwnExternStyleGroupRotateOrigin(message);
+    }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH)))
+    {
+        handleOwnExternStyleGroupStretch(message);
+    }
 	else
 	{
 		reportError("Invalid OSC pattern received: " + pattern.toString(), &message);
