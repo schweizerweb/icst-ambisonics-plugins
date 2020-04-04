@@ -506,6 +506,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 
 void Radar2D::modifierKeysChanged(const juce::ModifierKeys &modifiers) {
     specialGroupManipulationMode = modifiers.isAltDown();
+    currentSpecialHandlingMode = None;
 }
 
 void Radar2D::setRadarMode(RadarMode mode)
@@ -899,6 +900,7 @@ void Radar2D::mouseUp(const MouseEvent& e)
 	}
 
 	selectionRectangleActive = false;
+    currentSpecialHandlingMode = None;
 }
 
 void Radar2D::mouseDoubleClick(const MouseEvent& e)
