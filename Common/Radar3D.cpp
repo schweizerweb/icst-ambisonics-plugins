@@ -47,13 +47,13 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
     btnFull.reset (new ImageButton ("btnFull"));
     addAndMakeVisible (btnFull.get());
-    btnFull->setButtonText (TRANS("new button"));
+    btnFull->setButtonText (TRANS("Full"));
     btnFull->addListener (this);
 
     btnFull->setImages (false, true, false,
                         ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, Colour (0x00000000),
                         Image(), 1.000f, Colour (0xffdd6060),
-                        ImageCache::getFromMemory (flatArrowUpT_png, flatArrowUpT_pngSize), 1.000f, Colour (0x00000000));
+                        ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, Colour (0x00000000));
     btnFull->setBounds (0, 360, 336, 6);
 
 
@@ -64,7 +64,6 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
 
     //[Constructor] You can add your own custom stuff here..
-	btnFull->setClickingTogglesState(true);
     //[/Constructor]
 }
 
@@ -100,7 +99,7 @@ void Radar3D::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-	int secondRadarHeight = int((getHeight() - 3) / (fullRadarFlag ? 2.0 : 3.0));
+	int secondRadarHeight = int((getHeight() - 6) / (fullRadarFlag ? 2.0 : 3.0));
 	int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
 	xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
 	xzRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
@@ -116,7 +115,11 @@ void Radar3D::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == btnFull.get())
     {
         //[UserButtonCode_btnFull] -- add your button handler code here..
-		setRadarMode(btnFull->getToggleState());
+        setRadarMode(!fullRadarFlag);
+        btnFull->setImages (false, true, false,
+            ImageCache::getFromMemory (fullRadarFlag ? flatArrowUpT_png : flatArrowDownT_png, fullRadarFlag ? flatArrowUpT_pngSize : flatArrowDownT_pngSize), 1.000f, Colour (0x00000000),
+            Image(), 1.000f, Colour (0xffdd6060),
+            ImageCache::getFromMemory (fullRadarFlag ? flatArrowUpT_png : flatArrowDownT_png, fullRadarFlag ? flatArrowUpT_pngSize : flatArrowDownT_pngSize), 1.000f, Colour (0x00000000));
         //[/UserButtonCode_btnFull]
     }
 
@@ -155,11 +158,11 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
                     explicitFocusOrder="0" pos="0 0 336 240" class="Radar2D" params="Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
   <IMAGEBUTTON name="btnFull" id="7f9ff0bdbe393e2c" memberName="btnFull" virtualName=""
-               explicitFocusOrder="0" pos="0 360 336 6" buttonText="new button"
-               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="0"
-               resourceNormal="flatArrowDownT_png" opacityNormal="1.0" colourNormal="0"
-               resourceOver="" opacityOver="1.0" colourOver="ffdd6060" resourceDown="flatArrowUpT_png"
-               opacityDown="1.0" colourDown="0"/>
+               explicitFocusOrder="0" pos="0 360 336 6" buttonText="Full" connectedEdges="0"
+               needsCallback="1" radioGroupId="0" keepProportions="0" resourceNormal="flatArrowDownT_png"
+               opacityNormal="1.0" colourNormal="0" resourceOver="" opacityOver="1.0"
+               colourOver="ffdd6060" resourceDown="flatArrowDownT_png" opacityDown="1.0"
+               colourDown="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
