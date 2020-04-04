@@ -13,6 +13,8 @@
 StatusMessageHandler::StatusMessageHandler()
 {
 	pLabel = nullptr;
+    pTextEditor = nullptr;
+    errorFlag = false;
 }
 
 void StatusMessageHandler::registerLabel(Label* label)
@@ -41,29 +43,6 @@ void StatusMessageHandler::unregisterDetailLog()
 
 void StatusMessageHandler::showMessage(String message, String detailMessage, MessageStyle style)
 {
-	if (pLabel != nullptr)
-	{
-		int timeout;
-		stopTimer();
-
-		const ScopedLock lock(cs);
-		switch (style)
-		{
-		case Error:
-			pLabel->setColour(Label::textColourId, Colours::red);
-			pLabel->setColour(Label::backgroundColourId, Colours::yellow);
-			timeout = 3000;
-			break;
-		default:
-			pLabel->setColour(Label::textColourId, Colours::white);
-			pLabel->setColour(Label::backgroundColourId, Colours::green);
-			timeout = 500;
-		}
-
-		pLabel->setText(message, sendNotification);
-		startTimer(timeout);
-	}
-    
     if(pTextEditor != nullptr)
     {
         pTextEditor->setColour(TextEditor::textColourId, style == Error ? Colours::red : Colours::limegreen);
@@ -72,6 +51,32 @@ void StatusMessageHandler::showMessage(String message, String detailMessage, Mes
         pTextEditor->moveCaretToEnd();
         pTextEditor->insertTextAtCaret(Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n");
     }
+    
+	if (pLabel != nullptr)
+	{
+        const ScopedLock lock(cs);
+        
+        if(style == Error)
+        {
+            stopTimer();
+            pLabel->setColour(Label::textColourId, Colours::red);
+            pLabel->setColour(Label::backgroundColourId, Colours::yellow);
+            errorFlag = true;
+            pLabel->setText(message, sendNotification);
+            startTimer(3000);
+        }
+        else
+        {
+            if(!errorFlag) // do not overwrite error messages
+            {
+                stopTimer();
+                pLabel->setColour(Label::textColourId, Colours::white);
+                pLabel->setColour(Label::backgroundColourId, Colours::green);
+                pLabel->setText(message, sendNotification);
+                startTimer(500);
+            }
+        }
+	}
 }
 
 void StatusMessageHandler::timerCallback()
@@ -83,5 +88,6 @@ void StatusMessageHandler::timerCallback()
 		pLabel->setColour(Label::textColourId, Colours::green);
 		pLabel->setColour(Label::backgroundColourId, Colours::transparentBlack);
 		pLabel->setText("", dontSendNotification);
+        errorFlag = false;
 	}
 }

@@ -30,4 +30,5 @@ private:
 	Label* pLabel;
     TextEditor* pTextEditor;
 	CriticalSection cs;
+    bool errorFlag;
 };
