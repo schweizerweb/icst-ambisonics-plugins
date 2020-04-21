@@ -33,6 +33,7 @@ AmbiSpeaker::AmbiSpeaker(XmlElement* element) :
 	filterInfo.filterType = FilterInfo::FilterType(element->getIntAttribute(XML_ATTRIBUTE_POINT_FILTER_TYPE));
 	filterInfo.cutOffFrequencyHz = float(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_FILTER_FREQUENCY, DEFAULT_FREQUENCY));
 	filterInfo.qValue = float(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_FILTER_Q, DEFAULT_Q));
+    filterInfo.gainFactor = float(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_FILTER_GAIN_FACTOR, DEFAULT_GAIN_FACTOR));
 }
 
 FilterInfo* AmbiSpeaker::getFilterInfo()
@@ -51,5 +52,6 @@ XmlElement* AmbiSpeaker::getAsXmlElement(String tagName)
 	element->setAttribute(XML_ATTRIBUTE_POINT_FILTER_TYPE, int(filterInfo.filterType));
 	element->setAttribute(XML_ATTRIBUTE_POINT_FILTER_FREQUENCY, double(filterInfo.cutOffFrequencyHz));
 	element->setAttribute(XML_ATTRIBUTE_POINT_FILTER_Q, double(filterInfo.qValue));
+    element->setAttribute(XML_ATTRIBUTE_POINT_FILTER_GAIN_FACTOR, double(filterInfo.gainFactor));
 	return element;
 }
