@@ -4,7 +4,7 @@
 <Move>Right Mouse Button Drag-Drop</Move>
 <ZoomIn name="Zoom In">Right Mouse Button Click / MouseWheel</ZoomIn>
 <ZoomOut name="Zoom Out">Shift + Right Mouse Button Click / MouseWheel</ZoomOut>
-<ResetZoom name="Reset Zoom">Home-Button (OSX: Cmd + Left Arrow)</ResetZoom>
+<ResetZoom name="Reset Zoom">Home-Button (OSX: Fn + Left Arrow)</ResetZoom>
 </Radar>
 <Point>
 <SelectPoint name="Select Point">Click Point</SelectPoint>
