@@ -14,7 +14,7 @@
 class AdditionalWindow : public DialogWindow
 {
 public:
-    AdditionalWindow(String title, Component* pComponent): DialogWindow("Encoder settings", Colours::white, false, true)
+    AdditionalWindow(String title, Component* pComponent): DialogWindow(title, Colours::white, false, true)
     {
         pDialogContent = pComponent;
     }
