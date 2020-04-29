@@ -29,7 +29,7 @@ bool AmbiOSCSenderExt::start(String targetHost, int port)
 	bool ret = oscSender->connect(targetHost, port);
 	if (ret)
 	{
-		startTimerHz(5);
+		startTimerHz(20);
 	}
 	return ret;
 }
