@@ -20,7 +20,7 @@
 <MoveGroup name="Move Group(s)">Drag-Drop Selected Group Point(s)</MoveGroup>
 <MoveGroupPointOnly name="Move Group Point(s) only">Shift + Drag-Drop Selected Group Point(s)</MoveGroupPointOnly>
 <StretchGroupPoints name="Stretch Group">Alt -> Stretchsymbol -> Mouse Up/down to increase/decrease stretch</StretchGroupPoints>
-<RotateGroupPoints name="Rotate Group Points">Alt -> Drag-Drop Rotate-Around-Group-Symbol</RotateGroupPoints>
+<RotateGroupPoints name="Rotate Point(s) around Group Point(s)">Alt -> Drag-Drop Rotate-Around-Group-Symbol</RotateGroupPoints>
 <RotateGroupAroundOrigin name="Rotate Group(s) around Origin">Alt -> Drag-Drop Rotate-Around-Origin-Symbol</RotateGroupAroundOrigin>
 </Group>
 </Documentation>
