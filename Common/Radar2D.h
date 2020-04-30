@@ -87,6 +87,7 @@ private:
 	void timerCallback() override;
     bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
     void calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ);
+    bool containsIncludingBoder(const Rectangle<int>* rect, Point<int> point) const;
     
     
 private:

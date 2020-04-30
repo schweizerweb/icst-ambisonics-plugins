@@ -273,12 +273,17 @@ void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screen
 	}
 }
 
+bool Radar2D::containsIncludingBoder(const Rectangle<int> *rect, Point<int> point) const
+{
+    return point.x >= rect->getX() && point.y >= rect->getY() && point.x <= rect->getRight() && point.y <= rect->getBottom();
+}
+
 void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize, bool extendedHandles) const
 {
 	Point3D<double>* pt = point->getPoint();
 	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(pt).toFloat());
     
-    if(!radarViewport.contains(screenPt.toInt()))
+    if(!containsIncludingBoder(&radarViewport, screenPt.toInt()))
         return;
     
 	if (select)
