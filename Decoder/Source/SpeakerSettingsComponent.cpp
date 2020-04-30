@@ -283,7 +283,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 SpeakerSettingsComponent::~SpeakerSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-	pTestSoundGenerator->reset();
+    pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
@@ -793,13 +793,15 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
     }
     else if(message == ACTION_MESSAGE_PRESET_CHANGED)
     {
+        if(pAmbiSettings->getWarningFlag())
+        {
+            const MessageManagerLock lock;
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Inconsistent Ambisonic Order", "This preset was saved using a different order plugin. Ambisonic channel weighting may have to be adjusted.");
+        }
+        
         updateUI();
         controlDimming();
         sendChangeMessage();
-        if(pAmbiSettings->getWarningFlag())
-        {
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Inconsistent Ambisonic Order", "This preset was saved using a different order plugin. Ambisonic channel weighting may have to be adjusted.");
-        }
     }
 }
 
