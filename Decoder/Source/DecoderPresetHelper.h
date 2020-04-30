@@ -114,7 +114,7 @@ public:
         else
         {
             Point<float> projectedPoint(0.0, 1.0);
-            projectedPoint = projectedPoint.rotatedAboutOrigin(-float(PI / numberOfSpeakers));
+            projectedPoint = projectedPoint.rotatedAboutOrigin(float(PI / numberOfSpeakers));
             for (int i = 0; i < numberOfSpeakers; i++)
             {
                 speakerSet.addNew(Uuid().toString(), Point3D<double>(projectedPoint.getX(), projectedPoint.getY(), 0.0), String(i + 1), TrackColors::getSpeakerColor());
