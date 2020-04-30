@@ -31,7 +31,7 @@
 #include "../../Common/AmbiSpeakerSet.h"
 #include "FilterSettingsComponent.h"
 #include "DecoderPresetHelper.h"
-#include "../../Common/PresetManagerComponent.h"
+#include "../../Common/PresetManagerDialog.h"
 //[/Headers]
 
 
@@ -111,7 +111,7 @@ private:
 	DelayHelper delayHelper;
 	TestSoundGenerator* pTestSoundGenerator;
 	dsp::ProcessSpec* pFilterSpecification;
-    std::unique_ptr<PresetManagerComponent> presetManagerComponent;
+    PresetManagerDialog presetManagerDialog;
     //[/UserVariables]
 
     //==============================================================================

@@ -23,7 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SourceDefinitionComponent.h"
 #include "EncoderPresetHelper.h"
-#include "../../Common/PresetManagerComponent.h"
+#include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
 //[/Headers]
 
@@ -70,7 +70,7 @@ private:
     EncoderSettings* pEncoderSettings;
     AmbiSourceSet* pSources;
     Array<AudioParameterSet>* pAudioParams;
-    std::unique_ptr<PresetManagerComponent> presetManagerComponent;
+    PresetManagerDialog presetManagerDialog;
     EncoderPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;
     //[/UserVariables]

@@ -241,8 +241,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonManagePresets.get())
     {
         //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
-        presetManagerComponent.reset(new PresetManagerComponent(pPresetHelper));
-        DialogWindow::showDialog("Preset Manager", presetManagerComponent.get(), this, Colours::black, true);
+        presetManagerDialog.show(pPresetHelper);
         //[/UserButtonCode_buttonManagePresets]
     }
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())

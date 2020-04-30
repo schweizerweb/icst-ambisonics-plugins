@@ -479,8 +479,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonManage.get())
     {
         //[UserButtonCode_buttonManage] -- add your button handler code here..
-        presetManagerComponent.reset(new PresetManagerComponent(pPresetHelper));
-        DialogWindow::showDialog("Preset Manager", presetManagerComponent.get(), this, Colours::black, true);
+        presetManagerDialog.show(this, pPresetHelper);
         //[/UserButtonCode_buttonManage]
     }
 
