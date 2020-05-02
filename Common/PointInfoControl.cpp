@@ -412,7 +412,8 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 		textD->setText("-");
 	}
 
-	btnGroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1 && pEditablePoints->groupCount() < pRadarOptions->audioParams->groupParams.size());
+	btnGroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
+                         && ( pRadarOptions->audioParams == nullptr || pEditablePoints->groupCount() < pRadarOptions->audioParams->groupParams.size()));
 	btnUngroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1);
 	textX->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
 	textY->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
