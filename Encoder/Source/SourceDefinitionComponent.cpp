@@ -85,6 +85,16 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
+    buttonMoveGroupDown.reset (new TextButton ("buttonMoveGroupDown"));
+    addAndMakeVisible (buttonMoveGroupDown.get());
+    buttonMoveGroupDown->setButtonText (TRANS("down"));
+    buttonMoveGroupDown->addListener (this);
+
+    buttonMoveGroupUp.reset (new TextButton ("buttonMoveGroupUp"));
+    addAndMakeVisible (buttonMoveGroupUp.get());
+    buttonMoveGroupUp->setButtonText (TRANS("up"));
+    buttonMoveGroupUp->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -127,6 +137,8 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
+    buttonMoveGroupDown = nullptr;
+    buttonMoveGroupUp = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -151,16 +163,18 @@ void SourceDefinitionComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4000f), getWidth() - 0, proportionOfHeight (0.4000f));
-    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4000f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4000f) - 67);
-    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4000f)) + proportionOfHeight (0.4000f) - 40, 64, 24);
-    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4000f)) + proportionOfHeight (0.4000f) - 40, 64, 24);
-    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.6000f));
-    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.6000f) - 67);
-    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
-    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
-    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.6000f) - 40, 64, 24);
+    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4006f), getWidth() - 0, proportionOfHeight (0.4006f));
+    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4006f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4006f) - 67);
+    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
+    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
+    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5994f));
+    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5994f) - 67);
+    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
+    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
+    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
+    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
+    buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
+    buttonMoveGroupUp->setBounds (0 + (getWidth() - 0) - 152, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -243,7 +257,6 @@ void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
             pSources->swap(selection, selection + 1);
             pPointSelection->selectPoint(selection + 1);
         }
-
         //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp.get())
@@ -256,8 +269,37 @@ void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
             pSources->swap(selection, selection - 1);
             pPointSelection->selectPoint(selection - 1);
         }
-
         //[/UserButtonCode_buttonMoveUp]
+    }
+    else if (buttonThatWasClicked == buttonMoveGroupDown.get())
+    {
+        //[UserButtonCode_buttonMoveGroupDown] -- add your button handler code here..
+        if(pPointSelection->getSelectionMode() == PointSelection::Group)
+        {
+            int selection = pPointSelection->getMainSelectedPointIndex();
+            if (selection >= 0 && selection < pSources->groupCount() - 1)
+            {
+                pPointSelection->unselectPoint();
+                pSources->swapGroup(selection, selection + 1);
+                pPointSelection->selectGroup(selection + 1, false);
+            }
+        }
+        //[/UserButtonCode_buttonMoveGroupDown]
+    }
+    else if (buttonThatWasClicked == buttonMoveGroupUp.get())
+    {
+        //[UserButtonCode_buttonMoveGroupUp] -- add your button handler code here..
+        if(pPointSelection->getSelectionMode() == PointSelection::Group)
+        {
+            int selection = pPointSelection->getMainSelectedPointIndex();
+            if (selection >= 1 && selection < pSources->groupCount())
+            {
+                pPointSelection->unselectPoint();
+                pSources->swapGroup(selection, selection - 1);
+                pPointSelection->selectGroup(selection - 1, false);
+            }
+        }
+        //[/UserButtonCode_buttonMoveGroupUp]
     }
 
     //[UserbuttonClicked_Post]
@@ -325,9 +367,10 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.03%" posRelativeX="73249ab85d6bba3a"
-                  posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
-                  posRelativeH="73249ab85d6bba3a" title="Groups"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.057%"
+                  posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
+                  posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
+                  title="Groups"/>
   <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="983b0a3b2c5c945a"
                     posRelativeY="983b0a3b2c5c945a" posRelativeW="983b0a3b2c5c945a"
@@ -341,7 +384,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.97%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.943%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
@@ -363,6 +406,14 @@ BEGIN_JUCER_METADATA
   <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
               virtualName="" explicitFocusOrder="0" pos="152R 40R 64 24" posRelativeX="da4e7711e3fff0be"
               posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonMoveGroupDown" id="9952d6c7fdf6c103" memberName="buttonMoveGroupDown"
+              virtualName="" explicitFocusOrder="0" pos="80R 40R 64 24" posRelativeX="983b0a3b2c5c945a"
+              posRelativeY="983b0a3b2c5c945a" buttonText="down" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonMoveGroupUp" id="a7a2e7a9aeab456c" memberName="buttonMoveGroupUp"
+              virtualName="" explicitFocusOrder="0" pos="152R 40R 64 24" posRelativeX="983b0a3b2c5c945a"
+              posRelativeY="983b0a3b2c5c945a" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 

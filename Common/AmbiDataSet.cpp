@@ -397,3 +397,19 @@ bool AmbiDataSet::nameExists(String name) const
 
 	return false;
 }
+
+void AmbiDataSet::swapGroup(int a, int b)
+{
+    if (groups.size() > a && groups.size() > b)
+    {
+        // keep audio parameter for index
+        Point3D<double>* pointA = groups.getUnchecked(a)->getPoint();
+        Point3D<double>* pointB = groups.getUnchecked(b)->getPoint();
+        
+        AudioParameterSet setA = pointA->getAudioParameterSet();
+        pointA->setAudioParameterSet(pointB->getAudioParameterSet());
+        pointB->setAudioParameterSet(setA);
+        groups.swap(a, b);
+    }
+}
+

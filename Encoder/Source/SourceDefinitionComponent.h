@@ -83,6 +83,8 @@ private:
     std::unique_ptr<TextButton> buttonRemove;
     std::unique_ptr<TextButton> buttonMoveDown;
     std::unique_ptr<TextButton> buttonMoveUp;
+    std::unique_ptr<TextButton> buttonMoveGroupDown;
+    std::unique_ptr<TextButton> buttonMoveGroupUp;
 
 
     //==============================================================================

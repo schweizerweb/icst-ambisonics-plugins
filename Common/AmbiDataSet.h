@@ -65,6 +65,7 @@ public:
     bool stretchGroup(String groupName, double stretchValue);
     bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
+    void swapGroup(int a, int b);
 
 private:
 	bool nameExists(String name) const;
