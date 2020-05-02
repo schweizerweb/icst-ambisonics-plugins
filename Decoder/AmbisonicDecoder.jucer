@@ -99,6 +99,7 @@
             file="../Common/AmbiSpeakerSet.cpp"/>
       <FILE id="EzUhBa" name="AmbiSpeakerSet.h" compile="0" resource="0"
             file="../Common/AmbiSpeakerSet.h"/>
+      <FILE id="rEXoft" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
       <FILE id="RAo2Ku" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
       <FILE id="rdwYUW" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="clRUKZ" name="DelayBuffer.cpp" compile="1" resource="0" file="../Common/DelayBuffer.cpp"/>
