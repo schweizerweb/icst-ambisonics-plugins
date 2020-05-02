@@ -20,7 +20,7 @@ class AmbiGroup : public AmbiPoint
 {
 public:
 	AmbiGroup(String id, Point3D<double> point, String name, Colour color) : AmbiPoint(id, point, name, color) {}
-	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources);
+	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet);
 	virtual ~AmbiGroup() = default;
 
 	float getDisplayScaler() override;

@@ -20,6 +20,7 @@
 #include "../../Common/VarDelayBuffer.h"
 #include "../../Common/DelayHelper.h"
 #include "EncoderPresetHelper.h"
+#include "../../Common/AudioParams.h"
 
 //==============================================================================
 /**
@@ -70,7 +71,7 @@ public:
 	EncoderSettings* getEncoderSettings();
 	void initializeOsc();
     void initializeAudioParameter();
-	Array<AudioParameterSet>* getAudioParams();
+	AudioParams* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
 	DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
@@ -85,7 +86,7 @@ private:
 	OSCHandler* pOscHandler;
 	AmbiOSCSender* pOscSender;
 	AmbiOSCSenderExt* pOscSenderExt;
-	Array<AudioParameterSet> audioParams;
+	AudioParams audioParams;
 	StatusMessageHandler statusMessageHandler;
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;

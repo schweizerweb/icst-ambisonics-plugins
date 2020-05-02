@@ -928,11 +928,11 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	int index = pEditablePoints->size();
 	switch (radarMode) {
 	case XY:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	case XZ_Half:
 	case XZ_Full:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
 		break;
 	}
 

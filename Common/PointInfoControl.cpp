@@ -351,7 +351,7 @@ void PointInfoControl::buttonClicked (Button* buttonThatWasClicked)
 			Point<double> centerXY = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
             double centerZ = (minZ + maxZ) / 2.0;
 
-			AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(centerXY.getX(), centerXY.getY(), centerZ), "G", Colours::orange);
+			AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(centerXY.getX(), centerXY.getY(), centerZ, pRadarOptions->getAudioParamForIndex(pEditablePoints->groupCount(), true)), "G", Colours::orange);
 			for (int i : selection)
 			{
 				g->groupPoints.add(pEditablePoints->get(i));

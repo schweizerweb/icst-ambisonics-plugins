@@ -46,7 +46,7 @@ class EncodingSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
+    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
     ~EncodingSettingsComponent() override;
 
     //==============================================================================
@@ -69,7 +69,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     EncoderSettings* pEncoderSettings;
     AmbiSourceSet* pSources;
-    Array<AudioParameterSet>* pAudioParams;
+    AudioParams* pAudioParams;
     PresetManagerDialog presetManagerDialog;
     EncoderPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;

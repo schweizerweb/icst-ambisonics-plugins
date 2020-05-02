@@ -39,6 +39,9 @@ public:
 	void setX(int channel, double x, bool notify = true) const;
 	void setY(int channel, double y, bool notify = true) const;
 	void setZ(int channel, double z, bool notify = true) const;
+    void setGroupX(int channel, double x, bool notify = true) const;
+    void setGroupY(int channel, double y, bool notify = true) const;
+    void setGroupZ(int channel, double z, bool notify = true) const;
 	void setAzimuth(int channel, double azimuth) const;
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;

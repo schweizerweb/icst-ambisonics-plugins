@@ -10,7 +10,7 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "../../Common/AudioParameterSet.h"
+#include "../../Common/AudioParams.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PresetHelper.h"
 #include "../../Common/TrackColors.h"
@@ -26,7 +26,7 @@ public:
     {
     }
     
-    bool loadFromXmlFile(const File file, Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    bool loadFromXmlFile(const File file, AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {
         XmlDocument doc(file);
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("EncoderPreset");
@@ -88,7 +88,7 @@ public:
         presetFiles.addIfNotAlreadyThere(file);
     }
     
-    void loadDefaultPreset(Array<AudioParameterSet>* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    void loadDefaultPreset(AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {
         for(File f : presetFiles)
         {

@@ -133,7 +133,7 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 	elements.add(new AmbiSource(id, point, name, color));
 }
 
-void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>* pAudioParams)
+void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams)
 {
 	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	clear();
@@ -143,8 +143,8 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>
 		XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
 		while (xmlPoint != nullptr)
 		{
-			if ( pAudioParams != nullptr && pAudioParams->size() > index)
-				add(new AmbiSource(xmlPoint, pAudioParams->getUnchecked(index)));
+			if (pAudioParams != nullptr && pAudioParams->sourceParams.size() > index)
+				add(new AmbiSource(xmlPoint, pAudioParams->sourceParams.getUnchecked(index)));
 			else
 				add(new AmbiSource(xmlPoint, AudioParameterSet()));
 
@@ -162,13 +162,15 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>
 		XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
 		while (xmlGroup != nullptr)
 		{
-			groups.add(new AmbiGroup(xmlGroup, &elements));
+            if(pAudioParams != nullptr && pAudioParams->groupParams.size() > index)
+                groups.add(new AmbiGroup(xmlGroup, &elements, pAudioParams->groupParams.getUnchecked(index)));
+            else
+                groups.add(new AmbiGroup(xmlGroup, &elements, AudioParameterSet()));
+            
 			xmlGroup = xmlGroup->getNextElement();
 			index++;
 		}
 	}
-
-	
 }
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const

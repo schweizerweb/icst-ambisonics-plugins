@@ -30,7 +30,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams)
+SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams)
     : pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -173,12 +173,18 @@ void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonAddGroup.get())
     {
         //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
-        Uuid newId = Uuid();
-        pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "G", Colours::orange);
-        pPointSelection->selectGroup(pSources->groupCount() - 1, false);
-        groupList->updateContent();
-        groupList->repaint();
-
+        if(pAudioParams != nullptr && pSources->groupCount() < pAudioParams->groupParams.size())
+        {
+            Uuid newId = Uuid();
+            pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->groupParams.getUnchecked(pSources->groupCount())), "G", Colours::orange);
+            pPointSelection->selectGroup(pSources->groupCount() - 1, false);
+            groupList->updateContent();
+            groupList->repaint();
+        }
+        else
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "No more groups allowed!");
+        }
         //[/UserButtonCode_buttonAddGroup]
     }
     else if (buttonThatWasClicked == buttonRemoveGroup.get())
@@ -198,10 +204,10 @@ void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-        if (pAudioParams != nullptr && pSources->size() < pAudioParams->size())
+        if (pAudioParams != nullptr && pSources->size() < pAudioParams->sourceParams.size())
         {
             Uuid newId = Uuid();
-            pSources->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->getUnchecked(pSources->size())), pSources->getNewUniqueName(), TrackColors::getColor(pSources->size() + 1));
+            pSources->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->sourceParams.getUnchecked(pSources->size())), pSources->getNewUniqueName(), TrackColors::getColor(pSources->size() + 1));
             pPointSelection->selectPoint(pSources->size() - 1);
             sourceList->updateContent();
             sourceList->repaint();
@@ -284,11 +290,11 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
 
 void SourceDefinitionComponent::controlDimming() const
 {
-    buttonAdd->setEnabled(pSources->size() < pAudioParams->size());
+    buttonAdd->setEnabled(pSources->size() < pAudioParams->sourceParams.size());
     buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pSources->size() > 0);
     buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
     buttonMoveDown->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
-    buttonAdd->setEnabled(true);
+    buttonAddGroup->setEnabled(true);
     buttonRemoveGroup->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
 }
 
@@ -313,7 +319,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
                  componentName="" parentClasses="public Component, public ChangeListener, public ChangeBroadcaster"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams"
                  variableInitialisers="pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">

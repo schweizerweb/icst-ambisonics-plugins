@@ -29,7 +29,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper)
+EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -119,7 +119,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
                  componentName="" parentClasses="public Component, public ActionBroadcaster"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>

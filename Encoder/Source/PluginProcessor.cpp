@@ -67,20 +67,35 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
     // points (X, Y, Z, Gain)
      for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
      {
-         String indexStr = String(i + 1);
+        String indexStr = String(i + 1);
          
-         AudioParameterSet set;
-         set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
-         set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
-         set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
-         set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::GainDbMin, Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
+        AudioParameterSet set;
+        set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
+        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
+        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
+        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::GainDbMin, Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
 
-         audioParams.add(set);
-         addParameter(set.pX);
-         addParameter(set.pY);
-         addParameter(set.pZ);
-         addParameter(set.pGain);
-     }
+        audioParams.sourceParams.add(set);
+        addParameter(set.pX);
+        addParameter(set.pY);
+        addParameter(set.pZ);
+        addParameter(set.pGain);
+    }
+    
+    for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+    {
+        String indexStr = String(i + 1);
+        
+        AudioParameterSet set;
+        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GX);
+        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GY);
+        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GZ);
+
+        audioParams.groupParams.add(set);
+        addParameter(set.pX);
+        addParameter(set.pY);
+        addParameter(set.pZ);
+    }
 }
 
 //==============================================================================
@@ -292,7 +307,7 @@ AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
 	return &sources;
 }
 
-Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()
+AudioParams* AmbisonicEncoderAudioProcessor::getAudioParams()
 {
 	return &audioParams;
 }

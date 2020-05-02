@@ -46,7 +46,7 @@ class SourceDefinitionComponent  : public Component,
 {
 public:
     //==============================================================================
-    SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams);
+    SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams);
     ~SourceDefinitionComponent() override;
 
     //==============================================================================
@@ -66,7 +66,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbiSourceSet* pSources;
     PointSelection* pPointSelection;
-    Array<AudioParameterSet>* pAudioParams;
+    AudioParams* pAudioParams;
     std::unique_ptr<GroupTableListModel> groupModel;
     std::unique_ptr<SourceTableListModel> sourceModel;
     EncoderSettings* pEncoderSettings;

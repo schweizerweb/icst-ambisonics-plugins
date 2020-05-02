@@ -11,6 +11,7 @@
 #pragma once
 #include "AmbiDataSet.h"
 #include "AmbiSource.h"
+#include "AudioParams.h"
 
 #define XML_TAG_SOURCES "Sources"
 #define XML_TAG_SOURCE "Source"
@@ -33,7 +34,7 @@ public:
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;
-	void loadFromXml(XmlElement* xmlElement, Array<AudioParameterSet>* pAudioParams);
+	void loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams);
 	void writeToXmlElement(XmlElement* xml) const;
     void resetIds();
 

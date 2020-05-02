@@ -156,6 +156,30 @@ void AmbiDataSet::setZ(int channel, double z, bool notify) const
 		pt->getPoint()->setZ(z, notify);
 }
 
+void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setX(x, notify);
+}
+
+void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setY(y, notify);
+}
+
+void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setZ(z, notify);
+}
+
 void AmbiDataSet::setAzimuth(int channel, double azimuth) const
 {
 	AmbiPoint* pt = get(channel);

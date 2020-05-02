@@ -10,7 +10,7 @@
 
 #include "AmbiGroup.h"
 
-AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources) : AmbiPoint(xmlElement)
+AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet) : AmbiPoint(xmlElement, audioParameterSet)
 {
 	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
 	groupPoints.clear();

@@ -29,7 +29,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
+EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
     : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -344,7 +344,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array&lt;AudioParameterSet&gt;* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
                  variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">

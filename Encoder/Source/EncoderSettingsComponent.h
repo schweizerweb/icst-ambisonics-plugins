@@ -41,7 +41,7 @@ class EncoderSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, Array<AudioParameterSet>* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper);
+    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper);
     ~EncoderSettingsComponent() override;
 
     //==============================================================================
