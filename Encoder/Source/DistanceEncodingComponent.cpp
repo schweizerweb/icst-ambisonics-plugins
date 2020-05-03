@@ -177,15 +177,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Advanced], EncoderConstants::Advanced);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
-    comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
-    sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
-    sliderDbUnit->setSkewFactorFromMidPoint(5.0);
-    sliderDbUnit->setValue(pParams->getDbUnit(), dontSendNotification);
-    sliderDistanceAttenuation->setValue(pParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
-    sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
-    sliderCenterCurve->setValue(pParams->getCenterCurve(), dontSendNotification);
-    sliderAdvancedFactor->setValue(pParams->getAdvancedFactor(), dontSendNotification);
-    sliderAdvancedExponent->setValue(pParams->getAdvancedExponent(), dontSendNotification);
+    setUiValues(pParams);
 
     // set slider ranges according to constants
     sliderUnitCircleRadius->setRange(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax, EncoderConstants::UnitCircleRadiusResolution);
@@ -194,13 +186,17 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
     sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
     sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
+    
+    pParams->addChangeListener(this);
     controlDimming();
+
     //[/Constructor]
 }
 
 DistanceEncodingComponent::~DistanceEncodingComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pParams->removeChangeListener(this);
     //[/Destructor_pre]
 
     distanceEncodingGraph = nullptr;
@@ -337,6 +333,24 @@ void DistanceEncodingComponent::controlDimming() const
     labelAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
 }
 
+void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pParams) {
+    comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
+    sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
+    sliderDbUnit->setSkewFactorFromMidPoint(5.0);
+    sliderDbUnit->setValue(pParams->getDbUnit(), dontSendNotification);
+    sliderDistanceAttenuation->setValue(pParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
+    sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
+    sliderCenterCurve->setValue(pParams->getCenterCurve(), dontSendNotification);
+    sliderAdvancedFactor->setValue(pParams->getAdvancedFactor(), dontSendNotification);
+    sliderAdvancedExponent->setValue(pParams->getAdvancedExponent(), dontSendNotification);
+    controlDimming();
+    distanceEncodingGraph->repaint();
+}
+
+void DistanceEncodingComponent::changeListenerCallback(ChangeBroadcaster *source)
+{
+    setUiValues(pParams);
+}
 //[/MiscUserCode]
 
 
@@ -350,10 +364,10 @@ void DistanceEncodingComponent::controlDimming() const
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DistanceEncodingComponent"
-                 componentName="" parentClasses="public Component" constructorParams="DistanceEncodingParams* pParams"
-                 variableInitialisers="pParams(pParams)" snapPixels="8" snapActive="1"
-                 snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
-                 initialHeight="400">
+                 componentName="" parentClasses="public Component, ChangeListener"
+                 constructorParams="DistanceEncodingParams* pParams" variableInitialisers="pParams(pParams)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
                     virtualName="" explicitFocusOrder="0" pos="0 184 100% 184M" class="DistanceEncodingGraph"

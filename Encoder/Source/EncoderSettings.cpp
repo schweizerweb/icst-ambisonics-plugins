@@ -40,7 +40,6 @@ EncoderSettings::EncoderSettings():
 	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
-    distanceEncodingParams(DistanceEncodingParams()),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG)
 {
 }

@@ -20,7 +20,7 @@
 #define DEFAULT_ADVANCED_EXPONENT  	    1.0f
 #define DEFAULT_DISTANCE_ENCODING_MODE  EncoderConstants::Standard
 
-class DistanceEncodingParams
+class DistanceEncodingParams : AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
 public:
     
@@ -65,6 +65,14 @@ public:
         pProcessor->addParameter(centerCurve);
         pProcessor->addParameter(advancedFactor);
         pProcessor->addParameter(advancedExponent);
+        
+        encodingMode->addListener(this);
+        unitCircleRadius->addListener(this);
+        dbUnit->addListener(this);
+        inverseProportionalDistanceAttenuation->addListener(this);
+        centerCurve->addListener(this);
+        advancedFactor->addListener(this);
+        advancedExponent->addListener(this);
     }
     
 	void calculateAttenuation(double distance, double* wFactor, double* otherFactor) const
@@ -227,4 +235,13 @@ private:
     float localCenterCurve;
     float localAdvancedFactor;
     float localAdvancedExponent;
+    
+    void parameterValueChanged(int parameterIndex, float newValue) override {
+        sendChangeMessage();
+    }
+    
+    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {
+        
+    }
+    
 };
