@@ -38,7 +38,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pAmbiSettings = ownerProc.getAmbiSettings();
 	pDecoderSettings = ownerProc.getDecoderSettings();
 	pFilterSpecification = ownerProc.getFilterSpecification();
-	pOscHandler = new OSCHandler(pMovingPoints);
+	pOscHandler = new OSCHandlerDecoder(pMovingPoints);
 	initializeOscHandler();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = false;

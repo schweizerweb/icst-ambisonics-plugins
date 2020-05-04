@@ -26,7 +26,7 @@
 #include "SpeakerSettingsDialog.h"
 #include "../../Common/RadarComponent.h"
 #include "../../Common/RadarOptions.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerDecoder.h"
 #include "../../Common/HelpDialogManager.h"
 //[/Headers]
 

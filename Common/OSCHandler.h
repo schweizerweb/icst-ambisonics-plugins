@@ -15,8 +15,6 @@
 #include "StatusMessageHandler.h"
 #include "AmbiSourceSet.h"
 
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
-
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 
@@ -30,8 +28,7 @@ public:
 protected:
     virtual bool handleSpecific(const OSCMessage& message) = 0;
 	static double GetIntOrFloat(const OSCArgument* pOscArgument);
-	void handleOwnInternalStyle(const OSCMessage& message) const;
-    void oscMessageReceived(const OSCMessage& message) override;
+	void oscMessageReceived(const OSCMessage& message) override;
 	void reportError(String message, const OSCMessage* pMsg) const;
 	void reportSuccess(const OSCMessage* pMsg) const;
 	bool checkAed(double a, double e, double d, String* errorString) const;
