@@ -42,10 +42,12 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void showInfo(String info);
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
+    void broughtToFront() override;
     void mouseUp (const MouseEvent& e) override;
 
     // Binary resources:

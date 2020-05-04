@@ -92,6 +92,13 @@ void HelpOscSyntax::resized()
     //[/UserResized]
 }
 
+void HelpOscSyntax::broughtToFront()
+{
+    //[UserCode_broughtToFront] -- Add your code here...
+    showInfo("Right-Click on Element to copy to clipboard...");
+    //[/UserCode_broughtToFront]
+}
+
 void HelpOscSyntax::mouseUp (const MouseEvent& e)
 {
     //[UserCode_mouseUp] -- Add your code here...
@@ -102,11 +109,7 @@ void HelpOscSyntax::mouseUp (const MouseEvent& e)
             TreeViewItem* item = treeViewOscSyntax->getSelectedItem(0);
             String copyText = ((TreeViewItemHelp*)item)->getCopyableString();
             SystemClipboard::copyTextToClipboard(copyText);
-            Label* label = new Label();
-            label->setSize(this->getWidth() - 40, 30);
-            label->setText("Copied to clipboard: " + copyText, dontSendNotification);
-            label->setJustificationType(Justification::centred);
-            CallOutBox::launchAsynchronously(label , getScreenBounds(), this);
+            showInfo("Copied to clipboard: " + copyText);
         }
     }
     //[/UserCode_mouseUp]
@@ -115,6 +118,14 @@ void HelpOscSyntax::mouseUp (const MouseEvent& e)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void HelpOscSyntax::showInfo(String info)
+{
+    Label* label = new Label();
+    label->setSize(this->getWidth() - 40, 30);
+    label->setText(info, dontSendNotification);
+    label->setJustificationType(Justification::centred);
+    CallOutBox::launchAsynchronously(label , getScreenBounds(), this);
+}
 //[/MiscUserCode]
 
 
@@ -133,6 +144,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <METHODS>
     <METHOD name="mouseUp (const MouseEvent&amp; e)"/>
+    <METHOD name="broughtToFront()"/>
   </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TREEVIEW name="treeViewOscSyntax" id="996dafc9de0089bc" memberName="treeViewOscSyntax"
