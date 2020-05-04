@@ -54,6 +54,7 @@ HelpOscSyntax::HelpOscSyntax ()
 
 
     //[Constructor] You can add your own custom stuff here..
+    treeViewOscSyntax->addMouseListener(this, true);
     //[/Constructor]
 }
 
@@ -91,6 +92,26 @@ void HelpOscSyntax::resized()
     //[/UserResized]
 }
 
+void HelpOscSyntax::mouseUp (const MouseEvent& e)
+{
+    //[UserCode_mouseUp] -- Add your code here...
+    if(e.mods.isRightButtonDown())
+    {
+        if(treeViewOscSyntax->getNumSelectedItems()>0)
+        {
+            TreeViewItem* item = treeViewOscSyntax->getSelectedItem(0);
+            String copyText = ((TreeViewItemHelp*)item)->getCopyableString();
+            SystemClipboard::copyTextToClipboard(copyText);
+            Label* label = new Label();
+            label->setSize(this->getWidth() - 40, 30);
+            label->setText("Copied to clipboard: " + copyText, dontSendNotification);
+            label->setJustificationType(Justification::centred);
+            CallOutBox::launchAsynchronously(label , getScreenBounds(), this);
+        }
+    }
+    //[/UserCode_mouseUp]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -110,6 +131,9 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component" constructorParams="" variableInitialisers=""
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
+  <METHODS>
+    <METHOD name="mouseUp (const MouseEvent&amp; e)"/>
+  </METHODS>
   <BACKGROUND backgroundColour="ff323e44"/>
   <TREEVIEW name="treeViewOscSyntax" id="996dafc9de0089bc" memberName="treeViewOscSyntax"
             virtualName="" explicitFocusOrder="0" pos="0 0 0M 0M" rootVisible="0"

@@ -46,6 +46,7 @@ public:
 
     void paint (Graphics& g) override;
     void resized() override;
+    void mouseUp (const MouseEvent& e) override;
 
     // Binary resources:
     static const char* osc_syntax_xml;

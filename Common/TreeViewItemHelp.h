@@ -94,6 +94,20 @@ public:
     {
         return "TreeView Items";
     }
+    
+    String getCopyableString()
+    {
+        if(xml.isTextElement())
+            return xml.getText();
+        
+        if(xml.hasAttribute("desc"))
+            return xml.getStringAttribute("desc");
+        
+        if(xml.hasAttribute("name"))
+            return xml.getStringAttribute("name");
+        
+        return xml.getTagName();
+    }
 
 private:
     XmlElement& xml;
