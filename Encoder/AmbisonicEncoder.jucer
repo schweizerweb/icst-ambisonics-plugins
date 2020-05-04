@@ -14,6 +14,12 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="uR9r1o" name="DistanceEncodingParams.h" compile="0" resource="0"
+            file="Source/DistanceEncodingParams.h"/>
+      <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"
+            file="Source/OSCHandlerEncoder.cpp"/>
+      <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
+            file="Source/OSCHandlerEncoder.h"/>
       <FILE id="F7eoPa" name="EncoderConstants.cpp" compile="1" resource="0"
             file="Source/EncoderConstants.cpp"/>
       <FILE id="g37xg9" name="EncoderConstants.h" compile="0" resource="0"
@@ -42,8 +48,6 @@
             file="Source/OSCSettingsComponent.cpp"/>
       <FILE id="FtLdyb" name="OSCSettingsComponent.h" compile="0" resource="0"
             file="Source/OSCSettingsComponent.h"/>
-      <FILE id="ExW4LU" name="DistanceEncodingParams.h" compile="0" resource="0"
-            file="Source/DistanceEncodingParams.h"/>
       <FILE id="V5YI5c" name="DistanceEncodingGraph.cpp" compile="1" resource="0"
             file="Source/DistanceEncodingGraph.cpp"/>
       <FILE id="hFEmfb" name="DistanceEncodingGraph.h" compile="0" resource="0"

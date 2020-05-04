@@ -39,7 +39,7 @@ public:
     const static float AdvancedExponentResolution;
     
     // make sure enum EncodingMode and StringArray encodingModeString are in sync!
-    enum EncodingMode { None, Standard, Advanced, Exponential, InverseProportional };
+    enum EncodingMode { None = 0, Standard = 1, Advanced = 2, Exponential = 3, InverseProportional = 4 };
     const static StringArray encodingModeStrings;
     
 };

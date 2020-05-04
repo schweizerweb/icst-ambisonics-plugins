@@ -100,6 +100,19 @@ bool AmbiDataSet::setChannelNameXYZ(String channelName, double x, double y, doub
 	return false;
 }
 
+bool AmbiDataSet::setChannelNameGain(String channelName, double gain) const
+{
+    AmbiPoint* ambiPt = getPointByName(channelName);
+
+    if (ambiPt != nullptr)
+    {
+        ambiPt->setGain(gain, true);
+        return true;
+    }
+
+    return false;
+}
+
 void AmbiDataSet::setChannelXY(int channel, double x, double y) const
 {
 	AmbiPoint* pt = get(channel);
@@ -204,12 +217,17 @@ void AmbiDataSet::setDistance(int channel, double distance) const
 		pt->getPoint()->setDistance(distance);
 }
 
-void AmbiDataSet::setGain(int channel, double gain, bool notify) const
+bool AmbiDataSet::setGain(int channel, double gain, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
-		pt->setGain(gain, notify);
+    {
+        pt->setGain(gain, notify);
+        return true;
+    }
+    
+    return false;
 }
 
 String AmbiDataSet::getNewUniqueName() const

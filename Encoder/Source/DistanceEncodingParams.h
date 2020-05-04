@@ -131,12 +131,17 @@ public:
         return encodingMode != nullptr ? (EncoderConstants::EncodingMode)encodingMode->getIndex() : localEncodingMode;
     }
     
-    void setEncodingMode(EncoderConstants::EncodingMode mode)
+    bool setEncodingMode(EncoderConstants::EncodingMode mode)
     {
+        if(mode < 0 || mode >= EncoderConstants::encodingModeStrings.size())
+            return false;
+        
         if(encodingMode != nullptr)
             *encodingMode = (int)mode;
         else
             localEncodingMode = mode;
+        
+        return true;
     }
     
     float getUnitCircleRadius() const
@@ -144,12 +149,17 @@ public:
         return unitCircleRadius != nullptr ? unitCircleRadius->get() : localUnitCircleRadius;
     }
     
-    void setUnitCircleRadius(float radius)
+    bool setUnitCircleRadius(float radius)
     {
+        if(radius < EncoderConstants::UnitCircleRadiusMin || radius > EncoderConstants::UnitCircleRadiusMax)
+            return false;
+        
         if(unitCircleRadius != nullptr)
             *unitCircleRadius = radius;
         else
             localUnitCircleRadius = radius;
+        
+        return true;
     }
     
     float getDbUnit() const
@@ -157,12 +167,17 @@ public:
         return dbUnit != nullptr ? dbUnit->get() : localDbUnit;
     }
     
-    void setDbUnit(float newDbUnit)
+    bool setDbUnit(float newDbUnit)
     {
+        if(newDbUnit < EncoderConstants::DbUnitMin || newDbUnit > EncoderConstants::DbUnitMax)
+            return false;
+        
         if(dbUnit != nullptr)
             *dbUnit = newDbUnit;
         else
             localDbUnit = newDbUnit;
+        
+        return true;
     }
     
     float getInverseProportionalDistanceAttenuation() const
@@ -170,12 +185,17 @@ public:
         return inverseProportionalDistanceAttenuation != nullptr ? inverseProportionalDistanceAttenuation->get() : localInverseProportionalDistanceAttenuation;
     }
     
-    void setInverseProportionalDistanceAttenuation(float newAttenuation)
+    bool setInverseProportionalDistanceAttenuation(float newAttenuation)
     {
+        if(newAttenuation < EncoderConstants::DistanceAttenuationMin || newAttenuation > EncoderConstants::DistanceAttenuationMax)
+            return false;
+        
         if(inverseProportionalDistanceAttenuation != nullptr)
             *inverseProportionalDistanceAttenuation = newAttenuation;
         else
             localInverseProportionalDistanceAttenuation = newAttenuation;
+        
+        return true;
     }
     
     float getCenterCurve() const
@@ -183,12 +203,17 @@ public:
         return centerCurve != nullptr ? centerCurve->get() : localCenterCurve;
     }
     
-    void setCenterCurve(float newValue)
+    bool setCenterCurve(float newValue)
     {
+        if(newValue < EncoderConstants::CenterCurveMin || newValue > EncoderConstants::CenterCurveMax)
+            return false;
+        
         if(centerCurve != nullptr)
             *centerCurve = newValue;
         else
             localCenterCurve = newValue;
+        
+        return true;
     }
     
     float getAdvancedFactor() const
@@ -196,12 +221,17 @@ public:
         return advancedFactor != nullptr ? advancedFactor->get() : localAdvancedFactor;
     }
     
-    void setAdvancedFactor(float newFactor)
+    bool setAdvancedFactor(float newFactor)
     {
+        if(newFactor < EncoderConstants::AdvancedFactorMin || newFactor > EncoderConstants::AdvancedFactorMax)
+            return false;
+        
         if(advancedFactor != nullptr)
             *advancedFactor = newFactor;
         else
             localAdvancedFactor = newFactor;
+        
+        return true;
     }
     
     float getAdvancedExponent() const
@@ -209,12 +239,17 @@ public:
         return advancedExponent != nullptr ? advancedExponent->get() : localAdvancedExponent;
     }
     
-    void setAdvancedExponent(float newPower)
+    bool setAdvancedExponent(float newExponent)
     {
+        if(newExponent < EncoderConstants::AdvancedExponentMin || newExponent > EncoderConstants::AdvancedExponentMax)
+            return false;
+        
         if(advancedExponent != nullptr)
-            *advancedExponent = newPower;
+            *advancedExponent = newExponent;
         else
-            localAdvancedExponent = newPower;
+            localAdvancedExponent = newExponent;
+        
+        return true;
     }
     
     

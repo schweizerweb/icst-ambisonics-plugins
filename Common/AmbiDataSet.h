@@ -32,6 +32,7 @@ public:
 	AmbiPoint* getPointByName(String string) const;
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
 	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
+    bool setChannelNameGain(String channelName, double gain) const;
 	void setChannelXY(int channel, double x, double y) const;
 	void setChannelYZ(int channel, double y, double z) const;
 	void setChannelName(int channel, String name) const;
@@ -45,7 +46,7 @@ public:
 	void setAzimuth(int channel, double azimuth) const;
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
-	void setGain(int channel, double gain, bool notify = true) const;
+	bool setGain(int channel, double gain, bool notify = true) const;
 	String getNewUniqueName() const;
 
 	int groupCount() const;

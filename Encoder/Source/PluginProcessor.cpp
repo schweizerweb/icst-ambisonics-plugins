@@ -30,7 +30,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
                        )
 #endif
 {
-	pOscHandler = new OSCHandler(&sources, &statusMessageHandler);
+	pOscHandler = new OSCHandlerEncoder(&sources, &statusMessageHandler, &encoderSettings.distanceEncodingParams);
 	pOscSender = new AmbiOSCSender(&sources);
 	pOscSenderExt = new AmbiOSCSenderExt(&sources);
 	initializeOsc();

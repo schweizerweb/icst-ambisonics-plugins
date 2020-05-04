@@ -13,7 +13,7 @@
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
 #include "../../Common/AmbiPoint.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerEncoder.h"
 #include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
 #include "AmbiOSCSenderExt.h"

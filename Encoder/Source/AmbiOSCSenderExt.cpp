@@ -9,7 +9,7 @@
 */
 
 #include "AmbiOSCSenderExt.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerEncoder.h"
 
 AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints): pPoints(ambiPoints)
 {
