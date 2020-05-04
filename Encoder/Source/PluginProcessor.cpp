@@ -46,7 +46,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     {
         String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
         Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
-        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams[0]), name, color);
+        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
     presetHelper->loadDefaultPreset(&audioParams, &sources, &encoderSettings);
