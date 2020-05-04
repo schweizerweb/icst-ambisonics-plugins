@@ -15,6 +15,7 @@
 #include "StatusMessageHandler.h"
 #include "AmbiSourceSet.h"
 
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 

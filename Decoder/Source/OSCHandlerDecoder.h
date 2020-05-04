@@ -12,9 +12,6 @@
 #include "JuceHeader.h"
 #include "../../Common/OSCHandler.h"
 
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
-
-
 class OSCHandlerDecoder : public OSCHandler
 {
 public:
