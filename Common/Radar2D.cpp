@@ -600,7 +600,7 @@ double Radar2D::getMaxPointSelectionDist() const
 	return pZoomSettings->getCurrentRadius()/15.0;
 }
 
-void Radar2D::mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel)
+void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetails& wheel)
 {
     if(wheel.deltaY != 0)
     {

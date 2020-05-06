@@ -205,7 +205,7 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void PresetManagerComponent::filesDropped (const StringArray& filenames, int mouseX, int mouseY)
+void PresetManagerComponent::filesDropped (const StringArray& filenames, int /*mouseX*/, int /*mouseY*/)
 {
     //[UserCode_filesDropped] -- Add your code here...
     Array<File> fileArray;

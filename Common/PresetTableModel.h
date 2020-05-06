@@ -73,7 +73,7 @@ private:
         g.fillRect(width - 1, 0, 1, height);
     }
 
-    void selectedRowsChanged(int lastRowSelected) override
+    void selectedRowsChanged(int /*lastRowSelected*/) override
     {
         pParentComponent->repaint();
     }
