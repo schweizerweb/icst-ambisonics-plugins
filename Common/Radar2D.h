@@ -20,7 +20,7 @@
 #define ACTIVE_REFRESH_RATE 25
 #define INACTIVE_REFRESH_RATE 10
 #define NUDGE_VALUE 0.01
-#define SIN45 0.70710678118
+#define SIN45 0.70710678118f
 
 //==============================================================================
 /*

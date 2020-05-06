@@ -9,7 +9,7 @@
 */
 
 #include "Globals.h"
-#define SQRT2 1.41421356237
+#define SQRT2 1.41421356237f
 #define INFINITE 0.0f
 
 float Globals::Scaler = INFINITE;

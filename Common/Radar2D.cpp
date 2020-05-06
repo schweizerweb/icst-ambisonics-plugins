@@ -137,8 +137,8 @@ Image Radar2D::createRadarBackground() const
 	
     // axis label
     g.setColour(radarColors.getRadarAxisColor());
-    g.drawSingleLineText("X", localBounds.getWidth()-12, centerPoint.getY() - 2);
-    g.drawSingleLineText(radarMode == XY ? "Y" : "Z", centerPoint.getX() - 10, 15);
+    g.drawSingleLineText("X", int(localBounds.getWidth()-12), int(centerPoint.getY() - 2));
+    g.drawSingleLineText(radarMode == XY ? "Y" : "Z", int(centerPoint.getX() - 10), 15);
     
     if(!Globals::IsInfinite())
     {
@@ -186,7 +186,7 @@ float Radar2D::getSelectedPointSize(float scaler) const
 
 Point<float> Radar2D::getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const
 {
-    float offset = getEditablePointSize(1.0)*2.1;
+    float offset = getEditablePointSize(1.0f)*2.1f;
     switch(mode)
     {
         case Stretch:
@@ -221,11 +221,11 @@ void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) con
 void Radar2D::drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const
 {
     Path p;
-    p.addArrow(Line<float>(screenPt.translated(0.0f, -0.5f*pointSize), screenPt.translated(-1.2*pointSize, -0.5*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
-    p.addArrow(Line<float>(screenPt.translated(0.0f, -0.5f*pointSize), screenPt.translated(1.2*pointSize, -0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
+    p.addArrow(Line<float>(screenPt.translated(0.0f, -0.5f*pointSize), screenPt.translated(-1.2f*pointSize, -0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
+    p.addArrow(Line<float>(screenPt.translated(0.0f, -0.5f*pointSize), screenPt.translated(1.2f*pointSize, -0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
     
-    p.addArrow(Line<float>(screenPt.translated(-1.2*pointSize, 0.5*pointSize), screenPt.translated(0.0f, 0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
-    p.addArrow(Line<float>(screenPt.translated(1.2*pointSize, 0.5f*pointSize), screenPt.translated(0.0f, 0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
+    p.addArrow(Line<float>(screenPt.translated(-1.2f*pointSize, 0.5f*pointSize), screenPt.translated(0.0f, 0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
+    p.addArrow(Line<float>(screenPt.translated(1.2f*pointSize, 0.5f*pointSize), screenPt.translated(0.0f, 0.5f*pointSize)), pointSize / 6.0f, pointSize, pointSize / 2.0f);
     
     g->fillPath(p);
 }
@@ -233,7 +233,7 @@ void Radar2D::drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize
 void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const
 {
     Path p;
-    p.addCentredArc(screenPt.getX(), screenPt.getY(), pointSize, pointSize, 0.0f, -PI*0.75, PI*0.75, true);
+    p.addCentredArc(screenPt.getX(), screenPt.getY(), pointSize, pointSize, 0.0f, float(-PI*0.75), float(PI*0.75), true);
     g->strokePath(p, PathStrokeType(2.0f));
     
     Path p2;
@@ -249,8 +249,8 @@ void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize
     }
     else
     {
-        g->drawHorizontalLine(screenPt.getY(), screenPt.getX() - 1.5 * pointSize, screenPt.getX() + 1.5 * pointSize);
-        g->drawVerticalLine(screenPt.getX(), screenPt.getY() - 1.5 * pointSize, screenPt.getY() + 1.5 * pointSize);
+        g->drawHorizontalLine(int(screenPt.getY()), screenPt.getX() - 1.5f * pointSize, screenPt.getX() + 1.5f * pointSize);
+        g->drawVerticalLine(int(screenPt.getX()), screenPt.getY() - 1.5f * pointSize, screenPt.getY() + 1.5f * pointSize);
     }
 }
 

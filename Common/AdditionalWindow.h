@@ -25,17 +25,17 @@ public:
         Rectangle<int> targetArea = newAreaToPointTo;
         Rectangle<int> newAreaToFitIn = Desktop::getInstance().getDisplays().findDisplayForRect(newAreaToPointTo).userArea;
         
-        auto borderSpace = 1;
-        auto arrowSize = 0;
+        float borderSpace = 1;
+        float arrowSize = 0;
         
-        Rectangle<int> newBounds (pDialogContent->getWidth()  + borderSpace * 2,
-                                  pDialogContent->getHeight() + borderSpace * 2);
+        Rectangle<int> newBounds (pDialogContent->getWidth()  + int(borderSpace * 2),
+                                  pDialogContent->getHeight() + int(borderSpace * 2));
     
-        auto hw = newBounds.getWidth() / 2;
-        auto hh = newBounds.getHeight() / 2;
-        auto hwReduced = (float) (hw - borderSpace * 2);
-        auto hhReduced = (float) (hh - borderSpace * 2);
-        auto arrowIndent = borderSpace - arrowSize;
+        float hw = newBounds.getWidth() / 2.0f;
+        float hh = newBounds.getHeight() / 2.0f;
+        float hwReduced = (float) (hw - borderSpace * 2);
+        float hhReduced = (float) (hh - borderSpace * 2);
+        float arrowIndent = borderSpace - arrowSize;
     
         Point<float> targets[4] = { { (float) targetArea.getCentreX(), (float) targetArea.getBottom() },
                                     { (float) targetArea.getRight(),   (float) targetArea.getCentreY() },
@@ -47,7 +47,7 @@ public:
                                  { targets[2].translated (-(hw - arrowIndent), -hhReduced), targets[2].translated (-(hw - arrowIndent), hhReduced) },
                                  { targets[3].translated (-hwReduced, -(hh - arrowIndent)), targets[3].translated (hwReduced, -(hh - arrowIndent)) } };
     
-        auto centrePointArea = newAreaToFitIn.reduced (hw, hh).toFloat();
+        auto centrePointArea = newAreaToFitIn.reduced (int(hw), int(hh)).toFloat();
         auto targetCentre = targetArea.getCentre().toFloat();
     
         float nearest = 1.0e9f;

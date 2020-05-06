@@ -361,7 +361,7 @@ private:
     ValueType compress(ValueType value)
     {
         if(Globals::IsInfinite())
-            return atan(value) / (PI/2.0);
+            return ValueType(atan(value) / (PI/2.0));
         
         return value / Globals::GetScaler();
     }
@@ -369,7 +369,7 @@ private:
     ValueType decompress(ValueType value)
     {
         if(Globals::IsInfinite())
-            return tan(value*(PI/2.0));
+            return ValueType(tan(value*(PI/2.0)));
         
         return value * Globals::GetScaler();
         

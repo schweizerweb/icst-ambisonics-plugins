@@ -37,6 +37,6 @@ public:
     
     void notifyGain(double gain)
     {
-        if (pGain != nullptr) { pGain->setUnscaledValue(Constants::GainFactorToDb(float(gain))); }
+        if (pGain != nullptr) { pGain->setUnscaledValue((float)Constants::GainFactorToDb(gain)); }
     }
 };

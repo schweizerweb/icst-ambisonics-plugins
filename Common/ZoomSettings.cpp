@@ -84,7 +84,7 @@ void ZoomSettings::setCurrentRadius(float newRadius)
 void ZoomSettings::Reset()
 {
     currentCenterPoint.setXYZ(0.0, 0.0, 0.0);
-    setCurrentRadius(Globals::IsInfinite() ? 1.0 : Globals::GetScaler());
+    setCurrentRadius(Globals::IsInfinite() ? 1.0f : Globals::GetScaler());
 }
 
 int ZoomSettings::getNumberOfRings() const
@@ -99,7 +99,7 @@ int ZoomSettings::getNumberOfRings() const
 float ZoomSettings::getRingResolution() const
 {
     if(currentRadius < 0.006)
-        return 0.0005;
+        return 0.0005f;
     if(currentRadius < 0.015)
         return 0.001f;
     if(currentRadius < 0.06)
