@@ -271,11 +271,11 @@ private:
     float localAdvancedFactor;
     float localAdvancedExponent;
     
-    void parameterValueChanged(int parameterIndex, float newValue) override {
+    void parameterValueChanged(int /*parameterIndex*/, float /*newValue*/) override {
         sendChangeMessage();
     }
     
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {
+    void parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/) override {
         
     }
     
