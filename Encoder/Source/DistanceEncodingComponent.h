@@ -50,7 +50,7 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void controlDimming() const;
-    void setUiValues(DistanceEncodingParams *pParams);
+    void setUiValues(DistanceEncodingParams *pEncodingParams);
     void changeListenerCallback(ChangeBroadcaster *source) override;
     //[/UserMethods]
 

@@ -333,21 +333,21 @@ void DistanceEncodingComponent::controlDimming() const
     labelAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
 }
 
-void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pParams) {
-    comboBoxEncodingMode->setSelectedId(pParams->getEncodingMode(), dontSendNotification);
-    sliderUnitCircleRadius->setValue(pParams->getUnitCircleRadius(), dontSendNotification);
+void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingParams) {
+    comboBoxEncodingMode->setSelectedId(pEncodingParams->getEncodingMode(), dontSendNotification);
+    sliderUnitCircleRadius->setValue(pEncodingParams->getUnitCircleRadius(), dontSendNotification);
     sliderDbUnit->setSkewFactorFromMidPoint(5.0);
-    sliderDbUnit->setValue(pParams->getDbUnit(), dontSendNotification);
-    sliderDistanceAttenuation->setValue(pParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
+    sliderDbUnit->setValue(pEncodingParams->getDbUnit(), dontSendNotification);
+    sliderDistanceAttenuation->setValue(pEncodingParams->getInverseProportionalDistanceAttenuation(), dontSendNotification);
     sliderCenterCurve->setSkewFactorFromMidPoint(0.1);
-    sliderCenterCurve->setValue(pParams->getCenterCurve(), dontSendNotification);
-    sliderAdvancedFactor->setValue(pParams->getAdvancedFactor(), dontSendNotification);
-    sliderAdvancedExponent->setValue(pParams->getAdvancedExponent(), dontSendNotification);
+    sliderCenterCurve->setValue(pEncodingParams->getCenterCurve(), dontSendNotification);
+    sliderAdvancedFactor->setValue(pEncodingParams->getAdvancedFactor(), dontSendNotification);
+    sliderAdvancedExponent->setValue(pEncodingParams->getAdvancedExponent(), dontSendNotification);
     controlDimming();
     distanceEncodingGraph->repaint();
 }
 
-void DistanceEncodingComponent::changeListenerCallback(ChangeBroadcaster *source)
+void DistanceEncodingComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     setUiValues(pParams);
 }
