@@ -14,6 +14,9 @@
               companyWebsite="https://www.zhdk.ch/forschung/icst">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="CXnIL9" name="GroupAnimator.cpp" compile="1" resource="0"
+            file="Source/GroupAnimator.cpp"/>
+      <FILE id="cLqXqH" name="GroupAnimator.h" compile="0" resource="0" file="Source/GroupAnimator.h"/>
       <FILE id="uR9r1o" name="DistanceEncodingParams.h" compile="0" resource="0"
             file="Source/DistanceEncodingParams.h"/>
       <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"

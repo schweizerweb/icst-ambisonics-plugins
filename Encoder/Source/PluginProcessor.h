@@ -21,6 +21,7 @@
 #include "../../Common/DelayHelper.h"
 #include "EncoderPresetHelper.h"
 #include "../../Common/AudioParams.h"
+#include "GroupAnimator.h"
 
 //==============================================================================
 /**
@@ -90,6 +91,7 @@ private:
 	StatusMessageHandler statusMessageHandler;
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
+    std::unique_ptr<GroupAnimator> groupAnimator;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
 
