@@ -75,7 +75,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     $node.pluginDesc = $description
     $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
 	$node.pluginCode = $pluginUniqueCode
-	$node.bundleIdentifier = "$($node.bundleIdentifier)_$(($code).ToLower())"
+	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($code).ToLower())"
     
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
