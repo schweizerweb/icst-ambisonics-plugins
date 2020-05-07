@@ -80,7 +80,7 @@ public:
         sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0), "1", TrackColors::getColor(1));
         settings.distanceEncodingFlag = true;
         settings.distanceEncodingParams.setEncodingMode(EncoderConstants::Standard);
-        settings.distanceEncodingParams.setUnitCircleRadius(0.1);
+        settings.distanceEncodingParams.setUnitCircleRadius(0.1f);
         
         File file = getPathForPresetName(DEFAULT_PRESET_NAME);
         

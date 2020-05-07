@@ -509,27 +509,27 @@ void OSCHandlerEncoder::handleOwnExternStyleDistanceEncoding(const OSCMessage &m
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_UNITCIRCLE))
     {
-        ok = pDistanceEncodingParams->setUnitCircleRadius(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setUnitCircleRadius((float)GetIntOrFloat(&message[0]));
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DBUNIT))
     {
-        ok = pDistanceEncodingParams->setDbUnit(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setDbUnit((float)GetIntOrFloat(&message[0]));
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DISTANCEATTENUATION))
     {
-        ok = pDistanceEncodingParams->setInverseProportionalDistanceAttenuation(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setInverseProportionalDistanceAttenuation((float)GetIntOrFloat(&message[0]));
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_CENTERCURVE))
     {
-        ok = pDistanceEncodingParams->setCenterCurve(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setCenterCurve((float)GetIntOrFloat(&message[0]));
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDFACTOR))
     {
-        ok = pDistanceEncodingParams->setAdvancedFactor(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setAdvancedFactor((float)GetIntOrFloat(&message[0]));
     }
     else if(pattern.matches(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDEXPONENT))
     {
-        ok = pDistanceEncodingParams->setAdvancedExponent(GetIntOrFloat(&message[0]));
+        ok = pDistanceEncodingParams->setAdvancedExponent((float)GetIntOrFloat(&message[0]));
     }
     
     if (ok)

@@ -16,9 +16,9 @@ public:
     static float CartesianMax();
     static float DistanceMax();
     static bool IsInfinite();
-    static void SetScaler(float newScaler);
-    static float GetScaler();
+    static void SetScaler(double newScaler);
+    static double GetScaler();
     
 private:
-    static float Scaler;
+    static double Scaler;
 };

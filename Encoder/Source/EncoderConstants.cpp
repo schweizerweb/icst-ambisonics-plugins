@@ -18,21 +18,21 @@ const float EncoderConstants::DbUnitMin = float(0.01);
 const float EncoderConstants::DbUnitMax = float(100);
 const float EncoderConstants::DbUnitResolution = float(0.01);
 
-const float EncoderConstants::DistanceAttenuationMin = 0.01;
-const float EncoderConstants::DistanceAttenuationMax = 20;
-const float EncoderConstants::DistanceAttenuationResolution = 0.01;
+const float EncoderConstants::DistanceAttenuationMin = 0.01f;
+const float EncoderConstants::DistanceAttenuationMax = 20.0f;
+const float EncoderConstants::DistanceAttenuationResolution = 0.01f;
 
-const float EncoderConstants::CenterCurveMin = 0;
-const float EncoderConstants::CenterCurveMax = 1;
-const float EncoderConstants::CenterCurveResolution = 0.0001;
+const float EncoderConstants::CenterCurveMin = 0.0f;
+const float EncoderConstants::CenterCurveMax = 1.0f;
+const float EncoderConstants::CenterCurveResolution = 0.0001f;
 
-const float EncoderConstants::AdvancedFactorMin = 0;
-const float EncoderConstants::AdvancedFactorMax = 5;
-const float EncoderConstants::AdvancedFactorResolution = 0.01;
+const float EncoderConstants::AdvancedFactorMin = 0.0f;
+const float EncoderConstants::AdvancedFactorMax = 5.0f;
+const float EncoderConstants::AdvancedFactorResolution = 0.01f;
 
-const float EncoderConstants::AdvancedExponentMin = 0;
-const float EncoderConstants::AdvancedExponentMax = 20;
-const float EncoderConstants::AdvancedExponentResolution = 0.01;
+const float EncoderConstants::AdvancedExponentMin = 0.0f;
+const float EncoderConstants::AdvancedExponentMax = 20.0f;
+const float EncoderConstants::AdvancedExponentResolution = 0.01f;
 
 const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Advanced", "Exponential", "Inverse Proportional"};
     

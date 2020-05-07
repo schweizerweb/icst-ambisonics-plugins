@@ -209,19 +209,19 @@ void RadarSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == sliderCenterPointX.get())
     {
         //[UserSliderCode_sliderCenterPointX] -- add your slider handling code here..
-        pZoomSettings->setCurrentCenterPointXY(sliderCenterPointX->getValue(), pZoomSettings->getCurrentCenterPoint().getY());
+        pZoomSettings->setCurrentCenterPointXY((float)sliderCenterPointX->getValue(), (float)pZoomSettings->getCurrentCenterPoint().getY());
         //[/UserSliderCode_sliderCenterPointX]
     }
     else if (sliderThatWasMoved == sliderCenterPointY.get())
     {
         //[UserSliderCode_sliderCenterPointY] -- add your slider handling code here..
-        pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX(), sliderCenterPointY->getValue());
+        pZoomSettings->setCurrentCenterPointXY((float)pZoomSettings->getCurrentCenterPoint().getX(), (float)sliderCenterPointY->getValue());
         //[/UserSliderCode_sliderCenterPointY]
     }
     else if (sliderThatWasMoved == sliderCenterPointZ.get())
     {
         //[UserSliderCode_sliderCenterPointZ] -- add your slider handling code here..
-        pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX(), sliderCenterPointZ->getValue());
+        pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX(), (float)sliderCenterPointZ->getValue());
         //[/UserSliderCode_sliderCenterPointZ]
     }
     else if (sliderThatWasMoved == sliderPointScaler.get())
@@ -233,7 +233,7 @@ void RadarSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     else if (sliderThatWasMoved == sliderRadius.get())
     {
         //[UserSliderCode_sliderRadius] -- add your slider handling code here..
-        pZoomSettings->setCurrentRadius(sliderRadius->getValue());
+        pZoomSettings->setCurrentRadius((float)sliderRadius->getValue());
         //[/UserSliderCode_sliderRadius]
     }
 

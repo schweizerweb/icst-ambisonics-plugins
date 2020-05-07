@@ -26,8 +26,8 @@ public:
 	const static double GainDbMin;
 	const static double GainDbMax;
 	
-    const static double CompressedMin;
-    const static double CompressedMax;
+    const static float CompressedMin;
+    const static float CompressedMax;
 
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);

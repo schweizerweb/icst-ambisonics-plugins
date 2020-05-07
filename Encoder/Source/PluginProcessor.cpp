@@ -73,7 +73,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
         set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
         set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
-        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::GainDbMin, Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
+        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
 
         audioParams.sourceParams.add(set);
         addParameter(set.pX);
