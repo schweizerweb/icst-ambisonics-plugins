@@ -12,7 +12,7 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiSourceSet.h"
-#define CHECKBOX_HEIGHT 30
+#define CHECKBOX_HEIGHT 25
 #define COMPONENT_WIDTH 200
 //==============================================================================
 /*
@@ -29,6 +29,9 @@ public:
 		
     	pGroup = pSources->getGroup(groupIndex);
 
+        columnCount = std::ceil(pSources->size() / 16.0);
+        rowCount = columnCount > 0 ?  std::ceil(pSources->size() / columnCount) : 0;
+        
 		for (int i = 0; i < pSources->size(); i++)
 		{
 			ToggleButton* b = new ToggleButton(pSources->get(i)->getName());
@@ -38,7 +41,7 @@ public:
 			addAndMakeVisible(b);
 		}
 
-		setSize(COMPONENT_WIDTH, toggleButtons.size() * CHECKBOX_HEIGHT);
+		setSize(COMPONENT_WIDTH * columnCount, rowCount * CHECKBOX_HEIGHT);
     }
 
 	~GroupPointsSelectionComponent()
@@ -56,12 +59,12 @@ public:
 
     void resized() override
     {
-        int y = 0;
+        int index = 0;
 
 		for(ToggleButton* b : toggleButtons)
 		{
-			b->setBounds(0, y, COMPONENT_WIDTH, CHECKBOX_HEIGHT);
-			y += CHECKBOX_HEIGHT;
+			b->setBounds(std::floor(index / rowCount) * COMPONENT_WIDTH, (index % rowCount) * CHECKBOX_HEIGHT , COMPONENT_WIDTH, CHECKBOX_HEIGHT);
+            index++;
 		}
     }
 
@@ -95,4 +98,6 @@ private:
 	AmbiSourceSet* pSources;
 	Array<ToggleButton*> toggleButtons;
 	AmbiGroup* pGroup;
+    int columnCount;
+    int rowCount;
 };
