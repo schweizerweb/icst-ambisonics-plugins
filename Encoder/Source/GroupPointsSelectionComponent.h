@@ -30,7 +30,7 @@ public:
     	pGroup = pSources->getGroup(groupIndex);
 
         columnCount = std::ceil(pSources->size() / 16.0);
-        rowCount = columnCount > 0 ?  std::ceil(pSources->size() / columnCount) : 0;
+        rowCount = columnCount > 0 ?  std::ceil(pSources->size() / (double)columnCount) : 0;
         
 		for (int i = 0; i < pSources->size(); i++)
 		{
