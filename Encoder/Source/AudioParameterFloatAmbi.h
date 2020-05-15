@@ -22,6 +22,7 @@ public:
 		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterFloatAmbi();
 
+    void setEnabled(bool enabled) override;
 	float getValue() const override;
 	void setValue(float newValue) override;
 	float get() const noexcept { return getValue(); }
@@ -41,4 +42,6 @@ private:
 
 	AmbiDataSet* pAmbiPoints;
 	int ambiIndex;
+    
+    bool enabled;
 };

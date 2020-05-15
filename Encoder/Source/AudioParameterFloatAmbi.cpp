@@ -19,6 +19,7 @@ AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const St
 	pAmbiPoints(pPointArray),
 	ambiIndex(pointIndex)
 {
+    enabled = true;
 }
 
 AudioParameterFloatAmbi::~AudioParameterFloatAmbi()
@@ -33,6 +34,11 @@ AudioParameterFloatAmbi& AudioParameterFloatAmbi::operator= (float newValue)
 	}
 
 	return *this;
+}
+
+void AudioParameterFloatAmbi::setEnabled(bool en)
+{
+    enabled = en;
 }
 
 float AudioParameterFloatAmbi::getDefaultValue() const
@@ -60,6 +66,9 @@ float AudioParameterFloatAmbi::getValue() const
 
 void AudioParameterFloatAmbi::setValue(float newValue)
 {
+    if(!enabled)
+        return;
+    
 	float newValueScaled = range.convertFrom0to1(newValue);
 	if (value != newValueScaled)
 	{

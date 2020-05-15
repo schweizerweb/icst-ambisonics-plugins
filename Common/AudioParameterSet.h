@@ -39,4 +39,11 @@ public:
     {
         if (pGain != nullptr) { pGain->setUnscaledValue((float)Constants::GainFactorToDb(gain)); }
     }
+    
+    void setEnabled(bool enable)
+    {
+        pX->setEnabled(enable);
+        pY->setEnabled(enable);
+        pZ->setEnabled(enable);
+    }
 };

@@ -43,6 +43,14 @@ void GroupAnimator::toggleOnOff()
     {
         stopTimer();
     }
+    
+    if(pSourceSet->groupCount() > 0)
+    {
+        for(AmbiPoint* p: pSourceSet->getGroup(0)->groupPoints)
+        {
+            p->getPoint()->getAudioParameterSet().setEnabled(!audioParameterAnimationToggle->get());
+        }
+    }
 }
 
 void GroupAnimator::timerCallback()
