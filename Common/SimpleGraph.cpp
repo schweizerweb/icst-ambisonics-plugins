@@ -49,17 +49,37 @@ void SimpleGraph::drawXAxis(Graphics& g) const
 {
 	double stepSize;
 	String annotationFormat;
+    
+    if(scalingModeX == LogarithmicFrequency)
+    {
+        Array<int> labelValues = { 10, 20, 30, 50, 100, 200, 300, 500, 1000, 2000, 3000, 5000, 10000, 20000 };
+        Array<String> labelStrings = { "10", "20", "30", "50", "100", "200", "300", "500", "1k", "2k", "3k", "5k", "10k", "20k" };
+        
+        for(int i = 0; i < labelValues.size(); i++)
+        {
+            double logValue = log10(labelValues[i]);
+            if(logValue >= displayRangeX->getStart() && logValue <= displayRangeX->getEnd())
+            {
+                double realValue = labelValues[i];
+                Point<float> xy = mapValues(realValue, displayRangeY->getStart()).toFloat();
+                g.drawLine(xy.getX(), xy.getY() + 3, xy.getX(), fullGridFlag ? graphArea->getY() : xy.getY() - 3, 1.0f);
+                g.drawSingleLineText(labelStrings[i], int(xy.getX()), int(xy.getY()) + 14, Justification::horizontallyCentred);
+            }
+        }
+        return;
+    }
+    
 	getStepSize(displayRangeX->getStart(), displayRangeX->getEnd(), 8, &stepSize, &annotationFormat, 1.0);
 
 	double upperLim = displayRangeX->getEnd() + 0.01*stepSize;
 	double currentStep = stepSize * int(displayRangeX->getStart() / stepSize - 1);
 	while (currentStep < upperLim) {
 		if (currentStep >= displayRangeX->getStart()) {
-			double realValue = scalingModeX == Logarithmic ? pow(10.0, currentStep) : currentStep;
+			double realValue = scalingModeX == Linear ? currentStep : pow(10.0, currentStep);
 			Point<float> xy = mapValues(realValue, displayRangeY->getStart()).toFloat();
 			g.drawLine(xy.getX(), xy.getY() + 3, xy.getX(), fullGridFlag ? graphArea->getY() : xy.getY() - 3, 1.0f);
 			//String buffer = "10^" + String::formatted(annotationFormat, currentStep);
-			String buffer = String::formatted(scalingModeX == Logarithmic ? "%.0f" : annotationFormat, realValue);
+			String buffer = String::formatted(scalingModeX == Linear ? annotationFormat : "%.0f", realValue);
 			g.drawSingleLineText(buffer, int(xy.getX()), int(xy.getY()) + 14, Justification::horizontallyCentred);
 		}
 		currentStep += stepSize;
@@ -154,9 +174,9 @@ void SimpleGraph::getStepSize(double minValue, double maxValue, int maxNbOfSteps
 Point<double> SimpleGraph::mapValues(double x, double y) const
 {
 	double mx = graphArea->getX() 
-		+ jmax(0.0, graphArea->getWidth() / displayRangeX->getLength() * ((scalingModeX == Logarithmic ? log10(x) : x) - displayRangeX->getStart()));
+		+ jmax(0.0, graphArea->getWidth() / displayRangeX->getLength() * ((scalingModeX == Linear ? x : log10(x)) - displayRangeX->getStart()));
 	double my = graphArea->getBottom() 
-		- graphArea->getHeight() / displayRangeY->getLength() * ((scalingModeY == Logarithmic ? log10(y) : y) - displayRangeY->getStart());
+		- graphArea->getHeight() / displayRangeY->getLength() * ((scalingModeY == Linear ? y : log10(y)) - displayRangeY->getStart());
 
 	return Point<double>(mx, my);
 }

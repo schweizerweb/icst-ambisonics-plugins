@@ -25,7 +25,7 @@ IIRFilterGraph::IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilte
 	
 	magnitudes = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
 
-	setDisplayRange(Logarithmic, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-20, 20));
+	setDisplayRange(LogarithmicFrequency, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-20, 20));
 	fullGridFlag = true;
 	labelAxisY = "Gain [dB]";
 	labelAxisX = "Frequency [Hz]";

@@ -18,7 +18,7 @@
 class SimpleGraph    : public Component
 {
 public:
-	enum ScalingMode { Linear, Logarithmic };
+	enum ScalingMode { Linear, Logarithmic, LogarithmicFrequency };
 
     SimpleGraph();
 	virtual ~SimpleGraph();
