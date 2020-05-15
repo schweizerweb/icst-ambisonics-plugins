@@ -31,6 +31,7 @@
 #include "../../Common/AmbiSpeakerSet.h"
 #include "FilterSettingsComponent.h"
 #include "DecoderPresetHelper.h"
+#include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
 //[/Headers]
 
@@ -91,6 +92,7 @@ public:
 	FilterInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
+    FilterPresetHelper* getFilterPresetHelper() const;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -112,6 +114,7 @@ private:
 	TestSoundGenerator* pTestSoundGenerator;
 	dsp::ProcessSpec* pFilterSpecification;
     PresetManagerDialog presetManagerDialog;
+    std::unique_ptr<FilterPresetHelper> filterPresetHelper;
     //[/UserVariables]
 
     //==============================================================================
@@ -140,6 +143,7 @@ private:
     std::unique_ptr<Label> labelDevelopmentVersion;
     std::unique_ptr<TextButton> buttonManage;
     std::unique_ptr<ComboBox> comboBoxChannelWeightingMode;
+    std::unique_ptr<TextButton> buttonManageFilters;
 
 
     //==============================================================================

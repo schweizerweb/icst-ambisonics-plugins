@@ -61,6 +61,8 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	addChangeListener(pCallback);
     pPresetHelper->addActionListener(this);
 
+    filterPresetHelper.reset(new FilterPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder/Filters"), this));
+    filterPresetHelper->initialize();
     //[/Constructor_pre]
 
     groupOsc.reset (new GroupComponent ("groupOsc",
@@ -228,6 +230,11 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     comboBoxChannelWeightingMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxChannelWeightingMode->addListener (this);
 
+    buttonManageFilters.reset (new TextButton ("buttonManageFilters"));
+    addAndMakeVisible (buttonManageFilters.get());
+    buttonManageFilters->setButtonText (TRANS("manage filters..."));
+    buttonManageFilters->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -313,6 +320,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     labelDevelopmentVersion = nullptr;
     buttonManage = nullptr;
     comboBoxChannelWeightingMode = nullptr;
+    buttonManageFilters = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -339,9 +347,9 @@ void SpeakerSettingsComponent::resized()
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 267)) + 199, ((getWidth() - 18) - 0) - 0, 60);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 267), (getWidth() - 18) - 0, 199);
     groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 267);
-    comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 411, 24);
+    comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 531, 24);
     labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
-    buttonSave->setBounds (8 + (getWidth() - 18) - 108 - 80, 0 + 24, 80, 24);
+    buttonSave->setBounds (8 + (getWidth() - 18) - 233 - 80, 0 + 24, 80, 24);
     speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 267) - 96);
     buttonAdd->setBounds ((8 + 16) + 0, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
     buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
@@ -357,10 +365,11 @@ void SpeakerSettingsComponent::resized()
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 15 - 82, ((0 + (getHeight() - 267)) + 199) + 20, 82, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3995f) / 2), 0, proportionOfWidth (0.3995f), 24);
-    buttonManage->setBounds (8 + (getWidth() - 18) - 16 - 80, 0 + 24, 80, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4979f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3997f) / 2), 0, proportionOfWidth (0.3997f), 24);
+    buttonManage->setBounds (8 + (getWidth() - 18) - 145 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
+    buttonManageFilters->setBounds (8 + (getWidth() - 18) - 17 - 120, 0 + 24, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -481,6 +490,12 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         //[UserButtonCode_buttonManage] -- add your button handler code here..
         presetManagerDialog.show(this, pPresetHelper);
         //[/UserButtonCode_buttonManage]
+    }
+    else if (buttonThatWasClicked == buttonManageFilters.get())
+    {
+        //[UserButtonCode_buttonManageFilters] -- add your button handler code here..
+        presetManagerDialog.show(this, filterPresetHelper.get(), false);
+        //[/UserButtonCode_buttonManageFilters]
     }
 
     //[UserbuttonClicked_Post]
@@ -754,6 +769,11 @@ dsp::ProcessSpec* SpeakerSettingsComponent::getFilterSpecification() const
 	return pFilterSpecification;
 }
 
+FilterPresetHelper* SpeakerSettingsComponent::getFilterPresetHelper() const
+{
+    return filterPresetHelper.get();
+}
+
 void SpeakerSettingsComponent::updateUI() const
 {
 	speakerList->updateContent();
@@ -798,7 +818,7 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
             const MessageManagerLock lock;
             AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Inconsistent Ambisonic Order", "This preset was saved using a different order plugin. Ambisonic channel weighting may have to be adjusted.");
         }
-        
+
         updateUI();
         controlDimming();
         sendChangeMessage();
@@ -883,7 +903,7 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
                   virtualName="" explicitFocusOrder="0" pos="8 0 18M 267M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="192 24 411M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="192 24 531M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
@@ -893,7 +913,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="108Rr 24 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="233Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
@@ -966,23 +986,27 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.797%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.772%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.919% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.909% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
   <TEXTBUTTON name="buttonManage" id="a4621bea805565b3" memberName="buttonManage"
-              virtualName="" explicitFocusOrder="0" pos="16Rr 24 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="145Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="comboBoxChannelWeightingMode" id="e9f5f23a259dd1c0" memberName="comboBoxChannelWeightingMode"
             virtualName="" explicitFocusOrder="0" pos="136 20 120 24" posRelativeX="17eb4b418501687a"
             posRelativeY="17eb4b418501687a" editable="0" layout="33" items=""
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
+  <TEXTBUTTON name="buttonManageFilters" id="5b471faa99c7496b" memberName="buttonManageFilters"
+              virtualName="" explicitFocusOrder="0" pos="17Rr 24 120 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="manage filters..."
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

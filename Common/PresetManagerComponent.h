@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -42,8 +42,8 @@ class PresetManagerComponent  : public Component,
 {
 public:
     //==============================================================================
-    PresetManagerComponent (PresetHelper* pPresetHelper);
-    ~PresetManagerComponent();
+    PresetManagerComponent (PresetHelper* pPresetHelper, bool allowApply);
+    ~PresetManagerComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.

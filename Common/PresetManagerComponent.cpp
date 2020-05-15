@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper)
+PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper, bool allowApply)
     : pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -72,7 +72,7 @@ PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper)
 
     //[Constructor] You can add your own custom stuff here..
     tableModel.reset(new PresetTableModel(pPresetHelper, this));
-    tableModel->initTable(presetTable.get());
+    tableModel->initTable(presetTable.get(), allowApply);
     presetTable->setMultipleSelectionEnabled(true);
     pPresetHelper->addActionListener(this);
     //[/Constructor]
@@ -205,7 +205,7 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void PresetManagerComponent::filesDropped (const StringArray& filenames, int /*mouseX*/, int /*mouseY*/)
+void PresetManagerComponent::filesDropped (const StringArray& filenames, int mouseX, int mouseY)
 {
     //[UserCode_filesDropped] -- Add your code here...
     Array<File> fileArray;
@@ -262,9 +262,10 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PresetManagerComponent" componentName=""
                  parentClasses="public Component, public FileDragAndDropTarget, ActionListener"
-                 constructorParams="PresetHelper* pPresetHelper" variableInitialisers="pPresetHelper(pPresetHelper)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="700" initialHeight="400">
+                 constructorParams="PresetHelper* pPresetHelper, bool allowApply"
+                 variableInitialisers="pPresetHelper(pPresetHelper)" snapPixels="8"
+                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
+                 initialWidth="700" initialHeight="400">
   <METHODS>
     <METHOD name="filesDropped (const StringArray&amp; filenames, int mouseX, int mouseY)"/>
   </METHODS>

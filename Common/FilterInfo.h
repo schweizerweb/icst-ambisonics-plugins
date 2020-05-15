@@ -12,11 +12,12 @@
 #define DEFAULT_Q	1.0
 #define DEFAULT_FREQUENCY 200
 #define DEFAULT_GAIN_FACTOR 1
+#define DEFAULT_FILTER_TYPE None
 
 class FilterInfo
 {
 public:
-	FilterInfo(): filterType(None), cutOffFrequencyHz(DEFAULT_FREQUENCY), qValue(DEFAULT_Q), gainFactor(DEFAULT_GAIN_FACTOR)
+	FilterInfo(): filterType(DEFAULT_FILTER_TYPE), cutOffFrequencyHz(DEFAULT_FREQUENCY), qValue(DEFAULT_Q), gainFactor(DEFAULT_GAIN_FACTOR)
 	{
 	}
 
@@ -62,6 +63,27 @@ public:
 	{
 		return filterType == LowPass || filterType == FirstOrderLowPass;
 	}
+    
+    bool loadFromXmlElement(XmlElement* xmlElement)
+    {
+        filterType = (FilterType)xmlElement->getIntAttribute("filterType", DEFAULT_FILTER_TYPE);
+        cutOffFrequencyHz = xmlElement->getDoubleAttribute("cutOffFrequencyHz", DEFAULT_FREQUENCY);
+        qValue = xmlElement->getDoubleAttribute("qValue", DEFAULT_Q);
+        gainFactor = xmlElement->getDoubleAttribute("gainFactor", DEFAULT_GAIN_FACTOR);
+        
+        return true;
+    }
+    
+    bool writeToXmlElement(XmlElement* xmlElement)
+    {
+        xmlElement->setAttribute("filterType", (int)filterType);
+        xmlElement->setAttribute("cutOffFrequencyHz", cutOffFrequencyHz);
+        xmlElement->setAttribute("qValue", qValue);
+        xmlElement->setAttribute("gainFactor", gainFactor);
+        
+        return true;
+    }
+
 
 	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf, Peak } filterType;
 	float cutOffFrequencyHz;

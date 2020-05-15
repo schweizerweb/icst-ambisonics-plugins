@@ -59,11 +59,11 @@ public:
         }
     }
     
-    void show(Component* pParent, PresetHelper* pPresetHelper)
+    void show(Component* pParent, PresetHelper* pPresetHelper, bool showApplyButton = true)
     {
         if(window)
             delete window;
-        window = new PresetManagerWindow(this, new PresetManagerComponent(pPresetHelper));
+        window = new PresetManagerWindow(this, new PresetManagerComponent(pPresetHelper, showApplyButton));
         window->setVisible(true);
         window->updatePosition(pParent->getScreenBounds());
     }

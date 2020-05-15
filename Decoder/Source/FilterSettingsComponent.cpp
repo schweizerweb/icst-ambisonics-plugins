@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -27,7 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
+FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper)
+    : pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	this->pFilterInfo = pFilterInfo;
@@ -112,11 +113,33 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     sliderGain->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
     sliderGain->addListener (this);
 
+    comboBoxFilterPreset.reset (new ComboBox ("comboBoxFilterPreset"));
+    addAndMakeVisible (comboBoxFilterPreset.get());
+    comboBoxFilterPreset->setEditableText (false);
+    comboBoxFilterPreset->setJustificationType (Justification::centredLeft);
+    comboBoxFilterPreset->setTextWhenNothingSelected (TRANS("-"));
+    comboBoxFilterPreset->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxFilterPreset->addListener (this);
+
+    labelPresets.reset (new Label ("labelPresets",
+                                   TRANS("Presets:")));
+    addAndMakeVisible (labelPresets.get());
+    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setEditable (false, false, false);
+    labelPresets->setColour (TextEditor::textColourId, Colours::black);
+    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    buttonSave.reset (new TextButton ("buttonSave"));
+    addAndMakeVisible (buttonSave.get());
+    buttonSave->setButtonText (TRANS("save"));
+    buttonSave->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (400, 400);
+    setSize (600, 400);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -131,24 +154,26 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     comboBoxType->addItem("Low Shelf", 1+FilterInfo::FilterType::LowShelf);
     comboBoxType->addItem("High Shelf", 1+FilterInfo::FilterType::HighShelf);
     comboBoxType->addItem("Peak", 1+FilterInfo::FilterType::Peak);
-	comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
+
 
 	sliderFrequency->setSkewFactorFromMidPoint(500);
 	sliderFrequency->setRange(20, jmin(int(pFilterSpecification->sampleRate / 2.0), 22000));
-	sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
 	sliderFrequency->setNumDecimalPlacesToDisplay(0);
     sliderQ->setNumDecimalPlacesToDisplay(3);
 	sliderQ->setSkewFactorFromMidPoint(1.0);
-	sliderQ->setValue(pFilterInfo->qValue);
     sliderGain->setNumDecimalPlacesToDisplay(3);
     sliderGain->setSkewFactorFromMidPoint(1.0);
-    sliderGain->setValue(pFilterInfo->gainFactor);
+
+    updateUi();
+    updatePresetComboBox();
+    pPresetHelper->addActionListener(this);
     //[/Constructor]
 }
 
 FilterSettingsComponent::~FilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
     comboBoxType = nullptr;
@@ -160,6 +185,9 @@ FilterSettingsComponent::~FilterSettingsComponent()
     filterGraph = nullptr;
     labelGain = nullptr;
     sliderGain = nullptr;
+    comboBoxFilterPreset = nullptr;
+    labelPresets = nullptr;
+    buttonSave = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -186,8 +214,11 @@ void FilterSettingsComponent::resized()
     comboBoxType->setBounds (136, 8, getWidth() - 144, 24);
     sliderFrequency->setBounds (136, 40, getWidth() - 144, 24);
     sliderQ->setBounds (136, 72, getWidth() - 144, 24);
-    filterGraph->setBounds (8, 136, getWidth() - 16, getHeight() - 144);
+    filterGraph->setBounds (8, 136, getWidth() - 16, getHeight() - 175);
     sliderGain->setBounds (136, 104, getWidth() - 144, 24);
+    comboBoxFilterPreset->setBounds (80, getHeight() - 32, getWidth() - 179, 24);
+    labelPresets->setBounds (8, getHeight() - 32, 64, 24);
+    buttonSave->setBounds (getWidth() - 11 - 80, getHeight() - 32, 80, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -205,6 +236,13 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         sliderGain->setEnabled(pFilterInfo->gainRequired());
 		sendChangeMessage();
         //[/UserComboBoxCode_comboBoxType]
+    }
+    else if (comboBoxThatHasChanged == comboBoxFilterPreset.get())
+    {
+        //[UserComboBoxCode_comboBoxFilterPreset] -- add your combo box handling code here..
+        String presetName = comboBoxFilterPreset->getText();
+        pPresetHelper->selectPresetName(presetName);
+        //[/UserComboBoxCode_comboBoxFilterPreset]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -241,9 +279,64 @@ void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
+void FilterSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == buttonSave.get())
+    {
+        //[UserButtonCode_buttonSave] -- add your button handler code here..
+        File* newFile = pPresetHelper->tryCreateNewPreset();
+        if(newFile == nullptr)
+                return;
+
+        pPresetHelper->writeToXmlFile(*newFile, pFilterInfo);
+        comboBoxFilterPreset->setText("", dontSendNotification);
+        delete newFile;
+        //[/UserButtonCode_buttonSave]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void FilterSettingsComponent::updatePresetComboBox()
+{
+    comboBoxFilterPreset->clear();
+    int i = 1;
+    for (File file : pPresetHelper->presetFiles)
+    {
+        comboBoxFilterPreset->addItem(file.getFileNameWithoutExtension(), i++);
+    }
+}
+
+void FilterSettingsComponent::updateUi()
+{
+    comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
+    sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
+    sliderQ->setValue(pFilterInfo->qValue);
+    sliderGain->setValue(pFilterInfo->gainFactor);
+}
+
+void FilterSettingsComponent::actionListenerCallback(const String &message)
+{
+    if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
+    {
+        updatePresetComboBox();
+    }
+    else if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    {
+        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        pPresetHelper->loadFromXmlFile(presetFile, pFilterInfo);
+        pPresetHelper->notifyPresetChanged();
+        updateUi();
+    }
+}
+
 //[/MiscUserCode]
 
 
@@ -257,10 +350,11 @@ void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
-                 componentName="" parentClasses="public Component, public ChangeBroadcaster"
-                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="400" initialHeight="400">
+                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
+                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper"
+                 variableInitialisers="pPresetHelper(pPresetHelper)" snapPixels="8"
+                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
+                 initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <COMBOBOX name="comboBoxType" id="8896d80d8503e534" memberName="comboBoxType"
             virtualName="" explicitFocusOrder="0" pos="136 8 144M 24" editable="0"
@@ -291,7 +385,7 @@ BEGIN_JUCER_METADATA
           int="0.0" style="LinearBar" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
-                    virtualName="" explicitFocusOrder="0" pos="8 136 16M 144M" class="IIRFilterGraph"
+                    virtualName="" explicitFocusOrder="0" pos="8 136 16M 175M" class="IIRFilterGraph"
                     params="pFilterInfo, pFilterSpecification"/>
   <LABEL name="labelGain" id="5e0ece6555401094" memberName="labelGain"
          virtualName="" explicitFocusOrder="0" pos="8 104 150 24" edTextCol="ff000000"
@@ -303,6 +397,19 @@ BEGIN_JUCER_METADATA
           max="10.0" int="0.001" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <COMBOBOX name="comboBoxFilterPreset" id="4b25adf5b07e9492" memberName="comboBoxFilterPreset"
+            virtualName="" explicitFocusOrder="0" pos="80 32R 179M 24" posRelativeX="450188aa0f332e78"
+            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
+            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
+  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
+         virtualName="" explicitFocusOrder="0" pos="8 32R 64 24" posRelativeY="450188aa0f332e78"
+         edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
+              virtualName="" explicitFocusOrder="0" pos="11Rr 32R 80 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

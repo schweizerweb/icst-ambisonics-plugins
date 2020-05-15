@@ -30,12 +30,16 @@ public:
 
     ~PresetTableModel() override {}
 
-    void initTable(TableListBox* tableListBox)
+    void initTable(TableListBox* tableListBox, bool allowApply)
     {
         tableListBox->setModel(this);
         tableListBox->getHeader().addColumn("Name", COLUMN_ID_PRESET_NAME, 100);
         tableListBox->getHeader().addColumn("Creation Date", COLUMN_ID_PRESET_DATE, 100);
-        tableListBox->getHeader().addColumn("", COLUMN_ID_PRESET_APPLY, 40);
+        if(allowApply)
+        {
+            tableListBox->getHeader().addColumn("", COLUMN_ID_PRESET_APPLY, 40);
+        }
+        
         tableListBox->getHeader().setStretchToFitActive(true);
         tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
     }
