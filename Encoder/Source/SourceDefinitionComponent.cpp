@@ -113,7 +113,9 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
     groupList->setVisible(MULTI_ENCODER_MODE);
     buttonAddGroup->setVisible(MULTI_ENCODER_MODE);
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
-
+    buttonMoveGroupUp->setVisible(MULTI_ENCODER_MODE);
+    buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
+    
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
     pPointSelection->addChangeListener(this);
