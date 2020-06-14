@@ -59,6 +59,54 @@ public:
         return filterType == HighShelf || filterType == LowShelf || filterType == Peak;
     }
     
+    bool frequencyRequired() const
+    {
+        return filterType != None;
+    }
+    
+    float defaultFrequency()
+    {
+        switch(filterType)
+        {
+            case LowPass: return 35.0f;
+            case BandPass: return 50.0f;
+            case HighPass: return 13000.0f;
+            case FirstOrderLowPass: return 35.0f;
+            case FirstOrderHighPass: return 13000.0f;
+            case Notch: return 300.0f;
+            case LowShelf: return 150.0f;
+            case HighShelf: return 3200.0f;
+            case Peak: return 2000.0f;
+            default: return 200.0f;
+        }
+    }
+    
+    float defaultQ()
+    {
+        switch(filterType)
+        {
+            case LowPass: return 0.75f;
+            case BandPass: return 15.0f;
+            case HighPass: return 0.5f;
+            case Notch: return 1.25f;
+            case LowShelf: return 1.8f;
+            case HighShelf: return 1.8f;
+            case Peak: return 10.0f;
+            default: return 1.0f;
+        }
+    }
+    
+    float defaultGainFactor()
+    {
+        switch(filterType)
+        {
+            case LowShelf: return 0.1f;
+            case HighShelf: return 0.1f;
+            case Peak: return 2.0f;
+            default: return 1.0f;
+        }
+    }
+    
 	bool isLowPass() const
 	{
 		return filterType == LowPass || filterType == FirstOrderLowPass;
