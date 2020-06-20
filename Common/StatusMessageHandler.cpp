@@ -33,11 +33,13 @@ void StatusMessageHandler::registerDetailLog(TextEditor *editor)
 {
     const ScopedLock lock(cs);
     pTextEditor = editor;
+    startTimer(TIMER_ID_UPDATE, 20);
 }
 
 void StatusMessageHandler::unregisterDetailLog()
 {
     const ScopedLock lock(cs);
+    stopTimer(TIMER_ID_UPDATE);
     pTextEditor = nullptr;
 }
 
@@ -45,11 +47,11 @@ void StatusMessageHandler::showMessage(String message, String detailMessage, Mes
 {
     if(pTextEditor != nullptr)
     {
-        pTextEditor->setColour(TextEditor::textColourId, style == Error ? Colours::red : Colours::limegreen);
+        DetailMessage msg;
+        msg.message = Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n";
+        msg.messageStyle = style;
         
-        const ScopedLock lock(cs);
-        pTextEditor->moveCaretToEnd();
-        pTextEditor->insertTextAtCaret(Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n");
+        messageQueue.push(msg);
     }
     
 	if (pLabel != nullptr)
@@ -58,36 +60,69 @@ void StatusMessageHandler::showMessage(String message, String detailMessage, Mes
         
         if(style == Error)
         {
-            stopTimer();
+            stopTimer(TIMER_ID_LABEL_DELAY);
             pLabel->setColour(Label::textColourId, Colours::red);
             pLabel->setColour(Label::backgroundColourId, Colours::yellow);
             errorFlag = true;
             pLabel->setText(message, sendNotification);
-            startTimer(3000);
+            startTimer(TIMER_ID_LABEL_DELAY, 3000);
         }
         else
         {
             if(!errorFlag) // do not overwrite error messages
             {
-                stopTimer();
+                stopTimer(TIMER_ID_LABEL_DELAY);
                 pLabel->setColour(Label::textColourId, Colours::white);
                 pLabel->setColour(Label::backgroundColourId, Colours::green);
                 pLabel->setText(message, sendNotification);
-                startTimer(500);
+                startTimer(TIMER_ID_LABEL_DELAY, 500);
             }
         }
 	}
 }
 
-void StatusMessageHandler::timerCallback()
+void StatusMessageHandler::timerCallback(int timerID)
 {
-	stopTimer();
-	const ScopedLock lock(cs);
-	if (pLabel != nullptr)
-	{
-		pLabel->setColour(Label::textColourId, Colours::green);
-		pLabel->setColour(Label::backgroundColourId, Colours::transparentBlack);
-		pLabel->setText("", dontSendNotification);
-        errorFlag = false;
-	}
+    if(timerID == TIMER_ID_UPDATE)
+    {
+        stopTimer(TIMER_ID_UPDATE);
+        const ScopedLock lock(cs);
+     
+        if(messageQueue.size() > 10)
+        {
+            pTextEditor->setColour(TextEditor::textColourId, Colours::red);
+            pTextEditor->moveCaretToEnd();
+            size_t discardedCount = messageQueue.size();
+            std::queue<DetailMessage> empty;
+            std::swap( messageQueue, empty );
+            pTextEditor->insertTextAtCaret("Too many messages to display, " + String(discardedCount) + " elements discarded");
+        }
+        else
+        {
+            while(!messageQueue.empty())
+            {
+                DetailMessage msg = messageQueue.front();
+                messageQueue.pop();
+                pTextEditor->setColour(TextEditor::textColourId, msg.messageStyle == Error ? Colours::red : Colours::limegreen);
+        
+                pTextEditor->moveCaretToEnd();
+                pTextEditor->insertTextAtCaret(msg.message);
+            }
+        }
+        
+        pTextEditor->setText(pTextEditor->getText().getLastCharacters(1200));
+        startTimer(TIMER_ID_UPDATE, 20);
+    }
+    else if(timerID == TIMER_ID_LABEL_DELAY)
+    {
+        stopTimer(TIMER_ID_LABEL_DELAY);
+        const ScopedLock lock(cs);
+        if (pLabel != nullptr)
+        {
+            pLabel->setColour(Label::textColourId, Colours::green);
+            pLabel->setColour(Label::backgroundColourId, Colours::transparentBlack);
+            pLabel->setText("", dontSendNotification);
+            errorFlag = false;
+        }
+    }
 }
