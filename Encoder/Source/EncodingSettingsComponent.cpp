@@ -34,6 +34,8 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
+    distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
+    distanceEncodingPresetHelper->initialize();
     //[/Constructor_pre]
 
     comboBoxPresets.reset (new ComboBox ("comboBoxPresets"));
@@ -109,6 +111,11 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     toggleInfiniteDistance->setButtonText (TRANS("Infinite"));
     toggleInfiniteDistance->addListener (this);
 
+    btnManageDistanceEncodingPresets.reset (new TextButton ("btnManageDistanceEncodingPresets"));
+    addAndMakeVisible (btnManageDistanceEncodingPresets.get());
+    btnManageDistanceEncodingPresets->setButtonText (TRANS("presets..."));
+    btnManageDistanceEncodingPresets->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -149,6 +156,7 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     btnEditDistanceEncoding = nullptr;
     buttonManagePresets = nullptr;
     toggleInfiniteDistance = nullptr;
+    btnManageDistanceEncodingPresets = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -177,9 +185,10 @@ void EncodingSettingsComponent::resized()
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
     sourceDefinition->setBounds (8, 112, getWidth() - 16, getHeight() - 154);
     sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 80, getWidth() - 301, 24);
-    btnEditDistanceEncoding->setBounds (getWidth() - 12 - 86, 19, 86, 24);
+    btnEditDistanceEncoding->setBounds (getWidth() - 108 - 86, 19, 86, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
     toggleInfiniteDistance->setBounds (getWidth() - 82, 80, 72, 24);
+    btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 19, 86, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -235,7 +244,7 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams), getScreenBounds(), nullptr);
+        CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams, distanceEncodingPresetHelper.get()), getScreenBounds(), nullptr);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
@@ -252,6 +261,12 @@ void EncodingSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         sourceDefinition->refresh();
         updateEncodingUiElements();
         //[/UserButtonCode_toggleInfiniteDistance]
+    }
+    else if (buttonThatWasClicked == btnManageDistanceEncodingPresets.get())
+    {
+        //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
+        presetManagerDialog.show(this, distanceEncodingPresetHelper.get(), false);
+        //[/UserButtonCode_btnManageDistanceEncodingPresets]
     }
 
     //[UserbuttonClicked_Post]
@@ -385,7 +400,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
-              virtualName="" explicitFocusOrder="0" pos="12Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              virtualName="" explicitFocusOrder="0" pos="108Rr 19 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
@@ -395,6 +410,11 @@ BEGIN_JUCER_METADATA
   <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
                 virtualName="" explicitFocusOrder="0" pos="82R 80 72 24" buttonText="Infinite"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTBUTTON name="btnManageDistanceEncodingPresets" id="e79fc007bc779712"
+              memberName="btnManageDistanceEncodingPresets" virtualName=""
+              explicitFocusOrder="0" pos="12Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              posRelativeY="b72378bdfe4e130" buttonText="presets..." connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

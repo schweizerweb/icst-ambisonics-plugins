@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -162,10 +162,15 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     textLog->setMultiLine (true);
     textLog->setReturnKeyStartsNewLine (false);
     textLog->setReadOnly (true);
-    textLog->setScrollbarsShown (true);
+    textLog->setScrollbarsShown (false);
     textLog->setCaretVisible (false);
     textLog->setPopupMenuEnabled (true);
     textLog->setText (String());
+
+    toggleLog.reset (new ToggleButton ("toggleLog"));
+    addAndMakeVisible (toggleLog.get());
+    toggleLog->setButtonText (TRANS("Enable (may slow down OSC handling)"));
+    toggleLog->addListener (this);
 
 
     //[UserPreSize]
@@ -193,8 +198,8 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     toggleSendOscExt->setToggleState(pSettings->oscSendExtFlag, dontSendNotification);
     textOscSendIpExt->setText(String(pSettings->oscSendExtTargetHost));
     textOscSendPortExt->setText(String(pSettings->oscSendExtPort));
-
-    pStatusMessageHandler->registerDetailLog(textLog.get());
+    
+    textLog->setEnabled(false);
     //[/Constructor]
 }
 
@@ -221,6 +226,7 @@ OSCSettingsComponent::~OSCSettingsComponent()
     textOscSendPortExt = nullptr;
     groupLog = nullptr;
     textLog = nullptr;
+    toggleLog = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -260,7 +266,8 @@ void OSCSettingsComponent::resized()
     labelOscSendIpExt->setBounds (8 + (getWidth() - 16) - 180 - 126, 8 + 57, 126, 24);
     textOscSendPortExt->setBounds (8 + (getWidth() - 16) - 16 - 48, 8 + 57, 48, 24);
     groupLog->setBounds (8, 216, getWidth() - 16, getHeight() - 221);
-    textLog->setBounds (8 + 16, 216 + 24, (getWidth() - 16) - 30, (getHeight() - 221) - 40);
+    textLog->setBounds (8 + 16, 216 + 56, (getWidth() - 16) - 30, (getHeight() - 221) - 72);
+    toggleLog->setBounds (8 + 16, 216 + 24, 280, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -291,6 +298,20 @@ void OSCSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
         sendChangeMessage();
 
         //[/UserButtonCode_toggleSendOscExt]
+    }
+    else if (buttonThatWasClicked == toggleLog.get())
+    {
+        //[UserButtonCode_toggleLog] -- add your button handler code here..
+    if(toggleLog->getToggleState())
+    {
+        textLog->setEnabled(true);
+        pStatusMessageHandler->registerDetailLog(textLog.get());
+    }
+    else{
+        pStatusMessageHandler->unregisterDetailLog();
+        textLog->setEnabled(false);
+    }
+        //[/UserButtonCode_toggleLog]
     }
 
     //[UserbuttonClicked_Post]
@@ -442,10 +463,14 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupLog" id="1f10ffbcf9f07a8c" memberName="groupLog" virtualName=""
                   explicitFocusOrder="0" pos="8 216 16M 221M" title="Log"/>
   <TEXTEDITOR name="textLog" id="c68a1d41e12fc01" memberName="textLog" virtualName=""
-              explicitFocusOrder="0" pos="16 24 30M 40M" posRelativeX="1f10ffbcf9f07a8c"
+              explicitFocusOrder="0" pos="16 56 30M 72M" posRelativeX="1f10ffbcf9f07a8c"
               posRelativeY="1f10ffbcf9f07a8c" posRelativeW="1f10ffbcf9f07a8c"
               posRelativeH="1f10ffbcf9f07a8c" initialText="" multiline="1"
-              retKeyStartsLine="0" readonly="1" scrollbars="1" caret="0" popupmenu="1"/>
+              retKeyStartsLine="0" readonly="1" scrollbars="0" caret="0" popupmenu="1"/>
+  <TOGGLEBUTTON name="toggleLog" id="3acf4be5e0798efd" memberName="toggleLog"
+                virtualName="" explicitFocusOrder="0" pos="16 24 280 24" posRelativeX="1f10ffbcf9f07a8c"
+                posRelativeY="1f10ffbcf9f07a8c" buttonText="Enable (may slow down OSC handling)"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

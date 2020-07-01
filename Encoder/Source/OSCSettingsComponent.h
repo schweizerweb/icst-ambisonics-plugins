@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.5
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -43,7 +43,7 @@ class OSCSettingsComponent  : public Component,
 public:
     //==============================================================================
     OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler);
-    ~OSCSettingsComponent();
+    ~OSCSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -84,6 +84,7 @@ private:
     std::unique_ptr<TextEditor> textOscSendPortExt;
     std::unique_ptr<GroupComponent> groupLog;
     std::unique_ptr<TextEditor> textLog;
+    std::unique_ptr<ToggleButton> toggleLog;
 
 
     //==============================================================================

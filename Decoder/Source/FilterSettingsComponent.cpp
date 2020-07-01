@@ -232,9 +232,11 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     {
         //[UserComboBoxCode_comboBoxType] -- add your combo box handling code here..
 		pFilterInfo->filterType = FilterInfo::FilterType(comboBoxType->getSelectedId()-1);
-		sliderQ->setEnabled(pFilterInfo->qRequired());
-        sliderGain->setEnabled(pFilterInfo->gainRequired());
-		sendChangeMessage();
+        pFilterInfo->cutOffFrequencyHz = pFilterInfo->defaultFrequency();
+        pFilterInfo->qValue = pFilterInfo->defaultQ();
+        pFilterInfo->gainFactor = pFilterInfo->defaultGainFactor();
+        updateUi();
+        sendChangeMessage();
         //[/UserComboBoxCode_comboBoxType]
     }
     else if (comboBoxThatHasChanged == comboBoxFilterPreset.get())
@@ -242,6 +244,7 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
         //[UserComboBoxCode_comboBoxFilterPreset] -- add your combo box handling code here..
         String presetName = comboBoxFilterPreset->getText();
         pPresetHelper->selectPresetName(presetName);
+        comboBoxFilterPreset->setSelectedItemIndex(-1);
         //[/UserComboBoxCode_comboBoxFilterPreset]
     }
 
@@ -316,10 +319,14 @@ void FilterSettingsComponent::updatePresetComboBox()
 
 void FilterSettingsComponent::updateUi()
 {
-    comboBoxType->setSelectedId(1+pFilterInfo->filterType, sendNotification);
+    comboBoxType->setSelectedId(1+pFilterInfo->filterType, dontSendNotification);
     sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
     sliderQ->setValue(pFilterInfo->qValue);
     sliderGain->setValue(pFilterInfo->gainFactor);
+    
+    sliderFrequency->setEnabled(pFilterInfo->frequencyRequired());
+    sliderQ->setEnabled(pFilterInfo->qRequired());
+    sliderGain->setEnabled(pFilterInfo->gainRequired());
 }
 
 void FilterSettingsComponent::actionListenerCallback(const String &message)
