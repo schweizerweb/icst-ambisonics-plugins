@@ -1,8 +1,8 @@
 /*
   ==============================================================================
 
-    FilterPresetHelper.h
-    Created: 15 May 2020 9:47:54pm
+    DistanceEncodingPresetHelper.h
+    Created: 1 Jul 2020 11:16:36pm
     Author:  Schweizer Christian
 
   ==============================================================================
@@ -13,10 +13,10 @@
 #include "../../Common/PresetHelper.h"
 
 
-class FilterPresetHelper : public PresetHelper
+class DistanceEncodingPresetHelper : public PresetHelper
 {
 public:
-    FilterPresetHelper(File presetDirectory, ActionListener* pActionListener)
+    DistanceEncodingPresetHelper(File presetDirectory, ActionListener* pActionListener)
         : PresetHelper(presetDirectory, pActionListener)
     {
         
@@ -24,7 +24,7 @@ public:
     
     bool checkValid(File presetFile) override
     {
-        FilterInfo testInfo;
+        DistanceEncodingParams testInfo;
         if(loadFromXmlFile(presetFile, &testInfo))
         {
             return true;
@@ -35,35 +35,33 @@ public:
     
     void restoreDefaultsInternal() override
     {
-        FilterInfo filterInfo;
+        DistanceEncodingParams p;
         
-        File file = getPathForPresetName("LowPass 50 Hz");
-        filterInfo.filterType = FilterInfo::LowPass;
-        filterInfo.cutOffFrequencyHz = 50;
+        File file = getPathForPresetName("Default");
         
-        writeToXmlFile(file, &filterInfo);
+        writeToXmlFile(file, &p);
         presetFiles.addIfNotAlreadyThere(file);
     }
     
-    bool loadFromXmlFile(const File file, FilterInfo* pFilterInfo)
+    bool loadFromXmlFile(const File file, DistanceEncodingParams* pEncodingParams)
     {
         XmlDocument doc(file);
-        std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("FilterPreset");
+        std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("DistanceEncodingPreset");
 
-        if (rootElement == nullptr || rootElement->getTagName() != "FilterPreset")
+        if (rootElement == nullptr || rootElement->getTagName() != "DistanceEncodingPreset")
             return false;
         
-        bool ok = pFilterInfo->loadFromXmlElement(rootElement->getChildByName("Settings"));
+        bool ok = pEncodingParams->loadFromXmlElement(rootElement->getChildByName("Settings"));
     
         return ok;
     }
     
-    bool writeToXmlFile(const File file, FilterInfo* pFilterInfo)
+    bool writeToXmlFile(const File file, DistanceEncodingParams* pEncodingParams)
     {
-        XmlElement* rootElement = new XmlElement("FilterPreset");
+        XmlElement* rootElement = new XmlElement("DistanceEncodingPreset");
 
         XmlElement* xmlSettings = new XmlElement("Settings");
-        pFilterInfo->writeToXmlElement(xmlSettings);
+        pEncodingParams->writeToXmlElement(xmlSettings);
         rootElement->addChildElement(xmlSettings);
 
         bool success = rootElement->writeTo(file);

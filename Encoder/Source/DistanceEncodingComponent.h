@@ -23,7 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "DistanceEncodingParams.h"
 #include "DistanceEncodingGraph.h"
-
+#include "DistanceEncodingPresetHelper.h"
 //[/Headers]
 
 
@@ -38,32 +38,37 @@
 */
 class DistanceEncodingComponent  : public Component,
                                    ChangeListener,
+                                   ActionListener,
                                    public Slider::Listener,
-                                   public ComboBox::Listener
+                                   public ComboBox::Listener,
+                                   public Button::Listener
 {
 public:
     //==============================================================================
-    DistanceEncodingComponent (DistanceEncodingParams* pParams);
+    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper);
     ~DistanceEncodingComponent() override;
-    
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void updatePresetComboBox();
     void controlDimming() const;
     void setUiValues(DistanceEncodingParams *pEncodingParams);
     void changeListenerCallback(ChangeBroadcaster *source) override;
+    void actionListenerCallback(const String &message) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
     void resized() override;
     void sliderValueChanged (Slider* sliderThatWasMoved) override;
     void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	DistanceEncodingParams* pParams;
+    DistanceEncodingPresetHelper* pPresetHelper;
     //[/UserVariables]
 
     //==============================================================================
@@ -82,6 +87,9 @@ private:
     std::unique_ptr<Label> labelAdvancedFact;
     std::unique_ptr<Slider> sliderAdvancedExponent;
     std::unique_ptr<Label> labelAdvancedExponent;
+    std::unique_ptr<ComboBox> comboBoxDistanceEncodingPreset;
+    std::unique_ptr<Label> labelPresets;
+    std::unique_ptr<TextButton> buttonSave;
 
 
     //==============================================================================
