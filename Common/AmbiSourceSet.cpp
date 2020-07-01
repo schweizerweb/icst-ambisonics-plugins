@@ -81,6 +81,8 @@ void AmbiSourceSet::cleanup(int keepNbOfElements)
 
 void AmbiSourceSet::setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color)
 {
+    const ScopedLock lock(cs);
+
 	AmbiSource* matchingPt = nullptr;
 
 	for (AmbiSource* pt : elements)
