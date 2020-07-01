@@ -25,6 +25,7 @@
 #include "EncoderPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
+#include "DistanceEncodingPresetHelper.h"
 //[/Headers]
 
 
@@ -73,6 +74,7 @@ private:
     PresetManagerDialog presetManagerDialog;
     EncoderPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;
+    std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
     //[/UserVariables]
 
     //==============================================================================
@@ -87,6 +89,7 @@ private:
     std::unique_ptr<TextButton> btnEditDistanceEncoding;
     std::unique_ptr<TextButton> buttonManagePresets;
     std::unique_ptr<ToggleButton> toggleInfiniteDistance;
+    std::unique_ptr<TextButton> btnManageDistanceEncodingPresets;
 
 
     //==============================================================================

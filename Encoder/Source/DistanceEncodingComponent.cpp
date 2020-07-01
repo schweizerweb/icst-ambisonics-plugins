@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams)
-    : pParams(pParams)
+DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper)
+    : pParams(pParams), pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -165,6 +165,28 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
 
     labelAdvancedExponent->setBounds (8, 80, 140, 24);
 
+    comboBoxDistanceEncodingPreset.reset (new ComboBox ("comboBoxDistanceEncodingPreset"));
+    addAndMakeVisible (comboBoxDistanceEncodingPreset.get());
+    comboBoxDistanceEncodingPreset->setEditableText (false);
+    comboBoxDistanceEncodingPreset->setJustificationType (Justification::centredLeft);
+    comboBoxDistanceEncodingPreset->setTextWhenNothingSelected (TRANS("-"));
+    comboBoxDistanceEncodingPreset->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxDistanceEncodingPreset->addListener (this);
+
+    labelPresets.reset (new Label ("labelPresets",
+                                   TRANS("Presets:")));
+    addAndMakeVisible (labelPresets.get());
+    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setEditable (false, false, false);
+    labelPresets->setColour (TextEditor::textColourId, Colours::black);
+    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+
+    buttonSave.reset (new TextButton ("buttonSave"));
+    addAndMakeVisible (buttonSave.get());
+    buttonSave->setButtonText (TRANS("save"));
+    buttonSave->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -186,8 +208,12 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
     sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
     sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
-    
+
     pParams->addChangeListener(this);
+
+    updatePresetComboBox();
+    pPresetHelper->addActionListener(this);
+
     controlDimming();
 
     //[/Constructor]
@@ -197,6 +223,7 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     pParams->removeChangeListener(this);
+    pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
     distanceEncodingGraph = nullptr;
@@ -214,6 +241,9 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     labelAdvancedFact = nullptr;
     sliderAdvancedExponent = nullptr;
     labelAdvancedExponent = nullptr;
+    comboBoxDistanceEncodingPreset = nullptr;
+    labelPresets = nullptr;
+    buttonSave = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -237,7 +267,7 @@ void DistanceEncodingComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    distanceEncodingGraph->setBounds (0, 184, proportionOfWidth (1.0000f), getHeight() - 184);
+    distanceEncodingGraph->setBounds (0, 184, proportionOfWidth (1.0000f), getHeight() - 222);
     sliderUnitCircleRadius->setBounds (152, 32, getWidth() - 165, 24);
     comboBoxEncodingMode->setBounds (152, 8, getWidth() - 165, 24);
     sliderDbUnit->setBounds (153, 104, getWidth() - 165, 24);
@@ -245,6 +275,9 @@ void DistanceEncodingComponent::resized()
     sliderCenterCurve->setBounds (153, 128, getWidth() - 165, 24);
     sliderAdvancedFactor->setBounds (153, 56, getWidth() - 165, 24);
     sliderAdvancedExponent->setBounds (153, 80, getWidth() - 165, 24);
+    comboBoxDistanceEncodingPreset->setBounds (72, getHeight() - 30, getWidth() - 171, 24);
+    labelPresets->setBounds (0, getHeight() - 30, 64, 24);
+    buttonSave->setBounds (getWidth() - 6 - 80, getHeight() - 30, 80, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -309,14 +342,67 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
         distanceEncodingGraph->repaint();
         //[/UserComboBoxCode_comboBoxEncodingMode]
     }
+    else if (comboBoxThatHasChanged == comboBoxDistanceEncodingPreset.get())
+    {
+        //[UserComboBoxCode_comboBoxDistanceEncodingPreset] -- add your combo box handling code here..
+        String presetName = comboBoxDistanceEncodingPreset->getText();
+        pPresetHelper->selectPresetName(presetName);
+        comboBoxDistanceEncodingPreset->setSelectedItemIndex(-1);
+        //[/UserComboBoxCode_comboBoxDistanceEncodingPreset]
+    }
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
 }
 
+void DistanceEncodingComponent::buttonClicked (Button* buttonThatWasClicked)
+{
+    //[UserbuttonClicked_Pre]
+    //[/UserbuttonClicked_Pre]
+
+    if (buttonThatWasClicked == buttonSave.get())
+    {
+        //[UserButtonCode_buttonSave] -- add your button handler code here..
+        File* newFile = pPresetHelper->tryCreateNewPreset();
+        if(newFile == nullptr)
+                return;
+
+        pPresetHelper->writeToXmlFile(*newFile, pParams);
+        comboBoxDistanceEncodingPreset->setText("", dontSendNotification);
+        delete newFile;
+        //[/UserButtonCode_buttonSave]
+    }
+
+    //[UserbuttonClicked_Post]
+    //[/UserbuttonClicked_Post]
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void DistanceEncodingComponent::updatePresetComboBox()
+{
+    comboBoxDistanceEncodingPreset->clear();
+    int i = 1;
+    for (File file : pPresetHelper->presetFiles)
+    {
+        comboBoxDistanceEncodingPreset->addItem(file.getFileNameWithoutExtension(), i++);
+    }
+}
+void DistanceEncodingComponent::actionListenerCallback(const String &message)
+{
+    if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
+    {
+        updatePresetComboBox();
+    }
+    else if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    {
+        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        pPresetHelper->loadFromXmlFile(presetFile, pParams);
+        pPresetHelper->notifyPresetChanged();
+        setUiValues(pParams);
+    }
+}
 void DistanceEncodingComponent::controlDimming() const
 {
     EncoderConstants::EncodingMode mode = pParams->getEncodingMode();
@@ -364,13 +450,14 @@ void DistanceEncodingComponent::changeListenerCallback(ChangeBroadcaster* /*sour
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DistanceEncodingComponent"
-                 componentName="" parentClasses="public Component, ChangeListener"
-                 constructorParams="DistanceEncodingParams* pParams" variableInitialisers="pParams(pParams)"
+                 componentName="" parentClasses="public Component, ChangeListener, ActionListener"
+                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper"
+                 variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
-                    virtualName="" explicitFocusOrder="0" pos="0 184 100% 184M" class="DistanceEncodingGraph"
+                    virtualName="" explicitFocusOrder="0" pos="0 184 100% 222M" class="DistanceEncodingGraph"
                     params="pParams"/>
   <SLIDER name="sliderUnitCircleRadius" id="33a23e1d161c87b2" memberName="sliderUnitCircleRadius"
           virtualName="" explicitFocusOrder="0" pos="152 32 165M 24" min="0.01"
@@ -440,6 +527,19 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Advanced Exponent" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="comboBoxDistanceEncodingPreset" id="4b25adf5b07e9492" memberName="comboBoxDistanceEncodingPreset"
+            virtualName="" explicitFocusOrder="0" pos="72 30R 171M 24" posRelativeX="450188aa0f332e78"
+            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
+            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
+  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
+         virtualName="" explicitFocusOrder="0" pos="0 30R 64 24" posRelativeY="450188aa0f332e78"
+         edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
+              virtualName="" explicitFocusOrder="0" pos="6Rr 30R 80 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
