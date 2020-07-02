@@ -49,6 +49,8 @@ void AmbiSourceSet::remove(int index)
 
 	if (removedPt != nullptr)
 		removedElements.add(removedPt);
+    
+    cleanup(100);
 }
 
 void AmbiSourceSet::swap(int a, int b)
