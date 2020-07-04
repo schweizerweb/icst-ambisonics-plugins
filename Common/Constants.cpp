@@ -20,7 +20,7 @@ const double Constants::AzimuthGradMin = 0.0;
 const double Constants::AzimuthGradMax = 360.0;
 const double Constants::ElevationGradMin = -90.0;
 const double Constants::ElevationGradMax = 90.0;
-const double Constants::GainDbMin = -128.0;
+const double Constants::GainDbMin = -88.0;
 const double Constants::GainDbMax = 12.0;
 
 const float Constants::CompressedMin = -1.0f;
