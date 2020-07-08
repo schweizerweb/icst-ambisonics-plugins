@@ -114,6 +114,44 @@
 </GroupManipulation>
 
 <DistanceEncoding name="Distance Encoding">
+    <Standard name="Standard">
+        <Syntax desc="/icst/ambi/distanceencoding/standard [Radius]">The standard distance encoding mode.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/standard 0.2" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        </Parameter>
+    </Standard>
+    <Advanced name="Advanced">
+        <Syntax desc="/icst/ambi/distanceencoding/advanced [Radius] [Factor] [Exponent]">A modified version of the Standard formula with userdefinable weightings of factor and exponent.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/advanced 0.1 2.6 1.1" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Factor desc="Advanced Factor as Int/Float" />
+        <Exponent desc="Advanced Exponent as Int/Float" />
+        </Parameter>
+    </Advanced>
+    <Exponential name="Exponential">
+        <Syntax desc="/icst/ambi/distanceencoding/exponential [Radius] [Unit] [Curve]">Exponential distance attenuation.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/exponential 0.1 1.2 0.2" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Unit desc="dB Unit as Int/Float" />
+        <Curve desc="Center Curve as Int/Float" />
+        </Parameter>
+    </Exponential>
+    <InverseProportional name="Inverse Proportional">
+        <Syntax desc="/icst/ambi/distanceencoding/inverseproportional [Radius] [Unit] [Curve] [Attenuation]">Inverse proportional distance attenuation.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/inverseproportional 0.1 1.2 0.2 1.3" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Unit desc="dB Unit as Int/Float" />
+        <Curve desc="Center Curve as Int/Float" />
+        <Attenuation desc="Distance Attenuation as Int/Float" />
+        </Parameter>
+    </InverseProportional>
+</DistanceEncoding>
+
+<DistanceEncodingAdvanced name="Distance Encoding Advanced">
 <DistanceEncodingMode name="Mode">
 <Syntax desc="/icst/ambi/distanceencoding/mode [Mode]" />
 <Example desc="/icst/ambi/distanceencoding/mode 1" />
@@ -169,7 +207,7 @@
 <Attenuation desc="Distance Attenuation as Int/Float" />
 </Parameter>
 </DistanceAttenuation>
-</DistanceEncoding>
+</DistanceEncodingAdvanced>
 
 <PointInfoOutput name="Point Info Output">
 <PositionAED name="Source Position AED">
