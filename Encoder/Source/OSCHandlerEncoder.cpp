@@ -76,6 +76,22 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     {
         handleOwnExternStyleDistanceEncoding(message);
     }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_STANDARD)))
+    {
+        handleOwnExternStyleDistanceEncodingStandard(message);
+    }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCED)))
+    {
+        handleOwnExternStyleDistanceEncodingAdvanced(message);
+    }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL)))
+    {
+        handleOwnExternStyleDistanceEncodingExponential(message);
+    }
+    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL)))
+    {
+        handleOwnExternStyleDistanceEncodingInverseProportional(message);
+    }
     else
     {
         return false;
@@ -542,3 +558,116 @@ void OSCHandlerEncoder::handleOwnExternStyleDistanceEncoding(const OSCMessage &m
     }
 }
 
+void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingStandard(const OSCMessage &message) const
+{
+    bool valid =
+        message.size() == 1
+        && (message[0].isInt32() || message[0].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(distance encoding)", &message);
+        return;
+    }
+
+    bool ok = false;
+    ok = pDistanceEncodingParams->setEncodingMode(EncoderConstants::EncodingMode::Standard);
+    ok &= pDistanceEncodingParams->setUnitCircleRadius((float)GetIntOrFloat(&message[0]));
+    
+    if (ok)
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER, &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingAdvanced(const OSCMessage &message) const
+{
+    bool valid =
+        message.size() == 3
+        && (message[0].isInt32() || message[0].isFloat32())
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(distance encoding)", &message);
+        return;
+    }
+
+    bool ok = false;
+    ok = pDistanceEncodingParams->setEncodingMode(EncoderConstants::EncodingMode::Advanced);
+    ok &= pDistanceEncodingParams->setUnitCircleRadius((float)GetIntOrFloat(&message[0]));
+    ok &= pDistanceEncodingParams->setAdvancedFactor((float)GetIntOrFloat(&message[1]));
+    ok &= pDistanceEncodingParams->setAdvancedExponent((float)GetIntOrFloat(&message[2]));
+    
+    if (ok)
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER, &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingExponential(const OSCMessage &message) const
+{
+    bool valid =
+        message.size() == 3
+        && (message[0].isInt32() || message[0].isFloat32())
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(distance encoding)", &message);
+        return;
+    }
+
+    bool ok = false;
+    ok = pDistanceEncodingParams->setEncodingMode(EncoderConstants::EncodingMode::Exponential);
+    ok &= pDistanceEncodingParams->setUnitCircleRadius((float)GetIntOrFloat(&message[0]));
+    ok &= pDistanceEncodingParams->setDbUnit((float)GetIntOrFloat(&message[1]));
+    ok &= pDistanceEncodingParams->setCenterCurve((float)GetIntOrFloat(&message[2]));
+    
+    if (ok)
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER, &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingInverseProportional(const OSCMessage &message) const
+{
+    bool valid =
+        message.size() == 4
+        && (message[0].isInt32() || message[0].isFloat32())
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32())
+        && (message[3].isInt32() || message[3].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(distance encoding)", &message);
+        return;
+    }
+
+    bool ok = false;
+    ok = pDistanceEncodingParams->setEncodingMode(EncoderConstants::EncodingMode::InverseProportional);
+    ok &= pDistanceEncodingParams->setUnitCircleRadius((float)GetIntOrFloat(&message[0]));
+    ok &= pDistanceEncodingParams->setDbUnit((float)GetIntOrFloat(&message[1]));
+    ok &= pDistanceEncodingParams->setCenterCurve((float)GetIntOrFloat(&message[2]));
+    ok &= pDistanceEncodingParams->setInverseProportionalDistanceAttenuation((float)GetIntOrFloat(&message[3]));
+    
+    if (ok)
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER, &message);
+    }
+}

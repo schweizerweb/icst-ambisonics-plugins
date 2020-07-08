@@ -33,6 +33,10 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDFACTOR "/icst/ambi/distanceencoding/advancedfactor"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDEXPONENT "/icst/ambi/distanceencoding/advancedexponent"
 #define ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER String("OSC message with invalid distance encoding parameter received ")
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_STANDARD "/icst/ambi/distanceencoding/standard"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCED "/icst/ambi/distanceencoding/advanced"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL "/icst/ambi/distanceencoding/exponential"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL "/icst/ambi/distanceencoding/inverseproportional"
 
 class OSCHandlerEncoder : public OSCHandler
 {
@@ -54,7 +58,10 @@ private:
     void handleOwnExternStyleGroupRotateOrigin(const OSCMessage& message) const;
     void handleOwnExternStyleGroupStretch(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncoding(const OSCMessage& message) const;
-    
+    void handleOwnExternStyleDistanceEncodingStandard(const OSCMessage& message) const;
+    void handleOwnExternStyleDistanceEncodingAdvanced(const OSCMessage& message) const;
+    void handleOwnExternStyleDistanceEncodingExponential(const OSCMessage& message) const;
+    void handleOwnExternStyleDistanceEncodingInverseProportional(const OSCMessage& message) const;
     
     DistanceEncodingParams* pDistanceEncodingParams;
 };
