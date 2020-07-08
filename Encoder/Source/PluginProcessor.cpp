@@ -299,6 +299,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             Globals::SetScaler(encoderSettings.getDistanceScaler());
 			// load last source preset
 			sources.loadFromXml(xmlState.get(), &audioParams);
+            sources.resetIds();
 		}
 	}
 
