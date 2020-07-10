@@ -40,7 +40,8 @@ public:
 
 	void paint(Graphics& g) override
 	{
-		g.fillAll(color);
+        if(isEnabled())
+            g.fillAll(color);
 	}
 
 	void changeListenerCallback(ChangeBroadcaster* source) override
