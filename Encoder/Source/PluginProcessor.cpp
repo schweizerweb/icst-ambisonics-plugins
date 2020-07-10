@@ -223,8 +223,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
-		AmbiPoint* source = sources.get(iSource);
-		if (source == nullptr)
+		AmbiSource* source = sources.get(iSource);
+		if (source == nullptr || !source->getEnabled())
 			continue;
 
 		const float sourceGain = float(source->getGain());

@@ -143,6 +143,11 @@ public:
 		}
 	}
 
+    bool getEnabled(const int columnId, const int rowNumber) override
+    {
+        return true;
+    }
+    
 	void setValue(int columnId, int rowNumber, double newValue) override
 	{
 		switch (columnId)

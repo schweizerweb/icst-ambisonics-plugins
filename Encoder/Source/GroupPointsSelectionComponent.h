@@ -34,8 +34,10 @@ public:
         
 		for (int i = 0; i < pSources->size(); i++)
 		{
-			ToggleButton* b = new ToggleButton(pSources->get(i)->getName());
-			b->setToggleState(pGroup->groupPoints.contains(pSources->get(i)), dontSendNotification);
+            AmbiSource* s = pSources->get(i);
+			ToggleButton* b = new ToggleButton(s->getName());
+			b->setToggleState(pGroup->groupPoints.contains(s), dontSendNotification);
+            b->setEnabled(s->getEnabled());
 			b->addListener(this);
 			toggleButtons.add(b);
 			addAndMakeVisible(b);

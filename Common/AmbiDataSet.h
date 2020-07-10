@@ -37,6 +37,7 @@ public:
 	void setChannelYZ(int channel, double y, double z) const;
 	void setChannelName(int channel, String name) const;
 	void setChannelColor(int channel, Colour colour) const;
+    void setEnabled(int channel, bool enable) const;
 	void setX(int channel, double x, bool notify = true) const;
 	void setY(int channel, double y, bool notify = true) const;
 	void setZ(int channel, double z, bool notify = true) const;

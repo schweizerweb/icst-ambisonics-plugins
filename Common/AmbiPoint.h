@@ -20,6 +20,7 @@
 #define XML_ATTRIBUTE_POINT_NAME "Name"
 #define XML_ATTRIBUTE_POINT_COLOR "Color"
 #define XML_ATTRIBUTE_POINT_GAIN "Gain"
+#define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
 
 class AmbiPoint
@@ -30,25 +31,35 @@ protected:
 	AmbiPoint(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
 	AmbiPoint(XmlElement* element);
 	AmbiPoint(XmlElement* element, AudioParameterSet audioParams);
+    AmbiPoint(AudioParameterSet audioParams);
 	~AmbiPoint();
 	XmlElement* getBaseXmlElement(String tagName);
 
 public:
 	Point3D<double>* getPoint();
+    
 	Colour getColor() const;
-	String getName() const;
-	void setName(String newName);
-	double getGain() const;
-	void setGain(double newGain, bool notify);
-	String getId();
-	void resetId();
 	void setColor(Colour newColor);
     
-	bool checkAlive(int64 referenceTime, int timeout) const;
+    String getName() const;
+	void setName(String newName);
+	
+    double getGain() const;
+	void setGain(double newGain, bool notify);
+	
+    String getId();
+	void resetId();
+	
+    bool getEnabled();
+    void setEnabled(bool enable);
+	
+    bool checkAlive(int64 referenceTime, int timeout) const;
 	void setAlive(int64 currentTimeMillis);
-	Image* getLabelImage();
+	
+    Image* getLabelImage();
 	void ensureLabelImage();
-	virtual float getDisplayScaler() = 0;
+	
+    virtual float getDisplayScaler() = 0;
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
 private:
@@ -60,6 +71,7 @@ private:
 	int64 lastUpdate = 0;
 	Image labelImage;
     AudioParameterSet audioParams;
+    bool enabled = true;
 };
 
 

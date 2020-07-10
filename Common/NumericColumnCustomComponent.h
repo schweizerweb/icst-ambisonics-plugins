@@ -49,6 +49,9 @@ public:
 		columnId = newColumn;
 		range = SliderRange(owner.getSliderRange(columnId));
 		setText(String(owner.getValue(columnId, row), 3), dontSendNotification);
+        bool enabled = owner.getEnabled(columnId, row);
+        setEditable(false, enabled, false);
+        setColour(textColourId, enabled ? Colours::white : Colours::darkgrey);
 	}
 
 	void paint(Graphics& g) override

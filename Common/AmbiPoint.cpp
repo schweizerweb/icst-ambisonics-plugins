@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams), enabled(other->enabled)
 {
 	if (copyImage)
 	{
@@ -33,7 +33,8 @@ AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color
 	point(point),
 	color(color),
 	name(name),
-	gain(gain)
+	gain(gain),
+    enabled(true)
 {
 }
 
@@ -44,7 +45,8 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z))),
 	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR))).withAlpha(1.0f)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
-	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0))
+	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
 {
 }
 
@@ -57,7 +59,12 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR))).withAlpha(1.0f)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
-    audioParams(audioParams)
+    audioParams(audioParams),
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
+{
+}
+
+AmbiPoint::AmbiPoint(AudioParameterSet audioParams) : color(Colours::black), gain(1.0), audioParams(audioParams), enabled(false)
 {
 }
 
@@ -75,6 +82,7 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 	element->setAttribute(XML_ATTRIBUTE_POINT_NAME, getName());
 	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR, int(getColor().getARGB()));
 	element->setAttribute(XML_ATTRIBUTE_POINT_GAIN, getGain());
+    element->setAttribute(XML_ATTRIBUTE_POINT_ENABLED, getEnabled());
 	return element;
 }
 
@@ -165,4 +173,14 @@ void AmbiPoint::ensureLabelImage()
 		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
 		labelImage.duplicateIfShared();
 	}
+}
+
+bool AmbiPoint::getEnabled()
+{
+    return enabled;
+}
+
+void AmbiPoint::setEnabled(bool enable)
+{
+    enabled = enable;
 }

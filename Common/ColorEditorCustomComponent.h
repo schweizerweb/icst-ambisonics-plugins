@@ -21,8 +21,11 @@ public:
 
 	void mouseDown(const MouseEvent& event) override
 	{
-		owner.getTable()->selectRowsBasedOnModifierKeys(row, event.mods, false);
-        CallOutBox::launchAsynchronously(new ColorSelectionComponent(color, this, this, groupFlag), getScreenBounds(), nullptr);
+        if(isEnabled())
+        {
+            owner.getTable()->selectRowsBasedOnModifierKeys(row, event.mods, false);
+            CallOutBox::launchAsynchronously(new ColorSelectionComponent(color, this, this, groupFlag), getScreenBounds(), nullptr);
+        }
 	}
 
 	void setRowAndColumn(const int newRow, const int newColumn)
@@ -30,6 +33,9 @@ public:
 		row = newRow;
 		columnId = newColumn;
 		color = Colour(uint32(owner.getValue(columnId, row)));
+        bool enabled = owner.getEnabled(columnId, row);
+        setEnabled(enabled);
+        setColour(textColourId, enabled ? Colours::white : Colours::darkgrey);
 	}
 
 	void paint(Graphics& g) override

@@ -35,14 +35,13 @@ public:
 		row = newRow;
 		columnId = newColumn;
 		setText(owner.getTableText(columnId, row), dontSendNotification);
+        bool enabled = owner.getEnabled(columnId, row);
+        setEditable(false, enabled, false);
+        setColour(textColourId, enabled ? Colours::white : Colours::darkgrey);
 	}
 
 	void paint(Graphics& g) override
 	{
-		auto& lf = getLookAndFeel();
-		if (!dynamic_cast<LookAndFeel_V4*> (&lf))
-			lf.setColour(textColourId, Colours::black);
-
 		Label::paint(g);
 	}
 

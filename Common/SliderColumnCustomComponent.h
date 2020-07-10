@@ -35,6 +35,10 @@ public:
 		SliderRange range = owner.getSliderRange(columnId);
 		slider.setRange(range.min, range.max, range.interval);
 		slider.setValue(owner.getValue(columnId, row), dontSendNotification);
+        bool enabled = owner.getEnabled(columnId, row);
+        slider.setEnabled(enabled);
+        setColour(Slider::textBoxTextColourId, enabled ? Colours::white : Colours::darkgrey);
+        setColour(Slider::thumbColourId, enabled ? Colours::white : Colours::darkgrey);
 	}
 
 	void sliderValueChanged(Slider* changedSlider) override

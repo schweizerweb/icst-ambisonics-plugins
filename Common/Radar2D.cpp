@@ -369,7 +369,7 @@ void Radar2D::renderOpenGL()
 			for (int i = 0; i < pEditablePoints->size(); i++)
 			{
 				AmbiPoint* pt = pEditablePoints->get(i);
-				if (pt != nullptr)
+				if (pt != nullptr && pt->getEnabled())
 				{
 					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare ? Square : Circle, pPointSelection->isPointSelected(i), getSelectedPointSize(scaler));
@@ -385,7 +385,8 @@ void Radar2D::renderOpenGL()
 					float scaler = gPt->getDisplayScaler();
 					for(int iSub = 0; iSub < gPt->groupPoints.size(); iSub++)
 					{
-						paintConnection(&g, gPt, gPt->groupPoints[iSub]);
+                        if(gPt->groupPoints[iSub]->getEnabled())
+                            paintConnection(&g, gPt, gPt->groupPoints[iSub]);
 					}
 
 					paintPoint(&g, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler), specialGroupManipulationMode);
@@ -399,7 +400,7 @@ void Radar2D::renderOpenGL()
 			for (int i = pDisplayOnlyPoints->size() - 1; i >= 0 ; i--)
 			{
 				AmbiPoint* pt = pDisplayOnlyPoints->get(i, referenceTime, pRadarOptions->displayTimeout);
-				if (pt != nullptr)
+				if (pt != nullptr && pt->getEnabled())
 				{
 					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), Circle);

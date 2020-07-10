@@ -145,6 +145,14 @@ void AmbiDataSet::setChannelColor(int channel, Colour colour) const
 		pt->setColor(colour);
 }
 
+void AmbiDataSet::setEnabled(int channel, bool enable) const
+{
+    AmbiPoint* pt = get(channel);
+
+    if (pt != nullptr)
+        pt->setEnabled(enable);
+}
+
 void AmbiDataSet::setX(int channel, double x, bool notify) const
 {
 	AmbiPoint* pt = get(channel);

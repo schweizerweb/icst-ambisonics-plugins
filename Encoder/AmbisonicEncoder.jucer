@@ -14,86 +14,83 @@
               jucerFormatVersion="1">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
-      <FILE id="aenO0C" name="DistanceEncodingPresetHelper.h" compile="0"
-            resource="0" file="Source/DistanceEncodingPresetHelper.h"/>
-      <FILE id="CXnIL9" name="GroupAnimator.cpp" compile="1" resource="0"
-            file="Source/GroupAnimator.cpp"/>
-      <FILE id="cLqXqH" name="GroupAnimator.h" compile="0" resource="0" file="Source/GroupAnimator.h"/>
+      <FILE id="mmyVim" name="AmbiOSCSender.cpp" compile="1" resource="0"
+            file="Source/AmbiOSCSender.cpp"/>
+      <FILE id="QCTjN6" name="AmbiOSCSender.h" compile="0" resource="0" file="Source/AmbiOSCSender.h"/>
+      <FILE id="XLgJC2" name="AmbiOSCSenderExt.cpp" compile="1" resource="0"
+            file="Source/AmbiOSCSenderExt.cpp"/>
+      <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
+            file="Source/AmbiOSCSenderExt.h"/>
+      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
+            file="Source/AudioParameterFloatAmbi.cpp"/>
+      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
+            file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
+            resource="0" file="Source/DistanceEncodingComponent.cpp"/>
+      <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"
+            file="Source/DistanceEncodingComponent.h"/>
+      <FILE id="V5YI5c" name="DistanceEncodingGraph.cpp" compile="1" resource="0"
+            file="Source/DistanceEncodingGraph.cpp"/>
+      <FILE id="hFEmfb" name="DistanceEncodingGraph.h" compile="0" resource="0"
+            file="Source/DistanceEncodingGraph.h"/>
       <FILE id="uR9r1o" name="DistanceEncodingParams.h" compile="0" resource="0"
             file="Source/DistanceEncodingParams.h"/>
-      <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"
-            file="Source/OSCHandlerEncoder.cpp"/>
-      <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
-            file="Source/OSCHandlerEncoder.h"/>
+      <FILE id="aenO0C" name="DistanceEncodingPresetHelper.h" compile="0"
+            resource="0" file="Source/DistanceEncodingPresetHelper.h"/>
       <FILE id="F7eoPa" name="EncoderConstants.cpp" compile="1" resource="0"
             file="Source/EncoderConstants.cpp"/>
       <FILE id="g37xg9" name="EncoderConstants.h" compile="0" resource="0"
             file="Source/EncoderConstants.h"/>
       <FILE id="zbf72D" name="EncoderPresetHelper.h" compile="0" resource="0"
             file="Source/EncoderPresetHelper.h"/>
-      <FILE id="HbYSNl" name="SourceTableListModel.h" compile="0" resource="0"
-            file="Source/SourceTableListModel.h"/>
-      <FILE id="nlQSsS" name="SourceDefinitionComponent.cpp" compile="1"
-            resource="0" file="Source/SourceDefinitionComponent.cpp"/>
-      <FILE id="bQOrQz" name="SourceDefinitionComponent.h" compile="0" resource="0"
-            file="Source/SourceDefinitionComponent.h"/>
-      <FILE id="fUAzPm" name="EncodingSettingsComponent.cpp" compile="1"
-            resource="0" file="Source/EncodingSettingsComponent.cpp"/>
-      <FILE id="hMz40v" name="EncodingSettingsComponent.h" compile="0" resource="0"
-            file="Source/EncodingSettingsComponent.h"/>
-      <FILE id="HdKLMP" name="RadarSettingsComponent.cpp" compile="1" resource="0"
-            file="Source/RadarSettingsComponent.cpp"/>
-      <FILE id="GnCkuy" name="RadarSettingsComponent.h" compile="0" resource="0"
-            file="Source/RadarSettingsComponent.h"/>
-      <FILE id="tPcKpu" name="EncoderSettingsComponent.cpp" compile="1" resource="0"
-            file="Source/EncoderSettingsComponent.cpp"/>
-      <FILE id="Tr1sQD" name="EncoderSettingsComponent.h" compile="0" resource="0"
-            file="Source/EncoderSettingsComponent.h"/>
-      <FILE id="QBorv6" name="OSCSettingsComponent.cpp" compile="1" resource="0"
-            file="Source/OSCSettingsComponent.cpp"/>
-      <FILE id="FtLdyb" name="OSCSettingsComponent.h" compile="0" resource="0"
-            file="Source/OSCSettingsComponent.h"/>
-      <FILE id="V5YI5c" name="DistanceEncodingGraph.cpp" compile="1" resource="0"
-            file="Source/DistanceEncodingGraph.cpp"/>
-      <FILE id="hFEmfb" name="DistanceEncodingGraph.h" compile="0" resource="0"
-            file="Source/DistanceEncodingGraph.h"/>
-      <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
-            resource="0" file="Source/DistanceEncodingComponent.cpp"/>
-      <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"
-            file="Source/DistanceEncodingComponent.h"/>
-      <FILE id="wzVHPY" name="GroupPointsSelectionComponent.h" compile="0"
-            resource="0" file="Source/GroupPointsSelectionComponent.h"/>
-      <FILE id="qLSobP" name="GroupTableListModel.h" compile="0" resource="0"
-            file="Source/GroupTableListModel.h"/>
-      <FILE id="AuTClw" name="EncoderSettingsDialog.h" compile="0" resource="0"
-            file="Source/EncoderSettingsDialog.h"/>
-      <FILE id="XLgJC2" name="AmbiOSCSenderExt.cpp" compile="1" resource="0"
-            file="Source/AmbiOSCSenderExt.cpp"/>
-      <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
-            file="Source/AmbiOSCSenderExt.h"/>
-      <FILE id="mmyVim" name="AmbiOSCSender.cpp" compile="1" resource="0"
-            file="Source/AmbiOSCSender.cpp"/>
-      <FILE id="QCTjN6" name="AmbiOSCSender.h" compile="0" resource="0" file="Source/AmbiOSCSender.h"/>
-      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
-            file="Source/AudioParameterFloatAmbi.cpp"/>
-      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
-            file="Source/AudioParameterFloatAmbi.h"/>
       <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
             file="Source/EncoderSettings.cpp"/>
       <FILE id="mjvFIP" name="EncoderSettings.h" compile="0" resource="0"
             file="Source/EncoderSettings.h"/>
+      <FILE id="tPcKpu" name="EncoderSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/EncoderSettingsComponent.cpp"/>
+      <FILE id="Tr1sQD" name="EncoderSettingsComponent.h" compile="0" resource="0"
+            file="Source/EncoderSettingsComponent.h"/>
+      <FILE id="AuTClw" name="EncoderSettingsDialog.h" compile="0" resource="0"
+            file="Source/EncoderSettingsDialog.h"/>
+      <FILE id="fUAzPm" name="EncodingSettingsComponent.cpp" compile="1"
+            resource="0" file="Source/EncodingSettingsComponent.cpp"/>
+      <FILE id="hMz40v" name="EncodingSettingsComponent.h" compile="0" resource="0"
+            file="Source/EncodingSettingsComponent.h"/>
+      <FILE id="CXnIL9" name="GroupAnimator.cpp" compile="1" resource="0"
+            file="Source/GroupAnimator.cpp"/>
+      <FILE id="cLqXqH" name="GroupAnimator.h" compile="0" resource="0" file="Source/GroupAnimator.h"/>
+      <FILE id="wzVHPY" name="GroupPointsSelectionComponent.h" compile="0"
+            resource="0" file="Source/GroupPointsSelectionComponent.h"/>
+      <FILE id="qLSobP" name="GroupTableListModel.h" compile="0" resource="0"
+            file="Source/GroupTableListModel.h"/>
+      <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"
+            file="Source/OSCHandlerEncoder.cpp"/>
+      <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
+            file="Source/OSCHandlerEncoder.h"/>
+      <FILE id="QBorv6" name="OSCSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/OSCSettingsComponent.cpp"/>
+      <FILE id="FtLdyb" name="OSCSettingsComponent.h" compile="0" resource="0"
+            file="Source/OSCSettingsComponent.h"/>
+      <FILE id="Zchuil" name="PluginEditor.cpp" compile="1" resource="0"
+            file="Source/PluginEditor.cpp"/>
+      <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
       <FILE id="tUmxIJ" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="DR1KSx" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
-      <FILE id="Zchuil" name="PluginEditor.cpp" compile="1" resource="0"
-            file="Source/PluginEditor.cpp"/>
-      <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>
+      <FILE id="HdKLMP" name="RadarSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/RadarSettingsComponent.cpp"/>
+      <FILE id="GnCkuy" name="RadarSettingsComponent.h" compile="0" resource="0"
+            file="Source/RadarSettingsComponent.h"/>
+      <FILE id="nlQSsS" name="SourceDefinitionComponent.cpp" compile="1"
+            resource="0" file="Source/SourceDefinitionComponent.cpp"/>
+      <FILE id="bQOrQz" name="SourceDefinitionComponent.h" compile="0" resource="0"
+            file="Source/SourceDefinitionComponent.h"/>
+      <FILE id="HbYSNl" name="SourceTableListModel.h" compile="0" resource="0"
+            file="Source/SourceTableListModel.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
-      <FILE id="UZ8YsX" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
-      <FILE id="ek8OWV" name="PresetManagerDialog.h" compile="0" resource="0"
-            file="../Common/PresetManagerDialog.h"/>
       <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
         <FILE id="n75RM5" name="HelpDialogManager.h" compile="0" resource="0"
               file="../Common/HelpDialogManager.h"/>
@@ -117,74 +114,49 @@
       </GROUP>
       <FILE id="t6mAXi" name="AdditionalWindow.h" compile="0" resource="0"
             file="../Common/AdditionalWindow.h"/>
-      <FILE id="EoX5QX" name="Globals.cpp" compile="1" resource="0" file="../Common/Globals.cpp"/>
-      <FILE id="No8HNU" name="Globals.h" compile="0" resource="0" file="../Common/Globals.h"/>
-      <FILE id="bTewUG" name="PresetComparators.h" compile="0" resource="0"
-            file="../Common/PresetComparators.h"/>
-      <FILE id="wBCHGM" name="PresetHelper.cpp" compile="1" resource="0"
-            file="../Common/PresetHelper.cpp"/>
-      <FILE id="hrDMMM" name="PresetHelper.h" compile="0" resource="0" file="../Common/PresetHelper.h"/>
-      <FILE id="d4ssP2" name="PresetTableModel.h" compile="0" resource="0"
-            file="../Common/PresetTableModel.h"/>
-      <FILE id="aJ9g5J" name="PresetManagerComponent.cpp" compile="1" resource="0"
-            file="../Common/PresetManagerComponent.cpp"/>
-      <FILE id="gbUnDC" name="PresetManagerComponent.h" compile="0" resource="0"
-            file="../Common/PresetManagerComponent.h"/>
-      <FILE id="XOuO2j" name="ColorSelectionComponent.h" compile="0" resource="0"
-            file="../Common/ColorSelectionComponent.h"/>
-      <FILE id="Fo1nOJ" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
-      <FILE id="vLva8d" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
       <FILE id="R5Yz8G" name="AmbiBasicSettings.cpp" compile="1" resource="0"
             file="../Common/AmbiBasicSettings.cpp"/>
       <FILE id="nLYHF0" name="AmbiBasicSettings.h" compile="0" resource="0"
             file="../Common/AmbiBasicSettings.h"/>
-      <FILE id="yg4jMj" name="VarDelayBuffer.cpp" compile="1" resource="0"
-            file="../Common/VarDelayBuffer.cpp"/>
-      <FILE id="CTPRg9" name="VarDelayBuffer.h" compile="0" resource="0"
-            file="../Common/VarDelayBuffer.h"/>
-      <FILE id="n9fEOI" name="DawParameter.h" compile="0" resource="0" file="../Common/DawParameter.h"/>
-      <FILE id="MYpf1r" name="SimpleGraph.cpp" compile="1" resource="0" file="../Common/SimpleGraph.cpp"/>
-      <FILE id="Drfoo1" name="SimpleGraph.h" compile="0" resource="0" file="../Common/SimpleGraph.h"/>
+      <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
+      <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
       <FILE id="QjJM5Y" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>
       <FILE id="czc4x6" name="AmbiGroup.h" compile="0" resource="0" file="../Common/AmbiGroup.h"/>
-      <FILE id="lYVTet" name="TrackColorSelector.h" compile="0" resource="0"
-            file="../Common/TrackColorSelector.h"/>
-      <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"
-            file="../Common/ColorEditorCustomComponent.h"/>
-      <FILE id="P4BWsP" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>
-      <FILE id="GWDlI6" name="TableColumnCallback.h" compile="0" resource="0"
-            file="../Common/TableColumnCallback.h"/>
-      <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
-            resource="0" file="../Common/EditableTextCustomComponent.h"/>
-      <FILE id="lzw3Wj" name="NumericColumnCustomComponent.h" compile="0"
-            resource="0" file="../Common/NumericColumnCustomComponent.h"/>
-      <FILE id="SJSYr5" name="SliderColumnCustomComponent.h" compile="0"
-            resource="0" file="../Common/SliderColumnCustomComponent.h"/>
-      <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="FySjhB" name="AmbiPoint.cpp" compile="1" resource="0" file="../Common/AmbiPoint.cpp"/>
+      <FILE id="WVKDPz" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
+      <FILE id="wCCCzr" name="AmbiSource.cpp" compile="1" resource="0" file="../Common/AmbiSource.cpp"/>
+      <FILE id="U7D481" name="AmbiSource.h" compile="0" resource="0" file="../Common/AmbiSource.h"/>
       <FILE id="NAnUK3" name="AmbiSourceSet.cpp" compile="1" resource="0"
             file="../Common/AmbiSourceSet.cpp"/>
       <FILE id="abzgNg" name="AmbiSourceSet.h" compile="0" resource="0" file="../Common/AmbiSourceSet.h"/>
-      <FILE id="wCCCzr" name="AmbiSource.cpp" compile="1" resource="0" file="../Common/AmbiSource.cpp"/>
-      <FILE id="U7D481" name="AmbiSource.h" compile="0" resource="0" file="../Common/AmbiSource.h"/>
-      <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
-      <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
-      <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
-            file="../Common/LabelCreator.cpp"/>
-      <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
-      <FILE id="FySjhB" name="AmbiPoint.cpp" compile="1" resource="0" file="../Common/AmbiPoint.cpp"/>
-      <FILE id="GoCWjo" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
-      <FILE id="bfp1AJ" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
-      <FILE id="tupxe4" name="StatusMessageHandler.cpp" compile="1" resource="0"
-            file="../Common/StatusMessageHandler.cpp"/>
-      <FILE id="TR1MRw" name="StatusMessageHandler.h" compile="0" resource="0"
-            file="../Common/StatusMessageHandler.h"/>
-      <FILE id="WVKDPz" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
-      <FILE id="v8HVwz" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>
-      <FILE id="SnPl8L" name="OSCHandler.h" compile="0" resource="0" file="../Common/OSCHandler.h"/>
       <FILE id="b0ptGs" name="AudioParameterFloatAmbiAbs.h" compile="0" resource="0"
             file="../Common/AudioParameterFloatAmbiAbs.h"/>
       <FILE id="IeOIVL" name="AudioParameterSet.h" compile="0" resource="0"
             file="../Common/AudioParameterSet.h"/>
+      <FILE id="UZ8YsX" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
+      <FILE id="mW2oB3" name="CheckBoxCustomComponent.h" compile="0" resource="0"
+            file="../Common/CheckBoxCustomComponent.h"/>
+      <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"
+            file="../Common/ColorEditorCustomComponent.h"/>
+      <FILE id="XOuO2j" name="ColorSelectionComponent.h" compile="0" resource="0"
+            file="../Common/ColorSelectionComponent.h"/>
+      <FILE id="GoCWjo" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
+      <FILE id="bfp1AJ" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
+      <FILE id="n9fEOI" name="DawParameter.h" compile="0" resource="0" file="../Common/DawParameter.h"/>
+      <FILE id="Fo1nOJ" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
+      <FILE id="vLva8d" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
+      <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
+            resource="0" file="../Common/EditableTextCustomComponent.h"/>
+      <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="EoX5QX" name="Globals.cpp" compile="1" resource="0" file="../Common/Globals.cpp"/>
+      <FILE id="No8HNU" name="Globals.h" compile="0" resource="0" file="../Common/Globals.h"/>
+      <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
+            file="../Common/LabelCreator.cpp"/>
+      <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
+      <FILE id="lzw3Wj" name="NumericColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/NumericColumnCustomComponent.h"/>
+      <FILE id="v8HVwz" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>
+      <FILE id="SnPl8L" name="OSCHandler.h" compile="0" resource="0" file="../Common/OSCHandler.h"/>
       <FILE id="ZHl4WA" name="Point3D.h" compile="0" resource="0" file="../Common/Point3D.h"/>
       <FILE id="Qz0Ecw" name="PointInfoControl.cpp" compile="1" resource="0"
             file="../Common/PointInfoControl.cpp"/>
@@ -194,6 +166,19 @@
             file="../Common/PointSelection.cpp"/>
       <FILE id="MMxLut" name="PointSelection.h" compile="0" resource="0"
             file="../Common/PointSelection.h"/>
+      <FILE id="bTewUG" name="PresetComparators.h" compile="0" resource="0"
+            file="../Common/PresetComparators.h"/>
+      <FILE id="wBCHGM" name="PresetHelper.cpp" compile="1" resource="0"
+            file="../Common/PresetHelper.cpp"/>
+      <FILE id="hrDMMM" name="PresetHelper.h" compile="0" resource="0" file="../Common/PresetHelper.h"/>
+      <FILE id="aJ9g5J" name="PresetManagerComponent.cpp" compile="1" resource="0"
+            file="../Common/PresetManagerComponent.cpp"/>
+      <FILE id="gbUnDC" name="PresetManagerComponent.h" compile="0" resource="0"
+            file="../Common/PresetManagerComponent.h"/>
+      <FILE id="ek8OWV" name="PresetManagerDialog.h" compile="0" resource="0"
+            file="../Common/PresetManagerDialog.h"/>
+      <FILE id="d4ssP2" name="PresetTableModel.h" compile="0" resource="0"
+            file="../Common/PresetTableModel.h"/>
       <FILE id="dYIrX4" name="Radar2D.cpp" compile="1" resource="0" file="../Common/Radar2D.cpp"/>
       <FILE id="xCXFcd" name="Radar2D.h" compile="0" resource="0" file="../Common/Radar2D.h"/>
       <FILE id="RaB2Xw" name="Radar3D.cpp" compile="1" resource="0" file="../Common/Radar3D.cpp"/>
@@ -206,7 +191,24 @@
       <FILE id="txOVY9" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="pBBZnl" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="MYpf1r" name="SimpleGraph.cpp" compile="1" resource="0" file="../Common/SimpleGraph.cpp"/>
+      <FILE id="Drfoo1" name="SimpleGraph.h" compile="0" resource="0" file="../Common/SimpleGraph.h"/>
+      <FILE id="SJSYr5" name="SliderColumnCustomComponent.h" compile="0"
+            resource="0" file="../Common/SliderColumnCustomComponent.h"/>
+      <FILE id="P4BWsP" name="SliderRange.h" compile="0" resource="0" file="../Common/SliderRange.h"/>
+      <FILE id="tupxe4" name="StatusMessageHandler.cpp" compile="1" resource="0"
+            file="../Common/StatusMessageHandler.cpp"/>
+      <FILE id="TR1MRw" name="StatusMessageHandler.h" compile="0" resource="0"
+            file="../Common/StatusMessageHandler.h"/>
+      <FILE id="GWDlI6" name="TableColumnCallback.h" compile="0" resource="0"
+            file="../Common/TableColumnCallback.h"/>
       <FILE id="Hw1uM6" name="TrackColors.h" compile="0" resource="0" file="../Common/TrackColors.h"/>
+      <FILE id="lYVTet" name="TrackColorSelector.h" compile="0" resource="0"
+            file="../Common/TrackColorSelector.h"/>
+      <FILE id="yg4jMj" name="VarDelayBuffer.cpp" compile="1" resource="0"
+            file="../Common/VarDelayBuffer.cpp"/>
+      <FILE id="CTPRg9" name="VarDelayBuffer.h" compile="0" resource="0"
+            file="../Common/VarDelayBuffer.h"/>
       <FILE id="zPbNEo" name="ZoomSettings.cpp" compile="1" resource="0"
             file="../Common/ZoomSettings.cpp"/>
       <FILE id="M7xhIt" name="ZoomSettings.h" compile="0" resource="0" file="../Common/ZoomSettings.h"/>

@@ -47,7 +47,7 @@ void AmbiOSCSender::timerCallback()
 	for (int i = 0; i < pPoints->size(); i++)
 	{
 		AmbiSource* pt = pPoints->get(i);
-		if (pt != nullptr)
+		if (pt != nullptr && pt->getEnabled())
 		{
 			OSCMessage message = OSCMessage(
 				OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL),

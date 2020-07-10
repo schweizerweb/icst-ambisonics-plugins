@@ -19,6 +19,7 @@ public:
 	AmbiSource(AmbiSource* other, bool copyImage = false);
 	AmbiSource(String id, Point3D<double> point, String name, Colour color);
 	AmbiSource(XmlElement* element, AudioParameterSet audioParams);
+    AmbiSource(AudioParameterSet audioParams);
 
 	void setRms(float newRmsLevel, bool onlyIfGreater = false);
 	float getRms() const;

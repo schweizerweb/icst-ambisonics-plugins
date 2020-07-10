@@ -16,9 +16,10 @@
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
+#include "../../Common/CheckBoxCustomComponent.h"
 
-#define COLUMN_ID_NB        1
-#define COLUMN_ID_NAME        2
+#define COLUMN_ID_NB        2
+#define COLUMN_ID_NAME        3
 #define COLUMN_ID_X            7
 #define COLUMN_ID_Y            8
 #define COLUMN_ID_Z            9
@@ -27,6 +28,7 @@
 #define COLUMN_ID_D            12
 #define COLUMN_ID_GAIN        5
 #define COLUMN_ID_COLOR        13
+#define COLUMN_ID_ENABLED       1
 
 
 class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
@@ -42,6 +44,7 @@ public:
     {
         pTableListBox = tableListBox;
         tableListBox->setModel(this);
+        tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLED, 30);
         tableListBox->getHeader().addColumn("CH", COLUMN_ID_NB, 30);
         tableListBox->getHeader().addColumn("Name", COLUMN_ID_NAME, 100);
         tableListBox->getHeader().addColumn("X", COLUMN_ID_X, 50);
@@ -140,7 +143,15 @@ private:
             colorBox->setRowAndColumn(rowNumber, columnId);
             return colorBox;
         }
-
+        else if (columnId == COLUMN_ID_ENABLED)
+        {
+            CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*>(existingComponentToUpdate);
+            if(checkBox == nullptr)
+                checkBox = new CheckBoxCustomComponent(*this);
+            
+            checkBox->setRowAndColumn(rowNumber, columnId);
+            return checkBox;
+        }
         return nullptr;
     }
 
@@ -160,8 +171,15 @@ private:
         case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
         case COLUMN_ID_D: return pt->getPoint()->getDistance();
         case COLUMN_ID_COLOR: return pt->getColor().getARGB();
+        case COLUMN_ID_ENABLED: return pt->getEnabled() ? 1 : 0;
         default: return 0.0;
         }
+    }
+
+    bool getEnabled(int columnId, int rowNumber) override
+    {
+        AmbiSource* pt = pSources->get(rowNumber);
+        return (pt != nullptr && pt->getEnabled());
     }
 
     void setValue(int columnId, int rowNumber, double newValue) override
@@ -176,6 +194,7 @@ private:
         case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
         case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
         case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
+        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1); break;
         default: throw;
         }
 

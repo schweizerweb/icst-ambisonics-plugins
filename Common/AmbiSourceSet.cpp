@@ -155,6 +155,14 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 			xmlPoint = xmlPoint->getNextElement();
 			index++;
 		}
+        if(pAudioParams != nullptr)
+        {
+            while (elements.size() < pAudioParams->sourceParams.size())
+            {
+                add(new AmbiSource(pAudioParams->sourceParams.getUnchecked(index)));
+                index++;
+            }
+        }
 	}
 
 	// groups
