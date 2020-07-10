@@ -10,8 +10,8 @@
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
-              jucerVersion="5.4.7" companyName="ICST" pluginFormats="buildAU,buildVST3"
-              companyWebsite="https://www.zhdk.ch/forschung/icst">
+              companyName="ICST" pluginFormats="buildAU,buildVST3" companyWebsite="https://www.zhdk.ch/forschung/icst"
+              jucerFormatVersion="1">
   <MAINGROUP id="oa5A98" name="AmbiDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="VcLCoa" name="help.png" compile="0" resource="1" file="../Resources/help.png"/>

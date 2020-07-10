@@ -82,7 +82,9 @@ public:
     bool getFlag(int columnId, int rowNumber) const;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() override;
-	SliderRange getSliderRange(int columnId) override;
+    SliderRange getSliderRange(int columnId) override;
+    bool getEnabled(const int columnId, const int rowNumber) override;
+    
 
 	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
