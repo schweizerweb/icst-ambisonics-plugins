@@ -21,13 +21,13 @@ PresetHelper::PresetHelper(File presetDirectory, ActionListener* pActionListener
 void PresetHelper::initialize()
 {
     bool hasPresets = false;
-    DirectoryIterator iterator(presetDirectory, false, "*.xml");
-    while (iterator.next())
+    RangedDirectoryIterator iterator(presetDirectory, false, "*.xml");
+    for(DirectoryEntry entry : iterator)
     {
         // try to load preset
-        if(checkValid(iterator.getFile()))
+        if(checkValid(entry.getFile()))
         {
-            presetFiles.add(iterator.getFile());
+            presetFiles.add(entry.getFile());
             hasPresets = true;
         }
     }
