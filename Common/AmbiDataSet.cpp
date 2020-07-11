@@ -150,7 +150,20 @@ void AmbiDataSet::setEnabled(int channel, bool enable) const
     AmbiPoint* pt = get(channel);
 
     if (pt != nullptr)
+    {
         pt->setEnabled(enable);
+        if(!enable)
+        {
+            for(AmbiGroup* g : groups)
+            {
+                for(int i = 0; i < g->groupPoints.size(); i++)
+                {
+                    if(g->groupPoints[i] == pt)
+                        g->groupPoints.remove(i);
+                }
+            }
+        }
+    }
 }
 
 void AmbiDataSet::setX(int channel, double x, bool notify) const
