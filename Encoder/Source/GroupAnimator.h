@@ -28,8 +28,12 @@ private:
     struct GroupAnimationSet
     {
         AudioParameterBool* audioParameterAnimationToggle;
-        AudioParameterFloat* audioParameterGroupRotation;
-        AudioParameterFloat* audioParameterOriginRotation;
+        AudioParameterFloat* audioParameterGroupRotationX;
+        AudioParameterFloat* audioParameterGroupRotationY;
+        AudioParameterFloat* audioParameterGroupRotationZ;
+        AudioParameterFloat* audioParameterOriginRotationX;
+        AudioParameterFloat* audioParameterOriginRotationY;
+        AudioParameterFloat* audioParameterOriginRotationZ;
         AudioParameterFloat* audioParameterGroupStretch;
         int toggleIndex;
     };
