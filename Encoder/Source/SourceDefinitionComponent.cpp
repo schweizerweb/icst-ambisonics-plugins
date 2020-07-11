@@ -104,8 +104,8 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
 
     //[Constructor] You can add your own custom stuff here..
     groupSources->setVisible(MULTI_ENCODER_MODE);
-    buttonAdd->setVisible(MULTI_ENCODER_MODE);
-    buttonRemove->setVisible(MULTI_ENCODER_MODE);
+    buttonAdd->setVisible(false);
+    buttonRemove->setVisible(false);
     buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
     sourceList->setVisible(MULTI_ENCODER_MODE);
