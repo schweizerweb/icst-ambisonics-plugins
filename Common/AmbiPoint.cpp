@@ -64,7 +64,13 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 {
 }
 
-AmbiPoint::AmbiPoint(AudioParameterSet audioParams) : color(Colours::black), gain(1.0), audioParams(audioParams), enabled(false)
+AmbiPoint::AmbiPoint(AudioParameterSet audioParams) :
+    id(Uuid().toString()),
+    point(Point3D<double>(0.0, 0.0, 0.0, audioParams)),
+    color(Colours::black),
+    gain(1.0),
+    audioParams(audioParams),
+    enabled(false)
 {
 }
 
