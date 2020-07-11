@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -42,7 +42,7 @@
 class SourceDefinitionComponent  : public Component,
                                    public ChangeListener,
                                    public ChangeBroadcaster,
-                                   public Button::Listener
+                                   public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -56,9 +56,9 @@ public:
     void refresh() const;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -73,18 +73,18 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupGroups;
+    std::unique_ptr<juce::GroupComponent> groupGroups;
     std::unique_ptr<TableListBox> groupList;
-    std::unique_ptr<TextButton> buttonAddGroup;
-    std::unique_ptr<TextButton> buttonRemoveGroup;
-    std::unique_ptr<GroupComponent> groupSources;
+    std::unique_ptr<juce::TextButton> buttonAddGroup;
+    std::unique_ptr<juce::TextButton> buttonRemoveGroup;
+    std::unique_ptr<juce::GroupComponent> groupSources;
     std::unique_ptr<TableListBox> sourceList;
-    std::unique_ptr<TextButton> buttonAdd;
-    std::unique_ptr<TextButton> buttonRemove;
-    std::unique_ptr<TextButton> buttonMoveDown;
-    std::unique_ptr<TextButton> buttonMoveUp;
-    std::unique_ptr<TextButton> buttonMoveGroupDown;
-    std::unique_ptr<TextButton> buttonMoveGroupUp;
+    std::unique_ptr<juce::TextButton> buttonAdd;
+    std::unique_ptr<juce::TextButton> buttonRemove;
+    std::unique_ptr<juce::TextButton> buttonMoveDown;
+    std::unique_ptr<juce::TextButton> buttonMoveUp;
+    std::unique_ptr<juce::TextButton> buttonMoveGroupDown;
+    std::unique_ptr<juce::TextButton> buttonMoveGroupUp;
 
 
     //==============================================================================
