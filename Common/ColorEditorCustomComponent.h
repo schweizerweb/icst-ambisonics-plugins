@@ -42,6 +42,8 @@ public:
 	{
         if(isEnabled())
             g.fillAll(color);
+        else
+            g.fillAll(color.withAlpha(0.3f));
 	}
 
 	void changeListenerCallback(ChangeBroadcaster* source) override
