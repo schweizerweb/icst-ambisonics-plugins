@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AmbiDataSet.h"
+#define ANIMATION_SET_COUNT 4
 
 class GroupAnimator : Timer, AudioProcessorParameter::Listener
 {
@@ -21,17 +22,19 @@ private:
     void timerCallback() override;
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-    void toggleOnOff();
+    void toggleOnOff(int parameterIndex);
     
 private:
+    struct GroupAnimationSet
+    {
+        AudioParameterBool* audioParameterAnimationToggle;
+        AudioParameterFloat* audioParameterGroupRotation;
+        AudioParameterFloat* audioParameterOriginRotation;
+        AudioParameterFloat* audioParameterGroupStretch;
+        int toggleIndex;
+    };
     
-    AudioParameterBool* audioParameterAnimationToggle;
-    AudioParameterFloat* audioParameterGroupRotation;
-    AudioParameterFloat* audioParameterOriginRotation;
-    AudioParameterFloat* audioParameterGroupStretch;
-
+    GroupAnimationSet animationSets[ANIMATION_SET_COUNT];
     AmbiDataSet* pSourceSet;
-
-
 };
 

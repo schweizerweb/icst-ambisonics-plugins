@@ -13,73 +13,80 @@
 
 void GroupAnimator::initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDataSet)
 {
-    audioParameterAnimationToggle = new AudioParameterBool("Animation Toggle", "Animation Toggle", false, "Turn On/Off Animation");
+    for(int i = 0; i < ANIMATION_SET_COUNT; i++)
+    {
+        String indexString = "G" + String(i+1) + " ";
+        
+        animationSets[i].audioParameterAnimationToggle = new AudioParameterBool(indexString + "Animation Toggle", indexString + "Animation Toggle", false, "Turn On/Off Animation");
     
-    audioParameterGroupRotation = new AudioParameterFloat("Group Rotation Z", "Group Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Z-Axis) in Degrees per Second");
+        animationSets[i].audioParameterGroupRotation = new AudioParameterFloat(indexString + "Rotation Z", indexString + "Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Z-Axis) in Degrees per Second");
     
-    audioParameterOriginRotation = new AudioParameterFloat("Origin Rotation Z", "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Z-Axis) in Degrees per Second");
+        animationSets[i].audioParameterOriginRotation = new AudioParameterFloat(indexString + "Origin Rotation Z", indexString + "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Z-Axis) in Degrees per Second");
     
-    audioParameterGroupStretch = new AudioParameterFloat("Group Stretch", "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, "Group Stretch in Units per Second");
+        animationSets[i].audioParameterGroupStretch = new AudioParameterFloat(indexString + "Stretch", indexString + "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, "Group Stretch in Units per Second");
     
-    audioParameterAnimationToggle->addListener(this);
     
-    pAudioProcessor->addParameter(audioParameterAnimationToggle);
-    pAudioProcessor->addParameter(audioParameterGroupRotation);
-    pAudioProcessor->addParameter(audioParameterOriginRotation);
-    pAudioProcessor->addParameter(audioParameterGroupStretch);
+        pAudioProcessor->addParameter(animationSets[i].audioParameterAnimationToggle);
+        pAudioProcessor->addParameter(animationSets[i].audioParameterGroupRotation);
+        pAudioProcessor->addParameter(animationSets[i].audioParameterOriginRotation);
+        pAudioProcessor->addParameter(animationSets[i].audioParameterGroupStretch);
+        
+        animationSets[i].toggleIndex = animationSets[i].audioParameterAnimationToggle->getParameterIndex();
+        animationSets[i].audioParameterAnimationToggle->addListener(this);
+    }
     
     pSourceSet = pDataSet;
-    
-    toggleOnOff();
+    startTimerHz(TIMER_FREQUENCY);
 }
 
-void GroupAnimator::toggleOnOff()
+void GroupAnimator::toggleOnOff(int parameterIndex)
 {
-    if(audioParameterAnimationToggle->get())
+    for(int i = 0; i < ANIMATION_SET_COUNT && i < pSourceSet->groupCount(); i++)
     {
-        startTimerHz(TIMER_FREQUENCY);
-    }
-    else
-    {
-        stopTimer();
-    }
-    
-    if(pSourceSet->groupCount() > 0)
-    {
-        for(AmbiPoint* p: pSourceSet->getGroup(0)->groupPoints)
+        if(animationSets[i].toggleIndex == parameterIndex)
         {
-            p->getPoint()->getAudioParameterSet().setEnabled(!audioParameterAnimationToggle->get());
+            bool enablePoints = !animationSets[i].audioParameterAnimationToggle->get();
+            
+            for(AmbiPoint* p: pSourceSet->getGroup(i)->groupPoints)
+            {
+                p->getPoint()->getAudioParameterSet().setEnabled(enablePoints);
+            }
+            
+            break;
         }
     }
 }
 
 void GroupAnimator::timerCallback()
 {
-    if(pSourceSet->groupCount() > 0)
+    for(int i = 0; i < ANIMATION_SET_COUNT; i++)
     {
-        float rotationZ = audioParameterGroupRotation->get();
+        if(!animationSets[i].audioParameterAnimationToggle->get() || i >= pSourceSet->groupCount())
+            continue;
+        
+        float rotationZ = animationSets[i].audioParameterGroupRotation->get();
         if(rotationZ != 0.0f)
         {
-            pSourceSet->rotateGroup(0, 0.0, 0.0, Constants::GradToRad(rotationZ / TIMER_FREQUENCY));
+            pSourceSet->rotateGroup(i, 0.0, 0.0, Constants::GradToRad(rotationZ / TIMER_FREQUENCY));
         }
         
-        float rotationOriginZ = audioParameterOriginRotation->get();
+        float rotationOriginZ = animationSets[i].audioParameterOriginRotation->get();
         if(rotationOriginZ != 0.0f)
         {
-            pSourceSet->rotateGroupAroundOrigin(0, 0.0, 0.0, Constants::GradToRad(rotationOriginZ / TIMER_FREQUENCY), true);
+            pSourceSet->rotateGroupAroundOrigin(i, 0.0, 0.0, Constants::GradToRad(rotationOriginZ / TIMER_FREQUENCY), true);
         }
         
-        float stretch = audioParameterGroupStretch->get();
+        float stretch = animationSets[i].audioParameterGroupStretch->get();
         if(stretch != 0.0f)
         {
-            pSourceSet->stretchGroup(0, stretch / TIMER_FREQUENCY);
+            pSourceSet->stretchGroup(i, stretch / TIMER_FREQUENCY);
         }
     }
 }
 
 void GroupAnimator::parameterValueChanged(int parameterIndex, float newValue)
 {
-    toggleOnOff();
+    toggleOnOff(parameterIndex);
 }
 
 void GroupAnimator::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
