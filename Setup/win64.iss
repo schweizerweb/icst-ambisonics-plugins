@@ -31,40 +31,28 @@ WizardStyle=modern
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\bin\VST3\AmbiDecoder_O1_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\VST3\AmbiDecoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O2_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O3_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O4_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O5_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O6_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O7_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiDecoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O1_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O1_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
+Source: "..\bin\VST3\AmbiEncoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O2_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O2_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O3_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O3_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O4_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O4_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O5_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O5_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O6_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O6_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O7_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O7_32CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
