@@ -33,8 +33,10 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pOscHandler = new OSCHandlerEncoder(&sources, &statusMessageHandler, &encoderSettings.distanceEncodingParams);
 	pOscSender = new AmbiOSCSender(&sources);
 	pOscSenderExt = new AmbiOSCSenderExt(&sources);
-    groupAnimator.reset(new GroupAnimator());
     
+#if MULTI_ENCODER_MODE
+    groupAnimator.reset(new GroupAnimator());
+#endif
 	initializeOsc();
 
     initializeAudioParameter();
@@ -64,7 +66,9 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
+#if MULTI_ENCODER_MODE
     groupAnimator->initialize(this, &sources);
+#endif
     encoderSettings.distanceEncodingParams.initialize(this);
 
     // points (X, Y, Z, Gain)
@@ -85,7 +89,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         addParameter(set.pGain);
     }
     
-    for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+    for (int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
     {
         String indexStr = String(i + 1);
         

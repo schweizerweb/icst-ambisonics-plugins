@@ -26,6 +26,7 @@
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
+#define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 4 : 0)
 
 class EncoderSettings : public AmbiBasicSettings
 {

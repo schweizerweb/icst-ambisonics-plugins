@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -39,58 +39,58 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
     sourceModel.reset(new SourceTableListModel(pSourceSet, pPointSelection, this));
     //[/Constructor_pre]
 
-    groupGroups.reset (new GroupComponent ("groupGroups",
-                                           TRANS("Groups")));
+    groupGroups.reset (new juce::GroupComponent ("groupGroups",
+                                                 TRANS("Groups")));
     addAndMakeVisible (groupGroups.get());
 
     groupList.reset (new TableListBox());
     addAndMakeVisible (groupList.get());
     groupList->setName ("groupList");
 
-    buttonAddGroup.reset (new TextButton ("buttonAddGroup"));
+    buttonAddGroup.reset (new juce::TextButton ("buttonAddGroup"));
     addAndMakeVisible (buttonAddGroup.get());
     buttonAddGroup->setButtonText (TRANS("add"));
     buttonAddGroup->addListener (this);
 
-    buttonRemoveGroup.reset (new TextButton ("buttonRemoveGroup"));
+    buttonRemoveGroup.reset (new juce::TextButton ("buttonRemoveGroup"));
     addAndMakeVisible (buttonRemoveGroup.get());
     buttonRemoveGroup->setButtonText (TRANS("remove"));
     buttonRemoveGroup->addListener (this);
 
-    groupSources.reset (new GroupComponent ("groupSources",
-                                            TRANS("Sources")));
+    groupSources.reset (new juce::GroupComponent ("groupSources",
+                                                  TRANS("Sources")));
     addAndMakeVisible (groupSources.get());
 
     sourceList.reset (new TableListBox());
     addAndMakeVisible (sourceList.get());
     sourceList->setName ("sourceList");
 
-    buttonAdd.reset (new TextButton ("buttonAdd"));
+    buttonAdd.reset (new juce::TextButton ("buttonAdd"));
     addAndMakeVisible (buttonAdd.get());
     buttonAdd->setButtonText (TRANS("add"));
     buttonAdd->addListener (this);
 
-    buttonRemove.reset (new TextButton ("buttonRemove"));
+    buttonRemove.reset (new juce::TextButton ("buttonRemove"));
     addAndMakeVisible (buttonRemove.get());
     buttonRemove->setButtonText (TRANS("remove"));
     buttonRemove->addListener (this);
 
-    buttonMoveDown.reset (new TextButton ("buttonMoveDown"));
+    buttonMoveDown.reset (new juce::TextButton ("buttonMoveDown"));
     addAndMakeVisible (buttonMoveDown.get());
     buttonMoveDown->setButtonText (TRANS("down"));
     buttonMoveDown->addListener (this);
 
-    buttonMoveUp.reset (new TextButton ("buttonMoveUp"));
+    buttonMoveUp.reset (new juce::TextButton ("buttonMoveUp"));
     addAndMakeVisible (buttonMoveUp.get());
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    buttonMoveGroupDown.reset (new TextButton ("buttonMoveGroupDown"));
+    buttonMoveGroupDown.reset (new juce::TextButton ("buttonMoveGroupDown"));
     addAndMakeVisible (buttonMoveGroupDown.get());
     buttonMoveGroupDown->setButtonText (TRANS("down"));
     buttonMoveGroupDown->addListener (this);
 
-    buttonMoveGroupUp.reset (new TextButton ("buttonMoveGroupUp"));
+    buttonMoveGroupUp.reset (new juce::TextButton ("buttonMoveGroupUp"));
     addAndMakeVisible (buttonMoveGroupUp.get());
     buttonMoveGroupUp->setButtonText (TRANS("up"));
     buttonMoveGroupUp->addListener (this);
@@ -115,7 +115,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
-    
+
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
     pPointSelection->addChangeListener(this);
@@ -149,12 +149,12 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
 }
 
 //==============================================================================
-void SourceDefinitionComponent::paint (Graphics& g)
+void SourceDefinitionComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -181,7 +181,7 @@ void SourceDefinitionComponent::resized()
     //[/UserResized]
 }
 
-void SourceDefinitionComponent::buttonClicked (Button* buttonThatWasClicked)
+void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -369,7 +369,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.057%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.126%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -386,7 +386,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.943%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.874%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
