@@ -115,9 +115,9 @@ public:
     bool loadFromXmlElement(XmlElement* xmlElement)
     {
         filterType = (FilterType)xmlElement->getIntAttribute("filterType", DEFAULT_FILTER_TYPE);
-        cutOffFrequencyHz = xmlElement->getDoubleAttribute("cutOffFrequencyHz", DEFAULT_FREQUENCY);
-        qValue = xmlElement->getDoubleAttribute("qValue", DEFAULT_Q);
-        gainFactor = xmlElement->getDoubleAttribute("gainFactor", DEFAULT_GAIN_FACTOR);
+        cutOffFrequencyHz = (float)xmlElement->getDoubleAttribute("cutOffFrequencyHz", DEFAULT_FREQUENCY);
+        qValue = (float)xmlElement->getDoubleAttribute("qValue", DEFAULT_Q);
+        gainFactor = (float)xmlElement->getDoubleAttribute("gainFactor", DEFAULT_GAIN_FACTOR);
         
         return true;
     }

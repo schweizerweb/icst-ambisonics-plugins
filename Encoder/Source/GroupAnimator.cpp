@@ -100,12 +100,12 @@ void GroupAnimator::timerCallback()
     }
 }
 
-void GroupAnimator::parameterValueChanged(int parameterIndex, float newValue)
+void GroupAnimator::parameterValueChanged(int parameterIndex, float /*newValue*/)
 {
     toggleOnOff(parameterIndex);
 }
 
-void GroupAnimator::parameterGestureChanged(int parameterIndex, bool gestureIsStarting)
+void GroupAnimator::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
 {
     
 }

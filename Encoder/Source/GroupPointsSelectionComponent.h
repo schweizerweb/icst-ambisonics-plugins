@@ -29,8 +29,8 @@ public:
 		
     	pGroup = pSources->getGroup(groupIndex);
 
-        columnCount = std::ceil(pSources->size() / 16.0);
-        rowCount = columnCount > 0 ?  std::ceil(pSources->size() / (double)columnCount) : 0;
+        columnCount = (int)std::ceil(pSources->size() / 16.0);
+        rowCount = columnCount > 0 ?  (int)(std::ceil(pSources->size() / (double)columnCount)) : 0;
         
 		for (int i = 0; i < pSources->size(); i++)
 		{
@@ -65,7 +65,7 @@ public:
 
 		for(ToggleButton* b : toggleButtons)
 		{
-			b->setBounds(std::floor(index / rowCount) * COMPONENT_WIDTH, (index % rowCount) * CHECKBOX_HEIGHT , COMPONENT_WIDTH, CHECKBOX_HEIGHT);
+			b->setBounds((int)(std::floor(index / rowCount) * COMPONENT_WIDTH), (index % rowCount) * CHECKBOX_HEIGHT , COMPONENT_WIDTH, CHECKBOX_HEIGHT);
             index++;
 		}
     }

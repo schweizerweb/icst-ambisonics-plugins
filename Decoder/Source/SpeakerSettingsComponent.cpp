@@ -750,7 +750,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 	return SliderRange(0.0, 1.0, 0.001);
 }
 
-bool SpeakerSettingsComponent::getEnabled(const int columnId, const int rowNumber)
+bool SpeakerSettingsComponent::getEnabled(const int /*columnId*/, const int /*rowNumber*/)
 {
     return true;
 }

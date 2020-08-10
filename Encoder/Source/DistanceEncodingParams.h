@@ -255,12 +255,12 @@ public:
     bool loadFromXmlElement(XmlElement* xmlElement)
     {
         setEncodingMode((EncoderConstants::EncodingMode)xmlElement->getIntAttribute("encodingMode", DEFAULT_DISTANCE_ENCODING_MODE));
-        setUnitCircleRadius(xmlElement->getDoubleAttribute("unitCircleRadius", DEFAULT_UNIT_CIRCLE_SIZE));
-        setDbUnit(xmlElement->getDoubleAttribute("dBUnit", DEFAULT_DB_UNIT));
-    setInverseProportionalDistanceAttenuation(xmlElement->getDoubleAttribute("inverseProportionalDistanceAttenuation", DEFAULT_DISTANCE_ATTENUATION));
-        setCenterCurve(xmlElement->getDoubleAttribute("centerCurve", DEFAULT_CENTER_CURVE));
-        setAdvancedFactor(xmlElement->getDoubleAttribute("advancedFactor", DEFAULT_ADVANCED_FACTOR));
-        setAdvancedExponent(xmlElement->getDoubleAttribute("advancedExponent", DEFAULT_ADVANCED_EXPONENT));
+        setUnitCircleRadius((float)xmlElement->getDoubleAttribute("unitCircleRadius", DEFAULT_UNIT_CIRCLE_SIZE));
+        setDbUnit((float)xmlElement->getDoubleAttribute("dBUnit", DEFAULT_DB_UNIT));
+        setInverseProportionalDistanceAttenuation((float)xmlElement->getDoubleAttribute("inverseProportionalDistanceAttenuation", DEFAULT_DISTANCE_ATTENUATION));
+        setCenterCurve((float)xmlElement->getDoubleAttribute("centerCurve", DEFAULT_CENTER_CURVE));
+        setAdvancedFactor((float)xmlElement->getDoubleAttribute("advancedFactor", DEFAULT_ADVANCED_FACTOR));
+        setAdvancedExponent((float)xmlElement->getDoubleAttribute("advancedExponent", DEFAULT_ADVANCED_EXPONENT));
         
         return true;
     }

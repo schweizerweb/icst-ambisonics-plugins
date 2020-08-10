@@ -143,7 +143,7 @@ public:
 		}
 	}
 
-    bool getEnabled(const int columnId, const int rowNumber) override
+    bool getEnabled(const int /*columnId*/, const int /*rowNumber*/) override
     {
         return true;
     }
