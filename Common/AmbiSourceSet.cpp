@@ -159,7 +159,8 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
         {
             while (elements.size() < pAudioParams->sourceParams.size())
             {
-                add(new AmbiSource(pAudioParams->sourceParams.getUnchecked(index)));
+				String indexString = String(index + 1);
+                add(new AmbiSource(pAudioParams->sourceParams.getUnchecked(index), indexString));
                 index++;
             }
         }

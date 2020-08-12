@@ -30,8 +30,9 @@ AmbiSource::AmbiSource(XmlElement* element, AudioParameterSet audioParams) : Amb
 {
 }
 
-AmbiSource::AmbiSource(AudioParameterSet audioParams) : AmbiPoint(audioParams), rms(0.0f)
+AmbiSource::AmbiSource(AudioParameterSet audioParams, String name) : AmbiPoint(audioParams), rms(0.0f)
 {
+    setName(name);
 }
 
 void AmbiSource::setRms(float newRmsLevel, bool onlyIfGreater)
