@@ -23,6 +23,7 @@
 
 EncoderSettings::EncoderSettings():
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
+    masterGain(nullptr),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFALUT_RECEIVE_PORT),
 	oscSendFlag(DEFALUT_SEND_FLAG),
