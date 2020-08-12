@@ -19,6 +19,13 @@
 #define DEFAULT_ADVANCED_FACTOR  	    1.0f
 #define DEFAULT_ADVANCED_EXPONENT  	    1.0f
 #define DEFAULT_DISTANCE_ENCODING_MODE  EncoderConstants::Standard
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_MODE "DistEncMode"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT "DistEncDbUnit"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION "DistEncDistanceAttenuation"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE "DistEncCenterCurve"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR "DistEncAdvancedFactor"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT "DistEncAdvancedExponent"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
 
 class DistanceEncodingParams : AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
@@ -254,26 +261,26 @@ public:
     
     bool loadFromXmlElement(XmlElement* xmlElement)
     {
-        setEncodingMode((EncoderConstants::EncodingMode)xmlElement->getIntAttribute("encodingMode", DEFAULT_DISTANCE_ENCODING_MODE));
-        setUnitCircleRadius((float)xmlElement->getDoubleAttribute("unitCircleRadius", DEFAULT_UNIT_CIRCLE_SIZE));
-        setDbUnit((float)xmlElement->getDoubleAttribute("dBUnit", DEFAULT_DB_UNIT));
-        setInverseProportionalDistanceAttenuation((float)xmlElement->getDoubleAttribute("inverseProportionalDistanceAttenuation", DEFAULT_DISTANCE_ATTENUATION));
-        setCenterCurve((float)xmlElement->getDoubleAttribute("centerCurve", DEFAULT_CENTER_CURVE));
-        setAdvancedFactor((float)xmlElement->getDoubleAttribute("advancedFactor", DEFAULT_ADVANCED_FACTOR));
-        setAdvancedExponent((float)xmlElement->getDoubleAttribute("advancedExponent", DEFAULT_ADVANCED_EXPONENT));
+        setEncodingMode((EncoderConstants::EncodingMode)xmlElement->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
+        setUnitCircleRadius((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
+        setDbUnit((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, DEFAULT_DB_UNIT));
+        setInverseProportionalDistanceAttenuation((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, DEFAULT_DISTANCE_ATTENUATION));
+        setCenterCurve((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
+        setAdvancedFactor((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, DEFAULT_ADVANCED_FACTOR));
+        setAdvancedExponent((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, DEFAULT_ADVANCED_EXPONENT));
         
         return true;
     }
     
-    bool writeToXmlElement(XmlElement* xmlElement)
+    bool writeToXmlElement(XmlElement* xmlElement) const
     {
-        xmlElement->setAttribute("encodingMode", (int)getEncodingMode());
-        xmlElement->setAttribute("unitCircleRadius", getUnitCircleRadius());
-        xmlElement->setAttribute("dBUnit", getDbUnit());
-        xmlElement->setAttribute("inverseProportionalDistanceAttenuation", getInverseProportionalDistanceAttenuation());
-        xmlElement->setAttribute("centerCurve", getCenterCurve());
-        xmlElement->setAttribute("advancedFactor", getAdvancedFactor());
-        xmlElement->setAttribute("advancedExponent", getAdvancedExponent());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, (int)getEncodingMode());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_UNIT_CIRCLE_RADIUS, getUnitCircleRadius());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT, getDbUnit());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION, getInverseProportionalDistanceAttenuation());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, getCenterCurve());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, getAdvancedFactor());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, getAdvancedExponent());
         
         return true;
     }
