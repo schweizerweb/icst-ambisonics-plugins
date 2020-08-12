@@ -125,7 +125,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     labelMasterGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelMasterGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelMasterGain->setBounds (16, 109, 109, 24);
+    labelMasterGain->setBounds (14, 109, 109, 24);
 
     sliderMasterGain.reset (new juce::Slider ("sliderMasterGain"));
     addAndMakeVisible (sliderMasterGain.get());
@@ -482,7 +482,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="b72378bdfe4e130" buttonText="presets..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelMasterGain" id="5a6c2906ed7799ee" memberName="labelMasterGain"
-         virtualName="" explicitFocusOrder="0" pos="16 109 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="14 109 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Master Gain [dB]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
