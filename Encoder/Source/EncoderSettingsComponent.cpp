@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -34,25 +34,25 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    tabbedComponent.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    tabbedComponent.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (tabbedComponent.get());
     tabbedComponent->setTabBarDepth (35);
-    tabbedComponent->addTab (TRANS("Encoding"), Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings), true);
-    tabbedComponent->addTab (TRANS("Radar"), Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pZoomSettings), true);
-    tabbedComponent->addTab (TRANS("OSC"), Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler), true);
+    tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings), true);
+    tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pZoomSettings), true);
+    tabbedComponent->addTab (TRANS("OSC"), juce::Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler), true);
     tabbedComponent->setCurrentTabIndex (0);
 
-    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
-                                              TRANS("Unofficial Pre-Release")));
+    labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
+                                                    TRANS("Unofficial Pre-Release")));
     addAndMakeVisible (labelDevelopmentVersion.get());
-    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDevelopmentVersion->setJustificationType (Justification::centred);
+    labelDevelopmentVersion->setFont (juce::Font (25.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setJustificationType (juce::Justification::centred);
     labelDevelopmentVersion->setEditable (false, false, false);
-    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
-    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
-    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDevelopmentVersion->setColour (juce::Label::backgroundColourId, juce::Colour (0xbded0d0d));
+    labelDevelopmentVersion->setColour (juce::Label::textColourId, juce::Colours::yellow);
+    labelDevelopmentVersion->setColour (juce::Label::outlineColourId, juce::Colours::yellow);
+    labelDevelopmentVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelDevelopmentVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -80,12 +80,12 @@ EncoderSettingsComponent::~EncoderSettingsComponent()
 }
 
 //==============================================================================
-void EncoderSettingsComponent::paint (Graphics& g)
+void EncoderSettingsComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]

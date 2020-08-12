@@ -34,5 +34,9 @@ const float EncoderConstants::AdvancedExponentMin = 0.0f;
 const float EncoderConstants::AdvancedExponentMax = 20.0f;
 const float EncoderConstants::AdvancedExponentResolution = 0.01f;
 
+const float EncoderConstants::MasterGainMin = 0.0f;
+const float EncoderConstants::MasterGainMax = 36.0f;
+const float EncoderConstants::MasterGainResolution = 0.1f;
+
 const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Advanced", "Exponential", "Inverse Proportional"};
     

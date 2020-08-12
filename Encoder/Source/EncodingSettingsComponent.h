@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -41,9 +41,10 @@
 class EncodingSettingsComponent  : public Component,
                                    public ChangeBroadcaster,
                                    public ActionListener,
-                                   public ComboBox::Listener,
-                                   public Button::Listener,
-                                   public Slider::Listener
+                                   public ChangeListener,
+                                   public juce::ComboBox::Listener,
+                                   public juce::Button::Listener,
+                                   public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -56,13 +57,15 @@ public:
     void initializePresets();
     void updateEncodingUiElements();
     void actionListenerCallback(const String &message) override;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
+    void updateMasterGainWarning() const;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -78,18 +81,21 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<ComboBox> comboBoxPresets;
-    std::unique_ptr<Label> labelPresets;
-    std::unique_ptr<TextButton> buttonSave;
+    std::unique_ptr<juce::ComboBox> comboBoxPresets;
+    std::unique_ptr<juce::Label> labelPresets;
+    std::unique_ptr<juce::TextButton> buttonSave;
     std::unique_ptr<SourceDefinitionComponent> sourceDefinition;
-    std::unique_ptr<ToggleButton> toggleDistanceEncoding;
-    std::unique_ptr<ToggleButton> toggleDoppler;
-    std::unique_ptr<Slider> sliderDistanceScaler;
-    std::unique_ptr<Label> labelDistanceScaler;
-    std::unique_ptr<TextButton> btnEditDistanceEncoding;
-    std::unique_ptr<TextButton> buttonManagePresets;
-    std::unique_ptr<ToggleButton> toggleInfiniteDistance;
-    std::unique_ptr<TextButton> btnManageDistanceEncodingPresets;
+    std::unique_ptr<juce::ToggleButton> toggleDistanceEncoding;
+    std::unique_ptr<juce::ToggleButton> toggleDoppler;
+    std::unique_ptr<juce::Slider> sliderDistanceScaler;
+    std::unique_ptr<juce::Label> labelDistanceScaler;
+    std::unique_ptr<juce::TextButton> btnEditDistanceEncoding;
+    std::unique_ptr<juce::TextButton> buttonManagePresets;
+    std::unique_ptr<juce::ToggleButton> toggleInfiniteDistance;
+    std::unique_ptr<juce::TextButton> btnManageDistanceEncodingPresets;
+    std::unique_ptr<juce::Label> labelMasterGain;
+    std::unique_ptr<juce::Slider> sliderMasterGain;
+    std::unique_ptr<juce::Label> labelCaution;
 
 
     //==============================================================================

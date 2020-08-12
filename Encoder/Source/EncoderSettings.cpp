@@ -33,7 +33,8 @@ EncoderSettings::EncoderSettings():
 	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
-    dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG)
+    dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
+    localMasterGain(DEFAULT_MASTER_GAIN)
 {
 }
 
@@ -122,4 +123,42 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
         setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
     }
+}
+
+float EncoderSettings::getMasterGain() const
+{
+    return masterGain != nullptr ? masterGain->get() : localMasterGain;
+}
+
+bool EncoderSettings::setMasterGain(float gainDb)
+{
+    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
+        return false;
+
+    if (masterGain != nullptr)
+        *masterGain = gainDb;
+    else
+        localMasterGain = gainDb;
+
+    return true;
+}
+
+void EncoderSettings::initialize(AudioProcessor* pProcessor)
+{
+    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
+
+    pProcessor->addParameter(masterGain);
+
+    masterGain->addListener(this);
+
+	distanceEncodingParams.initialize(pProcessor);
+}
+
+void EncoderSettings::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
+{
+    sendChangeMessage();
+}
+
+void EncoderSettings::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
+{
 }

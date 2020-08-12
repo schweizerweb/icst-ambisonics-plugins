@@ -69,7 +69,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 #if MULTI_ENCODER_MODE
     groupAnimator->initialize(this, &sources);
 #endif
-    encoderSettings.distanceEncodingParams.initialize(this);
+	encoderSettings.initialize(this);
 
     // points (X, Y, Z, Gain)
      for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
@@ -211,8 +211,9 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
+	float masterGainFactor = Constants::GainDbToFactor(encoderSettings.getMasterGain());
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources.size());
-	const float channelScaler = 1.0f / totalNumInputChannels;
+	const float channelScaler = 1.0f / totalNumInputChannels * masterGainFactor;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
 	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];

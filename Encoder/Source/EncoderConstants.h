@@ -37,7 +37,11 @@ public:
     const static float AdvancedExponentMin;
     const static float AdvancedExponentMax;
     const static float AdvancedExponentResolution;
-    
+
+    const static float MasterGainMin;
+    const static float MasterGainMax;
+    const static float MasterGainResolution;
+
     // make sure enum EncodingMode and StringArray encodingModeString are in sync!
     enum EncodingMode { None = 0, Standard = 1, Advanced = 2, Exponential = 3, InverseProportional = 4 };
     const static StringArray encodingModeStrings;
