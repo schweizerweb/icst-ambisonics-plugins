@@ -639,6 +639,8 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	for (int i = 0; i < pEditablePoints->size(); i++)
 	{
 		AmbiPoint* pt = pEditablePoints->get(i);
+		if (!pt->getEnabled())
+			continue;
 		double dist;
 		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
 		{
@@ -651,7 +653,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	for(int i = 0; i < pEditablePoints->groupCount(); i++)
 	{
 		AmbiPoint* pt = pEditablePoints->getGroup(i);
-		double dist;
+		if (!pt->getEnabled())
+			continue;
+	    double dist;
 		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
 		{
 			minDist = dist;
@@ -894,6 +898,8 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		Rectangle<float> rectangle(selectionRectangleStart, selectionRectangleEnd);
 		for(int i = 0; i < pEditablePoints->size(); i++)
 		{
+			if (!pEditablePoints->get(i)->getEnabled())
+				continue;
 			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
 			Point<float> realCoords;
 			realCoords.x = float(radarMode == XY ? p->getX() : p->getX());
