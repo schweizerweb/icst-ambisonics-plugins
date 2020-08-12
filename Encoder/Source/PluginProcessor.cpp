@@ -68,9 +68,9 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
 #if MULTI_ENCODER_MODE
     groupAnimator->initialize(this, &sources);
-#endif
 	encoderSettings.initialize(this);
-
+#endif
+	encoderSettings.distanceEncodingParams.initialize(this);
     // points (X, Y, Z, Gain)
      for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
      {

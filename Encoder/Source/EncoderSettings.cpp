@@ -150,8 +150,6 @@ void EncoderSettings::initialize(AudioProcessor* pProcessor)
     pProcessor->addParameter(masterGain);
 
     masterGain->addListener(this);
-
-	distanceEncodingParams.initialize(pProcessor);
 }
 
 void EncoderSettings::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)

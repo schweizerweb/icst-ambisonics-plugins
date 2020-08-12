@@ -160,6 +160,9 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
     buttonSave->setVisible(MULTI_ENCODER_MODE);
     buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
+    labelMasterGain->setVisible(MULTI_ENCODER_MODE);
+    sliderMasterGain->setVisible(MULTI_ENCODER_MODE);
+    labelCaution->setVisible(MULTI_ENCODER_MODE);
 
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
