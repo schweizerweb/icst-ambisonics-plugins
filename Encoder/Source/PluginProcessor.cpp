@@ -214,7 +214,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-	float masterGainFactor = Constants::GainDbToFactor(encoderSettings.getMasterGain());
+    const float masterGainFactor = float(Constants::GainDbToFactor(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources.size());
 	const float channelScaler = 1.0f / totalNumInputChannels * masterGainFactor;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
