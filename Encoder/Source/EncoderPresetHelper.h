@@ -88,16 +88,20 @@ public:
         presetFiles.addIfNotAlreadyThere(file);
     }
     
-    void loadDefaultPreset(AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    bool loadDefaultPreset(AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
     {
+        bool found = false;
         for(File f : presetFiles)
         {
             if(f.getFileNameWithoutExtension() == DEFAULT_PRESET_NAME)
             {
                 loadFromXmlFile(f, pAudioParams, pSourceSet, pEncoderSettings);
+                found = true;
                 break;
             }
         }
+
+        return found;
     }
     
 };

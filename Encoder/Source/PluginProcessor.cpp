@@ -53,7 +53,10 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
         sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
-    presetHelper->loadDefaultPreset(&audioParams, &sources, &encoderSettings);
+    if(!presetHelper->loadDefaultPreset(&audioParams, &sources, &encoderSettings))
+    {
+		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
+    }
 #endif
 }
 
