@@ -17,6 +17,7 @@
 #include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
 #include "AmbiOSCSenderExt.h"
+#include "DistanceEncodingPresetHelper.h"
 #include "../../Common/VarDelayBuffer.h"
 #include "../../Common/DelayHelper.h"
 #include "EncoderPresetHelper.h"
@@ -76,6 +77,7 @@ public:
 	StatusMessageHandler* getStatusMessageHandler();
 	DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
+    DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
 
 #if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
@@ -92,6 +94,7 @@ private:
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
     std::unique_ptr<GroupAnimator> groupAnimator;
+    std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
 

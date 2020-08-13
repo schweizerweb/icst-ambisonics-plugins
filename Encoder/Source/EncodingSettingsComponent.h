@@ -48,7 +48,7 @@ class EncodingSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
+    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper);
     ~EncodingSettingsComponent() override;
 
     //==============================================================================
@@ -77,7 +77,7 @@ private:
     PresetManagerDialog presetManagerDialog;
     EncoderPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;
-    std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
+    DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper;
     //[/UserVariables]
 
     //==============================================================================

@@ -29,13 +29,11 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)
+EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper)
+    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings), pDistanceEncodingPresetHelper(pDistanceEncodingPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
-    distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
-    distanceEncodingPresetHelper->initialize();
     //[/Constructor_pre]
 
     comboBoxPresets.reset (new juce::ComboBox ("comboBoxPresets"));
@@ -288,7 +286,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams, distanceEncodingPresetHelper.get()), getScreenBounds(), nullptr);
+        CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper), getScreenBounds(), this);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
@@ -309,7 +307,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == btnManageDistanceEncodingPresets.get())
     {
         //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
-        presetManagerDialog.show(this, distanceEncodingPresetHelper.get(), false);
+        presetManagerDialog.show(this, pDistanceEncodingPresetHelper, false);
         //[/UserButtonCode_btnManageDistanceEncodingPresets]
     }
 
@@ -425,8 +423,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper"
+                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings), pDistanceEncodingPresetHelper(pDistanceEncodingPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

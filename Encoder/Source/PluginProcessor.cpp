@@ -41,9 +41,11 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 
     initializeAudioParameter();
     
-    presetHelper.reset(new  EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
+    presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
     presetHelper->initialize();
-    
+	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
+	distanceEncodingPresetHelper->initialize();
+
 #if(!MULTI_ENCODER_MODE)
     // initialize mono encoder with one source
     if (sources.size() == 0)
@@ -337,6 +339,11 @@ DawParameter* AmbisonicEncoderAudioProcessor::getDawParameter()
 EncoderPresetHelper* AmbisonicEncoderAudioProcessor::getPresetHelper()
 {
     return presetHelper.get();
+}
+
+DistanceEncodingPresetHelper* AmbisonicEncoderAudioProcessor::getDistanceEncodingPresetHelper()
+{
+	return distanceEncodingPresetHelper.get();
 }
 
 #if (!MULTI_ENCODER_MODE)
