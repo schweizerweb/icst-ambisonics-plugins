@@ -27,7 +27,7 @@ public:
 #if MULTI_ENCODER_MODE
 		setResizeLimits(600, 600, 3000, 3000);
 #else
-		setResizeLimits(600, 450, 3000, 3000);
+		setResizeLimits(600, 500, 3000, 3000);
 #endif
 	}
 
