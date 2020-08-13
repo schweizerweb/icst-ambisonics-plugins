@@ -76,6 +76,7 @@ File* PresetHelper::tryCreateNewPreset()
     alert.addTextEditor("text", "", "Or enter new name", false);
     alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
     alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    alert.setAlwaysOnTop(true);
 
     int returnValue = alert.runModalLoop();
     if(returnValue == 1)
