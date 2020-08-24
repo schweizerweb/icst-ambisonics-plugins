@@ -10,7 +10,7 @@
 
 #include "DecoderSettings.h"
 
-DecoderSettings::DecoderSettings(): oscReceive(DEFALUT_RECEIVE_FLAG), oscReceivePort(DEFAULT_RECEIVE_PORT), oscReceiveTimeoutMs(DEFAULT_RECEIVE_TIMEOUT), lastUIWidth(DEFAULT_UI_WIDTH), lastUIHeight(DEFAULT_UI_HEIGTH), editMode(false)
+DecoderSettings::DecoderSettings(): oscReceive(DEFALUT_RECEIVE_FLAG), oscReceivePort(DEFAULT_RECEIVE_PORT), oscReceiveTimeoutMs(DEFAULT_RECEIVE_TIMEOUT), lastUIWidth(DEFAULT_UI_WIDTH), lastUIHeight(DEFAULT_UI_HEIGTH), editMode(DEFAULT_EDIT_MODE_FLAG)
 {
 }
 
@@ -21,6 +21,7 @@ void DecoderSettings::saveToXml(XmlElement* xmlElement) const
 	xmlElement->setAttribute("oscReceive", oscReceive);
 	xmlElement->setAttribute("oscReceivePort", oscReceivePort);
 	xmlElement->setAttribute("oscReceiveTimeoutMs", oscReceiveTimeoutMs);
+	xmlElement->setAttribute("editMode", editMode);
 }
 
 void DecoderSettings::loadFromXml(XmlElement* xmlElement)
@@ -30,4 +31,5 @@ void DecoderSettings::loadFromXml(XmlElement* xmlElement)
 	oscReceive = xmlElement->getBoolAttribute("oscReceive", DEFALUT_RECEIVE_FLAG);
 	oscReceivePort = xmlElement->getIntAttribute("oscReceivePort", DEFAULT_RECEIVE_PORT);
 	oscReceiveTimeoutMs = xmlElement->getIntAttribute("oscReceiveTimeoutMs", DEFAULT_RECEIVE_TIMEOUT);
+	editMode = xmlElement->getBoolAttribute("editMode", DEFAULT_EDIT_MODE_FLAG);
 }

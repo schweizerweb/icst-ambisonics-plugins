@@ -9,13 +9,13 @@
 */
 
 #pragma once
-#include "SpeakerSettingsComponent.h"
+#include "TableColumnCallback.h"
 
 class SliderColumnCustomComponent : public Component,
 	private Slider::Listener
 {
 public:
-	SliderColumnCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	SliderColumnCustomComponent(TableColumnCallback& td) : owner(td)
 	{
 		addAndMakeVisible(slider);
 		slider.setSliderStyle(Slider::IncDecButtons);
@@ -35,6 +35,10 @@ public:
 		SliderRange range = owner.getSliderRange(columnId);
 		slider.setRange(range.min, range.max, range.interval);
 		slider.setValue(owner.getValue(columnId, row), dontSendNotification);
+        bool enabled = owner.getEnabled(columnId, row);
+        slider.setEnabled(enabled);
+        setColour(Slider::textBoxTextColourId, enabled ? Colours::white : Colours::darkgrey);
+        setColour(Slider::thumbColourId, enabled ? Colours::white : Colours::darkgrey);
 	}
 
 	void sliderValueChanged(Slider* changedSlider) override
@@ -44,7 +48,7 @@ public:
 
 	
 private:
-	SpeakerSettingsComponent& owner;
+	TableColumnCallback& owner;
 	Slider slider;
 	int row, columnId;
 };

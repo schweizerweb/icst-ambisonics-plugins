@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -24,6 +24,8 @@
 #include "PluginProcessor.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/RadarComponent.h"
+#include "EncoderSettingsDialog.h"
+#include "../../Common/HelpDialogManager.h"
 //[/Headers]
 
 
@@ -37,15 +39,19 @@
                                                                     //[/Comments]
 */
 class AmbisonicEncoderAudioProcessorEditor  : public AudioProcessorEditor,
+                                              public ChangeListener,
+                                              public ActionListener,
                                               public Button::Listener
 {
 public:
     //==============================================================================
     AmbisonicEncoderAudioProcessorEditor (AmbisonicEncoderAudioProcessor& ownerProc);
-    ~AmbisonicEncoderAudioProcessorEditor();
+    ~AmbisonicEncoderAudioProcessorEditor() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+	void actionListenerCallback(const String& message) override;
+	void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -55,15 +61,19 @@ public:
     // Binary resources:
     static const char* settings_png;
     static const int settings_pngSize;
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& processor;
-	AmbiDataSet* pSources;
+	AmbiSourceSet* pSources;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;
+	EncoderSettingsDialog* settingsWindow;
+    HelpDialogManager helpDialogManager;
     //[/UserVariables]
 
     //==============================================================================
@@ -71,6 +81,7 @@ private:
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
     std::unique_ptr<Label> labelMessage;
+    std::unique_ptr<ImageButton> btnHelp;
 
 
     //==============================================================================

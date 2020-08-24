@@ -10,13 +10,14 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "AudioParameterSet.h"
+#include "AudioParams.h"
+#include "DawParameter.h"
 
 class RadarOptions
 {
 public:
 	RadarOptions();
-	AudioParameterSet getAudioParamForIndex(int index) const;
+	AudioParameterSet getAudioParamForIndex(int index, bool isGroup) const;
 
 public:
 	bool nameFieldEditable;
@@ -25,6 +26,8 @@ public:
 	int displayTimeout;
 	bool showEditablePoints;
 	bool showDisplayOnlyPoints;
+	bool setTrackColorAccordingToName;
 
-	Array<AudioParameterSet>* audioParams;
+    AudioParams* audioParams;
+	DawParameter* dawParameter;
 };

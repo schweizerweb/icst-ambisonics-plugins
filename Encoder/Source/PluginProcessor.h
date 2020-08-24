@@ -13,15 +13,21 @@
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
 #include "../../Common/AmbiPoint.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerEncoder.h"
+#include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
 #include "AmbiOSCSenderExt.h"
-
+#include "DistanceEncodingPresetHelper.h"
+#include "../../Common/VarDelayBuffer.h"
+#include "../../Common/DelayHelper.h"
+#include "EncoderPresetHelper.h"
+#include "../../Common/AudioParams.h"
+#include "GroupAnimator.h"
 
 //==============================================================================
 /**
 */
-class AmbisonicEncoderAudioProcessor  : public AudioProcessor
+class AmbisonicEncoderAudioProcessor  : public AudioProcessor, ActionListener
 {
 public:
     //==============================================================================
@@ -36,7 +42,7 @@ public:
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
    #endif
 
-	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance);
+	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
     //==============================================================================
@@ -61,21 +67,36 @@ public:
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
 
-	AmbiDataSet* getSources();
+    void actionListenerCallback(const juce::String &message) override;
+    
+	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
 	void initializeOsc();
-	Array<AudioParameterSet>* getAudioParams();
+    void initializeAudioParameter();
+	AudioParams* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
+	DawParameter* getDawParameter();
+    EncoderPresetHelper* getPresetHelper();
+    DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
+
+#if (!MULTI_ENCODER_MODE)
+	void updateTrackProperties(const TrackProperties& properties) override;
+#endif
 
 private:
-	AmbiDataSet sources;
+	AmbiSourceSet sources;
 	EncoderSettings encoderSettings;
 	OSCHandler* pOscHandler;
 	AmbiOSCSender* pOscSender;
 	AmbiOSCSenderExt* pOscSenderExt;
-	Array<AudioParameterSet> audioParams;
+	AudioParams audioParams;
 	StatusMessageHandler statusMessageHandler;
+	DawParameter dawParameter;
+    std::unique_ptr<EncoderPresetHelper> presetHelper;
+    std::unique_ptr<GroupAnimator> groupAnimator;
+    std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
+	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)

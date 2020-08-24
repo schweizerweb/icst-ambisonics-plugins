@@ -4,6 +4,7 @@ param(
     [string]$buildExecutable,
     [string]$buildArgumentsPre,
     [string]$buildArgumentsPost,
+    [string]$buildInstallerScript,
     [string]$projectFileExtension,
 	[string]$platformString,
     [string[]]$pluginTypeStrings
@@ -136,4 +137,7 @@ foreach($pluginType in $pluginTypes)
     Write-Output $targetZip
 }
 
-Write-Output "Done"
+# create installer
+. Setup/$($buildInstallerScript) "ICST_AmbiPlugins_$($releaseVersion)_$($platformString)" "$($releaseVersion)" 
+
+Write-Output "All Done"

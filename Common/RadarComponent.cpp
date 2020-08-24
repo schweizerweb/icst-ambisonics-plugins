@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -89,8 +89,8 @@ void RadarComponent::resized()
 	{
     //[/UserPreResize]
 
-    radar->setBounds (0, 0 + 100, getWidth() - 0, getHeight() - 100);
-    pointInfo->setBounds (0, 0, getWidth() - 0, 100);
+    radar->setBounds (0, 0, getWidth() - 0, getHeight() - 100);
+    pointInfo->setBounds (0, getHeight() - 100, getWidth() - 0, 100);
     //[UserResized] Add your own custom resize handling here..
 	}
     //[/UserResized]
@@ -125,13 +125,12 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="RadarComponent" componentName=""
                  parentClasses="public Component, public Timer" constructorParams="AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.33" fixedSize="0" initialWidth="600" initialHeight="400">
+                 overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0R 0M 100M" posRelativeY="328b0557e3704175"
-                    class="Radar3D" params="pEditablePoints, pDisplayOnlyPoints, &amp;zoomSettings, pPointSelection, pRadarOptions"/>
+                    explicitFocusOrder="0" pos="0 0 0M 100M" class="Radar3D" params="pEditablePoints, pDisplayOnlyPoints, &amp;zoomSettings, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
-                    virtualName="" explicitFocusOrder="0" pos="0 0 0M 100" class="PointInfoControl"
+                    virtualName="" explicitFocusOrder="0" pos="0 100R 0M 100" class="PointInfoControl"
                     params="pEditablePoints, pPointSelection, pRadarOptions"/>
 </JUCER_COMPONENT>
 
@@ -142,3 +141,4 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

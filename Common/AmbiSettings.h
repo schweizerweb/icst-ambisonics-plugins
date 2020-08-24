@@ -10,32 +10,49 @@
 
 #pragma once
 #include "JuceHeader.h"
-#define SOUND_SPEED_M_PER_S	343.0
-#define SOUND_SPEED_MS_PER_M (1000.0 / SOUND_SPEED_M_PER_S)
-#define SOUND_SPEED_S_PER_M (1.0 / SOUND_SPEED_M_PER_S)
-
-#define DEFAULT_DISTANCE_SCALER	1.0
+#include "AmbiBasicSettings.h"
 #define MAX_AMBISONICS_ORDER 7
 #define NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
 #define NB_OF_AMBISONICS_CHANNELS (NB_OF_AMBISONICS_GAINS * NB_OF_AMBISONICS_GAINS)
 #define CURRENT_AMBISONICS_ORDER_NB_OF_GAINS	int(sqrt(JucePlugin_MaxNumInputChannels))
 #define CURRENT_AMBISONICS_ORDER	(CURRENT_AMBISONICS_ORDER_NB_OF_GAINS - 1)
-class AmbiSettings
+
+#define XML_TAG_PRESET_DISTANCESCALER "DistanceScaler"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
+#define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
+#define XML_VALUE "Value"
+
+class AmbiSettings: public AmbiBasicSettings
 {
 public:
 	AmbiSettings();
-	AmbiSettings(double distanceScaler, bool directionFlip);
+	AmbiSettings(double distanceScaler);
 
-	double getDistanceScaler() const;
-	void setDistanceScaler(double newDistanceScaler);
+    enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3 };
+    
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();
-	bool getDirectionFlip() const;
-	void setDirectionFlip(bool flip);
+    AmbiWeightMode getWeightMode();
+    void setWeightMode(AmbiWeightMode mode);
+    
+    void writeToPresetXmlElement(XmlElement* xmlElement) const;
+    void loadFromPresetXml(XmlElement* xmlElement);
 
+    bool getWarningFlag();
+    
 private:
-	double distanceScaler;
-	bool directionFlip;
-	double* ambiChannelWeights[NB_OF_AMBISONICS_CHANNELS];
-	double ambiOrderWeights[NB_OF_AMBISONICS_GAINS];
+	double fact(int n);
+    void prepareInPhaseWeighting();
+    void prepareStandardWeighting();
+    void prepareManualWeighting();
+    
+    int ambiChannelOrder[NB_OF_AMBISONICS_CHANNELS];
+	double manualOrderWeights[NB_OF_AMBISONICS_GAINS];
+    
+    double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
+    double standardWeights[NB_OF_AMBISONICS_GAINS];
+    
+    AmbiWeightMode weightMode;
+    bool loadWarningFlag;
 };

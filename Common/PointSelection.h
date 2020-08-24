@@ -12,17 +12,25 @@
 
 #include "JuceHeader.h"
 
-#define NO_POINT_SELECTED -1
-
 class PointSelection : public ChangeBroadcaster
 {
 public:
+	enum SelectionMode { None, Point, Group };
+
 	PointSelection();
-	int getSelectedPointIndex() const;
+
 	void unselectPoint();
-	void selectPoint(int index);
+	void selectPoint(int index, bool add = false);
 	void notifyChange();
+	bool isPointSelected(int index) const;
+	bool isGroupSelected(int index) const;
+	SelectionMode getSelectionMode() const;
+	int getMainSelectedPointIndex() const;
+	Array<int> getSelectedIndices() const;
+	void selectGroup(int index, bool add);
 
 private:
-	int selectedPointIndex;
+	Array<int> selectedIndices;
+	int mainSelectedIndex;
+	SelectionMode selectionMode;
 };

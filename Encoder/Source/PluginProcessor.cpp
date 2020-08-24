@@ -11,11 +11,11 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
+#include "../../Common/TrackColors.h"
+#include "EncoderConstants.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
-#define XML_TAG_SOURCES "Sources"
-#define XML_TAG_SOURCE "Source"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -30,25 +30,36 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
                        )
 #endif
 {
-	pOscHandler = new OSCHandler(&sources, &statusMessageHandler);
+	pOscHandler = new OSCHandlerEncoder(&sources, &statusMessageHandler, &encoderSettings.distanceEncodingParams);
 	pOscSender = new AmbiOSCSender(&sources);
 	pOscSenderExt = new AmbiOSCSenderExt(&sources);
+    
+#if MULTI_ENCODER_MODE
+    groupAnimator.reset(new GroupAnimator());
+#endif
 	initializeOsc();
 
-	for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
-	{
-		String indexStr = String(i + 1);
-		
-		AudioParameterSet set;
-		set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::XMin, Constants::XMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
-		set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::YMin, Constants::YMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
-		set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::ZMin, Constants::ZMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
+    initializeAudioParameter();
+    
+    presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this));
+    presetHelper->initialize();
+	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
+	distanceEncodingPresetHelper->initialize();
 
-		audioParams.add(set);
-		addParameter(set.pX);
-		addParameter(set.pY);
-		addParameter(set.pZ);
-	}
+#if(!MULTI_ENCODER_MODE)
+    // initialize mono encoder with one source
+    if (sources.size() == 0)
+    {
+        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
+        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
+        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
+    }
+#else
+    if(!presetHelper->loadDefaultPreset(&audioParams, &sources, &encoderSettings))
+    {
+		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
+    }
+#endif
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -56,6 +67,47 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 	delete pOscHandler;
 	delete pOscSender;
 	delete pOscSenderExt;
+}
+
+void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
+{
+#if MULTI_ENCODER_MODE
+    groupAnimator->initialize(this, &sources);
+	encoderSettings.initialize(this);
+#endif
+	encoderSettings.distanceEncodingParams.initialize(this);
+    // points (X, Y, Z, Gain)
+     for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+     {
+        String indexStr = String(i + 1);
+         
+        AudioParameterSet set;
+        set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::X);
+        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Y);
+        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Z);
+        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, &sources, i, AudioParameterFloatAmbi::Gain);
+
+        audioParams.sourceParams.add(set);
+        addParameter(set.pX);
+        addParameter(set.pY);
+        addParameter(set.pZ);
+        addParameter(set.pGain);
+    }
+    
+    for (int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+    {
+        String indexStr = String(i + 1);
+        
+        AudioParameterSet set;
+        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GX);
+        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GY);
+        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, &sources, i, AudioParameterFloatAmbi::GZ);
+
+        audioParams.groupParams.add(set);
+        addParameter(set.pX);
+        addParameter(set.pY);
+        addParameter(set.pZ);
+    }
 }
 
 //==============================================================================
@@ -148,14 +200,14 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 }
 #endif
 
-void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance)
+void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
-	if (!encoderSettings.distanceEncodingFlag || encoderSettings.unitCircleRadius == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.getUnitCircleRadius() == 0.0)
 		return;
 
-	double scaledDistance = distance * (1.0 / encoderSettings.unitCircleRadius);
-	double wFactor = atan(scaledDistance * PI / 2.0) / (scaledDistance * PI / 2.0);
-	double otherFactor = (1 - exp(-scaledDistance)) * wFactor;
+	double wFactor, otherFactor;
+	encoderSettings.distanceEncodingParams.calculateAttenuation(distance, &wFactor, &otherFactor);
+
 	pCoefficientArray[0] *= wFactor;
 	for (int i = 1; i < arraySize; i++)
 		pCoefficientArray[i] *= otherFactor;
@@ -164,8 +216,9 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
+    const float masterGainFactor = float(Constants::GainDbToFactor(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources.size());
-	const float channelScaler = 1.0f / totalNumInputChannels;
+	const float channelScaler = 1.0f / totalNumInputChannels * masterGainFactor;
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
 	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
@@ -180,17 +233,29 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
-		AmbiPoint* source = sources.get(iSource);
+		AmbiSource* source = sources.get(iSource);
+		if (source == nullptr || !source->getEnabled())
+			continue;
+
+		const float sourceGain = float(source->getGain());
 
 		// keep RMS
 		sources.setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
 		Point3D<double>* pSourcePoint = source->getPoint();
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], !encoderSettings.directionFlip, true);
+		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
-		const float* inputData = inputBuffer.getReadPointer(iSource);
 		
+		if (encoderSettings.dopplerEncodingFlag)
+		{
+			// check doppler delay buffers
+			int currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance() * encoderSettings.getDistanceScaler(), getSampleRate());
+			delayBuffers[iSource].process(currentDelayInSamples, inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
+		}
+
+		const float* inputData = inputBuffer.getReadPointer(iSource);
+
 		// create B-format
 		int numSamples = buffer.getNumSamples();
 		for (int iSample = 0; iSample < numSamples; iSample++)
@@ -198,7 +263,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
 			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
-				outputBufferPointers[iChannel][iSample] += channelScaler * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
+				outputBufferPointers[iChannel][iSample] += sourceGain * channelScaler * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
@@ -214,7 +279,7 @@ bool AmbisonicEncoderAudioProcessor::hasEditor() const
 
 AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 {
-    return new AmbisonicEncoderAudioProcessorEditor (*this);
+	return new AmbisonicEncoderAudioProcessorEditor(*this);
 }
 
 //==============================================================================
@@ -224,17 +289,8 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
+	sources.writeToXmlElement(xml);
 	
-	// load sources
-	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
-	for (int i = 0; i < sources.size(); i++)
-	{
-		AmbiPoint* pt = sources.get(i);
-		if(pt != nullptr)
-			sourcesElement->addChildElement(pt->getAsXmlElement(XML_TAG_SOURCE));
-	}
-	xml->addChildElement(sourcesElement);
-
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
 	delete xml;
@@ -250,37 +306,22 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		{
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
-
-			// load last speaker preset
-			XmlElement* sourcesElement = xmlState->getChildByName(XML_TAG_SOURCES);
-			sources.clear();
-			if (sourcesElement != nullptr)
-			{
-				int index = 0;
-				XmlElement* xmlPoint = sourcesElement->getChildByName(XML_TAG_SOURCE);
-				while (xmlPoint != nullptr)
-				{
-					if (audioParams.size() > index)
-						sources.add(new AmbiPoint(xmlPoint, audioParams[index]));
-					else
-						sources.add(new AmbiPoint(xmlPoint, AudioParameterSet()));
-
-					xmlPoint = xmlPoint->getNextElement();
-					index++;
-				}
-			}
+            Globals::SetScaler(encoderSettings.getDistanceScaler());
+			// load last source preset
+			sources.loadFromXml(xmlState.get(), &audioParams);
+            sources.resetIds();
 		}
 	}
 
 	initializeOsc();
 }
 
-AmbiDataSet* AmbisonicEncoderAudioProcessor::getSources()
+AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
 {
 	return &sources;
 }
 
-Array<AudioParameterSet>* AmbisonicEncoderAudioProcessor::getAudioParams()
+AudioParams* AmbisonicEncoderAudioProcessor::getAudioParams()
 {
 	return &audioParams;
 }
@@ -289,6 +330,35 @@ StatusMessageHandler* AmbisonicEncoderAudioProcessor::getStatusMessageHandler()
 {
 	return &statusMessageHandler;
 }
+
+DawParameter* AmbisonicEncoderAudioProcessor::getDawParameter()
+{
+	return &dawParameter;
+}
+
+EncoderPresetHelper* AmbisonicEncoderAudioProcessor::getPresetHelper()
+{
+    return presetHelper.get();
+}
+
+DistanceEncodingPresetHelper* AmbisonicEncoderAudioProcessor::getDistanceEncodingPresetHelper()
+{
+	return distanceEncodingPresetHelper.get();
+}
+
+#if (!MULTI_ENCODER_MODE)
+void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
+{
+	dawParameter.updateTrackPropertiesWorking = true;
+	dawParameter.lastTrackProperties = properties;
+
+	if (sources.size() > 0)
+	{
+		sources.get(0)->setName(properties.name);
+		sources.get(0)->setColor(properties.colour);
+	}
+}
+#endif
 
 EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 {
@@ -335,6 +405,16 @@ void AmbisonicEncoderAudioProcessor::initializeOsc()
 	{
 		pOscSenderExt->stop();
 	}
+}
+
+void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &message)
+{
+    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    {
+        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        presetHelper->loadFromXmlFile(presetFile, &audioParams, &sources, &encoderSettings);
+        presetHelper->notifyPresetChanged();
+    }
 }
 
 //==============================================================================

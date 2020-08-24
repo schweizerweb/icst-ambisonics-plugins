@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -45,12 +45,13 @@ class RadarComponent  : public Component,
 public:
     //==============================================================================
     RadarComponent (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
-    ~RadarComponent();
+    ~RadarComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void setPointInfoVisible(bool visible);
     void timerCallback() override;
+    ZoomSettings* getZoomSettingsPointer() {return &zoomSettings;}
     //[/UserMethods]
 
     void paint (Graphics& g) override;
@@ -75,3 +76,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

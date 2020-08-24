@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.4
+  Created with Projucer version: 5.4.7
 
   ------------------------------------------------------------------------------
 
@@ -22,12 +22,12 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
-#include "PresetInfo.h"
 #include "DecoderSettings.h"
 #include "SpeakerSettingsDialog.h"
 #include "../../Common/RadarComponent.h"
 #include "../../Common/RadarOptions.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerDecoder.h"
+#include "../../Common/HelpDialogManager.h"
 //[/Headers]
 
 
@@ -48,7 +48,7 @@ class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
 public:
     //==============================================================================
     AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc);
-    ~AmbisonicsDecoderAudioProcessorEditor();
+    ~AmbisonicsDecoderAudioProcessorEditor() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -65,26 +65,31 @@ public:
     // Binary resources:
     static const char* settings_png;
     static const int settings_pngSize;
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& processor;
-	AmbiDataSet* pSpeakerSet;
-	AmbiDataSet* pMovingPoints;
+	AmbiSpeakerSet* pSpeakerSet;
+	AmbiSourceSet* pMovingPoints;
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
-	OwnedArray<PresetInfo> presets;
+	DecoderPresetHelper* pPresetHelper;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;
 	RadarOptions radarOptions;
 	SpeakerSettingsDialog* settingsWindow;
+	dsp::ProcessSpec* pFilterSpecification;
+    HelpDialogManager helpDialogManager;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<Label> labelVersion;
     std::unique_ptr<ImageButton> btnSettings;
+    std::unique_ptr<ImageButton> btnHelp;
 
 
     //==============================================================================

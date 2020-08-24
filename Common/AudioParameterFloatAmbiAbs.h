@@ -20,4 +20,5 @@ public:
 	}
 
 	virtual void setUnscaledValue(float value) = 0;
+    virtual void setEnabled(bool enabled) = 0;
 };

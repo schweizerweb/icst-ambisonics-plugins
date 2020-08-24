@@ -16,12 +16,13 @@
 class AudioParameterFloatAmbi : public AudioParameterFloatAmbiAbs
 {
 public:
-	enum ParamType { X, Y, Z };
+	enum ParamType { X, Y, Z, Gain, GX, GY, GZ };
 
 	AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
 		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterFloatAmbi();
 
+    void setEnabled(bool enabled) override;
 	float getValue() const override;
 	void setValue(float newValue) override;
 	float get() const noexcept { return getValue(); }
@@ -41,4 +42,6 @@ private:
 
 	AmbiDataSet* pAmbiPoints;
 	int ambiIndex;
+    
+    bool enabled;
 };

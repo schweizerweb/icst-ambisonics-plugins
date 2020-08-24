@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.1
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -23,6 +23,8 @@
 #include "JuceHeader.h"
 #include "AmbiDataSet.h"
 #include "PointSelection.h"
+#include "DawParameter.h"
+
 //[/Headers]
 
 
@@ -37,12 +39,13 @@
 */
 class PointInfoControl  : public Component,
                           public ChangeListener,
-                          public TextEditor::Listener
+                          public TextEditor::Listener,
+                          public juce::Button::Listener
 {
 public:
     //==============================================================================
     PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
-    ~PointInfoControl();
+    ~PointInfoControl() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -54,36 +57,47 @@ public:
 	void setFieldsEnabled(bool enable) const;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
+    // Binary resources:
+    static const char* group_png;
+    static const int group_pngSize;
+    static const char* ungroup_png;
+    static const int ungroup_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiDataSet* pEditablePoints;
 	PointSelection* pPointSelection;
+	RadarOptions* pRadarOptions;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TextEditor> textName;
-    std::unique_ptr<Label> labelName;
-    std::unique_ptr<Label> labelX;
-    std::unique_ptr<TextEditor> textX;
-    std::unique_ptr<Label> labelY;
-    std::unique_ptr<TextEditor> textY;
-    std::unique_ptr<Label> labelZ;
-    std::unique_ptr<TextEditor> textZ;
-    std::unique_ptr<Label> labelCartesian;
-    std::unique_ptr<Label> labelA;
-    std::unique_ptr<TextEditor> textA;
-    std::unique_ptr<Label> labelE;
-    std::unique_ptr<TextEditor> textE;
-    std::unique_ptr<Label> labelD;
-    std::unique_ptr<TextEditor> textD;
-    std::unique_ptr<Label> labelPolar;
-    std::unique_ptr<Label> labelCH;
-    std::unique_ptr<TextEditor> textCH;
+    std::unique_ptr<juce::TextEditor> textName;
+    std::unique_ptr<juce::Label> labelName;
+    std::unique_ptr<juce::Label> labelX;
+    std::unique_ptr<juce::TextEditor> textX;
+    std::unique_ptr<juce::Label> labelY;
+    std::unique_ptr<juce::TextEditor> textY;
+    std::unique_ptr<juce::Label> labelZ;
+    std::unique_ptr<juce::TextEditor> textZ;
+    std::unique_ptr<juce::Label> labelCartesian;
+    std::unique_ptr<juce::Label> labelA;
+    std::unique_ptr<juce::TextEditor> textA;
+    std::unique_ptr<juce::Label> labelE;
+    std::unique_ptr<juce::TextEditor> textE;
+    std::unique_ptr<juce::Label> labelD;
+    std::unique_ptr<juce::TextEditor> textD;
+    std::unique_ptr<juce::Label> labelPolar;
+    std::unique_ptr<juce::Label> labelCH;
+    std::unique_ptr<juce::TextEditor> textCH;
+    std::unique_ptr<juce::ImageButton> btnGroupBackup;
+    std::unique_ptr<juce::ImageButton> btnUngroupBackup;
+    std::unique_ptr<juce::TextButton> btnGroup;
+    std::unique_ptr<juce::TextButton> btnUngroup;
 
 
     //==============================================================================
@@ -92,3 +106,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

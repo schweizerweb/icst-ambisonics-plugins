@@ -29,3 +29,8 @@ int DelayHelper::getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPo
 		* SOUND_SPEED_S_PER_M
 		* samplingRate);
 }
+
+int DelayHelper::getDelaySamples(double distance, double samplingRate)
+{
+	return int(distance * SOUND_SPEED_S_PER_M * samplingRate);
+}

@@ -11,7 +11,8 @@
 #pragma once
 #include "JuceHeader.h"
 
-#define DEFALUT_RECEIVE_FLAG	true
+#define DEFAULT_EDIT_MODE_FLAG	true
+#define DEFALUT_RECEIVE_FLAG	false
 #define DEFAULT_RECEIVE_PORT	50000
 #define DEFAULT_RECEIVE_TIMEOUT	1000
 #define DEFAULT_UI_WIDTH		300

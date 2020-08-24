@@ -9,7 +9,7 @@
 */
 
 #include "AmbiOSCSenderExt.h"
-#include "../../Common/OSCHandler.h"
+#include "OSCHandlerEncoder.h"
 
 AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints): pPoints(ambiPoints)
 {
@@ -29,7 +29,7 @@ bool AmbiOSCSenderExt::start(String targetHost, int port)
 	bool ret = oscSender->connect(targetHost, port);
 	if (ret)
 	{
-		startTimerHz(5);
+		startTimerHz(20);
 	}
 	return ret;
 }

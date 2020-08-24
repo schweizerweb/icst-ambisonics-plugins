@@ -9,6 +9,9 @@
 */
 
 #pragma once
+#define DEFAULT_POINT_SCALER 1.0
+#define MIN_ZOOM_RADIUS 0.001f
+
 #include "Point3D.h"
 
 class ZoomSettings : public ChangeBroadcaster
@@ -16,16 +19,22 @@ class ZoomSettings : public ChangeBroadcaster
 public:
 	ZoomSettings();
 
-	Rectangle<float> getVisibleArea(bool isZY);
+	Rectangle<float> getVisibleArea(bool isXZ, bool isFull);
 	Point3D<float> getInitialCenterPoint() const;
 	Point3D<float> getCurrentCenterPoint() const;
 	void setCurrentCenterPointXY(float x, float y);
-	void setCurrentCenterPointYZ(float y, float z);
+	void setCurrentCenterPointXZ(float x, float z);
 	
 	float getInitialRadius() const;
 	float getCurrentRadius() const;
 	void setCurrentRadius(float newRadius);
 	int getNumberOfRings() const;
+    float getRingResolution() const;
+    
+    void setPointScaler(double newScaler);
+    double getPointScaler();
+    
+    void Reset();
 
 private:
 	Point3D<float> initialCenterPoint;
@@ -33,4 +42,6 @@ private:
 	
 	float initialRadius;
 	float currentRadius;
+    
+    double pointScaler;
 };

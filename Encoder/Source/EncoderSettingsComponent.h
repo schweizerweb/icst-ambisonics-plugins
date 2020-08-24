@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.3
+  Created with Projucer version: 6.0.1
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -21,7 +21,9 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
-#include "EncoderSettings.h"
+#include "OSCSettingsComponent.h"
+#include "RadarSettingsComponent.h"
+#include "EncodingSettingsComponent.h"
 //[/Headers]
 
 
@@ -35,58 +37,29 @@
                                                                     //[/Comments]
 */
 class EncoderSettingsComponent  : public Component,
-                                  public TextEditor::Listener,
-                                  public Button::Listener
+                                  public ActionBroadcaster
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (EncoderSettings* pSettings);
-    ~EncoderSettingsComponent();
+    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper);
+    ~EncoderSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	static void showAsDialog(EncoderSettings* encoder_settings);
-	void checkForNumbers(TextEditor* pEditor, int* pParameter) const;
-	void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
-	void textEditorTextChanged(TextEditor&) override;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	EncoderSettings* pEncoderSettings;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupOscReceive;
-    std::unique_ptr<ToggleButton> toggleReceiveOsc;
-    std::unique_ptr<TextEditor> textOscReceivePort;
-    std::unique_ptr<Label> labelOscPort;
-    std::unique_ptr<GroupComponent> groupOscSend;
-    std::unique_ptr<ToggleButton> toggleSendOsc;
-    std::unique_ptr<TextEditor> textOscSendIp;
-    std::unique_ptr<Label> labelOscSendIp;
-    std::unique_ptr<TextEditor> textOscSendPort;
-    std::unique_ptr<Label> labelOscSendPort;
-    std::unique_ptr<TextEditor> textOscSendInterval;
-    std::unique_ptr<Label> labelOscSendInterval;
-    std::unique_ptr<GroupComponent> groupDistanceEncoding;
-    std::unique_ptr<ToggleButton> toggleDistanceEncoding;
-    std::unique_ptr<TextEditor> textUnitCircleRadius;
-    std::unique_ptr<Label> labelUnitCircleRadius;
-    std::unique_ptr<GroupComponent> groupOrientation;
-    std::unique_ptr<ToggleButton> toggleDirectionFlip;
-    std::unique_ptr<GroupComponent> groupOscSendExt;
-    std::unique_ptr<ToggleButton> toggleSendOscExt;
-    std::unique_ptr<TextEditor> textOscSendIpExt;
-    std::unique_ptr<Label> labelOscSendIpExt;
-    std::unique_ptr<TextEditor> textOscSendPortExt;
-    std::unique_ptr<Label> labelOscSendPortExt;
+    std::unique_ptr<juce::TabbedComponent> tabbedComponent;
+    std::unique_ptr<juce::Label> labelDevelopmentVersion;
 
 
     //==============================================================================

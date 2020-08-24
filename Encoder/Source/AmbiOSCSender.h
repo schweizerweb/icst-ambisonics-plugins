@@ -10,12 +10,12 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "../../Common/AmbiDataSet.h"
+#include "../../Common/AmbiSourceSet.h"
 
 class AmbiOSCSender : public Timer
 {
 public:
-	AmbiOSCSender(AmbiDataSet* ambiPoints);
+	AmbiOSCSender(AmbiSourceSet* ambiPoints);
 	~AmbiOSCSender();
 
 	bool start(String targetHost, int port, int intervalMs);
@@ -25,7 +25,7 @@ private:
 	void timerCallback() override;
 
 private:
-	AmbiDataSet* pPoints;
+	AmbiSourceSet* pPoints;
 	OSCSender* oscSender;
 	int sendIntervalMs;
 };

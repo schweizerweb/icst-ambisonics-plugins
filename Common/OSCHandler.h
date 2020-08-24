@@ -12,41 +12,32 @@
 #define OSCHANDLER_H_INCLUDED
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiPoint.h"
 #include "StatusMessageHandler.h"
-#include "AmbiDataSet.h"
+#include "AmbiSourceSet.h"
 
-#define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED "/icst/ambi/source/aed"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ "/icst/ambi/source/xyz"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/channelsource/aed"
-#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/channelsource/xyz"
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
 {
 public:
-	OSCHandler(AmbiDataSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
+	OSCHandler(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
 	bool start(int portNb);
 	void stop();
 
-private:
+protected:
+    virtual bool handleSpecific(const OSCMessage& message) = 0;
 	static double GetIntOrFloat(const OSCArgument* pOscArgument);
-	void handleMusescoreSSMNStyle(const OSCMessage& message) const;
-	void handleOwnInternalStyle(const OSCMessage& message) const;
-	void handleOwnExternStyleAed(const OSCMessage& message) const;
-	void handleOwnExternStyleXyz(const OSCMessage& message) const;
-	void handleOwnExternStyleIndexAed(const OSCMessage& message) const;
-	void handleOwnExternStyleIndexXyz(const OSCMessage& message) const;
 	void oscMessageReceived(const OSCMessage& message) override;
-	void reportError(String message) const;
-	void reportSuccess() const;
-	bool checkAed(double a, double e, double d) const;
-	bool checkXyz(double x, double y, double z) const;
-
-	AmbiDataSet* pAmbiPoints;
+	void reportError(String message, const OSCMessage* pMsg) const;
+	void reportSuccess(const OSCMessage* pMsg) const;
+	bool checkAed(double a, double e, double d, String* errorString) const;
+	bool checkXyz(double x, double y, double z, String* errorString) const;
+    bool checkGain(double gain, String* errorString) const;
+    String oscMessageToString(const OSCMessage* pMsg) const;
+    
+	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };
 

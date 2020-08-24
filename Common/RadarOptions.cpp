@@ -19,13 +19,19 @@ RadarOptions::RadarOptions()
 	editablePointsAsSquare = false;
 	showDisplayOnlyPoints = true;
 	showEditablePoints = true;
+	dawParameter = nullptr;
+	setTrackColorAccordingToName = true;
 }
 
-AudioParameterSet RadarOptions::getAudioParamForIndex(int index) const
+AudioParameterSet RadarOptions::getAudioParamForIndex(int index, bool isGroup) const
 {
-	if(audioParams != nullptr && audioParams->size()>index)
+    if(isGroup && audioParams != nullptr && audioParams->groupParams.size()>index)
+    {
+        return audioParams->groupParams.getUnchecked(index);
+    }
+	if(!isGroup && audioParams != nullptr && audioParams->sourceParams.size()>index)
 	{
-		return audioParams->getUnchecked(index);
+		return audioParams->sourceParams.getUnchecked(index);
 	}
 
 	return AudioParameterSet();

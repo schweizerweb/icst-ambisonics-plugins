@@ -1,0 +1,235 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<OSCSyntax>
+<PointManipulation name="Point Manipulation">
+<SetPositionAED name="Set Source Position AED">
+<Syntax desc="/icst/ambi/source/aed [ChannelName] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/source/aed 'S1' 45 10 0.8" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+</Parameter>
+</SetPositionAED>
+<SetPositionXYZ name="Set Source Position XYZ">
+<Syntax desc="/icst/ambi/source/xyz [ChannelName] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/source/xyz 'S2' 0.2 0.2 0.0" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+</Parameter>
+</SetPositionXYZ>
+<SetGain name="Set Source Gain">
+<Syntax desc="/icst/ambi/source/gain [ChannelName] [Gain]" />
+<Example desc="/icst/ambi/source/gain 'S1' -2.5" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<Gain desc="Gain in dB as Int/Float" />
+</Parameter>
+</SetGain>
+<SetPositionIndexAED name="Set Source (Index) Position AED">
+<Syntax desc="/icst/ambi/sourceindex/aed [ChannelIndex] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/sourceindex/aed 1 45 10 0.8" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+</Parameter>
+</SetPositionIndexAED>
+<SetPositionIndexXYZ name="Set Source (Index) Position XYZ">
+<Syntax desc="/icst/ambi/sourceindex/xyz [ChannelIndex] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/sourceindex/xyz 2 0.2 0.2 0.0" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+</Parameter>
+</SetPositionIndexXYZ>
+<SetGainIndex name="Set Source (Index) Gain">
+<Syntax desc="/icst/ambi/sourceindex/gain [ChannelIndex] [Gain]" />
+<Example desc="/icst/ambi/sourceindex/gain 2 1.5" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<Gain desc="Gain in dB as Int/Float" />
+</Parameter>
+</SetGainIndex>
+</PointManipulation>
+
+<GroupManipulation name="Group Manipulation">
+<SetGroupPoisitonAED name="Set Group Position AED">
+<Syntax desc="/icst/ambi/group/aed [GroupName] [Azimuth] [Elevation] [Distance] [Mode]" />
+<Example desc="/icst/ambi/group/aed 'G1' 135 0 0.1 1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float (limits according to Scaler)" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</SetGroupPositionAED>
+<SetGroupPoisitonXYZ name="Set Group Position XYZ">
+<Syntax desc="/icst/ambi/group/xyz [GroupName] [X] [Y] [Z] [Mode]" />
+<Example desc="/icst/ambi/group/xyz 'G2' 0.1 0.1 0 0" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="X coordinate as Int/Float (limits according to scaler)" />
+<Y desc="Y coordinate as Int/Float (limits according to scaler)" />
+<Z desc="Z coordinate as Int/Float (limits according to scaler)" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</SetGroupPositionXYZ>
+<StretchGroup name="Stretch Group">
+<Syntax desc="/icst/ambi/group/stretch [GroupName] [Distance]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/stretch 'G3' -0.1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Distance desc="Distance to stretch/shrink Distance of attached Sources to Group Point as Int/Float" /> 
+</Parameter>
+</StretchGroup>
+<Rotate name="Rotate around Group Point">
+<Syntax desc="/icst/ambi/group/rotate [GroupName] [X] [Y] [Z]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/rotate 'G4' 0 0.01 0.1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="Rotation angle around the X-Axis in Grad as Int/Float" />
+<Y desc="Rotation angle around the Y-Axis in Grad as Int/Float" />
+<Z desc="Rotation angle around the Z-Axis in Grad as Int/Float" />
+</Parameter>
+</Rotate>
+<RotateAroundOrigin name="Rotate around Origin (0,0,0)">
+<Syntax desc="/icst/ambi/group/rotateorigin [GroupName] [X] [Y] [Z] [Mode]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/rotateorigin 'G5' 0 0 0.05 1" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="Rotation angle around the X-Axis in Grad as Int/Float" />
+<Y desc="Rotation angle around the Y-Axis in Grad as Int/Float" />
+<Z desc="Rotation angle around the Z-Axis in Grad as Int/Float" />
+<Mode desc="1 to move attached sources, 0 to move group point only" />
+</Parameter>
+</RotateAroundOrigin>
+</GroupManipulation>
+
+<DistanceEncoding name="Distance Encoding">
+    <Standard name="Standard">
+        <Syntax desc="/icst/ambi/distanceencoding/standard [Radius]">The standard distance encoding mode.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/standard 0.2" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        </Parameter>
+    </Standard>
+    <Advanced name="Advanced">
+        <Syntax desc="/icst/ambi/distanceencoding/advanced [Radius] [Factor] [Exponent]">A modified version of the Standard formula with userdefinable weightings of factor and exponent.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/advanced 0.1 2.6 1.1" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Factor desc="Advanced Factor as Int/Float" />
+        <Exponent desc="Advanced Exponent as Int/Float" />
+        </Parameter>
+    </Advanced>
+    <Exponential name="Exponential">
+        <Syntax desc="/icst/ambi/distanceencoding/exponential [Radius] [Unit] [Curve]">Exponential distance attenuation.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/exponential 0.1 1.2 0.2" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Unit desc="dB Unit as Int/Float" />
+        <Curve desc="Center Curve as Int/Float" />
+        </Parameter>
+    </Exponential>
+    <InverseProportional name="Inverse Proportional">
+        <Syntax desc="/icst/ambi/distanceencoding/inverseproportional [Radius] [Unit] [Curve] [Attenuation]">Inverse proportional distance attenuation.</Syntax>
+        <Example desc="/icst/ambi/distanceencoding/inverseproportional 0.1 1.2 0.2 1.3" />
+        <Parameter>
+        <Radius desc="Unit Circle Radius as Int/Float" />
+        <Unit desc="dB Unit as Int/Float" />
+        <Curve desc="Center Curve as Int/Float" />
+        <Attenuation desc="Distance Attenuation as Int/Float" />
+        </Parameter>
+    </InverseProportional>
+</DistanceEncoding>
+
+<DistanceEncodingAdvanced name="Distance Encoding Advanced">
+<DistanceEncodingMode name="Mode">
+<Syntax desc="/icst/ambi/distanceencoding/mode [Mode]" />
+<Example desc="/icst/ambi/distanceencoding/mode 1" />
+<Parameter>
+<Mode desc="Encoding mode as Int">
+    <Option0 name = "0" desc = "No Distance Encoding"/>
+    <Option1 name = "1" desc = "Standard"/>
+    <Option2 name = "2" desc = "Advanced"/>
+    <Option3 name = "3" desc = "Exponential"/>
+    <Option4 name = "4" desc = "Inverse Proportional" />
+</Mode>
+</Parameter>
+</DistanceEncodingMode>
+<UnitCircleRadius name="Unit Circle Radius">
+<Syntax desc="/icst/ambi/distanceencoding/unitcircle [Radius]">Applies to all encoding modes.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/unitcircle 0.2" />
+<Parameter>
+<Radius desc="Unit Circle Radius as Int/Float" />
+</Parameter>
+</UnitCircleRadius>
+<AdvancedFactor name="Advanced Factor">
+<Syntax desc="/icst/ambi/distanceencoding/advancedfactor [Factor]">Applies to encoding mode Advanced (2) only.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/advancedfactor 2.8" />
+<Parameter>
+<Factor desc="Advanced Factor as Int/Float" />
+</Parameter>
+</AdvancedFactor>
+<AdvancedExponent name="Advanced Exponent">
+<Syntax desc="/icst/ambi/distanceencoding/advancedexponent [Exponent]">Applies to encoding mode Advanced (2) only.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/advancedexponent 1.1" />
+<Parameter>
+<Exponent desc="Advanced Exponent as Int/Float" />
+</Parameter>
+</AdvancedExponent>
+<DBUnit name="dB Unit">
+<Syntax desc="/icst/ambi/distanceencoding/dbUnit [Unit]">Applies to encoding modes Exponential (3) and Inverse Proportional (4) only.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/dbunit 1.2" />
+<Parameter>
+<Unit desc="dB Unit as Int/Float" />
+</Parameter>
+</DBUnit>
+<CenterCurve name="Center Curve">
+<Syntax desc="/icst/ambi/distanceencoding/centercurve [Curve]">Applies to encoding modes Exponential (3) and Inverse Proportional (4) only.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/centercurve 0.2" />
+<Parameter>
+<Curve desc="Center Curve as Int/Float" />
+</Parameter>
+</CenterCurve>
+<DistanceAttenuation name="Distance Attenuation">
+<Syntax desc="/icst/ambi/distanceencoding/distanceattenuation [Attenuation]">Applies to encoding mode Inverse Proportional (4) only.</Syntax>
+<Example desc="/icst/ambi/distanceencoding/distanceattenuation 1.2" />
+<Parameter>
+<Attenuation desc="Distance Attenuation as Int/Float" />
+</Parameter>
+</DistanceAttenuation>
+</DistanceEncodingAdvanced>
+
+<PointInfoOutput name="Point Info Output">
+<PositionAED name="Source Position AED">
+<Syntax desc="/icst/ambi/source/aed [ChannelName] [Azimuth] [Elevation] [Distance]" />
+<Example desc="/icst/ambi/source/aed 'S1' 45 10 0.8" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<Azimuth desc="Azimuth in Degrees as Int/Float" />
+<Elevation desc="Elevation in Degrees as Int/Float" />
+<Distance desc="Relative Distance as Int/Float" />
+</Parameter>
+</PositionAED>
+<PositionXYZ name="Source Position XYZ">
+<Syntax desc="/icst/ambi/source/xyz [ChannelName] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/source/xyz 'S2' 0.2 0.2 0.0" />
+<Parameter>
+<ChannelName desc="Channel Name as String" />
+<X desc="X coordinate as Int/Float" />
+<Y desc="Y coordinate as Int/Float" />
+<Z desc="Z coordinate as Int/Float" />
+</Parameter>
+</PositionXYZ>
+</PointInfoOutput>
+
+</OSCSyntax>

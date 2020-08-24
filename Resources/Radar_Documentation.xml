@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Documentation>
+<Radar>
+<Move>Right Mouse Button Drag-Drop</Move>
+<ZoomIn name="Zoom In">Right Mouse Button Click / MouseWheel</ZoomIn>
+<ZoomOut name="Zoom Out">Shift + Right Mouse Button Click / MouseWheel</ZoomOut>
+<ResetZoom name="Reset Zoom">Home-Button (OSX: Fn + Left Arrow)</ResetZoom>
+</Radar>
+<Point>
+<SelectPoint name="Select Point">Click Point</SelectPoint>
+<SelectMultiplePoints name = "Select Multiple Points">Shift + Click Multiple Points or Select rectangular Region using Drag-Drop</SelectMultiplePoints>
+<MovePoint name="Move Point(s)">Drag-Drop Selected Point(s)</MovePoint>
+<AddNew name="Add New">Doubleclick on desired Position (only available if maximum not yet reached)</AddNew>
+</Point>
+<Group>
+<GroupPoints name="Group">Select multiple points -> Click Group-Symbol below Radar</GroupPoints>
+<SelectGroup name="Select Group">Click Group Point</SelectGroup>
+<UngroupPoints name="Ungroup">Select Group Point -> Click Ungroup-Symbol below Radar</UngroupPoints>
+<SelectMultipleGroups name = "Select Multiple Groups">Shift + Click Multiple Group Points</SelectMultipleGroups>
+<MoveGroup name="Move Group(s)">Drag-Drop Selected Group Point(s)</MoveGroup>
+<MoveGroupPointOnly name="Move Group Point(s) only">Shift + Drag-Drop Selected Group Point(s)</MoveGroupPointOnly>
+<StretchGroupPoints name="Stretch Group">Alt -> Stretchsymbol -> Mouse Up/down to increase/decrease stretch</StretchGroupPoints>
+<RotateGroupPoints name="Rotate Point(s) around Group Point(s)">Alt -> Drag-Drop Rotate-Around-Group-Symbol</RotateGroupPoints>
+<RotateGroupAroundOrigin name="Rotate Group(s) around Origin">Alt -> Drag-Drop Rotate-Around-Origin-Symbol</RotateGroupAroundOrigin>
+</Group>
+</Documentation>

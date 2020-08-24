@@ -18,51 +18,10 @@ AmbiDataSet::~AmbiDataSet()
 {
 }
 
-int AmbiDataSet::size() const
-{
-	return elements.size();
-}
-
-void AmbiDataSet::clear()
-{
-	const ScopedLock lock(cs);
-	while(elements.size() > 0)
-	{
-		remove(0);
-	}
-}
-
-void AmbiDataSet::add(AmbiPoint* pt)
-{
-	const ScopedLock lock(cs);
-	elements.add(pt);
-}
-
-void AmbiDataSet::remove(int index)
-{
-	const ScopedLock lock(cs);
-	AmbiPoint* removedPt = elements.removeAndReturn(index);
-
-	if (removedPt != nullptr)
-		removedElements.add(removedPt);
-}
-
-void AmbiDataSet::swap(int a, int b)
-{
-	if (elements.size() > a && elements.size() > b)
-		elements.swap(a, b);
-}
-
-
-AmbiPoint* AmbiDataSet::get(const int index) const
-{
-	return elements[index];
-}
-
 AmbiPoint* AmbiDataSet::get(int index, int64 referenceTime, int timeoutMs)
 {
 	const ScopedLock lock(cs);
-	AmbiPoint* pt = elements[index];
+	AmbiPoint* pt = get(index);
 	if (pt != nullptr)
 	{
 		if (pt->checkAlive(referenceTime, timeoutMs))
@@ -76,7 +35,7 @@ AmbiPoint* AmbiDataSet::get(int index, int64 referenceTime, int timeoutMs)
 
 bool AmbiDataSet::setChannelXYZ(int channel, double x, double y, double z) const
 {
-	AmbiPoint* ambiPt = elements[channel];
+	AmbiPoint* ambiPt = get(channel);
 	if(ambiPt != nullptr)
 	{
 		ambiPt->getPoint()->setXYZ(x, y, z);
@@ -88,64 +47,23 @@ bool AmbiDataSet::setChannelXYZ(int channel, double x, double y, double z) const
 
 bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 {
-	AmbiPoint* ambiPt = elements[channel];
+	AmbiPoint* ambiPt = get(channel);
 	if(ambiPt != nullptr)
 	{
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
+        ambiPt->getPoint()->setAed(a, e, d);
 		return true;
 	}
 
 	return false;
 }
 
-void AmbiDataSet::setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color)
-{
-	AmbiPoint* matchingPt = nullptr;
-
-	for (AmbiPoint* pt : elements)
-	{
-		if (pt != nullptr && pt->getId() == id)
-		{
-			matchingPt = pt;
-			break;
-		}
-	}
-
-	if (matchingPt == nullptr)
-	{
-		// try to reactivate deleted point
-		for (AmbiPoint* pt : removedElements)
-		{
-			if (pt != nullptr && pt->getId() == id)
-			{
-				matchingPt = pt;
-				break;
-			}
-		}
-		if(matchingPt != nullptr)
-		{
-			elements.add(matchingPt);
-			removedElements.removeObject(matchingPt, false);
-		}
-		else
-			matchingPt = elements.add(new AmbiPoint(id, Point3D<double>(0.0, 0.0, 0.0), name, color));
-	}
-
-	matchingPt->setName(name);
-	matchingPt->getPoint()->setXYZ(x, y, z);
-	matchingPt->setRms(rms);
-	matchingPt->setColor(color);
-	matchingPt->setAlive(Time::currentTimeMillis());
-}
-
-bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, double d) const
+AmbiPoint* AmbiDataSet::getPointByName(String channelName) const
 {
 	AmbiPoint* ambiPt = nullptr;
 
-	for (AmbiPoint* pt : elements)
+	for (int i = 0; i < size(); i++)
 	{
+		AmbiPoint* pt = get(i);
 		if (pt != nullptr && pt->getName() == channelName)
 		{
 			ambiPt = pt;
@@ -153,11 +71,16 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 		}
 	}
 
+	return ambiPt;
+}
+
+bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, double d) const
+{
+	AmbiPoint* ambiPt = getPointByName(channelName);
+
 	if (ambiPt != nullptr)
 	{
-		ambiPt->getPoint()->setDistance(d);
-		ambiPt->getPoint()->setAzimuth(a);
-		ambiPt->getPoint()->setElevation(e);
+        ambiPt->getPoint()->setAed(a, e, d);
 		return true;
 	}
 
@@ -166,16 +89,7 @@ bool AmbiDataSet::setChannelNameAED(String channelName, double a, double e, doub
 
 bool AmbiDataSet::setChannelNameXYZ(String channelName, double x, double y, double z) const
 {
-	AmbiPoint* ambiPt = nullptr;
-
-	for (AmbiPoint* pt : elements)
-	{
-		if (pt != nullptr && pt->getName() == channelName)
-		{
-			ambiPt = pt;
-			break;
-		}
-	}
+	AmbiPoint* ambiPt = getPointByName(channelName);
 
 	if (ambiPt != nullptr)
 	{
@@ -186,9 +100,22 @@ bool AmbiDataSet::setChannelNameXYZ(String channelName, double x, double y, doub
 	return false;
 }
 
+bool AmbiDataSet::setChannelNameGain(String channelName, double gain) const
+{
+    AmbiPoint* ambiPt = getPointByName(channelName);
+
+    if (ambiPt != nullptr)
+    {
+        ambiPt->setGain(gain, true);
+        return true;
+    }
+
+    return false;
+}
+
 void AmbiDataSet::setChannelXY(int channel, double x, double y) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 	
 	if(pt != nullptr)
 		pt->getPoint()->setXY(x, y);
@@ -196,7 +123,7 @@ void AmbiDataSet::setChannelXY(int channel, double x, double y) const
 
 void AmbiDataSet::setChannelYZ(int channel, double y, double z) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setYZ(y, z);
@@ -204,7 +131,7 @@ void AmbiDataSet::setChannelYZ(int channel, double y, double z) const
 
 void AmbiDataSet::setChannelName(int channel, String name) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->setName(name);
@@ -212,15 +139,36 @@ void AmbiDataSet::setChannelName(int channel, String name) const
 
 void AmbiDataSet::setChannelColor(int channel, Colour colour) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->setColor(colour);
 }
 
+void AmbiDataSet::setEnabled(int channel, bool enable) const
+{
+    AmbiPoint* pt = get(channel);
+
+    if (pt != nullptr)
+    {
+        pt->setEnabled(enable);
+        if(!enable)
+        {
+            for(AmbiGroup* g : groups)
+            {
+                for(int i = 0; i < g->groupPoints.size(); i++)
+                {
+                    if(g->groupPoints[i] == pt)
+                        g->groupPoints.remove(i);
+                }
+            }
+        }
+    }
+}
+
 void AmbiDataSet::setX(int channel, double x, bool notify) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setX(x, notify);
@@ -228,7 +176,7 @@ void AmbiDataSet::setX(int channel, double x, bool notify) const
 
 void AmbiDataSet::setY(int channel, double y, bool notify) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setY(y, notify);
@@ -236,15 +184,39 @@ void AmbiDataSet::setY(int channel, double y, bool notify) const
 
 void AmbiDataSet::setZ(int channel, double z, bool notify) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setZ(z, notify);
 }
 
+void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setX(x, notify);
+}
+
+void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setY(y, notify);
+}
+
+void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
+{
+    AmbiPoint* pt = getGroup(channel);
+
+    if (pt != nullptr)
+        pt->getPoint()->setZ(z, notify);
+}
+
 void AmbiDataSet::setAzimuth(int channel, double azimuth) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setAzimuth(azimuth);
@@ -252,7 +224,7 @@ void AmbiDataSet::setAzimuth(int channel, double azimuth) const
 
 void AmbiDataSet::setElevation(int channel, double elevation) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setElevation(elevation);
@@ -260,48 +232,223 @@ void AmbiDataSet::setElevation(int channel, double elevation) const
 
 void AmbiDataSet::setDistance(int channel, double distance) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
 		pt->getPoint()->setDistance(distance);
 }
 
-void AmbiDataSet::setGain(int channel, double gain) const
+bool AmbiDataSet::setGain(int channel, double gain, bool notify) const
 {
-	AmbiPoint* pt = elements[channel];
+	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
-		pt->setGain(gain);
+    {
+        pt->setGain(gain, notify);
+        return true;
+    }
+    
+    return false;
 }
 
-double AmbiDataSet::getMaxNormalizedDistance() const
+String AmbiDataSet::getNewUniqueName() const
 {
-	double maxDist = 0.0;
-	for (AmbiPoint* pt : elements)
+	String nameBase = String(size() + 1);
+	String name = nameBase;
+	int iTrial = 1;
+
+	while (nameExists(name))
 	{
-		if(pt != nullptr)
-			maxDist = jmax(maxDist, pt->getPoint()->getDistance());
+		name = nameBase + "-" + String(iTrial++);
 	}
 
-	return maxDist;
+	return name;
 }
 
-void AmbiDataSet::cleanup(int keepNbOfElements)
+int AmbiDataSet::groupCount() const
+{
+	return groups.size();
+}
+
+AmbiGroup* AmbiDataSet::getGroup(int index) const
+{
+	return groups[index];
+}
+
+void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
 {
 	const ScopedLock lock(cs);
 
-	while (removedElements.size() > keepNbOfElements)
-	{
-		AmbiPoint* pt = removedElements.removeAndReturn(0);
-		if (pt != nullptr)
-			delete pt;
-	}
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->moveXYZ(dx, dy, dz, moveSubElements);
 }
 
-void AmbiDataSet::setRms(int channel, float rms, bool onlyIfGreater) const
+void AmbiDataSet::removeGroup(int groupIndex)
 {
-	AmbiPoint* pt = elements[channel];
-
-	if (pt != nullptr)
-		pt->setRms(rms, onlyIfGreater);
+	groups.remove(groupIndex);
 }
+
+void AmbiDataSet::setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setXYZ(newX, newY, newZ, moveSubElements);
+}
+
+void AmbiDataSet::setGroupAed(int groupIndex, double newA, double newE, double newD, bool moveSubElements) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setAED(newA, newE, newD, moveSubElements);
+}
+
+void AmbiDataSet::stretchGroup(int groupIndex, double stretchValue)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->stretch(stretchValue);
+}
+
+bool AmbiDataSet::stretchGroup(String groupName, double stretchValue)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            stretchGroup(i, stretchValue);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
+void AmbiDataSet::rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->rotate(angleAroundXAxis, angleAroundYAxis, angleAroundZAxis);
+}
+
+bool AmbiDataSet::rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            rotateGroup(i, angleAroundXAxis, angleAroundYAxis, angleAroundZAxis);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
+void AmbiDataSet::rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->rotateAroundOrigin(angleAroundXAxis, angleAroundYAxis, angleAroundZAxis, moveSubElements);
+}
+
+bool AmbiDataSet::rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements)
+{
+    bool found = false;
+    for (int i = 0; i < groups.size(); i++)
+    {
+        if (getGroup(i)->getName() == groupName)
+        {
+            rotateGroupAroundOrigin(i, angleAroundXAxis, angleAroundYAxis, angleAroundZAxis, moveSubElements);
+            found = true;
+        }
+    }
+
+    return found;
+}
+
+void AmbiDataSet::setGroupName(int groupIndex, String name) const
+{
+	const ScopedLock lock(cs);
+
+	AmbiGroup* group = groups[groupIndex];
+	if (group != nullptr)
+		group->setName(name);
+}
+
+bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bool moveSubElements)
+{
+	bool found = false;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		if (getGroup(i)->getName() == groupName)
+		{
+			setGroupAed(i, a, e, d, moveSubElements);
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
+{
+	AmbiGroup* group = new AmbiGroup(id, point, name, color);
+	groups.add(group);
+
+	return group;
+}
+
+bool AmbiDataSet::setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const
+{
+	bool found = false;
+	for (int i = 0; i < groups.size(); i++)
+	{
+		if (getGroup(i)->getName() == groupName)
+		{
+			setGroupXyz(i, x, y, z, moveSubElements);
+			found = true;
+		}
+	}
+
+	return found;
+}
+
+bool AmbiDataSet::nameExists(String name) const
+{
+	for (int i = 0; i < size(); i++)
+	{
+		if (get(i)->getName() == name)
+			return true;
+	}
+
+	return false;
+}
+
+void AmbiDataSet::swapGroup(int a, int b)
+{
+    if (groups.size() > a && groups.size() > b)
+    {
+        // keep audio parameter for index
+        Point3D<double>* pointA = groups.getUnchecked(a)->getPoint();
+        Point3D<double>* pointB = groups.getUnchecked(b)->getPoint();
+        
+        AudioParameterSet setA = pointA->getAudioParameterSet();
+        pointA->setAudioParameterSet(pointB->getAudioParameterSet());
+        pointB->setAudioParameterSet(setA);
+        groups.swap(a, b);
+    }
+}
+

@@ -13,16 +13,18 @@
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
-#define XML_TAG_ORIENTATION "Orientation"
+#define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
+#define XML_TAG_DISPLAY "Display"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_IP "Ip"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
-#define XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
-#define XML_ATTRIBUTE_DIRECTION_FLIP "DirectionFlip"
+#define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 
 EncoderSettings::EncoderSettings():
-	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
+    masterGain(nullptr),
+    oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFALUT_RECEIVE_PORT),
 	oscSendFlag(DEFALUT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
@@ -31,9 +33,9 @@ EncoderSettings::EncoderSettings():
 	oscSendExtFlag(DEFALUT_SEND_EXT_FLAG), 
 	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
 	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
-	distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
-	unitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
-	directionFlip(DEFAULT_DIRECTION_FLIP)
+    distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
+    dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
+    localMasterGain(DEFAULT_MASTER_GAIN)
 {
 }
 
@@ -63,15 +65,8 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	oscSendExt->setAttribute(XML_ATTRIBUTE_IP, oscSendExtTargetHost);
 	element->addChildElement(oscSendExt);
 
-	XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
-	distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-	distanceEncoding->setAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, unitCircleRadius);
-	element->addChildElement(distanceEncoding);
-
-	XmlElement* orientation = new XmlElement(XML_TAG_ORIENTATION);
-	orientation->setAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, directionFlip);
-	element->addChildElement(orientation);
-
+    writeToPresetXmlElement(element);
+	
 	return element;
 }
 
@@ -98,16 +93,71 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		oscSendExtTargetHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_EXT_HOST);
 	}
 
-	XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
-	if(distanceEncoding != nullptr)
-	{
-		distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-		unitCircleRadius = float(distanceEncoding->getDoubleAttribute(XML_ATTRIBUTE_UNIT_CIRCLE_RADIUS, DEFAULT_UNIT_CIRCLE_SIZE));
-	}
+    loadFromPresetXml(element);
+}
 
-	XmlElement* orientation = element->getChildByName(XML_TAG_ORIENTATION);
-	if(orientation != nullptr)
-	{
-		directionFlip = orientation->getBoolAttribute(XML_ATTRIBUTE_DIRECTION_FLIP, DEFAULT_DIRECTION_FLIP);
-	}
+void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
+{
+    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
+    distanceEncodingParams.writeToXmlElement(distanceEncoding);
+    xmlElement->addChildElement(distanceEncoding);
+
+    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
+    xmlElement->addChildElement(dopplerEncoding);
+}
+
+void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
+{
+    XmlElement* distanceEncoding = xmlElement->getChildByName(XML_TAG_DISTANCE_ENCODING);
+    if (distanceEncoding != nullptr)
+    {
+        distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
+        distanceEncodingParams.loadFromXmlElement(distanceEncoding);     
+    }
+
+    XmlElement* dopplerEncoding = xmlElement->getChildByName(XML_TAG_DOPPLER_ENCODING);
+    if (dopplerEncoding != nullptr)
+    {
+        dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
+        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
+    }
+}
+
+float EncoderSettings::getMasterGain() const
+{
+    return masterGain != nullptr ? masterGain->get() : localMasterGain;
+}
+
+bool EncoderSettings::setMasterGain(float gainDb)
+{
+    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
+        return false;
+
+    if (masterGain != nullptr)
+        *masterGain = gainDb;
+    else
+        localMasterGain = gainDb;
+
+    return true;
+}
+
+void EncoderSettings::initialize(AudioProcessor* pProcessor)
+{
+    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
+
+    pProcessor->addParameter(masterGain);
+
+    masterGain->addListener(this);
+}
+
+void EncoderSettings::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
+{
+    sendChangeMessage();
+}
+
+void EncoderSettings::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
+{
 }
