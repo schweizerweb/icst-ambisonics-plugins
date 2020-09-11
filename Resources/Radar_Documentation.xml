@@ -10,7 +10,6 @@
 <SelectPoint name="Select Point">Click Point</SelectPoint>
 <SelectMultiplePoints name = "Select Multiple Points">Shift + Click Multiple Points or Select rectangular Region using Drag-Drop</SelectMultiplePoints>
 <MovePoint name="Move Point(s)">Drag-Drop Selected Point(s)</MovePoint>
-<AddNew name="Add New">Doubleclick on desired Position (only available if maximum not yet reached)</AddNew>
 </Point>
 <Group>
 <GroupPoints name="Group">Select multiple points -> Click Group-Symbol below Radar</GroupPoints>
