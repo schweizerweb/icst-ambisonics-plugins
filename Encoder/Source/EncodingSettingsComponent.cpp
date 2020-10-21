@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.1
+  Created with Projucer version: 6.0.4
 
   ------------------------------------------------------------------------------
 
@@ -132,17 +132,6 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     sliderMasterGain->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderMasterGain->addListener (this);
 
-    labelCaution.reset (new juce::Label ("labelCaution",
-                                         TRANS("caution!")));
-    addAndMakeVisible (labelCaution.get());
-    labelCaution->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelCaution->setJustificationType (juce::Justification::centred);
-    labelCaution->setEditable (false, false, false);
-    labelCaution->setColour (juce::Label::backgroundColourId, juce::Colours::yellow);
-    labelCaution->setColour (juce::Label::textColourId, juce::Colours::red);
-    labelCaution->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelCaution->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -160,13 +149,11 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
     labelMasterGain->setVisible(MULTI_ENCODER_MODE);
     sliderMasterGain->setVisible(MULTI_ENCODER_MODE);
-    labelCaution->setVisible(MULTI_ENCODER_MODE);
-
+    
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
     sliderMasterGain->setTextValueSuffix(" dB");
     sliderMasterGain->setValue(pEncoderSettings->getMasterGain());
-    updateMasterGainWarning();
     // load stored presets
     pPresetHelper->addActionListener(this);
     pEncoderSettings->addChangeListener(this);
@@ -196,7 +183,6 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     btnManageDistanceEncodingPresets = nullptr;
     labelMasterGain = nullptr;
     sliderMasterGain = nullptr;
-    labelCaution = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -230,7 +216,6 @@ void EncodingSettingsComponent::resized()
     toggleInfiniteDistance->setBounds (getWidth() - 82, 79, 72, 24);
     btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 19, 86, 24);
     sliderMasterGain->setBounds (getWidth() - 90 - (getWidth() - 301), 109, getWidth() - 301, 24);
-    labelCaution->setBounds (getWidth() - 82, 109, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -334,7 +319,6 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     {
         //[UserSliderCode_sliderMasterGain] -- add your slider handling code here..
         pEncoderSettings->setMasterGain((float)sliderMasterGain->getValue());
-        updateMasterGainWarning();
         //[/UserSliderCode_sliderMasterGain]
     }
 
@@ -398,15 +382,6 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
 void EncodingSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     sliderMasterGain->setValue(pEncoderSettings->getMasterGain());
-    updateMasterGainWarning();
-}
-
-void EncodingSettingsComponent::updateMasterGainWarning() const
-{
-    bool warning = pEncoderSettings->getMasterGain() > 0.0f;
-    labelCaution->setColour(Label::backgroundColourId, warning ? Colours::yellow : Colours::transparentBlack);
-    labelCaution->setColour(Label::textColourId, warning ? Colours::red : Colours::green);
-    labelCaution->setText(warning ? "Caution!" : "Safe", dontSendNotification);
 }
 
 //[/MiscUserCode]
@@ -491,12 +466,6 @@ BEGIN_JUCER_METADATA
           min="0.0" max="36.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="labelCaution" id="f93fbdf8fa0be848" memberName="labelCaution"
-         virtualName="" explicitFocusOrder="0" pos="82R 109 72 24" bkgCol="ffffff00"
-         textCol="ffff0000" edTextCol="ff000000" edBkgCol="0" labelText="caution!"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
-         italic="0" justification="36"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
