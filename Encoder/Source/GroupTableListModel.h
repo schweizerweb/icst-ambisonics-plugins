@@ -246,7 +246,7 @@ public:
 	{
 		if(columnId == COLUMN_ID_GROUP_POINTS)
 		{
-			CallOutBox::launchAsynchronously(new GroupPointsSelectionComponent(pSources, rowNumber, this), pTableListBox->getCellPosition(columnId, rowNumber, true).translated(pTableListBox->getScreenX(), pTableListBox->getScreenY()), nullptr);
+			CallOutBox::launchAsynchronously(std::make_unique<GroupPointsSelectionComponent>(pSources, rowNumber, this), pTableListBox->getCellPosition(columnId, rowNumber, true).translated(pTableListBox->getScreenX(), pTableListBox->getScreenY()), nullptr);
 		}
 	}
 

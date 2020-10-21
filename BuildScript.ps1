@@ -59,21 +59,31 @@ foreach($file in $jucerFiles)
     
     # build project files from projucer
     Write-Output "Building jucerfile..."
-    $args = "--resave $($file.FullName)"
-    Start-Process $projucer -ArgumentList $args -Wait -NoNewWindow
+    $arguments = "--resave $($file.FullName)"
+    Start-Process $projucer -ArgumentList $arguments -Wait -NoNewWindow
 
     # find solution file
     $projectFiles = Get-ChildItem -Path $buildPath -Filter $projectFileExtension -Recurse -ErrorAction SilentlyContinue -Force
     if(@($projectFiles).length -ne 1)
     {
-        Write-Output "Error: $(@($projectFiles).length) sln-Files found!"
+        Write-Output "Error: $(@($projectFiles).length) Project-Files found!"
         exit
     }
     
     # build solution
     $projectFile = @($projectFiles)[0]
     Write-Output "Building solution..."
-    $process = Start-Process $buildExecutable "$($buildArgumentsPre) $($projectFiles.FullName) $($buildArgumentsPost)" -Wait -PassThru
+    if($buildExecutable -eq "make")
+    {
+        $currentPath = Get-Location
+        Set-Location (Split-Path -Path $projectFiles.FullName)
+        $process = Start-Process "make" -Wait -PassThru
+        Set-Location $currentPath
+    }
+    else
+    {
+        $process = Start-Process $buildExecutable "$($buildArgumentsPre) $($projectFiles.FullName) $($buildArgumentsPost)" -Wait -PassThru
+    }
     if($process.ExitCode -ne 0)
     {
         Write-Output "Error building $($projectFile)"

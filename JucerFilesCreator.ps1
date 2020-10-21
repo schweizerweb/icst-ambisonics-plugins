@@ -1,5 +1,4 @@
 $ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36, 49, 64 )
-$VersionFile = "./versionInformation.txt"
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
@@ -55,7 +54,6 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
         $node.version = $releaseVersion
     }
 
-    $version = $node.version
     $node.id = $projectId
     $node.pluginName = "$($node.pluginName)_$($code)"
     $node.pluginDesc = $description
@@ -69,7 +67,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
         $format.targetFolder = "$($format.targetFolder)/$($code)"
         foreach($configuration in $format.CONFIGURATIONS.ChildNodes)
         {
-            $configuration.targetName = "$($node.pluginName)"
+            $configuration.SetAttribute("targetName", "$($node.pluginName)")
         }
     }
 
@@ -98,8 +96,8 @@ Write-Output "Generating Decoder files"
 $source = '.\Decoder\AmbisonicDecoder.jucer'
 foreach ($element in $DecoderVersions) 
 {
-    $input = $ChannelsPerOrder[$element.Order]
-    createFile $source $input $element.Output $element.Order $element.Output $element.Description $element.PluginCode
+    $inputCount = $ChannelsPerOrder[$element.Order]
+    createFile $source $inputCount $element.Output $element.Order $element.Output $element.Description $element.PluginCode
 }
 return 0
 # program end

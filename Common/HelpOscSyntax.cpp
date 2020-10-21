@@ -120,11 +120,11 @@ void HelpOscSyntax::mouseUp (const MouseEvent& e)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void HelpOscSyntax::showInfo(String info)
 {
-    Label* label = new Label();
+    std::unique_ptr<Label> label = std::make_unique<Label>();
     label->setSize(this->getWidth() - 40, 30);
     label->setText(info, dontSendNotification);
     label->setJustificationType(Justification::centred);
-    CallOutBox::launchAsynchronously(label , getScreenBounds(), this);
+    CallOutBox::launchAsynchronously(std::move(label) , getScreenBounds(), this);
 }
 //[/MiscUserCode]
 

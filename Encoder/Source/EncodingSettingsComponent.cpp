@@ -286,7 +286,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(new DistanceEncodingComponent(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper), getScreenBounds(), this);
+        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper), getScreenBounds(), this);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
