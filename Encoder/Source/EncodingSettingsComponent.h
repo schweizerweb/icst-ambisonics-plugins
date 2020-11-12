@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.1
+  Created with Projucer version: 6.0.4
 
   ------------------------------------------------------------------------------
 
@@ -58,7 +58,6 @@ public:
     void updateEncodingUiElements();
     void actionListenerCallback(const String &message) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
-    void updateMasterGainWarning() const;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -95,7 +94,6 @@ private:
     std::unique_ptr<juce::TextButton> btnManageDistanceEncodingPresets;
     std::unique_ptr<juce::Label> labelMasterGain;
     std::unique_ptr<juce::Slider> sliderMasterGain;
-    std::unique_ptr<juce::Label> labelCaution;
 
 
     //==============================================================================
