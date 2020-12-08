@@ -37,6 +37,7 @@ void SimpleGraph::drawYAxis(Graphics& g) const
 	while (currentStep < upperLim) {
 		if (currentStep >= displayRangeY->getStart()) {
 			Point<float> xy = mapValues(displayRangeX->getStart(), currentStep).toFloat();
+            xy.setX(jmax((float)graphArea->getX(), xy.getX()));
 			g.drawLine(xy.getX() - 3, xy.getY(), fullGridFlag ? graphArea->getRight() : xy.getX() + 3, xy.getY(), 1.0);
 			String buffer = String::formatted(annotationFormat, currentStep);
 			g.drawSingleLineText(buffer, int(xy.getX()) - 4, int(xy.getY()) + 4, Justification::right);
@@ -93,8 +94,6 @@ void SimpleGraph::paint (Graphics& g)
 	// draw graph basics
 	g.fillAll(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));   // clear the background
 
-	paintData(g);
-
 	g.setColour(getLookAndFeel().findColour(ResizableWindow::backgroundColourId));
 	g.fillRect(0, 0, graphArea->getX(), getHeight());
 	g.fillRect(0, graphArea->getBottom(), getWidth(), getBottom() - graphArea->getBottom());
@@ -110,6 +109,9 @@ void SimpleGraph::paint (Graphics& g)
 	g.drawArrow(Line<int>(graphArea->getBottomLeft(), graphArea->getBottomRight().translated(10, 0)).toFloat(), 2, 8, 7);
 	g.drawSingleLineText(labelAxisX, graphArea->getRight(), graphArea->getBottom() - 8, Justification::right);
 	drawXAxis(g);
+    
+    g.reduceClipRegion(*graphArea.get());
+    paintData(g);
 }
 
 void SimpleGraph::resized()
@@ -174,7 +176,7 @@ void SimpleGraph::getStepSize(double minValue, double maxValue, int maxNbOfSteps
 Point<double> SimpleGraph::mapValues(double x, double y) const
 {
 	double mx = graphArea->getX() 
-		+ jmax(0.0, graphArea->getWidth() / displayRangeX->getLength() * ((scalingModeX == Linear ? x : log10(x)) - displayRangeX->getStart()));
+		+ graphArea->getWidth() / displayRangeX->getLength() * ((scalingModeX == Linear ? x : log10(x)) - displayRangeX->getStart());
 	double my = graphArea->getBottom() 
 		- graphArea->getHeight() / displayRangeY->getLength() * ((scalingModeY == Linear ? y : log10(y)) - displayRangeY->getStart());
 
