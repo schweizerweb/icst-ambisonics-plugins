@@ -13,6 +13,7 @@
 #define DEFAULT_FREQUENCY 200
 #define DEFAULT_GAIN_FACTOR 1
 #define DEFAULT_FILTER_TYPE None
+#define DEFAULT_BYPASS_FILTER true
 
 class FilterInfo
 {
@@ -132,10 +133,25 @@ public:
         return true;
     }
 
+    void copyFrom(FilterInfo* info)
+    {
+        filterType = info->filterType;
+        cutOffFrequencyHz = info->cutOffFrequencyHz;
+        qValue = info->qValue;
+        gainFactor = info->gainFactor;
+    }
+    
+    bool equals(FilterInfo* info)
+    {
+        return info != nullptr
+        && info->filterType == filterType
+        && info->cutOffFrequencyHz == cutOffFrequencyHz
+        && info->qValue == qValue
+        && info->gainFactor == gainFactor;
+    }
 
 	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf, Peak } filterType;
 	float cutOffFrequencyHz;
 	float qValue;
     float gainFactor;
-	void copyFrom(FilterInfo* info);
 };

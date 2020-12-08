@@ -27,6 +27,7 @@ public:
 	void swap(int a, int b) override;
 
 	void setFilterInfo(int channel, FilterInfo info) const;
+    void setFilterBypass(int channel, bool byPass) const;
 	double getMaxNormalizedDistance() const;
 
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;

@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -65,36 +65,36 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     filterPresetHelper->initialize();
     //[/Constructor_pre]
 
-    groupOsc.reset (new GroupComponent ("groupOsc",
-                                        TRANS("OSC")));
+    groupOsc.reset (new juce::GroupComponent ("groupOsc",
+                                              TRANS("OSC")));
     addAndMakeVisible (groupOsc.get());
 
-    groupAmbisonics.reset (new GroupComponent ("groupAmbisonics",
-                                               TRANS("Ambisonics")));
+    groupAmbisonics.reset (new juce::GroupComponent ("groupAmbisonics",
+                                                     TRANS("Ambisonics")));
     addAndMakeVisible (groupAmbisonics.get());
 
-    groupSpeakers.reset (new GroupComponent ("groupSpeakers",
-                                             TRANS("Speakers")));
+    groupSpeakers.reset (new juce::GroupComponent ("groupSpeakers",
+                                                   TRANS("Speakers")));
     addAndMakeVisible (groupSpeakers.get());
 
-    comboBoxChannelConfig.reset (new ComboBox ("channelConfig"));
+    comboBoxChannelConfig.reset (new juce::ComboBox ("channelConfig"));
     addAndMakeVisible (comboBoxChannelConfig.get());
     comboBoxChannelConfig->setEditableText (false);
-    comboBoxChannelConfig->setJustificationType (Justification::centredLeft);
+    comboBoxChannelConfig->setJustificationType (juce::Justification::centredLeft);
     comboBoxChannelConfig->setTextWhenNothingSelected (TRANS("-"));
     comboBoxChannelConfig->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxChannelConfig->addListener (this);
 
-    labelPresets.reset (new Label ("labelPresets",
-                                   TRANS("Presets:")));
+    labelPresets.reset (new juce::Label ("labelPresets",
+                                         TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
-    labelPresets->setColour (TextEditor::textColourId, Colours::black);
-    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    buttonSave.reset (new TextButton ("buttonSave"));
+    buttonSave.reset (new juce::TextButton ("buttonSave"));
     addAndMakeVisible (buttonSave.get());
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
@@ -103,61 +103,61 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     addAndMakeVisible (speakerList.get());
     speakerList->setName ("speakerList");
 
-    buttonAdd.reset (new TextButton ("buttonAdd"));
+    buttonAdd.reset (new juce::TextButton ("buttonAdd"));
     addAndMakeVisible (buttonAdd.get());
     buttonAdd->setButtonText (TRANS("add"));
     buttonAdd->addListener (this);
 
-    buttonRemove.reset (new TextButton ("buttonAdd"));
+    buttonRemove.reset (new juce::TextButton ("buttonAdd"));
     addAndMakeVisible (buttonRemove.get());
     buttonRemove->setButtonText (TRANS("remove"));
     buttonRemove->addListener (this);
 
-    buttonMoveDown.reset (new TextButton ("buttonMoveDown"));
+    buttonMoveDown.reset (new juce::TextButton ("buttonMoveDown"));
     addAndMakeVisible (buttonMoveDown.get());
     buttonMoveDown->setButtonText (TRANS("down"));
     buttonMoveDown->addListener (this);
 
-    buttonMoveUp.reset (new TextButton ("buttonMoveUp"));
+    buttonMoveUp.reset (new juce::TextButton ("buttonMoveUp"));
     addAndMakeVisible (buttonMoveUp.get());
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    sliderDistanceScaler.reset (new Slider ("sliderDistanceScaler"));
+    sliderDistanceScaler.reset (new juce::Slider ("sliderDistanceScaler"));
     addAndMakeVisible (sliderDistanceScaler.get());
     sliderDistanceScaler->setRange (1, 500, 0.1);
-    sliderDistanceScaler->setSliderStyle (Slider::LinearHorizontal);
-    sliderDistanceScaler->setTextBoxStyle (Slider::TextBoxRight, false, 80, 20);
+    sliderDistanceScaler->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderDistanceScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderDistanceScaler->addListener (this);
 
     ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
-    labelChannelWeights.reset (new Label ("labelChannelWeights",
-                                          TRANS("Channel weights")));
+    labelChannelWeights.reset (new juce::Label ("labelChannelWeights",
+                                                TRANS("Channel weights")));
     addAndMakeVisible (labelChannelWeights.get());
-    labelChannelWeights->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelChannelWeights->setJustificationType (Justification::centredLeft);
+    labelChannelWeights->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelChannelWeights->setJustificationType (juce::Justification::centredLeft);
     labelChannelWeights->setEditable (false, false, false);
-    labelChannelWeights->setColour (TextEditor::textColourId, Colours::black);
-    labelChannelWeights->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelChannelWeights->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelChannelWeights->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceScaler.reset (new Label ("labelDistanceScaler",
-                                          TRANS("Distance scaler")));
+    labelDistanceScaler.reset (new juce::Label ("labelDistanceScaler",
+                                                TRANS("Distance scaler")));
     addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceScaler->setJustificationType (Justification::centredLeft);
+    labelDistanceScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDistanceScaler->setJustificationType (juce::Justification::centredLeft);
     labelDistanceScaler->setEditable (false, false, false);
-    labelDistanceScaler->setColour (TextEditor::textColourId, Colours::black);
-    labelDistanceScaler->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    btnEditMode.reset (new ToggleButton ("btnEditMode"));
+    btnEditMode.reset (new juce::ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
     btnEditMode->setButtonText (TRANS("Edit mode"));
     btnEditMode->addListener (this);
 
-    textOscPort.reset (new TextEditor ("textOscPort"));
+    textOscPort.reset (new juce::TextEditor ("textOscPort"));
     addAndMakeVisible (textOscPort.get());
     textOscPort->setMultiLine (false);
     textOscPort->setReturnKeyStartsNewLine (false);
@@ -165,18 +165,18 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     textOscPort->setScrollbarsShown (true);
     textOscPort->setCaretVisible (true);
     textOscPort->setPopupMenuEnabled (true);
-    textOscPort->setText (String());
+    textOscPort->setText (juce::String());
 
-    labelOscPort.reset (new Label ("labelOscPort",
-                                   TRANS("OSC-Port:\n")));
+    labelOscPort.reset (new juce::Label ("labelOscPort",
+                                         TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelOscPort->setJustificationType (Justification::centredLeft);
+    labelOscPort->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscPort->setJustificationType (juce::Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
-    labelOscPort->setColour (TextEditor::textColourId, Colours::black);
-    labelOscPort->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelOscPort->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    textTimeout.reset (new TextEditor ("textTimeout"));
+    textTimeout.reset (new juce::TextEditor ("textTimeout"));
     addAndMakeVisible (textTimeout.get());
     textTimeout->setMultiLine (false);
     textTimeout->setReturnKeyStartsNewLine (false);
@@ -184,53 +184,53 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     textTimeout->setScrollbarsShown (true);
     textTimeout->setCaretVisible (true);
     textTimeout->setPopupMenuEnabled (true);
-    textTimeout->setText (String());
+    textTimeout->setText (juce::String());
 
-    labelTimeout.reset (new Label ("labelTimeout",
-                                   TRANS("Timeout [ms]:")));
+    labelTimeout.reset (new juce::Label ("labelTimeout",
+                                         TRANS("Timeout [ms]:")));
     addAndMakeVisible (labelTimeout.get());
-    labelTimeout->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelTimeout->setJustificationType (Justification::centredLeft);
+    labelTimeout->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelTimeout->setJustificationType (juce::Justification::centredLeft);
     labelTimeout->setEditable (false, false, false);
-    labelTimeout->setColour (TextEditor::textColourId, Colours::black);
-    labelTimeout->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelTimeout->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelTimeout->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    toggleOsc.reset (new ToggleButton ("toggleOsc"));
+    toggleOsc.reset (new juce::ToggleButton ("toggleOsc"));
     addAndMakeVisible (toggleOsc.get());
     toggleOsc->setButtonText (TRANS("Receive OSC messages"));
     toggleOsc->addListener (this);
 
-    buttonSpeakerTest.reset (new TextButton ("buttonSpeakerTest"));
+    buttonSpeakerTest.reset (new juce::TextButton ("buttonSpeakerTest"));
     addAndMakeVisible (buttonSpeakerTest.get());
     buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
     buttonSpeakerTest->addListener (this);
 
-    labelDevelopmentVersion.reset (new Label ("labelDevelopmentVersion",
-                                              TRANS("Unofficial Pre-Release")));
+    labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
+                                                    TRANS("Unofficial Pre-Release")));
     addAndMakeVisible (labelDevelopmentVersion.get());
-    labelDevelopmentVersion->setFont (Font (25.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDevelopmentVersion->setJustificationType (Justification::centred);
+    labelDevelopmentVersion->setFont (juce::Font (25.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setJustificationType (juce::Justification::centred);
     labelDevelopmentVersion->setEditable (false, false, false);
-    labelDevelopmentVersion->setColour (Label::backgroundColourId, Colour (0xbded0d0d));
-    labelDevelopmentVersion->setColour (Label::textColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (Label::outlineColourId, Colours::yellow);
-    labelDevelopmentVersion->setColour (TextEditor::textColourId, Colours::black);
-    labelDevelopmentVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDevelopmentVersion->setColour (juce::Label::backgroundColourId, juce::Colour (0xbded0d0d));
+    labelDevelopmentVersion->setColour (juce::Label::textColourId, juce::Colours::yellow);
+    labelDevelopmentVersion->setColour (juce::Label::outlineColourId, juce::Colours::yellow);
+    labelDevelopmentVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelDevelopmentVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    buttonManage.reset (new TextButton ("buttonManage"));
+    buttonManage.reset (new juce::TextButton ("buttonManage"));
     addAndMakeVisible (buttonManage.get());
     buttonManage->setButtonText (TRANS("manage..."));
     buttonManage->addListener (this);
 
-    comboBoxChannelWeightingMode.reset (new ComboBox ("comboBoxChannelWeightingMode"));
+    comboBoxChannelWeightingMode.reset (new juce::ComboBox ("comboBoxChannelWeightingMode"));
     addAndMakeVisible (comboBoxChannelWeightingMode.get());
     comboBoxChannelWeightingMode->setEditableText (false);
-    comboBoxChannelWeightingMode->setJustificationType (Justification::centredLeft);
-    comboBoxChannelWeightingMode->setTextWhenNothingSelected (String());
+    comboBoxChannelWeightingMode->setJustificationType (juce::Justification::centredLeft);
+    comboBoxChannelWeightingMode->setTextWhenNothingSelected (juce::String());
     comboBoxChannelWeightingMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxChannelWeightingMode->addListener (this);
 
-    buttonManageFilters.reset (new TextButton ("buttonManageFilters"));
+    buttonManageFilters.reset (new juce::TextButton ("buttonManageFilters"));
     addAndMakeVisible (buttonManageFilters.get());
     buttonManageFilters->setButtonText (TRANS("manage filters..."));
     buttonManageFilters->addListener (this);
@@ -328,12 +328,12 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
 }
 
 //==============================================================================
-void SpeakerSettingsComponent::paint (Graphics& g)
+void SpeakerSettingsComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -365,8 +365,8 @@ void SpeakerSettingsComponent::resized()
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 15 - 82, ((0 + (getHeight() - 267)) + 199) + 20, 82, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4979f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3997f) / 2), 0, proportionOfWidth (0.3997f), 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4977f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3991f) / 2), 0, proportionOfWidth (0.3991f), 24);
     buttonManage->setBounds (8 + (getWidth() - 18) - 145 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 18) - 17 - 120, 0 + 24, 120, 24);
@@ -374,7 +374,7 @@ void SpeakerSettingsComponent::resized()
     //[/UserResized]
 }
 
-void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
@@ -400,7 +400,7 @@ void SpeakerSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged
     //[/UsercomboBoxChanged_Post]
 }
 
-void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
+void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -502,7 +502,7 @@ void SpeakerSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void SpeakerSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
+void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
@@ -684,12 +684,12 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	}
 }
 
-void SpeakerSettingsComponent::setFlag(int columnId, int /*rowNumber*/, bool /*newValue*/) const
+void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValue) const
 {
     switch (columnId)
     {
     case COLUMN_ID_FILTER:
-		// do nothing
+        pSpeakerSet->setFilterBypass(rowNumber, !newValue);
     	break;
 
     default: throw;
@@ -707,7 +707,7 @@ bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
 
     switch (columnId)
     {
-    case COLUMN_ID_FILTER: return pt->getFilterInfo()->filterType != FilterInfo::None;
+    case COLUMN_ID_FILTER: return !pt->getFilterBypass();
     default: return false;
     }
 }
@@ -991,11 +991,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.772%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.909% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"

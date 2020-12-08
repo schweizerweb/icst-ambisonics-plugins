@@ -73,6 +73,13 @@ void AmbiSpeakerSet::setFilterInfo(int channel, FilterInfo info) const
 		pt->getFilterInfo()->copyFrom(&info);
 }
 
+void AmbiSpeakerSet::setFilterBypass(int channel, bool byPass) const
+{
+    AmbiSpeaker* pt = elements[channel];
+
+    if (pt != nullptr)
+        pt->setFilterBypass(byPass);
+}
 
 double AmbiSpeakerSet::getMaxNormalizedDistance() const
 {
