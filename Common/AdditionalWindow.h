@@ -23,7 +23,11 @@ public:
     {
         // based on juce CallOutBox
         Rectangle<int> targetArea = newAreaToPointTo;
-        Rectangle<int> newAreaToFitIn = Desktop::getInstance().getDisplays().findDisplayForRect(newAreaToPointTo).userArea;
+        const Displays::Display* d = Desktop::getInstance().getDisplays().getDisplayForRect(newAreaToPointTo);
+        if(d == nullptr)
+            return;
+        
+        Rectangle<int> newAreaToFitIn = d->userArea;
         
         float borderSpace = 1;
         float arrowSize = 0;
