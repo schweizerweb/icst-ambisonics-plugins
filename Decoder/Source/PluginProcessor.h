@@ -84,8 +84,9 @@ private:
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
     std::unique_ptr<DecoderPresetHelper> presetHelper;
-    
-    OwnedArray<dsp::IIR::Filter<float>> iirFilters;
+
+    dsp::IIR::Filter<float> iirFilters[JucePlugin_MaxNumOutputChannels][MAX_FILTER_COUNT];
+    FilterBankInfo filterInfo[JucePlugin_MaxNumOutputChannels];
     dsp::ProcessSpec iirFilterSpec;
     
 

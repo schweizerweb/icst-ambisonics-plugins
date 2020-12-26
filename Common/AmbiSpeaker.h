@@ -10,12 +10,9 @@
 
 #pragma once
 #include "AmbiPoint.h"
-#include "FilterInfo.h"
+#include "FilterBankInfo.h"
 
-#define XML_ATTRIBUTE_POINT_FILTER_TYPE "FilterType"
-#define XML_ATTRIBUTE_POINT_FILTER_FREQUENCY "FilterFrequency"
-#define XML_ATTRIBUTE_POINT_FILTER_Q "FilterQ"
-#define XML_ATTRIBUTE_POINT_FILTER_GAIN_FACTOR "GainFactor"
+
 #define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"
 
 class AmbiSpeaker : public AmbiPoint
@@ -27,7 +24,7 @@ public:
 	AmbiSpeaker(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
 	AmbiSpeaker(XmlElement* element);
 
-	FilterInfo* getFilterInfo();
+	FilterBankInfo* getFilterInfo();
     bool getFilterBypass();
     void setFilterBypass(bool byPass);
     
@@ -35,6 +32,6 @@ public:
 	XmlElement* getAsXmlElement(String tagName) override;
 
 private:
-	FilterInfo filterInfo;
+	FilterBankInfo filterInfo;
     bool filterBypass;
 };

@@ -760,7 +760,7 @@ void SpeakerSettingsComponent::updateDistanceScaler() const
 	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
 }
 
-FilterInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
+FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
 {
 	AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
 	if (pt == nullptr)

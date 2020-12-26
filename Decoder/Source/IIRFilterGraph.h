@@ -11,7 +11,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/FilterInfo.h"
+#include "../../Common/FilterBankInfo.h"
 #include "../../Common/SimpleGraph.h"
 
 #define MIN_FREQUENCY	1
@@ -23,7 +23,7 @@
 class IIRFilterGraph    : public SimpleGraph
 {
 public:
-    IIRFilterGraph(FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
+    IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
     ~IIRFilterGraph();
 
 	void paintData(Graphics&) override;
@@ -32,8 +32,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
 
 private:
-	FilterInfo* pFilterInfo;
+	FilterBankInfo* pFilterInfo;
 	Array<double> frequencies;
 	double sampleRate;
-	double* magnitudes;
+	double* magnitudes[MAX_FILTER_COUNT];
 };
