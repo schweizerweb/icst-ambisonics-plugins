@@ -248,6 +248,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     // prepare weighting comboBox
     comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);
     comboBoxChannelWeightingMode->addItem("In-Phase", AmbiSettings::INPHASE);
+    comboBoxChannelWeightingMode->addItem("Max-rE", AmbiSettings::MAXRE);
     comboBoxChannelWeightingMode->addItem("Manual", AmbiSettings::MANUAL);
 
     // speaker list elements
