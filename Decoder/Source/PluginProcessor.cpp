@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "../../Common/FFTAnalyzer.h"
 
 
 //==============================================================================
@@ -35,6 +36,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
 	delete pTestSoundGenerator;
+    FFTAnalyzer::deleteInstance();
 }
 
 //==============================================================================
@@ -272,6 +274,13 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
                         }
                     }
                 }
+            }
+
+            auto analyzer = FFTAnalyzer::getInstance();
+            if (analyzer->isActive(iSpeaker))
+            {
+                for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+                    analyzer->pushNextSampleIntoFifo(channelData[iSample]);
             }
 		}
 	}

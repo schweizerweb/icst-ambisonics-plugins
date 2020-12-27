@@ -19,6 +19,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/FilterBankInfo.h"
+#include "../../Common/FFTAnalyzer.h"
 //[/Headers]
 
 #include "FilterSettingsComponent.h"
@@ -28,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper)
-    : pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo)
+FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex)
+    : pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -78,11 +79,16 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInf
     addAndMakeVisible (filter3.get());
     filter3->setName ("filter3");
 
+    toggleFFT.reset (new juce::ToggleButton ("toggleFFT"));
+    addAndMakeVisible (toggleFFT.get());
+    toggleFFT->setButtonText (TRANS("FFT"));
+    toggleFFT->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 550);
+    setSize (700, 550);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -97,6 +103,8 @@ FilterSettingsComponent::~FilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     pPresetHelper->removeActionListener(this);
+    stopTimer();
+    FFTAnalyzer::getInstance()->disable();
     //[/Destructor_pre]
 
     filterGraph = nullptr;
@@ -107,6 +115,7 @@ FilterSettingsComponent::~FilterSettingsComponent()
     filter1 = nullptr;
     filter2 = nullptr;
     filter3 = nullptr;
+    toggleFFT = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -137,6 +146,7 @@ void FilterSettingsComponent::resized()
     filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    toggleFFT->setBounds (proportionOfWidth (0.5000f) - (58 / 2), 40, 58, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -176,6 +186,22 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         comboBoxFilterPreset->setText("", dontSendNotification);
         delete newFile;
         //[/UserButtonCode_buttonSave]
+    }
+    else if (buttonThatWasClicked == toggleFFT.get())
+    {
+        //[UserButtonCode_toggleFFT] -- add your button handler code here..
+        if(toggleFFT->getToggleState())
+        {
+            FFTAnalyzer::getInstance()->setActive(channelIndex);
+            startTimer(50);
+        }
+        else
+        {
+            stopTimer();
+            FFTAnalyzer::getInstance()->disable();
+            filterGraph->disableFFT();
+        }
+        //[/UserButtonCode_toggleFFT]
     }
 
     //[UserbuttonClicked_Post]
@@ -219,6 +245,17 @@ void FilterSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source
     sendChangeMessage();
 }
 
+void FilterSettingsComponent::timerCallback()
+{
+    float scope[SCOPE_SIZE];
+    float frequencies[SCOPE_SIZE];
+    int fftSize;
+    if (FFTAnalyzer::getInstance()->scopeRequest(&scope[0], &frequencies[0], &fftSize))
+    {
+        filterGraph->setFFTResult(&scope[0], &frequencies[0], SCOPE_SIZE, fftSize);
+    }
+}
+
 //[/MiscUserCode]
 
 
@@ -232,11 +269,11 @@ void FilterSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
-                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener"
-                 constructorParams="FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper"
-                 variableInitialisers="pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo)"
+                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener, public Timer"
+                 constructorParams="FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex"
+                 variableInitialisers="pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="550">
+                 fixedSize="0" initialWidth="700" initialHeight="550">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
                     virtualName="" explicitFocusOrder="0" pos="0 40 0M 240M" class="IIRFilterGraph"
@@ -255,17 +292,21 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="filter0" id="49c5ab20d38acf14" memberName="filter0" virtualName=""
-                    explicitFocusOrder="0" pos="0 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="0 200R 24.945% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(0), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter1" id="1bbdd0b2e36d35d6" memberName="filter1" virtualName=""
-                    explicitFocusOrder="0" pos="24.913% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="24.945% 200R 24.945% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(1), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter2" id="fd705b145567f812" memberName="filter2" virtualName=""
-                    explicitFocusOrder="0" pos="49.827% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="49.817% 200R 24.945% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(2), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter3" id="d7de5a2154c80bcf" memberName="filter3" virtualName=""
-                    explicitFocusOrder="0" pos="75.087% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="75.055% 200R 24.945% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(3), pFilterSpecification, this"/>
+  <TOGGLEBUTTON name="toggleFFT" id="7049cb4ab444a015" memberName="toggleFFT"
+                virtualName="" explicitFocusOrder="0" pos="49.963%c 40 58 24"
+                buttonText="FFT" connectedEdges="0" needsCallback="1" radioGroupId="0"
+                state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

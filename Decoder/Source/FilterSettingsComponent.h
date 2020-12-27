@@ -41,12 +41,13 @@ class FilterSettingsComponent  : public Component,
                                  public ChangeBroadcaster,
                                  public ActionListener,
                                  public ChangeListener,
+                                 public Timer,
                                  public juce::ComboBox::Listener,
                                  public juce::Button::Listener
 {
 public:
     //==============================================================================
-    FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper);
+    FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex);
     ~FilterSettingsComponent() override;
 
     //==============================================================================
@@ -54,6 +55,7 @@ public:
     void updatePresetComboBox();
     void actionListenerCallback(const String &message) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
+    void timerCallback() override;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -67,6 +69,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	FilterBankInfo* pFilterBankInfo;
     FilterPresetHelper* pPresetHelper;
+    int channelIndex;
     //[/UserVariables]
 
     //==============================================================================
@@ -78,6 +81,7 @@ private:
     std::unique_ptr<SingleFilterSettingsComponent> filter1;
     std::unique_ptr<SingleFilterSettingsComponent> filter2;
     std::unique_ptr<SingleFilterSettingsComponent> filter3;
+    std::unique_ptr<juce::ToggleButton> toggleFFT;
 
 
     //==============================================================================

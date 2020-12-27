@@ -26,7 +26,7 @@ void TestSoundGenerator::process(float* sampleData, int sampleCount, int speaker
 			double testSoundGain = p->getGain();
 			for (int i = 0; i < sampleCount; i++)
 			{
-				sampleData[i] = float((random.nextFloat() - 0.5f) * testSoundGain);
+				sampleData[i] = float((random.nextFloat() * 2.0f - 1.0f) * testSoundGain);
 			}
 		}
 	}

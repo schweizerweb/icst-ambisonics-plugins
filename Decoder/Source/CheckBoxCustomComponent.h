@@ -130,7 +130,7 @@ private:
     {
         if(!toggle.contains(event.getPosition()))
         {
-            CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner, owner.getFilterPresetHelper()), getScreenBounds().translated(-owner.getScreenX(), -owner.getScreenY()), &owner);
+            CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner, owner.getFilterPresetHelper(), row), getScreenBounds().translated(-owner.getScreenX(), -owner.getScreenY()), &owner);
         }
     }
     

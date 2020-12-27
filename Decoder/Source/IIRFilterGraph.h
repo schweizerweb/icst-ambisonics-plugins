@@ -27,6 +27,8 @@ public:
     ~IIRFilterGraph();
 
 	void paintData(Graphics&) override;
+    void setFFTResult(float* data, float* frequencies, int size, int fftSize);
+    void disableFFT();
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
@@ -36,4 +38,8 @@ private:
 	Array<double> frequencies;
 	double sampleRate;
 	double* magnitudes[MAX_FILTER_COUNT];
+    float* fftResultData;
+    float* fftResultFrequencies;
+    int fftResultDataSize;
+    int fftSize;
 };
