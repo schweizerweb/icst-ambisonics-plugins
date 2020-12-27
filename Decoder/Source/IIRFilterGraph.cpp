@@ -13,7 +13,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultDataSize(0), fftResultData(nullptr), fftResultFrequencies(nullptr), fftSize(0)
+IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultDataSize(0), fftResultData(nullptr), fftSize(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -28,7 +28,7 @@ IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pF
 		magnitudes[i] = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
 	}
 
-	setDisplayRange(LogarithmicFrequency, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-40, 40));
+	setDisplayRange(LogarithmicFrequency, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-50, 50));
 	fullGridFlag = true;
 	labelAxisY = "Gain [dB]";
 	labelAxisX = "Frequency [Hz]";
@@ -44,11 +44,6 @@ IIRFilterGraph::~IIRFilterGraph()
 	if (fftResultData != nullptr)
 	{
 		free(fftResultData);
-	}
-
-	if(fftResultFrequencies != nullptr)
-	{
-		free(fftResultFrequencies);
 	}
 }
 
@@ -95,34 +90,29 @@ void IIRFilterGraph::paintData(Graphics& g)
 		g.setColour(Colours::blueviolet.withAlpha(0.5f));
 	    for(int i = 0; i < fftResultDataSize; i++)
 	    {
-            const double frequency = (double)fftResultFrequencies[i] * (sampleRate / fftSize);
-			Point<float> displayPoint = mapValues(frequency, fftResultData[i]).toFloat();
-            const float height = float(graphArea->getBottom() - displayPoint.getY());
-			if (displayPoint.getX() > 0 && height > 0)
+			Point<float> topLeft = mapValues((double)i * (sampleRate / fftSize), fftResultData[i]).toFloat();
+			Point<float> bottomRight = mapValues((double)(i+1) * (sampleRate / fftSize), -200).toFloat();
+            if (bottomRight.getY() > topLeft.getY())
 			{
-				g.fillRect(displayPoint.getX()-1.0f, displayPoint.getY(), 3.0f, height);
+				g.fillRect(Rectangle<float>(topLeft, bottomRight));
 			}
 	    }
 	}
 }
 
-void IIRFilterGraph::setFFTResult(float* data, float* fftFrequencies, int size, int newFftSize)
+void IIRFilterGraph::setFFTResult(float* data, int size, int newFftSize)
 {
 	this->fftSize = newFftSize;
 	if(size != fftResultDataSize)
 	{
 		if (fftResultData != nullptr)
 			free(fftResultData);
-		if (fftResultFrequencies != nullptr)
-			free(fftResultFrequencies);
-
+		
 		fftResultData = static_cast<float*>(calloc(size, sizeof(float)));
-		fftResultFrequencies = static_cast<float*>(calloc(size, sizeof(float)));
 		fftResultDataSize = size;
 	}
 
 	memcpy_s(fftResultData, size * sizeof(float), data, size * sizeof(float));
-	memcpy_s(fftResultFrequencies, size * sizeof(float), fftFrequencies, size * sizeof(float));
 	repaint();
 }
 

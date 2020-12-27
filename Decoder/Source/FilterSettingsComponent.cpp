@@ -248,11 +248,10 @@ void FilterSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source
 void FilterSettingsComponent::timerCallback()
 {
     float scope[SCOPE_SIZE];
-    float frequencies[SCOPE_SIZE];
     int fftSize;
-    if (FFTAnalyzer::getInstance()->scopeRequest(&scope[0], &frequencies[0], &fftSize))
+    if (FFTAnalyzer::getInstance()->scopeRequest(&scope[0], &fftSize))
     {
-        filterGraph->setFFTResult(&scope[0], &frequencies[0], SCOPE_SIZE, fftSize);
+        filterGraph->setFFTResult(&scope[0], SCOPE_SIZE, fftSize);
     }
 }
 

@@ -42,7 +42,7 @@ bool FFTAnalyzer::isActive(int channel) const
     return activeChannel != INACTIVE && activeChannel == channel;
 }
 
-bool FFTAnalyzer::scopeRequest(float* pData, float* pFrequencies, int* pFFTSize)
+bool FFTAnalyzer::scopeRequest(float* pData, int* pFFTSize)
 {
     if (nextFFTBlockReady)
     {
@@ -51,13 +51,10 @@ bool FFTAnalyzer::scopeRequest(float* pData, float* pFrequencies, int* pFFTSize)
 
         for (int i = 0; i < SCOPE_SIZE; ++i)
         {
-            const float skewedProportionX = 1.0f - std::exp(std::log(1.0f - (float)i / (float)SCOPE_SIZE) * 0.2f);
-            const float frequencyIndex = skewedProportionX * (float)fftSize * 0.5f;
-            const int fftDataIndex = jlimit(0, fftSize / 2, (int)frequencyIndex);
+            const int fftDataIndex = jlimit(0, fftSize / 2, (int)i);
             const float level = Decibels::gainToDecibels(fftData[fftDataIndex]) - Decibels::gainToDecibels(float(fftSize));
 
             pData[i] = level;
-            pFrequencies[i] = frequencyIndex;
         }
 
         nextFFTBlockReady = false;

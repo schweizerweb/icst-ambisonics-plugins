@@ -11,7 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #define INACTIVE -1
-#define SCOPE_SIZE 1024
+#define SCOPE_SIZE 2048
 
 class FFTAnalyzer
 {
@@ -24,7 +24,7 @@ public:
     void setActive(int channel);
     void disable();
     bool isActive(int channel) const;
-    bool scopeRequest(float* pData, float* pFrequencies, int* pFFTSize);
+    bool scopeRequest(float* pData, int* pFFTSize);
     void pushNextSampleIntoFifo(float sample) noexcept;
 
 private:
