@@ -95,19 +95,20 @@ void IIRFilterGraph::paintData(Graphics& g)
 		g.setColour(Colours::blueviolet.withAlpha(0.5f));
 	    for(int i = 0; i < fftResultDataSize; i++)
 	    {
-			double frequency = (double)fftResultFrequencies[i] * (sampleRate / fftSize);
+            const double frequency = (double)fftResultFrequencies[i] * (sampleRate / fftSize);
 			Point<float> displayPoint = mapValues(frequency, fftResultData[i]).toFloat();
-			if (displayPoint.getX() > 0)
+            const float height = float(graphArea->getBottom() - displayPoint.getY());
+			if (displayPoint.getX() > 0 && height > 0)
 			{
-				g.drawLine(displayPoint.getX(), displayPoint.getY(), displayPoint.getX(), graphArea->getBottom());
+				g.fillRect(displayPoint.getX()-1.0f, displayPoint.getY(), 3.0f, height);
 			}
 	    }
 	}
 }
 
-void IIRFilterGraph::setFFTResult(float* data, float* frequencies, int size, int fftSize)
+void IIRFilterGraph::setFFTResult(float* data, float* fftFrequencies, int size, int newFftSize)
 {
-	this->fftSize = fftSize;
+	this->fftSize = newFftSize;
 	if(size != fftResultDataSize)
 	{
 		if (fftResultData != nullptr)
@@ -121,7 +122,7 @@ void IIRFilterGraph::setFFTResult(float* data, float* frequencies, int size, int
 	}
 
 	memcpy_s(fftResultData, size * sizeof(float), data, size * sizeof(float));
-	memcpy_s(fftResultFrequencies, size * sizeof(float), frequencies, size * sizeof(float));
+	memcpy_s(fftResultFrequencies, size * sizeof(float), fftFrequencies, size * sizeof(float));
 	repaint();
 }
 

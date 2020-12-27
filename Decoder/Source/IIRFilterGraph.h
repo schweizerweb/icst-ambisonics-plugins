@@ -27,7 +27,7 @@ public:
     ~IIRFilterGraph();
 
 	void paintData(Graphics&) override;
-    void setFFTResult(float* data, float* frequencies, int size, int fftSize);
+    void setFFTResult(float* data, float* fftFrequencies, int size, int newFftSize);
     void disableFFT();
 
 private:
