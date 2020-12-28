@@ -164,10 +164,14 @@ void AmbisonicEncoderAudioProcessor::changeProgramName (int /*index*/, const Str
 }
 
 //==============================================================================
-void AmbisonicEncoderAudioProcessor::prepareToPlay (double /*sampleRate*/, int /*samplesPerBlock*/)
+void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+	iirFilterSpec.numChannels = 1;
+	iirFilterSpec.maximumBlockSize = samplesPerBlock;
+	iirFilterSpec.sampleRate = sampleRate;
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -236,13 +240,23 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		if (source == nullptr || !source->getEnabled())
 			continue;
 
-		const float sourceGain = float(source->getGain());
+		Point3D<double>* pSourcePoint = source->getPoint();
+
+		// air absorbation filter
+		if (encoderSettings.distanceEncodingFlag && airAbsorbationFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
+		{
+            float* writePointer = inputBuffer.getWritePointer(iSource);
+            AirAbsorbationFilter* filter = &airAbsorbationFilters[iChannel];
+			for (int iSample = 0; iSample < inputBuffer.getNumSamples(); iSample++)
+			{
+				writePointer[iSample] = filter->processSample(writePointer[iSample]);
+			}
+		}
 
 		// keep RMS
 		sources.setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-		Point3D<double>* pSourcePoint = source->getPoint();
 		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
 		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
 		
@@ -254,6 +268,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		}
 
 		const float* inputData = inputBuffer.getReadPointer(iSource);
+		const float sourceGain = float(source->getGain());
 
 		// create B-format
 		int numSamples = buffer.getNumSamples();

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.4
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
@@ -149,7 +149,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
     labelMasterGain->setVisible(MULTI_ENCODER_MODE);
     sliderMasterGain->setVisible(MULTI_ENCODER_MODE);
-    
+
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
     sliderMasterGain->setTextValueSuffix(" dB");
