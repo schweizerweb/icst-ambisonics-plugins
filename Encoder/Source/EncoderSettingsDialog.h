@@ -25,9 +25,9 @@ public:
         setResizable(true, true);
 		setUsingNativeTitleBar(false);
 #if MULTI_ENCODER_MODE
-		setResizeLimits(600, 600, 3000, 3000);
+		setResizeLimits(700, 650, 3000, 3000);
 #else
-		setResizeLimits(600, 500, 3000, 3000);
+		setResizeLimits(700, 650, 3000, 3000);
 #endif
 	}
 

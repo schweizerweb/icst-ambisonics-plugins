@@ -43,13 +43,16 @@ bool AirAbsorbationFilter::checkFilter(DistanceEncodingParams* pParams, double d
         currentIntensity = pParams->getAirAbsorbationIntensity();
         currentDistance = distance;
         currentSampleRate = pSpec->sampleRate;
-        filter.coefficients = dsp::IIR::Coefficients<float>::makeLowPass(currentSampleRate, float(jmax(currentSampleRate / 2.0 - currentDistance * currentIntensity * 5000.0, 20.0)), 1.0f);
+        float frequency = float(jmax(currentSampleRate / 2.0 - currentDistance * currentIntensity * 5000.0, 20.0));
+        float q = 1.0f;
 
-        if(initRequired)
+        if (initRequired)
         {
             filter.prepare(*pSpec);
             filter.reset();
         }
+
+        filter.coefficients = dsp::IIR::Coefficients<float>::makeLowPass(currentSampleRate, frequency, q);
     }
 
     return true;

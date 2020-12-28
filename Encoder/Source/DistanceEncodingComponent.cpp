@@ -232,7 +232,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (600, 500);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -241,8 +241,8 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
 
-    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::Off], EncoderConstants::Off);
-    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::LowPass], EncoderConstants::LowPass);
+    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::Off], EncoderConstants::Off + 1);
+    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::LowPass], EncoderConstants::LowPass + 1);
     setUiValues(pParams);
 
     // set slider ranges according to constants
@@ -415,7 +415,7 @@ void DistanceEncodingComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHas
     else if (comboBoxThatHasChanged == comboBoxAirAbsorbationMode.get())
     {
         //[UserComboBoxCode_comboBoxAirAbsorbationMode] -- add your combo box handling code here..
-        pParams->setAirAbsorbationMode(EncoderConstants::AirAbsorbationMode(comboBoxAirAbsorbationMode->getSelectedId()));
+        pParams->setAirAbsorbationMode(EncoderConstants::AirAbsorbationMode(comboBoxAirAbsorbationMode->getSelectedId() - 1));
         controlDimming();
         //[/UserComboBoxCode_comboBoxAirAbsorbationMode]
     }
@@ -501,7 +501,7 @@ void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingPar
     sliderAdvancedFactor->setValue(pEncodingParams->getAdvancedFactor(), dontSendNotification);
     sliderAdvancedExponent->setValue(pEncodingParams->getAdvancedExponent(), dontSendNotification);
 
-    comboBoxAirAbsorbationMode->setSelectedId(pEncodingParams->getAirAbsorbationMode(), dontSendNotification);
+    comboBoxAirAbsorbationMode->setSelectedId(pEncodingParams->getAirAbsorbationMode() + 1, dontSendNotification);
     sliderAirAbsorbationIntensity->setValue(pEncodingParams->getAirAbsorbationIntensity(), dontSendNotification);
 
     controlDimming();
@@ -529,7 +529,7 @@ BEGIN_JUCER_METADATA
                  constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper"
                  variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 fixedSize="0" initialWidth="600" initialHeight="500">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupAirAbsorbation" id="9e077e85238f4bfb" memberName="groupAirAbsorbation"
                   virtualName="" explicitFocusOrder="0" pos="0 99R 0M 64" title="Air Absorbation"/>

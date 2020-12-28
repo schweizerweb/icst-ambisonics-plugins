@@ -246,7 +246,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		if (encoderSettings.distanceEncodingFlag && airAbsorbationFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
 		{
             float* writePointer = inputBuffer.getWritePointer(iSource);
-            AirAbsorbationFilter* filter = &airAbsorbationFilters[iChannel];
+            AirAbsorbationFilter* filter = &airAbsorbationFilters[iSource];
 			for (int iSample = 0; iSample < inputBuffer.getNumSamples(); iSample++)
 			{
 				writePointer[iSample] = filter->processSample(writePointer[iSample]);
