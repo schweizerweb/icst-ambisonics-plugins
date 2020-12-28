@@ -18,7 +18,8 @@
 #define XML_ATTRIBUTE_POINT_Y "Y"
 #define XML_ATTRIBUTE_POINT_Z "Z"
 #define XML_ATTRIBUTE_POINT_NAME "Name"
-#define XML_ATTRIBUTE_POINT_COLOR "Color"
+#define XML_ATTRIBUTE_POINT_COLOR_OLD "Color"
+#define XML_ATTRIBUTE_POINT_COLOR_NEW "ColorCode"
 #define XML_ATTRIBUTE_POINT_GAIN "Gain"
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
@@ -29,7 +30,7 @@ protected:
 	AmbiPoint(AmbiPoint* other, bool copyImage = false);
 	AmbiPoint();
 	AmbiPoint(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
-	AmbiPoint(XmlElement* element);
+    AmbiPoint(XmlElement* element);
 	AmbiPoint(XmlElement* element, AudioParameterSet audioParams);
     AmbiPoint(AudioParameterSet audioParams);
 	~AmbiPoint();
@@ -63,7 +64,9 @@ public:
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
 private:
-	String id;
+	Colour loadColorAttribute(XmlElement* element);
+
+    String id;
 	Point3D<double> point;
 	Colour color;
 	String name;
