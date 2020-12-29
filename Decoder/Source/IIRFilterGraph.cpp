@@ -112,7 +112,7 @@ void IIRFilterGraph::setFFTResult(float* data, int size, int newFftSize)
 		fftResultDataSize = size;
 	}
 
-	memcpy_s(fftResultData, size * sizeof(float), data, size * sizeof(float));
+	std::memcpy(fftResultData, data, size * sizeof(float));
 	repaint();
 }
 
