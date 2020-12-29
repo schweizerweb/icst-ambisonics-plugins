@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -53,9 +53,9 @@ class SpeakerSettingsComponent  : public Component,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
                                   ActionListener,
-                                  public ComboBox::Listener,
-                                  public Button::Listener,
-                                  public Slider::Listener
+                                  public juce::ComboBox::Listener,
+                                  public juce::Button::Listener,
+                                  public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -84,7 +84,7 @@ public:
 	TableListBox* getTable() override;
     SliderRange getSliderRange(int columnId) override;
     bool getEnabled(const int columnId, const int rowNumber) override;
-    
+
 
 	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
@@ -97,11 +97,11 @@ public:
     FilterPresetHelper* getFilterPresetHelper() const;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -120,32 +120,32 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupOsc;
-    std::unique_ptr<GroupComponent> groupAmbisonics;
-    std::unique_ptr<GroupComponent> groupSpeakers;
-    std::unique_ptr<ComboBox> comboBoxChannelConfig;
-    std::unique_ptr<Label> labelPresets;
-    std::unique_ptr<TextButton> buttonSave;
+    std::unique_ptr<juce::GroupComponent> groupOsc;
+    std::unique_ptr<juce::GroupComponent> groupAmbisonics;
+    std::unique_ptr<juce::GroupComponent> groupSpeakers;
+    std::unique_ptr<juce::ComboBox> comboBoxChannelConfig;
+    std::unique_ptr<juce::Label> labelPresets;
+    std::unique_ptr<juce::TextButton> buttonSave;
     std::unique_ptr<TableListBox> speakerList;
-    std::unique_ptr<TextButton> buttonAdd;
-    std::unique_ptr<TextButton> buttonRemove;
-    std::unique_ptr<TextButton> buttonMoveDown;
-    std::unique_ptr<TextButton> buttonMoveUp;
-    std::unique_ptr<Slider> sliderDistanceScaler;
+    std::unique_ptr<juce::TextButton> buttonAdd;
+    std::unique_ptr<juce::TextButton> buttonRemove;
+    std::unique_ptr<juce::TextButton> buttonMoveDown;
+    std::unique_ptr<juce::TextButton> buttonMoveUp;
+    std::unique_ptr<juce::Slider> sliderDistanceScaler;
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
-    std::unique_ptr<Label> labelChannelWeights;
-    std::unique_ptr<Label> labelDistanceScaler;
-    std::unique_ptr<ToggleButton> btnEditMode;
-    std::unique_ptr<TextEditor> textOscPort;
-    std::unique_ptr<Label> labelOscPort;
-    std::unique_ptr<TextEditor> textTimeout;
-    std::unique_ptr<Label> labelTimeout;
-    std::unique_ptr<ToggleButton> toggleOsc;
-    std::unique_ptr<TextButton> buttonSpeakerTest;
-    std::unique_ptr<Label> labelDevelopmentVersion;
-    std::unique_ptr<TextButton> buttonManage;
-    std::unique_ptr<ComboBox> comboBoxChannelWeightingMode;
-    std::unique_ptr<TextButton> buttonManageFilters;
+    std::unique_ptr<juce::Label> labelChannelWeights;
+    std::unique_ptr<juce::Label> labelDistanceScaler;
+    std::unique_ptr<juce::ToggleButton> btnEditMode;
+    std::unique_ptr<juce::TextEditor> textOscPort;
+    std::unique_ptr<juce::Label> labelOscPort;
+    std::unique_ptr<juce::TextEditor> textTimeout;
+    std::unique_ptr<juce::Label> labelTimeout;
+    std::unique_ptr<juce::ToggleButton> toggleOsc;
+    std::unique_ptr<juce::TextButton> buttonSpeakerTest;
+    std::unique_ptr<juce::Label> labelDevelopmentVersion;
+    std::unique_ptr<juce::TextButton> buttonManage;
+    std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
+    std::unique_ptr<juce::TextButton> buttonManageFilters;
 
 
     //==============================================================================

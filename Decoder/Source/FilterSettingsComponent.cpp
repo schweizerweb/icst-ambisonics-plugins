@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -35,102 +35,102 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
 
     //[/Constructor_pre]
 
-    comboBoxType.reset (new ComboBox ("comboBoxType"));
+    comboBoxType.reset (new juce::ComboBox ("comboBoxType"));
     addAndMakeVisible (comboBoxType.get());
     comboBoxType->setEditableText (false);
-    comboBoxType->setJustificationType (Justification::centredLeft);
-    comboBoxType->setTextWhenNothingSelected (String());
+    comboBoxType->setJustificationType (juce::Justification::centredLeft);
+    comboBoxType->setTextWhenNothingSelected (juce::String());
     comboBoxType->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxType->addListener (this);
 
-    sliderFrequency.reset (new Slider ("sliderFrequency"));
+    sliderFrequency.reset (new juce::Slider ("sliderFrequency"));
     addAndMakeVisible (sliderFrequency.get());
     sliderFrequency->setRange (20, 15000, 1);
-    sliderFrequency->setSliderStyle (Slider::LinearBar);
-    sliderFrequency->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderFrequency->setSliderStyle (juce::Slider::LinearBar);
+    sliderFrequency->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderFrequency->addListener (this);
 
-    labelFrequency.reset (new Label ("labelFrequency",
-                                     TRANS("Frequency [Hz]")));
+    labelFrequency.reset (new juce::Label ("labelFrequency",
+                                           TRANS("Frequency [Hz]")));
     addAndMakeVisible (labelFrequency.get());
     labelFrequency->setTooltip (TRANS("Frequency [Hz] (Cut-off / Center)"));
-    labelFrequency->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelFrequency->setJustificationType (Justification::centredLeft);
+    labelFrequency->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFrequency->setJustificationType (juce::Justification::centredLeft);
     labelFrequency->setEditable (false, false, false);
-    labelFrequency->setColour (TextEditor::textColourId, Colours::black);
-    labelFrequency->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelFrequency->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelFrequency->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     labelFrequency->setBounds (8, 40, 152, 24);
 
-    labelFilterType.reset (new Label ("labelFilterType",
-                                      TRANS("Filter Type")));
+    labelFilterType.reset (new juce::Label ("labelFilterType",
+                                            TRANS("Filter Type")));
     addAndMakeVisible (labelFilterType.get());
-    labelFilterType->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelFilterType->setJustificationType (Justification::centredLeft);
+    labelFilterType->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFilterType->setJustificationType (juce::Justification::centredLeft);
     labelFilterType->setEditable (false, false, false);
-    labelFilterType->setColour (TextEditor::textColourId, Colours::black);
-    labelFilterType->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelFilterType->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelFilterType->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     labelFilterType->setBounds (8, 8, 150, 24);
 
-    labelQ.reset (new Label ("labelQ",
-                             TRANS("Q-Value")));
+    labelQ.reset (new juce::Label ("labelQ",
+                                   TRANS("Q-Value")));
     addAndMakeVisible (labelQ.get());
-    labelQ->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelQ->setJustificationType (Justification::centredLeft);
+    labelQ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelQ->setJustificationType (juce::Justification::centredLeft);
     labelQ->setEditable (false, false, false);
-    labelQ->setColour (TextEditor::textColourId, Colours::black);
-    labelQ->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelQ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelQ->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     labelQ->setBounds (8, 72, 150, 24);
 
-    sliderQ.reset (new Slider ("sliderQ"));
+    sliderQ.reset (new juce::Slider ("sliderQ"));
     addAndMakeVisible (sliderQ.get());
     sliderQ->setRange (0.001, 100, 0);
-    sliderQ->setSliderStyle (Slider::LinearBar);
-    sliderQ->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderQ->setSliderStyle (juce::Slider::LinearBar);
+    sliderQ->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderQ->addListener (this);
 
     filterGraph.reset (new IIRFilterGraph (pFilterInfo, pFilterSpecification));
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
 
-    labelGain.reset (new Label ("labelGain",
-                                TRANS("Gain Factor")));
+    labelGain.reset (new juce::Label ("labelGain",
+                                      TRANS("Gain Factor")));
     addAndMakeVisible (labelGain.get());
-    labelGain->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelGain->setJustificationType (Justification::centredLeft);
+    labelGain->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelGain->setJustificationType (juce::Justification::centredLeft);
     labelGain->setEditable (false, false, false);
-    labelGain->setColour (TextEditor::textColourId, Colours::black);
-    labelGain->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     labelGain->setBounds (8, 104, 150, 24);
 
-    sliderGain.reset (new Slider ("sliderGain"));
+    sliderGain.reset (new juce::Slider ("sliderGain"));
     addAndMakeVisible (sliderGain.get());
     sliderGain->setRange (0.1, 10, 0.001);
-    sliderGain->setSliderStyle (Slider::LinearBar);
-    sliderGain->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderGain->setSliderStyle (juce::Slider::LinearBar);
+    sliderGain->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderGain->addListener (this);
 
-    comboBoxFilterPreset.reset (new ComboBox ("comboBoxFilterPreset"));
+    comboBoxFilterPreset.reset (new juce::ComboBox ("comboBoxFilterPreset"));
     addAndMakeVisible (comboBoxFilterPreset.get());
     comboBoxFilterPreset->setEditableText (false);
-    comboBoxFilterPreset->setJustificationType (Justification::centredLeft);
+    comboBoxFilterPreset->setJustificationType (juce::Justification::centredLeft);
     comboBoxFilterPreset->setTextWhenNothingSelected (TRANS("-"));
     comboBoxFilterPreset->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxFilterPreset->addListener (this);
 
-    labelPresets.reset (new Label ("labelPresets",
-                                   TRANS("Presets:")));
+    labelPresets.reset (new juce::Label ("labelPresets",
+                                         TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
-    labelPresets->setColour (TextEditor::textColourId, Colours::black);
-    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    buttonSave.reset (new TextButton ("buttonSave"));
+    buttonSave.reset (new juce::TextButton ("buttonSave"));
     addAndMakeVisible (buttonSave.get());
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
@@ -195,12 +195,12 @@ FilterSettingsComponent::~FilterSettingsComponent()
 }
 
 //==============================================================================
-void FilterSettingsComponent::paint (Graphics& g)
+void FilterSettingsComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -223,7 +223,7 @@ void FilterSettingsComponent::resized()
     //[/UserResized]
 }
 
-void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+void FilterSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
@@ -253,7 +253,7 @@ void FilterSettingsComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
     //[/UsercomboBoxChanged_Post]
 }
 
-void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
+void FilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
@@ -279,10 +279,11 @@ void FilterSettingsComponent::sliderValueChanged (Slider* sliderThatWasMoved)
 
     //[UsersliderValueChanged_Post]
 	filterGraph->repaint();
+    sendChangeMessage();
     //[/UsersliderValueChanged_Post]
 }
 
-void FilterSettingsComponent::buttonClicked (Button* buttonThatWasClicked)
+void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -323,7 +324,7 @@ void FilterSettingsComponent::updateUi()
     sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
     sliderQ->setValue(pFilterInfo->qValue);
     sliderGain->setValue(pFilterInfo->gainFactor);
-    
+
     sliderFrequency->setEnabled(pFilterInfo->frequencyRequired());
     sliderQ->setEnabled(pFilterInfo->qRequired());
     sliderGain->setEnabled(pFilterInfo->gainRequired());

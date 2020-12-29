@@ -62,6 +62,6 @@ void IIRFilterGraph::paintData(Graphics& g)
 		}
 	}
 
-	g.setColour(Colours::darkgreen);
+	g.setColour(Colours::lightgreen);
 	g.strokePath(path, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
 }

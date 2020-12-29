@@ -16,6 +16,7 @@
 #define XML_ATTRIBUTE_POINT_FILTER_FREQUENCY "FilterFrequency"
 #define XML_ATTRIBUTE_POINT_FILTER_Q "FilterQ"
 #define XML_ATTRIBUTE_POINT_FILTER_GAIN_FACTOR "GainFactor"
+#define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"
 
 class AmbiSpeaker : public AmbiPoint
 {
@@ -27,10 +28,13 @@ public:
 	AmbiSpeaker(XmlElement* element);
 
 	FilterInfo* getFilterInfo();
-
+    bool getFilterBypass();
+    void setFilterBypass(bool byPass);
+    
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
 
 private:
 	FilterInfo filterInfo;
+    bool filterBypass;
 };
