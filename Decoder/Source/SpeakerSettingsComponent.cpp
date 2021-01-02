@@ -649,7 +649,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 {
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: pSpeakerSet->setGain(rowNumber, pow(10.0, 0.1 * newValue)); break;
+    case COLUMN_ID_GAIN: pSpeakerSet->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
 	case COLUMN_ID_X: pSpeakerSet->setX(rowNumber, newValue); break;
 	case COLUMN_ID_Y: pSpeakerSet->setY(rowNumber, newValue); break;
 	case COLUMN_ID_Z: pSpeakerSet->setZ(rowNumber, newValue); break;
@@ -672,7 +672,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 
 	switch (columnId)
 	{
-	case COLUMN_ID_GAIN: return 10.0 * log10(pt->getGain());
+    case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
 	case COLUMN_ID_X: return pt->getPoint()->getX();
 	case COLUMN_ID_Y: return pt->getPoint()->getY();
 	case COLUMN_ID_Z: return pt->getPoint()->getZ();

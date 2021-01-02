@@ -80,7 +80,7 @@ void AudioParameterFloatAmbi::setValue(float newValue)
 			case X: pAmbiPoints->setX(ambiIndex, value, false); break;
 			case Y: pAmbiPoints->setY(ambiIndex, value, false); break;
 			case Z: pAmbiPoints->setZ(ambiIndex, value, false); break;
-            case Gain: pAmbiPoints->setGain(ambiIndex, Constants::GainDbToFactor(value), false); break;
+			case Gain: pAmbiPoints->setGain(ambiIndex, Decibels::decibelsToGain(value), false); break;
             case GX: pAmbiPoints->setGroupX(ambiIndex, value, false); break;
             case GY: pAmbiPoints->setGroupY(ambiIndex, value, false); break;
             case GZ: pAmbiPoints->setGroupZ(ambiIndex, value, false); break;

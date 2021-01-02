@@ -84,6 +84,22 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInf
     toggleFFT->setButtonText (TRANS("FFT"));
     toggleFFT->addListener (this);
 
+    sliderFFTScaler.reset (new juce::Slider ("sliderFFTScaler"));
+    addAndMakeVisible (sliderFFTScaler.get());
+    sliderFFTScaler->setRange (0, 50, 1);
+    sliderFFTScaler->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderFFTScaler->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 30, 20);
+    sliderFFTScaler->addListener (this);
+
+    labelFFTScaler.reset (new juce::Label ("labelFFTScaler",
+                                           TRANS("Scaler [dB]:")));
+    addAndMakeVisible (labelFFTScaler.get());
+    labelFFTScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFFTScaler->setJustificationType (juce::Justification::centredLeft);
+    labelFFTScaler->setEditable (false, false, false);
+    labelFFTScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelFFTScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -92,6 +108,9 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInf
 
 
     //[Constructor] You can add your own custom stuff here..
+    labelFFTScaler->setVisible(false);
+    sliderFFTScaler->setVisible(false);
+
 	addChangeListener(pChangeListener);
 
     updatePresetComboBox();
@@ -116,6 +135,8 @@ FilterSettingsComponent::~FilterSettingsComponent()
     filter2 = nullptr;
     filter3 = nullptr;
     toggleFFT = nullptr;
+    sliderFFTScaler = nullptr;
+    labelFFTScaler = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -146,7 +167,9 @@ void FilterSettingsComponent::resized()
     filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    toggleFFT->setBounds (proportionOfWidth (0.5000f) - (58 / 2), 40, 58, 24);
+    toggleFFT->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58, 42, 58, 24);
+    sliderFFTScaler->setBounds (getWidth() - 170, 42, 170, 24);
+    labelFFTScaler->setBounds ((getWidth() - 170) + 0 - 85, 42, 85, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -192,6 +215,7 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_toggleFFT] -- add your button handler code here..
         if(toggleFFT->getToggleState())
         {
+            filterGraph->setFFTParams(true, sliderFFTScaler->getValue());
             FFTAnalyzer::getInstance()->setActive(channelIndex);
             startTimer(50);
         }
@@ -199,13 +223,32 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         {
             stopTimer();
             FFTAnalyzer::getInstance()->disable();
-            filterGraph->disableFFT();
+            filterGraph->setFFTParams(false);
         }
+
+        labelFFTScaler->setVisible(toggleFFT->getToggleState());
+        sliderFFTScaler->setVisible(toggleFFT->getToggleState());
         //[/UserButtonCode_toggleFFT]
     }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
+}
+
+void FilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == sliderFFTScaler.get())
+    {
+        //[UserSliderCode_sliderFFTScaler] -- add your slider handling code here..
+        filterGraph->setFFTParams(true, sliderFFTScaler->getValue());
+        //[/UserSliderCode_sliderFFTScaler]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -291,21 +334,31 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="filter0" id="49c5ab20d38acf14" memberName="filter0" virtualName=""
-                    explicitFocusOrder="0" pos="0 200R 24.945% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="0 200R 24.913% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(0), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter1" id="1bbdd0b2e36d35d6" memberName="filter1" virtualName=""
-                    explicitFocusOrder="0" pos="24.945% 200R 24.945% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="24.913% 200R 24.913% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(1), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter2" id="fd705b145567f812" memberName="filter2" virtualName=""
-                    explicitFocusOrder="0" pos="49.817% 200R 24.945% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="49.827% 200R 24.913% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(2), pFilterSpecification, this"/>
   <GENERICCOMPONENT name="filter3" id="d7de5a2154c80bcf" memberName="filter3" virtualName=""
-                    explicitFocusOrder="0" pos="75.055% 200R 24.945% 200" class="SingleFilterSettingsComponent"
+                    explicitFocusOrder="0" pos="75.087% 200R 24.913% 200" class="SingleFilterSettingsComponent"
                     params="pFilterBankInfo-&gt;get(3), pFilterSpecification, this"/>
   <TOGGLEBUTTON name="toggleFFT" id="7049cb4ab444a015" memberName="toggleFFT"
-                virtualName="" explicitFocusOrder="0" pos="49.963%c 40 58 24"
+                virtualName="" explicitFocusOrder="0" pos="0r 42 58 24" posRelativeX="8939080a2743d889"
                 buttonText="FFT" connectedEdges="0" needsCallback="1" radioGroupId="0"
                 state="0"/>
+  <SLIDER name="sliderFFTScaler" id="8c8b26e83a78b29" memberName="sliderFFTScaler"
+          virtualName="" explicitFocusOrder="0" pos="170R 42 170 24" min="0.0"
+          max="50.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="30" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="labelFFTScaler" id="8939080a2743d889" memberName="labelFFTScaler"
+         virtualName="" explicitFocusOrder="0" pos="0r 42 85 24" posRelativeX="8c8b26e83a78b29"
+         edTextCol="ff000000" edBkgCol="0" labelText="Scaler [dB]:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

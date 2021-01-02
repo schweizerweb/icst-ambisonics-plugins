@@ -216,7 +216,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-    const float masterGainFactor = float(Constants::GainDbToFactor(encoderSettings.getMasterGain()));
+    const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources.size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
