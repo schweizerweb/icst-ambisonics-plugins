@@ -273,6 +273,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
 	speakerList->getHeader().setStretchToFitActive(true);
 	speakerList->getHeader().resizeAllColumnsToFit(speakerList->getWidth());
+    speakerList->setMultipleSelectionEnabled(true);
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
     updateUI();
@@ -364,7 +365,7 @@ void SpeakerSettingsComponent::resized()
     labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 267)) + 20, 104, 24);
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
     textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 217 - 88, ((0 + (getHeight() - 267)) + 199) + 20, 88, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 313 - 72, ((0 + (getHeight() - 267)) + 199) + 20, 72, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 313 - 81, ((0 + (getHeight() - 267)) + 199) + 20, 81, 24);
     textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 15 - 82, ((0 + (getHeight() - 267)) + 199) + 20, 82, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
@@ -533,18 +534,42 @@ int SpeakerSettingsComponent::getNumRows()
 
 void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
 {
-	if(lastRowSelected >= 0 && lastRowSelected < pSpeakerSet->size())
-		pPointSelection->selectPoint(lastRowSelected);
+    bool first = true;
+    if (lastRowSelected >= 0 && lastRowSelected < pSpeakerSet->size())
+    {
+        auto set = speakerList->getSelectedRows();
+        for (auto r : set.getRanges())
+        {
+            for (int i = r.getStart(); i < r.getEnd(); i++)
+            {
+                if (i != lastRowSelected)
+                {
+                    pPointSelection->selectPoint(i, !first);
+                    first = false;
+                }
+            }
+        }
+
+        pPointSelection->selectPoint(lastRowSelected, !first);
+    }
 }
 
 void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, int, int, bool rowIsSelected)
 {
-	const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
-		.interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
 	if (rowIsSelected)
-		g.fillAll(Colours::lightblue);
-	else if (rowNumber % 2)
-		g.fillAll(alternateColour);
+    {
+        if (pPointSelection->getMainSelectedPointIndex() == rowNumber)
+            g.fillAll(Colours::lightblue.withAlpha(0.8f));
+        else
+            g.fillAll(Colours::lightblue.withAlpha(0.3f));
+    }
+    else if (rowNumber % 2)
+    {
+        const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
+            .interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+
+        g.fillAll(alternateColour);
+    }
 }
 
 void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool)
@@ -819,7 +844,13 @@ void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
 
 	if (source == pPointSelection)
 	{
-		speakerList->selectRow(pPointSelection->getMainSelectedPointIndex());
+        SparseSet<int> sel;
+        for (int index : pPointSelection->getSelectedIndices())
+        {
+            sel.addRange(Range<int>(index, index + 1));
+        }
+
+        speakerList->setSelectedRows(sel, dontSendNotification);
 	}
 }
 
@@ -984,7 +1015,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="313Rr 20 72 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="313Rr 20 81 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
