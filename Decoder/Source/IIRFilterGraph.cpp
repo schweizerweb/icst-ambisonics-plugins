@@ -13,7 +13,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0)
+IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -87,11 +87,12 @@ void IIRFilterGraph::paintData(Graphics& g)
 
 	if(fftResultDataSize > 0)
 	{
+        const double sampleRateVsFFTSize = (sampleRate / fftSize);
 		g.setColour(Colours::blueviolet.withAlpha(0.5f));
 	    for(int i = 0; i < fftResultDataSize; i++)
 	    {
-			Point<float> topLeft = mapValues((double)i * (sampleRate / fftSize), fftResultData[i]).toFloat();
-			Point<float> bottomRight = mapValues((double)(i+1) * (sampleRate / fftSize), -200).toFloat();
+			Point<float> topLeft = mapValues((i - 0.5) * sampleRateVsFFTSize, fftResultData[i] + fftScaler).toFloat();
+			Point<float> bottomRight = mapValues((i + 0.5) * sampleRateVsFFTSize, displayRangeY->getStart()).toFloat();
             if (bottomRight.getY() > topLeft.getY())
 			{
 				g.fillRect(Rectangle<float>(topLeft, bottomRight));
@@ -112,12 +113,23 @@ void IIRFilterGraph::setFFTResult(float* data, int size, int newFftSize)
 		fftResultDataSize = size;
 	}
 
-	memcpy(fftResultData, data, size * sizeof(float));
-	repaint();
+	if (fftResultData != nullptr)
+	{
+		memcpy(fftResultData, data, size * sizeof(float));
+		repaint();
+	}
 }
 
-void IIRFilterGraph::disableFFT()
+void IIRFilterGraph::setFFTParams(bool enable, double scaler)
 {
-	fftResultDataSize = 0;
+	if(enable)
+	{
+		fftScaler = scaler;
+	}
+	else
+	{
+		fftResultDataSize = 0;
+	}
+
 	repaint();
 }
