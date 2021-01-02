@@ -33,11 +33,23 @@ public:
             frequencies.add(currentFrequency);
             currentFrequency *= FREQUENCY_STEP_THUMBNAIL;
         }
-        
-        magnitudes = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
+
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            magnitudes[i] = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
+        }
+
         displayRangeX.reset(new Range<double>(log10(20), log10(sampleRate / 2.0)));
-        displayRangeY.reset(new Range<double>(-20, 20));
+        displayRangeY.reset(new Range<double>(-30, 30));
         graphArea.reset(new Rectangle<int>(0, 0, 150, 40));
+	}
+
+    ~CheckBoxCustomComponent()
+	{
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            free(magnitudes[i]);
+        }
 	}
 
 	void setRowAndColumn(const int newRow, const int newColumn)
@@ -46,7 +58,7 @@ public:
 		columnId = newColumn;
 		toggle.setToggleState(owner.getFlag(columnId, row), dontSendNotification);
         
-        FilterInfo* newFilterInfo = owner.getFilterInfo(newRow);
+        FilterBankInfo* newFilterInfo = owner.getFilterInfo(newRow);
         if(!filterInfo.equals(newFilterInfo))
         {
             filterInfo = *newFilterInfo;
@@ -59,7 +71,7 @@ private:
     void resized() override
     {
         toggle.setBounds(0, 0, getHeight(), getHeight());
-        transform = AffineTransform::scale(((float)getWidth()-toggle.getWidth()) / graphArea->getWidth(), (float)getHeight() / graphArea->getHeight()).followedBy(AffineTransform::translation(toggle.getWidth(), 0.0f));
+        transform = AffineTransform::scale((float(getWidth())-toggle.getWidth()) / float(graphArea->getWidth()), (float)getHeight() / graphArea->getHeight()).followedBy(AffineTransform::translation(float(toggle.getWidth()), 0.0f));
     }
     
     void updateFilterPath()
@@ -67,20 +79,29 @@ private:
         thumbnailFilterPath.clear();
         
         // draw curve
-        dsp::IIR::Coefficients<float>::Ptr coeff = filterInfo.getCoefficients(sampleRate);
-        
-        if(coeff == nullptr)
+        if(!filterInfo.anyActive())
         {
             thumbnailFilterPath.startNewSubPath(mapValues(frequencies.getFirst(), 0.0).toFloat());
             thumbnailFilterPath.lineTo(mapValues(frequencies.getLast(), 0.0).toFloat());
         }
         else
         {
-            coeff->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes, frequencies.size(), sampleRate);
+            std::vector<dsp::IIR::Coefficients<float>::Ptr> coeffs;
+            filterInfo.getCoefficients(sampleRate, &coeffs);
+
+            int activeFilterCount = int(coeffs.size());
+            for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
+            {
+                coeffs[iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], frequencies.size(), sampleRate);
+            }
 
             for (int i = 0; i < frequencies.size(); i++)
             {
-                Point<float> displayPoint = mapValues(frequencies[i], Decibels::gainToDecibels(magnitudes[i])).toFloat();
+                double magnitudeSum = 1.0;
+                for (int iMag = 0; iMag < activeFilterCount; iMag++)
+                    magnitudeSum *= magnitudes[iMag][i];
+
+                Point<float> displayPoint = mapValues(frequencies[i], Decibels::gainToDecibels(magnitudeSum)).toFloat();
                 
                 if (i == 0)
                     thumbnailFilterPath.startNewSubPath(displayPoint);
@@ -94,7 +115,7 @@ private:
     {
         g.fillAll(getLookAndFeel().findColour(ListBox::backgroundColourId));
         g.setColour(Colours::lightgrey);
-        g.drawLine(toggle.getWidth(), getHeight()/2, getWidth(), getHeight()/2);
+        g.drawLine(float(toggle.getWidth()), getHeight()/2.0f, float(getWidth()), getHeight()/2.0f);
         
         g.setColour(owner.getFlag(columnId, row) ? Colours::lightgreen : Colours::red);
         g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);
@@ -105,12 +126,11 @@ private:
         owner.setFlag(columnId, row, b->getToggleState());
     }
    
-    //void mouseDoubleClick(const MouseEvent &event) override
     void mouseUp(const MouseEvent &event) override
     {
         if(!toggle.contains(event.getPosition()))
         {
-            CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner, owner.getFilterPresetHelper()), getScreenBounds().translated(-owner.getScreenX(), -owner.getScreenY()), &owner);
+            CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner, owner.getFilterPresetHelper(), row), getScreenBounds().translated(-owner.getScreenX(), -owner.getScreenY()), &owner);
         }
     }
     
@@ -131,10 +151,10 @@ private:
     Path thumbnailFilterPath;
     std::unique_ptr<PathStrokeType> strokeType;
     
-    FilterInfo filterInfo;
+    FilterBankInfo filterInfo;
     Array<double> frequencies;
     double sampleRate;
-    double* magnitudes;
+    double* magnitudes[MAX_FILTER_COUNT];
     std::unique_ptr<Rectangle<int>> graphArea;
     std::unique_ptr<Range<double>> displayRangeX;
     std::unique_ptr<Range<double>> displayRangeY;

@@ -10,6 +10,7 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
+#include "../../Common/FFTAnalyzer.h"
 
 
 //==============================================================================
@@ -35,6 +36,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
 {
 	delete pTestSoundGenerator;
+    FFTAnalyzer::deleteInstance();
 }
 
 //==============================================================================
@@ -158,25 +160,37 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
 void AmbisonicsDecoderAudioProcessor::checkFilters()
 {
     int size = speakerSet.size();
-    
-    // IIR filter
-    while(size > iirFilters.size())
+
+    for(int iSpeaker = 0; iSpeaker < size; iSpeaker++)
     {
-        dsp::IIR::Filter<float>* newFilter = new dsp::IIR::Filter<float>();
-        newFilter->prepare(iirFilterSpec);
-        newFilter->reset();
-        iirFilters.add(newFilter);
+        if (!speakerSet.get(iSpeaker)->getFilterBypass())
+        {
+            for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
+            {
+                FilterInfo* pFilter = speakerSet.get(iSpeaker)->getFilterInfo()->get(iFilter);
+                if (pFilter == nullptr)
+                {
+                    Logger::writeToLog("Error in Filterbank!");
+                    return;
+                }
+                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter))
+                {
+                    if (filterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
+                    {
+                        iirFilters[iSpeaker][iFilter].prepare(iirFilterSpec);
+                        iirFilters[iSpeaker][iFilter].reset();
+                    }
+
+                    filterInfo[iSpeaker].get(iFilter)->copyFrom(pFilter);
+                    auto newCoeff = pFilter->getCoefficients(iirFilterSpec.sampleRate);
+                    if (newCoeff != nullptr)
+                    {
+                        iirFilters[iSpeaker][iFilter].coefficients = newCoeff;
+                    }
+                }
+            }
+        }
     }
-        
-    while(size < iirFilters.size())
-    {
-        iirFilters.removeLast();
-    }
-    
-	for(int i = 0; i < iirFilters.size() && i < speakerSet.size(); i++)
-	{
-		iirFilters[i]->coefficients = speakerSet.get(i)->getFilterBypass() ? nullptr :  speakerSet.get(i)->getFilterInfo()->getCoefficients(iirFilterSpec.sampleRate);
-	}
 }
 
 void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&)
@@ -218,7 +232,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 		{
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
-			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->filterType == FilterInfo::LowPass;
+			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
             int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
             int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
             
@@ -246,13 +260,27 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 			}
             
             pTestSoundGenerator->process(channelData, buffer.getNumSamples(), iSpeaker);
-            
-            if(!pt->getFilterBypass() && pt->getFilterInfo()->filterType != FilterInfo::None)
+
+            // apply filters
+            if(!pt->getFilterBypass() && pt->getFilterInfo()->anyActive())
             {
                 for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
                 {
-                    channelData[iSample] = iirFilters[iSpeaker]->processSample(channelData[iSample]);
+                    for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
+                    {
+                        if (filterInfo[iSpeaker].get(iFilter)->filterType != FilterInfo::None)
+                        {
+                            channelData[iSample] = iirFilters[iSpeaker][iFilter].processSample(channelData[iSample]);
+                        }
+                    }
                 }
+            }
+
+            auto analyzer = FFTAnalyzer::getInstance();
+            if (analyzer->isActive(iSpeaker))
+            {
+                for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+                    analyzer->pushNextSampleIntoFifo(channelData[iSample]);
             }
 		}
 	}

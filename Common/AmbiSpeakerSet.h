@@ -26,7 +26,6 @@ public:
 	void remove(int index) override;
 	void swap(int a, int b) override;
 
-	void setFilterInfo(int channel, FilterInfo info) const;
     void setFilterBypass(int channel, bool byPass) const;
 	double getMaxNormalizedDistance() const;
 

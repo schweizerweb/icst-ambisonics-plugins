@@ -24,7 +24,7 @@ public:
     
     bool checkValid(File presetFile) override
     {
-        FilterInfo testInfo;
+        FilterBankInfo testInfo;
         if(loadFromXmlFile(presetFile, &testInfo))
         {
             return true;
@@ -35,17 +35,17 @@ public:
     
     void restoreDefaultsInternal() override
     {
-        FilterInfo filterInfo;
+        FilterBankInfo filterInfo;
         
         File file = getPathForPresetName("LowPass 50 Hz");
-        filterInfo.filterType = FilterInfo::LowPass;
-        filterInfo.cutOffFrequencyHz = 50;
+        filterInfo.get(0)->filterType = FilterInfo::LowPass;
+        filterInfo.get(0)->cutOffFrequencyHz = 50;
         
         writeToXmlFile(file, &filterInfo);
         presetFiles.addIfNotAlreadyThere(file);
     }
     
-    bool loadFromXmlFile(const File file, FilterInfo* pFilterInfo)
+    bool loadFromXmlFile(const File file, FilterBankInfo* pFilterInfo)
     {
         XmlDocument doc(file);
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("FilterPreset");
@@ -58,7 +58,7 @@ public:
         return ok;
     }
     
-    bool writeToXmlFile(const File file, FilterInfo* pFilterInfo)
+    bool writeToXmlFile(const File file, FilterBankInfo* pFilterInfo)
     {
         XmlElement* rootElement = new XmlElement("FilterPreset");
 

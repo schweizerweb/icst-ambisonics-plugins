@@ -91,7 +91,7 @@ public:
     void actionListenerCallback(const String &message) override;
 	void updateDistanceScaler() const;
     void updateUI() const;
-	FilterInfo* getFilterInfo(int rowNumber) const;
+	FilterBankInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
     FilterPresetHelper* getFilterPresetHelper() const;

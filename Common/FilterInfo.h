@@ -9,6 +9,12 @@
 */
 
 #pragma once
+#include "JuceHeader.h"
+
+#define XML_ATTRIBUTE_FILTER_TYPE "FilterType"
+#define XML_ATTRIBUTE_FILTER_FREQUENCY "FilterFrequency"
+#define XML_ATTRIBUTE_FILTER_Q "FilterQ"
+#define XML_ATTRIBUTE_FILTER_GAIN_FACTOR "GainFactor"
 #define DEFAULT_Q	1.0
 #define DEFAULT_FREQUENCY 200
 #define DEFAULT_GAIN_FACTOR 1
@@ -113,22 +119,22 @@ public:
 		return filterType == LowPass || filterType == FirstOrderLowPass;
 	}
     
-    bool loadFromXmlElement(XmlElement* xmlElement)
+    bool loadFromXmlElement(XmlElement* xmlElement, String indexSuffix)
     {
-        filterType = (FilterType)xmlElement->getIntAttribute("filterType", DEFAULT_FILTER_TYPE);
-        cutOffFrequencyHz = (float)xmlElement->getDoubleAttribute("cutOffFrequencyHz", DEFAULT_FREQUENCY);
-        qValue = (float)xmlElement->getDoubleAttribute("qValue", DEFAULT_Q);
-        gainFactor = (float)xmlElement->getDoubleAttribute("gainFactor", DEFAULT_GAIN_FACTOR);
+        filterType = (FilterType)xmlElement->getIntAttribute(XML_ATTRIBUTE_FILTER_TYPE + indexSuffix, DEFAULT_FILTER_TYPE);
+        cutOffFrequencyHz = (float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_FILTER_FREQUENCY + indexSuffix, DEFAULT_FREQUENCY);
+        qValue = (float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_FILTER_Q + indexSuffix, DEFAULT_Q);
+        gainFactor = (float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_FILTER_GAIN_FACTOR + indexSuffix, DEFAULT_GAIN_FACTOR);
         
         return true;
     }
     
-    bool writeToXmlElement(XmlElement* xmlElement)
+    bool writeToXmlElement(XmlElement* xmlElement, String indexSuffix)
     {
-        xmlElement->setAttribute("filterType", (int)filterType);
-        xmlElement->setAttribute("cutOffFrequencyHz", cutOffFrequencyHz);
-        xmlElement->setAttribute("qValue", qValue);
-        xmlElement->setAttribute("gainFactor", gainFactor);
+        xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_TYPE + indexSuffix, (int)filterType);
+        xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_FREQUENCY + indexSuffix, cutOffFrequencyHz);
+        xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_Q + indexSuffix, qValue);
+        xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_GAIN_FACTOR + indexSuffix, gainFactor);
         
         return true;
     }

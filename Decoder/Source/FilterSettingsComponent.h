@@ -21,10 +21,9 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../../Common/FilterInfo.h"
 #include "IIRFilterGraph.h"
 #include "FilterPresetHelper.h"
-#include "../../Common/PresetManagerDialog.h"
+#include "SingleFilterSettingsComponent.h"
 //[/Headers]
 
 
@@ -40,49 +39,52 @@
 class FilterSettingsComponent  : public Component,
                                  public ChangeBroadcaster,
                                  public ActionListener,
+                                 public ChangeListener,
+                                 public Timer,
                                  public juce::ComboBox::Listener,
-                                 public juce::Slider::Listener,
-                                 public juce::Button::Listener
+                                 public juce::Button::Listener,
+                                 public juce::Slider::Listener
 {
 public:
     //==============================================================================
-    FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper);
+    FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex);
     ~FilterSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void updatePresetComboBox();
-    void updateUi();
     void actionListenerCallback(const String &message) override;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
+    void timerCallback() override;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
-    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	FilterInfo* pFilterInfo;
     FilterPresetHelper* pPresetHelper;
+    FilterBankInfo* pFilterBankInfo;
+    int channelIndex;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::ComboBox> comboBoxType;
-    std::unique_ptr<juce::Slider> sliderFrequency;
-    std::unique_ptr<juce::Label> labelFrequency;
-    std::unique_ptr<juce::Label> labelFilterType;
-    std::unique_ptr<juce::Label> labelQ;
-    std::unique_ptr<juce::Slider> sliderQ;
     std::unique_ptr<IIRFilterGraph> filterGraph;
-    std::unique_ptr<juce::Label> labelGain;
-    std::unique_ptr<juce::Slider> sliderGain;
     std::unique_ptr<juce::ComboBox> comboBoxFilterPreset;
     std::unique_ptr<juce::Label> labelPresets;
     std::unique_ptr<juce::TextButton> buttonSave;
+    std::unique_ptr<SingleFilterSettingsComponent> filter0;
+    std::unique_ptr<SingleFilterSettingsComponent> filter1;
+    std::unique_ptr<SingleFilterSettingsComponent> filter2;
+    std::unique_ptr<SingleFilterSettingsComponent> filter3;
+    std::unique_ptr<juce::ToggleButton> toggleFFT;
+    std::unique_ptr<juce::Slider> sliderFFTScaler;
+    std::unique_ptr<juce::Label> labelFFTScaler;
 
 
     //==============================================================================

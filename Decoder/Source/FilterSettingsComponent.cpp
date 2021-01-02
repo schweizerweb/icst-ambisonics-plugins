@@ -18,6 +18,8 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "../../Common/FilterBankInfo.h"
+#include "../../Common/FFTAnalyzer.h"
 //[/Headers]
 
 #include "FilterSettingsComponent.h"
@@ -27,91 +29,15 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper)
-    : pPresetHelper(pPresetHelper)
+FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex)
+    : pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	this->pFilterInfo = pFilterInfo;
-
     //[/Constructor_pre]
 
-    comboBoxType.reset (new juce::ComboBox ("comboBoxType"));
-    addAndMakeVisible (comboBoxType.get());
-    comboBoxType->setEditableText (false);
-    comboBoxType->setJustificationType (juce::Justification::centredLeft);
-    comboBoxType->setTextWhenNothingSelected (juce::String());
-    comboBoxType->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxType->addListener (this);
-
-    sliderFrequency.reset (new juce::Slider ("sliderFrequency"));
-    addAndMakeVisible (sliderFrequency.get());
-    sliderFrequency->setRange (20, 15000, 1);
-    sliderFrequency->setSliderStyle (juce::Slider::LinearBar);
-    sliderFrequency->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderFrequency->addListener (this);
-
-    labelFrequency.reset (new juce::Label ("labelFrequency",
-                                           TRANS("Frequency [Hz]")));
-    addAndMakeVisible (labelFrequency.get());
-    labelFrequency->setTooltip (TRANS("Frequency [Hz] (Cut-off / Center)"));
-    labelFrequency->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelFrequency->setJustificationType (juce::Justification::centredLeft);
-    labelFrequency->setEditable (false, false, false);
-    labelFrequency->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelFrequency->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelFrequency->setBounds (8, 40, 152, 24);
-
-    labelFilterType.reset (new juce::Label ("labelFilterType",
-                                            TRANS("Filter Type")));
-    addAndMakeVisible (labelFilterType.get());
-    labelFilterType->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelFilterType->setJustificationType (juce::Justification::centredLeft);
-    labelFilterType->setEditable (false, false, false);
-    labelFilterType->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelFilterType->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelFilterType->setBounds (8, 8, 150, 24);
-
-    labelQ.reset (new juce::Label ("labelQ",
-                                   TRANS("Q-Value")));
-    addAndMakeVisible (labelQ.get());
-    labelQ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelQ->setJustificationType (juce::Justification::centredLeft);
-    labelQ->setEditable (false, false, false);
-    labelQ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelQ->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelQ->setBounds (8, 72, 150, 24);
-
-    sliderQ.reset (new juce::Slider ("sliderQ"));
-    addAndMakeVisible (sliderQ.get());
-    sliderQ->setRange (0.001, 100, 0);
-    sliderQ->setSliderStyle (juce::Slider::LinearBar);
-    sliderQ->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderQ->addListener (this);
-
-    filterGraph.reset (new IIRFilterGraph (pFilterInfo, pFilterSpecification));
+    filterGraph.reset (new IIRFilterGraph (pFilterBankInfo, pFilterSpecification));
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
-
-    labelGain.reset (new juce::Label ("labelGain",
-                                      TRANS("Gain Factor")));
-    addAndMakeVisible (labelGain.get());
-    labelGain->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelGain->setJustificationType (juce::Justification::centredLeft);
-    labelGain->setEditable (false, false, false);
-    labelGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelGain->setBounds (8, 104, 150, 24);
-
-    sliderGain.reset (new juce::Slider ("sliderGain"));
-    addAndMakeVisible (sliderGain.get());
-    sliderGain->setRange (0.1, 10, 0.001);
-    sliderGain->setSliderStyle (juce::Slider::LinearBar);
-    sliderGain->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderGain->addListener (this);
 
     comboBoxFilterPreset.reset (new juce::ComboBox ("comboBoxFilterPreset"));
     addAndMakeVisible (comboBoxFilterPreset.get());
@@ -130,41 +56,63 @@ FilterSettingsComponent::FilterSettingsComponent (FilterInfo* pFilterInfo, dsp::
     labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
+    labelPresets->setBounds (0, 8, 64, 24);
+
     buttonSave.reset (new juce::TextButton ("buttonSave"));
     addAndMakeVisible (buttonSave.get());
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
+    filter0.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(0), pFilterSpecification, this));
+    addAndMakeVisible (filter0.get());
+    filter0->setName ("filter0");
+
+    filter1.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(1), pFilterSpecification, this));
+    addAndMakeVisible (filter1.get());
+    filter1->setName ("filter1");
+
+    filter2.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(2), pFilterSpecification, this));
+    addAndMakeVisible (filter2.get());
+    filter2->setName ("filter2");
+
+    filter3.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(3), pFilterSpecification, this));
+    addAndMakeVisible (filter3.get());
+    filter3->setName ("filter3");
+
+    toggleFFT.reset (new juce::ToggleButton ("toggleFFT"));
+    addAndMakeVisible (toggleFFT.get());
+    toggleFFT->setButtonText (TRANS("FFT"));
+    toggleFFT->addListener (this);
+
+    sliderFFTScaler.reset (new juce::Slider ("sliderFFTScaler"));
+    addAndMakeVisible (sliderFFTScaler.get());
+    sliderFFTScaler->setRange (0, 50, 1);
+    sliderFFTScaler->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderFFTScaler->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 30, 20);
+    sliderFFTScaler->addListener (this);
+
+    labelFFTScaler.reset (new juce::Label ("labelFFTScaler",
+                                           TRANS("Scaler [dB]:")));
+    addAndMakeVisible (labelFFTScaler.get());
+    labelFFTScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFFTScaler->setJustificationType (juce::Justification::centredLeft);
+    labelFFTScaler->setEditable (false, false, false);
+    labelFFTScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelFFTScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (700, 550);
 
 
     //[Constructor] You can add your own custom stuff here..
+    labelFFTScaler->setVisible(false);
+    sliderFFTScaler->setVisible(false);
+
 	addChangeListener(pChangeListener);
-	comboBoxType->addItem("Off", 1+FilterInfo::FilterType::None);
-	comboBoxType->addItem("Low-Pass", 1+FilterInfo::FilterType::LowPass);
-	comboBoxType->addItem("Band-Pass", 1+FilterInfo::FilterType::BandPass);
-	comboBoxType->addItem("High-Pass", 1+FilterInfo::FilterType::HighPass);
-	comboBoxType->addItem("Low-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderLowPass);
-	comboBoxType->addItem("High-Pass (1st order)", 1+FilterInfo::FilterType::FirstOrderHighPass);
-	comboBoxType->addItem("Notch", 1+FilterInfo::FilterType::Notch);
-    comboBoxType->addItem("Low Shelf", 1+FilterInfo::FilterType::LowShelf);
-    comboBoxType->addItem("High Shelf", 1+FilterInfo::FilterType::HighShelf);
-    comboBoxType->addItem("Peak", 1+FilterInfo::FilterType::Peak);
 
-
-	sliderFrequency->setSkewFactorFromMidPoint(500);
-	sliderFrequency->setRange(20, jmin(int(pFilterSpecification->sampleRate / 2.0), 22000));
-	sliderFrequency->setNumDecimalPlacesToDisplay(0);
-    sliderQ->setNumDecimalPlacesToDisplay(3);
-	sliderQ->setSkewFactorFromMidPoint(1.0);
-    sliderGain->setNumDecimalPlacesToDisplay(3);
-    sliderGain->setSkewFactorFromMidPoint(1.0);
-
-    updateUi();
     updatePresetComboBox();
     pPresetHelper->addActionListener(this);
     //[/Constructor]
@@ -174,20 +122,21 @@ FilterSettingsComponent::~FilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     pPresetHelper->removeActionListener(this);
+    stopTimer();
+    FFTAnalyzer::getInstance()->disable();
     //[/Destructor_pre]
 
-    comboBoxType = nullptr;
-    sliderFrequency = nullptr;
-    labelFrequency = nullptr;
-    labelFilterType = nullptr;
-    labelQ = nullptr;
-    sliderQ = nullptr;
     filterGraph = nullptr;
-    labelGain = nullptr;
-    sliderGain = nullptr;
     comboBoxFilterPreset = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
+    filter0 = nullptr;
+    filter1 = nullptr;
+    filter2 = nullptr;
+    filter3 = nullptr;
+    toggleFFT = nullptr;
+    sliderFFTScaler = nullptr;
+    labelFFTScaler = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -211,14 +160,16 @@ void FilterSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxType->setBounds (136, 8, getWidth() - 144, 24);
-    sliderFrequency->setBounds (136, 40, getWidth() - 144, 24);
-    sliderQ->setBounds (136, 72, getWidth() - 144, 24);
-    filterGraph->setBounds (8, 136, getWidth() - 16, getHeight() - 175);
-    sliderGain->setBounds (136, 104, getWidth() - 144, 24);
-    comboBoxFilterPreset->setBounds (80, getHeight() - 32, getWidth() - 179, 24);
-    labelPresets->setBounds (8, getHeight() - 32, 64, 24);
-    buttonSave->setBounds (getWidth() - 11 - 80, getHeight() - 32, 80, 24);
+    filterGraph->setBounds (0, 40, getWidth() - 0, getHeight() - 240);
+    comboBoxFilterPreset->setBounds (72, 8, getWidth() - 167, 24);
+    buttonSave->setBounds (getWidth() - 7 - 80, 8, 80, 24);
+    filter0->setBounds (0, getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    toggleFFT->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58, 42, 58, 24);
+    sliderFFTScaler->setBounds (getWidth() - 170, 42, 170, 24);
+    labelFFTScaler->setBounds ((getWidth() - 170) + 0 - 85, 42, 85, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -228,18 +179,7 @@ void FilterSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasCh
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
 
-    if (comboBoxThatHasChanged == comboBoxType.get())
-    {
-        //[UserComboBoxCode_comboBoxType] -- add your combo box handling code here..
-		pFilterInfo->filterType = FilterInfo::FilterType(comboBoxType->getSelectedId()-1);
-        pFilterInfo->cutOffFrequencyHz = pFilterInfo->defaultFrequency();
-        pFilterInfo->qValue = pFilterInfo->defaultQ();
-        pFilterInfo->gainFactor = pFilterInfo->defaultGainFactor();
-        updateUi();
-        sendChangeMessage();
-        //[/UserComboBoxCode_comboBoxType]
-    }
-    else if (comboBoxThatHasChanged == comboBoxFilterPreset.get())
+    if (comboBoxThatHasChanged == comboBoxFilterPreset.get())
     {
         //[UserComboBoxCode_comboBoxFilterPreset] -- add your combo box handling code here..
         String presetName = comboBoxFilterPreset->getText();
@@ -251,36 +191,6 @@ void FilterSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasCh
     //[UsercomboBoxChanged_Post]
 	filterGraph->repaint();
     //[/UsercomboBoxChanged_Post]
-}
-
-void FilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
-{
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
-    if (sliderThatWasMoved == sliderFrequency.get())
-    {
-        //[UserSliderCode_sliderFrequency] -- add your slider handling code here..
-		pFilterInfo->cutOffFrequencyHz = float(sliderFrequency->getValue());
-        //[/UserSliderCode_sliderFrequency]
-    }
-    else if (sliderThatWasMoved == sliderQ.get())
-    {
-        //[UserSliderCode_sliderQ] -- add your slider handling code here..
-		pFilterInfo->qValue = float(sliderQ->getValue());
-        //[/UserSliderCode_sliderQ]
-    }
-    else if (sliderThatWasMoved == sliderGain.get())
-    {
-        //[UserSliderCode_sliderGain] -- add your slider handling code here..
-        pFilterInfo->gainFactor = float(sliderGain->getValue());
-        //[/UserSliderCode_sliderGain]
-    }
-
-    //[UsersliderValueChanged_Post]
-	filterGraph->repaint();
-    sendChangeMessage();
-    //[/UsersliderValueChanged_Post]
 }
 
 void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
@@ -295,14 +205,50 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         if(newFile == nullptr)
                 return;
 
-        pPresetHelper->writeToXmlFile(*newFile, pFilterInfo);
+        pPresetHelper->writeToXmlFile(*newFile, pFilterBankInfo);
         comboBoxFilterPreset->setText("", dontSendNotification);
         delete newFile;
         //[/UserButtonCode_buttonSave]
     }
+    else if (buttonThatWasClicked == toggleFFT.get())
+    {
+        //[UserButtonCode_toggleFFT] -- add your button handler code here..
+        if(toggleFFT->getToggleState())
+        {
+            filterGraph->setFFTParams(true, sliderFFTScaler->getValue());
+            FFTAnalyzer::getInstance()->setActive(channelIndex);
+            startTimer(50);
+        }
+        else
+        {
+            stopTimer();
+            FFTAnalyzer::getInstance()->disable();
+            filterGraph->setFFTParams(false);
+        }
+
+        labelFFTScaler->setVisible(toggleFFT->getToggleState());
+        sliderFFTScaler->setVisible(toggleFFT->getToggleState());
+        //[/UserButtonCode_toggleFFT]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
+}
+
+void FilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == sliderFFTScaler.get())
+    {
+        //[UserSliderCode_sliderFFTScaler] -- add your slider handling code here..
+        filterGraph->setFFTParams(true, sliderFFTScaler->getValue());
+        //[/UserSliderCode_sliderFFTScaler]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -318,18 +264,6 @@ void FilterSettingsComponent::updatePresetComboBox()
     }
 }
 
-void FilterSettingsComponent::updateUi()
-{
-    comboBoxType->setSelectedId(1+pFilterInfo->filterType, dontSendNotification);
-    sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
-    sliderQ->setValue(pFilterInfo->qValue);
-    sliderGain->setValue(pFilterInfo->gainFactor);
-
-    sliderFrequency->setEnabled(pFilterInfo->frequencyRequired());
-    sliderQ->setEnabled(pFilterInfo->qRequired());
-    sliderGain->setEnabled(pFilterInfo->gainRequired());
-}
-
 void FilterSettingsComponent::actionListenerCallback(const String &message)
 {
     if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
@@ -339,9 +273,28 @@ void FilterSettingsComponent::actionListenerCallback(const String &message)
     else if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
     {
         File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
-        pPresetHelper->loadFromXmlFile(presetFile, pFilterInfo);
+        pPresetHelper->loadFromXmlFile(presetFile, pFilterBankInfo);
         pPresetHelper->notifyPresetChanged();
-        updateUi();
+        filter0->updateUi();
+        filter1->updateUi();
+        filter2->updateUi();
+        filter3->updateUi();
+    }
+}
+
+void FilterSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
+{
+    filterGraph->repaint();
+    sendChangeMessage();
+}
+
+void FilterSettingsComponent::timerCallback()
+{
+    float scope[SCOPE_SIZE];
+    int fftSize;
+    if (FFTAnalyzer::getInstance()->scopeRequest(&scope[0], &fftSize))
+    {
+        filterGraph->setFFTResult(&scope[0], SCOPE_SIZE, fftSize);
     }
 }
 
@@ -358,66 +311,54 @@ void FilterSettingsComponent::actionListenerCallback(const String &message)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
-                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
-                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper"
-                 variableInitialisers="pPresetHelper(pPresetHelper)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="600" initialHeight="400">
+                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener, public Timer"
+                 constructorParams="FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex"
+                 variableInitialisers="pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="700" initialHeight="550">
   <BACKGROUND backgroundColour="ff505050"/>
-  <COMBOBOX name="comboBoxType" id="8896d80d8503e534" memberName="comboBoxType"
-            virtualName="" explicitFocusOrder="0" pos="136 8 144M 24" editable="0"
-            layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <SLIDER name="sliderFrequency" id="f23e9b966efc9df5" memberName="sliderFrequency"
-          virtualName="" explicitFocusOrder="0" pos="136 40 144M 24" min="20.0"
-          max="15000.0" int="1.0" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <LABEL name="labelFrequency" id="2b4b513621db1c33" memberName="labelFrequency"
-         virtualName="" explicitFocusOrder="0" pos="8 40 152 24" tooltip="Frequency [Hz] (Cut-off / Center)"
-         edTextCol="ff000000" edBkgCol="0" labelText="Frequency [Hz]"
-         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
-         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
-         italic="0" justification="33"/>
-  <LABEL name="labelFilterType" id="45be7377944657a2" memberName="labelFilterType"
-         virtualName="" explicitFocusOrder="0" pos="8 8 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Filter Type" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="labelQ" id="c59d0be17b74b579" memberName="labelQ" virtualName=""
-         explicitFocusOrder="0" pos="8 72 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Q-Value" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderQ" id="d75dd45147568a5" memberName="sliderQ" virtualName=""
-          explicitFocusOrder="0" pos="136 72 144M 24" min="0.001" max="100.0"
-          int="0.0" style="LinearBar" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="filterGraph" id="d097d04040748d3c" memberName="filterGraph"
-                    virtualName="" explicitFocusOrder="0" pos="8 136 16M 175M" class="IIRFilterGraph"
-                    params="pFilterInfo, pFilterSpecification"/>
-  <LABEL name="labelGain" id="5e0ece6555401094" memberName="labelGain"
-         virtualName="" explicitFocusOrder="0" pos="8 104 150 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Gain Factor" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderGain" id="6dc6c3b4f1230227" memberName="sliderGain"
-          virtualName="" explicitFocusOrder="0" pos="136 104 144M 24" min="0.1"
-          max="10.0" int="0.001" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+                    virtualName="" explicitFocusOrder="0" pos="0 40 0M 240M" class="IIRFilterGraph"
+                    params="pFilterBankInfo, pFilterSpecification"/>
   <COMBOBOX name="comboBoxFilterPreset" id="4b25adf5b07e9492" memberName="comboBoxFilterPreset"
-            virtualName="" explicitFocusOrder="0" pos="80 32R 179M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="72 8 167M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="8 32R 64 24" posRelativeY="450188aa0f332e78"
+         virtualName="" explicitFocusOrder="0" pos="0 8 64 24" posRelativeY="450188aa0f332e78"
          edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="11Rr 32R 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="7Rr 8 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <GENERICCOMPONENT name="filter0" id="49c5ab20d38acf14" memberName="filter0" virtualName=""
+                    explicitFocusOrder="0" pos="0 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    params="pFilterBankInfo-&gt;get(0), pFilterSpecification, this"/>
+  <GENERICCOMPONENT name="filter1" id="1bbdd0b2e36d35d6" memberName="filter1" virtualName=""
+                    explicitFocusOrder="0" pos="24.913% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    params="pFilterBankInfo-&gt;get(1), pFilterSpecification, this"/>
+  <GENERICCOMPONENT name="filter2" id="fd705b145567f812" memberName="filter2" virtualName=""
+                    explicitFocusOrder="0" pos="49.827% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    params="pFilterBankInfo-&gt;get(2), pFilterSpecification, this"/>
+  <GENERICCOMPONENT name="filter3" id="d7de5a2154c80bcf" memberName="filter3" virtualName=""
+                    explicitFocusOrder="0" pos="75.087% 200R 24.913% 200" class="SingleFilterSettingsComponent"
+                    params="pFilterBankInfo-&gt;get(3), pFilterSpecification, this"/>
+  <TOGGLEBUTTON name="toggleFFT" id="7049cb4ab444a015" memberName="toggleFFT"
+                virtualName="" explicitFocusOrder="0" pos="0r 42 58 24" posRelativeX="8939080a2743d889"
+                buttonText="FFT" connectedEdges="0" needsCallback="1" radioGroupId="0"
+                state="0"/>
+  <SLIDER name="sliderFFTScaler" id="8c8b26e83a78b29" memberName="sliderFFTScaler"
+          virtualName="" explicitFocusOrder="0" pos="170R 42 170 24" min="0.0"
+          max="50.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="30" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="labelFFTScaler" id="8939080a2743d889" memberName="labelFFTScaler"
+         virtualName="" explicitFocusOrder="0" pos="0r 42 85 24" posRelativeX="8c8b26e83a78b29"
+         edTextCol="ff000000" edBkgCol="0" labelText="Scaler [dB]:" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
