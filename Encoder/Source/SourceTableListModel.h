@@ -163,7 +163,7 @@ private:
 
         switch (columnId)
         {
-        case COLUMN_ID_GAIN: return Constants::GainFactorToDb(pt->getGain());
+        case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
         case COLUMN_ID_X: return pt->getPoint()->getX();
         case COLUMN_ID_Y: return pt->getPoint()->getY();
         case COLUMN_ID_Z: return pt->getPoint()->getZ();
@@ -186,7 +186,7 @@ private:
     {
         switch (columnId)
         {
-        case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Constants::GainDbToFactor(newValue)); break;
+        case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
         case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
         case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
         case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
