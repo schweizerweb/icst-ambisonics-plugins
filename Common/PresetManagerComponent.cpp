@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -38,30 +38,35 @@ PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper, boo
     addAndMakeVisible (presetTable.get());
     presetTable->setName ("presetTable");
 
-    btnRemove.reset (new TextButton ("btnRemove"));
+    btnRemove.reset (new juce::TextButton ("btnRemove"));
     addAndMakeVisible (btnRemove.get());
     btnRemove->setButtonText (TRANS("Remove"));
     btnRemove->addListener (this);
 
-    btnRemoveAll.reset (new TextButton ("btnRemoveAll"));
+    btnRemoveAll.reset (new juce::TextButton ("btnRemoveAll"));
     addAndMakeVisible (btnRemoveAll.get());
     btnRemoveAll->setButtonText (TRANS("Remove All"));
     btnRemoveAll->addListener (this);
 
-    btnExportAll.reset (new TextButton ("btnExportAll"));
+    btnExportAll.reset (new juce::TextButton ("btnExportAll"));
     addAndMakeVisible (btnExportAll.get());
     btnExportAll->setButtonText (TRANS("Export All"));
     btnExportAll->addListener (this);
 
-    btnImport.reset (new TextButton ("btnImport"));
+    btnImport.reset (new juce::TextButton ("btnImport"));
     addAndMakeVisible (btnImport.get());
     btnImport->setButtonText (TRANS("Import"));
     btnImport->addListener (this);
 
-    btnRestoreDefaults.reset (new TextButton ("btnRestoreDefaults"));
+    btnRestoreDefaults.reset (new juce::TextButton ("btnRestoreDefaults"));
     addAndMakeVisible (btnRestoreDefaults.get());
     btnRestoreDefaults->setButtonText (TRANS("Restore Defaults"));
     btnRestoreDefaults->addListener (this);
+
+    btnExport.reset (new juce::TextButton ("btnExport"));
+    addAndMakeVisible (btnExport.get());
+    btnExport->setButtonText (TRANS("Export"));
+    btnExport->addListener (this);
 
 
     //[UserPreSize]
@@ -90,6 +95,7 @@ PresetManagerComponent::~PresetManagerComponent()
     btnExportAll = nullptr;
     btnImport = nullptr;
     btnRestoreDefaults = nullptr;
+    btnExport = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -97,12 +103,12 @@ PresetManagerComponent::~PresetManagerComponent()
 }
 
 //==============================================================================
-void PresetManagerComponent::paint (Graphics& g)
+void PresetManagerComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     controlDimming();
@@ -118,13 +124,15 @@ void PresetManagerComponent::resized()
     btnRemove->setBounds (8, getHeight() - 8 - 24, 104, 24);
     btnRemoveAll->setBounds (120, getHeight() - 8 - 24, 104, 24);
     btnExportAll->setBounds (getWidth() - 8 - 104, getHeight() - 8 - 24, 104, 24);
-    btnImport->setBounds (getWidth() - 118 - 104, getHeight() - 8 - 24, 104, 24);
+    btnImport->setBounds (getWidth() - 232 - 104, getHeight() - 8 - 24, 104, 24);
     btnRestoreDefaults->setBounds (232, getHeight() - 8 - 24, 120, 24);
+    btnExport->setBounds (getWidth() - 120 - 104, getHeight() - 8 - 24, 104, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
 
-void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
+
+void PresetManagerComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -154,30 +162,10 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnExportAll.get())
     {
         //[UserButtonCode_btnExportAll] -- add your button handler code here..
-        bool overwriteAll = false;
         FileChooser chooser("Select directory to export...", File::getSpecialLocation(File::userHomeDirectory));
         if (chooser.browseForDirectory())
         {
-            for(File file : pPresetHelper->presetFiles)
-            {
-                File target(chooser.getResult().getFullPathName() + "/" + file.getFileName());
-                if(target.exists() && !overwriteAll)
-                {
-                    int returnType = pPresetHelper->showOverwriteDialog(target.getFullPathName());
-                    if(returnType == RETURN_TYPE_NO)
-                        continue;
-                    else if(returnType == RETURN_TYPE_YESFORALL)
-                        overwriteAll = true;
-                    else if(returnType == RETURN_TYPE_CANCEL)
-                    {
-                        return;
-                    }
-                }
-                if(!file.copyFileTo(target))
-                {
-                    AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + target.getFullPathName());
-                }
-            }
+            exportToFolder(pPresetHelper->presetFiles, chooser.getResult().getFullPathName());
         }
         //[/UserButtonCode_btnExportAll]
     }
@@ -200,12 +188,33 @@ void PresetManagerComponent::buttonClicked (Button* buttonThatWasClicked)
         }
         //[/UserButtonCode_btnRestoreDefaults]
     }
+    else if (buttonThatWasClicked == btnExport.get())
+    {
+        //[UserButtonCode_btnExport] -- add your button handler code here..
+        FileChooser chooser("Select directory to export...", File::getSpecialLocation(File::userHomeDirectory));
+        if (chooser.browseForDirectory())
+        {
+            Array<File> presetsToExport;
+            SparseSet<int> selectedRows = presetTable->getSelectedRows();
+            for (int i = 0; i < presetTable->getNumRows(); i++)
+            {
+                if (presetTable->isRowSelected(i))
+                {
+                    presetsToExport.add(pPresetHelper->presetFiles[i]);
+                }
+            }
+
+            String exportFolder = chooser.getResult().getFullPathName();
+            exportToFolder(presetsToExport, exportFolder);
+        }
+        //[/UserButtonCode_btnExport]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
 }
 
-void PresetManagerComponent::filesDropped (const StringArray& filenames, int /*mouseX*/, int /*mouseY*/)
+void PresetManagerComponent::filesDropped (const juce::StringArray& filenames, int /*mouseX*/, int /*mouseY*/)
 {
     //[UserCode_filesDropped] -- Add your code here...
     Array<File> fileArray;
@@ -236,6 +245,7 @@ bool PresetManagerComponent::isInterestedInFileDrag(const juce::StringArray &fil
 void PresetManagerComponent::controlDimming()
 {
     btnRemove->setEnabled(presetTable->getSelectedRows().size() > 0);
+    btnExport->setEnabled(presetTable->getSelectedRows().size() > 0);
     btnRemoveAll->setEnabled(pPresetHelper->presetFiles.size() > 0);
     btnExportAll->setEnabled(pPresetHelper->presetFiles.size() > 0);
 }
@@ -248,6 +258,33 @@ void PresetManagerComponent::actionListenerCallback(const String &message)
         presetTable->repaint();
     }
 }
+
+void PresetManagerComponent::exportToFolder(Array<File> presetsToExport, String exportFolder)
+{
+    bool overwriteAll = false;
+
+    for (File file : presetsToExport)
+    {
+        File target(exportFolder + "/" + file.getFileName());
+        if (target.exists() && !overwriteAll)
+        {
+            int returnType = pPresetHelper->showOverwriteDialog(target.getFullPathName());
+            if (returnType == RETURN_TYPE_NO)
+                continue;
+            else if (returnType == RETURN_TYPE_YESFORALL)
+                overwriteAll = true;
+            else if (returnType == RETURN_TYPE_CANCEL)
+            {
+                break;
+            }
+        }
+        if (!file.copyFileTo(target))
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + target.getFullPathName());
+        }
+    }
+}
+
 //[/MiscUserCode]
 
 
@@ -283,11 +320,14 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 104 24" buttonText="Export All"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="btnImport" id="8bf69d278e8d3cf0" memberName="btnImport"
-              virtualName="" explicitFocusOrder="0" pos="118Rr 8Rr 104 24"
+              virtualName="" explicitFocusOrder="0" pos="232Rr 8Rr 104 24"
               buttonText="Import" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="btnRestoreDefaults" id="c5da3bad1b135575" memberName="btnRestoreDefaults"
               virtualName="" explicitFocusOrder="0" pos="232 8Rr 120 24" buttonText="Restore Defaults"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="btnExport" id="32141f834035c38b" memberName="btnExport"
+              virtualName="" explicitFocusOrder="0" pos="120Rr 8Rr 104 24"
+              buttonText="Export" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -38,7 +38,7 @@
 class PresetManagerComponent  : public Component,
                                 public FileDragAndDropTarget,
                                 ActionListener,
-                                public Button::Listener
+                                public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -52,10 +52,10 @@ public:
     void actionListenerCallback(const String &message) override;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
-    void filesDropped (const StringArray& filenames, int mouseX, int mouseY) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void filesDropped (const juce::StringArray& filenames, int mouseX, int mouseY) override;
 
 
 
@@ -63,15 +63,17 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     PresetHelper* pPresetHelper;
     std::unique_ptr<PresetTableModel> tableModel;
+    void exportToFolder(Array<File> presetsToExport, String exportFolder);
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<TableListBox> presetTable;
-    std::unique_ptr<TextButton> btnRemove;
-    std::unique_ptr<TextButton> btnRemoveAll;
-    std::unique_ptr<TextButton> btnExportAll;
-    std::unique_ptr<TextButton> btnImport;
-    std::unique_ptr<TextButton> btnRestoreDefaults;
+    std::unique_ptr<juce::TextButton> btnRemove;
+    std::unique_ptr<juce::TextButton> btnRemoveAll;
+    std::unique_ptr<juce::TextButton> btnExportAll;
+    std::unique_ptr<juce::TextButton> btnImport;
+    std::unique_ptr<juce::TextButton> btnRestoreDefaults;
+    std::unique_ptr<juce::TextButton> btnExport;
 
 
     //==============================================================================
