@@ -28,6 +28,7 @@ AmbiSettings::AmbiSettings(double distanceScaler) : AmbiBasicSettings(distanceSc
     
     loadWarningFlag = false;
     prepareInPhaseWeighting();
+    prepareMaxreWeighting();
     prepareStandardWeighting();
     prepareManualWeighting();
 }
@@ -40,6 +41,8 @@ double AmbiSettings::getAmbiChannelWeight(int ambiChannel)
             return inPhaseWeights[ambiChannelOrder[ambiChannel]];
         case BASIC:
             return standardWeights[ambiChannelOrder[ambiChannel]];
+        case MAXRE:
+            return maxreWeights[ambiChannelOrder[ambiChannel]];
         case MANUAL:
         default:
             return manualOrderWeights[ambiChannelOrder[ambiChannel]];
@@ -134,6 +137,21 @@ void AmbiSettings::prepareInPhaseWeighting()
     }
 }
 
+void AmbiSettings::prepareMaxreWeighting()
+{
+    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    {
+        if (i < CURRENT_AMBISONICS_ORDER_NB_OF_GAINS)
+        {
+            maxreWeights[i] = cos(MathConstants<double>::pi * i / (2 * (CURRENT_AMBISONICS_ORDER + 1)));
+        }
+        else
+        {
+            maxreWeights[i] = 0.0;
+        }
+    }
+}
+
 
 double AmbiSettings::fact(int n)
 {
@@ -161,8 +179,10 @@ void AmbiSettings::setWeightMode(AmbiSettings::AmbiWeightMode mode)
     weightMode = mode;
     
     // copy values to the manual value array for display purpose
-    if(mode == INPHASE)
+    if (mode == INPHASE)
         memcpy(&manualOrderWeights, &inPhaseWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
-    else if(mode == BASIC)
+    else if (mode == BASIC)
         memcpy(&manualOrderWeights, &standardWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
+    else if (mode == MAXRE)
+        memcpy(&manualOrderWeights, &maxreWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
 }

@@ -29,7 +29,7 @@ public:
 	AmbiSettings();
 	AmbiSettings(double distanceScaler);
 
-    enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3 };
+    enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3, MAXRE = 4 };
     
 	double getAmbiChannelWeight(int ambiChannel);
 	double* getAmbiOrderWeightPointer();
@@ -44,6 +44,7 @@ public:
 private:
 	double fact(int n);
     void prepareInPhaseWeighting();
+    void prepareMaxreWeighting();
     void prepareStandardWeighting();
     void prepareManualWeighting();
     
@@ -51,6 +52,7 @@ private:
 	double manualOrderWeights[NB_OF_AMBISONICS_GAINS];
     
     double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
+    double maxreWeights[NB_OF_AMBISONICS_GAINS];
     double standardWeights[NB_OF_AMBISONICS_GAINS];
     
     AmbiWeightMode weightMode;
