@@ -21,7 +21,6 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
-#include "../../Common/FilterInfo.h"
 #include "IIRFilterGraph.h"
 #include "FilterPresetHelper.h"
 #include "SingleFilterSettingsComponent.h"
@@ -43,7 +42,8 @@ class FilterSettingsComponent  : public Component,
                                  public ChangeListener,
                                  public Timer,
                                  public juce::ComboBox::Listener,
-                                 public juce::Button::Listener
+                                 public juce::Button::Listener,
+                                 public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -62,13 +62,14 @@ public:
     void resized() override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	FilterBankInfo* pFilterBankInfo;
     FilterPresetHelper* pPresetHelper;
+    FilterBankInfo* pFilterBankInfo;
     int channelIndex;
     //[/UserVariables]
 
@@ -82,6 +83,8 @@ private:
     std::unique_ptr<SingleFilterSettingsComponent> filter2;
     std::unique_ptr<SingleFilterSettingsComponent> filter3;
     std::unique_ptr<juce::ToggleButton> toggleFFT;
+    std::unique_ptr<juce::Slider> sliderFFTScaler;
+    std::unique_ptr<juce::Label> labelFFTScaler;
 
 
     //==============================================================================
