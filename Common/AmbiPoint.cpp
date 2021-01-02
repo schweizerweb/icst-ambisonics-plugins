@@ -43,7 +43,7 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z))),
-	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR))).withAlpha(1.0f)),
+	color(loadColorAttribute(element)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
@@ -56,7 +56,7 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z),
 	                      audioParams)),
-	color(Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR))).withAlpha(1.0f)),
+	color(loadColorAttribute(element)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     audioParams(audioParams),
@@ -86,7 +86,7 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 	element->setAttribute(XML_ATTRIBUTE_POINT_Y, getPoint()->getY());
 	element->setAttribute(XML_ATTRIBUTE_POINT_Z, getPoint()->getZ());
 	element->setAttribute(XML_ATTRIBUTE_POINT_NAME, getName());
-	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR, int(getColor().getARGB()));
+	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW, getColor().toString());
 	element->setAttribute(XML_ATTRIBUTE_POINT_GAIN, getGain());
     element->setAttribute(XML_ATTRIBUTE_POINT_ENABLED, getEnabled());
 	return element;
@@ -189,4 +189,12 @@ bool AmbiPoint::getEnabled()
 void AmbiPoint::setEnabled(bool enable)
 {
     enabled = enable;
+}
+
+Colour AmbiPoint::loadColorAttribute(XmlElement* element)
+{
+	if (element->hasAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW))
+		return Colour::fromString(element->getStringAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW));
+
+    return Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR_OLD))).withAlpha(1.0f);
 }

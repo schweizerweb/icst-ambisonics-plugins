@@ -34,4 +34,5 @@ private:
 	Random random;
 	AmbiDataSet* pSpeakerSet;
 	int tempChannel;
+	double testSoundBaseGain;
 };

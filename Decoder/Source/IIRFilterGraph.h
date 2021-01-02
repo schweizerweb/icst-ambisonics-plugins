@@ -28,7 +28,7 @@ public:
 
 	void paintData(Graphics&) override;
     void setFFTResult(float* data, int size, int newFftSize);
-    void disableFFT();
+    void setFFTParams(bool enable, double scaler = 0);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
@@ -41,4 +41,5 @@ private:
     float* fftResultData;
     int fftResultDataSize;
     int fftSize;
+    double fftScaler;
 };
