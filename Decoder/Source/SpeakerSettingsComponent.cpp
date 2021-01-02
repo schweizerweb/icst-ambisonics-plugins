@@ -46,7 +46,12 @@
 #define COLUMN_ID_COLOR     15
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
-#define COLUMN_ID_FILTER 14
+#define COLUMN_ID_FILTER    14
+
+#define ID_APPLY_COLOR      1
+#define ID_APPLY_FILTER     2
+#define ID_APPLY_DEC_GAIN   3
+#define ID_APPLY_INC_GAIN   4
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -236,6 +241,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonManageFilters->setButtonText (TRANS("manage filters..."));
     buttonManageFilters->addListener (this);
 
+    comboBoxApply.reset (new juce::ComboBox ("comboBoxApply"));
+    addAndMakeVisible (comboBoxApply.get());
+    comboBoxApply->setEditableText (false);
+    comboBoxApply->setJustificationType (juce::Justification::centredLeft);
+    comboBoxApply->setTextWhenNothingSelected (TRANS("apply..."));
+    comboBoxApply->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxApply->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -325,6 +338,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonManage = nullptr;
     comboBoxChannelWeightingMode = nullptr;
     buttonManageFilters = nullptr;
+    comboBoxApply = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -374,6 +388,7 @@ void SpeakerSettingsComponent::resized()
     buttonManage->setBounds (8 + (getWidth() - 18) - 145 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 18) - 17 - 120, 0 + 24, 120, 24);
+    comboBoxApply->setBounds ((proportionOfWidth (0.4977f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -398,6 +413,55 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
         ambiChannelControl->updateValues();
         controlDimming();
         //[/UserComboBoxCode_comboBoxChannelWeightingMode]
+    }
+    else if (comboBoxThatHasChanged == comboBoxApply.get())
+    {
+        //[UserComboBoxCode_comboBoxApply] -- add your combo box handling code here..
+        int mainSelection = pPointSelection->getMainSelectedPointIndex();
+        if (mainSelection >= 0 && mainSelection < pSpeakerSet->size() - 1)
+        {
+
+            if (comboBoxApply->getSelectedId() == ID_APPLY_COLOR)
+            {
+                Colour color = pSpeakerSet->get(mainSelection)->getColor();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != mainSelection)
+                    {
+                        pSpeakerSet->get(selection[i])->setColor(color);
+                    }
+                }
+            }
+            else if (comboBoxApply->getSelectedId() == ID_APPLY_FILTER)
+            {
+                FilterBankInfo* info = pSpeakerSet->get(mainSelection)->getFilterInfo();
+                bool bypass = pSpeakerSet->get(mainSelection)->getFilterBypass();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != mainSelection)
+                    {
+                        pSpeakerSet->get(selection[i])->getFilterInfo()->copyFrom(info);
+                        pSpeakerSet->get(selection[i])->setFilterBypass(bypass);
+                    }
+                }
+            }
+            else if(comboBoxApply->getSelectedId() == ID_APPLY_DEC_GAIN || comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN)
+            {
+                float gainFactor = Decibels::decibelsToGain(comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN ? 0.5 : -0.5);
+                auto selection = pPointSelection->getSelectedIndices();
+                for (auto index : selection)
+                {
+                    pSpeakerSet->get(index)->setGain(pSpeakerSet->get(index)->getGain() * gainFactor, true);
+                }
+            }
+        }
+
+        speakerList->updateContent();
+        speakerList->repaint();
+        comboBoxApply->setSelectedId(0);
+        //[/UserComboBoxCode_comboBoxApply]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -434,11 +498,16 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonRemove.get())
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
-		int selection = pPointSelection->getMainSelectedPointIndex();
-		if (selection >= 0 && selection < pSpeakerSet->size())
-		{
-			pPointSelection->unselectPoint();
-			pSpeakerSet->remove(selection);
+        auto selection = pPointSelection->getSelectedIndices();
+        if(!pPointSelection->getSelectedIndices().isEmpty())
+        {
+        	pPointSelection->unselectPoint();
+            selection.sort();
+            for (int i = selection.size() - 1; i >= 0; i--)
+            {
+                pSpeakerSet->remove(selection[i]);
+            }
+
 			speakerList->updateContent();
 			speakerList->repaint();
 		}
@@ -534,6 +603,8 @@ int SpeakerSettingsComponent::getNumRows()
 
 void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
 {
+    pPointSelection->unselectPoint();
+
     bool first = true;
     if (lastRowSelected >= 0 && lastRowSelected < pSpeakerSet->size())
     {
@@ -551,6 +622,7 @@ void SpeakerSettingsComponent::selectedRowsChanged(int lastRowSelected)
         }
 
         pPointSelection->selectPoint(lastRowSelected, !first);
+        controlDimming();
     }
 }
 
@@ -851,6 +923,7 @@ void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
         }
 
         speakerList->setSelectedRows(sel, dontSendNotification);
+        controlDimming();
 	}
 }
 
@@ -877,6 +950,8 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
 void SpeakerSettingsComponent::controlDimming()
 {
 	bool en = pDecoderSettings->editMode;
+    bool multiselection = pPointSelection->getSelectedIndices().size() > 1;
+
 	groupSpeakers->setEnabled(en);
 	labelPresets->setEnabled(en);
 	comboBoxChannelConfig->setEnabled(en);
@@ -885,11 +960,27 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonSave->setEnabled(en);
 	buttonAdd->setEnabled(en);
 	buttonRemove->setEnabled(en);
-	buttonMoveUp->setEnabled(en);
-	buttonMoveDown->setEnabled(en);
+	buttonMoveUp->setEnabled(en && !multiselection);
+	buttonMoveDown->setEnabled(en && !multiselection);
 	buttonSpeakerTest->setEnabled(en);
 
     ambiChannelControl->setEnabled(pAmbiSettings->getWeightMode() == AmbiSettings::MANUAL);
+
+    comboBoxApply->setVisible(multiselection);
+    if(multiselection)
+    {
+        comboBoxApply->clear(dontSendNotification);
+
+        int mainIndex = pPointSelection->getMainSelectedPointIndex();
+        if(mainIndex >= 0 && mainIndex < pSpeakerSet->size())
+        {
+            comboBoxApply->addItem("Color from CH " + String(mainIndex + 1), ID_APPLY_COLOR);
+            comboBoxApply->addItem("Filter from CH " + String (mainIndex + 1), ID_APPLY_FILTER);
+
+            comboBoxApply->addItem(TRANS("Gain -0.5 dB"), ID_APPLY_DEC_GAIN);
+            comboBoxApply->addItem(TRANS("Gain +0.5 dB"), ID_APPLY_INC_GAIN);
+        }
+    }
 }
 
 void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
@@ -1056,6 +1147,10 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="17Rr 24 120 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage filters..."
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <COMBOBOX name="comboBoxApply" id="30951c9518bbedeb" memberName="comboBoxApply"
+            virtualName="" explicitFocusOrder="0" pos="-8R 0 144 24" posRelativeX="5fad387b688247bf"
+            posRelativeY="5fad387b688247bf" editable="0" layout="33" items=""
+            textWhenNonSelected="apply..." textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
