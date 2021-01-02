@@ -31,7 +31,9 @@ void PresetHelper::initialize()
             hasPresets = true;
         }
     }
-    
+
+    presetFiles.sort();
+
     if(!hasPresets)
         restoreDefaults();
 }
@@ -51,6 +53,7 @@ void PresetHelper::selectPresetName(String name)
 void PresetHelper::restoreDefaults()
 {
     restoreDefaultsInternal();
+    presetFiles.sort();
     notifyPresetListChanged();
 }
 
@@ -185,6 +188,7 @@ void PresetHelper::tryImportFiles(Array<File> files)
 
     if(presetListChanged)
     {
+        presetFiles.sort();
         notifyPresetListChanged();
     }
     
