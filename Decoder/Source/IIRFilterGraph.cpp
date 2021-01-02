@@ -13,7 +13,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultDataSize(0), fftResultData(nullptr), fftSize(0)
+IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -112,7 +112,7 @@ void IIRFilterGraph::setFFTResult(float* data, int size, int newFftSize)
 		fftResultDataSize = size;
 	}
 
-	std::memcpy(fftResultData, data, size * sizeof(float));
+	memcpy(fftResultData, data, size * sizeof(float));
 	repaint();
 }
 

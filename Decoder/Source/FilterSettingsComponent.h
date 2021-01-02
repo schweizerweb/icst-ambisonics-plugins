@@ -67,8 +67,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	FilterBankInfo* pFilterBankInfo;
     FilterPresetHelper* pPresetHelper;
+    FilterBankInfo* pFilterBankInfo;
     int channelIndex;
     //[/UserVariables]
 
