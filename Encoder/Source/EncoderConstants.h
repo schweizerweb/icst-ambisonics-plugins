@@ -42,16 +42,16 @@ public:
     const static float MasterGainMax;
     const static float MasterGainResolution;
 
-    const static float AirAbsorbationIntensityMin;
-    const static float AirAbsorbationIntensityMax;
-    const static float AirAbsorbationIntensityResolution;
+    const static float AirAbsorbtionIntensityMin;
+    const static float AirAbsorbtionIntensityMax;
+    const static float AirAbsorbtionIntensityResolution;
 
     // make sure enum EncodingMode and StringArray encodingModeString are in sync!
     enum EncodingMode { None = 0, Standard = 1, Advanced = 2, Exponential = 3, InverseProportional = 4 };
-    // make sure enum AirAbsorbationMode and StringArray airAbsorbationModeString are in sync!
-    enum AirAbsorbationMode { Off = 0, LowPass = 1};
+    // make sure enum AirAbsorbtionMode and StringArray airAbsorbtionModeString are in sync!
+    enum AirAbsorbtionMode { Off = 0, LowPass = 1};
 
     const static StringArray encodingModeStrings;
-    const static StringArray airAbsorbationModeStrings;
+    const static StringArray airAbsorbtionModeStrings;
     
 };

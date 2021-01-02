@@ -38,10 +38,10 @@ const float EncoderConstants::MasterGainMin = -12.0f;
 const float EncoderConstants::MasterGainMax = 12.0f;
 const float EncoderConstants::MasterGainResolution = 0.1f;
 
-const float EncoderConstants::AirAbsorbationIntensityMin = 0.1f;
-const float EncoderConstants::AirAbsorbationIntensityMax = 10.0f;
-const float EncoderConstants::AirAbsorbationIntensityResolution = 0.1f;
+const float EncoderConstants::AirAbsorbtionIntensityMin = 0.1f;
+const float EncoderConstants::AirAbsorbtionIntensityMax = 10.0f;
+const float EncoderConstants::AirAbsorbtionIntensityResolution = 0.1f;
 
 const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Advanced", "Exponential", "Inverse Proportional"};
-const StringArray EncoderConstants::airAbsorbationModeStrings = {"Off", "Low-Pass"};
+const StringArray EncoderConstants::airAbsorbtionModeStrings = {"Off", "Low-Pass"};
     

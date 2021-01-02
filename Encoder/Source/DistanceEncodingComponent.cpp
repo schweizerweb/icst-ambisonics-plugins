@@ -34,9 +34,9 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    groupAirAbsorbation.reset (new juce::GroupComponent ("groupAirAbsorbation",
-                                                         TRANS("Air Absorbation")));
-    addAndMakeVisible (groupAirAbsorbation.get());
+    groupAirAbsorbtion.reset (new juce::GroupComponent ("groupAirAbsorbtion",
+                                                        TRANS("Air Absorbtion")));
+    addAndMakeVisible (groupAirAbsorbtion.get());
 
     groupAttenuation.reset (new juce::GroupComponent ("groupAttenuation",
                                                       TRANS("Attenuation")));
@@ -195,29 +195,29 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
-    labelAirAbsorbationMode.reset (new juce::Label ("labelAirAbsorbationMode",
+    labelAirAbsorbtionMode.reset (new juce::Label ("labelAirAbsorbtionMode",
                                                     TRANS("Mode")));
-    addAndMakeVisible (labelAirAbsorbationMode.get());
-    labelAirAbsorbationMode->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelAirAbsorbationMode->setJustificationType (juce::Justification::centredLeft);
-    labelAirAbsorbationMode->setEditable (false, false, false);
-    labelAirAbsorbationMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelAirAbsorbationMode->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    addAndMakeVisible (labelAirAbsorbtionMode.get());
+    labelAirAbsorbtionMode->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);
+    labelAirAbsorbtionMode->setEditable (false, false, false);
+    labelAirAbsorbtionMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAirAbsorbtionMode->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    comboBoxAirAbsorbationMode.reset (new juce::ComboBox ("comboBoxAirAbsorbationMode"));
-    addAndMakeVisible (comboBoxAirAbsorbationMode.get());
-    comboBoxAirAbsorbationMode->setEditableText (false);
-    comboBoxAirAbsorbationMode->setJustificationType (juce::Justification::centredLeft);
-    comboBoxAirAbsorbationMode->setTextWhenNothingSelected (juce::String());
-    comboBoxAirAbsorbationMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxAirAbsorbationMode->addListener (this);
+    comboBoxAirAbsorbtionMode.reset (new juce::ComboBox ("comboBoxAirAbsorbtionMode"));
+    addAndMakeVisible (comboBoxAirAbsorbtionMode.get());
+    comboBoxAirAbsorbtionMode->setEditableText (false);
+    comboBoxAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);
+    comboBoxAirAbsorbtionMode->setTextWhenNothingSelected (juce::String());
+    comboBoxAirAbsorbtionMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxAirAbsorbtionMode->addListener (this);
 
-    sliderAirAbsorbationIntensity.reset (new juce::Slider ("sliderAirAbsorbationIntensity"));
-    addAndMakeVisible (sliderAirAbsorbationIntensity.get());
-    sliderAirAbsorbationIntensity->setRange (0, 10, 0);
-    sliderAirAbsorbationIntensity->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderAirAbsorbationIntensity->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
-    sliderAirAbsorbationIntensity->addListener (this);
+    sliderAirAbsorbtionIntensity.reset (new juce::Slider ("sliderAirAbsorbtionIntensity"));
+    addAndMakeVisible (sliderAirAbsorbtionIntensity.get());
+    sliderAirAbsorbtionIntensity->setRange (0, 10, 0);
+    sliderAirAbsorbtionIntensity->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderAirAbsorbtionIntensity->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
+    sliderAirAbsorbtionIntensity->addListener (this);
 
     labelIntensity.reset (new juce::Label ("labelIntensity",
                                            TRANS("Intensity")));
@@ -241,8 +241,8 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
 
-    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::Off], EncoderConstants::Off + 1);
-    comboBoxAirAbsorbationMode->addItem(EncoderConstants::airAbsorbationModeStrings[EncoderConstants::LowPass], EncoderConstants::LowPass + 1);
+    comboBoxAirAbsorbtionMode->addItem(EncoderConstants::airAbsorbtionModeStrings[EncoderConstants::Off], EncoderConstants::Off + 1);
+    comboBoxAirAbsorbtionMode->addItem(EncoderConstants::airAbsorbtionModeStrings[EncoderConstants::LowPass], EncoderConstants::LowPass + 1);
     setUiValues(pParams);
 
     // set slider ranges according to constants
@@ -252,7 +252,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
     sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
     sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
-    sliderAirAbsorbationIntensity->setRange(EncoderConstants::AirAbsorbationIntensityMin, EncoderConstants::AirAbsorbationIntensityMax, EncoderConstants::AirAbsorbationIntensityResolution);
+    sliderAirAbsorbtionIntensity->setRange(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax, EncoderConstants::AirAbsorbtionIntensityResolution);
     pParams->addChangeListener(this);
 
     updatePresetComboBox();
@@ -270,7 +270,7 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
-    groupAirAbsorbation = nullptr;
+    groupAirAbsorbtion = nullptr;
     groupAttenuation = nullptr;
     distanceEncodingGraph = nullptr;
     sliderUnitCircleRadius = nullptr;
@@ -290,9 +290,9 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     comboBoxDistanceEncodingPreset = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
-    labelAirAbsorbationMode = nullptr;
-    comboBoxAirAbsorbationMode = nullptr;
-    sliderAirAbsorbationIntensity = nullptr;
+    labelAirAbsorbtionMode = nullptr;
+    comboBoxAirAbsorbtionMode = nullptr;
+    sliderAirAbsorbtionIntensity = nullptr;
     labelIntensity = nullptr;
 
 
@@ -317,7 +317,7 @@ void DistanceEncodingComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupAirAbsorbation->setBounds (0, getHeight() - 99, getWidth() - 0, 64);
+    groupAirAbsorbtion->setBounds (0, getHeight() - 99, getWidth() - 0, 64);
     groupAttenuation->setBounds (0, 0, getWidth() - 0, getHeight() - 99);
     distanceEncodingGraph->setBounds (16, 200, proportionOfWidth (0.9674f), getHeight() - 315);
     sliderUnitCircleRadius->setBounds (160, 48, getWidth() - 174, 24);
@@ -330,9 +330,9 @@ void DistanceEncodingComponent::resized()
     comboBoxDistanceEncodingPreset->setBounds (72, getHeight() - 30, getWidth() - 171, 24);
     labelPresets->setBounds (0, getHeight() - 30, 64, 24);
     buttonSave->setBounds (getWidth() - 6 - 80, getHeight() - 30, 80, 24);
-    labelAirAbsorbationMode->setBounds (19, getHeight() - 76, 53, 24);
-    comboBoxAirAbsorbationMode->setBounds (80, getHeight() - 75, 192, 24);
-    sliderAirAbsorbationIntensity->setBounds (368, getHeight() - 75, getWidth() - 382, 24);
+    labelAirAbsorbtionMode->setBounds (19, getHeight() - 76, 53, 24);
+    comboBoxAirAbsorbtionMode->setBounds (80, getHeight() - 75, 192, 24);
+    sliderAirAbsorbtionIntensity->setBounds (368, getHeight() - 75, getWidth() - 382, 24);
     labelIntensity->setBounds (288, getHeight() - 76, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -379,11 +379,11 @@ void DistanceEncodingComponent::sliderValueChanged (juce::Slider* sliderThatWasM
         pParams->setAdvancedExponent(float(sliderAdvancedExponent->getValue()));
         //[/UserSliderCode_sliderAdvancedExponent]
     }
-    else if (sliderThatWasMoved == sliderAirAbsorbationIntensity.get())
+    else if (sliderThatWasMoved == sliderAirAbsorbtionIntensity.get())
     {
-        //[UserSliderCode_sliderAirAbsorbationIntensity] -- add your slider handling code here..
-        pParams->setAirAbsorbationIntensity(float(sliderAirAbsorbationIntensity->getValue()));
-        //[/UserSliderCode_sliderAirAbsorbationIntensity]
+        //[UserSliderCode_sliderAirAbsorbtionIntensity] -- add your slider handling code here..
+        pParams->setAirAbsorbtionIntensity(float(sliderAirAbsorbtionIntensity->getValue()));
+        //[/UserSliderCode_sliderAirAbsorbtionIntensity]
     }
 
     //[UsersliderValueChanged_Post]
@@ -412,12 +412,12 @@ void DistanceEncodingComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHas
         comboBoxDistanceEncodingPreset->setSelectedItemIndex(-1);
         //[/UserComboBoxCode_comboBoxDistanceEncodingPreset]
     }
-    else if (comboBoxThatHasChanged == comboBoxAirAbsorbationMode.get())
+    else if (comboBoxThatHasChanged == comboBoxAirAbsorbtionMode.get())
     {
-        //[UserComboBoxCode_comboBoxAirAbsorbationMode] -- add your combo box handling code here..
-        pParams->setAirAbsorbationMode(EncoderConstants::AirAbsorbationMode(comboBoxAirAbsorbationMode->getSelectedId() - 1));
+        //[UserComboBoxCode_comboBoxAirAbsorbtionMode] -- add your combo box handling code here..
+        pParams->setAirAbsorbtionMode(EncoderConstants::AirAbsorbtionMode(comboBoxAirAbsorbtionMode->getSelectedId() - 1));
         controlDimming();
-        //[/UserComboBoxCode_comboBoxAirAbsorbationMode]
+        //[/UserComboBoxCode_comboBoxAirAbsorbtionMode]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -487,7 +487,7 @@ void DistanceEncodingComponent::controlDimming() const
     sliderAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
     labelAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
 
-    sliderAirAbsorbationIntensity->setEnabled(pParams->getAirAbsorbationMode() != EncoderConstants::Off);
+    sliderAirAbsorbtionIntensity->setEnabled(pParams->getAirAbsorbtionMode() != EncoderConstants::Off);
 }
 
 void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingParams) {
@@ -501,8 +501,8 @@ void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingPar
     sliderAdvancedFactor->setValue(pEncodingParams->getAdvancedFactor(), dontSendNotification);
     sliderAdvancedExponent->setValue(pEncodingParams->getAdvancedExponent(), dontSendNotification);
 
-    comboBoxAirAbsorbationMode->setSelectedId(pEncodingParams->getAirAbsorbationMode() + 1, dontSendNotification);
-    sliderAirAbsorbationIntensity->setValue(pEncodingParams->getAirAbsorbationIntensity(), dontSendNotification);
+    comboBoxAirAbsorbtionMode->setSelectedId(pEncodingParams->getAirAbsorbtionMode() + 1, dontSendNotification);
+    sliderAirAbsorbtionIntensity->setValue(pEncodingParams->getAirAbsorbtionIntensity(), dontSendNotification);
 
     controlDimming();
     distanceEncodingGraph->repaint();
@@ -531,8 +531,8 @@ BEGIN_JUCER_METADATA
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="500">
   <BACKGROUND backgroundColour="ff505050"/>
-  <GROUPCOMPONENT name="groupAirAbsorbation" id="9e077e85238f4bfb" memberName="groupAirAbsorbation"
-                  virtualName="" explicitFocusOrder="0" pos="0 99R 0M 64" title="Air Absorbation"/>
+  <GROUPCOMPONENT name="groupAirAbsorbtion" id="9e077e85238f4bfb" memberName="groupAirAbsorbtion"
+                  virtualName="" explicitFocusOrder="0" pos="0 99R 0M 64" title="Air Absorbtion"/>
   <GROUPCOMPONENT name="groupAttenuation" id="874eb788ffea8f71" memberName="groupAttenuation"
                   virtualName="" explicitFocusOrder="0" pos="0 0 0M 99M" title="Attenuation"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
@@ -619,15 +619,15 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="6Rr 30R 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <LABEL name="labelAirAbsorbationMode" id="21b94baa2315f138" memberName="labelAirAbsorbationMode"
+  <LABEL name="labelAirAbsorbtionMode" id="21b94baa2315f138" memberName="labelAirAbsorbtionMode"
          virtualName="" explicitFocusOrder="0" pos="19 76R 53 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Mode" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <COMBOBOX name="comboBoxAirAbsorbationMode" id="ee61081979986e59" memberName="comboBoxAirAbsorbationMode"
+  <COMBOBOX name="comboBoxAirAbsorbtionMode" id="ee61081979986e59" memberName="comboBoxAirAbsorbtionMode"
             virtualName="" explicitFocusOrder="0" pos="80 75R 192 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <SLIDER name="sliderAirAbsorbationIntensity" id="d2648c461e85094" memberName="sliderAirAbsorbationIntensity"
+  <SLIDER name="sliderAirAbsorbtionIntensity" id="d2648c461e85094" memberName="sliderAirAbsorbtionIntensity"
           virtualName="" explicitFocusOrder="0" pos="368 75R 382M 24" min="0.0"
           max="10.0" int="0.0" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"

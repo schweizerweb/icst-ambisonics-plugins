@@ -72,7 +72,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::GroupComponent> groupAirAbsorbation;
+    std::unique_ptr<juce::GroupComponent> groupAirAbsorbtion;
     std::unique_ptr<juce::GroupComponent> groupAttenuation;
     std::unique_ptr<DistanceEncodingGraph> distanceEncodingGraph;
     std::unique_ptr<juce::Slider> sliderUnitCircleRadius;
@@ -92,9 +92,9 @@ private:
     std::unique_ptr<juce::ComboBox> comboBoxDistanceEncodingPreset;
     std::unique_ptr<juce::Label> labelPresets;
     std::unique_ptr<juce::TextButton> buttonSave;
-    std::unique_ptr<juce::Label> labelAirAbsorbationMode;
-    std::unique_ptr<juce::ComboBox> comboBoxAirAbsorbationMode;
-    std::unique_ptr<juce::Slider> sliderAirAbsorbationIntensity;
+    std::unique_ptr<juce::Label> labelAirAbsorbtionMode;
+    std::unique_ptr<juce::ComboBox> comboBoxAirAbsorbtionMode;
+    std::unique_ptr<juce::Slider> sliderAirAbsorbtionIntensity;
     std::unique_ptr<juce::Label> labelIntensity;
 
 

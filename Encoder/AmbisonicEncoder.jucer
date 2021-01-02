@@ -14,10 +14,10 @@
               jucerFormatVersion="1">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
-      <FILE id="qw16WF" name="AirAbsorbationFilter.cpp" compile="1" resource="0"
-            file="Source/AirAbsorbationFilter.cpp"/>
-      <FILE id="Wq3sFb" name="AirAbsorbationFilter.h" compile="0" resource="0"
-            file="Source/AirAbsorbationFilter.h"/>
+      <FILE id="qw16WF" name="AirAbsorbtionFilter.cpp" compile="1" resource="0"
+            file="Source/AirAbsorbtionFilter.cpp"/>
+      <FILE id="Wq3sFb" name="AirAbsorbtionFilter.h" compile="0" resource="0"
+            file="Source/AirAbsorbtionFilter.h"/>
       <FILE id="mmyVim" name="AmbiOSCSender.cpp" compile="1" resource="0"
             file="Source/AmbiOSCSender.cpp"/>
       <FILE id="QCTjN6" name="AmbiOSCSender.h" compile="0" resource="0" file="Source/AmbiOSCSender.h"/>

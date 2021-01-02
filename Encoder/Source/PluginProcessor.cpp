@@ -242,11 +242,11 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 
 		Point3D<double>* pSourcePoint = source->getPoint();
 
-		// air absorbation filter
-		if (encoderSettings.distanceEncodingFlag && airAbsorbationFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
+		// air absorbtion filter
+		if (encoderSettings.distanceEncodingFlag && airAbsorbtionFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
 		{
             float* writePointer = inputBuffer.getWritePointer(iSource);
-            AirAbsorbationFilter* filter = &airAbsorbationFilters[iSource];
+            AirAbsorbtionFilter* filter = &airAbsorbtionFilters[iSource];
 			for (int iSample = 0; iSample < inputBuffer.getNumSamples(); iSample++)
 			{
 				writePointer[iSample] = filter->processSample(writePointer[iSample]);
