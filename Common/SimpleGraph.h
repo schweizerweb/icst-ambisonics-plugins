@@ -39,13 +39,13 @@ private:
 
 protected:
 	std::unique_ptr<Rectangle<int>> graphArea;
-	bool fullGridFlag;
+	std::unique_ptr<Range<double>> displayRangeX;
+	std::unique_ptr<Range<double>> displayRangeY;
+    bool fullGridFlag;
 	String labelAxisX;
 	String labelAxisY;
 
 private:
-	std::unique_ptr<Range<double>> displayRangeX;
-	std::unique_ptr<Range<double>> displayRangeY;
 	ScalingMode scalingModeX;
 	ScalingMode scalingModeY;
 };
