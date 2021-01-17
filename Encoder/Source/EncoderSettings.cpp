@@ -15,24 +15,33 @@
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
 #define XML_TAG_DISPLAY "Display"
+#define XML_TAG_OSC_SEND_EXT_XYZ "Xyz"
+#define XML_TAG_OSC_SEND_EXT_AED "Aed"
 #define XML_ATTRIBUTE_ENABLE "Enable"
 #define XML_ATTRIBUTE_PORT "Port"
-#define XML_ATTRIBUTE_IP "Ip"
+#define XML_ATTRIBUTE_HOST "Host"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
+#define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
+#define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 
 EncoderSettings::EncoderSettings():
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
     masterGain(nullptr),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
-	oscReceivePort(DEFALUT_RECEIVE_PORT),
-	oscSendFlag(DEFALUT_SEND_FLAG),
+	oscReceivePort(DEFAULT_RECEIVE_PORT),
+	oscSendFlag(DEFAULT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
 	oscSendTargetHost(DEFAULT_SEND_HOST),
 	oscSendIntervalMs(DEFAULT_SEND_INTERVAL),
-	oscSendExtFlag(DEFALUT_SEND_EXT_FLAG), 
-	oscSendExtPort(DEFAULT_SEND_EXT_PORT),
-	oscSendExtTargetHost(DEFAULT_SEND_EXT_HOST),
+	oscSendExtMasterFlag(DEFAULT_SEND_EXT_MASTER_FLAG), 
+	oscSendExtIntervalMs(DEFAULT_SEND_EXT_INTERVAL_MS), 
+	oscSendExtXyzFlag(DEFAULT_SEND_EXT_XYZ_FLAG), 
+	oscSendExtXyzPort(DEFAULT_SEND_EXT_XYZ_PORT),
+	oscSendExtXyzHost(DEFAULT_SEND_EXT_XYZ_HOST),
+    oscSendExtAedFlag(DEFAULT_SEND_EXT_AED_FLAG), 
+	oscSendExtAedPort(DEFAULT_SEND_EXT_AED_PORT),
+	oscSendExtAedHost(DEFAULT_SEND_EXT_AED_HOST),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
     localMasterGain(DEFAULT_MASTER_GAIN)
@@ -55,16 +64,32 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	XmlElement* oscSend = new XmlElement(XML_TAG_OSC_SEND);
 	oscSend->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendFlag);
 	oscSend->setAttribute(XML_ATTRIBUTE_PORT, oscSendPort);
-	oscSend->setAttribute(XML_ATTRIBUTE_IP, oscSendTargetHost);
+	oscSend->setAttribute(XML_ATTRIBUTE_HOST, oscSendTargetHost);
 	oscSend->setAttribute(XML_ATTRIBUTE_INTERVAL, oscSendIntervalMs);
 	element->addChildElement(oscSend);
 
 	XmlElement* oscSendExt = new XmlElement(XML_TAG_OSC_SEND_EXT);
-	oscSendExt->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtFlag);
-	oscSendExt->setAttribute(XML_ATTRIBUTE_PORT, oscSendExtPort);
-	oscSendExt->setAttribute(XML_ATTRIBUTE_IP, oscSendExtTargetHost);
-	element->addChildElement(oscSendExt);
+	oscSendExt->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtMasterFlag);
+	oscSendExt->setAttribute(XML_ATTRIBUTE_INTERVAL, oscSendExtIntervalMs);
+	XmlElement* oscSendExtXyz = new XmlElement(XML_TAG_OSC_SEND_EXT_XYZ);
+	oscSendExtXyz->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtXyzFlag);
+	oscSendExtXyz->setAttribute(XML_ATTRIBUTE_PORT, oscSendExtXyzPort);
+	oscSendExtXyz->setAttribute(XML_ATTRIBUTE_HOST, oscSendExtXyzHost);
+	oscSendExt->addChildElement(oscSendExtXyz);
+    XmlElement* oscSendExtAed = new XmlElement(XML_TAG_OSC_SEND_EXT_AED);
+	oscSendExtAed->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtAedFlag);
+	oscSendExtAed->setAttribute(XML_ATTRIBUTE_PORT, oscSendExtAedPort);
+	oscSendExtAed->setAttribute(XML_ATTRIBUTE_HOST, oscSendExtAedHost);
+	oscSendExt->addChildElement(oscSendExtAed);
+	XmlElement* customTargets = new XmlElement(XML_TAG_CUSTOM_OSC_TARGETS);
+	for (auto target : customOscTargets)
+	{
+		customTargets->addChildElement(target->getAsXmlElement(XML_TAG_CUSTOM_OSC_TARGET));
+	}
+	oscSendExt->addChildElement(customTargets);
+    element->addChildElement(oscSendExt);
 
+	
     writeToPresetXmlElement(element);
 	
 	return element;
@@ -77,20 +102,44 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
 	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
-	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFALUT_RECEIVE_PORT);
+	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
 	
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
-	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFALUT_SEND_FLAG);
+	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
 	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
-	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_HOST);
+	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_HOST);
 	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
 
 	XmlElement* oscSendExt = element->getChildByName(XML_TAG_OSC_SEND_EXT);
 	if (oscSendExt != nullptr)
 	{
-		oscSendExtFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFALUT_SEND_EXT_FLAG);
-		oscSendExtPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_PORT);
-		oscSendExtTargetHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_IP, DEFAULT_SEND_EXT_HOST);
+		oscSendExtMasterFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_MASTER_FLAG);
+		oscSendExtIntervalMs = oscSendExt->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_EXT_INTERVAL_MS);
+		XmlElement* oscSendExtXyz = oscSendExt->getChildByName(XML_TAG_OSC_SEND_EXT_XYZ);
+		if (oscSendExtXyz != nullptr)
+		{
+			oscSendExtXyzFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_XYZ_FLAG);
+			oscSendExtXyzPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_XYZ_PORT);
+			oscSendExtXyzHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_XYZ_HOST);
+		}
+		XmlElement* oscSendExtAed = oscSendExt->getChildByName(XML_TAG_OSC_SEND_EXT_AED);
+		if (oscSendExtAed != nullptr)
+		{
+			oscSendExtAedFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_AED_FLAG);
+			oscSendExtAedPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_AED_PORT);
+			oscSendExtAedHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_AED_HOST);
+		}
+		XmlElement* customTargets = oscSendExt->getChildByName(XML_TAG_CUSTOM_OSC_TARGETS);
+		if (customTargets != nullptr)
+		{
+			XmlElement* target = customTargets->getChildByName(XML_TAG_CUSTOM_OSC_TARGET);
+			while (target != nullptr)
+			{
+				customOscTargets.add(new CustomOscTarget(target));
+
+				target = target->getNextElement();
+			}
+		}
 	}
 
     loadFromPresetXml(element);

@@ -11,6 +11,8 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AmbiDataSet.h"
+#include "EncoderSettings.h"
+#include "OSCSenderInstance.h"
 
 class PointHistoryEntry
 {
@@ -40,9 +42,10 @@ class AmbiOSCSenderExt : public Timer
 {
 public:
 	AmbiOSCSenderExt(AmbiDataSet* ambiPoints);
-	~AmbiOSCSenderExt();
+    virtual ~AmbiOSCSenderExt();
 
-	bool start(String targetHost, int port);
+    OSCSenderInstance* getOrCreateInstance(int index);
+	bool start(EncoderSettings* pSettings, String* pMessage);
 	void stop();
 
 private:
@@ -52,5 +55,5 @@ private:
 
 	AmbiDataSet* pPoints;
 	OwnedArray<PointHistoryEntry> history;
-	OSCSender* oscSender;
+	OwnedArray<OSCSenderInstance> oscSender;
 };

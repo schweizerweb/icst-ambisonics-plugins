@@ -381,7 +381,7 @@ EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 
 void AmbisonicEncoderAudioProcessor::initializeOsc()
 {
-	if(encoderSettings.oscReceiveFlag)
+	if (encoderSettings.oscReceiveFlag)
 	{
 		if (!pOscHandler->start(encoderSettings.oscReceivePort))
 		{
@@ -394,7 +394,7 @@ void AmbisonicEncoderAudioProcessor::initializeOsc()
 		pOscHandler->stop();
 	}
 
-	if(encoderSettings.oscSendFlag)
+	if (encoderSettings.oscSendFlag)
 	{
 		if (!pOscSender->start(encoderSettings.oscSendTargetHost, encoderSettings.oscSendPort, encoderSettings.oscSendIntervalMs))
 		{
@@ -407,17 +407,11 @@ void AmbisonicEncoderAudioProcessor::initializeOsc()
 		pOscSender->stop();
 	}
 
-	if (encoderSettings.oscSendExtFlag)
+	String message;
+	if (!pOscSenderExt->start(&encoderSettings, &message))
 	{
-		if (!pOscSenderExt->start(encoderSettings.oscSendExtTargetHost, encoderSettings.oscSendExtPort))
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Sender for external usage on " + encoderSettings.oscSendExtTargetHost + ":" + String(encoderSettings.oscSendExtPort));
-			encoderSettings.oscSendExtFlag = false;
-		}
-	}
-	else
-	{
-		pOscSenderExt->stop();
+		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, ("Error starting OSC Sender for external usage: \r\n" + message));
+		encoderSettings.oscSendExtMasterFlag = false;
 	}
 }
 
