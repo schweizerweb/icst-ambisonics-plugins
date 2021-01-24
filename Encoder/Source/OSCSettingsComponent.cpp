@@ -292,6 +292,7 @@ void OSCSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
+    controlDimming();
     //[/UserbuttonClicked_Post]
 }
 

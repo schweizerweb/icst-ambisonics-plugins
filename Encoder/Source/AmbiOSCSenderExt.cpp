@@ -43,15 +43,6 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 	if (pSettings->oscSendExtXyzFlag)
 	{
 		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-		/*
-		pInstance->oscPath = OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ;
-		pInstance->parametersInPath.clear();
-		pInstance->realParameters.clear();
-		pInstance->realParameters.add(OSCSenderInstance::Name);
-		pInstance->realParameters.add(OSCSenderInstance::X);
-		pInstance->realParameters.add(OSCSenderInstance::Y);
-		pInstance->realParameters.add(OSCSenderInstance::Z);
-		*/
 		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ,
 			pInstance->escapeStringMap[OSCSenderInstance::Name],
 			pInstance->escapeStringMap[OSCSenderInstance::X],
@@ -73,15 +64,6 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 	if (pSettings->oscSendExtAedFlag)
 	{
 		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-		/*
-	    pInstance->oscPath = OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED;
-		pInstance->parametersInPath.clear();
-		pInstance->realParameters.clear();
-		pInstance->realParameters.add(OSCSenderInstance::Name);
-		pInstance->realParameters.add(OSCSenderInstance::A);
-		pInstance->realParameters.add(OSCSenderInstance::E);
-		pInstance->realParameters.add(OSCSenderInstance::D);
-		*/
 		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED,
 			pInstance->escapeStringMap[OSCSenderInstance::Name],
 			pInstance->escapeStringMap[OSCSenderInstance::A],
@@ -120,7 +102,7 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 			}
 		}
 	}
-	
+
 	if (hasSuccessful)
 	{
 		startTimer(pSettings->oscSendExtIntervalMs);

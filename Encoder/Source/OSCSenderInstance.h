@@ -34,8 +34,8 @@ public:
 		std::make_pair(Gain, "{g}")
 	};
 
-	bool connect(String host, int port) const;
-	void disconnect() const;
+    bool connect(String host, int port);
+	void disconnect();
 	void sendMessage(AmbiPoint* pt, int index);
 	void setOscPath(String path);
 
@@ -44,5 +44,7 @@ private:
 	String oscPath;
 	Array<ParameterType> parametersInPath;
 	Array<ParameterType> realParameters;
+	bool isConnected;
+	CriticalSection cs;
 };
 

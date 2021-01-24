@@ -10,18 +10,27 @@
 
 #include "OSCSenderInstance.h"
 
-bool OSCSenderInstance::connect(String host, int port) const
+bool OSCSenderInstance::connect(String host, int port)
 {
-    return sender->connect(host, port);
+    const ScopedLock lock(cs);
+    bool ok = sender->connect(host, port);
+    isConnected = ok;
+    return ok;
 }
 
-void OSCSenderInstance::disconnect() const
+void OSCSenderInstance::disconnect()
 {
+    const ScopedLock lock(cs);
+    isConnected = false;
     sender->disconnect();
 }
 
 void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
 {
+    const ScopedLock lock(cs);
+    if (!isConnected)
+        return;
+
     String path = String(oscPath);
 
     for (ParameterType parameter : parametersInPath)

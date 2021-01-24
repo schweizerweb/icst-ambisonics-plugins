@@ -74,8 +74,6 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
                                                   TRANS("General")));
     addAndMakeVisible (groupGeneral.get());
 
-    groupGeneral->setBounds (0, 0, 800, 64);
-
     sliderInterval.reset (new juce::Slider ("sliderInterval"));
     addAndMakeVisible (sliderInterval.get());
     sliderInterval->setRange (10, 10000, 1);
@@ -123,16 +121,12 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     sliderPortExtXyz->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderPortExtXyz->addListener (this);
 
-    sliderPortExtXyz->setBounds (704, 96, 86, 24);
-
     sliderPortExtAed.reset (new juce::Slider ("sliderPortExtAed"));
     addAndMakeVisible (sliderPortExtAed.get());
     sliderPortExtAed->setRange (0, 65535, 1);
     sliderPortExtAed->setSliderStyle (juce::Slider::IncDecButtons);
     sliderPortExtAed->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderPortExtAed->addListener (this);
-
-    sliderPortExtAed->setBounds (704, 128, 86, 24);
 
 
     //[UserPreSize]
@@ -201,15 +195,18 @@ void OSCTargetsComponent::resized()
 
     groupStandard->setBounds (0, 72, getWidth() - 0, 96);
     toggleEnableStandardXyz->setBounds (0 + 16, 72 + 24, 150, 24);
-    textOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 105 - 106, 72 + 24, 106, 24);
-    labelOscSendIpExt->setBounds (0 + (getWidth() - 0) - 215 - 126, 72 + 24, 126, 24);
+    textOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 109 - 106, 72 + 24, 106, 24);
+    labelOscSendIpExt->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 24, 126, 24);
     groupCustom->setBounds (0, 176, getWidth() - 0, getHeight() - 176);
     targetList->setBounds (0 + 16, 176 + 24, (getWidth() - 0) - 32, (getHeight() - 176) - 40);
-    sliderInterval->setBounds (0 + 800 - 20 - 270, 0 + 24, 270, 24);
+    groupGeneral->setBounds (0, 0, getWidth() - 0, 64);
+    sliderInterval->setBounds (0 + (getWidth() - 0) - 16 - 270, 0 + 24, 270, 24);
     labelInterval->setBounds (0 + 16, 0 + 24, 150, 24);
     toggleEnableStandardAed->setBounds (0 + 16, 72 + 55, 150, 24);
-    textOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 105 - 106, 72 + 55, 106, 24);
-    labelOscSendIpExt2->setBounds (0 + (getWidth() - 0) - 215 - 126, 72 + 55, 126, 24);
+    textOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 109 - 106, 72 + 55, 106, 24);
+    labelOscSendIpExt2->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 55, 126, 24);
+    sliderPortExtXyz->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 24, 86, 24);
+    sliderPortExtAed->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 56, 86, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -316,11 +313,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="a452293a001780b9" buttonText="Enable XYZ" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscSendIpExtXyz" id="ed3cbf6e9d145d08" memberName="textOscSendIpExtXyz"
-              virtualName="" explicitFocusOrder="0" pos="105Rr 24 106 24" posRelativeX="a452293a001780b9"
+              virtualName="" explicitFocusOrder="0" pos="109Rr 24 106 24" posRelativeX="a452293a001780b9"
               posRelativeY="a452293a001780b9" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscSendIpExt" id="ee4b90142f7a53f4" memberName="labelOscSendIpExt"
-         virtualName="" explicitFocusOrder="0" pos="215Rr 24 126 24" posRelativeX="a452293a001780b9"
+         virtualName="" explicitFocusOrder="0" pos="219Rr 24 126 24" posRelativeX="a452293a001780b9"
          posRelativeY="a452293a001780b9" edTextCol="ff000000" edBkgCol="0"
          labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -332,9 +329,9 @@ BEGIN_JUCER_METADATA
                     posRelativeY="5ccced30e0050e9" posRelativeW="5ccced30e0050e9"
                     posRelativeH="5ccced30e0050e9" class="TableListBox" params=""/>
   <GROUPCOMPONENT name="groupGeneral" id="4e210261f2d82b98" memberName="groupGeneral"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 800 64" title="General"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 64" title="General"/>
   <SLIDER name="sliderInterval" id="d02cfad6a67a7536" memberName="sliderInterval"
-          virtualName="" explicitFocusOrder="0" pos="20Rr 24 270 24" posRelativeX="4e210261f2d82b98"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 24 270 24" posRelativeX="4e210261f2d82b98"
           posRelativeY="4e210261f2d82b98" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
@@ -349,25 +346,25 @@ BEGIN_JUCER_METADATA
                 posRelativeY="a452293a001780b9" buttonText="Enable AED" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscSendIpExtAed" id="9e5f2789bd7772" memberName="textOscSendIpExtAed"
-              virtualName="" explicitFocusOrder="0" pos="105Rr 55 106 24" posRelativeX="a452293a001780b9"
+              virtualName="" explicitFocusOrder="0" pos="109Rr 55 106 24" posRelativeX="a452293a001780b9"
               posRelativeY="a452293a001780b9" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscSendIpExt" id="22dbcbf07f7968d2" memberName="labelOscSendIpExt2"
-         virtualName="" explicitFocusOrder="0" pos="215Rr 55 126 24" posRelativeX="a452293a001780b9"
+         virtualName="" explicitFocusOrder="0" pos="219Rr 55 126 24" posRelativeX="a452293a001780b9"
          posRelativeY="a452293a001780b9" edTextCol="ff000000" edBkgCol="0"
          labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <SLIDER name="sliderPortExtXyz" id="591bcc850e858bff" memberName="sliderPortExtXyz"
-          virtualName="" explicitFocusOrder="0" pos="704 96 86 24" min="0.0"
-          max="65535.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="16Rr 24 86 24" posRelativeX="a452293a001780b9"
+          posRelativeY="a452293a001780b9" min="0.0" max="65535.0" int="1.0"
+          style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="sliderPortExtAed" id="218b7cbec68ee7e8" memberName="sliderPortExtAed"
-          virtualName="" explicitFocusOrder="0" pos="704 128 86 24" min="0.0"
-          max="65535.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="16Rr 56 86 24" posRelativeX="a452293a001780b9"
+          posRelativeY="a452293a001780b9" min="0.0" max="65535.0" int="1.0"
+          style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
