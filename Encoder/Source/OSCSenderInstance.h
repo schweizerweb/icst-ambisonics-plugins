@@ -10,15 +10,14 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "OSCHandlerEncoder.h"
 #include "../../Common/AmbiPoint.h"
 
 class OSCSenderInstance
 {
 public:
-	OSCSenderInstance() { sender.reset(new OSCSender()); }
-	~OSCSenderInstance() { sender = nullptr; }
-    
+    OSCSenderInstance();
+    ~OSCSenderInstance();
+
     enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, Gain };
 
 	std::map<ParameterType, String> escapeStringMap = {
@@ -37,7 +36,8 @@ public:
     bool connect(String host, int port);
 	void disconnect();
 	void sendMessage(AmbiPoint* pt, int index);
-	void setOscPath(String path);
+	bool setOscPath(String path);
+	String getOscPath();
 
 private:
     std::unique_ptr<OSCSender> sender;

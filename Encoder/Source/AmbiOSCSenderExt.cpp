@@ -89,11 +89,9 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 		if (target->enabledFlag)
 		{
 			OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-			pInstance->setOscPath(target->oscString);
-			bool ret = pInstance->connect(target->targetHost, target->targetPort);
-			if(!ret)
+            if(!pInstance->setOscPath(target->oscString) || !pInstance->connect(target->targetHost, target->targetPort))
 			{
-				pMessage->append("Error initializing custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + ": " + target->oscString + NewLine::getDefault(), 500);
+            	pMessage->append("Error initializing custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + ": " + target->oscString + NewLine::getDefault(), 500);
 				hasErrors = true;
 			}
 			else
@@ -118,10 +116,17 @@ void AmbiOSCSenderExt::stop()
 	{
 		sender->disconnect();
 	}
+
 }
 
 void AmbiOSCSenderExt::timerCallback()
 {
+	const ScopedTryLock lock(cs);
+
+	// skip if still busy
+	if (!lock.isLocked())
+		return;
+
 	// create history elements if required
 	while (pPoints->size() > history.size())
 		history.add(new PointHistoryEntry());
@@ -141,7 +146,7 @@ void AmbiOSCSenderExt::timerCallback()
                     }
                     catch (...)
                     {
-						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + String(i), StatusMessageHandler::Error);
+						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + sender->getOscPath(), StatusMessageHandler::Error);
                     }
 					
 				}

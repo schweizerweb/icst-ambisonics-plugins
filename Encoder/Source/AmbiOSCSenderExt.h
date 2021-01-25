@@ -13,6 +13,7 @@
 #include "../../Common/AmbiDataSet.h"
 #include "EncoderSettings.h"
 #include "OSCSenderInstance.h"
+#include "../../Common/StatusMessageHandler.h"
 
 class PointHistoryEntry
 {
@@ -31,11 +32,23 @@ public:
 			point = *pAmbiPoint->getPoint();
 			changed = true;
 		}
+		if(pAmbiPoint->getGain() != gain)
+		{
+			gain = pAmbiPoint->getGain();
+			changed = true;
+		}
+		if(pAmbiPoint->getColor() != color)
+		{
+			color = pAmbiPoint->getColor();
+			changed = true;
+		}
 		return changed;
 	}
 
 	String name; 
 	Point3D<double> point;
+	Colour color;
+	double gain;
 };
 
 class AmbiOSCSenderExt : public Timer
@@ -52,7 +65,7 @@ private:
 	void timerCallback() override;
 
 private:
-
+	CriticalSection cs;
 	AmbiDataSet* pPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 	OwnedArray<PointHistoryEntry> history;

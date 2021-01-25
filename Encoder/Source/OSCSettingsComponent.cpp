@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.7
 
   ------------------------------------------------------------------------------
 
@@ -132,14 +132,14 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     addAndMakeVisible (sliderReceiveOscPort.get());
     sliderReceiveOscPort->setRange (0, 65535, 1);
     sliderReceiveOscPort->setSliderStyle (juce::Slider::IncDecButtons);
-    sliderReceiveOscPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderReceiveOscPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
     sliderReceiveOscPort->addListener (this);
 
     sliderSendOscPort.reset (new juce::Slider ("sliderSendOscPort"));
     addAndMakeVisible (sliderSendOscPort.get());
     sliderSendOscPort->setRange (0, 65535, 1);
     sliderSendOscPort->setSliderStyle (juce::Slider::IncDecButtons);
-    sliderSendOscPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderSendOscPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
     sliderSendOscPort->addListener (this);
 
     sliderInterval.reset (new juce::Slider ("sliderInterval"));
@@ -158,9 +158,8 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
 
     //[Constructor] You can add your own custom stuff here..
     textOscSendIp->addListener(this);
-    sliderReceiveOscPort->setSkewFactorFromMidPoint(50.0);
-    sliderSendOscPort->setSkewFactorFromMidPoint(50.0);
-
+    sliderReceiveOscPort->setSkewFactorFromMidPoint(100.0);
+    sliderSendOscPort->setSkewFactorFromMidPoint(100.0);
     toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
     sliderReceiveOscPort->setValue(pSettings->oscReceivePort, dontSendNotification);
 
@@ -225,20 +224,20 @@ void OSCSettingsComponent::resized()
     groupExternal->setBounds (8, 8, getWidth() - 16, 96);
     groupInternal->setBounds (8, 112, getWidth() - 16, 96);
     toggleReceiveOsc->setBounds (8 + 14, 8 + 27, 150, 24);
-    labelOscPort->setBounds (8 + (getWidth() - 16) - 108 - 49, 8 + 27, 49, 24);
+    labelOscPort->setBounds (8 + (getWidth() - 16) - 123 - 49, 8 + 27, 49, 24);
     toggleSendOsc->setBounds (8 + 14, 112 + 27, 199, 24);
-    textOscSendIp->setBounds (8 + (getWidth() - 16) - 111 - 106, 112 + 27, 106, 24);
-    labelOscSendIp->setBounds (8 + (getWidth() - 16) - 221 - 124, 112 + 27, 124, 24);
-    labelOscSendInterval->setBounds (8 + (getWidth() - 16) - 221 - 110, 112 + 57, 110, 24);
+    textOscSendIp->setBounds (8 + (getWidth() - 16) - 123 - 106, 112 + 27, 106, 24);
+    labelOscSendIp->setBounds (8 + (getWidth() - 16) - 236 - 124, 112 + 27, 124, 24);
+    labelOscSendInterval->setBounds (8 + (getWidth() - 16) - 236 - 110, 112 + 57, 110, 24);
     toggleSendOscExt->setBounds (8 + 14, 8 + 57, 245, 24);
     groupLog->setBounds (8, 216, getWidth() - 16, getHeight() - 221);
     textLog->setBounds (8 + 16, 216 + 56, (getWidth() - 16) - 30, (getHeight() - 221) - 72);
     toggleLog->setBounds (8 + 16, 216 + 24, 280, 24);
-    labelExternalOscInfo->setBounds (8 + (getWidth() - 16) - 115 - 224, 8 + 57, 224, 24);
-    btnEdit->setBounds (8 + (getWidth() - 16) - 16 - 86, 8 + 57, 86, 24);
-    sliderReceiveOscPort->setBounds (8 + (getWidth() - 16) - 16 - 86, 8 + 27, 86, 24);
-    sliderSendOscPort->setBounds (8 + (getWidth() - 16) - 16 - 86, 112 + 27, 86, 24);
-    sliderInterval->setBounds (8 + (getWidth() - 16) - 16 - 200, 112 + 57, 200, 24);
+    labelExternalOscInfo->setBounds (8 + (getWidth() - 16) - 123 - 224, 8 + 57, 224, 24);
+    btnEdit->setBounds (8 + (getWidth() - 16) - 16 - 100, 8 + 57, 100, 24);
+    sliderReceiveOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 8 + 27, 100, 24);
+    sliderSendOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 112 + 27, 100, 24);
+    sliderInterval->setBounds (8 + (getWidth() - 16) - 16 - 210, 112 + 57, 210, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -391,7 +390,7 @@ BEGIN_JUCER_METADATA
                 posRelativeY="64cdd18a28c39177" buttonText="Receive OSC" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="108Rr 27 49 24" posRelativeX="64cdd18a28c39177"
+         virtualName="" explicitFocusOrder="0" pos="123Rr 27 49 24" posRelativeX="64cdd18a28c39177"
          posRelativeY="64cdd18a28c39177" edTextCol="ff000000" edBkgCol="0"
          labelText="Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -401,17 +400,17 @@ BEGIN_JUCER_METADATA
                 posRelativeY="99fa521234eba1bd" buttonText="Send Positions to Decoder"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscSendIp" id="f5d167c87a68db4c" memberName="textOscSendIp"
-              virtualName="" explicitFocusOrder="0" pos="111Rr 27 106 24" posRelativeX="99fa521234eba1bd"
+              virtualName="" explicitFocusOrder="0" pos="123Rr 27 106 24" posRelativeX="99fa521234eba1bd"
               posRelativeY="99fa521234eba1bd" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscSendIp" id="ba6c86d4711d8bd0" memberName="labelOscSendIp"
-         virtualName="" explicitFocusOrder="0" pos="221Rr 27 124 24" posRelativeX="99fa521234eba1bd"
+         virtualName="" explicitFocusOrder="0" pos="236Rr 27 124 24" posRelativeX="99fa521234eba1bd"
          posRelativeY="99fa521234eba1bd" edTextCol="ff000000" edBkgCol="0"
          labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <LABEL name="labelOscSendInterval" id="104391e6ca4d3f12" memberName="labelOscSendInterval"
-         virtualName="" explicitFocusOrder="0" pos="221Rr 57 110 24" posRelativeX="99fa521234eba1bd"
+         virtualName="" explicitFocusOrder="0" pos="236Rr 57 110 24" posRelativeX="99fa521234eba1bd"
          posRelativeY="99fa521234eba1bd" edTextCol="ff000000" edBkgCol="0"
          labelText="Interval [ms]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -432,27 +431,27 @@ BEGIN_JUCER_METADATA
                 posRelativeY="1f10ffbcf9f07a8c" buttonText="Enable (may slow down OSC handling)"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelExternalOscInfo" id="d8016ede58eb1df8" memberName="labelExternalOscInfo"
-         virtualName="" explicitFocusOrder="0" pos="115Rr 57 224 24" posRelativeX="64cdd18a28c39177"
+         virtualName="" explicitFocusOrder="0" pos="123Rr 57 224 24" posRelativeX="64cdd18a28c39177"
          posRelativeY="64cdd18a28c39177" edTextCol="ff000000" edBkgCol="0"
          labelText="no active targets" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <TEXTBUTTON name="btnEdit" id="39868884fdb013a6" memberName="btnEdit" virtualName=""
-              explicitFocusOrder="0" pos="16Rr 57 86 24" posRelativeX="64cdd18a28c39177"
+              explicitFocusOrder="0" pos="16Rr 57 100 24" posRelativeX="64cdd18a28c39177"
               posRelativeY="64cdd18a28c39177" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderReceiveOscPort" id="591bcc850e858bff" memberName="sliderReceiveOscPort"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 27 86 24" posRelativeX="64cdd18a28c39177"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 27 100 24" posRelativeX="64cdd18a28c39177"
           posRelativeY="64cdd18a28c39177" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="sliderSendOscPort" id="b9eb26813403a118" memberName="sliderSendOscPort"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 27 86 24" posRelativeX="99fa521234eba1bd"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 27 100 24" posRelativeX="99fa521234eba1bd"
           posRelativeY="99fa521234eba1bd" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="sliderInterval" id="d02cfad6a67a7536" memberName="sliderInterval"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 57 200 24" posRelativeX="99fa521234eba1bd"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 57 210 24" posRelativeX="99fa521234eba1bd"
           posRelativeY="99fa521234eba1bd" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>

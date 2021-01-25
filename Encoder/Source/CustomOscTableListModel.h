@@ -19,19 +19,22 @@
 #define COLUMN_ID_HOST			202
 #define	COLUMN_ID_PORT			203
 #define	COLUMN_ID_PATH			204
+#define ACTION_MESSAGE_DATA_CHANGED "data"
+#define ACTION_MESSAGE_SEL_CHANGED "sel"
 
 
-class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeBroadcaster
+
+class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster
 {
 public:
-	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ChangeListener* pChangeListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
-		addChangeListener(pChangeListener);
+		addActionListener(pActionListener);
 	}
 
 	~CustomOscTableListModel() override
 	{
-		removeAllChangeListeners();
+		removeAllActionListeners();
 	}
 
 	int getNumRows() override {
@@ -48,7 +51,7 @@ public:
 			g.fillAll(alternateColour);
 	}
 
-	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override 
+	void paintCell(Graphics& g, int /*rowNumber*/, int /*columnId*/, int width, int height, bool /*rowIsSelected*/) override 
 	{
 		g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId));
 		g.fillRect(width - 1, 0, 1, height);
@@ -90,6 +93,7 @@ public:
 
 	void selectedRowsChanged(int /*lastRowSelected*/) override
 	{
+		sendActionMessage(ACTION_MESSAGE_SEL_CHANGED);
 	}
 
 	double getValue(int columnId, int rowNumber) override 
@@ -107,16 +111,6 @@ public:
 		}
 	}
 
-    bool getEnabled(const int columnId, const int rowNumber) override
-    {
-		if (columnId == COLUMN_ID_HOST 
-			|| columnId == COLUMN_ID_PORT
-			|| columnId == COLUMN_ID_PATH)
-			return pSettings->customOscTargets[rowNumber]->enabledFlag;
-
-        return true;
-    }
-    
 	void setValue(int columnId, int rowNumber, double newValue) override
 	{
 		switch (columnId)
@@ -129,7 +123,7 @@ public:
 		getTable()->updateContent();
 		getTable()->repaint();
 
-		sendChangeMessage();
+		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
 	}
 	
 	SliderRange getSliderRange(int columnId) override 
@@ -166,7 +160,7 @@ public:
 		default: ;
 		}
 
-		sendChangeMessage();
+		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
 	}
 
 	void initTable(TableListBox* tableListBox)
@@ -181,13 +175,9 @@ public:
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
 
-	void cellClicked(int rowNumber, int columnId, const MouseEvent&) override
+    bool getEnabled(const int /*columnId*/, const int /*rowNumber*/) override
 	{
-		//if(columnId == COLUMN_ID_GROUP_POINTS)
-		{
-		}
-
-		int i = rowNumber;
+	    return true;
 	}
 
 private:

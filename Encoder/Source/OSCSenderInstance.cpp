@@ -10,6 +10,16 @@
 
 #include "OSCSenderInstance.h"
 
+OSCSenderInstance::OSCSenderInstance(): isConnected(false)
+{
+    sender.reset(new OSCSender());
+}
+
+OSCSenderInstance::~OSCSenderInstance()
+{
+    sender = nullptr;
+}
+
 bool OSCSenderInstance::connect(String host, int port)
 {
     const ScopedLock lock(cs);
@@ -37,7 +47,7 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     {
         switch(parameter)
         {
-        case Index: path = path.replace(escapeStringMap[Index], String(index)); break;
+        case Index: path = path.replace(escapeStringMap[Index], String(index + 1)); break;
         case Name: path = path.replace(escapeStringMap[Name], pt->getName()); break;
         case Color: path = path.replace(escapeStringMap[Color], pt->getColor().toDisplayString(true)); break;
         case A: path = path.replace(escapeStringMap[A], String(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))); break;
@@ -56,16 +66,16 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     {
         switch (parameter)
         {
-        case Index: message.addArgument(OSCArgument(index)); break;
+        case Index: message.addArgument(OSCArgument(index + 1)); break;
         case Name: message.addArgument(OSCArgument(pt->getName())); break;
         case Color: message.addArgument(OSCArgument(pt->getColor().toDisplayString(true))); break;
-        case A: message.addArgument(OSCArgument((float)Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))); break;
-        case E: message.addArgument(OSCArgument((float)Constants::RadToGrad(double(pt->getPoint()->getElevation())))); break;
-        case D: message.addArgument(OSCArgument((float)pt->getPoint()->getDistance())); break;
-        case X: message.addArgument(OSCArgument((float)pt->getPoint()->getX())); break;
-        case Y: message.addArgument(OSCArgument((float)pt->getPoint()->getY())); break;
-        case Z: message.addArgument(OSCArgument((float)pt->getPoint()->getZ())); break;
-        case Gain: message.addArgument(OSCArgument((float)pt->getGain())); break;
+        case A: message.addArgument(OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth()))))); break;
+        case E: message.addArgument(OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getElevation()))))); break;
+        case D: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance()))); break;
+        case X: message.addArgument(OSCArgument(float(pt->getPoint()->getX()))); break;
+        case Y: message.addArgument(OSCArgument(float(pt->getPoint()->getY()))); break;
+        case Z: message.addArgument(OSCArgument(float(pt->getPoint()->getZ()))); break;
+        case Gain: message.addArgument(OSCArgument(float(pt->getGain()))); break;
         default:;
         }
     }
@@ -73,7 +83,7 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     sender->send(message);
 }
 
-void OSCSenderInstance::setOscPath(String path)
+bool OSCSenderInstance::setOscPath(String path)
 {
     parametersInPath.clear();
     realParameters.clear();
@@ -95,8 +105,22 @@ void OSCSenderInstance::setOscPath(String path)
         if(p.isNotEmpty())
         {
             auto f = std::find_if(escapeStringMap.begin(), escapeStringMap.end(), [&p](const auto& x) { return x.second == p; });
-            realParameters.add(f->first);
+            if (f != escapeStringMap.end())
+            {
+                realParameters.add(f->first);
+            }
+            else
+            {
+                return false;
+            }
         }
     }
+
+    return true;
+}
+
+String OSCSenderInstance::getOscPath()
+{
+    return oscPath;
 }
 

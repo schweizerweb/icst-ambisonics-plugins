@@ -411,7 +411,6 @@ void AmbisonicEncoderAudioProcessor::initializeOsc()
 	if (!pOscSenderExt->start(&encoderSettings, &message))
 	{
 		AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, ("Error starting OSC Sender for external usage: \r\n" + message));
-		encoderSettings.oscSendExtMasterFlag = false;
 	}
 }
 

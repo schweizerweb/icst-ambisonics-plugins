@@ -38,6 +38,7 @@
 class OSCTargetsComponent  : public juce::Component,
                              public ChangeBroadcaster,
                              public TextEditor::Listener,
+                             public ActionListener,
                              public juce::Button::Listener,
                              public juce::Slider::Listener
 {
@@ -61,6 +62,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void controlDimming();
+    void actionListenerCallback(const String& message) override;
     EncoderSettings* pSettings;
     std::unique_ptr<CustomOscTableListModel> customOscTableModel;
     //[/UserVariables]
@@ -69,7 +71,7 @@ private:
     std::unique_ptr<juce::GroupComponent> groupStandard;
     std::unique_ptr<juce::ToggleButton> toggleEnableStandardXyz;
     std::unique_ptr<juce::TextEditor> textOscSendIpExtXyz;
-    std::unique_ptr<juce::Label> labelOscSendIpExt;
+    std::unique_ptr<juce::Label> labelOscSendIpExtXyz;
     std::unique_ptr<juce::GroupComponent> groupCustom;
     std::unique_ptr<TableListBox> targetList;
     std::unique_ptr<juce::GroupComponent> groupGeneral;
@@ -77,7 +79,7 @@ private:
     std::unique_ptr<juce::Label> labelInterval;
     std::unique_ptr<juce::ToggleButton> toggleEnableStandardAed;
     std::unique_ptr<juce::TextEditor> textOscSendIpExtAed;
-    std::unique_ptr<juce::Label> labelOscSendIpExt2;
+    std::unique_ptr<juce::Label> labelOscSendIpExtAed;
     std::unique_ptr<juce::Slider> sliderPortExtXyz;
     std::unique_ptr<juce::Slider> sliderPortExtAed;
     std::unique_ptr<juce::TextButton> btnAdd;

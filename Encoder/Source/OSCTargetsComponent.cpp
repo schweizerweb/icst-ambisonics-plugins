@@ -31,7 +31,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     : pSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, pChangeListener));
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this));
     addChangeListener(pChangeListener);
     //[/Constructor_pre]
 
@@ -54,14 +54,14 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     textOscSendIpExtXyz->setPopupMenuEnabled (true);
     textOscSendIpExtXyz->setText (juce::String());
 
-    labelOscSendIpExt.reset (new juce::Label ("labelOscSendIpExt",
-                                              TRANS("Target Host/Port:")));
-    addAndMakeVisible (labelOscSendIpExt.get());
-    labelOscSendIpExt->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelOscSendIpExt->setJustificationType (juce::Justification::centredRight);
-    labelOscSendIpExt->setEditable (false, false, false);
-    labelOscSendIpExt->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelOscSendIpExt->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    labelOscSendIpExtXyz.reset (new juce::Label ("labelOscSendIpExtXyz",
+                                                 TRANS("Target Host/Port:")));
+    addAndMakeVisible (labelOscSendIpExtXyz.get());
+    labelOscSendIpExtXyz->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIpExtXyz->setJustificationType (juce::Justification::centredRight);
+    labelOscSendIpExtXyz->setEditable (false, false, false);
+    labelOscSendIpExtXyz->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelOscSendIpExtXyz->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     groupCustom.reset (new juce::GroupComponent ("groupCustom",
                                                  TRANS("Custom OSC")));
@@ -106,27 +106,27 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     textOscSendIpExtAed->setPopupMenuEnabled (true);
     textOscSendIpExtAed->setText (juce::String());
 
-    labelOscSendIpExt2.reset (new juce::Label ("labelOscSendIpExt",
-                                               TRANS("Target Host/Port:")));
-    addAndMakeVisible (labelOscSendIpExt2.get());
-    labelOscSendIpExt2->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelOscSendIpExt2->setJustificationType (juce::Justification::centredRight);
-    labelOscSendIpExt2->setEditable (false, false, false);
-    labelOscSendIpExt2->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelOscSendIpExt2->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    labelOscSendIpExtAed.reset (new juce::Label ("labelOscSendIpExtAed",
+                                                 TRANS("Target Host/Port:")));
+    addAndMakeVisible (labelOscSendIpExtAed.get());
+    labelOscSendIpExtAed->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIpExtAed->setJustificationType (juce::Justification::centredRight);
+    labelOscSendIpExtAed->setEditable (false, false, false);
+    labelOscSendIpExtAed->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelOscSendIpExtAed->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     sliderPortExtXyz.reset (new juce::Slider ("sliderPortExtXyz"));
     addAndMakeVisible (sliderPortExtXyz.get());
     sliderPortExtXyz->setRange (0, 65535, 1);
     sliderPortExtXyz->setSliderStyle (juce::Slider::IncDecButtons);
-    sliderPortExtXyz->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderPortExtXyz->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
     sliderPortExtXyz->addListener (this);
 
     sliderPortExtAed.reset (new juce::Slider ("sliderPortExtAed"));
     addAndMakeVisible (sliderPortExtAed.get());
     sliderPortExtAed->setRange (0, 65535, 1);
     sliderPortExtAed->setSliderStyle (juce::Slider::IncDecButtons);
-    sliderPortExtAed->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderPortExtAed->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
     sliderPortExtAed->addListener (this);
 
     btnAdd.reset (new juce::TextButton ("btnAdd"));
@@ -147,8 +147,8 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
 
 
     //[Constructor] You can add your own custom stuff here..
-    sliderInterval->setSkewFactorFromMidPoint(50.0);
-    sliderInterval->setValue(pSettings->oscSendExtIntervalMs);
+    sliderInterval->setSkewFactorFromMidPoint(100.0);
+    sliderInterval->setValue(pSettings->oscSendExtIntervalMs, dontSendNotification);
 
     toggleEnableStandardXyz->setToggleState(pSettings->oscSendExtXyzFlag, dontSendNotification);
     textOscSendIpExtXyz->setText(pSettings->oscSendExtXyzHost, false);
@@ -172,7 +172,7 @@ OSCTargetsComponent::~OSCTargetsComponent()
     groupStandard = nullptr;
     toggleEnableStandardXyz = nullptr;
     textOscSendIpExtXyz = nullptr;
-    labelOscSendIpExt = nullptr;
+    labelOscSendIpExtXyz = nullptr;
     groupCustom = nullptr;
     targetList = nullptr;
     groupGeneral = nullptr;
@@ -180,7 +180,7 @@ OSCTargetsComponent::~OSCTargetsComponent()
     labelInterval = nullptr;
     toggleEnableStandardAed = nullptr;
     textOscSendIpExtAed = nullptr;
-    labelOscSendIpExt2 = nullptr;
+    labelOscSendIpExtAed = nullptr;
     sliderPortExtXyz = nullptr;
     sliderPortExtAed = nullptr;
     btnAdd = nullptr;
@@ -211,18 +211,18 @@ void OSCTargetsComponent::resized()
 
     groupStandard->setBounds (0, 72, getWidth() - 0, 96);
     toggleEnableStandardXyz->setBounds (0 + 16, 72 + 24, 150, 24);
-    textOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 109 - 106, 72 + 24, 106, 24);
-    labelOscSendIpExt->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 24, 126, 24);
+    textOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 124 - 106, 72 + 24, 106, 24);
+    labelOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 234 - 126, 72 + 24, 126, 24);
     groupCustom->setBounds (0, 176, getWidth() - 0, getHeight() - 176);
     targetList->setBounds (0 + 16, 176 + 24, (getWidth() - 0) - 32, (getHeight() - 176) - 65);
     groupGeneral->setBounds (0, 0, getWidth() - 0, 64);
     sliderInterval->setBounds (0 + (getWidth() - 0) - 16 - 270, 0 + 24, 270, 24);
     labelInterval->setBounds (0 + 16, 0 + 24, 150, 24);
     toggleEnableStandardAed->setBounds (0 + 16, 72 + 55, 150, 24);
-    textOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 109 - 106, 72 + 55, 106, 24);
-    labelOscSendIpExt2->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 55, 126, 24);
-    sliderPortExtXyz->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 24, 86, 24);
-    sliderPortExtAed->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 56, 86, 24);
+    textOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 124 - 106, 72 + 55, 106, 24);
+    labelOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 234 - 126, 72 + 55, 126, 24);
+    sliderPortExtXyz->setBounds (0 + (getWidth() - 0) - 16 - 100, 72 + 24, 100, 24);
+    sliderPortExtAed->setBounds (0 + (getWidth() - 0) - 16 - 100, 72 + 56, 100, 24);
     btnAdd->setBounds (0 + (getWidth() - 0) - 16 - 86, 176 + (getHeight() - 176) - 10 - 24, 86, 24);
     btnDelete->setBounds (0 + (getWidth() - 0) - 108 - 86, 176 + (getHeight() - 176) - 10 - 24, 86, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -303,6 +303,9 @@ void OSCTargetsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void OSCTargetsComponent::controlDimming()
 {
+    labelOscSendIpExtXyz->setEnabled(toggleEnableStandardXyz->getToggleState());
+    labelOscSendIpExtAed->setEnabled(toggleEnableStandardAed->getToggleState());
+
     textOscSendIpExtXyz->setEnabled(toggleEnableStandardXyz->getToggleState());
     textOscSendIpExtAed->setEnabled(toggleEnableStandardAed->getToggleState());
 
@@ -310,6 +313,14 @@ void OSCTargetsComponent::controlDimming()
     sliderPortExtAed->setEnabled(toggleEnableStandardAed->getToggleState());
 
     btnDelete->setEnabled(targetList->getSelectedRows().size() > 0);
+}
+
+void OSCTargetsComponent::actionListenerCallback(const String& message)
+{
+    controlDimming();
+
+    if (message == ACTION_MESSAGE_DATA_CHANGED)
+        sendChangeMessage();
 }
 
 void OSCTargetsComponent::textEditorTextChanged(TextEditor& textEditor)
@@ -336,7 +347,7 @@ void OSCTargetsComponent::textEditorTextChanged(TextEditor& textEditor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCTargetsComponent" componentName=""
-                 parentClasses="public juce::Component, public ChangeBroadcaster, public TextEditor::Listener"
+                 parentClasses="public juce::Component, public ChangeBroadcaster, public TextEditor::Listener, public ActionListener"
                  constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings"
                  variableInitialisers="pSettings(pSettings)" snapPixels="8" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
@@ -349,11 +360,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="a452293a001780b9" buttonText="Enable XYZ" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscSendIpExtXyz" id="ed3cbf6e9d145d08" memberName="textOscSendIpExtXyz"
-              virtualName="" explicitFocusOrder="0" pos="109Rr 24 106 24" posRelativeX="a452293a001780b9"
+              virtualName="" explicitFocusOrder="0" pos="124Rr 24 106 24" posRelativeX="a452293a001780b9"
               posRelativeY="a452293a001780b9" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscSendIpExt" id="ee4b90142f7a53f4" memberName="labelOscSendIpExt"
-         virtualName="" explicitFocusOrder="0" pos="219Rr 24 126 24" posRelativeX="a452293a001780b9"
+  <LABEL name="labelOscSendIpExtXyz" id="ee4b90142f7a53f4" memberName="labelOscSendIpExtXyz"
+         virtualName="" explicitFocusOrder="0" pos="234Rr 24 126 24" posRelativeX="a452293a001780b9"
          posRelativeY="a452293a001780b9" edTextCol="ff000000" edBkgCol="0"
          labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -382,25 +393,25 @@ BEGIN_JUCER_METADATA
                 posRelativeY="a452293a001780b9" buttonText="Enable AED" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTEDITOR name="textOscSendIpExtAed" id="9e5f2789bd7772" memberName="textOscSendIpExtAed"
-              virtualName="" explicitFocusOrder="0" pos="109Rr 55 106 24" posRelativeX="a452293a001780b9"
+              virtualName="" explicitFocusOrder="0" pos="124Rr 55 106 24" posRelativeX="a452293a001780b9"
               posRelativeY="a452293a001780b9" initialText="" multiline="0"
               retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
-  <LABEL name="labelOscSendIpExt" id="22dbcbf07f7968d2" memberName="labelOscSendIpExt2"
-         virtualName="" explicitFocusOrder="0" pos="219Rr 55 126 24" posRelativeX="a452293a001780b9"
+  <LABEL name="labelOscSendIpExtAed" id="22dbcbf07f7968d2" memberName="labelOscSendIpExtAed"
+         virtualName="" explicitFocusOrder="0" pos="234Rr 55 126 24" posRelativeX="a452293a001780b9"
          posRelativeY="a452293a001780b9" edTextCol="ff000000" edBkgCol="0"
          labelText="Target Host/Port:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <SLIDER name="sliderPortExtXyz" id="591bcc850e858bff" memberName="sliderPortExtXyz"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 24 86 24" posRelativeX="a452293a001780b9"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 24 100 24" posRelativeX="a452293a001780b9"
           posRelativeY="a452293a001780b9" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="sliderPortExtAed" id="218b7cbec68ee7e8" memberName="sliderPortExtAed"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 56 86 24" posRelativeX="a452293a001780b9"
+          virtualName="" explicitFocusOrder="0" pos="16Rr 56 100 24" posRelativeX="a452293a001780b9"
           posRelativeY="a452293a001780b9" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <TEXTBUTTON name="btnAdd" id="239ce64ab2ee06e6" memberName="btnAdd" virtualName=""
               explicitFocusOrder="0" pos="16Rr 10Rr 86 24" posRelativeX="5ccced30e0050e9"
               posRelativeY="5ccced30e0050e9" buttonText="add" connectedEdges="0"
