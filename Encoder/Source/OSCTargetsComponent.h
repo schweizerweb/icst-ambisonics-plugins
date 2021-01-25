@@ -57,6 +57,9 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
+    // Binary resources:
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
@@ -84,6 +87,7 @@ private:
     std::unique_ptr<juce::Slider> sliderPortExtAed;
     std::unique_ptr<juce::TextButton> btnAdd;
     std::unique_ptr<juce::TextButton> btnDelete;
+    std::unique_ptr<juce::ImageButton> btnInfo;
 
 
     //==============================================================================
