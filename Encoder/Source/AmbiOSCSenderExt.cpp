@@ -11,7 +11,7 @@
 #include "AmbiOSCSenderExt.h"
 #include "OSCHandlerEncoder.h"
 
-AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints): pPoints(ambiPoints)
+AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler): pPoints(ambiPoints), pStatusMessageHandler(pStatusMessageHandler)
 {
 }
 
@@ -135,7 +135,15 @@ void AmbiOSCSenderExt::timerCallback()
 			{
 				for (auto sender : oscSender)
 				{
-					sender->sendMessage(pt, i);
+                    try
+                    {
+						sender->sendMessage(pt, i);
+                    }
+                    catch (...)
+                    {
+						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + String(i), StatusMessageHandler::Error);
+                    }
+					
 				}
 			}
 		}

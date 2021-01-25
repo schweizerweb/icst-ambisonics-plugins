@@ -29,6 +29,8 @@
             file="Source/AudioParameterFloatAmbi.cpp"/>
       <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
             file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="CP1A8I" name="CustomOscTableListModel.h" compile="0" resource="0"
+            file="Source/CustomOscTableListModel.h"/>
       <FILE id="KgMm41" name="CustomOscTarget.cpp" compile="1" resource="0"
             file="Source/CustomOscTarget.cpp"/>
       <FILE id="ZZTaMA" name="CustomOscTarget.h" compile="0" resource="0"

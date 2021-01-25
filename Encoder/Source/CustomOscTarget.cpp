@@ -12,6 +12,10 @@
 
 CustomOscTarget::CustomOscTarget()
 {
+    enabledFlag = false;
+    targetHost = "127.0.0.1";
+    targetPort = 50003;
+    oscString = "/demo/{n} {d}";
 }
 
 CustomOscTarget::CustomOscTarget(XmlElement* xmlElement)

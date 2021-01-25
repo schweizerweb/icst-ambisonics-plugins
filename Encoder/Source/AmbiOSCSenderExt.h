@@ -41,7 +41,7 @@ public:
 class AmbiOSCSenderExt : public Timer
 {
 public:
-	AmbiOSCSenderExt(AmbiDataSet* ambiPoints);
+	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler);
     virtual ~AmbiOSCSenderExt();
 
     OSCSenderInstance* getOrCreateInstance(int index);
@@ -54,6 +54,7 @@ private:
 private:
 
 	AmbiDataSet* pPoints;
+	StatusMessageHandler* pStatusMessageHandler;
 	OwnedArray<PointHistoryEntry> history;
 	OwnedArray<OSCSenderInstance> oscSender;
 };

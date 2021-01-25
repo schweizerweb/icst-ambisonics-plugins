@@ -37,16 +37,16 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     {
         switch(parameter)
         {
-        case Index: path.replace(escapeStringMap[Index], String(index)); break;
-        case Name: path.replace(escapeStringMap[Name], pt->getName()); break;
-        case Color: path.replace(escapeStringMap[Color], pt->getColor().toDisplayString(true)); break;
-        case A: path.replace(escapeStringMap[A], String(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))); break;
-        case E: path.replace(escapeStringMap[E], String(Constants::RadToGrad(double(pt->getPoint()->getElevation())))); break;
-        case D: path.replace(escapeStringMap[D], String(pt->getPoint()->getDistance())); break;
-        case X: path.replace(escapeStringMap[X], String(pt->getPoint()->getX())); break;
-        case Y: path.replace(escapeStringMap[Y], String(pt->getPoint()->getY())); break;
-        case Z: path.replace(escapeStringMap[Z], String(pt->getPoint()->getZ())); break;
-        case Gain: path.replace(escapeStringMap[Gain], String(pt->getGain())); break;
+        case Index: path = path.replace(escapeStringMap[Index], String(index)); break;
+        case Name: path = path.replace(escapeStringMap[Name], pt->getName()); break;
+        case Color: path = path.replace(escapeStringMap[Color], pt->getColor().toDisplayString(true)); break;
+        case A: path = path.replace(escapeStringMap[A], String(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))); break;
+        case E: path = path.replace(escapeStringMap[E], String(Constants::RadToGrad(double(pt->getPoint()->getElevation())))); break;
+        case D: path = path.replace(escapeStringMap[D], String(pt->getPoint()->getDistance())); break;
+        case X: path = path.replace(escapeStringMap[X], String(pt->getPoint()->getX())); break;
+        case Y: path = path.replace(escapeStringMap[Y], String(pt->getPoint()->getY())); break;
+        case Z: path = path.replace(escapeStringMap[Z], String(pt->getPoint()->getZ())); break;
+        case Gain: path = path.replace(escapeStringMap[Gain], String(pt->getGain())); break;
         default: ;
         }
     }

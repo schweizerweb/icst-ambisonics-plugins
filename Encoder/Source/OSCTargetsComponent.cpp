@@ -31,6 +31,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     : pSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, pChangeListener));
     addChangeListener(pChangeListener);
     //[/Constructor_pre]
 
@@ -128,6 +129,16 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     sliderPortExtAed->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderPortExtAed->addListener (this);
 
+    btnAdd.reset (new juce::TextButton ("btnAdd"));
+    addAndMakeVisible (btnAdd.get());
+    btnAdd->setButtonText (TRANS("add"));
+    btnAdd->addListener (this);
+
+    btnDelete.reset (new juce::TextButton ("btnDelete"));
+    addAndMakeVisible (btnDelete.get());
+    btnDelete->setButtonText (TRANS("delete"));
+    btnDelete->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -146,6 +157,8 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     toggleEnableStandardAed->setToggleState(pSettings->oscSendExtAedFlag, dontSendNotification);
     textOscSendIpExtAed->setText(pSettings->oscSendExtAedHost, false);
     sliderPortExtAed->setValue(pSettings->oscSendExtAedPort, dontSendNotification);
+
+    customOscTableModel->initTable(targetList.get());
 
     controlDimming();
     //[/Constructor]
@@ -170,9 +183,12 @@ OSCTargetsComponent::~OSCTargetsComponent()
     labelOscSendIpExt2 = nullptr;
     sliderPortExtXyz = nullptr;
     sliderPortExtAed = nullptr;
+    btnAdd = nullptr;
+    btnDelete = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
+    customOscTableModel = nullptr;
     //[/Destructor]
 }
 
@@ -198,7 +214,7 @@ void OSCTargetsComponent::resized()
     textOscSendIpExtXyz->setBounds (0 + (getWidth() - 0) - 109 - 106, 72 + 24, 106, 24);
     labelOscSendIpExt->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 24, 126, 24);
     groupCustom->setBounds (0, 176, getWidth() - 0, getHeight() - 176);
-    targetList->setBounds (0 + 16, 176 + 24, (getWidth() - 0) - 32, (getHeight() - 176) - 40);
+    targetList->setBounds (0 + 16, 176 + 24, (getWidth() - 0) - 32, (getHeight() - 176) - 65);
     groupGeneral->setBounds (0, 0, getWidth() - 0, 64);
     sliderInterval->setBounds (0 + (getWidth() - 0) - 16 - 270, 0 + 24, 270, 24);
     labelInterval->setBounds (0 + 16, 0 + 24, 150, 24);
@@ -207,6 +223,8 @@ void OSCTargetsComponent::resized()
     labelOscSendIpExt2->setBounds (0 + (getWidth() - 0) - 219 - 126, 72 + 55, 126, 24);
     sliderPortExtXyz->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 24, 86, 24);
     sliderPortExtAed->setBounds (0 + (getWidth() - 0) - 16 - 86, 72 + 56, 86, 24);
+    btnAdd->setBounds (0 + (getWidth() - 0) - 16 - 86, 176 + (getHeight() - 176) - 10 - 24, 86, 24);
+    btnDelete->setBounds (0 + (getWidth() - 0) - 108 - 86, 176 + (getHeight() - 176) - 10 - 24, 86, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -227,6 +245,22 @@ void OSCTargetsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_toggleEnableStandardAed] -- add your button handler code here..
         pSettings->oscSendExtAedFlag = toggleEnableStandardAed->getToggleState();
         //[/UserButtonCode_toggleEnableStandardAed]
+    }
+    else if (buttonThatWasClicked == btnAdd.get())
+    {
+        //[UserButtonCode_btnAdd] -- add your button handler code here..
+        pSettings->customOscTargets.add(new CustomOscTarget());
+        targetList->updateContent();
+        //[/UserButtonCode_btnAdd]
+    }
+    else if (buttonThatWasClicked == btnDelete.get())
+    {
+        //[UserButtonCode_btnDelete] -- add your button handler code here..
+        int row = targetList->getSelectedRow();
+        if (row >= 0 && row < pSettings->customOscTargets.size())
+            pSettings->customOscTargets.remove(row);
+        targetList->updateContent();
+        //[/UserButtonCode_btnDelete]
     }
 
     //[UserbuttonClicked_Post]
@@ -274,6 +308,8 @@ void OSCTargetsComponent::controlDimming()
 
     sliderPortExtXyz->setEnabled(toggleEnableStandardXyz->getToggleState());
     sliderPortExtAed->setEnabled(toggleEnableStandardAed->getToggleState());
+
+    btnDelete->setEnabled(targetList->getSelectedRows().size() > 0);
 }
 
 void OSCTargetsComponent::textEditorTextChanged(TextEditor& textEditor)
@@ -325,7 +361,7 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupCustom" id="5ccced30e0050e9" memberName="groupCustom"
                   virtualName="" explicitFocusOrder="0" pos="0 176 0M 176M" title="Custom OSC"/>
   <GENERICCOMPONENT name="targetList" id="78a64bf0c7700896" memberName="targetList"
-                    virtualName="" explicitFocusOrder="0" pos="16 24 32M 40M" posRelativeX="5ccced30e0050e9"
+                    virtualName="" explicitFocusOrder="0" pos="16 24 32M 65M" posRelativeX="5ccced30e0050e9"
                     posRelativeY="5ccced30e0050e9" posRelativeW="5ccced30e0050e9"
                     posRelativeH="5ccced30e0050e9" class="TableListBox" params=""/>
   <GROUPCOMPONENT name="groupGeneral" id="4e210261f2d82b98" memberName="groupGeneral"
@@ -365,6 +401,14 @@ BEGIN_JUCER_METADATA
           posRelativeY="a452293a001780b9" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <TEXTBUTTON name="btnAdd" id="239ce64ab2ee06e6" memberName="btnAdd" virtualName=""
+              explicitFocusOrder="0" pos="16Rr 10Rr 86 24" posRelativeX="5ccced30e0050e9"
+              posRelativeY="5ccced30e0050e9" buttonText="add" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="btnDelete" id="4ddb1b3ba4cb8ca0" memberName="btnDelete"
+              virtualName="" explicitFocusOrder="0" pos="108Rr 10Rr 86 24"
+              posRelativeX="5ccced30e0050e9" posRelativeY="5ccced30e0050e9"
+              buttonText="delete" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "EncoderSettings.h"
+#include "CustomOscTableListModel.h"
 //[/Headers]
 
 
@@ -61,6 +62,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void controlDimming();
     EncoderSettings* pSettings;
+    std::unique_ptr<CustomOscTableListModel> customOscTableModel;
     //[/UserVariables]
 
     //==============================================================================
@@ -78,6 +80,8 @@ private:
     std::unique_ptr<juce::Label> labelOscSendIpExt2;
     std::unique_ptr<juce::Slider> sliderPortExtXyz;
     std::unique_ptr<juce::Slider> sliderPortExtAed;
+    std::unique_ptr<juce::TextButton> btnAdd;
+    std::unique_ptr<juce::TextButton> btnDelete;
 
 
     //==============================================================================

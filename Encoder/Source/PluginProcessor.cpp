@@ -32,7 +32,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 {
 	pOscHandler = new OSCHandlerEncoder(&sources, &statusMessageHandler, &encoderSettings.distanceEncodingParams);
 	pOscSender = new AmbiOSCSender(&sources);
-	pOscSenderExt = new AmbiOSCSenderExt(&sources);
+	pOscSenderExt = new AmbiOSCSenderExt(&sources, &statusMessageHandler);
     
 #if MULTI_ENCODER_MODE
     groupAnimator.reset(new GroupAnimator());
