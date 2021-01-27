@@ -231,6 +231,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	// copy input buffer, clear output and get write pointers
 	inputBuffer.makeCopyOf(buffer);
 	buffer.clear();
+	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
+
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
@@ -262,9 +264,11 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
+			delayBuffers[iSource].check(DelayHelper::getDelaySamples(encoderSettings.getDistanceScaler() * MathConstants<float>::sqrt2, getSampleRate()));
+            localBuffer.copyFrom(0, 0, inputBuffer, iSource, 0, inputBuffer.getNumSamples());
 			// check doppler delay buffers
-			int currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance() * encoderSettings.getDistanceScaler(), getSampleRate());
-			delayBuffers[iSource].process(currentDelayInSamples, inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
+			float currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance(), getSampleRate());
+			delayBuffers[iSource].process(currentDelayInSamples, localBuffer.getReadPointer(0), inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
 		}
 
 		const float* inputData = inputBuffer.getReadPointer(iSource);

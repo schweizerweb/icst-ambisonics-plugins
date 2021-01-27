@@ -10,27 +10,73 @@
 
 #include "VarDelayBuffer.h"
 
-void VarDelayBuffer::process(int requiredBufferSize, float* buffer, int numSamples)
+VarDelayBuffer::VarDelayBuffer(): audioBuffer(nullptr), bufferLength(0), iWrite(0), lastDelayInSamples(0)
 {
-	if(audioBuffer.size() != requiredBufferSize)
+}
+
+VarDelayBuffer::~VarDelayBuffer()
+{
+	if (audioBuffer != nullptr)
+		free(audioBuffer);
+}
+
+void VarDelayBuffer::initialize(int bufferSize)
+{
+	if (audioBuffer != nullptr)
+		free(audioBuffer);
+
+	audioBuffer = (float*)calloc(bufferSize, sizeof(float));
+	bufferLength = bufferSize;
+	iWrite = 0;
+	lastDelayInSamples = 0.0f;
+	first = true;
+}
+
+void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, float* outBuffer, int numSamples)
+{
+	if(first)
 	{
-		int samplesToAdd = requiredBufferSize + numSamples - audioBuffer.size();
-		samplesToAdd = jmin(samplesToAdd, int(numSamples * 1.5));
-		samplesToAdd = jmax(samplesToAdd, int(numSamples / 1.5f));
-		if (samplesToAdd > 0)
-		{
-			float* tempBuffer = (float*)calloc(samplesToAdd, sizeof(float));
-			interpolator.process(double(numSamples) / samplesToAdd, buffer, tempBuffer, samplesToAdd);
-			audioBuffer.addArray(tempBuffer, samplesToAdd);
-			free(tempBuffer);
-		}
-	}
-	else
-	{
-		audioBuffer.addArray(buffer, numSamples);
+		lastDelayInSamples = newDelayInSamples;
+		first = false;
 	}
 
-	// remove the oldest elements from the buffer and write them to the current audio buffer
-	memcpy(buffer, audioBuffer.data(), numSamples * sizeof(float));
-	audioBuffer.removeRange(0, numSamples);
+	if(newDelayInSamples > bufferLength)
+	{
+		newDelayInSamples = bufferLength;
+	}
+
+    float slope = (float(newDelayInSamples) - lastDelayInSamples) / float(numSamples);
+	for (int i = 0; i < numSamples; i++)
+	{
+		audioBuffer[iWrite] = inBuffer[i];		// write input sound into the buffer
+
+		float pRead = iWrite - (lastDelayInSamples + i * slope);			// float Leseposition 
+		int iRead = (int)pRead;
+		float fracRead = pRead - iRead;
+		if (iRead < 0) {
+			iRead += bufferLength;
+		}
+
+		int iReadPlus1 = iRead + 1;
+		if (iReadPlus1 >= bufferLength) {
+			iReadPlus1 -= bufferLength;
+		}
+
+		outBuffer[i] = audioBuffer[iRead] + fracRead * (audioBuffer[iReadPlus1] - audioBuffer[iRead]);  	// lineare Interpolation
+		
+		iWrite++;
+		if (iWrite >= bufferLength) {
+			iWrite = 0;
+		}
+	}
+
+	lastDelayInSamples = newDelayInSamples;
+}
+
+void VarDelayBuffer::check(int bufferSize)
+{
+	if(bufferSize != bufferLength)
+	{
+		initialize(bufferSize);
+	}
 }

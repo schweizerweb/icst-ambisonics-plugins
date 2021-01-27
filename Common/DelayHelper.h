@@ -18,5 +18,5 @@ public:
 	double getTotalDelayMs(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint) const;
 	double getDelayCompensationMs(AmbiSettings* pAmbiSettings, double maxNormalizedDistance, AmbiPoint* pPoint) const;
 	static int getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPoint* pPoint, double maxNormalizedDistance, double samplingRate);
-	static int getDelaySamples(double distance, double samplingRate);
+	static float getDelaySamples(double distance, double samplingRate);
 };

@@ -99,6 +99,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     //[Constructor] You can add your own custom stuff here..
 	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
 	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
+    radarComponent->getZoomSettingsPointer()->Reset();
     //[/Constructor]
 }
 

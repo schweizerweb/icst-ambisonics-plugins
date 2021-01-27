@@ -30,7 +30,7 @@ int DelayHelper::getDelayCompensationSamples(AmbiSettings* pAmbiSettings, AmbiPo
 		* samplingRate);
 }
 
-int DelayHelper::getDelaySamples(double distance, double samplingRate)
+float DelayHelper::getDelaySamples(double distance, double samplingRate)
 {
-	return int(distance * SOUND_SPEED_S_PER_M * samplingRate);
+	return float(distance * SOUND_SPEED_S_PER_M * samplingRate);
 }
