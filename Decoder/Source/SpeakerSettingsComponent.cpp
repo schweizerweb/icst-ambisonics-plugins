@@ -418,7 +418,7 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
     {
         //[UserComboBoxCode_comboBoxApply] -- add your combo box handling code here..
         int mainSelection = pPointSelection->getMainSelectedPointIndex();
-        if (mainSelection >= 0 && mainSelection < pSpeakerSet->size() - 1)
+        if (mainSelection >= 0 && mainSelection < pSpeakerSet->size())
         {
 
             if (comboBoxApply->getSelectedId() == ID_APPLY_COLOR)
