@@ -219,8 +219,10 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
+#if MULTI_ENCODER_MODE
 	// group animator
 	groupAnimator->doStep(buffer.getNumSamples() / getSampleRate());
+#endif
 
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
