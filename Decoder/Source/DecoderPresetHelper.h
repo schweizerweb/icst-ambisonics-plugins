@@ -47,7 +47,7 @@ public:
         const double cos30 = 0.8660253882408143;
         const double sin45 = 0.7071067811865475;
         
-		createPreset("Dolby 11.1", {
+		createPreset("Dolby Atmos 11.1", {
 	        { -0.5, cos30, 0, "L"},
 	        { 0.5, cos30, 0, "R"},
 	        { 0, 1, 0, "C"},
@@ -62,7 +62,7 @@ public:
 	        { 0.813798, -0.296198, 0.5, "HBR"},
 		    });
 
-		createPreset("Dolby 13.1", {
+		createPreset("Dolby Atmos 13.1", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -117,7 +117,7 @@ public:
 			{ 0.939693, -0.34202, 0, "SR"},
 			});
 
-		createPreset("Dolby 5.0.2", {
+		createPreset("Dolby Atmos 5.0.2", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -127,7 +127,7 @@ public:
 			{ 0.696364, 0.122788, sin45, "HFR"},
 			});
 
-		createPreset("Dolby 5.0.4", {
+		createPreset("Dolby Atmos 5.0.4", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -157,7 +157,7 @@ public:
 			{ 0.939693, -0.34202, 0, "SR"},
 			});
 
-		createPreset("Dolby 5.1.2", {
+		createPreset("Dolby Atmos 5.1.2", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -168,7 +168,7 @@ public:
 			{ 0.696364, 0.122788, sin45, "RC"},
 			});
 
-		createPreset("Dolby 5.1.4", {
+		createPreset("Dolby Atmos 5.1.4", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -200,7 +200,7 @@ public:
 			{ 0, -1, 0, "BC"},
 			});
 
-		createPreset("Dolby 7.0.2", {
+		createPreset("Dolby Atmos 7.0.2", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -212,7 +212,7 @@ public:
 			{ 0.696364, 0.122788, sin45, "TR"},
 			});
 
-		createPreset("Dolby 7.0.4", {
+		createPreset("Dolby Atmos 7.0.4", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -236,7 +236,7 @@ public:
 			{ sin45, -sin45, 0, "SBR"},
 			});
 
-		createPreset("Dolby 7.1.2", {
+		createPreset("Dolby Atmos 7.1.2", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -249,7 +249,7 @@ public:
 			{ 0.696364, 0.122788, sin45, "TR"},
 			});
 
-		createPreset("Dolby 7.1.4", {
+		createPreset("Dolby Atmos 7.1.4", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -275,7 +275,7 @@ public:
 			{ sin45, -sin45, 0, "SBR"},
 			});
 
-		createPreset("Dolby 8.0", {
+		createPreset("Dolby Atmos 8.0", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ -0.939693, -0.34202, 0, "SL"},
@@ -286,7 +286,7 @@ public:
 			{ 0.813798, -0.296198, 0.5, "HBR"},
 			});
 
-		createPreset("Dolby 9.1.2", {
+		createPreset("Dolby Atmos 9.1.2", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -301,7 +301,7 @@ public:
 			{ 0.696364, 0.122788, sin45, "TR"},
 			});
 
-		createPreset("Dolby 9.1.6", {
+		createPreset("Dolby Atmos 9.1.6", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -320,7 +320,7 @@ public:
 			{ sin45, 0, sin45, "HSR"},
 			});
 
-		createPreset("Dolby 9.1", {
+		createPreset("Dolby Atmos 9.1", {
 			{ -0.5, cos30, 0, "L"},
 			{ 0.5, cos30, 0, "R"},
 			{ 0, 1, 0, "C"},
@@ -500,6 +500,48 @@ public:
 		createPreset("Standard - Stereo 45deg", {
 			{ -sin45, sin45, 0, "L"},
 			{ sin45, sin45, 0, "R"},
+			});
+
+		createPreset("Dolby Atmos 10.2", {
+		    { -0.5, cos30, 0, "L"},
+		    { 0.5, cos30, 0, "R"},
+		    { 0, 1, 0, "C"},
+		    { -0.939693, -0.34202, 0, "LS"},
+		    { 0.939693, -0.34202, 0, "RS"},
+		    { -0.819152, 0.573576, 0, "LW"},
+		    { 0.819152, 0.573576, 0, "RW"},
+		    { 0, -sin45, sin45, "BS"},
+		    { -0.5, 0.5, sin45, "LH"},
+		    { 0.5, 0.5, sin45, "RH"},
+		    { -0.965926, 0, -0.258819, "LFE-L"},
+		    { 0.965926, 0, -0.258819, "LFE-R"},
+			});
+
+		createPreset("Dolby Atmos 22.2", {
+			{ -0.836516, 0.482963, 0.258819, "MFL"},
+			{ -0.482963, 0.836516, 0.258819, "MFL/C"},
+			{ 0, 0.965926, 0.258819, "MFC"},
+			{ 0.482963, 0.836516, 0.258819, "MFC/R"},
+			{ 0.836516, 0.482963, 0.258819, "MFR"},
+			{ -0.965926, 0, 0.258819, "MSL"},
+			{ 0.965926, 0, 0.258819, "MSR"},
+			{ -0.620885, -0.739942, 0.258819, "MBL"},
+			{ 0, -0.965926, 0.258819, "MBC"},
+			{ 0.683013, -0.683013, 0.258819, "MBR"},
+			{ -0.612372, 0.353553, sin45, "UFL"},
+			{ 0, sin45, sin45, "UFC"},
+			{ 0.612372, 0.353553, sin45, "UFR"},
+			{ -sin45, 0, sin45, "USL"},
+			{ 0, 0, 1, "USC"},
+			{ sin45, 0, sin45, "USR"},
+			{ -0.454519, -0.541675, sin45, "UBL"},
+			{ 0, -sin45, sin45, "UBC"},
+			{ 0.5, -0.5, sin45, "UBR"},
+			{ -0.836516, 0.482963, -0.258819, "LFL"},
+			{ 0, 0.965926, -0.258819, "LFC"},
+			{ 0.482963, 0.836516, -0.258819, "LFR"},
+			{ -0.965926, 0, -0.258819, "LFE-L"},
+			{ 0.965926, 0, -0.258819, "LFE-R"},
 			});
 
         notifyPresetListChanged();
