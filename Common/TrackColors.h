@@ -37,10 +37,15 @@ public:
 
 	static Colour getSpeakerColor()
 	{
-		return Colours::darkgrey;
+		return Colours::darkblue;
 	}
 
-	static const int numColors = 10;
+    static Colour getSubwooferColor()
+	{
+		return Colours::darkred;
+	}
+
+    static const int numColors = 10;
 };
 
 #endif  // TRACKCOLORS_H_INCLUDED

@@ -59,12 +59,14 @@ public:
 		toggle.setToggleState(owner.getFlag(columnId, row), dontSendNotification);
         
         FilterBankInfo* newFilterInfo = owner.getFilterInfo(newRow);
-        if(!filterInfo.equals(newFilterInfo))
+        if(firstUpdate || !filterInfo.equals(newFilterInfo))
         {
             filterInfo = *newFilterInfo;
             updateFilterPath();
             repaint();
         }
+
+        firstUpdate = false;
 	}
     
 private:
@@ -159,5 +161,5 @@ private:
     std::unique_ptr<Range<double>> displayRangeX;
     std::unique_ptr<Range<double>> displayRangeY;
     AffineTransform transform;
-    
+    bool firstUpdate = true;
 };
