@@ -85,9 +85,9 @@ double AmbiSpeakerSet::getMaxNormalizedDistance() const
 	return maxDist;
 }
 
-void AmbiSpeakerSet::addNew(String id, Point3D<double> point, String name, Colour /*color*/)
+void AmbiSpeakerSet::addNew(String id, Point3D<double> point, String name, Colour color)
 {
-	elements.add(new AmbiSpeaker(id, point, name, TrackColors::getSpeakerColor()));	// override color
+	elements.add(new AmbiSpeaker(id, point, name, color));
 }
 
 void AmbiSpeakerSet::loadFromXml(XmlElement *xmlElement)
