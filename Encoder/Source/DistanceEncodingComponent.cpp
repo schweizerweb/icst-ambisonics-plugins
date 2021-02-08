@@ -196,7 +196,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     buttonSave->addListener (this);
 
     labelAirAbsorbtionMode.reset (new juce::Label ("labelAirAbsorbtionMode",
-                                                    TRANS("Mode")));
+                                                   TRANS("Mode")));
     addAndMakeVisible (labelAirAbsorbtionMode.get());
     labelAirAbsorbtionMode->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
     labelAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);

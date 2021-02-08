@@ -11,6 +11,9 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AmbiDataSet.h"
+#include "EncoderSettings.h"
+#include "OSCSenderInstance.h"
+#include "../../Common/StatusMessageHandler.h"
 
 class PointHistoryEntry
 {
@@ -29,28 +32,42 @@ public:
 			point = *pAmbiPoint->getPoint();
 			changed = true;
 		}
+		if(pAmbiPoint->getGain() != gain)
+		{
+			gain = pAmbiPoint->getGain();
+			changed = true;
+		}
+		if(pAmbiPoint->getColor() != color)
+		{
+			color = pAmbiPoint->getColor();
+			changed = true;
+		}
 		return changed;
 	}
 
 	String name; 
 	Point3D<double> point;
+	Colour color;
+	double gain;
 };
 
 class AmbiOSCSenderExt : public Timer
 {
 public:
-	AmbiOSCSenderExt(AmbiDataSet* ambiPoints);
-	~AmbiOSCSenderExt();
+	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler);
+    virtual ~AmbiOSCSenderExt();
 
-	bool start(String targetHost, int port);
+    OSCSenderInstance* getOrCreateInstance(int index);
+	bool start(EncoderSettings* pSettings, String* pMessage);
 	void stop();
 
 private:
 	void timerCallback() override;
 
 private:
-
+	CriticalSection cs;
 	AmbiDataSet* pPoints;
+	StatusMessageHandler* pStatusMessageHandler;
 	OwnedArray<PointHistoryEntry> history;
-	OSCSender* oscSender;
+	OwnedArray<OSCSenderInstance> oscSender;
 };

@@ -29,6 +29,12 @@
             file="Source/AudioParameterFloatAmbi.cpp"/>
       <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
             file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="CP1A8I" name="CustomOscTableListModel.h" compile="0" resource="0"
+            file="Source/CustomOscTableListModel.h"/>
+      <FILE id="KgMm41" name="CustomOscTarget.cpp" compile="1" resource="0"
+            file="Source/CustomOscTarget.cpp"/>
+      <FILE id="ZZTaMA" name="CustomOscTarget.h" compile="0" resource="0"
+            file="Source/CustomOscTarget.h"/>
       <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
             resource="0" file="Source/DistanceEncodingComponent.cpp"/>
       <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"
@@ -72,10 +78,18 @@
             file="Source/OSCHandlerEncoder.cpp"/>
       <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
             file="Source/OSCHandlerEncoder.h"/>
+      <FILE id="yRnDlX" name="OSCSenderInstance.cpp" compile="1" resource="0"
+            file="Source/OSCSenderInstance.cpp"/>
+      <FILE id="WkVcFY" name="OSCSenderInstance.h" compile="0" resource="0"
+            file="Source/OSCSenderInstance.h"/>
       <FILE id="QBorv6" name="OSCSettingsComponent.cpp" compile="1" resource="0"
             file="Source/OSCSettingsComponent.cpp"/>
       <FILE id="FtLdyb" name="OSCSettingsComponent.h" compile="0" resource="0"
             file="Source/OSCSettingsComponent.h"/>
+      <FILE id="XOG2ZA" name="OSCTargetsComponent.cpp" compile="1" resource="0"
+            file="Source/OSCTargetsComponent.cpp"/>
+      <FILE id="tVtGdx" name="OSCTargetsComponent.h" compile="0" resource="0"
+            file="Source/OSCTargetsComponent.h"/>
       <FILE id="Zchuil" name="PluginEditor.cpp" compile="1" resource="0"
             file="Source/PluginEditor.cpp"/>
       <FILE id="FV3teF" name="PluginEditor.h" compile="0" resource="0" file="Source/PluginEditor.h"/>

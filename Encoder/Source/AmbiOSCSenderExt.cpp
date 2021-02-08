@@ -11,37 +11,122 @@
 #include "AmbiOSCSenderExt.h"
 #include "OSCHandlerEncoder.h"
 
-AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints): pPoints(ambiPoints)
+AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler): pPoints(ambiPoints), pStatusMessageHandler(pStatusMessageHandler)
 {
-	oscSender = new OSCSender();
 }
 
 AmbiOSCSenderExt::~AmbiOSCSenderExt()
 {
 	stop();
-	delete oscSender;
+	oscSender.clear();
 }
 
-bool AmbiOSCSenderExt::start(String targetHost, int port)
+OSCSenderInstance* AmbiOSCSenderExt::getOrCreateInstance(int index)
+{
+	while(index >= oscSender.size())
+	{
+		auto newInstance = new OSCSenderInstance();
+		oscSender.add(newInstance);
+	}
+
+	return oscSender[index];
+}
+
+bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 {
 	stop();
-	
-	bool ret = oscSender->connect(targetHost, port);
-	if (ret)
+
+	bool hasErrors = false;
+	bool hasSuccessful = false;
+	int index = 0;
+
+	if (pSettings->oscSendExtXyzFlag)
 	{
-		startTimerHz(20);
+		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
+		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ,
+			pInstance->escapeStringMap[OSCSenderInstance::Name],
+			pInstance->escapeStringMap[OSCSenderInstance::X],
+			pInstance->escapeStringMap[OSCSenderInstance::Y],
+			pInstance->escapeStringMap[OSCSenderInstance::Z]};
+
+		pInstance->setOscPath(a.joinIntoString(" "));
+		bool ret = pInstance->connect(pSettings->oscSendExtXyzHost, pSettings->oscSendExtXyzPort);
+		if (!ret) {
+			pMessage->append("Error initializing standard XYZ sender @ " + pSettings->oscSendExtXyzHost + ":" + String(pSettings->oscSendExtXyzPort) + NewLine::getDefault(), 500);
+			hasErrors = true;
+		}
+		else
+		{
+			hasSuccessful = true;
+		}
 	}
-	return ret;
+
+	if (pSettings->oscSendExtAedFlag)
+	{
+		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
+		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED,
+			pInstance->escapeStringMap[OSCSenderInstance::Name],
+			pInstance->escapeStringMap[OSCSenderInstance::A],
+			pInstance->escapeStringMap[OSCSenderInstance::E],
+			pInstance->escapeStringMap[OSCSenderInstance::D]};
+
+		pInstance->setOscPath(a.joinIntoString(" "));
+
+		bool ret = pInstance->connect(pSettings->oscSendExtAedHost, pSettings->oscSendExtAedPort);
+		if(!ret)
+		{
+			pMessage->append("Error initializing standard AED sender @ " + pSettings->oscSendExtAedHost + ":" + String(pSettings->oscSendExtAedPort) + NewLine::getDefault(), 500);
+			hasErrors = true;
+		}
+		else
+		{
+			hasSuccessful = true;
+		}
+	}
+
+	for (auto target : pSettings->customOscTargets)
+	{
+		if (target->enabledFlag)
+		{
+			OSCSenderInstance* pInstance = getOrCreateInstance(index++);
+            if(!pInstance->setOscPath(target->oscString) || !pInstance->connect(target->targetHost, target->targetPort))
+			{
+            	pMessage->append("Error initializing custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + ": " + target->oscString + NewLine::getDefault(), 500);
+				hasErrors = true;
+			}
+			else
+			{
+				hasSuccessful = true;
+			}
+		}
+	}
+
+	if (hasSuccessful)
+	{
+		startTimer(pSettings->oscSendExtIntervalMs);
+	}
+
+	return !hasErrors;
 }
 
 void AmbiOSCSenderExt::stop()
 {
 	stopTimer();
-	oscSender->disconnect();
+	for (auto sender : oscSender)
+	{
+		sender->disconnect();
+	}
+
 }
 
 void AmbiOSCSenderExt::timerCallback()
 {
+	const ScopedTryLock lock(cs);
+
+	// skip if still busy
+	if (!lock.isLocked())
+		return;
+
 	// create history elements if required
 	while (pPoints->size() > history.size())
 		history.add(new PointHistoryEntry());
@@ -49,25 +134,22 @@ void AmbiOSCSenderExt::timerCallback()
 	for (int i = 0; i < pPoints->size(); i++)
 	{
 		AmbiPoint* pt = pPoints->get(i);
-		if (pt != nullptr)
+		if (pt != nullptr && pt->getEnabled())
 		{
 			if (history[i]->update(pt))
 			{
-				OSCMessage messageAed = OSCMessage(
-					OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED),
-					OSCArgument(pt->getName()),
-					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))),
-					OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getElevation())))),
-					OSCArgument(float(pt->getPoint()->getDistance())));
-				oscSender->send(messageAed);
-
-				OSCMessage messageXyz = OSCMessage(
-					OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ),
-					OSCArgument(pt->getName()),
-					OSCArgument(float(pt->getPoint()->getX())),
-					OSCArgument(float(pt->getPoint()->getY())),
-					OSCArgument(float(pt->getPoint()->getZ())));
-				oscSender->send(messageXyz);
+				for (auto sender : oscSender)
+				{
+                    try
+                    {
+						sender->sendMessage(pt, i);
+                    }
+                    catch (...)
+                    {
+						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + sender->getOscPath(), StatusMessageHandler::Error);
+                    }
+					
+				}
 			}
 		}
 	}

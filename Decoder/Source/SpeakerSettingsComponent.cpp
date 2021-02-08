@@ -449,7 +449,7 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
             }
             else if(comboBoxApply->getSelectedId() == ID_APPLY_DEC_GAIN || comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN)
             {
-                float gainFactor = Decibels::decibelsToGain(comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN ? 0.5 : -0.5);
+                float gainFactor = float(Decibels::decibelsToGain(comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN ? 0.5 : -0.5));
                 auto selection = pPointSelection->getSelectedIndices();
                 for (auto index : selection)
                 {

@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.7
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -38,7 +38,9 @@
 class OSCSettingsComponent  : public Component,
                               public TextEditor::Listener,
                               public ChangeBroadcaster,
-                              public Button::Listener
+                              public ChangeListener,
+                              public juce::Button::Listener,
+                              public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -49,9 +51,10 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -59,32 +62,30 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void textEditorTextChanged(TextEditor&) override;
     void controlDimming() const;
-    void checkForNumbers(TextEditor* pEditor, int* pParameter) const;
-    void checkForNumbers(TextEditor* pEditor, float* pParameter) const;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
 
     EncoderSettings* pSettings;
     StatusMessageHandler* pStatusMessageHandler;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupExternal;
-    std::unique_ptr<GroupComponent> groupInternal;
-    std::unique_ptr<ToggleButton> toggleReceiveOsc;
-    std::unique_ptr<TextEditor> textOscReceivePort;
-    std::unique_ptr<Label> labelOscPort;
-    std::unique_ptr<ToggleButton> toggleSendOsc;
-    std::unique_ptr<TextEditor> textOscSendIp;
-    std::unique_ptr<Label> labelOscSendIp;
-    std::unique_ptr<TextEditor> textOscSendPort;
-    std::unique_ptr<TextEditor> textOscSendInterval;
-    std::unique_ptr<Label> labelOscSendInterval;
-    std::unique_ptr<ToggleButton> toggleSendOscExt;
-    std::unique_ptr<TextEditor> textOscSendIpExt;
-    std::unique_ptr<Label> labelOscSendIpExt;
-    std::unique_ptr<TextEditor> textOscSendPortExt;
-    std::unique_ptr<GroupComponent> groupLog;
-    std::unique_ptr<TextEditor> textLog;
-    std::unique_ptr<ToggleButton> toggleLog;
+    std::unique_ptr<juce::GroupComponent> groupExternal;
+    std::unique_ptr<juce::GroupComponent> groupInternal;
+    std::unique_ptr<juce::ToggleButton> toggleReceiveOsc;
+    std::unique_ptr<juce::Label> labelOscPort;
+    std::unique_ptr<juce::ToggleButton> toggleSendOsc;
+    std::unique_ptr<juce::TextEditor> textOscSendIp;
+    std::unique_ptr<juce::Label> labelOscSendIp;
+    std::unique_ptr<juce::Label> labelOscSendInterval;
+    std::unique_ptr<juce::ToggleButton> toggleSendOscExt;
+    std::unique_ptr<juce::GroupComponent> groupLog;
+    std::unique_ptr<juce::TextEditor> textLog;
+    std::unique_ptr<juce::ToggleButton> toggleLog;
+    std::unique_ptr<juce::Label> labelExternalOscInfo;
+    std::unique_ptr<juce::TextButton> btnEdit;
+    std::unique_ptr<juce::Slider> sliderReceiveOscPort;
+    std::unique_ptr<juce::Slider> sliderSendOscPort;
+    std::unique_ptr<juce::Slider> sliderInterval;
 
 
     //==============================================================================
