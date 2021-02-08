@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.7
 
   ------------------------------------------------------------------------------
 
@@ -340,10 +340,6 @@ void EncodingSettingsComponent::updateEncodingUiElements()
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())
         sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
-
-    // TODO: Doppler temporarily deactivated
-    toggleDoppler->setToggleState(false, dontSendNotification);
-    toggleDoppler->setEnabled(false);
 }
 
 void EncodingSettingsComponent::controlDimming() const

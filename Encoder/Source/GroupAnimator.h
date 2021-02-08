@@ -13,13 +13,13 @@
 #include "../../Common/AmbiDataSet.h"
 #define ANIMATION_SET_COUNT 4
 
-class GroupAnimator : Timer, AudioProcessorParameter::Listener
+class GroupAnimator : AudioProcessorParameter::Listener
 {
 public:
     void initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDataSet);
-    
+    void doStep(float seconds);
+
 private:
-    void timerCallback() override;
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
     void toggleOnOff(int parameterIndex);

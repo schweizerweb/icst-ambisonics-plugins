@@ -9,7 +9,6 @@
 */
 
 #include "GroupAnimator.h"
-#define TIMER_FREQUENCY 20
 
 void GroupAnimator::initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDataSet)
 {
@@ -48,7 +47,6 @@ void GroupAnimator::initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDa
     }
     
     pSourceSet = pDataSet;
-    startTimerHz(TIMER_FREQUENCY);
 }
 
 void GroupAnimator::toggleOnOff(int parameterIndex)
@@ -69,7 +67,7 @@ void GroupAnimator::toggleOnOff(int parameterIndex)
     }
 }
 
-void GroupAnimator::timerCallback()
+void GroupAnimator::doStep(float seconds)
 {
     for(int i = 0; i < ANIMATION_SET_COUNT; i++)
     {
@@ -81,7 +79,7 @@ void GroupAnimator::timerCallback()
         float rotationZ = animationSets[i].audioParameterGroupRotationZ->get();
         if(rotationX != 0.0f || rotationY != 0.0f || rotationZ != 0.0f)
         {
-            pSourceSet->rotateGroup(i, Constants::GradToRad(rotationX / TIMER_FREQUENCY), Constants::GradToRad(rotationY / TIMER_FREQUENCY), Constants::GradToRad(rotationZ / TIMER_FREQUENCY));
+            pSourceSet->rotateGroup(i, Constants::GradToRad(rotationX * seconds), Constants::GradToRad(rotationY * seconds), Constants::GradToRad(rotationZ * seconds));
         }
         
         float rotationOriginX = animationSets[i].audioParameterOriginRotationX->get();
@@ -89,13 +87,13 @@ void GroupAnimator::timerCallback()
         float rotationOriginZ = animationSets[i].audioParameterOriginRotationZ->get();
         if(rotationOriginX != 0.0f || rotationOriginY != 0.0f || rotationOriginZ != 0.0f)
         {
-            pSourceSet->rotateGroupAroundOrigin(i, Constants::GradToRad(rotationOriginX / TIMER_FREQUENCY), Constants::GradToRad(rotationOriginY / TIMER_FREQUENCY), Constants::GradToRad(rotationOriginZ / TIMER_FREQUENCY), true);
+            pSourceSet->rotateGroupAroundOrigin(i, Constants::GradToRad(rotationOriginX * seconds), Constants::GradToRad(rotationOriginY * seconds), Constants::GradToRad(rotationOriginZ * seconds), true);
         }
         
         float stretch = animationSets[i].audioParameterGroupStretch->get();
         if(stretch != 0.0f)
         {
-            pSourceSet->stretchGroup(i, stretch / TIMER_FREQUENCY);
+            pSourceSet->stretchGroup(i, stretch * seconds);
         }
     }
 }

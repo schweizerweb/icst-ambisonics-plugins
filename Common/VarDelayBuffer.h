@@ -14,10 +14,16 @@
 class VarDelayBuffer
 {
 public:
-	void process(int requiredBufferSize, float* buffer, int numSamples);
+    VarDelayBuffer();
+    ~VarDelayBuffer();
+    void initialize(int bufferSize);
+    void process(float newDelayInSamples, const float* inBuffer, float* outBuffer, int numSamples);
+    void check(int bufferSize);
 
 private:
-	Array<float> audioBuffer;
-	//CatmullRomInterpolator interpolator;
-	LagrangeInterpolator interpolator;
+	float* audioBuffer;
+    int bufferLength;
+    int iWrite;
+    float lastDelayInSamples;
+    bool first;
 };
