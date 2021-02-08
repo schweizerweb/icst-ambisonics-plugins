@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -39,9 +39,9 @@
 class DistanceEncodingComponent  : public Component,
                                    ChangeListener,
                                    ActionListener,
-                                   public Slider::Listener,
-                                   public ComboBox::Listener,
-                                   public Button::Listener
+                                   public juce::Slider::Listener,
+                                   public juce::ComboBox::Listener,
+                                   public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -57,11 +57,11 @@ public:
     void actionListenerCallback(const String &message) override;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void comboBoxChanged (ComboBox* comboBoxThatHasChanged) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -72,24 +72,30 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<juce::GroupComponent> groupAirAbsorbtion;
+    std::unique_ptr<juce::GroupComponent> groupAttenuation;
     std::unique_ptr<DistanceEncodingGraph> distanceEncodingGraph;
-    std::unique_ptr<Slider> sliderUnitCircleRadius;
-    std::unique_ptr<Label> labelUnitCircleRadius;
-    std::unique_ptr<Label> labelEncodingMode;
-    std::unique_ptr<ComboBox> comboBoxEncodingMode;
-    std::unique_ptr<Slider> sliderDbUnit;
-    std::unique_ptr<Label> labelDbUnit;
-    std::unique_ptr<Slider> sliderDistanceAttenuation;
-    std::unique_ptr<Label> labelDistanceAttenuation;
-    std::unique_ptr<Slider> sliderCenterCurve;
-    std::unique_ptr<Label> labelCenterCurve;
-    std::unique_ptr<Slider> sliderAdvancedFactor;
-    std::unique_ptr<Label> labelAdvancedFact;
-    std::unique_ptr<Slider> sliderAdvancedExponent;
-    std::unique_ptr<Label> labelAdvancedExponent;
-    std::unique_ptr<ComboBox> comboBoxDistanceEncodingPreset;
-    std::unique_ptr<Label> labelPresets;
-    std::unique_ptr<TextButton> buttonSave;
+    std::unique_ptr<juce::Slider> sliderUnitCircleRadius;
+    std::unique_ptr<juce::Label> labelUnitCircleRadius;
+    std::unique_ptr<juce::Label> labelEncodingMode;
+    std::unique_ptr<juce::ComboBox> comboBoxEncodingMode;
+    std::unique_ptr<juce::Slider> sliderDbUnit;
+    std::unique_ptr<juce::Label> labelDbUnit;
+    std::unique_ptr<juce::Slider> sliderDistanceAttenuation;
+    std::unique_ptr<juce::Label> labelDistanceAttenuation;
+    std::unique_ptr<juce::Slider> sliderCenterCurve;
+    std::unique_ptr<juce::Label> labelCenterCurve;
+    std::unique_ptr<juce::Slider> sliderAdvancedFactor;
+    std::unique_ptr<juce::Label> labelAdvancedFact;
+    std::unique_ptr<juce::Slider> sliderAdvancedExponent;
+    std::unique_ptr<juce::Label> labelAdvancedExponent;
+    std::unique_ptr<juce::ComboBox> comboBoxDistanceEncodingPreset;
+    std::unique_ptr<juce::Label> labelPresets;
+    std::unique_ptr<juce::TextButton> buttonSave;
+    std::unique_ptr<juce::Label> labelAirAbsorbtionMode;
+    std::unique_ptr<juce::ComboBox> comboBoxAirAbsorbtionMode;
+    std::unique_ptr<juce::Slider> sliderAirAbsorbtionIntensity;
+    std::unique_ptr<juce::Label> labelIntensity;
 
 
     //==============================================================================

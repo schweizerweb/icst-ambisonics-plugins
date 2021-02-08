@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.5
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -34,164 +34,205 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
+    groupAirAbsorbtion.reset (new juce::GroupComponent ("groupAirAbsorbtion",
+                                                        TRANS("Air Absorbtion")));
+    addAndMakeVisible (groupAirAbsorbtion.get());
+
+    groupAttenuation.reset (new juce::GroupComponent ("groupAttenuation",
+                                                      TRANS("Attenuation")));
+    addAndMakeVisible (groupAttenuation.get());
+
     distanceEncodingGraph.reset (new DistanceEncodingGraph (pParams));
     addAndMakeVisible (distanceEncodingGraph.get());
     distanceEncodingGraph->setName ("distanceEncodingGraph");
 
-    sliderUnitCircleRadius.reset (new Slider ("sliderUnitCircleRadius"));
+    sliderUnitCircleRadius.reset (new juce::Slider ("sliderUnitCircleRadius"));
     addAndMakeVisible (sliderUnitCircleRadius.get());
     sliderUnitCircleRadius->setRange (0.01, 1, 0.01);
-    sliderUnitCircleRadius->setSliderStyle (Slider::LinearHorizontal);
-    sliderUnitCircleRadius->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderUnitCircleRadius->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderUnitCircleRadius->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderUnitCircleRadius->addListener (this);
 
-    labelUnitCircleRadius.reset (new Label ("labelUnitCircleRadius",
-                                            TRANS("Unit Circle Radius")));
+    labelUnitCircleRadius.reset (new juce::Label ("labelUnitCircleRadius",
+                                                  TRANS("Unit Circle Radius")));
     addAndMakeVisible (labelUnitCircleRadius.get());
-    labelUnitCircleRadius->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelUnitCircleRadius->setJustificationType (Justification::centredLeft);
+    labelUnitCircleRadius->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelUnitCircleRadius->setJustificationType (juce::Justification::centredLeft);
     labelUnitCircleRadius->setEditable (false, false, false);
-    labelUnitCircleRadius->setColour (TextEditor::textColourId, Colours::black);
-    labelUnitCircleRadius->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelUnitCircleRadius->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelUnitCircleRadius->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelUnitCircleRadius->setBounds (8, 32, 140, 24);
+    labelUnitCircleRadius->setBounds (16, 48, 140, 24);
 
-    labelEncodingMode.reset (new Label ("labelEncodingMode",
-                                        TRANS("Encoding Mode")));
+    labelEncodingMode.reset (new juce::Label ("labelEncodingMode",
+                                              TRANS("Encoding Mode")));
     addAndMakeVisible (labelEncodingMode.get());
-    labelEncodingMode->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelEncodingMode->setJustificationType (Justification::centredLeft);
+    labelEncodingMode->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelEncodingMode->setJustificationType (juce::Justification::centredLeft);
     labelEncodingMode->setEditable (false, false, false);
-    labelEncodingMode->setColour (TextEditor::textColourId, Colours::black);
-    labelEncodingMode->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelEncodingMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelEncodingMode->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelEncodingMode->setBounds (8, 8, 140, 24);
+    labelEncodingMode->setBounds (16, 24, 140, 24);
 
-    comboBoxEncodingMode.reset (new ComboBox ("comboBoxEncodingMode"));
+    comboBoxEncodingMode.reset (new juce::ComboBox ("comboBoxEncodingMode"));
     addAndMakeVisible (comboBoxEncodingMode.get());
     comboBoxEncodingMode->setEditableText (false);
-    comboBoxEncodingMode->setJustificationType (Justification::centredLeft);
-    comboBoxEncodingMode->setTextWhenNothingSelected (String());
+    comboBoxEncodingMode->setJustificationType (juce::Justification::centredLeft);
+    comboBoxEncodingMode->setTextWhenNothingSelected (juce::String());
     comboBoxEncodingMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxEncodingMode->addListener (this);
 
-    sliderDbUnit.reset (new Slider ("sliderDbUnit"));
+    sliderDbUnit.reset (new juce::Slider ("sliderDbUnit"));
     addAndMakeVisible (sliderDbUnit.get());
     sliderDbUnit->setRange (0.01, 100, 0.01);
-    sliderDbUnit->setSliderStyle (Slider::LinearHorizontal);
-    sliderDbUnit->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderDbUnit->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderDbUnit->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderDbUnit->addListener (this);
 
-    labelDbUnit.reset (new Label ("labelDbUnit",
-                                  TRANS("dB Unit")));
+    labelDbUnit.reset (new juce::Label ("labelDbUnit",
+                                        TRANS("dB Unit")));
     addAndMakeVisible (labelDbUnit.get());
-    labelDbUnit->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDbUnit->setJustificationType (Justification::centredLeft);
+    labelDbUnit->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDbUnit->setJustificationType (juce::Justification::centredLeft);
     labelDbUnit->setEditable (false, false, false);
-    labelDbUnit->setColour (TextEditor::textColourId, Colours::black);
-    labelDbUnit->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDbUnit->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelDbUnit->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDbUnit->setBounds (8, 104, 140, 24);
+    labelDbUnit->setBounds (16, 120, 140, 24);
 
-    sliderDistanceAttenuation.reset (new Slider ("sliderDistanceAttenuation"));
+    sliderDistanceAttenuation.reset (new juce::Slider ("sliderDistanceAttenuation"));
     addAndMakeVisible (sliderDistanceAttenuation.get());
     sliderDistanceAttenuation->setRange (0.01, 20, 0.01);
-    sliderDistanceAttenuation->setSliderStyle (Slider::LinearHorizontal);
-    sliderDistanceAttenuation->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderDistanceAttenuation->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderDistanceAttenuation->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderDistanceAttenuation->addListener (this);
 
-    labelDistanceAttenuation.reset (new Label ("labelDistanceAttenuation",
-                                               TRANS("Distance Attenuation")));
+    labelDistanceAttenuation.reset (new juce::Label ("labelDistanceAttenuation",
+                                                     TRANS("Distance Attenuation")));
     addAndMakeVisible (labelDistanceAttenuation.get());
-    labelDistanceAttenuation->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceAttenuation->setJustificationType (Justification::centredLeft);
+    labelDistanceAttenuation->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDistanceAttenuation->setJustificationType (juce::Justification::centredLeft);
     labelDistanceAttenuation->setEditable (false, false, false);
-    labelDistanceAttenuation->setColour (TextEditor::textColourId, Colours::black);
-    labelDistanceAttenuation->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelDistanceAttenuation->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelDistanceAttenuation->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceAttenuation->setBounds (8, 152, 140, 24);
+    labelDistanceAttenuation->setBounds (16, 168, 140, 24);
 
-    sliderCenterCurve.reset (new Slider ("sliderCenterCurve"));
+    sliderCenterCurve.reset (new juce::Slider ("sliderCenterCurve"));
     addAndMakeVisible (sliderCenterCurve.get());
     sliderCenterCurve->setRange (0, 1, 0.0001);
-    sliderCenterCurve->setSliderStyle (Slider::LinearHorizontal);
-    sliderCenterCurve->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderCenterCurve->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderCenterCurve->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderCenterCurve->addListener (this);
 
-    labelCenterCurve.reset (new Label ("labelCenterCurve",
-                                       TRANS("Center Curve")));
+    labelCenterCurve.reset (new juce::Label ("labelCenterCurve",
+                                             TRANS("Center Curve")));
     addAndMakeVisible (labelCenterCurve.get());
-    labelCenterCurve->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelCenterCurve->setJustificationType (Justification::centredLeft);
+    labelCenterCurve->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterCurve->setJustificationType (juce::Justification::centredLeft);
     labelCenterCurve->setEditable (false, false, false);
-    labelCenterCurve->setColour (TextEditor::textColourId, Colours::black);
-    labelCenterCurve->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelCenterCurve->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelCenterCurve->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelCenterCurve->setBounds (8, 128, 140, 24);
+    labelCenterCurve->setBounds (16, 144, 140, 24);
 
-    sliderAdvancedFactor.reset (new Slider ("sliderAdvancedFactor"));
+    sliderAdvancedFactor.reset (new juce::Slider ("sliderAdvancedFactor"));
     addAndMakeVisible (sliderAdvancedFactor.get());
     sliderAdvancedFactor->setRange (0, 5, 0.01);
-    sliderAdvancedFactor->setSliderStyle (Slider::LinearHorizontal);
-    sliderAdvancedFactor->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderAdvancedFactor->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderAdvancedFactor->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderAdvancedFactor->addListener (this);
 
-    labelAdvancedFact.reset (new Label ("labelAdvancedFact",
-                                        TRANS("Advanced Factor")));
+    labelAdvancedFact.reset (new juce::Label ("labelAdvancedFact",
+                                              TRANS("Advanced Factor")));
     addAndMakeVisible (labelAdvancedFact.get());
-    labelAdvancedFact->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelAdvancedFact->setJustificationType (Justification::centredLeft);
+    labelAdvancedFact->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAdvancedFact->setJustificationType (juce::Justification::centredLeft);
     labelAdvancedFact->setEditable (false, false, false);
-    labelAdvancedFact->setColour (TextEditor::textColourId, Colours::black);
-    labelAdvancedFact->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelAdvancedFact->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAdvancedFact->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelAdvancedFact->setBounds (8, 56, 140, 24);
+    labelAdvancedFact->setBounds (16, 72, 140, 24);
 
-    sliderAdvancedExponent.reset (new Slider ("sliderAdvancedExponent"));
+    sliderAdvancedExponent.reset (new juce::Slider ("sliderAdvancedExponent"));
     addAndMakeVisible (sliderAdvancedExponent.get());
     sliderAdvancedExponent->setRange (0, 20, 0.01);
-    sliderAdvancedExponent->setSliderStyle (Slider::LinearHorizontal);
-    sliderAdvancedExponent->setTextBoxStyle (Slider::TextBoxLeft, false, 80, 20);
+    sliderAdvancedExponent->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderAdvancedExponent->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderAdvancedExponent->addListener (this);
 
-    labelAdvancedExponent.reset (new Label ("labelAdvancedExponent",
-                                            TRANS("Advanced Exponent")));
+    labelAdvancedExponent.reset (new juce::Label ("labelAdvancedExponent",
+                                                  TRANS("Advanced Exponent")));
     addAndMakeVisible (labelAdvancedExponent.get());
-    labelAdvancedExponent->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelAdvancedExponent->setJustificationType (Justification::centredLeft);
+    labelAdvancedExponent->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAdvancedExponent->setJustificationType (juce::Justification::centredLeft);
     labelAdvancedExponent->setEditable (false, false, false);
-    labelAdvancedExponent->setColour (TextEditor::textColourId, Colours::black);
-    labelAdvancedExponent->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelAdvancedExponent->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAdvancedExponent->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelAdvancedExponent->setBounds (8, 80, 140, 24);
+    labelAdvancedExponent->setBounds (16, 96, 140, 24);
 
-    comboBoxDistanceEncodingPreset.reset (new ComboBox ("comboBoxDistanceEncodingPreset"));
+    comboBoxDistanceEncodingPreset.reset (new juce::ComboBox ("comboBoxDistanceEncodingPreset"));
     addAndMakeVisible (comboBoxDistanceEncodingPreset.get());
     comboBoxDistanceEncodingPreset->setEditableText (false);
-    comboBoxDistanceEncodingPreset->setJustificationType (Justification::centredLeft);
+    comboBoxDistanceEncodingPreset->setJustificationType (juce::Justification::centredLeft);
     comboBoxDistanceEncodingPreset->setTextWhenNothingSelected (TRANS("-"));
     comboBoxDistanceEncodingPreset->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxDistanceEncodingPreset->addListener (this);
 
-    labelPresets.reset (new Label ("labelPresets",
-                                   TRANS("Presets:")));
+    labelPresets.reset (new juce::Label ("labelPresets",
+                                         TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelPresets->setJustificationType (Justification::centredLeft);
+    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
-    labelPresets->setColour (TextEditor::textColourId, Colours::black);
-    labelPresets->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    buttonSave.reset (new TextButton ("buttonSave"));
+    buttonSave.reset (new juce::TextButton ("buttonSave"));
     addAndMakeVisible (buttonSave.get());
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
+
+    labelAirAbsorbtionMode.reset (new juce::Label ("labelAirAbsorbtionMode",
+                                                    TRANS("Mode")));
+    addAndMakeVisible (labelAirAbsorbtionMode.get());
+    labelAirAbsorbtionMode->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);
+    labelAirAbsorbtionMode->setEditable (false, false, false);
+    labelAirAbsorbtionMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAirAbsorbtionMode->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    comboBoxAirAbsorbtionMode.reset (new juce::ComboBox ("comboBoxAirAbsorbtionMode"));
+    addAndMakeVisible (comboBoxAirAbsorbtionMode.get());
+    comboBoxAirAbsorbtionMode->setEditableText (false);
+    comboBoxAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);
+    comboBoxAirAbsorbtionMode->setTextWhenNothingSelected (juce::String());
+    comboBoxAirAbsorbtionMode->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboBoxAirAbsorbtionMode->addListener (this);
+
+    sliderAirAbsorbtionIntensity.reset (new juce::Slider ("sliderAirAbsorbtionIntensity"));
+    addAndMakeVisible (sliderAirAbsorbtionIntensity.get());
+    sliderAirAbsorbtionIntensity->setRange (0, 10, 0);
+    sliderAirAbsorbtionIntensity->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderAirAbsorbtionIntensity->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
+    sliderAirAbsorbtionIntensity->addListener (this);
+
+    labelIntensity.reset (new juce::Label ("labelIntensity",
+                                           TRANS("Intensity")));
+    addAndMakeVisible (labelIntensity.get());
+    labelIntensity->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelIntensity->setJustificationType (juce::Justification::centredLeft);
+    labelIntensity->setEditable (false, false, false);
+    labelIntensity->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelIntensity->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (600, 400);
+    setSize (600, 500);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -199,6 +240,9 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Advanced], EncoderConstants::Advanced);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::Exponential], EncoderConstants::Exponential);
     comboBoxEncodingMode->addItem(EncoderConstants::encodingModeStrings[EncoderConstants::InverseProportional], EncoderConstants::InverseProportional);
+
+    comboBoxAirAbsorbtionMode->addItem(EncoderConstants::airAbsorbtionModeStrings[EncoderConstants::Off], EncoderConstants::Off + 1);
+    comboBoxAirAbsorbtionMode->addItem(EncoderConstants::airAbsorbtionModeStrings[EncoderConstants::LowPass], EncoderConstants::LowPass + 1);
     setUiValues(pParams);
 
     // set slider ranges according to constants
@@ -208,7 +252,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderCenterCurve->setRange(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax, EncoderConstants::CenterCurveResolution);
     sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
     sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
-
+    sliderAirAbsorbtionIntensity->setRange(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax, EncoderConstants::AirAbsorbtionIntensityResolution);
     pParams->addChangeListener(this);
 
     updatePresetComboBox();
@@ -226,6 +270,8 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
+    groupAirAbsorbtion = nullptr;
+    groupAttenuation = nullptr;
     distanceEncodingGraph = nullptr;
     sliderUnitCircleRadius = nullptr;
     labelUnitCircleRadius = nullptr;
@@ -244,6 +290,10 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     comboBoxDistanceEncodingPreset = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
+    labelAirAbsorbtionMode = nullptr;
+    comboBoxAirAbsorbtionMode = nullptr;
+    sliderAirAbsorbtionIntensity = nullptr;
+    labelIntensity = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -251,12 +301,12 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
 }
 
 //==============================================================================
-void DistanceEncodingComponent::paint (Graphics& g)
+void DistanceEncodingComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -267,22 +317,28 @@ void DistanceEncodingComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    distanceEncodingGraph->setBounds (0, 184, proportionOfWidth (1.0000f), getHeight() - 222);
-    sliderUnitCircleRadius->setBounds (152, 32, getWidth() - 165, 24);
-    comboBoxEncodingMode->setBounds (152, 8, getWidth() - 165, 24);
-    sliderDbUnit->setBounds (153, 104, getWidth() - 165, 24);
-    sliderDistanceAttenuation->setBounds (153, 152, getWidth() - 165, 24);
-    sliderCenterCurve->setBounds (153, 128, getWidth() - 165, 24);
-    sliderAdvancedFactor->setBounds (153, 56, getWidth() - 165, 24);
-    sliderAdvancedExponent->setBounds (153, 80, getWidth() - 165, 24);
+    groupAirAbsorbtion->setBounds (0, getHeight() - 99, getWidth() - 0, 64);
+    groupAttenuation->setBounds (0, 0, getWidth() - 0, getHeight() - 99);
+    distanceEncodingGraph->setBounds (16, 200, proportionOfWidth (0.9674f), getHeight() - 315);
+    sliderUnitCircleRadius->setBounds (160, 48, getWidth() - 174, 24);
+    comboBoxEncodingMode->setBounds (160, 24, getWidth() - 174, 24);
+    sliderDbUnit->setBounds (161, 120, getWidth() - 175, 24);
+    sliderDistanceAttenuation->setBounds (161, 168, getWidth() - 175, 24);
+    sliderCenterCurve->setBounds (161, 144, getWidth() - 175, 24);
+    sliderAdvancedFactor->setBounds (161, 72, getWidth() - 175, 24);
+    sliderAdvancedExponent->setBounds (161, 96, getWidth() - 175, 24);
     comboBoxDistanceEncodingPreset->setBounds (72, getHeight() - 30, getWidth() - 171, 24);
     labelPresets->setBounds (0, getHeight() - 30, 64, 24);
     buttonSave->setBounds (getWidth() - 6 - 80, getHeight() - 30, 80, 24);
+    labelAirAbsorbtionMode->setBounds (19, getHeight() - 76, 53, 24);
+    comboBoxAirAbsorbtionMode->setBounds (80, getHeight() - 75, 192, 24);
+    sliderAirAbsorbtionIntensity->setBounds (368, getHeight() - 75, getWidth() - 382, 24);
+    labelIntensity->setBounds (288, getHeight() - 76, 72, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
 
-void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
+void DistanceEncodingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
@@ -323,13 +379,19 @@ void DistanceEncodingComponent::sliderValueChanged (Slider* sliderThatWasMoved)
         pParams->setAdvancedExponent(float(sliderAdvancedExponent->getValue()));
         //[/UserSliderCode_sliderAdvancedExponent]
     }
+    else if (sliderThatWasMoved == sliderAirAbsorbtionIntensity.get())
+    {
+        //[UserSliderCode_sliderAirAbsorbtionIntensity] -- add your slider handling code here..
+        pParams->setAirAbsorbtionIntensity(float(sliderAirAbsorbtionIntensity->getValue()));
+        //[/UserSliderCode_sliderAirAbsorbtionIntensity]
+    }
 
     //[UsersliderValueChanged_Post]
     distanceEncodingGraph->repaint();
     //[/UsersliderValueChanged_Post]
 }
 
-void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChanged)
+void DistanceEncodingComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 {
     //[UsercomboBoxChanged_Pre]
     //[/UsercomboBoxChanged_Pre]
@@ -350,12 +412,19 @@ void DistanceEncodingComponent::comboBoxChanged (ComboBox* comboBoxThatHasChange
         comboBoxDistanceEncodingPreset->setSelectedItemIndex(-1);
         //[/UserComboBoxCode_comboBoxDistanceEncodingPreset]
     }
+    else if (comboBoxThatHasChanged == comboBoxAirAbsorbtionMode.get())
+    {
+        //[UserComboBoxCode_comboBoxAirAbsorbtionMode] -- add your combo box handling code here..
+        pParams->setAirAbsorbtionMode(EncoderConstants::AirAbsorbtionMode(comboBoxAirAbsorbtionMode->getSelectedId() - 1));
+        controlDimming();
+        //[/UserComboBoxCode_comboBoxAirAbsorbtionMode]
+    }
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
 }
 
-void DistanceEncodingComponent::buttonClicked (Button* buttonThatWasClicked)
+void DistanceEncodingComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -417,6 +486,8 @@ void DistanceEncodingComponent::controlDimming() const
     labelAdvancedFact->setEnabled(mode == EncoderConstants::Advanced);
     sliderAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
     labelAdvancedExponent->setEnabled(mode == EncoderConstants::Advanced);
+
+    sliderAirAbsorbtionIntensity->setEnabled(pParams->getAirAbsorbtionMode() != EncoderConstants::Off);
 }
 
 void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingParams) {
@@ -429,6 +500,10 @@ void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingPar
     sliderCenterCurve->setValue(pEncodingParams->getCenterCurve(), dontSendNotification);
     sliderAdvancedFactor->setValue(pEncodingParams->getAdvancedFactor(), dontSendNotification);
     sliderAdvancedExponent->setValue(pEncodingParams->getAdvancedExponent(), dontSendNotification);
+
+    comboBoxAirAbsorbtionMode->setSelectedId(pEncodingParams->getAirAbsorbtionMode() + 1, dontSendNotification);
+    sliderAirAbsorbtionIntensity->setValue(pEncodingParams->getAirAbsorbtionIntensity(), dontSendNotification);
+
     controlDimming();
     distanceEncodingGraph->repaint();
 }
@@ -454,76 +529,80 @@ BEGIN_JUCER_METADATA
                  constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper"
                  variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
+                 fixedSize="0" initialWidth="600" initialHeight="500">
   <BACKGROUND backgroundColour="ff505050"/>
+  <GROUPCOMPONENT name="groupAirAbsorbtion" id="9e077e85238f4bfb" memberName="groupAirAbsorbtion"
+                  virtualName="" explicitFocusOrder="0" pos="0 99R 0M 64" title="Air Absorbtion"/>
+  <GROUPCOMPONENT name="groupAttenuation" id="874eb788ffea8f71" memberName="groupAttenuation"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 99M" title="Attenuation"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
-                    virtualName="" explicitFocusOrder="0" pos="0 184 100% 222M" class="DistanceEncodingGraph"
-                    params="pParams"/>
+                    virtualName="" explicitFocusOrder="0" pos="16 200 96.742% 315M"
+                    class="DistanceEncodingGraph" params="pParams"/>
   <SLIDER name="sliderUnitCircleRadius" id="33a23e1d161c87b2" memberName="sliderUnitCircleRadius"
-          virtualName="" explicitFocusOrder="0" pos="152 32 165M 24" min="0.01"
+          virtualName="" explicitFocusOrder="0" pos="160 48 174M 24" min="0.01"
           max="1.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelUnitCircleRadius" id="1c135dae5e4bb342" memberName="labelUnitCircleRadius"
-         virtualName="" explicitFocusOrder="0" pos="8 32 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 48 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Unit Circle Radius" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="labelEncodingMode" id="daf83410da235e44" memberName="labelEncodingMode"
-         virtualName="" explicitFocusOrder="0" pos="8 8 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 24 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Encoding Mode" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="comboBoxEncodingMode" id="2662ad301936b7c0" memberName="comboBoxEncodingMode"
-            virtualName="" explicitFocusOrder="0" pos="152 8 165M 24" editable="0"
+            virtualName="" explicitFocusOrder="0" pos="160 24 174M 24" editable="0"
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderDbUnit" id="10e905f78cc1a4e8" memberName="sliderDbUnit"
-          virtualName="" explicitFocusOrder="0" pos="153 104 165M 24" min="0.01"
+          virtualName="" explicitFocusOrder="0" pos="161 120 175M 24" min="0.01"
           max="100.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelDbUnit" id="e622db3c11547177" memberName="labelDbUnit"
-         virtualName="" explicitFocusOrder="0" pos="8 104 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 120 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="dB Unit" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderDistanceAttenuation" id="670b6b956458dbf0" memberName="sliderDistanceAttenuation"
-          virtualName="" explicitFocusOrder="0" pos="153 152 165M 24" min="0.01"
+          virtualName="" explicitFocusOrder="0" pos="161 168 175M 24" min="0.01"
           max="20.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelDistanceAttenuation" id="86897181d955aad6" memberName="labelDistanceAttenuation"
-         virtualName="" explicitFocusOrder="0" pos="8 152 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 168 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Distance Attenuation" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderCenterCurve" id="c8ebd57ab2ec2a1d" memberName="sliderCenterCurve"
-          virtualName="" explicitFocusOrder="0" pos="153 128 165M 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="161 144 175M 24" min="0.0"
           max="1.0" int="0.0001" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelCenterCurve" id="ee0374a11fdb34bf" memberName="labelCenterCurve"
-         virtualName="" explicitFocusOrder="0" pos="8 128 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 144 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Center Curve" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderAdvancedFactor" id="acaa669a372543dd" memberName="sliderAdvancedFactor"
-          virtualName="" explicitFocusOrder="0" pos="153 56 165M 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="161 72 175M 24" min="0.0"
           max="5.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelAdvancedFact" id="11f4879337765cab" memberName="labelAdvancedFact"
-         virtualName="" explicitFocusOrder="0" pos="8 56 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 72 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Advanced Factor" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderAdvancedExponent" id="848239971373225d" memberName="sliderAdvancedExponent"
-          virtualName="" explicitFocusOrder="0" pos="153 80 165M 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="161 96 175M 24" min="0.0"
           max="20.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelAdvancedExponent" id="5f0682ceb4e79610" memberName="labelAdvancedExponent"
-         virtualName="" explicitFocusOrder="0" pos="8 80 140 24" edTextCol="ff000000"
+         virtualName="" explicitFocusOrder="0" pos="16 96 140 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Advanced Exponent" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
@@ -540,6 +619,24 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="6Rr 30R 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <LABEL name="labelAirAbsorbtionMode" id="21b94baa2315f138" memberName="labelAirAbsorbtionMode"
+         virtualName="" explicitFocusOrder="0" pos="19 76R 53 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Mode" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="comboBoxAirAbsorbtionMode" id="ee61081979986e59" memberName="comboBoxAirAbsorbtionMode"
+            virtualName="" explicitFocusOrder="0" pos="80 75R 192 24" editable="0"
+            layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
+  <SLIDER name="sliderAirAbsorbtionIntensity" id="d2648c461e85094" memberName="sliderAirAbsorbtionIntensity"
+          virtualName="" explicitFocusOrder="0" pos="368 75R 382M 24" min="0.0"
+          max="10.0" int="0.0" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="labelIntensity" id="474bf2082d99f6e7" memberName="labelIntensity"
+         virtualName="" explicitFocusOrder="0" pos="288 76R 72 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Intensity" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

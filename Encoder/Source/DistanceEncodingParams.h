@@ -19,6 +19,8 @@
 #define DEFAULT_ADVANCED_FACTOR  	    1.0f
 #define DEFAULT_ADVANCED_EXPONENT  	    1.0f
 #define DEFAULT_DISTANCE_ENCODING_MODE  EncoderConstants::Standard
+#define DEFAULT_AIRABSORBTION_MODE     EncoderConstants::Off
+#define DEFAULT_AIRABSORBTION_INTENSITY 1.0f
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_MODE "DistEncMode"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_DB_UNIT "DistEncDbUnit"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_DISTANCE_ATTENUATION "DistEncDistanceAttenuation"
@@ -26,6 +28,8 @@
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR "DistEncAdvancedFactor"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT "DistEncAdvancedExponent"
 #define XML_ATTRIBUTE_DISTANCE_ENCODING_UNIT_CIRCLE_RADIUS "UnitCircleRadius"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_MODE "AirAbsorbtionMode"
+#define XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_INTENSITY "AirAbsorbtionIntensity"
 
 class DistanceEncodingParams : AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
@@ -39,13 +43,17 @@ public:
         centerCurve(nullptr),
         advancedFactor(nullptr),
         advancedExponent(nullptr),
+        airAbsorbtionMode(nullptr),
+        airAbsorbtionIntensity(nullptr),
         localEncodingMode(DEFAULT_DISTANCE_ENCODING_MODE),
         localUnitCircleRadius(DEFAULT_UNIT_CIRCLE_SIZE),
         localDbUnit(DEFAULT_DB_UNIT),
         localInverseProportionalDistanceAttenuation(DEFAULT_DISTANCE_ATTENUATION),
         localCenterCurve(DEFAULT_CENTER_CURVE),
         localAdvancedFactor(DEFAULT_ADVANCED_FACTOR),
-        localAdvancedExponent(DEFAULT_ADVANCED_EXPONENT)
+        localAdvancedExponent(DEFAULT_ADVANCED_EXPONENT),
+        localAirAbsorbtionMode(DEFAULT_AIRABSORBTION_MODE),
+        localAirAbsorbtionIntensity(DEFAULT_AIRABSORBTION_INTENSITY)
     {
     }
 
@@ -64,7 +72,12 @@ public:
         advancedFactor = new AudioParameterFloat("AdvancedFactor", "Advanced Factor", NormalisableRange<float>(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax), localAdvancedFactor, "Distance Encoding: Advanced Factor");
         
         advancedExponent = new AudioParameterFloat("AdvancedExponent", "Advanced Exponent", NormalisableRange<float>(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax), localAdvancedExponent, "Distance Encoding: Advanced Exponent");
-        
+
+        airAbsorbtionMode = new AudioParameterChoice("AirAbsorbtionMode", "Air Absorbtion Mode",
+            EncoderConstants::airAbsorbtionModeStrings, localAirAbsorbtionMode, "Distance Encoding: Air Absorbtion Mode");
+
+        airAbsorbtionIntensity = new AudioParameterFloat("AirAbsorbtionIntensity", "Air Absorbtion Intensity", NormalisableRange<float>(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax), localAirAbsorbtionIntensity, "Distance Encoding: Air Absorbtion Intensity");
+
         pProcessor->addParameter(encodingMode);
         pProcessor->addParameter(unitCircleRadius);
         pProcessor->addParameter(dbUnit);
@@ -72,7 +85,9 @@ public:
         pProcessor->addParameter(centerCurve);
         pProcessor->addParameter(advancedFactor);
         pProcessor->addParameter(advancedExponent);
-        
+        pProcessor->addParameter(airAbsorbtionMode);
+        pProcessor->addParameter(airAbsorbtionIntensity);
+
         encodingMode->addListener(this);
         unitCircleRadius->addListener(this);
         dbUnit->addListener(this);
@@ -80,6 +95,8 @@ public:
         centerCurve->addListener(this);
         advancedFactor->addListener(this);
         advancedExponent->addListener(this);
+        airAbsorbtionMode->addListener(this);
+        airAbsorbtionIntensity->addListener(this);
     }
     
 	void calculateAttenuation(double distance, double* wFactor, double* otherFactor) const
@@ -258,7 +275,43 @@ public:
         
         return true;
     }
-    
+
+    EncoderConstants::AirAbsorbtionMode getAirAbsorbtionMode() const
+    {
+        return airAbsorbtionMode != nullptr ? (EncoderConstants::AirAbsorbtionMode)airAbsorbtionMode->getIndex() : localAirAbsorbtionMode;
+    }
+
+    bool setAirAbsorbtionMode(EncoderConstants::AirAbsorbtionMode mode)
+    {
+        if (mode < 0 || mode >= EncoderConstants::airAbsorbtionModeStrings.size())
+            return false;
+
+        if (airAbsorbtionMode != nullptr)
+            *airAbsorbtionMode = (int)mode;
+        else
+            localAirAbsorbtionMode = mode;
+
+        return true;
+    }
+
+    float getAirAbsorbtionIntensity() const
+    {
+        return airAbsorbtionIntensity != nullptr ? airAbsorbtionIntensity->get() : localAirAbsorbtionIntensity;
+    }
+
+    bool setAirAbsorbtionIntensity(float intensity)
+    {
+        if (intensity < EncoderConstants::AirAbsorbtionIntensityMin || intensity > EncoderConstants::AirAbsorbtionIntensityMax)
+            return false;
+
+        if (airAbsorbtionIntensity != nullptr)
+            *airAbsorbtionIntensity = intensity;
+        else
+            localAirAbsorbtionIntensity = intensity;
+
+        return true;
+    }
+
     bool loadFromXmlElement(XmlElement* xmlElement)
     {
         setEncodingMode((EncoderConstants::EncodingMode)xmlElement->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_MODE, DEFAULT_DISTANCE_ENCODING_MODE));
@@ -268,7 +321,10 @@ public:
         setCenterCurve((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, DEFAULT_CENTER_CURVE));
         setAdvancedFactor((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, DEFAULT_ADVANCED_FACTOR));
         setAdvancedExponent((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, DEFAULT_ADVANCED_EXPONENT));
-        
+
+        setAirAbsorbtionMode((EncoderConstants::AirAbsorbtionMode)xmlElement->getIntAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_MODE, DEFAULT_AIRABSORBTION_MODE));
+        setAirAbsorbtionIntensity((float)xmlElement->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_INTENSITY, DEFAULT_AIRABSORBTION_INTENSITY));
+
         return true;
     }
     
@@ -281,6 +337,9 @@ public:
         xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_CENTER_CURVE, getCenterCurve());
         xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_FACTOR, getAdvancedFactor());
         xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_ADVANCED_EXPONENT, getAdvancedExponent());
+
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_MODE, (int)getAirAbsorbtionMode());
+        xmlElement->setAttribute(XML_ATTRIBUTE_DISTANCE_ENCODING_AIRABSORBTION_INTENSITY, getAirAbsorbtionIntensity());
         
         return true;
     }
@@ -294,6 +353,8 @@ private:
     AudioParameterFloat* centerCurve;
     AudioParameterFloat* advancedFactor;
     AudioParameterFloat* advancedExponent;
+    AudioParameterChoice* airAbsorbtionMode;
+    AudioParameterFloat* airAbsorbtionIntensity;
 
     // local fields for usage as temporary settings, not connected with audio processor
     EncoderConstants::EncodingMode localEncodingMode;
@@ -303,6 +364,9 @@ private:
     float localCenterCurve;
     float localAdvancedFactor;
     float localAdvancedExponent;
+
+    EncoderConstants::AirAbsorbtionMode localAirAbsorbtionMode;
+    float localAirAbsorbtionIntensity;
     
     void parameterValueChanged(int /*parameterIndex*/, float /*newValue*/) override {
         sendChangeMessage();

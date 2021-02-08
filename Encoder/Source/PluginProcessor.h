@@ -10,6 +10,7 @@
 
 #pragma once
 
+#include "AirAbsorbtionFilter.h"
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
 #include "../../Common/AmbiPoint.h"
@@ -97,6 +98,8 @@ private:
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
+    AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
+    dsp::ProcessSpec iirFilterSpec;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
