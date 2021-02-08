@@ -146,6 +146,7 @@ private:
     std::unique_ptr<juce::TextButton> buttonManage;
     std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
     std::unique_ptr<juce::TextButton> buttonManageFilters;
+    std::unique_ptr<juce::ComboBox> comboBoxApply;
 
 
     //==============================================================================
