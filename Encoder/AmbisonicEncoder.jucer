@@ -130,6 +130,8 @@
         <FILE id="T7ZWD0" name="HelpWebBrowserComponent.h" compile="0" resource="0"
               file="../Common/HelpWebBrowserComponent.h"/>
       </GROUP>
+      <FILE id="MPx4vz" name="ActivationDialog.h" compile="0" resource="0"
+            file="../Common/ActivationDialog.h"/>
       <FILE id="t6mAXi" name="AdditionalWindow.h" compile="0" resource="0"
             file="../Common/AdditionalWindow.h"/>
       <FILE id="R5Yz8G" name="AmbiBasicSettings.cpp" compile="1" resource="0"
