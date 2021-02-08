@@ -43,6 +43,7 @@
 #define COLUMN_ID_DISTANCE	3
 #define COLUMN_ID_DELAY		4
 #define COLUMN_ID_DELAY_COMPENSATION 13
+#define COLUMN_ID_COLOR     15
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
 #define COLUMN_ID_FILTER 14
@@ -266,6 +267,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
+	speakerList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 30);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
     speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
@@ -620,7 +622,15 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
         checkBox->setRowAndColumn(rowNumber, columnId);
         return checkBox;
     }
+    else if(columnId == COLUMN_ID_COLOR)
+    {
+        ColorEditorCustomComponent* colorBox = static_cast<ColorEditorCustomComponent*> (existingComponentToUpdate);
+        if (colorBox == nullptr)
+            colorBox = new ColorEditorCustomComponent(*this);
 
+        colorBox->setRowAndColumn(rowNumber, columnId);
+        return colorBox;
+    }
 	return nullptr;
 }
 
@@ -658,7 +668,8 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_D: pSpeakerSet->setDistance(rowNumber, newValue); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue / pAmbiSettings->getDistanceScaler()); break;
-	default: throw;
+    case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
+    default: return; // do nothing
 	}
 
 	speakerList->updateContent();
@@ -681,6 +692,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
 	case COLUMN_ID_D: return pt->getPoint()->getDistance();
 	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+    case COLUMN_ID_COLOR: return pt->getColor().getARGB();
 	default: return 0.0;
 	}
 }
