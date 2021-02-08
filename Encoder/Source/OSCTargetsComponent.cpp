@@ -276,10 +276,10 @@ void OSCTargetsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnInfo.get())
     {
         //[UserButtonCode_btnInfo] -- add your button handler code here..
-        auto label = std::make_unique<Label>("", "Allowed objects : {x}, {y}, {z}, {a}, {e}, {d}, {i} = index, {n} = name, {g} = gain, {c} = color");
-        label->setSize(700, 30);
-        label->setJustificationType(Justification::centred);
-        CallOutBox::launchAsynchronously(std::move(label), btnInfo->getScreenBounds(), nullptr);
+        auto label = std::make_unique<Label>("", "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color");
+        label->setSize(350, 145);
+        label->setJustificationType(Justification::left);
+        CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]
     }
 

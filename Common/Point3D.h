@@ -137,7 +137,18 @@ public:
         template <typename FloatType>
     Point3D<FloatType> operator+ (Point3D<FloatType> summand) noexcept{ return Point3D<ValueType>((ValueType)(getX() + summand.getX()), (ValueType)(getY() + summand.getY()), (ValueType)(getZ() + summand.getZ())); }
 
-		//==============================================================================
+	template <typename FloatType>
+    inline bool equals(Point3D< FloatType> other, double delta) noexcept
+	{
+		double x1 = getX();
+		double x2 = other.getX();
+		double diff = getX() - other.getX();
+		return abs(getX() - other.x) < delta
+			&& abs(getY() - other.y) < delta
+			&& abs(getZ() - other.z) < delta;
+	}
+
+    //==============================================================================
 		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
 	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;
 
