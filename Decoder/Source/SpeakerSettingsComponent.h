@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.7
 
   ------------------------------------------------------------------------------
 
@@ -147,6 +147,7 @@ private:
     std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
     std::unique_ptr<juce::TextButton> buttonManageFilters;
     std::unique_ptr<juce::ComboBox> comboBoxApply;
+    std::unique_ptr<juce::TextButton> buttonCsv;
 
 
     //==============================================================================

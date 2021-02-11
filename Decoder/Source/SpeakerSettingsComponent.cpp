@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.7
 
   ------------------------------------------------------------------------------
 
@@ -26,9 +26,11 @@
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
 #include "FilterSettingsComponent.h"
+#include "CsvImportExport.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
+
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
@@ -249,6 +251,11 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     comboBoxApply->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
     comboBoxApply->addListener (this);
 
+    buttonCsv.reset (new juce::TextButton ("buttonCsv"));
+    addAndMakeVisible (buttonCsv.get());
+    buttonCsv->setButtonText (TRANS("CSV"));
+    buttonCsv->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -339,6 +346,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     comboBoxChannelWeightingMode = nullptr;
     buttonManageFilters = nullptr;
     comboBoxApply = nullptr;
+    buttonCsv = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -384,11 +392,12 @@ void SpeakerSettingsComponent::resized()
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4977f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3991f) / 2), 0, proportionOfWidth (0.3991f), 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3984f) / 2), 0, proportionOfWidth (0.3984f), 24);
     buttonManage->setBounds (8 + (getWidth() - 18) - 145 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 18) - 17 - 120, 0 + 24, 120, 24);
     comboBoxApply->setBounds ((proportionOfWidth (0.4977f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
+    buttonCsv->setBounds ((proportionOfWidth (0.4977f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -569,6 +578,41 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
         //[UserButtonCode_buttonManageFilters] -- add your button handler code here..
         presetManagerDialog.show(this, filterPresetHelper.get(), false);
         //[/UserButtonCode_buttonManageFilters]
+    }
+    else if (buttonThatWasClicked == buttonCsv.get())
+    {
+        //[UserButtonCode_buttonCsv] -- add your button handler code here..
+        PopupMenu m;
+        m.addItem(1, "Import from CSV");
+        m.addItem(2, "Export to CSV");
+        const int result = m.show();
+        if (result == 1)
+        {
+            if (CsvImportExport::importFromCsv(pAmbiSettings, pSpeakerSet))
+            {
+                sendChangeMessage();
+                controlDimming();
+                updateDistanceScaler();
+                speakerList->updateContent();
+                speakerList->repaint();
+            }
+        }
+        else if (result == 2)
+        {
+            if(CsvImportExport::exportToCsv(pSpeakerSet))
+            {
+                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "CSV Export", "Export completed successfully");
+            }
+            else
+            {
+                AlertWindow::showMessageBox(AlertWindow::WarningIcon, "CSV Export", "Export failed!");
+            }
+        }
+        else if (result == 2)
+        {
+            // user picked item 2
+        }
+        //[/UserButtonCode_buttonCsv]
     }
 
     //[UserbuttonClicked_Post]
@@ -1126,11 +1170,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.772%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
+         virtualName="" explicitFocusOrder="0" pos="50.057%c 0 39.84% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1151,6 +1195,10 @@ BEGIN_JUCER_METADATA
             virtualName="" explicitFocusOrder="0" pos="-8R 0 144 24" posRelativeX="5fad387b688247bf"
             posRelativeY="5fad387b688247bf" editable="0" layout="33" items=""
             textWhenNonSelected="apply..." textWhenNoItems="(no choices)"/>
+  <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
+              virtualName="" explicitFocusOrder="0" pos="-8r 0 64 24" posRelativeX="5fad387b688247bf"
+              posRelativeY="5fad387b688247bf" buttonText="CSV" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
