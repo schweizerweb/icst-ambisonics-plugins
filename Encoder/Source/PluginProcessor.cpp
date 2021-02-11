@@ -50,6 +50,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     // initialize mono encoder with one source
     if (sources.size() == 0)
     {
+		Globals::SetScaler(1.0);
         String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
         Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
         sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
