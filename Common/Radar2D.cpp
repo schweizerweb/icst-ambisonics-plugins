@@ -10,6 +10,8 @@
 
 #include "JuceHeader.h"
 #include "Radar2D.h"
+
+#include "ActivationDialog.h"
 #include "TrackColors.h"
 #include "LabelCreator.h"
 
@@ -927,24 +929,32 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	if (!pRadarOptions->showEditablePoints)
 		return;
 
-	if (pRadarOptions->maxNumberEditablePoints > 0 && pEditablePoints->size() >= pRadarOptions->maxNumberEditablePoints)
+	if (pRadarOptions->maxNumberEditablePoints > 0 && pEditablePoints->getEnabledCount() >= pRadarOptions->maxNumberEditablePoints)
 		return;
 
-	// add new point
-	Uuid newId = Uuid();
-	int index = pEditablePoints->size();
-	switch (radarMode) {
-	case XY:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
-		break;
-	case XZ_Half:
-	case XZ_Full:
-		pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
-		break;
-	}
+	if (pEditablePoints->size() < pRadarOptions->maxNumberEditablePoints)
+	{
+		// add new point if capacity allows it
+		Uuid newId = Uuid();
+		int index = pEditablePoints->size();
+		switch (radarMode) {
+		case XY:
+			pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+			break;
+		case XZ_Half:
+		case XZ_Full:
+			pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+			break;
+		}
 
-	// select added point
-	pPointSelection->selectPoint(pEditablePoints->size() - 1);
+		// select point
+		pPointSelection->selectPoint(pEditablePoints->size() - 1);
+	}
+	else 
+	{
+		// otherwise enable a disabled point
+		CallOutBox::launchAsynchronously(std::make_unique<ActivationDialog>(pEditablePoints, valuePoint, radarMode == XY), Rectangle<int>(e.getPosition(), e.getPosition().translated(3, 3)), this);
+	}
 }
 
 void Radar2D::showCoordinates(const Point<float>& point)

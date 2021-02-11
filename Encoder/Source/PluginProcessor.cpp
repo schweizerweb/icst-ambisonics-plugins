@@ -221,7 +221,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 {
 #if MULTI_ENCODER_MODE
 	// group animator
-	groupAnimator->doStep(buffer.getNumSamples() / getSampleRate());
+	groupAnimator->doStep((float)(buffer.getNumSamples() / getSampleRate()));
 #endif
 
 	// Audio handling
@@ -269,7 +269,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
-			delayBuffers[iSource].check(DelayHelper::getDelaySamples(encoderSettings.getDistanceScaler() * MathConstants<float>::sqrt2, getSampleRate()));
+			delayBuffers[iSource].check(int(DelayHelper::getDelaySamples(encoderSettings.getDistanceScaler() * MathConstants<float>::sqrt2, getSampleRate())));
             localBuffer.copyFrom(0, 0, inputBuffer, iSource, 0, inputBuffer.getNumSamples());
 			// check doppler delay buffers
 			float currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance(), getSampleRate());

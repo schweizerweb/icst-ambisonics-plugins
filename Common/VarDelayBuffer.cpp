@@ -42,7 +42,7 @@ void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, flo
 
 	if(newDelayInSamples > bufferLength)
 	{
-		newDelayInSamples = bufferLength;
+		newDelayInSamples = float(bufferLength);
 	}
 
     float slope = (float(newDelayInSamples) - lastDelayInSamples) / float(numSamples);

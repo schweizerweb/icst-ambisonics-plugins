@@ -49,6 +49,7 @@ public:
 	void setDistance(int channel, double distance) const;
 	bool setGain(int channel, double gain, bool notify = true) const;
 	String getNewUniqueName() const;
+	int getEnabledCount() const;
 
 	int groupCount() const;
 	AmbiGroup* getGroup(int index) const;
@@ -68,6 +69,7 @@ public:
     bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     void swapGroup(int a, int b);
+   
 
 private:
 	bool nameExists(String name) const;

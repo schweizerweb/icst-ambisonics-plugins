@@ -265,6 +265,18 @@ String AmbiDataSet::getNewUniqueName() const
 	return name;
 }
 
+int AmbiDataSet::getEnabledCount() const
+{
+	int count = 0;
+	for(int i = 0; i < size(); i++)
+	{
+		if (get(i) != nullptr && get(i)->getEnabled())
+			count++;
+	}
+
+	return count;
+}
+
 int AmbiDataSet::groupCount() const
 {
 	return groups.size();
