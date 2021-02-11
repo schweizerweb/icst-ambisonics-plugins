@@ -44,7 +44,8 @@ public:
         {
             String line = stream.readNextLine();
             StringArray arr;
-            if (arr.addTokens(line, SEPARATOR, String()) >= 3)
+            int nbTokens = arr.addTokens(line, SEPARATOR, String());
+            if (nbTokens >= 3)
             {
                 CsvDataSet set;
                 set.a = Constants::GradToRad(arr[0].getDoubleValue());
@@ -56,6 +57,11 @@ public:
                 points.add(set);
                 maxDistance = jmax(maxDistance, set.d);
                 indexPlus1++;
+            }
+            else if(nbTokens > 0)
+            {
+                // fail for rows with less than 3 columns, but ignore empty lines
+                return false;
             }
         }
 
