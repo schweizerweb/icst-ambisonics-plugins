@@ -18,7 +18,7 @@ public:
     OSCSenderInstance();
     ~OSCSenderInstance();
 
-    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, Gain };
+    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, SA, SE, SD, SX, SY, SZ, Gain };
 
 	std::map<ParameterType, String> escapeStringMap = {
 		std::make_pair(Index, "{i}"),
@@ -30,6 +30,12 @@ public:
 		std::make_pair(X, "{x}"),
 		std::make_pair(Y, "{y}"),
 		std::make_pair(Z, "{z}"),
+		std::make_pair(SA, "{sa}"),
+		std::make_pair(SE, "{se}"),
+		std::make_pair(SD, "{sd}"),
+		std::make_pair(SX, "{sx}"),
+		std::make_pair(SY, "{sy}"),
+		std::make_pair(SZ, "{sz}"),
 		std::make_pair(Gain, "{g}")
 	};
 

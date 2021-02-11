@@ -14,6 +14,7 @@
 #include "EncoderSettings.h"
 #include "OSCSenderInstance.h"
 #include "../../Common/StatusMessageHandler.h"
+#define COMPARISON_DELTA 0.00001
 
 class PointHistoryEntry
 {
@@ -27,7 +28,7 @@ public:
 			name = pAmbiPoint->getName();
 			changed = true;
 		}
-		if(*pAmbiPoint->getPoint() != point)
+		if(!pAmbiPoint->getPoint()->equals(point, COMPARISON_DELTA))
 		{
 			point = *pAmbiPoint->getPoint();
 			changed = true;
