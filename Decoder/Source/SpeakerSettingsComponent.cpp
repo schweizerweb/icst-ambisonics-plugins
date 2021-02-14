@@ -32,7 +32,6 @@
 #include "SpeakerSettingsComponent.h"
 
 
-
 //[MiscUserDefs] You can add your own user definitions and misc code here...
 #define COLUMN_ID_NB		1
 #define COLUMN_ID_NAME		2
@@ -585,6 +584,7 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
         PopupMenu m;
         m.addItem(1, "Import from CSV");
         m.addItem(2, "Export to CSV");
+        m.addItem(3, "CSV Help");
         const int result = m.show();
         if (result == 1)
         {
@@ -595,22 +595,31 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
                 updateDistanceScaler();
                 speakerList->updateContent();
                 speakerList->repaint();
+                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Import", "Data import successful");
+            }
+            else
+            {
+                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "CSV Import", "Data import failed, please refer to file specification...");
             }
         }
         else if (result == 2)
         {
             if(CsvImportExport::exportToCsv(pSpeakerSet))
             {
-                AlertWindow::showMessageBox(AlertWindow::InfoIcon, "CSV Export", "Export completed successfully");
+                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Export", "Export completed successfully");
             }
             else
             {
-                AlertWindow::showMessageBox(AlertWindow::WarningIcon, "CSV Export", "Export failed!");
+                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "CSV Export", "Export failed!");
             }
         }
-        else if (result == 2)
+        else if (result == 3)
         {
-            // user picked item 2
+            std::unique_ptr<Label> label = std::make_unique<Label>();
+            label->setSize(600, 140);
+            label->setText("Required CSV format:\nAzimuth[Degrees];Elevation[Degrees];Distance[m];{Name};{Color[ARGB Hex]};{Gain[dB]}\nParameters in {} are optional, semicolons can be omitted after last used parameter.\nIf parameter 'Name' is not specified, the channel number will be used as name.\n\nExample:\n315;0;10\n45;0;9.5\n10;-5;4;Subwoofer;ffff0000;-6", dontSendNotification);
+            label->setJustificationType(Justification::left);
+            CallOutBox::launchAsynchronously(std::move(label), buttonCsv->getBounds(), this);
         }
         //[/UserButtonCode_buttonCsv]
     }
