@@ -10,13 +10,11 @@
 
 #include "Globals.h"
 #define SQRT2 1.41421356237f
-#define INFINITE 0.0
 
-double Globals::Scaler = INFINITE;
 
-float Globals::CartesianMin() { return Scaler == INFINITE ? -100000 : -(float)Scaler; }
-float Globals::CartesianMax() { return Scaler == INFINITE ? 100000 : (float)Scaler; }
+float Globals::CartesianMin() { return _global_scaler == Infinite ? -100000 : -(float)_global_scaler; }
+float Globals::CartesianMax() { return _global_scaler == Infinite ? 100000 : (float)_global_scaler; }
 float Globals::DistanceMax() { return SQRT2 * CartesianMax(); }
-bool Globals::IsInfinite() { return Scaler == INFINITE; }
+bool Globals::IsInfinite() { return _global_scaler == Infinite; }
 double Globals::GetScaler() { return CartesianMax(); }
-void Globals::SetScaler(double newScaler) { Scaler = newScaler; }
+void Globals::SetScaler(double newScaler) { _global_scaler = newScaler; }

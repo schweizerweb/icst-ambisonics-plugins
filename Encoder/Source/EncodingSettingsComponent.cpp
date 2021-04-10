@@ -283,7 +283,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
         //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? 0.0 : sliderDistanceScaler->getValue());
+        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? Globals::Infinite : sliderDistanceScaler->getValue());
         Globals::SetScaler(pEncoderSettings->getDistanceScaler());
         sourceDefinition->refresh();
         updateEncodingUiElements();

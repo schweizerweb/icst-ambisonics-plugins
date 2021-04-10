@@ -9,16 +9,15 @@
 */
 
 #pragma once
-class Globals
+namespace Globals
 {
-public:
-    static float CartesianMin();
-    static float CartesianMax();
-    static float DistanceMax();
-    static bool IsInfinite();
-    static void SetScaler(double newScaler);
-    static double GetScaler();
-    
-private:
-    static double Scaler;
+    float CartesianMin();
+    float CartesianMax();
+    float DistanceMax();
+    bool IsInfinite();
+    void SetScaler(double newScaler);
+    double GetScaler();
+
+    constexpr double Infinite = 0.0;
+    inline double _global_scaler;
 };

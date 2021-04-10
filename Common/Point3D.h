@@ -140,9 +140,6 @@ public:
 	template <typename FloatType>
     inline bool equals(Point3D< FloatType> other, double delta) noexcept
 	{
-		double x1 = getX();
-		double x2 = other.getX();
-		double diff = getX() - other.getX();
 		return abs(getX() - other.x) < delta
 			&& abs(getY() - other.y) < delta
 			&& abs(getZ() - other.z) < delta;
@@ -383,8 +380,6 @@ private:
             return ValueType(tan(value*(PI/2.0)));
         
         return ValueType(value * Globals::GetScaler());
-        
-        
     }
 };
 
