@@ -240,11 +240,27 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	// copy input buffer, clear output and get write pointers
 	inputBuffer.makeCopyOf(buffer);
 	buffer.clear();
+    
+    // in case of scaling change with doppler enabled, send an empty buffer and reset delay buffers
+    double newScaler = scalingInfo.GetScaler();
+    if(encoderSettings.dopplerEncodingFlag && lastScaler != newScaler)
+    {
+        for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
+        {
+            delayBuffers[iSource].initialize(0);
+        }
+        lastScaler = newScaler;
+        return;
+    }
+    
+    // prepare a buffer to reuse for doppler operation
 	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
 
+    // prepare write pointers
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
+    // loop through input channels
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
 		AmbiSource* source = sources->get(iSource);
@@ -273,7 +289,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
-			delayBuffers[iSource].check(int(DelayHelper::getDelaySamples(encoderSettings.getDistanceScaler() * MathConstants<float>::sqrt2, getSampleRate())));
+			delayBuffers[iSource].check(int(DelayHelper::getDelaySamples(scalingInfo.GetScaler() * MathConstants<float>::sqrt2, getSampleRate())));
             localBuffer.copyFrom(0, 0, inputBuffer, iSource, 0, inputBuffer.getNumSamples());
 			// check doppler delay buffers
 			float currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance(), getSampleRate());

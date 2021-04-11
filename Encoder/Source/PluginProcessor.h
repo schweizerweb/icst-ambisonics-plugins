@@ -103,6 +103,7 @@ private:
     AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
+    double lastScaler;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
