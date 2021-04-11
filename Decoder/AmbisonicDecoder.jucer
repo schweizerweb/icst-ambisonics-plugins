@@ -166,6 +166,8 @@
       <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="poQwVE" name="ScalingInfo.cpp" compile="1" resource="0" file="../Common/ScalingInfo.cpp"/>
+      <FILE id="D7ike2" name="ScalingInfo.h" compile="0" resource="0" file="../Common/ScalingInfo.h"/>
       <FILE id="dukqlN" name="SimpleGraph.cpp" compile="1" resource="0" file="../Common/SimpleGraph.cpp"/>
       <FILE id="KcvV3b" name="SimpleGraph.h" compile="0" resource="0" file="../Common/SimpleGraph.h"/>
       <FILE id="TSAtV3" name="SliderColumnCustomComponent.h" compile="0"

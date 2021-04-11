@@ -17,7 +17,7 @@
 class DecoderPresetHelper : public PresetHelper
 {
 public:
-    DecoderPresetHelper(File presetDirectory, ActionListener* pActionListener) : PresetHelper(presetDirectory, pActionListener)
+    DecoderPresetHelper(File presetDirectory, ActionListener* pActionListener, ScalingInfo* pScaling) : PresetHelper(presetDirectory, pActionListener), pScalingInfo(pScaling)
     {
     }
 
@@ -32,9 +32,9 @@ public:
 
     bool checkValid(juce::File presetFile) override
     {
-        AmbiSpeakerSet testSet;
+        std::unique_ptr<AmbiSpeakerSet> testSet(new AmbiSpeakerSet(pScalingInfo));
         AmbiSettings testSettings;
-        if(loadFromXmlFile(presetFile, &testSet, &testSettings))
+        if(loadFromXmlFile(presetFile, testSet.get(), &testSettings))
         {
             return true;
         }
@@ -604,16 +604,16 @@ public:
     void createPreset(String name, std::initializer_list<SSpeaker> speakerList)
     {
         AmbiSettings defaultAmbiSettings = getDefaultAmbiSettings();
-        AmbiSpeakerSet speakerSet;
+        std::unique_ptr<AmbiSpeakerSet> speakerSet(new AmbiSpeakerSet(pScalingInfo));
 
         File file = getPathForPresetName(name);
 
-        for (const SSpeaker speaker : speakerList)
+        for (const SSpeaker& speaker : speakerList)
         {
-            speakerSet.addNew(Uuid().toString(), Point3D<double>(speaker.x, speaker.y, speaker.z), speaker.name, TrackColors::getSpeakerColor());
+            speakerSet->addNew(Uuid().toString(), Point3D<double>(speaker.x, speaker.y, speaker.z), speaker.name, TrackColors::getSpeakerColor());
             if(speaker.isSubwoofer)
             {
-				auto s = speakerSet.get(speakerSet.size() - 1);
+				auto s = speakerSet->get(speakerSet->size() - 1);
 				auto f = s->getFilterInfo()->get(0);
 				s->setFilterBypass(false);
 				s->setGain(Decibels::decibelsToGain(-6.0), false);
@@ -624,7 +624,10 @@ public:
             }
         }
         
-        writeToXmlFile(file, &speakerSet, &defaultAmbiSettings);
+        writeToXmlFile(file, speakerSet.get(), &defaultAmbiSettings);
         presetFiles.addIfNotAlreadyThere(file);
     }
+    
+private:
+    ScalingInfo* pScalingInfo;
 };
