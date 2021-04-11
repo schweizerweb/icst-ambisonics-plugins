@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef OSCHANDLER_H_INCLUDED
-#define OSCHANDLER_H_INCLUDED
-
+#pragma once
 #include "JuceHeader.h"
 #include "StatusMessageHandler.h"
 #include "AmbiSourceSet.h"
@@ -37,7 +35,3 @@ protected:
 	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };
-
-
-
-#endif  // OSCHANDLER_H_INCLUDED
