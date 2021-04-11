@@ -42,6 +42,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	radarOptions.editablePointsAsSquare = false;
 	radarOptions.audioParams = ownerProc.getAudioParams();
 	radarOptions.dawParameter = ownerProc.getDawParameter();
+    radarOptions.scalingInfo = ownerProc.getScalingInfo();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));

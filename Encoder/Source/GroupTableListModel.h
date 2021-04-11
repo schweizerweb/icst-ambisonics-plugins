@@ -16,6 +16,7 @@
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
 #include "GroupPointsSelectionComponent.h"
+#include "../../Common/ScalingInfo.h"
 
 #define COLUMN_ID_GROUP_NB		101
 #define COLUMN_ID_GROUP_NAME	102
@@ -32,7 +33,7 @@
 class GroupTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-	GroupTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent): pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	GroupTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling): pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
 	{
 	}
 
@@ -183,10 +184,10 @@ public:
 		case COLUMN_ID_GROUP_X:
 		case COLUMN_ID_GROUP_Y:
 		case COLUMN_ID_GROUP_Z:
-			return SliderRange(Globals::CartesianMin(), Globals::CartesianMax(), 0.001);
+			return SliderRange(pScalingInfo->CartesianMin(), pScalingInfo->CartesianMax(), 0.001);
 
 		case COLUMN_ID_GROUP_D:
-			return SliderRange(Constants::DistanceMin, Globals::DistanceMax(), 0.001);
+			return SliderRange(Constants::DistanceMin, pScalingInfo->DistanceMax(), 0.001);
 
 		case COLUMN_ID_GROUP_A:
 			return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
@@ -261,4 +262,5 @@ private:
 	PointSelection* pPointSelection;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
+    ScalingInfo* pScalingInfo;
 };

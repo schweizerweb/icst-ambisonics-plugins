@@ -10,7 +10,6 @@
 
 #include "AmbiBasicSettings.h"
 #include "Constants.h"
-#include "Globals.h"
 
 AmbiBasicSettings::AmbiBasicSettings(double distanceScaler): distanceScaler(distanceScaler)
 {

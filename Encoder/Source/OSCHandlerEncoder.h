@@ -41,7 +41,7 @@
 class OSCHandlerEncoder : public OSCHandler
 {
 public:
-    OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams);
+    OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, ScalingInfo* pScaling);
     bool handleSpecific(const juce::OSCMessage &message) override;
     
 private:
@@ -62,6 +62,10 @@ private:
     void handleOwnExternStyleDistanceEncodingAdvanced(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncodingExponential(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncodingInverseProportional(const OSCMessage& message) const;
+    bool checkAed(double a, double e, double d, String* errorString) const;
+    bool checkXyz(double x, double y, double z, String* errorString) const;
+    bool checkGain(double gain, String* errorString) const;
     
     DistanceEncodingParams* pDistanceEncodingParams;
+    ScalingInfo* pScalingInfo;
 };

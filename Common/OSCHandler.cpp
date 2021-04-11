@@ -72,59 +72,6 @@ String OSCHandler::oscMessageToString(const OSCMessage *pMsg) const
     return detailString;
 }
 
-bool OSCHandler::checkAed(double a, double e, double d, String* errorString) const
-{
-	if(a < Constants::AzimuthRadMin || a > Constants::AzimuthRadMax)
-	{
-        *errorString = "OSC-Message Azimuth out of range: " + String(a);
-		return false;
-	}
-	if(e < Constants::ElevationRadMin || e > Constants::ElevationRadMax)
-	{
-		*errorString = "OSC-Message Elevation out of range: " + String(e);
-		return false;
-	}
-	if (d < Constants::DistanceMin)
-	{
-		*errorString = "OSC-Message Azimuth out of range: " + String(d);
-		return false;
-	}
-
-	return true;
-}
-
-bool OSCHandler::checkXyz(double x, double y, double z, String* errorString) const
-{
-	if (x < Globals::CartesianMin() || x > Globals::CartesianMax())
-	{
-		*errorString = "OSC-Message X out of range: " + String(x);
-		return false;
-	}
-	if (y < Globals::CartesianMin() || y > Globals::CartesianMax())
-	{
-		*errorString = "OSC-Message Y out of range: " + String(y);
-		return false;
-	}
-	if (z < Globals::CartesianMin() || z > Globals::CartesianMax())
-	{
-		*errorString = "OSC-Message Z out of range: " + String(z);
-		return false;
-	}
-
-	return true;
-}
-
-bool OSCHandler::checkGain(double gain, String *errorString) const
-{
-    if(gain < Constants::GainDbMin || gain > Constants::GainDbMax)
-    {
-        *errorString = "OSC-Message Gain out of range: " + String(gain);
-        return false;
-    }
-    
-    return true;
-}
-       
 void OSCHandler::stop()
 {
 	disconnect();

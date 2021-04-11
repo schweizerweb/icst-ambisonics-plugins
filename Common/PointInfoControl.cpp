@@ -362,12 +362,12 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
         Array<int> selection = pPointSelection->getSelectedIndices();
         if (pPointSelection->getSelectionMode() == PointSelection::Point && selection.size() > 1)
         {
-            double minX = Globals::CartesianMax();
-            double maxX = Globals::CartesianMin();
-            double minY = Globals::CartesianMax();
-            double maxY = Globals::CartesianMin();
-            double minZ = Globals::CartesianMax();
-            double maxZ = Globals::CartesianMin();
+            double minX = pRadarOptions->scalingInfo->CartesianMax();
+            double maxX = pRadarOptions->scalingInfo->CartesianMin();
+            double minY = pRadarOptions->scalingInfo->CartesianMax();
+            double maxY = pRadarOptions->scalingInfo->CartesianMin();
+            double minZ = pRadarOptions->scalingInfo->CartesianMax();
+            double maxZ = pRadarOptions->scalingInfo->CartesianMin();
 
             for (int i : selection)
             {

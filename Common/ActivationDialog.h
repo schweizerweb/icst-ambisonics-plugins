@@ -92,6 +92,6 @@ private:
 
     std::unique_ptr<TextButton> btn;
     AmbiDataSet* pData;
-    bool xyRadar;
     Point<float> newPosition;
+    bool xyRadar;
 };

@@ -19,16 +19,16 @@
 class AmbiGroup : public AmbiPoint
 {
 public:
-	AmbiGroup(String id, Point3D<double> point, String name, Colour color) : AmbiPoint(id, point, name, color) {}
-	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet);
+	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling) {}
+	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
 	virtual ~AmbiGroup() = default;
 
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
     void moveXYZ(double dx, double dy, double dz, bool moveSubElements);
-    static bool checkXYZ(double x, double y, double z);
-    static bool checkAED(double a, double e, double d);
-    static void checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz);
+    bool checkXYZ(double x, double y, double z);
+    bool checkAED(double a, double e, double d);
+    void checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz);
     void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
     void setAED(double newA, double newE, double newD, bool moveSubElements);
     void setChildrenColor();
@@ -39,4 +39,5 @@ public:
     void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
 
 	Array<AmbiPoint*> groupPoints;
+    ScalingInfo* pScalingInfo;
 };

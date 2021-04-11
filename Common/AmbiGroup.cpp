@@ -10,7 +10,7 @@
 
 #include "AmbiGroup.h"
 
-AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet) : AmbiPoint(xmlElement, audioParameterSet)
+AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling)
 {
 	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
 	groupPoints.clear();
@@ -85,9 +85,9 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements)
 
 bool AmbiGroup::checkXYZ(double x, double y, double z)
 {
-    return (Globals::CartesianMin() <= x && x <= Globals::CartesianMax())
-        && (Globals::CartesianMin() <= y && y <= Globals::CartesianMax())
-        && (Globals::CartesianMin() <= z && z <= Globals::CartesianMax());
+    return (pScalingInfo->CartesianMin() <= x && x <= pScalingInfo->CartesianMax())
+        && (pScalingInfo->CartesianMin() <= y && y <= pScalingInfo->CartesianMax())
+        && (pScalingInfo->CartesianMin() <= z && z <= pScalingInfo->CartesianMax());
 }
 
 bool AmbiGroup::checkAED(double a, double e, double d)
@@ -101,12 +101,12 @@ bool AmbiGroup::checkAED(double a, double e, double d)
 
 void AmbiGroup::checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz)
 {
-    *dx = (x + *dx) < Globals::CartesianMin() ? Globals::CartesianMin() - x : *dx;
-    *dx = (x + *dx) > Globals::CartesianMax() ? Globals::CartesianMax() - x : *dx;
-    *dy = (y + *dy) < Globals::CartesianMin() ? Globals::CartesianMin() - y : *dy;
-    *dy = (y + *dy) > Globals::CartesianMax() ? Globals::CartesianMax() - y : *dy;
-    *dz = (z + *dz) < Globals::CartesianMin() ? Globals::CartesianMin() - z : *dz;
-    *dz = (z + *dz) > Globals::CartesianMax() ? Globals::CartesianMax() - z : *dz;
+    *dx = (x + *dx) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - x : *dx;
+    *dx = (x + *dx) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - x : *dx;
+    *dy = (y + *dy) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - y : *dy;
+    *dy = (y + *dy) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - y : *dy;
+    *dz = (z + *dz) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - z : *dz;
+    *dz = (z + *dz) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - z : *dz;
 }
 
 void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElements)

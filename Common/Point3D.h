@@ -14,7 +14,6 @@
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
 #include "Constants.h"
-#include "Globals.h"
 
 #define	SQRT105		10.246950766	/*sqrt(105.0)*/
 #define SQRT15		3.87298334621	/*sqrt(15.0)*/
@@ -53,10 +52,10 @@ public:
 	Point3D(const Point3D& other) noexcept : x(other.x), y(other.y), z(other.z), audioParams(other.audioParams) { }
 
 	/** Creates a Point3D from an (x, y, z) position. */
-	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ) noexcept : x(compress(initialX)), y(compress(initialY)), z(compress(initialZ)) { }
+	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ) noexcept : x(initialX), y(initialY), z(initialZ) { }
 	
 	/** Creates a Point3D from an (x, y, z) position. Keeps a reference to the corresponding audio parameter.*/
-	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ, AudioParameterSet paramSet) noexcept : x(compress(initialX)), y(compress(initialY)), z(compress(initialZ)), audioParams(paramSet) { }
+	Point3D(ValueType initialX, ValueType initialY, ValueType initialZ, AudioParameterSet paramSet) noexcept : x(initialX), y(initialY), z(initialZ), audioParams(paramSet) { }
 
 	//==============================================================================
 	/** Copies this Point3D from another one. */
@@ -72,13 +71,13 @@ public:
 	inline bool isFinite() const noexcept{ return juce_isfinite(getX()) && juce_isfinite(getY()) && juce_isfinite(getZ()); }
 
 		/** Returns the Point3D's x coordinate. */
-	inline ValueType getX() noexcept{ return decompress(x); }
+	inline ValueType getX() noexcept{ return x; }
 
 		/** Returns the Point3D's y coordinate. */
-	inline ValueType getY() noexcept{ return decompress(y); }
+	inline ValueType getY() noexcept{ return y; }
 
 		/** Returns the Point3D's z coordinate. */
-	inline ValueType getZ() noexcept{ return decompress(z); }
+	inline ValueType getZ() noexcept{ return z; }
 
 		/** Returns the Point3D's azimuth. */
     inline ValueType getAzimuth() noexcept{ ValueType azimuth; calculateAed(&azimuth, nullptr, nullptr); return azimuth; }
@@ -90,13 +89,13 @@ public:
     inline ValueType getDistance() noexcept{ ValueType distance; calculateAed(nullptr, nullptr, &distance); return distance; }
 		
 		/** Sets the Point3D's x coordinate. */
-	inline void setX(ValueType newX, bool notify = true) noexcept { makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); x = notify ? compress(newX) : newX; if (notify) audioParams.notifyX(x); }
+	inline void setX(ValueType newX, bool notify = true) noexcept { x = notify ? audioParams.notifyX(newX) : newX; }
 
 		/** Sets the Point3D's y coordinate. */
-	inline void setY(ValueType newY, bool notify = true) noexcept { makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); y = notify ? compress(newY) : newY; if (notify) audioParams.notifyY(y); }
+    inline void setY(ValueType newY, bool notify = true) noexcept { y = notify ? audioParams.notifyY(newY) : newY; }
 
 		/** Sets the Point3D's z coordinate. */
-	inline void setZ(ValueType newZ, bool notify = true) noexcept { makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); z = notify ? compress(newZ) : newZ; if (notify) audioParams.notifyZ(z); }
+    inline void setZ(ValueType newZ, bool notify = true) noexcept { z = notify ? audioParams.notifyZ(newZ) : newZ; }
 
 		/** Sets the Point3D's azimuth. */
     inline void setAzimuth(ValueType newAzimuth) noexcept { ValueType elevation, distance; calculateAed(nullptr, &elevation, &distance); setFromAed(newAzimuth, elevation, distance); }
@@ -110,16 +109,33 @@ public:
     inline void setAed(ValueType newAzimuth, ValueType newElevation, ValueType newDistance) noexcept { setFromAed(newAzimuth, newElevation, newDistance); }
     
 		/** Changes the Point3D's x and y coordinates. */
-	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept { makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); y = compress(newY); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); } }
+	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept
+    {
+        x = notify ? audioParams.notifyX(newX) : newX;
+        y = notify ? audioParams.notifyY(newY) : newY;
+    }
 
 		/** Changes the Point3D's x and z coordinates. */
-	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept{ makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyZ(z); } }
+	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept
+    {
+        x = notify ? audioParams.notifyX(newX) : newX;
+        z = notify ? audioParams.notifyZ(newZ) : newZ;
+    }
 
 		/** Changes the Point3D's y and z coordinates. */
-	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept{ makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyY(y); audioParams.notifyZ(z); } }
+	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept
+    {
+        y = notify ? audioParams.notifyY(newY) : newY;
+        z = notify ? audioParams.notifyZ(newZ) : newZ;
+    }
 
 	/** Changes the Point3D's x, y and z coordinates. */
-	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept { makeValid(&newX, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newY, Globals::CartesianMin(), Globals::CartesianMax()); makeValid(&newZ, Globals::CartesianMin(), Globals::CartesianMax()); x = compress(newX); y = compress(newY); z = compress(newZ); if (notify) { audioParams.notifyX(x); audioParams.notifyY(y); audioParams.notifyZ(z); } }
+	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept
+    {
+        x = notify ? audioParams.notifyX(newX) : newX;
+        y = notify ? audioParams.notifyY(newY) : newY;
+        z = notify ? audioParams.notifyZ(newZ) : newZ;
+    }
 
 		/** Returns a Point3D whose coordinates are multiplied by a given scalar value. */
 		template <typename FloatType>
@@ -162,12 +178,6 @@ public:
 
 	String toShortStringXyz()	{ return String(getX(), 2) + ", " + String(getY(), 2) + ", " + String(getZ(), 2); }
 	String toShortStringAed()	{ return String(Constants::RadToGrad(getAzimuth()), 2) + ", " + String(Constants::RadToGrad(getElevation()), 2) + ", " + String(getDistance(), 2); }
-
-	void makeValid(ValueType* pValue, const ValueType min, const ValueType max) const
-	{
-		*pValue = jmin(*pValue, max);
-		*pValue = jmax(*pValue, min);
-	}
 
 	void getAmbisonicsCoefficients(int numCoefficients, ValueType* pCoefficients, bool flipDirection, bool inverseNormalisation = false)
 	{
@@ -326,61 +336,34 @@ private:
 
 	void calculateAed(ValueType* pAzimuth, ValueType* pElevation, ValueType* pDistance)
 	{
-        ValueType xDecompressed = decompress(x);
-        ValueType yDecompressed = decompress(y);
-        ValueType zDecompressed = decompress(z);
-        
         if(pDistance != nullptr)
         {
-            ValueType distance = sqrt(pow(xDecompressed, 2.0) + pow(yDecompressed, 2.0) + pow(zDecompressed, 2.0));
+            ValueType distance = sqrt(pow(x, 2.0) + pow(y, 2.0) + pow(z, 2.0));
             *pDistance = distance < DISTANCE_MIN_VALUE ? DISTANCE_MIN_VALUE : distance;
         }
 		
         if(pAzimuth != nullptr)
         {
-            ValueType azimuth = atan2(xDecompressed, yDecompressed);
+            ValueType azimuth = atan2(x, y);
             *pAzimuth = azimuth < 0.0 ? 2.0 * PI + azimuth : azimuth;
         }
         
         if(pElevation != nullptr)
         {
-            *pElevation = atan2(zDecompressed, sqrt(pow(xDecompressed, 2.0) + pow(yDecompressed, 2.0)));
+            *pElevation = atan2(z, sqrt(pow(x, 2.0) + pow(y, 2.0)));
         }
 	}
 
 	void setFromAed(ValueType azimuth, ValueType elevation, ValueType distance)
 	{
-		ValueType xDecompressed = distance * cos(elevation) * sin(azimuth);
-		ValueType yDecompressed = distance * cos(elevation) * cos(azimuth);
-		ValueType zDecompressed = distance * sin(elevation);
-		makeValid(&xDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
-		makeValid(&yDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
-		makeValid(&zDecompressed, Globals::CartesianMin(), Globals::CartesianMax());
-
-        x = compress(xDecompressed);
-        y = compress(yDecompressed);
-        z = compress(zDecompressed);
-
-		audioParams.notifyX(x);
-		audioParams.notifyY(y);
-		audioParams.notifyZ(z);
+		ValueType newX = distance * cos(elevation) * sin(azimuth);
+		ValueType newY = distance * cos(elevation) * cos(azimuth);
+		ValueType newZ = distance * sin(elevation);
+        
+		x = audioParams.notifyX(newX);
+        y = audioParams.notifyY(newY);
+        z = audioParams.notifyZ(newZ);
 	}
-    
-    ValueType compress(ValueType value)
-    {
-        if(Globals::IsInfinite())
-            return ValueType(atan(value) / (PI/2.0));
-        
-        return ValueType(value / Globals::GetScaler());
-    }
-    
-    ValueType decompress(ValueType value)
-    {
-        if(Globals::IsInfinite())
-            return ValueType(tan(value*(PI/2.0)));
-        
-        return ValueType(value * Globals::GetScaler());
-    }
 };
 
 /** Multiplies the Point3D's coordinates by a scalar value. */

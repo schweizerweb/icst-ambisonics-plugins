@@ -12,6 +12,7 @@
 #include "JuceHeader.h"
 #include "AudioParams.h"
 #include "DawParameter.h"
+#include "ScalingInfo.h"
 
 class RadarOptions
 {
@@ -30,4 +31,5 @@ public:
 
     AudioParams* audioParams;
 	DawParameter* dawParameter;
+    ScalingInfo* scalingInfo;
 };

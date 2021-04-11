@@ -17,6 +17,7 @@
 #include "../../Common/ColorEditorCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
+#include "../../Common/ScalingInfo.h"
 
 #define COLUMN_ID_NB        2
 #define COLUMN_ID_NAME        3
@@ -34,7 +35,7 @@
 class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr)
+    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
     {
     }
 
@@ -209,10 +210,10 @@ private:
         case COLUMN_ID_X:
         case COLUMN_ID_Y:
         case COLUMN_ID_Z:
-            return SliderRange(Globals::CartesianMin(), Globals::CartesianMax(), 0.001);
+            return SliderRange(pScalingInfo->CartesianMin(), pScalingInfo->CartesianMax(), 0.001);
 
         case COLUMN_ID_D:
-            return SliderRange(Constants::DistanceMin, Globals::DistanceMax(), 0.001);
+            return SliderRange(Constants::DistanceMin, pScalingInfo->DistanceMax(), 0.001);
 
         case COLUMN_ID_A:
             return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
@@ -264,4 +265,5 @@ private:
     PointSelection* pPointSelection;
     Component* pParentComponent;
     TableListBox* pTableListBox;
+    ScalingInfo* pScalingInfo;
 };

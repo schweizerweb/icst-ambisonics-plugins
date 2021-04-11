@@ -10,7 +10,7 @@
 
 #include "AmbiDataSet.h"
 
-AmbiDataSet::AmbiDataSet()
+AmbiDataSet::AmbiDataSet(ScalingInfo* pScaling) : pScalingInfo(pScaling)
 {
 }
 
@@ -417,7 +417,7 @@ bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bo
 
 AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
 {
-	AmbiGroup* group = new AmbiGroup(id, point, name, color);
+	AmbiGroup* group = new AmbiGroup(id, point, name, color, pScalingInfo);
 	groups.add(group);
 
 	return group;

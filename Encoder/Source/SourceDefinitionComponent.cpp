@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.1
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -20,6 +20,7 @@
 //[Headers] You can add your own extra header files here...
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/TrackColors.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 #include "SourceDefinitionComponent.h"
@@ -30,13 +31,13 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams)
+SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings)
     : pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
-    groupModel.reset(new GroupTableListModel(pSourceSet, pPointSelection, this));
-    sourceModel.reset(new SourceTableListModel(pSourceSet, pPointSelection, this));
+    groupModel.reset(new GroupTableListModel(pSourceSet, pPointSelection, this, pZoomSettings->getScalingInfo()));
+    sourceModel.reset(new SourceTableListModel(pSourceSet, pPointSelection, this, pZoomSettings->getScalingInfo()));
     //[/Constructor_pre]
 
     groupGroups.reset (new juce::GroupComponent ("groupGroups",
@@ -165,18 +166,18 @@ void SourceDefinitionComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4006f), getWidth() - 0, proportionOfHeight (0.4006f));
-    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4006f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4006f) - 67);
-    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
-    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
-    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5994f));
-    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5994f) - 67);
-    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
-    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
-    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5994f) - 40, 64, 24);
-    buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
-    buttonMoveGroupUp->setBounds (0 + (getWidth() - 0) - 152, (getHeight() - proportionOfHeight (0.4006f)) + proportionOfHeight (0.4006f) - 40, 64, 24);
+    groupGroups->setBounds (0, getHeight() - proportionOfHeight (0.4013f), getWidth() - 0, proportionOfHeight (0.4013f));
+    groupList->setBounds (0 + 16, (getHeight() - proportionOfHeight (0.4013f)) + 19, (getWidth() - 0) - 31, proportionOfHeight (0.4013f) - 67);
+    buttonAddGroup->setBounds (0 + 17, (getHeight() - proportionOfHeight (0.4013f)) + proportionOfHeight (0.4013f) - 40, 64, 24);
+    buttonRemoveGroup->setBounds (0 + 89, (getHeight() - proportionOfHeight (0.4013f)) + proportionOfHeight (0.4013f) - 40, 64, 24);
+    groupSources->setBounds (0, 0, getWidth() - 0, proportionOfHeight (0.5987f));
+    sourceList->setBounds (0 + 16, 0 + 19, (getWidth() - 0) - 31, proportionOfHeight (0.5987f) - 67);
+    buttonAdd->setBounds (0 + 17, 0 + proportionOfHeight (0.5987f) - 40, 64, 24);
+    buttonRemove->setBounds (0 + 89, 0 + proportionOfHeight (0.5987f) - 40, 64, 24);
+    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, 0 + proportionOfHeight (0.5987f) - 40, 64, 24);
+    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, 0 + proportionOfHeight (0.5987f) - 40, 64, 24);
+    buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (getHeight() - proportionOfHeight (0.4013f)) + proportionOfHeight (0.4013f) - 40, 64, 24);
+    buttonMoveGroupUp->setBounds (0 + (getWidth() - 0) - 152, (getHeight() - proportionOfHeight (0.4013f)) + proportionOfHeight (0.4013f) - 40, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -363,13 +364,13 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
                  componentName="" parentClasses="public Component, public ChangeListener, public ChangeBroadcaster"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings"
                  variableInitialisers="pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.126%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.127%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
                   title="Groups"/>
@@ -386,7 +387,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.874%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.873%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"

@@ -13,11 +13,12 @@
 #define MIN_ZOOM_RADIUS 0.001f
 
 #include "Point3D.h"
+#include "ScalingInfo.h"
 
 class ZoomSettings : public ChangeBroadcaster
 {
 public:
-	ZoomSettings();
+	ZoomSettings(ScalingInfo* pScaling);
 
 	Rectangle<float> getVisibleArea(bool isXZ, bool isFull);
 	Point3D<float> getInitialCenterPoint() const;
@@ -34,6 +35,8 @@ public:
     void setPointScaler(double newScaler);
     double getPointScaler();
     
+    ScalingInfo* getScalingInfo();
+    
     void Reset();
 
 private:
@@ -44,4 +47,6 @@ private:
 	float currentRadius;
     
     double pointScaler;
+    
+    ScalingInfo* pScalingInfo;
 };

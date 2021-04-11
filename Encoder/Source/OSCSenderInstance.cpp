@@ -10,7 +10,7 @@
 
 #include "OSCSenderInstance.h"
 
-OSCSenderInstance::OSCSenderInstance(): isConnected(false)
+OSCSenderInstance::OSCSenderInstance(ScalingInfo* pScaling): isConnected(false), pScalingInfo(pScaling)
 {
     sender.reset(new OSCSender());
 }
@@ -58,10 +58,10 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         case Z: path = path.replace(escapeStringMap[Z], String(pt->getPoint()->getZ())); break;
         case SA: path = path.replace(escapeStringMap[SA], String(pt->getPoint()->getAzimuth() / (2.0 * PI))); break;
         case SE: path = path.replace(escapeStringMap[SE], String(pt->getPoint()->getElevation() / PI + 0.5)); break;
-        case SD: path = path.replace(escapeStringMap[SD], String(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * Globals::GetScaler()))); break;
-        case SX: path = path.replace(escapeStringMap[SX], String(pt->getPoint()->getX() / (2.0 * Globals::GetScaler()) + 0.5)); break;
-        case SY: path = path.replace(escapeStringMap[SY], String(pt->getPoint()->getY() / (2.0 * Globals::GetScaler()) + 0.5)); break;
-        case SZ: path = path.replace(escapeStringMap[SZ], String(pt->getPoint()->getZ() / (2.0 * Globals::GetScaler()) + 0.5)); break;
+        case SD: path = path.replace(escapeStringMap[SD], String(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * pScalingInfo->GetScaler()))); break;
+        case SX: path = path.replace(escapeStringMap[SX], String(pt->getPoint()->getX() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
+        case SY: path = path.replace(escapeStringMap[SY], String(pt->getPoint()->getY() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
+        case SZ: path = path.replace(escapeStringMap[SZ], String(pt->getPoint()->getZ() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
         case Gain: path = path.replace(escapeStringMap[Gain], String(pt->getGain())); break;
         default: ;
         }
@@ -83,10 +83,10 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         case Z: message.addArgument(OSCArgument(float(pt->getPoint()->getZ()))); break;
         case SA: message.addArgument(OSCArgument(float(pt->getPoint()->getAzimuth() / (2.0 * PI)))); break;
         case SE: message.addArgument(OSCArgument(float(pt->getPoint()->getElevation() / PI + 0.5))); break;
-        case SD: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * Globals::GetScaler())))); break;
-        case SX: message.addArgument(OSCArgument(float(pt->getPoint()->getX() / (2.0 * Globals::GetScaler()) + 0.5))); break;
-        case SY: message.addArgument(OSCArgument(float(pt->getPoint()->getY() / (2.0 * Globals::GetScaler()) + 0.5))); break;
-        case SZ: message.addArgument(OSCArgument(float(pt->getPoint()->getZ() / (2.0 * Globals::GetScaler()) + 0.5))); break;
+        case SD: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * pScalingInfo->GetScaler())))); break;
+        case SX: message.addArgument(OSCArgument(float(pt->getPoint()->getX() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
+        case SY: message.addArgument(OSCArgument(float(pt->getPoint()->getY() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
+        case SZ: message.addArgument(OSCArgument(float(pt->getPoint()->getZ() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
         case Gain: message.addArgument(OSCArgument(float(pt->getGain()))); break;
         default:;
         }

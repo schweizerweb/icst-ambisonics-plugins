@@ -11,12 +11,13 @@
 #include "ZoomSettings.h"
 #include "JuceHeader.h"
 
-ZoomSettings::ZoomSettings() : 
+ZoomSettings::ZoomSettings(ScalingInfo* pScaling) :
 	initialCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
 	currentCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
 	initialRadius(1.0),
 	currentRadius(1.0),
-    pointScaler(DEFAULT_POINT_SCALER)
+    pointScaler(DEFAULT_POINT_SCALER),
+    pScalingInfo(pScaling)
 {
 }
 
@@ -84,7 +85,7 @@ void ZoomSettings::setCurrentRadius(float newRadius)
 void ZoomSettings::Reset()
 {
     currentCenterPoint.setXYZ(0.0, 0.0, 0.0);
-    setCurrentRadius(Globals::IsInfinite() ? 1.0f : (float)Globals::GetScaler());
+    setCurrentRadius(pScalingInfo->IsInfinite() ? 1.0f : (float)pScalingInfo->GetScaler());
 }
 
 int ZoomSettings::getNumberOfRings() const
@@ -130,4 +131,9 @@ float ZoomSettings::getRingResolution() const
         return 5000.0f;
     
     return 10000.0f;
+}
+
+ScalingInfo* ZoomSettings::getScalingInfo()
+{
+    return pScalingInfo;
 }

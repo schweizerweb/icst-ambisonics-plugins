@@ -15,7 +15,7 @@
 class OSCSenderInstance
 {
 public:
-    OSCSenderInstance();
+    OSCSenderInstance(ScalingInfo* pScaling);
     ~OSCSenderInstance();
 
     enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, SA, SE, SD, SX, SY, SZ, Gain };
@@ -52,5 +52,6 @@ private:
 	Array<ParameterType> realParameters;
 	bool isConnected;
 	CriticalSection cs;
+    ScalingInfo* pScalingInfo;
 };
 

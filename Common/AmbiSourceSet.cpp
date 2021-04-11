@@ -176,9 +176,9 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 		while (xmlGroup != nullptr)
 		{
             if(pAudioParams != nullptr && pAudioParams->groupParams.size() > index)
-                groups.add(new AmbiGroup(xmlGroup, &elements, pAudioParams->groupParams.getUnchecked(index)));
+                groups.add(new AmbiGroup(xmlGroup, &elements, pAudioParams->groupParams.getUnchecked(index), pScalingInfo));
             else
-                groups.add(new AmbiGroup(xmlGroup, &elements, AudioParameterSet()));
+                groups.add(new AmbiGroup(xmlGroup, &elements, AudioParameterSet(), pScalingInfo));
             
 			xmlGroup = xmlGroup->getNextElement();
 			index++;

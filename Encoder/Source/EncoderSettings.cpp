@@ -27,7 +27,6 @@
 
 EncoderSettings::EncoderSettings():
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
-    masterGain(nullptr),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
 	oscSendFlag(DEFAULT_SEND_FLAG),
@@ -44,6 +43,7 @@ EncoderSettings::EncoderSettings():
 	oscSendExtAedHost(DEFAULT_SEND_EXT_AED_HOST),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
+    masterGain(nullptr),
     localMasterGain(DEFAULT_MASTER_GAIN)
 {
 }

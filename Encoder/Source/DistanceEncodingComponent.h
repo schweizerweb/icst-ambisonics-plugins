@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -20,7 +20,7 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "DistanceEncodingParams.h"
 #include "DistanceEncodingGraph.h"
 #include "DistanceEncodingPresetHelper.h"
@@ -45,7 +45,7 @@ class DistanceEncodingComponent  : public Component,
 {
 public:
     //==============================================================================
-    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper);
+    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling);
     ~DistanceEncodingComponent() override;
 
     //==============================================================================

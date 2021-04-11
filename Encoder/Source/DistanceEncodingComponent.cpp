@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.5
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -28,7 +28,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper)
+DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling)
     : pParams(pParams), pPresetHelper(pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -42,7 +42,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
                                                       TRANS("Attenuation")));
     addAndMakeVisible (groupAttenuation.get());
 
-    distanceEncodingGraph.reset (new DistanceEncodingGraph (pParams));
+    distanceEncodingGraph.reset (new DistanceEncodingGraph (pParams, pScaling));
     addAndMakeVisible (distanceEncodingGraph.get());
     distanceEncodingGraph->setName ("distanceEncodingGraph");
 
@@ -526,7 +526,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DistanceEncodingComponent"
                  componentName="" parentClasses="public Component, ChangeListener, ActionListener"
-                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper"
+                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling"
                  variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="500">
@@ -537,7 +537,7 @@ BEGIN_JUCER_METADATA
                   virtualName="" explicitFocusOrder="0" pos="0 0 0M 99M" title="Attenuation"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
                     virtualName="" explicitFocusOrder="0" pos="16 200 96.742% 315M"
-                    class="DistanceEncodingGraph" params="pParams"/>
+                    class="DistanceEncodingGraph" params="pParams, pScaling"/>
   <SLIDER name="sliderUnitCircleRadius" id="33a23e1d161c87b2" memberName="sliderUnitCircleRadius"
           virtualName="" explicitFocusOrder="0" pos="160 48 174M 24" min="0.01"
           max="1.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"

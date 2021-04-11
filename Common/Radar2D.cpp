@@ -112,7 +112,7 @@ Image Radar2D::createRadarBackground() const
     int nbRings = 0;
     bool labelUp = centerPoint.getY() >= localBounds.getHeight()/2;
     
-    for(int i = 1; i * ringResolution < Globals::DistanceMax(); i++)
+    for(int i = 1; i * ringResolution < pZoomSettings->getScalingInfo()->DistanceMax(); i++)
     {
         float absDist = i * dist;
         float ringValue = i * ringResolution;
@@ -142,13 +142,13 @@ Image Radar2D::createRadarBackground() const
     g.drawSingleLineText("X", int(localBounds.getWidth()-12), int(centerPoint.getY() - 2));
     g.drawSingleLineText(radarMode == XY ? "Y" : "Z", int(centerPoint.getX() - 10), 15);
     
-    if(!Globals::IsInfinite())
+    if(!pRadarOptions->scalingInfo->IsInfinite())
     {
         // draw cartesian limits
         g.setColour(radarColors.getValidRangeColor());
-        float x = centerPoint.getX() + Globals::CartesianMin() * getValueToScreenRatio();
-        float y = centerPoint.getY() + Globals::CartesianMin() * getValueToScreenRatio();
-        float squareSize = (Globals::CartesianMax() - Globals::CartesianMin()) * getValueToScreenRatio();
+        float x = centerPoint.getX() + pRadarOptions->scalingInfo->CartesianMin() * getValueToScreenRatio();
+        float y = centerPoint.getY() + pRadarOptions->scalingInfo->CartesianMin() * getValueToScreenRatio();
+        float squareSize = (pRadarOptions->scalingInfo->CartesianMax() - pRadarOptions->scalingInfo->CartesianMin()) * getValueToScreenRatio();
         g.fillRect(x, y, squareSize, squareSize);
     }
     
@@ -353,10 +353,10 @@ void Radar2D::renderOpenGL()
 	                                                                                roundToInt(desktopScale * getHeight())));
 	if (glRenderer != nullptr)
 	{
-        if(lastCartesianLimit != Globals::CartesianMax())
+        if(lastCartesianLimit != pRadarOptions->scalingInfo->CartesianMax())
         {
             updateRadarBackground();
-            lastCartesianLimit = Globals::CartesianMax();
+            lastCartesianLimit = pRadarOptions->scalingInfo->CartesianMax();
         }
         
 		Graphics g(*glRenderer);
@@ -775,7 +775,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
 		    Point3D<double>* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex())->getPoint();
-            std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack));
+            std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack, pZoomSettings->getScalingInfo()));
             for (int i : selection)
             {
                 localGroup->groupPoints.add(pEditablePoints->get(i));

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -58,7 +58,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
-    sourceDefinition.reset (new SourceDefinitionComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams));
+    sourceDefinition.reset (new SourceDefinitionComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pZoomSettings));
     addAndMakeVisible (sourceDefinition.get());
     sourceDefinition->setName ("sourceDefinition");
 
@@ -271,7 +271,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper), getScreenBounds(), this);
+        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper, pZoomSettings->getScalingInfo()), getScreenBounds(), this);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
@@ -283,8 +283,8 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
         //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? Globals::Infinite : sliderDistanceScaler->getValue());
-        Globals::SetScaler(pEncoderSettings->getDistanceScaler());
+        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
+        pZoomSettings->getScalingInfo()->SetScaler(pEncoderSettings->getDistanceScaler());
         sourceDefinition->refresh();
         updateEncodingUiElements();
         //[/UserButtonCode_toggleInfiniteDistance]
@@ -310,7 +310,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     {
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
         pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-        Globals::SetScaler(pEncoderSettings->getDistanceScaler());
+        pZoomSettings->getScalingInfo()->SetScaler(pEncoderSettings->getDistanceScaler());
         sendChangeMessage();
         sourceDefinition->refresh();
         //[/UserSliderCode_sliderDistanceScaler]
@@ -414,7 +414,7 @@ BEGIN_JUCER_METADATA
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
                     virtualName="" explicitFocusOrder="0" pos="8 144 16M 186M" class="SourceDefinitionComponent"
-                    params="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams"/>
+                    params="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pZoomSettings"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"

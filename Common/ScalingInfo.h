@@ -1,23 +1,27 @@
 /*
   ==============================================================================
 
-    Globals.h
-    Created: 1 Apr 2020 1:53:08pm
+    ScalingInfo.h
+    Created: 7 Apr 2021 6:03:37pm
     Author:  Schweizer Christian
 
   ==============================================================================
 */
 
 #pragma once
-namespace Globals
+class ScalingInfo
 {
+public:
+    ScalingInfo();
     float CartesianMin();
     float CartesianMax();
     float DistanceMax();
     bool IsInfinite();
     void SetScaler(double newScaler);
     double GetScaler();
-
-    constexpr double Infinite = 0.0;
-    inline double _global_scaler;
+    static double Infinite;
+    
+private:
+    double Scaler;
 };
+

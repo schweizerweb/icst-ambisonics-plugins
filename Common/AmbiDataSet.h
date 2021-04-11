@@ -15,7 +15,7 @@
 class AmbiDataSet
 {
 public:
-	AmbiDataSet();
+	AmbiDataSet(ScalingInfo* pScaling);
 	virtual ~AmbiDataSet();
 
 	virtual int size() const = 0;
@@ -77,4 +77,5 @@ private:
 protected:
 	CriticalSection cs;
 	OwnedArray<AmbiGroup> groups;
+    ScalingInfo* pScalingInfo;
 };
