@@ -170,7 +170,7 @@ public:
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 30);
 		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 100);
 		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
-		tableListBox->getHeader().addColumn("Command", COLUMN_ID_PATH, 200);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 200);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
