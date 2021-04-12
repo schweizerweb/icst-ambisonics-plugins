@@ -71,7 +71,7 @@ begin
   begin
     // Is the installed version at least 14.28 ? 
     Log('VC Redist Version check : found ' + Version);
-    Result := (CompareStr(Version, 'v14.28.29334.00')<0);
+    Result := (CompareStr(Version, 'v14.28.29913.00')<0);
   end
   else 
   begin
