@@ -14,8 +14,8 @@ AppPublisher={#MyAppPublisher}
 AppPublisherURL={#MyAppURL}
 AppSupportURL={#MyAppURL}
 AppUpdatesURL={#MyAppURL}
-DefaultDirName={autopf}\Common Files\VST3
-DisableDirPage=yes
+DefaultDirName={autopf64}\Common Files\VST3
+DisableDirPage=no
 DefaultGroupName=ICST_AmbiPlugins
 DisableProgramGroupPage=yes
 InfoBeforeFile=..\readme.txt
@@ -54,5 +54,32 @@ Source: "..\bin\VST3\AmbiEncoder_O6_1CH.vst3"; DestDir: "{app}"; Flags: ignoreve
 Source: "..\bin\VST3\AmbiEncoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O7_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
 Source: "..\bin\VST3\AmbiEncoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
+Source: ".\Redist\VC_redist.x64.exe"; DestDir: {tmp}; Flags: dontcopy
 ; NOTE: Don't use "Flags: ignoreversion" on any shared system files
 
+[Run]
+Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "{cm:InstallingVCredist}"; \
+  Parameters: "/quiet"; Check: VCRedistNeedsInstall ; Flags: waituntilterminated
+
+[Code]
+function VCRedistNeedsInstall: Boolean;
+var 
+  Version: String;
+begin
+  if RegQueryStringValue(HKEY_LOCAL_MACHINE,
+       'SOFTWARE\Microsoft\VisualStudio\14.0\VC\Runtimes\x64', 'Version', Version) then
+  begin
+    // Is the installed version at least 14.28 ? 
+    Log('VC Redist Version check : found ' + Version);
+    Result := (CompareStr(Version, 'v14.28.29334.00')<0);
+  end
+  else 
+  begin
+    // Not even an old version installed
+    Result := True;
+  end;
+  if (Result) then
+  begin
+    ExtractTemporaryFile('VC_redist.x64.exe');
+  end;
+end;
