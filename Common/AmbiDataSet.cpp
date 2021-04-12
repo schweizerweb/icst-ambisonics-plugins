@@ -170,6 +170,9 @@ void AmbiDataSet::setX(int channel, double x, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        x = pScalingInfo->decompress(x);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setX(x, notify);
 }
@@ -178,6 +181,9 @@ void AmbiDataSet::setY(int channel, double y, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        y = pScalingInfo->decompress(y);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setY(y, notify);
 }
@@ -186,6 +192,9 @@ void AmbiDataSet::setZ(int channel, double z, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        z = pScalingInfo->decompress(z);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setZ(z, notify);
 }
@@ -194,6 +203,9 @@ void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        x = pScalingInfo->decompress(x);
+    
     if (pt != nullptr)
         pt->getPoint()->setX(x, notify);
 }
@@ -202,6 +214,9 @@ void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        y = pScalingInfo->decompress(y);
+    
     if (pt != nullptr)
         pt->getPoint()->setY(y, notify);
 }
@@ -210,6 +225,9 @@ void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        z = pScalingInfo->decompress(z);
+    
     if (pt != nullptr)
         pt->getPoint()->setZ(z, notify);
 }

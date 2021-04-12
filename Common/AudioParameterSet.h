@@ -26,7 +26,7 @@ public:
         if(pScaling != nullptr)
         {
             makeValid(&x, pScaling->CartesianMin(), pScaling->CartesianMax());
-            double compressedX = compress(x);
+            double compressedX = pScaling->compress(x);
         
             if (pX != nullptr)
             {
@@ -42,7 +42,7 @@ public:
         if(pScaling != nullptr)
         {
             makeValid(&y, pScaling->CartesianMin(), pScaling->CartesianMax());
-            double compressedY = compress(y);
+            double compressedY = pScaling->compress(y);
         
             if (pY != nullptr)
             {
@@ -58,7 +58,7 @@ public:
         if(pScaling != nullptr)
         {
             makeValid(&z, pScaling->CartesianMin(), pScaling->CartesianMax());
-            double compressedZ = compress(z);
+            double compressedZ = pScaling->compress(z);
         
             if (pZ != nullptr)
             {
@@ -94,22 +94,6 @@ public:
         if (pY != nullptr) pY->endChangeGesture();
         if (pZ != nullptr) pZ->endChangeGesture();
 	}
-    
-    double compress(double value) const
-    {
-        if(pScaling->IsInfinite())
-            return double(atan(value) / MathConstants<double>::halfPi);
-        
-        return double(value / pScaling->GetScaler());
-    }
-    
-    double decompress(double value) const
-    {
-        if(pScaling->IsInfinite())
-            return double(tan(value * MathConstants<double>::halfPi));
-        
-        return double(value * pScaling->GetScaler());
-    }
     
     void makeValid(double* pValue, const double min, const double max) const
     {
