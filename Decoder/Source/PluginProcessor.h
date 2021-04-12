@@ -65,6 +65,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void actionListenerCallback(const String &message) override;
+    ScalingInfo* getScalingInfo();
     
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();

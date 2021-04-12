@@ -26,7 +26,9 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
                        )
 #endif
 {
-	pTestSoundGenerator = new TestSoundGenerator(speakerSet.get());
+    speakerSet.reset(new AmbiSpeakerSet(&scalingInfo));
+    movingPoints.reset(new AmbiSourceSet(&scalingInfo));
+    pTestSoundGenerator = new TestSoundGenerator(speakerSet.get());
     
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
     presetHelper->initialize();
@@ -385,6 +387,11 @@ dsp::ProcessSpec* AmbisonicsDecoderAudioProcessor::getFilterSpecification()
 DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
 {
     return presetHelper.get();
+}
+
+ScalingInfo* AmbisonicsDecoderAudioProcessor::getScalingInfo()
+{
+    return &scalingInfo;
 }
 
 void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)
