@@ -118,16 +118,16 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		XmlElement* oscSendExtXyz = oscSendExt->getChildByName(XML_TAG_OSC_SEND_EXT_XYZ);
 		if (oscSendExtXyz != nullptr)
 		{
-			oscSendExtXyzFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_XYZ_FLAG);
-			oscSendExtXyzPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_XYZ_PORT);
-			oscSendExtXyzHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_XYZ_HOST);
+			oscSendExtXyzFlag = oscSendExtXyz->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_XYZ_FLAG);
+			oscSendExtXyzPort = oscSendExtXyz->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_XYZ_PORT);
+			oscSendExtXyzHost = oscSendExtXyz->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_XYZ_HOST);
 		}
 		XmlElement* oscSendExtAed = oscSendExt->getChildByName(XML_TAG_OSC_SEND_EXT_AED);
 		if (oscSendExtAed != nullptr)
 		{
-			oscSendExtAedFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_AED_FLAG);
-			oscSendExtAedPort = oscSendExt->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_AED_PORT);
-			oscSendExtAedHost = oscSendExt->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_AED_HOST);
+			oscSendExtAedFlag = oscSendExtAed->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_AED_FLAG);
+			oscSendExtAedPort = oscSendExtAed->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_EXT_AED_PORT);
+			oscSendExtAedHost = oscSendExtAed->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_EXT_AED_HOST);
 		}
 		XmlElement* customTargets = oscSendExt->getChildByName(XML_TAG_CUSTOM_OSC_TARGETS);
 		if (customTargets != nullptr)
