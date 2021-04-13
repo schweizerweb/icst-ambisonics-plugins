@@ -9,6 +9,8 @@
 */
 
 #include "OSCSenderInstance.h"
+#include <string>
+#include <regex>
 
 OSCSenderInstance::OSCSenderInstance(ScalingInfo* pScaling): isConnected(false), pScalingInfo(pScaling)
 {
@@ -56,12 +58,12 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         case X: path = path.replace(escapeStringMap[X], String(pt->getPoint()->getX())); break;
         case Y: path = path.replace(escapeStringMap[Y], String(pt->getPoint()->getY())); break;
         case Z: path = path.replace(escapeStringMap[Z], String(pt->getPoint()->getZ())); break;
-        case SA: path = path.replace(escapeStringMap[SA], String(pt->getPoint()->getAzimuth() / (2.0 * PI))); break;
-        case SE: path = path.replace(escapeStringMap[SE], String(pt->getPoint()->getElevation() / PI + 0.5)); break;
-        case SD: path = path.replace(escapeStringMap[SD], String(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * pScalingInfo->GetScaler()))); break;
-        case SX: path = path.replace(escapeStringMap[SX], String(pt->getPoint()->getX() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
-        case SY: path = path.replace(escapeStringMap[SY], String(pt->getPoint()->getY() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
-        case SZ: path = path.replace(escapeStringMap[SZ], String(pt->getPoint()->getZ() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
+        case ScaledA: path = path.replace(escapeStringMap[ScaledA], String(pt->getPoint()->getAzimuth() / (2.0 * PI))); break;
+        case ScaledE: path = path.replace(escapeStringMap[ScaledE], String(pt->getPoint()->getElevation() / PI + 0.5)); break;
+        case ScaledD: path = path.replace(escapeStringMap[ScaledD], String(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * pScalingInfo->GetScaler()))); break;
+        case ScaledX: path = path.replace(escapeStringMap[ScaledX], String(pt->getPoint()->getX() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
+        case ScaledY: path = path.replace(escapeStringMap[ScaledY], String(pt->getPoint()->getY() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
+        case ScaledZ: path = path.replace(escapeStringMap[ScaledZ], String(pt->getPoint()->getZ() / (2.0 * pScalingInfo->GetScaler()) + 0.5)); break;
         case Gain: path = path.replace(escapeStringMap[Gain], String(pt->getGain())); break;
         default: ;
         }
@@ -70,7 +72,9 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     OSCMessage message = OSCMessage(OSCAddressPattern(path));
     for (auto parameter : realParameters)
     {
-        switch (parameter)
+        double scaler = pScalingInfo->GetScaler();
+        
+        switch(parameter.type)
         {
         case Index: message.addArgument(OSCArgument(index + 1)); break;
         case Name: message.addArgument(OSCArgument(pt->getName())); break;
@@ -81,14 +85,15 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         case X: message.addArgument(OSCArgument(float(pt->getPoint()->getX()))); break;
         case Y: message.addArgument(OSCArgument(float(pt->getPoint()->getY()))); break;
         case Z: message.addArgument(OSCArgument(float(pt->getPoint()->getZ()))); break;
-        case SA: message.addArgument(OSCArgument(float(pt->getPoint()->getAzimuth() / (2.0 * PI)))); break;
-        case SE: message.addArgument(OSCArgument(float(pt->getPoint()->getElevation() / PI + 0.5))); break;
-        case SD: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * pScalingInfo->GetScaler())))); break;
-        case SX: message.addArgument(OSCArgument(float(pt->getPoint()->getX() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
-        case SY: message.addArgument(OSCArgument(float(pt->getPoint()->getY() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
-        case SZ: message.addArgument(OSCArgument(float(pt->getPoint()->getZ() / (2.0 * pScalingInfo->GetScaler()) + 0.5))); break;
+        case ScaledX: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getX(), -scaler, scaler, parameter.loLim, parameter.hiLim)))); break;
+        case ScaledY: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getY(), -scaler, scaler, parameter.loLim, parameter.hiLim)))); break;
+        case ScaledZ: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getZ(), -scaler, scaler, parameter.loLim, parameter.hiLim)))); break;
+        case ScaledA: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), parameter.loLim, parameter.hiLim)))); break;
+        case ScaledE: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), parameter.loLim, parameter.hiLim)))); break;
+        case ScaledD: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getDistance(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, parameter.loLim, parameter.hiLim)))); break;
         case Gain: message.addArgument(OSCArgument(float(pt->getGain()))); break;
-        default:;
+              
+        default: message.addArgument(OSCArgument("Error"));
         }
     }
 
@@ -119,11 +124,27 @@ bool OSCSenderInstance::setOscPath(String path)
             auto f = std::find_if(escapeStringMap.begin(), escapeStringMap.end(), [&p](const auto& x) { return x.second == p; });
             if (f != escapeStringMap.end())
             {
-                realParameters.add(f->first);
+                realParameters.add(ComplexParameter(f->first));
             }
             else
             {
-                return false;
+                // regex matching for user defined scaling option
+                std::regex r("\\{[ ]*s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
+                std::smatch sm;
+                std::string str = p.toStdString();
+                if(regex_search(str, sm, r))
+                {
+                    double lo = std::stod(sm[2]);
+                    double hi = std::stod(sm[3]);
+                    if(lo == hi)
+                        return false;
+                    
+                    realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi));
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
     }
