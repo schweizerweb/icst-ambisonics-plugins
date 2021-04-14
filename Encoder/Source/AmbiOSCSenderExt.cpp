@@ -103,6 +103,7 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 
 	if (hasSuccessful)
 	{
+        doContinuousUpdate = pSettings->oscSendExtContinuousFlag;
 		startTimer(pSettings->oscSendExtIntervalMs);
 	}
 
@@ -136,7 +137,7 @@ void AmbiOSCSenderExt::timerCallback()
 		AmbiPoint* pt = pPoints->get(i);
 		if (pt != nullptr && pt->getEnabled())
 		{
-			if (history[i]->update(pt))
+			if (doContinuousUpdate || history[i]->update(pt))
 			{
 				for (auto sender : oscSender)
 				{

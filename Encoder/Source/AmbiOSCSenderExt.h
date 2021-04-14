@@ -74,4 +74,5 @@ private:
 	OwnedArray<PointHistoryEntry> history;
 	OwnedArray<OSCSenderInstance> oscSender;
     ScalingInfo* pScalingInfo;
+    bool doContinuousUpdate;
 };

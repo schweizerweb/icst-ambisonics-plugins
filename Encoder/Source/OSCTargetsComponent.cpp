@@ -148,6 +148,12 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
                         juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
                         juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
                         juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    toggleSendContinuous.reset (new juce::ToggleButton ("toggleSendContinuous"));
+    addAndMakeVisible (toggleSendContinuous.get());
+    toggleSendContinuous->setTooltip (TRANS("If enabled, positions will constantly be sent, otherwise only if the values change."));
+    toggleSendContinuous->setButtonText (TRANS("Continuous"));
+    toggleSendContinuous->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -158,7 +164,8 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     //[Constructor] You can add your own custom stuff here..
     sliderInterval->setSkewFactorFromMidPoint(100.0);
     sliderInterval->setValue(pSettings->oscSendExtIntervalMs, dontSendNotification);
-
+    toggleSendContinuous->setToggleState(pSettings->oscSendExtContinuousFlag, dontSendNotification);
+    
     toggleEnableStandardXyz->setToggleState(pSettings->oscSendExtXyzFlag, dontSendNotification);
     textOscSendIpExtXyz->setText(pSettings->oscSendExtXyzHost, false);
     sliderPortExtXyz->setValue(pSettings->oscSendExtXyzPort, dontSendNotification);
@@ -195,6 +202,7 @@ OSCTargetsComponent::~OSCTargetsComponent()
     btnAdd = nullptr;
     btnDelete = nullptr;
     btnInfo = nullptr;
+    toggleSendContinuous = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -226,7 +234,7 @@ void OSCTargetsComponent::resized()
     groupCustom->setBounds (0, 176, getWidth() - 0, getHeight() - 176);
     targetList->setBounds (0 + 16, 176 + 24, (getWidth() - 0) - 32, (getHeight() - 176) - 65);
     groupGeneral->setBounds (0, 0, getWidth() - 0, 64);
-    sliderInterval->setBounds (0 + (getWidth() - 0) - 16 - 270, 0 + 24, 270, 24);
+    sliderInterval->setBounds (0 + (getWidth() - 0) - 135 - 270, 0 + 24, 270, 24);
     labelInterval->setBounds (0 + 16, 0 + 24, 150, 24);
     toggleEnableStandardAed->setBounds (0 + 16, 72 + 55, 150, 24);
     textOscSendIpExtAed->setBounds (0 + (getWidth() - 0) - 124 - 106, 72 + 55, 106, 24);
@@ -236,6 +244,7 @@ void OSCTargetsComponent::resized()
     btnAdd->setBounds (0 + (getWidth() - 0) - 16 - 70, 176 + (getHeight() - 176) - 10 - 24, 70, 24);
     btnDelete->setBounds (0 + (getWidth() - 0) - 92 - 70, 176 + (getHeight() - 176) - 10 - 24, 70, 24);
     btnInfo->setBounds (0 + 16, 176 + (getHeight() - 176) - 10 - 24, 23, 24);
+    toggleSendContinuous->setBounds (0 + (getWidth() - 0) - 16 - 104, 0 + 24, 104, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -281,6 +290,12 @@ void OSCTargetsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         label->setJustificationType(Justification::left);
         CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]
+    }
+    else if (buttonThatWasClicked == toggleSendContinuous.get())
+    {
+        //[UserButtonCode_toggleSendContinuous] -- add your button handler code here..
+        pSettings->oscSendExtContinuousFlag = toggleSendContinuous->getToggleState();
+        //[/UserButtonCode_toggleSendContinuous]
     }
 
     //[UserbuttonClicked_Post]
@@ -398,7 +413,7 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="groupGeneral" id="4e210261f2d82b98" memberName="groupGeneral"
                   virtualName="" explicitFocusOrder="0" pos="0 0 0M 64" title="General"/>
   <SLIDER name="sliderInterval" id="d02cfad6a67a7536" memberName="sliderInterval"
-          virtualName="" explicitFocusOrder="0" pos="16Rr 24 270 24" posRelativeX="4e210261f2d82b98"
+          virtualName="" explicitFocusOrder="0" pos="135Rr 24 270 24" posRelativeX="4e210261f2d82b98"
           posRelativeY="4e210261f2d82b98" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
@@ -447,6 +462,11 @@ BEGIN_JUCER_METADATA
                opacityNormal="1.0" colourNormal="0" resourceOver="help_png"
                opacityOver="0.4000000059604645" colourOver="6eee1010" resourceDown="help_png"
                opacityDown="1.0" colourDown="c0ee1010"/>
+  <TOGGLEBUTTON name="toggleSendContinuous" id="1424e4a474921c5c" memberName="toggleSendContinuous"
+                virtualName="" explicitFocusOrder="0" pos="16Rr 24 104 24" posRelativeX="4e210261f2d82b98"
+                posRelativeY="4e210261f2d82b98" tooltip="If enabled, positions will constantly be sent, otherwise only if the values change."
+                buttonText="Continuous" connectedEdges="0" needsCallback="1"
+                radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

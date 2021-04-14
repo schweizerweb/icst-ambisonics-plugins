@@ -88,6 +88,7 @@ private:
     std::unique_ptr<juce::TextButton> btnAdd;
     std::unique_ptr<juce::TextButton> btnDelete;
     std::unique_ptr<juce::ImageButton> btnInfo;
+    std::unique_ptr<juce::ToggleButton> toggleSendContinuous;
 
 
     //==============================================================================

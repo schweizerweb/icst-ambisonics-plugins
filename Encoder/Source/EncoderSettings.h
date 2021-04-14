@@ -23,6 +23,7 @@
 #define DEFAULT_SEND_INTERVAL		50
 #define DEFAULT_SEND_EXT_MASTER_FLAG		false
 #define DEFAULT_SEND_EXT_INTERVAL_MS		50
+#define DEFAULT_SEND_EXT_CONTINUOUS_FLAG    false
 #define DEFAULT_SEND_EXT_XYZ_FLAG		false
 #define DEFAULT_SEND_EXT_XYZ_PORT		50002
 #define DEFAULT_SEND_EXT_XYZ_HOST	    "127.0.0.1"
@@ -58,6 +59,7 @@ public:
 	
 	bool oscSendExtMasterFlag;
 	int oscSendExtIntervalMs;
+    bool oscSendExtContinuousFlag;
 
     bool oscSendExtXyzFlag;
 	int oscSendExtXyzPort;

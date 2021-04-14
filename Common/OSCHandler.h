@@ -15,6 +15,7 @@
 
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
+#define ERROR_STRING_UNKNOWN_OSC String("Unknown OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>

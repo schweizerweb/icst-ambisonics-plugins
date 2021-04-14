@@ -21,6 +21,7 @@
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_HOST "Host"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
+#define XML_ATTRIBUTE_CONTINUOUS "Continuous"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
@@ -34,7 +35,8 @@ EncoderSettings::EncoderSettings():
 	oscSendTargetHost(DEFAULT_SEND_HOST),
 	oscSendIntervalMs(DEFAULT_SEND_INTERVAL),
 	oscSendExtMasterFlag(DEFAULT_SEND_EXT_MASTER_FLAG), 
-	oscSendExtIntervalMs(DEFAULT_SEND_EXT_INTERVAL_MS), 
+	oscSendExtIntervalMs(DEFAULT_SEND_EXT_INTERVAL_MS),
+    oscSendExtContinuousFlag(DEFAULT_SEND_EXT_CONTINUOUS_FLAG),
 	oscSendExtXyzFlag(DEFAULT_SEND_EXT_XYZ_FLAG), 
 	oscSendExtXyzPort(DEFAULT_SEND_EXT_XYZ_PORT),
 	oscSendExtXyzHost(DEFAULT_SEND_EXT_XYZ_HOST),
@@ -71,6 +73,7 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	XmlElement* oscSendExt = new XmlElement(XML_TAG_OSC_SEND_EXT);
 	oscSendExt->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtMasterFlag);
 	oscSendExt->setAttribute(XML_ATTRIBUTE_INTERVAL, oscSendExtIntervalMs);
+    oscSendExt->setAttribute(XML_ATTRIBUTE_CONTINUOUS, oscSendExtContinuousFlag);
 	XmlElement* oscSendExtXyz = new XmlElement(XML_TAG_OSC_SEND_EXT_XYZ);
 	oscSendExtXyz->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendExtXyzFlag);
 	oscSendExtXyz->setAttribute(XML_ATTRIBUTE_PORT, oscSendExtXyzPort);
@@ -115,6 +118,7 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	{
 		oscSendExtMasterFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_EXT_MASTER_FLAG);
 		oscSendExtIntervalMs = oscSendExt->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_EXT_INTERVAL_MS);
+        oscSendExtContinuousFlag = oscSendExt->getBoolAttribute(XML_ATTRIBUTE_CONTINUOUS, DEFAULT_SEND_EXT_CONTINUOUS_FLAG);
 		XmlElement* oscSendExtXyz = oscSendExt->getChildByName(XML_TAG_OSC_SEND_EXT_XYZ);
 		if (oscSendExtXyz != nullptr)
 		{

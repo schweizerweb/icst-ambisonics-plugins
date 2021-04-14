@@ -169,7 +169,6 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     sliderInterval->setValue(pSettings->oscSendIntervalMs, dontSendNotification);
 
     toggleSendOscExt->setToggleState(pSettings->oscSendExtMasterFlag, dontSendNotification);
-
     textLog->setEnabled(false);
     controlDimming();
     //[/Constructor]
