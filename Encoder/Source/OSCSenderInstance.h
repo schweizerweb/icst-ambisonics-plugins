@@ -18,7 +18,7 @@ public:
     OSCSenderInstance(ScalingInfo* pScaling);
     ~OSCSenderInstance();
 
-    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain };
+    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain, DualScaledE, DualScaledX, DualScaledY, DualScaledZ };
     class ComplexParameter
     {
     public:
@@ -32,6 +32,17 @@ public:
                 case 'a': type = ParameterType::ScaledA; break;
                 case 'e': type = ParameterType::ScaledE; break;
                 case 'd': type = ParameterType::ScaledD; break;
+            }
+        }
+        
+        ComplexParameter(String originalString, std::string typeString, double lo, double hi, double zero) : originalString(originalString), loLim(lo), hiLim(hi), zero(zero)
+        {
+            switch(typeString.substr()[0])
+            {
+                case 'x': type = ParameterType::DualScaledX; break;
+                case 'y': type = ParameterType::DualScaledY; break;
+                case 'z': type = ParameterType::DualScaledZ; break;
+                case 'e': type = ParameterType::DualScaledE; break;
             }
         }
         
@@ -55,6 +66,7 @@ public:
         ParameterType type;
         double loLim;
         double hiLim;
+        double zero;
     };
     
 	std::map<ParameterType, String> escapeStringMap = {
@@ -83,6 +95,7 @@ public:
 	String getOscPath();
 
 private:
+    float dualMap(double value, double maxValue, ComplexParameter* pParam);
     std::unique_ptr<OSCSender> sender;
 	String oscPath;
 	Array<ParameterType> parametersInPath;

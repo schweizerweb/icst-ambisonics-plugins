@@ -92,12 +92,22 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         case ScaledE: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), parameter.loLim, parameter.hiLim)))); break;
         case ScaledD: message.addArgument(OSCArgument(float(jmap(pt->getPoint()->getDistance(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, parameter.loLim, parameter.hiLim)))); break;
         case Gain: message.addArgument(OSCArgument(float(pt->getGain()))); break;
-              
+        case DualScaledX: message.addArgument(OSCArgument(dualMap(pt->getPoint()->getX(), scaler, &parameter))); break;
+        case DualScaledY: message.addArgument(OSCArgument(dualMap(pt->getPoint()->getY(), scaler, &parameter))); break;
+        case DualScaledZ: message.addArgument(OSCArgument(dualMap(pt->getPoint()->getZ(), scaler, &parameter))); break;
+        case DualScaledE: message.addArgument(OSCArgument(dualMap(pt->getPoint()->getElevation(), Constants::ElevationRadMax, &parameter))); break;
         default: message.addArgument(OSCArgument("Error"));
         }
     }
 
     sender->send(message);
+}
+
+float OSCSenderInstance::dualMap(double value, double maxValue, ComplexParameter *pParam)
+{
+    return value <= 0.0
+    ? float(jmap(value, -maxValue, 0.0, pParam->loLim, pParam->zero))
+    : float(jmap(value, 0.0, maxValue, pParam->zero, pParam->hiLim));
 }
 
 bool OSCSenderInstance::setOscPath(String path)
@@ -129,10 +139,11 @@ bool OSCSenderInstance::setOscPath(String path)
             else
             {
                 // regex matching for user defined scaling option
-                std::regex r("\\{[ ]*s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
+                std::regex rTwoValues("\\{[ ]*s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
+                std::regex rThreeValues("\\{[ ]*s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
                 std::smatch sm;
                 std::string str = p.toStdString();
-                if(regex_search(str, sm, r))
+                if(regex_search(str, sm, rTwoValues))
                 {
                     double lo = std::stod(sm[2]);
                     double hi = std::stod(sm[3]);
@@ -140,6 +151,16 @@ bool OSCSenderInstance::setOscPath(String path)
                         return false;
                     
                     realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi));
+                }
+                else if(regex_search(str, sm, rThreeValues))
+                {
+                    double lo = std::stod(sm[2]);
+                    double zero = std::stod(sm[3]);
+                    double hi = std::stod(sm[4]);
+                    if(lo == hi && lo == zero)
+                        return false;
+                    
+                    realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi, zero));
                 }
                 else
                 {
