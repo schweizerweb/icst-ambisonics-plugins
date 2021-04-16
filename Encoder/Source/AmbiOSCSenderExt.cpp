@@ -43,11 +43,7 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 	if (pSettings->oscSendExtXyzFlag)
 	{
 		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ,
-			pInstance->escapeStringMap[OSCSenderInstance::Name],
-			pInstance->escapeStringMap[OSCSenderInstance::X],
-			pInstance->escapeStringMap[OSCSenderInstance::Y],
-			pInstance->escapeStringMap[OSCSenderInstance::Z]};
+		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ, "{n}", "{x}", "{y}", "{z}}"};
 
 		pInstance->setOscPath(a.joinIntoString(" "));
 		bool ret = pInstance->connect(pSettings->oscSendExtXyzHost, pSettings->oscSendExtXyzPort);
@@ -64,12 +60,7 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 	if (pSettings->oscSendExtAedFlag)
 	{
 		OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED,
-			pInstance->escapeStringMap[OSCSenderInstance::Name],
-			pInstance->escapeStringMap[OSCSenderInstance::A],
-			pInstance->escapeStringMap[OSCSenderInstance::E],
-			pInstance->escapeStringMap[OSCSenderInstance::D]};
-
+		StringArray a = { OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED, "{n}", "{a}", "{e}", "{d}"};
 		pInstance->setOscPath(a.joinIntoString(" "));
 
 		bool ret = pInstance->connect(pSettings->oscSendExtAedHost, pSettings->oscSendExtAedPort);
