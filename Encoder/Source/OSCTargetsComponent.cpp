@@ -165,7 +165,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     sliderInterval->setSkewFactorFromMidPoint(100.0);
     sliderInterval->setValue(pSettings->oscSendExtIntervalMs, dontSendNotification);
     toggleSendContinuous->setToggleState(pSettings->oscSendExtContinuousFlag, dontSendNotification);
-    
+
     toggleEnableStandardXyz->setToggleState(pSettings->oscSendExtXyzFlag, dontSendNotification);
     textOscSendIpExtXyz->setText(pSettings->oscSendExtXyzHost, false);
     sliderPortExtXyz->setValue(pSettings->oscSendExtXyzPort, dontSendNotification);
@@ -285,8 +285,8 @@ void OSCTargetsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnInfo.get())
     {
         //[UserButtonCode_btnInfo] -- add your button handler code here..
-        auto label = std::make_unique<Label>("", "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}");
-        label->setSize(350, 195);
+        auto label = std::make_unique<Label>("", "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}\nDual-Scaling for sx, sy, sz, se:\nSyntax: {s*,[lowLimit],[zeroValue],[highLimit]}\nExample: {sz, 1.0, 0.1, 1.0}");
+        label->setSize(370, 240);
         label->setJustificationType(Justification::left);
         CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]
