@@ -112,6 +112,11 @@ float OSCSenderInstance::dualMap(double value, double maxValue, ComplexParameter
 
 bool OSCSenderInstance::setOscPath(String path)
 {
+    // regex patterns
+    std::regex rParameter("[ ]*\\{[ ]*(.+?)[ ]*\\}[ ]*");
+    std::regex rTwoValues("s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+    std::regex rThreeValues("s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+    
     parametersInPath.clear();
     realParameters.clear();
 
@@ -125,49 +130,72 @@ bool OSCSenderInstance::setOscPath(String path)
         }
     }
 
-    StringArray followingParameters;
-    followingParameters.addTokens(path.substring(oscPath.length()), String(" "), "");
-    for (String p : followingParameters)
+    std::smatch parameterMatch;
+    std::string parameterString = path.substring(oscPath.length()).toStdString();
+    
+    while(regex_search(parameterString, parameterMatch, rParameter))
     {
-        if(p.isNotEmpty())
+        auto str = parameterMatch[1].str();
+        switch(str.substr()[0])
         {
-            auto f = std::find_if(escapeStringMap.begin(), escapeStringMap.end(), [&p](const auto& x) { return x.second == p; });
-            if (f != escapeStringMap.end())
-            {
-                realParameters.add(ComplexParameter(f->first));
-            }
-            else
-            {
-                // regex matching for user defined scaling option
-                std::regex rTwoValues("\\{[ ]*s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
-                std::regex rThreeValues("\\{[ ]*s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*\\}");
-                std::smatch sm;
-                std::string str = p.toStdString();
-                if(regex_search(str, sm, rTwoValues))
+            case 'a': realParameters.add(ComplexParameter(ParameterType::A)); break;
+            case 'e': realParameters.add(ComplexParameter(ParameterType::E)); break;
+            case 'd': realParameters.add(ComplexParameter(ParameterType::D)); break;
+            case 'x': realParameters.add(ComplexParameter(ParameterType::X)); break;
+            case 'y': realParameters.add(ComplexParameter(ParameterType::Y)); break;
+            case 'z': realParameters.add(ComplexParameter(ParameterType::Z)); break;
+            case 'i': realParameters.add(ComplexParameter(ParameterType::Index)); break;
+            case 'n': realParameters.add(ComplexParameter(ParameterType::Name)); break;
+            case 'c': realParameters.add(ComplexParameter(ParameterType::Color)); break;
+            case 'g': realParameters.add(ComplexParameter(ParameterType::Gain)); break;
+            case 's':
+                if(str.length() == 2)
                 {
-                    double lo = std::stod(sm[2]);
-                    double hi = std::stod(sm[3]);
-                    if(lo == hi)
-                        return false;
-                    
-                    realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi));
-                }
-                else if(regex_search(str, sm, rThreeValues))
-                {
-                    double lo = std::stod(sm[2]);
-                    double zero = std::stod(sm[3]);
-                    double hi = std::stod(sm[4]);
-                    if(lo == hi && lo == zero)
-                        return false;
-                    
-                    realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi, zero));
+                    switch(str.substr()[1])
+                    {
+                        case 'a': realParameters.add(ComplexParameter(ParameterType::ScaledA)); break;
+                        case 'e': realParameters.add(ComplexParameter(ParameterType::ScaledE)); break;
+                        case 'd': realParameters.add(ComplexParameter(ParameterType::ScaledD)); break;
+                        case 'x': realParameters.add(ComplexParameter(ParameterType::ScaledX)); break;
+                        case 'y': realParameters.add(ComplexParameter(ParameterType::ScaledY)); break;
+                        case 'z': realParameters.add(ComplexParameter(ParameterType::ScaledZ)); break;
+                        default: return false;
+                    }
                 }
                 else
                 {
-                    return false;
+                    std::smatch sm;
+                        
+                    if(regex_search(str, sm, rTwoValues))
+                    {
+                        double lo = std::stod(sm[2]);
+                        double hi = std::stod(sm[3]);
+                        if(lo == hi)
+                            return false;
+                            
+                        realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi));
+                    }
+                    else if(regex_search(str, sm, rThreeValues))
+                    {
+                        double lo = std::stod(sm[2]);
+                        double zero = std::stod(sm[3]);
+                        double hi = std::stod(sm[4]);
+                        if(lo == hi && lo == zero)
+                            return false;
+                            
+                        realParameters.add(ComplexParameter(String(sm[0]), sm[1].str(), lo, hi, zero));
+                    }
+                    else
+                    {
+                        return false;
+                    }
                 }
-            }
+                break;
+            default:
+                return false;
         }
+        
+        parameterString = parameterMatch.suffix();
     }
 
     return true;
