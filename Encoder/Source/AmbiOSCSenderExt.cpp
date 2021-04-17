@@ -36,6 +36,9 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 {
 	stop();
 
+    if(!pSettings->oscSendExtMasterFlag)
+        return true;
+    
 	bool hasErrors = false;
 	bool hasSuccessful = false;
 	int index = 0;

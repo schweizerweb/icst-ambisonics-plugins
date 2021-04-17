@@ -23,13 +23,14 @@
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
 
 
-
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster
 {
 public:
 	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ", &pSettings->oscSendExtXyzFlag, &pSettings->oscSendExtXyzHost, &pSettings->oscSendExtXyzPort));
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED", &pSettings->oscSendExtAedFlag, &pSettings->oscSendExtAedHost, &pSettings->oscSendExtAedPort));
 	}
 
 	~CustomOscTableListModel() override
@@ -38,7 +39,7 @@ public:
 	}
 
 	int getNumRows() override {
-		return pSettings->customOscTargets.size();
+		return standardTargets.size() + pSettings->customOscTargets.size();
 	}
 
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -75,7 +76,7 @@ public:
 			if (textLabel == nullptr)
 				textLabel = new EditableTextCustomComponent(*this);
 
-			textLabel->setRowAndColumn(rowNumber, columnId);
+			textLabel->setRowAndColumn(rowNumber, columnId, columnId == COLUMN_ID_PATH && rowNumber < standardTargets.size());
 			return textLabel;
 		}
 		else if (columnId == COLUMN_ID_ENABLE)
@@ -98,8 +99,17 @@ public:
 
 	double getValue(int columnId, int rowNumber) override 
 	{
-		// group table handling
-		CustomOscTarget* t = pSettings->customOscTargets[rowNumber];
+		if(rowNumber < standardTargets.size())
+        {
+            switch (columnId)
+            {
+                case COLUMN_ID_PORT: return *(standardTargets[rowNumber]->pPort);
+                case COLUMN_ID_ENABLE: return *(standardTargets[rowNumber]->pEnable);
+                default: return 0.0;
+            }
+        }
+        
+		CustomOscTarget* t = pSettings->customOscTargets[rowNumber - standardTargets.size()];
 		if (t == nullptr)
 			return 0.0;
 
@@ -113,13 +123,26 @@ public:
 
 	void setValue(int columnId, int rowNumber, double newValue) override
 	{
-		switch (columnId)
-		{
-		case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
-		case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = newValue != 0.0; break;
-		default: ;
-		}
-
+        if(rowNumber < standardTargets.size())
+        {
+            switch (columnId)
+            {
+                case COLUMN_ID_PORT: *standardTargets[rowNumber]->pPort = (int)newValue; break;
+                case COLUMN_ID_ENABLE: *standardTargets[rowNumber]->pEnable = newValue != 0.0; break;
+                default: ;
+            }
+        }
+        else
+        {
+            rowNumber -= standardTargets.size();
+            switch (columnId)
+            {
+                case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
+                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = newValue != 0.0; break;
+                default: ;
+            }
+        }
+        
 		getTable()->updateContent();
 		getTable()->repaint();
 
@@ -143,23 +166,47 @@ public:
 
 	String getTableText(const int columnId, const int rowNumber) override
 	{
+        if(rowNumber < standardTargets.size())
+        {
+            switch (columnId)
+            {
+                case COLUMN_ID_HOST: return *standardTargets[rowNumber]->pHost;
+                case COLUMN_ID_PATH: return standardTargets[rowNumber]->name;
+            default: return "";
+            }
+        }
+        
+        int row = rowNumber - standardTargets.size();
 		switch (columnId)
 		{
-		case COLUMN_ID_HOST: return pSettings->customOscTargets[rowNumber]->targetHost; break;
-		case COLUMN_ID_PATH: return pSettings->customOscTargets[rowNumber]->oscString; break;
+		case COLUMN_ID_HOST: return pSettings->customOscTargets[row]->targetHost; break;
+		case COLUMN_ID_PATH: return pSettings->customOscTargets[row]->oscString; break;
 		default: return "";
 		}
 	}
 
 	void setTableText(const int columnId, const int rowNumber, const String& newText) override
 	{
-		switch (columnId)
-		{
-		case COLUMN_ID_HOST: pSettings->customOscTargets[rowNumber]->targetHost = newText; break;
-		case COLUMN_ID_PATH: pSettings->customOscTargets[rowNumber]->oscString = newText; break;
-		default: ;
-		}
-
+        if(rowNumber < standardTargets.size())
+        {
+            switch (columnId)
+            {
+                case COLUMN_ID_HOST: *standardTargets[rowNumber]->pHost = newText;
+                case COLUMN_ID_PATH: return;
+            default: return;
+            }
+        }
+        else
+        {
+            int row = rowNumber - standardTargets.size();
+            switch (columnId)
+            {
+                case COLUMN_ID_HOST: pSettings->customOscTargets[row]->targetHost = newText; break;
+                case COLUMN_ID_PATH: pSettings->customOscTargets[row]->oscString = newText; break;
+                default: ;
+            }
+        }
+        
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
 	}
 
@@ -168,9 +215,9 @@ public:
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 30);
-		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 100);
-		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
-		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 200);
+		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 80);
+		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 40);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 250);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -179,9 +226,23 @@ public:
 	{
 	    return true;
 	}
+    
+    int getCustomTargetIndex(int selectedIndex)
+    {
+        return jmax(-1, selectedIndex - standardTargets.size());
+    }
 
 private:
+    struct StandardTarget {
+        StandardTarget(String name, bool* pEnable, String* pHost, int* pPort) : name(name), pEnable(pEnable), pHost(pHost), pPort(pPort) {};
+        String name;
+        bool* pEnable;
+        String* pHost;
+        int* pPort;
+    };
+    
 	EncoderSettings* pSettings;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
+    OwnedArray<StandardTarget> standardTargets;
 };

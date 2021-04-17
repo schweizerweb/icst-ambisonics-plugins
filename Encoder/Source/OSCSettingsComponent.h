@@ -24,6 +24,7 @@
 #include "EncoderSettings.h"
 #include "../../Common/StatusMessageHandler.h"
 #include "../../Common/OSCLogDialogManager.h"
+#include "OSCTargetsComponent.h"
 //[/Headers]
 
 
@@ -81,11 +82,12 @@ private:
     std::unique_ptr<juce::Label> labelOscSendInterval;
     std::unique_ptr<juce::ToggleButton> toggleSendOscExt;
     std::unique_ptr<juce::Label> labelExternalOscInfo;
-    std::unique_ptr<juce::TextButton> btnEdit;
     std::unique_ptr<juce::Slider> sliderReceiveOscPort;
     std::unique_ptr<juce::Slider> sliderSendOscPort;
     std::unique_ptr<juce::Slider> sliderInterval;
     std::unique_ptr<juce::TextButton> buttonShowOscLog;
+    std::unique_ptr<OSCTargetsComponent> oscTargets;
+    std::unique_ptr<juce::Label> labelLoadInfo;
 
 
     //==============================================================================
