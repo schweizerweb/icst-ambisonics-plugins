@@ -138,7 +138,7 @@ void AmbiOSCSenderExt::timerCallback()
                     }
                     catch (...)
                     {
-						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + sender->getOscPath(), StatusMessageHandler::Error);
+						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + sender->getOscPath(), StatusMessage::Error);
                     }
 					
 				}

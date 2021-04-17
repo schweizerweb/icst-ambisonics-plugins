@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -35,20 +35,20 @@ HelpComponent::HelpComponent (bool isEncoder)
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
 
-    tabHelp.reset (new TabbedComponent (TabbedButtonBar::TabsAtTop));
+    tabHelp.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (tabHelp.get());
     tabHelp->setTabBarDepth (30);
-    tabHelp->addTab (TRANS("Radar Interaction"), Colours::lightgrey, new HelpRadarInteraction(), true);
+    tabHelp->addTab (TRANS("Radar Interaction"), juce::Colours::lightgrey, new HelpRadarInteraction(), true);
     tabHelp->setCurrentTabIndex (0);
 
-    label.reset (new Label ("new label",
-                            CharPointer_UTF8 ("\xc2\xa9 2020 Johannes Schuett & Christian Schweizer @ ICST")));
+    label.reset (new juce::Label ("new label",
+                                  juce::CharPointer_UTF8 ("\xc2\xa9 2020 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST")));
     addAndMakeVisible (label.get());
-    label->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    label->setJustificationType (Justification::centred);
+    label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    label->setJustificationType (juce::Justification::centred);
     label->setEditable (false, false, false);
-    label->setColour (TextEditor::textColourId, Colours::black);
-    label->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    label->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    label->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -87,12 +87,12 @@ HelpComponent::~HelpComponent()
 }
 
 //==============================================================================
-void HelpComponent::paint (Graphics& g)
+void HelpComponent::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff323e44));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -137,7 +137,7 @@ BEGIN_JUCER_METADATA
   </TABBEDCOMPONENT>
   <LABEL name="new label" id="c9e7e52a2e8c0879" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="0 3Rr 0M 16" edTextCol="ff000000"
-         edBkgCol="0" labelText="&#169; 2020 Johannes Schuett &amp; Christian Schweizer @ ICST"
+         edBkgCol="0" labelText="&#169; 2020 Martin Neukom, Johannes Schuett &amp; Christian Schweizer @ ICST"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
          italic="0" justification="36"/>

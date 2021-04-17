@@ -26,6 +26,7 @@
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsDialog.h"
 #include "../../Common/HelpDialogManager.h"
+#include "../../Common/OSCLogDialogManager.h"
 //[/Headers]
 
 
@@ -74,6 +75,7 @@ private:
 	EncoderSettings* pEncoderSettings;
 	EncoderSettingsDialog* settingsWindow;
     HelpDialogManager helpDialogManager;
+    OSCLogDialogManager oscLogDialogManager;
     //[/UserVariables]
 
     //==============================================================================

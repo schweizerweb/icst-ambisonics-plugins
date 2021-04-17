@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -45,10 +45,10 @@ public:
     void showInfo(String info);
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
     void broughtToFront() override;
-    void mouseUp (const MouseEvent& e) override;
+    void mouseUp (const juce::MouseEvent& e) override;
 
     // Binary resources:
     static const char* osc_syntax_xml;
@@ -62,7 +62,7 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<TreeView> treeViewOscSyntax;
+    std::unique_ptr<juce::TreeView> treeViewOscSyntax;
 
 
     //==============================================================================

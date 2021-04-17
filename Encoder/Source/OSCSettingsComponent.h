@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -23,6 +23,7 @@
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "EncoderSettings.h"
 #include "../../Common/StatusMessageHandler.h"
+#include "../../Common/OSCLogDialogManager.h"
 //[/Headers]
 
 
@@ -44,7 +45,7 @@ class OSCSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler);
+    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager);
     ~OSCSettingsComponent() override;
 
     //==============================================================================
@@ -66,6 +67,7 @@ private:
 
     EncoderSettings* pSettings;
     StatusMessageHandler* pStatusMessageHandler;
+    OSCLogDialogManager* pOscLogManager;
     //[/UserVariables]
 
     //==============================================================================
@@ -78,14 +80,12 @@ private:
     std::unique_ptr<juce::Label> labelOscSendIp;
     std::unique_ptr<juce::Label> labelOscSendInterval;
     std::unique_ptr<juce::ToggleButton> toggleSendOscExt;
-    std::unique_ptr<juce::GroupComponent> groupLog;
-    std::unique_ptr<juce::TextEditor> textLog;
-    std::unique_ptr<juce::ToggleButton> toggleLog;
     std::unique_ptr<juce::Label> labelExternalOscInfo;
     std::unique_ptr<juce::TextButton> btnEdit;
     std::unique_ptr<juce::Slider> sliderReceiveOscPort;
     std::unique_ptr<juce::Slider> sliderSendOscPort;
     std::unique_ptr<juce::Slider> sliderInterval;
+    std::unique_ptr<juce::TextButton> buttonShowOscLog;
 
 
     //==============================================================================

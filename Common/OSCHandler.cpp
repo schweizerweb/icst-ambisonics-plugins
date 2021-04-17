@@ -43,7 +43,7 @@ void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 {
 	if(pStatusMessageHandler != nullptr)
 	{
-		pStatusMessageHandler->showMessage(message, oscMessageToString(pMsg) + "\r\n\t" + message, StatusMessageHandler::Error);
+		pStatusMessageHandler->showMessage(message, oscMessageToString(pMsg) + "\r\n\t" + message, StatusMessage::Error);
 	}
 }
 
@@ -51,7 +51,7 @@ void OSCHandler::reportSuccess(const OSCMessage* pMsg) const
 {
     if (pStatusMessageHandler != nullptr)
 	{
-		pStatusMessageHandler->showMessage("OSC", oscMessageToString(pMsg), StatusMessageHandler::Success);
+		pStatusMessageHandler->showMessage("OSC", oscMessageToString(pMsg), StatusMessage::Success);
 	}
 }
 

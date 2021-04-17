@@ -21,6 +21,8 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
+#include "StatusMessageHandler.h"
+#include "StatusMessageReceiver.h"
 //[/Headers]
 
 
@@ -33,15 +35,18 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class HelpComponent  : public Component
+class OSCLogComponent  : public juce::Component,
+                         public StatusMessageReceiver
 {
 public:
     //==============================================================================
-    HelpComponent (bool isEncoder);
-    ~HelpComponent() override;
+    OSCLogComponent (StatusMessageHandler* pStatusHandler);
+    ~OSCLogComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void notifyOverflow(int discardedCount) override;
+    void notify(StatusMessage msg) override;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -51,15 +56,15 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    StatusMessageHandler* pStatusHandler;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::TabbedComponent> tabHelp;
-    std::unique_ptr<juce::Label> label;
+    std::unique_ptr<juce::TextEditor> textLog;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelpComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OSCLogComponent)
 };
 
 //[EndFile] You can add extra defines here...

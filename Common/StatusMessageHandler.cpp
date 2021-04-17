@@ -13,7 +13,6 @@
 StatusMessageHandler::StatusMessageHandler()
 {
 	pLabel = nullptr;
-    pTextEditor = nullptr;
     errorFlag = false;
 }
 
@@ -29,25 +28,28 @@ void StatusMessageHandler::unregisterLabel()
 	pLabel = nullptr;
 }
 
-void StatusMessageHandler::registerDetailLog(TextEditor *editor)
+void StatusMessageHandler::registerDetailLog(StatusMessageReceiver* pMessageReceiver)
 {
     const ScopedLock lock(cs);
-    pTextEditor = editor;
+    messageReceivers.addIfNotAlreadyThere(pMessageReceiver);
     startTimer(TIMER_ID_UPDATE, 20);
 }
 
-void StatusMessageHandler::unregisterDetailLog()
+void StatusMessageHandler::unregisterDetailLog(StatusMessageReceiver* pMessageReceiver)
 {
     const ScopedLock lock(cs);
-    stopTimer(TIMER_ID_UPDATE);
-    pTextEditor = nullptr;
+    messageReceivers.removeAllInstancesOf(pMessageReceiver);
+    if(messageReceivers.size() == 0)
+    {
+        stopTimer(TIMER_ID_UPDATE);
+    }
 }
 
-void StatusMessageHandler::showMessage(String message, String detailMessage, MessageStyle style)
+void StatusMessageHandler::showMessage(String message, String detailMessage, StatusMessage::MessageStyle style)
 {
-    if(pTextEditor != nullptr)
+    if(messageReceivers.size() > 0)
     {
-        DetailMessage msg;
+        StatusMessage msg;
         msg.message = Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n";
         msg.messageStyle = style;
         
@@ -58,7 +60,7 @@ void StatusMessageHandler::showMessage(String message, String detailMessage, Mes
 	{
         const ScopedLock lock(cs);
         
-        if(style == Error)
+        if(style == StatusMessage::Error)
         {
             stopTimer(TIMER_ID_LABEL_DELAY);
             pLabel->setColour(Label::textColourId, Colours::red);
@@ -90,27 +92,24 @@ void StatusMessageHandler::timerCallback(int timerID)
      
         if(messageQueue.size() > 10)
         {
-            pTextEditor->setColour(TextEditor::textColourId, Colours::red);
-            pTextEditor->moveCaretToEnd();
             size_t discardedCount = messageQueue.size();
-            std::queue<DetailMessage> empty;
+            std::queue<StatusMessage> empty;
             std::swap( messageQueue, empty );
-            pTextEditor->insertTextAtCaret("Too many messages to display, " + String(discardedCount) + " elements discarded");
+            
+            for(auto r : messageReceivers)
+                r->notifyOverflow((int)discardedCount);
         }
         else
         {
             while(!messageQueue.empty())
             {
-                DetailMessage msg = messageQueue.front();
+                StatusMessage msg = messageQueue.front();
                 messageQueue.pop();
-                pTextEditor->setColour(TextEditor::textColourId, msg.messageStyle == Error ? Colours::red : Colours::limegreen);
-        
-                pTextEditor->moveCaretToEnd();
-                pTextEditor->insertTextAtCaret(msg.message);
+                for(auto r : messageReceivers)
+                    r->notify(msg);
             }
         }
         
-        pTextEditor->setText(pTextEditor->getText().getLastCharacters(1200));
         startTimer(TIMER_ID_UPDATE, 20);
     }
     else if(timerID == TIMER_ID_LABEL_DELAY)

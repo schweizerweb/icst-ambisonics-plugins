@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.1
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -41,7 +41,7 @@ class EncoderSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper);
+    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper, OSCLogDialogManager* pOscLogManager);
     ~EncoderSettingsComponent() override;
 
     //==============================================================================
