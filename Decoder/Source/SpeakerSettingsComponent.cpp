@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -130,13 +130,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    sliderDistanceScaler.reset (new juce::Slider ("sliderDistanceScaler"));
-    addAndMakeVisible (sliderDistanceScaler.get());
-    sliderDistanceScaler->setRange (1, 500, 0.1);
-    sliderDistanceScaler->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderDistanceScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
-    sliderDistanceScaler->addListener (this);
-
     ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
@@ -149,15 +142,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelChannelWeights->setEditable (false, false, false);
     labelChannelWeights->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelChannelWeights->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelDistanceScaler.reset (new juce::Label ("labelDistanceScaler",
-                                                TRANS("Distance scaler")));
-    addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceScaler->setJustificationType (juce::Justification::centredLeft);
-    labelDistanceScaler->setEditable (false, false, false);
-    labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     btnEditMode.reset (new juce::ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
@@ -329,10 +313,8 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
-    sliderDistanceScaler = nullptr;
     ambiChannelControl = nullptr;
     labelChannelWeights = nullptr;
-    labelDistanceScaler = nullptr;
     btnEditMode = nullptr;
     textOscPort = nullptr;
     labelOscPort = nullptr;
@@ -380,10 +362,8 @@ void SpeakerSettingsComponent::resized()
     buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
     buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    sliderDistanceScaler->setBounds ((8 + 0) + 424, (0 + (getHeight() - 267)) + 20, getWidth() - 458, 24);
     ambiChannelControl->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 52, ((getWidth() - 18) - 0) - 32, 199 - 68);
     labelChannelWeights->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 20, 112, 24);
-    labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 267)) + 20, 104, 24);
     btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
     textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 217 - 88, ((0 + (getHeight() - 267)) + 199) + 20, 88, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 313 - 81, ((0 + (getHeight() - 267)) + 199) + 20, 81, 24);
@@ -592,7 +572,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
             {
                 sendChangeMessage();
                 controlDimming();
-                updateDistanceScaler();
                 speakerList->updateContent();
                 speakerList->repaint();
                 AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Import", "Data import successful");
@@ -626,24 +605,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
-}
-
-void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
-{
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
-    if (sliderThatWasMoved == sliderDistanceScaler.get())
-    {
-        //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
-		pAmbiSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-		speakerList->updateContent();
-		speakerList->repaint();
-        //[/UserSliderCode_sliderDistanceScaler]
-    }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -709,7 +670,7 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	{
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pt->getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
+	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance(), 2); break;
 	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pt), 2); break;
 	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
 	default: text = "";
@@ -817,7 +778,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_A: pSpeakerSet->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_D: pSpeakerSet->setDistance(rowNumber, newValue); break;
-	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue / pAmbiSettings->getDistanceScaler()); break;
+	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
     default: return; // do nothing
 	}
@@ -841,7 +802,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
 	case COLUMN_ID_D: return pt->getPoint()->getDistance();
-	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
 	default: return 0.0;
 	}
@@ -918,11 +879,6 @@ bool SpeakerSettingsComponent::getEnabled(const int /*columnId*/, const int /*ro
     return true;
 }
 
-void SpeakerSettingsComponent::updateDistanceScaler() const
-{
-	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
-}
-
 FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
 {
 	AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
@@ -947,7 +903,6 @@ void SpeakerSettingsComponent::updateUI() const
 	speakerList->updateContent();
 	speakerList->repaint();
 
-	updateDistanceScaler();
 	ambiChannelControl->updateValues();
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
@@ -1129,11 +1084,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="424 20 458M 24" posRelativeX="17eb4b418501687a"
-          posRelativeY="17eb4b418501687a" min="1.0" max="500.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="16 52 32M 68M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
@@ -1142,12 +1092,6 @@ BEGIN_JUCER_METADATA
          virtualName="" explicitFocusOrder="0" pos="16 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="labelDistanceScaler" id="bbbf87bcedfbda85" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="312 20 104 24" posRelativeX="17eb4b418501687a"
-         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
-         labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
@@ -1179,11 +1123,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.772%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50.057%c 0 39.84% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"

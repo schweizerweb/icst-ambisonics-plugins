@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -54,8 +54,7 @@ class SpeakerSettingsComponent  : public Component,
                                   public TableColumnCallback,
                                   ActionListener,
                                   public juce::ComboBox::Listener,
-                                  public juce::Button::Listener,
-                                  public juce::Slider::Listener
+                                  public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -89,8 +88,7 @@ public:
 	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
-	void updateDistanceScaler() const;
-    void updateUI() const;
+	void updateUI() const;
 	FilterBankInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
@@ -101,7 +99,6 @@ public:
     void resized() override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
-    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -131,10 +128,8 @@ private:
     std::unique_ptr<juce::TextButton> buttonRemove;
     std::unique_ptr<juce::TextButton> buttonMoveDown;
     std::unique_ptr<juce::TextButton> buttonMoveUp;
-    std::unique_ptr<juce::Slider> sliderDistanceScaler;
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
     std::unique_ptr<juce::Label> labelChannelWeights;
-    std::unique_ptr<juce::Label> labelDistanceScaler;
     std::unique_ptr<juce::ToggleButton> btnEditMode;
     std::unique_ptr<juce::TextEditor> textOscPort;
     std::unique_ptr<juce::Label> labelOscPort;
