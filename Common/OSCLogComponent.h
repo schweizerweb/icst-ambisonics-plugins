@@ -36,7 +36,8 @@
                                                                     //[/Comments]
 */
 class OSCLogComponent  : public juce::Component,
-                         public StatusMessageReceiver
+                         public StatusMessageReceiver,
+                         public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -51,6 +52,7 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -61,6 +63,7 @@ private:
 
     //==============================================================================
     std::unique_ptr<juce::TextEditor> textLog;
+    std::unique_ptr<juce::ToggleButton> toggleOn;
 
 
     //==============================================================================

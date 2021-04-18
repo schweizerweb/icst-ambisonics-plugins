@@ -94,7 +94,6 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     }
     else
     {
-        reportError(ERROR_STRING_UNKNOWN_OSC, &message);
         return false;
     }
     

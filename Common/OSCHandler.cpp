@@ -35,7 +35,7 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	if(!handleSpecific(message))
 	{
-		reportError("Invalid OSC pattern received: " + message.getAddressPattern().toString(), &message);
+		reportError("Unknown OSC message received: " + message.getAddressPattern().toString(), &message);
 	}
 }
 
@@ -43,7 +43,7 @@ void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 {
 	if(pStatusMessageHandler != nullptr)
 	{
-		pStatusMessageHandler->showMessage(message, oscMessageToString(pMsg) + "\r\n\t" + message, StatusMessage::Error);
+		pStatusMessageHandler->showMessage(message, message + oscMessageToString(pMsg), StatusMessage::Error);
 	}
 }
 

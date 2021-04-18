@@ -50,7 +50,8 @@ void StatusMessageHandler::showMessage(String message, String detailMessage, Sta
     if(messageReceivers.size() > 0)
     {
         StatusMessage msg;
-        msg.message = Time::getCurrentTime().toString(true, true, true, true) + ": " + detailMessage + "\r\n";
+        msg.timestamp = Time::getCurrentTime();
+        msg.message = detailMessage;
         msg.messageStyle = style;
         
         messageQueue.push(msg);

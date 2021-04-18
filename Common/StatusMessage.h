@@ -12,5 +12,6 @@
 struct StatusMessage
 {
     enum MessageStyle { Error, Success } messageStyle;
+    Time timestamp;
     String message;
 };
