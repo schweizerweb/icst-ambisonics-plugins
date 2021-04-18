@@ -101,6 +101,8 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	if (element == nullptr)
 		return;
 
+    customOscTargets.clear();
+    
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
 	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
 	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
