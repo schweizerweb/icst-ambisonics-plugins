@@ -143,6 +143,7 @@ private:
     std::unique_ptr<juce::TextButton> buttonManageFilters;
     std::unique_ptr<juce::ComboBox> comboBoxApply;
     std::unique_ptr<juce::TextButton> buttonCsv;
+    std::unique_ptr<juce::TextButton> buttonScaling;
 
 
     //==============================================================================

@@ -193,7 +193,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
     buttonSpeakerTest.reset (new juce::TextButton ("buttonSpeakerTest"));
     addAndMakeVisible (buttonSpeakerTest.get());
-    buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
+    buttonSpeakerTest->setButtonText (TRANS("test all speakers"));
     buttonSpeakerTest->addListener (this);
 
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
@@ -236,8 +236,13 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
     buttonCsv.reset (new juce::TextButton ("buttonCsv"));
     addAndMakeVisible (buttonCsv.get());
-    buttonCsv->setButtonText (TRANS("CSV"));
+    buttonCsv->setButtonText (TRANS("csv"));
     buttonCsv->addListener (this);
+
+    buttonScaling.reset (new juce::TextButton ("buttonScaling"));
+    addAndMakeVisible (buttonScaling.get());
+    buttonScaling->setButtonText (TRANS("scaling"));
+    buttonScaling->addListener (this);
 
 
     //[UserPreSize]
@@ -328,6 +333,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonManageFilters = nullptr;
     comboBoxApply = nullptr;
     buttonCsv = nullptr;
+    buttonScaling = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -377,6 +383,7 @@ void SpeakerSettingsComponent::resized()
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
     comboBoxApply->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
     buttonCsv->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -601,6 +608,45 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
             CallOutBox::launchAsynchronously(std::move(label), buttonCsv->getBounds(), this);
         }
         //[/UserButtonCode_buttonCsv]
+    }
+    else if (buttonThatWasClicked == buttonScaling.get())
+    {
+        //[UserButtonCode_buttonScaling] -- add your button handler code here..
+        PopupMenu m;
+        m.addItem(1, "All +1m");
+        m.addItem(2, "All -1m");
+        m.addItem(3, "All *2");
+        m.addItem(4, "All /2");
+        m.addItem(5, "Scale to custom size...");
+        const int result = m.show();
+        switch(result)
+        {
+            case 1:
+            for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() + 1);
+                break;
+            case 2:
+            for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setDistance(jmax(DISTANCE_MIN_VALUE, pSpeakerSet->get(i)->getPoint()->getDistance() - 1));
+                break;
+            case 3:
+                for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() * 2.0f);
+                break;
+            case 4:
+                for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() * 0.5f);
+                break;
+            case 5:
+                AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Error", "Not yet implemented!");
+                break;
+        }
+
+        controlDimming();
+        speakerList->updateContent();
+        speakerList->repaint();
+        sendChangeMessage();
+        //[/UserButtonCode_buttonScaling]
     }
 
     //[UserbuttonClicked_Post]
@@ -1124,7 +1170,7 @@ BEGIN_JUCER_METADATA
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
               virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
-              posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
+              posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
          virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
@@ -1150,7 +1196,11 @@ BEGIN_JUCER_METADATA
             textWhenNonSelected="apply..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
               virtualName="" explicitFocusOrder="0" pos="-8r 0 64 24" posRelativeX="5fad387b688247bf"
-              posRelativeY="5fad387b688247bf" buttonText="CSV" connectedEdges="0"
+              posRelativeY="5fad387b688247bf" buttonText="csv" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonScaling" id="d872dac34b0e60ef" memberName="buttonScaling"
+              virtualName="" explicitFocusOrder="0" pos="-80r 0 64 24" posRelativeX="5fad387b688247bf"
+              posRelativeY="5fad387b688247bf" buttonText="scaling" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
