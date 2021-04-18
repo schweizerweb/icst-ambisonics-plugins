@@ -193,7 +193,7 @@ public:
         {
             switch (columnId)
             {
-                case COLUMN_ID_HOST: standardTargets[rowNumber]->pTarget->targetHost = newText;
+                case COLUMN_ID_HOST: standardTargets[rowNumber]->pTarget->targetHost = newText; break;
                 case COLUMN_ID_PATH: return;
             default: return;
             }

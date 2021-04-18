@@ -312,7 +312,7 @@ void OSCSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 
 void OSCSettingsComponent::controlDimming() const
 {
-    sliderReceiveOscPort->setEnabled(pSettings->oscReceiveFlag);
+    toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
     labelOscSendIp->setEnabled(pSettings->oscSendFlag);
     labelOscSendInterval->setEnabled(pSettings->oscSendFlag);
     textOscSendIp->setEnabled(pSettings->oscSendFlag);
