@@ -82,10 +82,21 @@ void ZoomSettings::setCurrentRadius(float newRadius)
 	sendChangeMessage();
 }
 
-void ZoomSettings::Reset()
+void ZoomSettings::Reset(AmbiDataSet* pDataSet)
 {
     currentCenterPoint.setXYZ(0.0, 0.0, 0.0);
-    setCurrentRadius(pScalingInfo->IsInfinite() ? 1.0f : (float)pScalingInfo->GetScaler());
+    float radius = 1.0f;
+    if(pScalingInfo->IsInfinite())
+    {
+        if(pDataSet != nullptr && pDataSet->size() > 0)
+        {
+            radius = jmax(1.0f, pDataSet->getMaxDistance());
+        }
+    }
+    else
+        radius =(float)pScalingInfo->GetScaler();
+    
+    setCurrentRadius(radius);
 }
 
 int ZoomSettings::getNumberOfRings() const

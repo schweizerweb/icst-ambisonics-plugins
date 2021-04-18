@@ -50,7 +50,8 @@ public:
 	bool setGain(int channel, double gain, bool notify = true) const;
 	String getNewUniqueName() const;
 	int getEnabledCount() const;
-
+    float getMaxDistance() const;
+    
 	int groupCount() const;
 	AmbiGroup* getGroup(int index) const;
 	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);

@@ -14,6 +14,7 @@
 
 #include "Point3D.h"
 #include "ScalingInfo.h"
+#include "AmbiDataSet.h"
 
 class ZoomSettings : public ChangeBroadcaster
 {
@@ -37,7 +38,7 @@ public:
     
     ScalingInfo* getScalingInfo();
     
-    void Reset();
+    void Reset(AmbiDataSet* pDataSet = nullptr);
 
 private:
 	Point3D<float> initialCenterPoint;

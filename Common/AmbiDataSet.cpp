@@ -57,6 +57,21 @@ bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 	return false;
 }
 
+float AmbiDataSet::getMaxDistance() const
+{
+    float maxDistance = 0.0f;
+    for (int i = 0; i < size(); i++)
+    {
+        AmbiPoint* pt = get(i);
+        if (pt != nullptr)
+        {
+            maxDistance = jmax(maxDistance, (float)pt->getPoint()->getDistance());
+        }
+    }
+    
+    return maxDistance;
+}
+
 AmbiPoint* AmbiDataSet::getPointByName(String channelName) const
 {
 	AmbiPoint* ambiPt = nullptr;

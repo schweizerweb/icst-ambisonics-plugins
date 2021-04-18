@@ -440,7 +440,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	if(key.isKeyCode(KeyPress::homeKey))
 	{
 		// reset zoom
-        pZoomSettings->Reset();
+        pZoomSettings->Reset(pEditablePoints);
 		return true;
 	}
 
