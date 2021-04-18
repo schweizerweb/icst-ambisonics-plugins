@@ -29,8 +29,10 @@ public:
 	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ", &pSettings->oscSendExtXyzFlag, &pSettings->oscSendExtXyzHost, &pSettings->oscSendExtXyzPort));
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED", &pSettings->oscSendExtAedFlag, &pSettings->oscSendExtAedHost, &pSettings->oscSendExtAedPort));
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED Name", pSettings->oscSendExtAed.get()));
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Index", pSettings->oscSendExtXyzIndex.get()));
+        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED Index", pSettings->oscSendExtAedIndex.get()));
 	}
 
 	~CustomOscTableListModel() override
@@ -103,8 +105,8 @@ public:
         {
             switch (columnId)
             {
-                case COLUMN_ID_PORT: return *(standardTargets[rowNumber]->pPort);
-                case COLUMN_ID_ENABLE: return *(standardTargets[rowNumber]->pEnable);
+                case COLUMN_ID_PORT: return standardTargets[rowNumber]->pTarget->targetPort;
+                case COLUMN_ID_ENABLE: return standardTargets[rowNumber]->pTarget->enabledFlag;
                 default: return 0.0;
             }
         }
@@ -127,8 +129,8 @@ public:
         {
             switch (columnId)
             {
-                case COLUMN_ID_PORT: *standardTargets[rowNumber]->pPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: *standardTargets[rowNumber]->pEnable = newValue != 0.0; break;
+                case COLUMN_ID_PORT: standardTargets[rowNumber]->pTarget->targetPort = (int)newValue; break;
+                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = newValue != 0.0; break;
                 default: ;
             }
         }
@@ -170,7 +172,7 @@ public:
         {
             switch (columnId)
             {
-                case COLUMN_ID_HOST: return *standardTargets[rowNumber]->pHost;
+                case COLUMN_ID_HOST: return standardTargets[rowNumber]->pTarget->targetHost;
                 case COLUMN_ID_PATH: return standardTargets[rowNumber]->name;
             default: return "";
             }
@@ -191,7 +193,7 @@ public:
         {
             switch (columnId)
             {
-                case COLUMN_ID_HOST: *standardTargets[rowNumber]->pHost = newText;
+                case COLUMN_ID_HOST: standardTargets[rowNumber]->pTarget->targetHost = newText;
                 case COLUMN_ID_PATH: return;
             default: return;
             }
@@ -214,10 +216,10 @@ public:
 	{
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
-		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 30);
-		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 80);
-		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 40);
-		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 250);
+		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
+		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 70);
+		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 320);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -234,11 +236,9 @@ public:
 
 private:
     struct StandardTarget {
-        StandardTarget(String name, bool* pEnable, String* pHost, int* pPort) : name(name), pEnable(pEnable), pHost(pHost), pPort(pPort) {};
+        StandardTarget(String name, StandardOscTarget* pTarget) : name(name), pTarget(pTarget) {};
         String name;
-        bool* pEnable;
-        String* pHost;
-        int* pPort;
+        StandardOscTarget* pTarget;
     };
     
 	EncoderSettings* pSettings;

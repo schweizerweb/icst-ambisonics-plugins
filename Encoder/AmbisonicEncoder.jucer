@@ -107,6 +107,10 @@
             file="Source/SourceDefinitionComponent.h"/>
       <FILE id="HbYSNl" name="SourceTableListModel.h" compile="0" resource="0"
             file="Source/SourceTableListModel.h"/>
+      <FILE id="Qu29qN" name="StandardOscTarget.cpp" compile="1" resource="0"
+            file="Source/StandardOscTarget.cpp"/>
+      <FILE id="l1djzL" name="StandardOscTarget.h" compile="0" resource="0"
+            file="Source/StandardOscTarget.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
       <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">

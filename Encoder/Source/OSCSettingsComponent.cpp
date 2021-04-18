@@ -323,7 +323,9 @@ void OSCSettingsComponent::controlDimming() const
     int targetCount = 0;
     if(pSettings->oscSendExtMasterFlag)
     {
-        targetCount += (pSettings->oscSendExtXyzFlag ? 1 : 0) + (pSettings->oscSendExtAedFlag ? 1 : 0);
+        targetCount += (pSettings->oscSendExtXyz->enabledFlag ? 1 : 0) + (pSettings->oscSendExtAed->enabledFlag ? 1 : 0) +
+            (pSettings->oscSendExtXyzIndex->enabledFlag ? 1 : 0) +
+            (pSettings->oscSendExtAedIndex->enabledFlag ? 1 : 0);
         for (auto target : pSettings->customOscTargets)
         {
             if (target->enabledFlag) targetCount++;

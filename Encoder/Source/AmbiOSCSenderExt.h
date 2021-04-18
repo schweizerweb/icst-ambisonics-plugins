@@ -66,7 +66,8 @@ public:
 
 private:
 	void timerCallback() override;
-
+    int connectStandardSender(int* pIndex, StandardOscTarget* pTarget, String oscString, String description, String* pMessage);
+    
 private:
 	CriticalSection cs;
 	AmbiDataSet* pPoints;
