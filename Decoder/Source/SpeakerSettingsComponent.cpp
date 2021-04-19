@@ -27,6 +27,7 @@
 #include "../../Common/Constants.h"
 #include "FilterSettingsComponent.h"
 #include "CsvImportExport.h"
+#include "ScalingComponent.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
@@ -56,8 +57,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification)
-    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
+    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
@@ -148,16 +149,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     btnEditMode->setButtonText (TRANS("Edit mode"));
     btnEditMode->addListener (this);
 
-    textOscPort.reset (new juce::TextEditor ("textOscPort"));
-    addAndMakeVisible (textOscPort.get());
-    textOscPort->setMultiLine (false);
-    textOscPort->setReturnKeyStartsNewLine (false);
-    textOscPort->setReadOnly (false);
-    textOscPort->setScrollbarsShown (true);
-    textOscPort->setCaretVisible (true);
-    textOscPort->setPopupMenuEnabled (true);
-    textOscPort->setText (juce::String());
-
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
@@ -166,16 +157,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelOscPort->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    textTimeout.reset (new juce::TextEditor ("textTimeout"));
-    addAndMakeVisible (textTimeout.get());
-    textTimeout->setMultiLine (false);
-    textTimeout->setReturnKeyStartsNewLine (false);
-    textTimeout->setReadOnly (false);
-    textTimeout->setScrollbarsShown (true);
-    textTimeout->setCaretVisible (true);
-    textTimeout->setPopupMenuEnabled (true);
-    textTimeout->setText (juce::String());
 
     labelTimeout.reset (new juce::Label ("labelTimeout",
                                          TRANS("Timeout [ms]:")));
@@ -244,6 +225,20 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonScaling->setButtonText (TRANS("scaling"));
     buttonScaling->addListener (this);
 
+    sliderPort.reset (new juce::Slider ("sliderPort"));
+    addAndMakeVisible (sliderPort.get());
+    sliderPort->setRange (0, 65535, 1);
+    sliderPort->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
+    sliderPort->addListener (this);
+
+    sliderTimeout.reset (new juce::Slider ("sliderTimeout"));
+    addAndMakeVisible (sliderTimeout.get());
+    sliderTimeout->setRange (10, 10000, 1);
+    sliderTimeout->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTimeout->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 70, 20);
+    sliderTimeout->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -289,11 +284,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
 
 	// OSC
-	textOscPort->addListener(this);
-	textTimeout->addListener(this);
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
-	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
-	textTimeout->setText(String(pDecoderSettings->oscReceiveTimeoutMs));
+	sliderPort->setValue(pDecoderSettings->oscReceivePort);
+	sliderTimeout->setValue(pDecoderSettings->oscReceiveTimeoutMs);
 
 	controlDimming();
     //[/Constructor]
@@ -321,9 +314,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     ambiChannelControl = nullptr;
     labelChannelWeights = nullptr;
     btnEditMode = nullptr;
-    textOscPort = nullptr;
     labelOscPort = nullptr;
-    textTimeout = nullptr;
     labelTimeout = nullptr;
     toggleOsc = nullptr;
     buttonSpeakerTest = nullptr;
@@ -334,6 +325,8 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     comboBoxApply = nullptr;
     buttonCsv = nullptr;
     buttonScaling = nullptr;
+    sliderPort = nullptr;
+    sliderTimeout = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -612,6 +605,8 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonScaling.get())
     {
         //[UserButtonCode_buttonScaling] -- add your button handler code here..
+        CallOutBox::launchAsynchronously(std::make_unique<ScalingComponent>(this, pSpeakerSet, pZoomSettings), buttonScaling->getBounds(), this);
+
         PopupMenu m;
         m.addItem(1, "All +1m");
         m.addItem(2, "All -1m");
@@ -642,15 +637,37 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
                 break;
         }
 
-        controlDimming();
         speakerList->updateContent();
         speakerList->repaint();
-        sendChangeMessage();
         //[/UserButtonCode_buttonScaling]
     }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
+}
+
+void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == sliderPort.get())
+    {
+        //[UserSliderCode_sliderPort] -- add your slider handling code here..
+        pDecoderSettings->oscReceivePort = (int)sliderPort->getValue();
+        sendChangeMessage();
+        //[/UserSliderCode_sliderPort]
+    }
+    else if (sliderThatWasMoved == sliderTimeout.get())
+    {
+        //[UserSliderCode_sliderTimeout] -- add your slider handling code here..
+        pDecoderSettings->oscReceiveTimeoutMs = (int)sliderTimeout->getValue();
+        sendChangeMessage();
+        //[/UserSliderCode_sliderTimeout]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -1035,36 +1052,6 @@ void SpeakerSettingsComponent::controlDimming()
             comboBoxApply->addItem(TRANS("Gain +0.5 dB"), ID_APPLY_INC_GAIN);
         }
     }
-}
-
-void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
-{
-	if (&editor == textOscPort.get())
-	{
-		if (textOscPort->getText().containsOnly("0123456789"))
-		{
-			pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
-			sendChangeMessage();
-		}
-		else
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid port number");
-			editor.undo();
-		}
-	}
-	else if (&editor == textTimeout.get())
-	{
-		if (textTimeout->getText().containsOnly("0123456789"))
-		{
-			pDecoderSettings->oscReceiveTimeoutMs = textTimeout->getText().getIntValue();
-			sendChangeMessage();
-		}
-		else
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid timeout");
-			editor.undo();
-		}
-	}
 }
 
 //[/MiscUserCode]

@@ -33,6 +33,7 @@
 #include "DecoderPresetHelper.h"
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 
@@ -48,22 +49,21 @@
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
-                                  public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
                                   ActionListener,
                                   public juce::ComboBox::Listener,
-                                  public juce::Button::Listener
+                                  public juce::Button::Listener,
+                                  public juce::Slider::Listener
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void textEditorTextChanged(TextEditor& editor) override;
 
     // table overrides
 	int getNumRows() override;
@@ -99,6 +99,7 @@ public:
     void resized() override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -114,6 +115,7 @@ private:
 	dsp::ProcessSpec* pFilterSpecification;
     PresetManagerDialog presetManagerDialog;
     std::unique_ptr<FilterPresetHelper> filterPresetHelper;
+    ZoomSettings* pZoomSettings;
     //[/UserVariables]
 
     //==============================================================================
@@ -131,9 +133,7 @@ private:
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
     std::unique_ptr<juce::Label> labelChannelWeights;
     std::unique_ptr<juce::ToggleButton> btnEditMode;
-    std::unique_ptr<juce::TextEditor> textOscPort;
     std::unique_ptr<juce::Label> labelOscPort;
-    std::unique_ptr<juce::TextEditor> textTimeout;
     std::unique_ptr<juce::Label> labelTimeout;
     std::unique_ptr<juce::ToggleButton> toggleOsc;
     std::unique_ptr<juce::TextButton> buttonSpeakerTest;
@@ -144,6 +144,8 @@ private:
     std::unique_ptr<juce::ComboBox> comboBoxApply;
     std::unique_ptr<juce::TextButton> buttonCsv;
     std::unique_ptr<juce::TextButton> buttonScaling;
+    std::unique_ptr<juce::Slider> sliderPort;
+    std::unique_ptr<juce::Slider> sliderTimeout;
 
 
     //==============================================================================
