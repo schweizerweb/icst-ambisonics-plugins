@@ -39,7 +39,6 @@ public:
         FileInputStream stream(chooser.getResult());
         Array<CsvDataSet> points;
         int indexPlus1 = 1;
-        double maxDistance = 0.0;
         while (!stream.isExhausted())
         {
             String line = stream.readNextLine();
@@ -55,7 +54,6 @@ public:
                 set.color = arr.size() > 4 && arr[4].isNotEmpty() ? Colour::fromString(arr[4]) : TrackColors::getSpeakerColor();
                 set.gain = arr.size() > 5 && arr[5].isNotEmpty() ? Decibels::decibelsToGain(arr[5].getDoubleValue()) : 1.0;
                 points.add(set);
-                maxDistance = jmax(maxDistance, set.d);
                 indexPlus1++;
             }
             else if(nbTokens > 0)
@@ -65,13 +63,11 @@ public:
             }
         }
 
-        maxDistance = jmax(1.0, maxDistance);
-        pAmbiSettings->setDistanceScaler(maxDistance);
         pSpeakerSet->clear();
         for (int i = 0; i < points.size(); i++)
         {
             Point3D<double> p;
-            p.setAed(points[i].a, points[i].e, points[i].d / maxDistance);
+            p.setAed(points[i].a, points[i].e, points[i].d);
             pSpeakerSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
             pSpeakerSet->setGain(i, points[i].gain);
         }

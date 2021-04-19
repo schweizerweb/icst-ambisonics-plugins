@@ -41,7 +41,6 @@
 #define	COLUMN_ID_Z			9
 #define	COLUMN_ID_A			10
 #define	COLUMN_ID_E			11
-#define	COLUMN_ID_D			12
 #define COLUMN_ID_DISTANCE	3
 #define COLUMN_ID_DELAY		4
 #define COLUMN_ID_DELAY_COMPENSATION 13
@@ -243,7 +242,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (1200, 800);
+    setSize (900, 700);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -264,10 +263,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("X", COLUMN_ID_X, 50);
 	speakerList->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
 	speakerList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
-	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 50);
-	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 50);
-	//speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
-	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
+	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 60);
+	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 60);
+	speakerList->getHeader().addColumn("D [m]", COLUMN_ID_DISTANCE, 60);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 30);
@@ -606,39 +604,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     {
         //[UserButtonCode_buttonScaling] -- add your button handler code here..
         CallOutBox::launchAsynchronously(std::make_unique<ScalingComponent>(this, pSpeakerSet, pZoomSettings), buttonScaling->getBounds(), this);
-
-        PopupMenu m;
-        m.addItem(1, "All +1m");
-        m.addItem(2, "All -1m");
-        m.addItem(3, "All *2");
-        m.addItem(4, "All /2");
-        m.addItem(5, "Scale to custom size...");
-        const int result = m.show();
-        switch(result)
-        {
-            case 1:
-            for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() + 1);
-                break;
-            case 2:
-            for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setDistance(jmax(DISTANCE_MIN_VALUE, pSpeakerSet->get(i)->getPoint()->getDistance() - 1));
-                break;
-            case 3:
-                for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() * 2.0f);
-                break;
-            case 4:
-                for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() * 0.5f);
-                break;
-            case 5:
-                AlertWindow::showMessageBox(AlertWindow::AlertIconType::WarningIcon, "Error", "Not yet implemented!");
-                break;
-        }
-
-        speakerList->updateContent();
-        speakerList->repaint();
         //[/UserButtonCode_buttonScaling]
     }
 
@@ -750,7 +715,6 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		|| columnId == COLUMN_ID_Z
 		|| columnId == COLUMN_ID_A
 		|| columnId == COLUMN_ID_E
-		|| columnId == COLUMN_ID_D
 		|| columnId == COLUMN_ID_DISTANCE)
 	{
 		NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
@@ -840,7 +804,6 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_Z: pSpeakerSet->setZ(rowNumber, newValue); break;
 	case COLUMN_ID_A: pSpeakerSet->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
-	case COLUMN_ID_D: pSpeakerSet->setDistance(rowNumber, newValue); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
     default: return; // do nothing
@@ -864,7 +827,6 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_Z: return pt->getPoint()->getZ();
 	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-	case COLUMN_ID_D: return pt->getPoint()->getDistance();
 	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
 	default: return 0.0;
@@ -916,10 +878,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 	case COLUMN_ID_X:
 	case COLUMN_ID_Y:
 	case COLUMN_ID_Z:
-		return SliderRange(-1.0, 1.0, 0.001);
-
-	case COLUMN_ID_D:
-		return SliderRange(Constants::DistanceMin, sqrt(2.0), 0.001);
+		return SliderRange(-10000.0, 10000.0, 0.001);
 
 	case COLUMN_ID_A:
 		return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
@@ -931,7 +890,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
 
 	case COLUMN_ID_DISTANCE:
-		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
+		return SliderRange(0.0, 10000.0 * MathConstants<double>::sqrt2, 0.001);
 	}
 
 	return SliderRange(0.0, 1.0, 0.001);
@@ -1071,7 +1030,7 @@ BEGIN_JUCER_METADATA
                  constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="1200" initialHeight="800">
+                 fixedSize="0" initialWidth="900" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="0 0R 0M 60" posRelativeX="17eb4b418501687a"

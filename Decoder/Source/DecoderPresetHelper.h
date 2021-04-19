@@ -363,7 +363,6 @@ public:
     {
         AmbiSettings settings;
         
-        settings.setDistanceScaler(DEFAULT_DISTANCE_SCALER);
         settings.setWeightMode(AmbiSettings::INPHASE);
             
         return settings;
