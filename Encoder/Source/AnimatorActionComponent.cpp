@@ -179,7 +179,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, Str
 
     sliderStretchSimple.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderStretchSimple.get());
-    sliderStretchSimple->setRange (-10, 10, 0.01);
+    sliderStretchSimple->setRange (-5, 5, 0.01);
     sliderStretchSimple->setSliderStyle (juce::Slider::LinearBar);
     sliderStretchSimple->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderStretchSimple->addListener (this);
@@ -495,7 +495,7 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="39716a26f90ba9d8" memberName="sliderStretchSimple"
           virtualName="" explicitFocusOrder="0" pos="72 16 80M 24" posRelativeX="92689b605a1ca01a"
           posRelativeY="92689b605a1ca01a" posRelativeW="92689b605a1ca01a"
-          min="-10.0" max="10.0" int="0.01" style="LinearBar" textBoxPos="TextBoxLeft"
+          min="-5.0" max="5.0" int="0.01" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
 </JUCER_COMPONENT>
