@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "../../Common/AmbiSourceSet.h"
+#include "AnimatorActionComponent.h"
 
 #define STEP_TIMER_ID       1
 #define STEP_TIMER_INTERVAL 50
@@ -40,8 +41,7 @@
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
                            public juce::Button::Listener,
-                           public juce::Slider::Listener,
-                           public juce::ComboBox::Listener
+                           public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -57,16 +57,20 @@ public:
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
-    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void calculateStepsTo(OwnedArray<AmbiSource>* pPositions, bool isPolar, double timeSec);
+    void setPreset(OwnedArray<AmbiSource>* pSet);
+    void performAction(AnimatorAction* pAction);
+    
     AmbiSourceSet* pSourceSet;
     OwnedArray<AmbiSource> set1;
     OwnedArray<AmbiSource> set2;
+    OwnedArray<AmbiSource> set3;
+    OwnedArray<AmbiSource> set4;
     HashMap<int, OwnedArray<Point3D<float>>*> steps;
     int currentStep;
     //[/UserVariables]
@@ -82,14 +86,18 @@ private:
     std::unique_ptr<juce::Slider> sliderTime2;
     std::unique_ptr<juce::ToggleButton> togglePolar2;
     std::unique_ptr<juce::TextButton> buttonGo2;
-    std::unique_ptr<juce::GroupComponent> groupRotationOrigin;
-    std::unique_ptr<juce::ComboBox> comboBoxRotateOrigin;
-    std::unique_ptr<juce::Slider> sliderRotateOriginTime;
-    std::unique_ptr<juce::Label> labelGroup;
-    std::unique_ptr<juce::Label> labelTime;
-    std::unique_ptr<juce::Slider> sliderRotateOriginRepetoitions;
-    std::unique_ptr<juce::Label> labelRepetitions;
-    std::unique_ptr<juce::TextButton> buttonRotationOriginGo;
+    std::unique_ptr<juce::GroupComponent> group3;
+    std::unique_ptr<juce::TextButton> buttonSet3;
+    std::unique_ptr<juce::Slider> sliderTime3;
+    std::unique_ptr<juce::ToggleButton> togglePolar3;
+    std::unique_ptr<juce::TextButton> buttonGo3;
+    std::unique_ptr<juce::GroupComponent> group4;
+    std::unique_ptr<juce::TextButton> buttonSet4;
+    std::unique_ptr<juce::Slider> sliderTime4;
+    std::unique_ptr<juce::ToggleButton> togglePolar4;
+    std::unique_ptr<juce::TextButton> buttonGo4;
+    std::unique_ptr<AnimatorActionComponent> action1;
+    std::unique_ptr<AnimatorActionComponent> action2;
 
 
     //==============================================================================

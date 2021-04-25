@@ -34,7 +34,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     //[/Constructor_pre]
 
     group1.reset (new juce::GroupComponent ("new group",
-                                            TRANS("1")));
+                                            TRANS("Preset 1")));
     addAndMakeVisible (group1.get());
 
     buttonSet1.reset (new juce::TextButton ("new button"));
@@ -60,7 +60,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     buttonGo1->addListener (this);
 
     group2.reset (new juce::GroupComponent ("new group",
-                                            TRANS("2")));
+                                            TRANS("Preset 2")));
     addAndMakeVisible (group2.get());
 
     buttonSet2.reset (new juce::TextButton ("new button"));
@@ -85,65 +85,65 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     buttonGo2->setButtonText (TRANS("Go"));
     buttonGo2->addListener (this);
 
-    groupRotationOrigin.reset (new juce::GroupComponent ("new group",
-                                                         TRANS("Rotation Origin")));
-    addAndMakeVisible (groupRotationOrigin.get());
+    group3.reset (new juce::GroupComponent ("new group",
+                                            TRANS("Preset 3")));
+    addAndMakeVisible (group3.get());
 
-    groupRotationOrigin->setBounds (0, 0, 264, 160);
+    buttonSet3.reset (new juce::TextButton ("new button"));
+    addAndMakeVisible (buttonSet3.get());
+    buttonSet3->setButtonText (TRANS("Set"));
+    buttonSet3->addListener (this);
 
-    comboBoxRotateOrigin.reset (new juce::ComboBox ("new combo box"));
-    addAndMakeVisible (comboBoxRotateOrigin.get());
-    comboBoxRotateOrigin->setEditableText (false);
-    comboBoxRotateOrigin->setJustificationType (juce::Justification::centredLeft);
-    comboBoxRotateOrigin->setTextWhenNothingSelected (juce::String());
-    comboBoxRotateOrigin->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxRotateOrigin->addListener (this);
+    sliderTime3.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderTime3.get());
+    sliderTime3->setRange (0, 10, 1);
+    sliderTime3->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime3->addListener (this);
 
-    sliderRotateOriginTime.reset (new juce::Slider ("new slider"));
-    addAndMakeVisible (sliderRotateOriginTime.get());
-    sliderRotateOriginTime->setRange (0, 10, 0.1);
-    sliderRotateOriginTime->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderRotateOriginTime->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderRotateOriginTime->addListener (this);
+    togglePolar3.reset (new juce::ToggleButton ("new toggle button"));
+    addAndMakeVisible (togglePolar3.get());
+    togglePolar3->setButtonText (TRANS("Polar"));
+    togglePolar3->addListener (this);
 
-    labelGroup.reset (new juce::Label ("new label",
-                                       TRANS("Group:")));
-    addAndMakeVisible (labelGroup.get());
-    labelGroup->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelGroup->setJustificationType (juce::Justification::centredLeft);
-    labelGroup->setEditable (false, false, false);
-    labelGroup->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelGroup->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    buttonGo3.reset (new juce::TextButton ("new button"));
+    addAndMakeVisible (buttonGo3.get());
+    buttonGo3->setButtonText (TRANS("Go"));
+    buttonGo3->addListener (this);
 
-    labelTime.reset (new juce::Label ("new label",
-                                      TRANS("Time:")));
-    addAndMakeVisible (labelTime.get());
-    labelTime->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelTime->setJustificationType (juce::Justification::centredLeft);
-    labelTime->setEditable (false, false, false);
-    labelTime->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelTime->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    group4.reset (new juce::GroupComponent ("new group",
+                                            TRANS("Preset 4")));
+    addAndMakeVisible (group4.get());
 
-    sliderRotateOriginRepetoitions.reset (new juce::Slider ("new slider"));
-    addAndMakeVisible (sliderRotateOriginRepetoitions.get());
-    sliderRotateOriginRepetoitions->setRange (0, 1000, 1);
-    sliderRotateOriginRepetoitions->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderRotateOriginRepetoitions->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderRotateOriginRepetoitions->addListener (this);
+    buttonSet4.reset (new juce::TextButton ("new button"));
+    addAndMakeVisible (buttonSet4.get());
+    buttonSet4->setButtonText (TRANS("Set"));
+    buttonSet4->addListener (this);
 
-    labelRepetitions.reset (new juce::Label ("new label",
-                                             TRANS("Rep:")));
-    addAndMakeVisible (labelRepetitions.get());
-    labelRepetitions->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelRepetitions->setJustificationType (juce::Justification::centredLeft);
-    labelRepetitions->setEditable (false, false, false);
-    labelRepetitions->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelRepetitions->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    sliderTime4.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderTime4.get());
+    sliderTime4->setRange (0, 10, 1);
+    sliderTime4->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime4->addListener (this);
 
-    buttonRotationOriginGo.reset (new juce::TextButton ("new button"));
-    addAndMakeVisible (buttonRotationOriginGo.get());
-    buttonRotationOriginGo->setButtonText (TRANS("Go"));
-    buttonRotationOriginGo->addListener (this);
+    togglePolar4.reset (new juce::ToggleButton ("new toggle button"));
+    addAndMakeVisible (togglePolar4.get());
+    togglePolar4->setButtonText (TRANS("Polar"));
+    togglePolar4->addListener (this);
+
+    buttonGo4.reset (new juce::TextButton ("new button"));
+    addAndMakeVisible (buttonGo4.get());
+    buttonGo4->setButtonText (TRANS("Go"));
+    buttonGo4->addListener (this);
+
+    action1.reset (new AnimatorActionComponent (pSourceSet));
+    addAndMakeVisible (action1.get());
+    action1->setName ("new component");
+
+    action2.reset (new AnimatorActionComponent (pSourceSet));
+    addAndMakeVisible (action2.get());
+    action2->setName ("new component");
 
 
     //[UserPreSize]
@@ -153,11 +153,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
 
     //[Constructor] You can add your own custom stuff here..
-    for(int i = 0; i < pSourceSet->groupCount(); i++)
-    {
-        comboBoxRotateOrigin->addItem(String(i) + " " + pSourceSet->getGroup(i)->getName(), i + 1);
-    }
-    
+
     startTimer(STEP_TIMER_ID, STEP_TIMER_INTERVAL);
     //[/Constructor]
 }
@@ -166,7 +162,7 @@ AnimatorComponent::~AnimatorComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     stopTimer(STEP_TIMER_ID);
-    
+
     for(auto s : steps)
         delete(s);
     steps.clear();
@@ -182,14 +178,18 @@ AnimatorComponent::~AnimatorComponent()
     sliderTime2 = nullptr;
     togglePolar2 = nullptr;
     buttonGo2 = nullptr;
-    groupRotationOrigin = nullptr;
-    comboBoxRotateOrigin = nullptr;
-    sliderRotateOriginTime = nullptr;
-    labelGroup = nullptr;
-    labelTime = nullptr;
-    sliderRotateOriginRepetoitions = nullptr;
-    labelRepetitions = nullptr;
-    buttonRotationOriginGo = nullptr;
+    group3 = nullptr;
+    buttonSet3 = nullptr;
+    sliderTime3 = nullptr;
+    togglePolar3 = nullptr;
+    buttonGo3 = nullptr;
+    group4 = nullptr;
+    buttonSet4 = nullptr;
+    sliderTime4 = nullptr;
+    togglePolar4 = nullptr;
+    buttonGo4 = nullptr;
+    action1 = nullptr;
+    action2 = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -213,23 +213,28 @@ void AnimatorComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    group1->setBounds (272, 0, getWidth() - 272, 48);
-    buttonSet1->setBounds (272 + 16, 0 + 16, 55, 24);
-    sliderTime1->setBounds (272 + 80, 0 + 16, (getWidth() - 272) - 216, 24);
-    togglePolar1->setBounds (272 + (getWidth() - 272) - 73 - 63, 0 + 16, 63, 24);
-    buttonGo1->setBounds (272 + (getWidth() - 272) - 9 - 55, 0 + 16, 55, 24);
-    group2->setBounds (272, 48, getWidth() - 272, 48);
-    buttonSet2->setBounds (272 + 16, 48 + 16, 55, 24);
-    sliderTime2->setBounds (272 + 80, 48 + 16, (getWidth() - 272) - 216, 24);
-    togglePolar2->setBounds (272 + (getWidth() - 272) - 73 - 63, 48 + 16, 63, 24);
-    buttonGo2->setBounds (272 + (getWidth() - 272) - 9 - 55, 48 + 16, 55, 24);
-    comboBoxRotateOrigin->setBounds (0 + 80, 0 + 24, 264 - 96, 24);
-    sliderRotateOriginTime->setBounds (0 + 80, 0 + 56, 264 - 90, 24);
-    labelGroup->setBounds (0 + 16, 0 + 24, 55, 24);
-    labelTime->setBounds (0 + 16, 0 + 56, 55, 24);
-    sliderRotateOriginRepetoitions->setBounds (0 + 80, 0 + 88, 264 - 90, 24);
-    labelRepetitions->setBounds (0 + 16, 0 + 88, 55, 24);
-    buttonRotationOriginGo->setBounds (0 + 16, 0 + 120, 264 - 32, 24);
+    group1->setBounds (0, 0, getWidth() - 0, 48);
+    buttonSet1->setBounds (0 + 16, 0 + 16, 55, 24);
+    sliderTime1->setBounds (0 + 80, 0 + 16, (getWidth() - 0) - 216, 24);
+    togglePolar1->setBounds (0 + (getWidth() - 0) - 73 - 63, 0 + 16, 63, 24);
+    buttonGo1->setBounds (0 + (getWidth() - 0) - 9 - 55, 0 + 16, 55, 24);
+    group2->setBounds (0, 48, getWidth() - 0, 48);
+    buttonSet2->setBounds (0 + 16, 48 + 16, 55, 24);
+    sliderTime2->setBounds (0 + 80, 48 + 16, (getWidth() - 0) - 216, 24);
+    togglePolar2->setBounds (0 + (getWidth() - 0) - 73 - 63, 48 + 16, 63, 24);
+    buttonGo2->setBounds (0 + (getWidth() - 0) - 9 - 55, 48 + 16, 55, 24);
+    group3->setBounds (0, 96, getWidth() - 0, 48);
+    buttonSet3->setBounds (0 + 16, 96 + 16, 55, 24);
+    sliderTime3->setBounds (0 + 80, 96 + 16, (getWidth() - 0) - 216, 24);
+    togglePolar3->setBounds (0 + (getWidth() - 0) - 73 - 63, 96 + 16, 63, 24);
+    buttonGo3->setBounds (0 + (getWidth() - 0) - 9 - 55, 96 + 16, 55, 24);
+    group4->setBounds (0, 144, getWidth() - 0, 48);
+    buttonSet4->setBounds (0 + 16, 144 + 16, 55, 24);
+    sliderTime4->setBounds (0 + 80, 144 + 16, (getWidth() - 0) - 216, 24);
+    togglePolar4->setBounds (0 + (getWidth() - 0) - 73 - 63, 144 + 16, 63, 24);
+    buttonGo4->setBounds (0 + (getWidth() - 0) - 9 - 55, 144 + 16, 55, 24);
+    action1->setBounds (0, 200, proportionOfWidth (0.5012f), 340);
+    action2->setBounds (getWidth() - proportionOfWidth (0.5012f), 200, proportionOfWidth (0.5012f), 340);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -242,9 +247,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonSet1.get())
     {
         //[UserButtonCode_buttonSet1] -- add your button handler code here..
-        set1.clear();
-        for(int i = 0; i < pSourceSet->size(); i++)
-            set1.add(new AmbiSource(pSourceSet->get(i)));
+        setPreset(&set1);
         //[/UserButtonCode_buttonSet1]
     }
     else if (buttonThatWasClicked == togglePolar1.get())
@@ -261,9 +264,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonSet2.get())
     {
         //[UserButtonCode_buttonSet2] -- add your button handler code here..
-        set2.clear();
-        for(int i = 0; i < pSourceSet->size(); i++)
-            set2.add(new AmbiSource(pSourceSet->get(i)));
+        setPreset(&set2);
         //[/UserButtonCode_buttonSet2]
     }
     else if (buttonThatWasClicked == togglePolar2.get())
@@ -277,10 +278,39 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         calculateStepsTo(&set2, togglePolar2->getToggleState(), sliderTime2->getValue());
         //[/UserButtonCode_buttonGo2]
     }
-    else if (buttonThatWasClicked == buttonRotationOriginGo.get())
+    else if (buttonThatWasClicked == buttonSet3.get())
     {
-        //[UserButtonCode_buttonRotationOriginGo] -- add your button handler code here..
-        //[/UserButtonCode_buttonRotationOriginGo]
+        //[UserButtonCode_buttonSet3] -- add your button handler code here..
+        setPreset(&set3);
+        //[/UserButtonCode_buttonSet3]
+    }
+    else if (buttonThatWasClicked == togglePolar3.get())
+    {
+        //[UserButtonCode_togglePolar3] -- add your button handler code here..
+        //[/UserButtonCode_togglePolar3]
+    }
+    else if (buttonThatWasClicked == buttonGo3.get())
+    {
+        //[UserButtonCode_buttonGo3] -- add your button handler code here..
+        calculateStepsTo(&set3, togglePolar3->getToggleState(), sliderTime3->getValue());
+        //[/UserButtonCode_buttonGo3]
+    }
+    else if (buttonThatWasClicked == buttonSet4.get())
+    {
+        //[UserButtonCode_buttonSet4] -- add your button handler code here..
+        setPreset(&set4);
+        //[/UserButtonCode_buttonSet4]
+    }
+    else if (buttonThatWasClicked == togglePolar4.get())
+    {
+        //[UserButtonCode_togglePolar4] -- add your button handler code here..
+        //[/UserButtonCode_togglePolar4]
+    }
+    else if (buttonThatWasClicked == buttonGo4.get())
+    {
+        //[UserButtonCode_buttonGo4] -- add your button handler code here..
+        calculateStepsTo(&set4, togglePolar4->getToggleState(), sliderTime4->getValue());
+        //[/UserButtonCode_buttonGo4]
     }
 
     //[UserbuttonClicked_Post]
@@ -302,34 +332,19 @@ void AnimatorComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         //[UserSliderCode_sliderTime2] -- add your slider handling code here..
         //[/UserSliderCode_sliderTime2]
     }
-    else if (sliderThatWasMoved == sliderRotateOriginTime.get())
+    else if (sliderThatWasMoved == sliderTime3.get())
     {
-        //[UserSliderCode_sliderRotateOriginTime] -- add your slider handling code here..
-        //[/UserSliderCode_sliderRotateOriginTime]
+        //[UserSliderCode_sliderTime3] -- add your slider handling code here..
+        //[/UserSliderCode_sliderTime3]
     }
-    else if (sliderThatWasMoved == sliderRotateOriginRepetoitions.get())
+    else if (sliderThatWasMoved == sliderTime4.get())
     {
-        //[UserSliderCode_sliderRotateOriginRepetoitions] -- add your slider handling code here..
-        //[/UserSliderCode_sliderRotateOriginRepetoitions]
+        //[UserSliderCode_sliderTime4] -- add your slider handling code here..
+        //[/UserSliderCode_sliderTime4]
     }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
-}
-
-void AnimatorComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == comboBoxRotateOrigin.get())
-    {
-        //[UserComboBoxCode_comboBoxRotateOrigin] -- add your combo box handling code here..
-        //[/UserComboBoxCode_comboBoxRotateOrigin]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 
@@ -340,7 +355,7 @@ void AnimatorComponent::timerCallback(int timerID)
     if(steps.size() > 0 && currentStep >= 0)
     {
         HashMap<int, OwnedArray<Point3D<float>>*>::Iterator i (steps);
- 
+
         while (i.next())
         {
             if(currentStep >= i.getValue()->size())
@@ -348,7 +363,7 @@ void AnimatorComponent::timerCallback(int timerID)
                 currentStep = -1;
                 return;
             }
-            
+
             auto p = *i.getValue()->getUnchecked(currentStep);
             pSourceSet->setChannelXYZ(
                                     i.getKey(),
@@ -356,8 +371,42 @@ void AnimatorComponent::timerCallback(int timerID)
                                     p.getY(),
                                     p.getZ());
         }
-            
+
         currentStep++;
+    }
+    else
+    {
+        performAction(&action1->action);
+        performAction(&action2->action);
+    }
+}
+
+void AnimatorComponent::performAction(AnimatorAction *pAction)
+{
+    double factor = 1.0 / STEP_TIMER_INTERVAL;
+    if(pAction->enabled && pAction->groupIndex >= 0 && pAction->groupIndex < pSourceSet->groupCount())
+    {
+        if(pAction->rotationX != 0.0 || pAction->rotationY != 0.0 || pAction->rotationZ != 0.0)
+        {
+            pSourceSet->rotateGroup(
+                                    pAction->groupIndex,
+                                    Constants::GradToRad(factor * pAction->rotationX),
+                                    Constants::GradToRad(factor * pAction->rotationY),
+                                    Constants::GradToRad(factor * pAction->rotationZ));
+        }
+        if(pAction->rotationOriginX != 0.0 || pAction->rotationOriginY != 0.0 || pAction->rotationOriginZ != 0.0)
+        {
+            pSourceSet->rotateGroupAroundOrigin(
+                                                pAction->groupIndex,
+                                                Constants::GradToRad(factor * pAction->rotationOriginX),
+                                                Constants::GradToRad(factor * pAction->rotationOriginY),
+                                                Constants::GradToRad(factor * pAction->rotationOriginZ),
+                                                true);
+        }
+        if(pAction->stretch != 0.0)
+        {
+            pSourceSet->stretchGroup(pAction->groupIndex, factor * pAction->stretch);
+        }
     }
 }
 
@@ -366,15 +415,15 @@ void AnimatorComponent::calculateStepsTo(OwnedArray<AmbiSource>* pPositions, boo
     for(auto s : steps)
         delete(s);
     steps.clear();
-    
+
     int stepsCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
-    
+
     // match points
     for(int i = 0; i < pSourceSet->size(); i++)
     {
         if(!pSourceSet->get(i)->getEnabled())
             continue;
-        
+
         String name = pSourceSet->get(i)->getName();
         Point3D<double> origin = *(pSourceSet->get(i)->getPoint());
         int j;
@@ -385,7 +434,7 @@ void AnimatorComponent::calculateStepsTo(OwnedArray<AmbiSource>* pPositions, boo
                 break;
             }
         }
-        
+
         if(j < pPositions->size() && pPositions->getUnchecked(j)->getEnabled())
         {
             // means match
@@ -421,8 +470,15 @@ void AnimatorComponent::calculateStepsTo(OwnedArray<AmbiSource>* pPositions, boo
             }
         }
     }
-    
+
     currentStep = 0;
+}
+
+void AnimatorComponent::setPreset(OwnedArray<AmbiSource> *pSet)
+{
+    pSet->clear();
+    for(int i = 0; i < pSourceSet->size(); i++)
+        pSet->add(new AmbiSource(pSourceSet->get(i)));
 }
 //[/MiscUserCode]
 
@@ -443,7 +499,7 @@ BEGIN_JUCER_METADATA
                  initialWidth="700" initialHeight="300">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="new group" id="238ed80972cc4d19" memberName="group1" virtualName=""
-                  explicitFocusOrder="0" pos="272 0 272M 48" title="1"/>
+                  explicitFocusOrder="0" pos="0 0 0M 48" title="Preset 1"/>
   <TEXTBUTTON name="new button" id="6f8d2fc9df3bb657" memberName="buttonSet1"
               virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="238ed80972cc4d19"
               posRelativeY="238ed80972cc4d19" buttonText="Set" connectedEdges="0"
@@ -463,7 +519,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="238ed80972cc4d19" buttonText="Go" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="new group" id="757958c6e56c2a33" memberName="group2" virtualName=""
-                  explicitFocusOrder="0" pos="272 48 272M 48" title="2"/>
+                  explicitFocusOrder="0" pos="0 48 0M 48" title="Preset 2"/>
   <TEXTBUTTON name="new button" id="5d84d95099e73bb4" memberName="buttonSet2"
               virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="757958c6e56c2a33"
               posRelativeY="757958c6e56c2a33" buttonText="Set" connectedEdges="0"
@@ -482,46 +538,52 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="757958c6e56c2a33"
               posRelativeY="757958c6e56c2a33" buttonText="Go" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <GROUPCOMPONENT name="new group" id="673732692faf9b89" memberName="groupRotationOrigin"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 264 160" title="Rotation Origin"/>
-  <COMBOBOX name="new combo box" id="ed3afd4d8c1363b3" memberName="comboBoxRotateOrigin"
-            virtualName="" explicitFocusOrder="0" pos="80 24 96M 24" posRelativeX="673732692faf9b89"
-            posRelativeY="673732692faf9b89" posRelativeW="673732692faf9b89"
-            editable="0" layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <SLIDER name="new slider" id="832fbd7caa85651a" memberName="sliderRotateOriginTime"
-          virtualName="" explicitFocusOrder="0" pos="80 56 90M 24" posRelativeX="673732692faf9b89"
-          posRelativeY="673732692faf9b89" posRelativeW="673732692faf9b89"
-          min="0.0" max="10.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+  <GROUPCOMPONENT name="new group" id="e8336da307c67c03" memberName="group3" virtualName=""
+                  explicitFocusOrder="0" pos="0 96 0M 48" title="Preset 3"/>
+  <TEXTBUTTON name="new button" id="6514609962c325db" memberName="buttonSet3"
+              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="e8336da307c67c03"
+              posRelativeY="e8336da307c67c03" buttonText="Set" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <SLIDER name="new slider" id="74aa9d1365e4e818" memberName="sliderTime3"
+          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="e8336da307c67c03"
+          posRelativeY="e8336da307c67c03" posRelativeW="e8336da307c67c03"
+          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="new label" id="951754df8632ee6f" memberName="labelGroup"
-         virtualName="" explicitFocusOrder="0" pos="16 24 55 24" posRelativeX="673732692faf9b89"
-         posRelativeY="673732692faf9b89" edTextCol="ff000000" edBkgCol="0"
-         labelText="Group:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="new label" id="96c8b57f2e002997" memberName="labelTime"
-         virtualName="" explicitFocusOrder="0" pos="16 56 55 24" posRelativeX="673732692faf9b89"
-         posRelativeY="673732692faf9b89" edTextCol="ff000000" edBkgCol="0"
-         labelText="Time:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="new slider" id="5778d425eb8e0dd3" memberName="sliderRotateOriginRepetoitions"
-          virtualName="" explicitFocusOrder="0" pos="80 88 90M 24" posRelativeX="673732692faf9b89"
-          posRelativeY="673732692faf9b89" posRelativeW="673732692faf9b89"
-          min="0.0" max="1000.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+  <TOGGLEBUTTON name="new toggle button" id="1dd6eb466e28fccb" memberName="togglePolar3"
+                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="e8336da307c67c03"
+                posRelativeY="e8336da307c67c03" buttonText="Polar" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTBUTTON name="new button" id="b5a1fad26134727a" memberName="buttonGo3"
+              virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="e8336da307c67c03"
+              posRelativeY="e8336da307c67c03" buttonText="Go" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <GROUPCOMPONENT name="new group" id="996694d54e1d1607" memberName="group4" virtualName=""
+                  explicitFocusOrder="0" pos="0 144 0M 48" title="Preset 4"/>
+  <TEXTBUTTON name="new button" id="16b3ac053bc2130" memberName="buttonSet4"
+              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="996694d54e1d1607"
+              posRelativeY="996694d54e1d1607" buttonText="Set" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <SLIDER name="new slider" id="9bf6f40205390b0d" memberName="sliderTime4"
+          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="996694d54e1d1607"
+          posRelativeY="996694d54e1d1607" posRelativeW="996694d54e1d1607"
+          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
-  <LABEL name="new label" id="bdc1861864d7c7c3" memberName="labelRepetitions"
-         virtualName="" explicitFocusOrder="0" pos="16 88 55 24" posRelativeX="673732692faf9b89"
-         posRelativeY="673732692faf9b89" edTextCol="ff000000" edBkgCol="0"
-         labelText="Rep:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="new button" id="f7860822b4ee837e" memberName="buttonRotationOriginGo"
-              virtualName="" explicitFocusOrder="0" pos="16 120 32M 24" posRelativeX="673732692faf9b89"
-              posRelativeY="673732692faf9b89" posRelativeW="673732692faf9b89"
-              buttonText="Go" connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TOGGLEBUTTON name="new toggle button" id="54313aa8ce125a33" memberName="togglePolar4"
+                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="996694d54e1d1607"
+                posRelativeY="996694d54e1d1607" buttonText="Polar" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
+  <TEXTBUTTON name="new button" id="a4b18c8c85023520" memberName="buttonGo4"
+              virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="996694d54e1d1607"
+              posRelativeY="996694d54e1d1607" buttonText="Go" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <GENERICCOMPONENT name="new component" id="99e58b8d05f9c746" memberName="action1"
+                    virtualName="" explicitFocusOrder="0" pos="0 200 50.118% 340"
+                    class="AnimatorActionComponent" params="pSourceSet"/>
+  <GENERICCOMPONENT name="new component" id="658f4eddb6e6b401" memberName="action2"
+                    virtualName="" explicitFocusOrder="0" pos="0Rr 200 50.118% 340"
+                    class="AnimatorActionComponent" params="pSourceSet"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

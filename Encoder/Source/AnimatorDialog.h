@@ -25,7 +25,7 @@ AnimatorDialog(ActionListener* actionListener, Component* pComponent)
 		addActionListener(actionListener);
         setResizable(true, true);
         setUsingNativeTitleBar(false);
-		setResizeLimits(700, 300, 3000, 3000);
+		setResizeLimits(700, 570, 3000, 570);
 	}
 
 	void closeButtonPressed() override
