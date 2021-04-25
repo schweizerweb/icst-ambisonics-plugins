@@ -23,6 +23,7 @@
 #include <JuceHeader.h>
 #include "../../Common/AmbiSourceSet.h"
 #include "AnimatorActionComponent.h"
+#include "EncoderSettings.h"
 
 #define STEP_TIMER_ID       1
 #define STEP_TIMER_INTERVAL 50
@@ -40,8 +41,7 @@
 */
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
-                           public juce::Button::Listener,
-                           public juce::Slider::Listener
+                           public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -56,22 +56,30 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
-    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    void calculateStepsTo(OwnedArray<AmbiSource>* pPositions, bool isPolar, double timeSec);
-    void setPreset(OwnedArray<AmbiSource>* pSet);
+    struct PositionSet
+    {
+        OwnedArray<Point3D<double>> sources;
+        OwnedArray<Point3D<double>> groups;
+    };
+
+    void calculateStepsTo(PositionSet* pPositions, bool isPolar, double timeSec);
+    void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
+
+    void setPreset(PositionSet* pSet);
     void performAction(AnimatorAction* pAction);
-    
+
     AmbiSourceSet* pSourceSet;
-    OwnedArray<AmbiSource> set1;
-    OwnedArray<AmbiSource> set2;
-    OwnedArray<AmbiSource> set3;
-    OwnedArray<AmbiSource> set4;
-    HashMap<int, OwnedArray<Point3D<float>>*> steps;
+    PositionSet set1;
+    PositionSet set2;
+    PositionSet set3;
+    PositionSet set4;
+    OwnedArray<Point3D<float>> steps[JucePlugin_MaxNumInputChannels];
+    OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
     int currentStep;
     //[/UserVariables]
 

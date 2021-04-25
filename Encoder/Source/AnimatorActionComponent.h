@@ -41,7 +41,7 @@ class AnimatorActionComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    AnimatorActionComponent (AmbiSourceSet* pSourceSet);
+    AnimatorActionComponent (AmbiSourceSet* pSourceSet, String title);
     ~AnimatorActionComponent() override;
 
     //==============================================================================

@@ -44,15 +44,13 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime1.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime1.get());
-    sliderTime1->setRange (0, 10, 1);
-    sliderTime1->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime1->setRange (0, 10, 0.1);
+    sliderTime1->setSliderStyle (juce::Slider::LinearBar);
     sliderTime1->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderTime1->addListener (this);
 
     togglePolar1.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar1.get());
     togglePolar1->setButtonText (TRANS("Polar"));
-    togglePolar1->addListener (this);
 
     buttonGo1.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (buttonGo1.get());
@@ -70,15 +68,13 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime2.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime2.get());
-    sliderTime2->setRange (0, 10, 1);
-    sliderTime2->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime2->setRange (0, 10, 0.1);
+    sliderTime2->setSliderStyle (juce::Slider::LinearBar);
     sliderTime2->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderTime2->addListener (this);
 
     togglePolar2.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar2.get());
     togglePolar2->setButtonText (TRANS("Polar"));
-    togglePolar2->addListener (this);
 
     buttonGo2.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (buttonGo2.get());
@@ -96,15 +92,13 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime3.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime3.get());
-    sliderTime3->setRange (0, 10, 1);
-    sliderTime3->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime3->setRange (0, 10, 0.1);
+    sliderTime3->setSliderStyle (juce::Slider::LinearBar);
     sliderTime3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderTime3->addListener (this);
 
     togglePolar3.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar3.get());
     togglePolar3->setButtonText (TRANS("Polar"));
-    togglePolar3->addListener (this);
 
     buttonGo3.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (buttonGo3.get());
@@ -122,31 +116,34 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime4.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime4.get());
-    sliderTime4->setRange (0, 10, 1);
-    sliderTime4->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTime4->setRange (0, 10, 0.1);
+    sliderTime4->setSliderStyle (juce::Slider::LinearBar);
     sliderTime4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
-    sliderTime4->addListener (this);
 
     togglePolar4.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar4.get());
     togglePolar4->setButtonText (TRANS("Polar"));
-    togglePolar4->addListener (this);
 
     buttonGo4.reset (new juce::TextButton ("new button"));
     addAndMakeVisible (buttonGo4.get());
     buttonGo4->setButtonText (TRANS("Go"));
     buttonGo4->addListener (this);
 
-    action1.reset (new AnimatorActionComponent (pSourceSet));
+    action1.reset (new AnimatorActionComponent (pSourceSet, "Action 1"));
     addAndMakeVisible (action1.get());
     action1->setName ("new component");
 
-    action2.reset (new AnimatorActionComponent (pSourceSet));
+    action2.reset (new AnimatorActionComponent (pSourceSet, "Action 2"));
     addAndMakeVisible (action2.get());
     action2->setName ("new component");
 
 
     //[UserPreSize]
+    String sliderSuffix = " s (Smoothing)";
+    sliderTime1->setTextValueSuffix(sliderSuffix);
+    sliderTime2->setTextValueSuffix(sliderSuffix);
+    sliderTime3->setTextValueSuffix(sliderSuffix);
+    sliderTime4->setTextValueSuffix(sliderSuffix);
     //[/UserPreSize]
 
     setSize (700, 300);
@@ -162,10 +159,6 @@ AnimatorComponent::~AnimatorComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     stopTimer(STEP_TIMER_ID);
-
-    for(auto s : steps)
-        delete(s);
-    steps.clear();
     //[/Destructor_pre]
 
     group1 = nullptr;
@@ -216,22 +209,22 @@ void AnimatorComponent::resized()
     group1->setBounds (0, 0, getWidth() - 0, 48);
     buttonSet1->setBounds (0 + 16, 0 + 16, 55, 24);
     sliderTime1->setBounds (0 + 80, 0 + 16, (getWidth() - 0) - 216, 24);
-    togglePolar1->setBounds (0 + (getWidth() - 0) - 73 - 63, 0 + 16, 63, 24);
+    togglePolar1->setBounds (0 + (getWidth() - 0) - 70 - 63, 0 + 16, 63, 24);
     buttonGo1->setBounds (0 + (getWidth() - 0) - 9 - 55, 0 + 16, 55, 24);
     group2->setBounds (0, 48, getWidth() - 0, 48);
     buttonSet2->setBounds (0 + 16, 48 + 16, 55, 24);
     sliderTime2->setBounds (0 + 80, 48 + 16, (getWidth() - 0) - 216, 24);
-    togglePolar2->setBounds (0 + (getWidth() - 0) - 73 - 63, 48 + 16, 63, 24);
+    togglePolar2->setBounds (0 + (getWidth() - 0) - 70 - 63, 48 + 16, 63, 24);
     buttonGo2->setBounds (0 + (getWidth() - 0) - 9 - 55, 48 + 16, 55, 24);
     group3->setBounds (0, 96, getWidth() - 0, 48);
     buttonSet3->setBounds (0 + 16, 96 + 16, 55, 24);
     sliderTime3->setBounds (0 + 80, 96 + 16, (getWidth() - 0) - 216, 24);
-    togglePolar3->setBounds (0 + (getWidth() - 0) - 73 - 63, 96 + 16, 63, 24);
+    togglePolar3->setBounds (0 + (getWidth() - 0) - 70 - 63, 96 + 16, 63, 24);
     buttonGo3->setBounds (0 + (getWidth() - 0) - 9 - 55, 96 + 16, 55, 24);
     group4->setBounds (0, 144, getWidth() - 0, 48);
     buttonSet4->setBounds (0 + 16, 144 + 16, 55, 24);
     sliderTime4->setBounds (0 + 80, 144 + 16, (getWidth() - 0) - 216, 24);
-    togglePolar4->setBounds (0 + (getWidth() - 0) - 73 - 63, 144 + 16, 63, 24);
+    togglePolar4->setBounds (0 + (getWidth() - 0) - 70 - 63, 144 + 16, 63, 24);
     buttonGo4->setBounds (0 + (getWidth() - 0) - 9 - 55, 144 + 16, 55, 24);
     action1->setBounds (0, 200, proportionOfWidth (0.5012f), 340);
     action2->setBounds (getWidth() - proportionOfWidth (0.5012f), 200, proportionOfWidth (0.5012f), 340);
@@ -250,11 +243,6 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         setPreset(&set1);
         //[/UserButtonCode_buttonSet1]
     }
-    else if (buttonThatWasClicked == togglePolar1.get())
-    {
-        //[UserButtonCode_togglePolar1] -- add your button handler code here..
-        //[/UserButtonCode_togglePolar1]
-    }
     else if (buttonThatWasClicked == buttonGo1.get())
     {
         //[UserButtonCode_buttonGo1] -- add your button handler code here..
@@ -266,11 +254,6 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_buttonSet2] -- add your button handler code here..
         setPreset(&set2);
         //[/UserButtonCode_buttonSet2]
-    }
-    else if (buttonThatWasClicked == togglePolar2.get())
-    {
-        //[UserButtonCode_togglePolar2] -- add your button handler code here..
-        //[/UserButtonCode_togglePolar2]
     }
     else if (buttonThatWasClicked == buttonGo2.get())
     {
@@ -284,11 +267,6 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         setPreset(&set3);
         //[/UserButtonCode_buttonSet3]
     }
-    else if (buttonThatWasClicked == togglePolar3.get())
-    {
-        //[UserButtonCode_togglePolar3] -- add your button handler code here..
-        //[/UserButtonCode_togglePolar3]
-    }
     else if (buttonThatWasClicked == buttonGo3.get())
     {
         //[UserButtonCode_buttonGo3] -- add your button handler code here..
@@ -301,11 +279,6 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         setPreset(&set4);
         //[/UserButtonCode_buttonSet4]
     }
-    else if (buttonThatWasClicked == togglePolar4.get())
-    {
-        //[UserButtonCode_togglePolar4] -- add your button handler code here..
-        //[/UserButtonCode_togglePolar4]
-    }
     else if (buttonThatWasClicked == buttonGo4.get())
     {
         //[UserButtonCode_buttonGo4] -- add your button handler code here..
@@ -317,62 +290,52 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void AnimatorComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
-{
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
-    if (sliderThatWasMoved == sliderTime1.get())
-    {
-        //[UserSliderCode_sliderTime1] -- add your slider handling code here..
-        //[/UserSliderCode_sliderTime1]
-    }
-    else if (sliderThatWasMoved == sliderTime2.get())
-    {
-        //[UserSliderCode_sliderTime2] -- add your slider handling code here..
-        //[/UserSliderCode_sliderTime2]
-    }
-    else if (sliderThatWasMoved == sliderTime3.get())
-    {
-        //[UserSliderCode_sliderTime3] -- add your slider handling code here..
-        //[/UserSliderCode_sliderTime3]
-    }
-    else if (sliderThatWasMoved == sliderTime4.get())
-    {
-        //[UserSliderCode_sliderTime4] -- add your slider handling code here..
-        //[/UserSliderCode_sliderTime4]
-    }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
-}
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AnimatorComponent::timerCallback(int timerID)
 {
-    if(steps.size() > 0 && currentStep >= 0)
+    if(currentStep >= 0)
     {
-        HashMap<int, OwnedArray<Point3D<float>>*>::Iterator i (steps);
-
-        while (i.next())
+        bool actionsPerformed = false;
+        for(int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
         {
-            if(currentStep >= i.getValue()->size())
+            if(currentStep >= steps[i].size())
             {
-                currentStep = -1;
-                return;
+                continue;
             }
 
-            auto p = *i.getValue()->getUnchecked(currentStep);
+            auto p = *steps[i].getUnchecked(currentStep);
             pSourceSet->setChannelXYZ(
-                                    i.getKey(),
+                                    i,
                                     p.getX(),
                                     p.getY(),
                                     p.getZ());
+            actionsPerformed = true;
         }
 
-        currentStep++;
+        for(int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+        {
+            if(currentStep >= groupSteps[i].size())
+            {
+                continue;
+            }
+
+            auto p = *groupSteps[i].getUnchecked(currentStep);
+            pSourceSet->setGroupXyz(i, p.getX(), p.getY(), p.getZ(), false);
+
+            actionsPerformed = true;
+        }
+
+        if(actionsPerformed)
+        {
+            currentStep++;
+        }
+        else
+        {
+            currentStep = -1;
+            return;
+        }
     }
     else
     {
@@ -383,7 +346,7 @@ void AnimatorComponent::timerCallback(int timerID)
 
 void AnimatorComponent::performAction(AnimatorAction *pAction)
 {
-    double factor = 1.0 / STEP_TIMER_INTERVAL;
+    double factor = STEP_TIMER_INTERVAL / 1000.0;
     if(pAction->enabled && pAction->groupIndex >= 0 && pAction->groupIndex < pSourceSet->groupCount())
     {
         if(pAction->rotationX != 0.0 || pAction->rotationY != 0.0 || pAction->rotationZ != 0.0)
@@ -410,75 +373,86 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
     }
 }
 
-void AnimatorComponent::calculateStepsTo(OwnedArray<AmbiSource>* pPositions, bool isPolar, double timeSec)
+void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, double timeSec)
 {
-    for(auto s : steps)
-        delete(s);
-    steps.clear();
+    for(auto& s : steps)
+        s.clear();
+    for(auto& s : groupSteps)
+        s.clear();
 
-    int stepsCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
+    int stepCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
 
-    // match points
     for(int i = 0; i < pSourceSet->size(); i++)
     {
         if(!pSourceSet->get(i)->getEnabled())
             continue;
 
-        String name = pSourceSet->get(i)->getName();
         Point3D<double> origin = *(pSourceSet->get(i)->getPoint());
-        int j;
-        for(j = 0; j < pPositions->size(); j++)
-        {
-            if(pPositions->getUnchecked(j)->getName() == name)
-            {
-                break;
-            }
-        }
+        Point3D<double> target = *pPositions->sources.getUnchecked(i);
 
-        if(j < pPositions->size() && pPositions->getUnchecked(j)->getEnabled())
-        {
-            // means match
-            steps.set(j, new OwnedArray<Point3D<float>>());
-            Point3D<double> p = *pPositions->getUnchecked(j)->getPoint();
-            if(isPolar)
-            {
-                double da = p.getAzimuth() - origin.getAzimuth();
-                double de = p.getElevation() - origin.getElevation();
-                double dd = p.getDistance() - origin.getDistance();
-                for(int iStep = 0; iStep < stepsCount; iStep++)
-                {
-                    auto newPt = new Point3D<float>();
-                    newPt->setAed(
-                                  origin.getAzimuth() + da * (iStep + 1) / stepsCount,
-                                  origin.getElevation() + de * (iStep + 1) / stepsCount,
-                                  origin.getDistance() + dd * (iStep + 1) / stepsCount);
-                    steps[j]->add(newPt);
-                }
-            }
-            else
-            {
-                double dx = p.getX() - origin.getX();
-                double dy = p.getY() - origin.getY();
-                double dz = p.getZ() - origin.getZ();
-                for(int iStep = 0; iStep < stepsCount; iStep++)
-                {
-                    steps[j]->add(new Point3D<float>(
-                                                    origin.getX() + dx * (iStep + 1) / stepsCount,
-                                                    origin.getY() + dy * (iStep + 1) / stepsCount,
-                                                    origin.getZ() + dz * (iStep + 1) / stepsCount));
-                }
-            }
-        }
+        calculateStepsTo(origin, target, &steps[i], isPolar, stepCount);
+    }
+
+    for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+    {
+        if(!pSourceSet->getGroup(i)->getEnabled())
+            continue;
+
+        Point3D<double> origin = *(pSourceSet->getGroup(i)->getPoint());
+        Point3D<double> target = *pPositions->groups.getUnchecked(i);
+
+        calculateStepsTo(origin, target, &groupSteps[i], isPolar, stepCount);
     }
 
     currentStep = 0;
 }
 
-void AnimatorComponent::setPreset(OwnedArray<AmbiSource> *pSet)
+void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float> > *pStepArray, bool isPolar, int stepCount)
 {
-    pSet->clear();
+    if(isPolar)
+    {
+        double da = target.getAzimuth() - origin.getAzimuth();
+        double de = target.getElevation() - origin.getElevation();
+        double dd = target.getDistance() - origin.getDistance();
+        for(int iStep = 0; iStep < stepCount; iStep++)
+        {
+            auto newPt = new Point3D<float>();
+            newPt->setAed(
+                            origin.getAzimuth() + da * (iStep + 1) / stepCount,
+                            origin.getElevation() + de * (iStep + 1) / stepCount,
+                            origin.getDistance() + dd * (iStep + 1) / stepCount);
+            pStepArray->add(newPt);
+        }
+    }
+    else
+    {
+        double dx = target.getX() - origin.getX();
+        double dy = target.getY() - origin.getY();
+        double dz = target.getZ() - origin.getZ();
+        for(int iStep = 0; iStep < stepCount; iStep++)
+        {
+            pStepArray->add(new Point3D<float>(
+                                            origin.getX() + dx * (iStep + 1) / stepCount,
+                                            origin.getY() + dy * (iStep + 1) / stepCount,
+                                            origin.getZ() + dz * (iStep + 1) / stepCount));
+        }
+    }
+}
+
+void AnimatorComponent::setPreset(PositionSet *pSet)
+{
+    pSet->sources.clear();
+    pSet->groups.clear();
     for(int i = 0; i < pSourceSet->size(); i++)
-        pSet->add(new AmbiSource(pSourceSet->get(i)));
+    {
+        pSet->sources.add(new Point3D<double>(*pSourceSet->get(i)->getPoint()));
+    }
+
+    for(int i = 0; i < pSourceSet->groupCount(); i++)
+    {
+        pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(i)->getPoint()));
+        Logger::writeToLog(String(pSourceSet->getGroup(i)->getPoint()->getX()) + "; " + String(pSourceSet->getGroup(i)->getPoint()->getY()));
+    }
 }
 //[/MiscUserCode]
 
@@ -507,13 +481,13 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="1406018e4c78eb13" memberName="sliderTime1"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="238ed80972cc4d19"
           posRelativeY="238ed80972cc4d19" posRelativeW="238ed80972cc4d19"
-          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="1c7a8ab484d0d51e" memberName="togglePolar1"
-                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="238ed80972cc4d19"
+                virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="238ed80972cc4d19"
                 posRelativeY="238ed80972cc4d19" buttonText="Polar" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
+                needsCallback="0" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="new button" id="cfe28ecd7a138f26" memberName="buttonGo1"
               virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="238ed80972cc4d19"
               posRelativeY="238ed80972cc4d19" buttonText="Go" connectedEdges="0"
@@ -527,13 +501,13 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="2bb561484b6a5dbb" memberName="sliderTime2"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="757958c6e56c2a33"
           posRelativeY="757958c6e56c2a33" posRelativeW="757958c6e56c2a33"
-          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="dab804a7a5be0515" memberName="togglePolar2"
-                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="757958c6e56c2a33"
+                virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="757958c6e56c2a33"
                 posRelativeY="757958c6e56c2a33" buttonText="Polar" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
+                needsCallback="0" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="new button" id="770f8258412948ef" memberName="buttonGo2"
               virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="757958c6e56c2a33"
               posRelativeY="757958c6e56c2a33" buttonText="Go" connectedEdges="0"
@@ -547,13 +521,13 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="74aa9d1365e4e818" memberName="sliderTime3"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="e8336da307c67c03"
           posRelativeY="e8336da307c67c03" posRelativeW="e8336da307c67c03"
-          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="1dd6eb466e28fccb" memberName="togglePolar3"
-                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="e8336da307c67c03"
+                virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="e8336da307c67c03"
                 posRelativeY="e8336da307c67c03" buttonText="Polar" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
+                needsCallback="0" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="new button" id="b5a1fad26134727a" memberName="buttonGo3"
               virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="e8336da307c67c03"
               posRelativeY="e8336da307c67c03" buttonText="Go" connectedEdges="0"
@@ -567,23 +541,23 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="9bf6f40205390b0d" memberName="sliderTime4"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="996694d54e1d1607"
           posRelativeY="996694d54e1d1607" posRelativeW="996694d54e1d1607"
-          min="0.0" max="10.0" int="1.0" style="LinearHorizontal" textBoxPos="TextBoxLeft"
+          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+          needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="54313aa8ce125a33" memberName="togglePolar4"
-                virtualName="" explicitFocusOrder="0" pos="73Rr 16 63 24" posRelativeX="996694d54e1d1607"
+                virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="996694d54e1d1607"
                 posRelativeY="996694d54e1d1607" buttonText="Polar" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
+                needsCallback="0" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="new button" id="a4b18c8c85023520" memberName="buttonGo4"
               virtualName="" explicitFocusOrder="0" pos="9Rr 16 55 24" posRelativeX="996694d54e1d1607"
               posRelativeY="996694d54e1d1607" buttonText="Go" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="new component" id="99e58b8d05f9c746" memberName="action1"
                     virtualName="" explicitFocusOrder="0" pos="0 200 50.118% 340"
-                    class="AnimatorActionComponent" params="pSourceSet"/>
+                    class="AnimatorActionComponent" params="pSourceSet, &quot;Action 1&quot;"/>
   <GENERICCOMPONENT name="new component" id="658f4eddb6e6b401" memberName="action2"
                     virtualName="" explicitFocusOrder="0" pos="0Rr 200 50.118% 340"
-                    class="AnimatorActionComponent" params="pSourceSet"/>
+                    class="AnimatorActionComponent" params="pSourceSet, &quot;Action 2&quot;"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

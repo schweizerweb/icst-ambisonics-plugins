@@ -117,9 +117,12 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
 
     // check new coordinates first
     checkAndAdjustDeltaXYZ(getPoint()->getX(), &dx, getPoint()->getY(), &dy, getPoint()->getZ(), &dz);
-    for (AmbiPoint* sp : groupPoints)
-        checkAndAdjustDeltaXYZ(sp->getPoint()->getX(), &dx, sp->getPoint()->getY(), &dy, sp->getPoint()->getZ(), &dz);
-
+    if(moveSubElements)
+    {
+        for (AmbiPoint* sp : groupPoints)
+            checkAndAdjustDeltaXYZ(sp->getPoint()->getX(), &dx, sp->getPoint()->getY(), &dy, sp->getPoint()->getZ(), &dz);
+    }
+    
     newX = getPoint()->getX() + dx;
     newY = getPoint()->getY() + dy;
     newZ = getPoint()->getZ() + dz;

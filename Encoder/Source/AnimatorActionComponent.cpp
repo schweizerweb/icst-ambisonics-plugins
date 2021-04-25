@@ -28,7 +28,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet)
+AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, String title)
     : pSourceSet(pSourceSet)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -186,12 +186,13 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet)
 
 
     //[UserPreSize]
+    groupMain->setText(title);
     for(int i = 0; i < pSourceSet->groupCount(); i++)
     {
-        comboBoxGroup->addItem(String(i) + " " + pSourceSet->getGroup(i)->getName(), i + 1);
+        comboBoxGroup->addItem(String(i + 1) + ": " + pSourceSet->getGroup(i)->getName(), i + 1);
     }
 
-    String rotationUnit = " [°/s]";
+    String rotationUnit = CharPointer_UTF8(" [°/s]");
     sliderRotationX->setTextValueSuffix(rotationUnit);
     sliderRotationY->setTextValueSuffix(rotationUnit);
     sliderRotationZ->setTextValueSuffix(rotationUnit);
@@ -382,7 +383,7 @@ void AnimatorActionComponent::sliderValueChanged (juce::Slider* sliderThatWasMov
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AnimatorActionComponent"
-                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* pSourceSet"
+                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* pSourceSet, String title"
                  variableInitialisers="pSourceSet(pSourceSet)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="300" initialHeight="340">
