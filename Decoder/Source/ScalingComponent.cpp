@@ -34,19 +34,8 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* p
     addChangeListener(pListener);
     //[/Constructor_pre]
 
-    labelProportionalScale.reset (new juce::Label ("new label",
-                                                   TRANS("Proportional distance scaling:")));
-    addAndMakeVisible (labelProportionalScale.get());
-    labelProportionalScale->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelProportionalScale->setJustificationType (juce::Justification::centredLeft);
-    labelProportionalScale->setEditable (false, false, false);
-    labelProportionalScale->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelProportionalScale->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelProportionalScale->setBounds (0, 0, 200, 24);
-
     labelRoomSize.reset (new juce::Label ("new label",
-                                          TRANS("Room size:")));
+                                          TRANS("Room size")));
     addAndMakeVisible (labelRoomSize.get());
     labelRoomSize->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
     labelRoomSize->setJustificationType (juce::Justification::centredLeft);
@@ -54,28 +43,28 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* p
     labelRoomSize->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelRoomSize->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelRoomSize->setBounds (0, 32, 80, 24);
+    labelRoomSize->setBounds (0, 0, 80, 24);
 
     sliderRoomSizeX.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderRoomSizeX.get());
-    sliderRoomSizeX->setRange (0, 1000, 0.1);
+    sliderRoomSizeX->setRange (0.1, 1000, 0.1);
     sliderRoomSizeX->setSliderStyle (juce::Slider::IncDecButtons);
     sliderRoomSizeX->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderRoomSizeX->addListener (this);
 
-    sliderRoomSizeX->setBounds (80, 32, 120, 24);
+    sliderRoomSizeX->setBounds (24, 24, 120, 24);
 
     sliderRoomSizeY.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderRoomSizeY.get());
-    sliderRoomSizeY->setRange (0, 1000, 0.1);
+    sliderRoomSizeY->setRange (0.1, 1000, 0.1);
     sliderRoomSizeY->setSliderStyle (juce::Slider::IncDecButtons);
     sliderRoomSizeY->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderRoomSizeY->addListener (this);
 
-    sliderRoomSizeY->setBounds (228, 32, 120, 24);
+    sliderRoomSizeY->setBounds (24, 48, 120, 24);
 
     labelX.reset (new juce::Label ("new label",
-                                   TRANS("x")));
+                                   TRANS("X:")));
     addAndMakeVisible (labelX.get());
     labelX->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
     labelX->setJustificationType (juce::Justification::centredLeft);
@@ -83,33 +72,51 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* p
     labelX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelX->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelX->setBounds (206, 32, 15, 24);
+    labelX->setBounds (0, 24, 24, 24);
 
-    buttonDec.reset (new juce::TextButton ("new button"));
-    addAndMakeVisible (buttonDec.get());
-    buttonDec->setButtonText (TRANS("-"));
-    buttonDec->addListener (this);
+    labelY.reset (new juce::Label ("new label",
+                                   TRANS("Y:")));
+    addAndMakeVisible (labelY.get());
+    labelY->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelY->setJustificationType (juce::Justification::centredLeft);
+    labelY->setEditable (false, false, false);
+    labelY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelY->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    buttonDec->setBounds (226, 0, 56, 24);
+    labelY->setBounds (0, 48, 24, 24);
 
-    buttonInc.reset (new juce::TextButton ("new button"));
-    addAndMakeVisible (buttonInc.get());
-    buttonInc->setButtonText (TRANS("+"));
-    buttonInc->addListener (this);
+    sliderRoomSizeZ.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderRoomSizeZ.get());
+    sliderRoomSizeZ->setRange (0.1, 1000, 0.1);
+    sliderRoomSizeZ->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderRoomSizeZ->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderRoomSizeZ->addListener (this);
 
-    buttonInc->setBounds (290, 0, 56, 24);
+    sliderRoomSizeZ->setBounds (24, 72, 120, 24);
+
+    labelZ.reset (new juce::Label ("new label",
+                                   TRANS("Z:")));
+    addAndMakeVisible (labelZ.get());
+    labelZ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelZ->setJustificationType (juce::Justification::centredLeft);
+    labelZ->setEditable (false, false, false);
+    labelZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelZ->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelZ->setBounds (0, 72, 24, 24);
 
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (350, 60);
+    setSize (150, 100);
 
 
     //[Constructor] You can add your own custom stuff here..
     calculateAndDisplayRoomSize();
     sliderRoomSizeX->setNumDecimalPlacesToDisplay(2);
     sliderRoomSizeY->setNumDecimalPlacesToDisplay(2);
+    sliderRoomSizeZ->setNumDecimalPlacesToDisplay(2);
     //[/Constructor]
 }
 
@@ -118,13 +125,13 @@ ScalingComponent::~ScalingComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     //[/Destructor_pre]
 
-    labelProportionalScale = nullptr;
     labelRoomSize = nullptr;
     sliderRoomSizeX = nullptr;
     sliderRoomSizeY = nullptr;
     labelX = nullptr;
-    buttonDec = nullptr;
-    buttonInc = nullptr;
+    labelY = nullptr;
+    sliderRoomSizeZ = nullptr;
+    labelZ = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -162,7 +169,7 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         //[UserSliderCode_sliderRoomSizeX] -- add your slider handling code here..
         for(int i = 0; i < pSpeakerSet->size(); i++)
             pSpeakerSet->get(i)->getPoint()->setX(pSpeakerSet->get(i)->getPoint()->getX() / currentRoomSizeX * sliderRoomSizeX->getValue());
-        
+
         currentRoomSizeX = sliderRoomSizeX->getValue();
         //[/UserSliderCode_sliderRoomSizeX]
     }
@@ -171,9 +178,18 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         //[UserSliderCode_sliderRoomSizeY] -- add your slider handling code here..
         for(int i = 0; i < pSpeakerSet->size(); i++)
         pSpeakerSet->get(i)->getPoint()->setY(pSpeakerSet->get(i)->getPoint()->getY() / currentRoomSizeY * sliderRoomSizeY->getValue());
-        
+
         currentRoomSizeY = sliderRoomSizeY->getValue();
         //[/UserSliderCode_sliderRoomSizeY]
+    }
+    else if (sliderThatWasMoved == sliderRoomSizeZ.get())
+    {
+        //[UserSliderCode_sliderRoomSizeZ] -- add your slider handling code here..
+        for(int i = 0; i < pSpeakerSet->size(); i++)
+        pSpeakerSet->get(i)->getPoint()->setZ(pSpeakerSet->get(i)->getPoint()->getZ() / currentRoomSizeZ * sliderRoomSizeZ->getValue());
+
+        currentRoomSizeZ = sliderRoomSizeZ->getValue();
+        //[/UserSliderCode_sliderRoomSizeZ]
     }
 
     //[UsersliderValueChanged_Post]
@@ -182,49 +198,26 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
     //[/UsersliderValueChanged_Post]
 }
 
-void ScalingComponent::buttonClicked (juce::Button* buttonThatWasClicked)
-{
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
-    if (buttonThatWasClicked == buttonDec.get())
-    {
-        //[UserButtonCode_buttonDec] -- add your button handler code here..
-        for(int i = 0; i < pSpeakerSet->size(); i++)
-            pSpeakerSet->get(i)->getPoint()->setDistance(jmax(DISTANCE_MIN_VALUE, pSpeakerSet->get(i)->getPoint()->getDistance() - 1));
-        //[/UserButtonCode_buttonDec]
-    }
-    else if (buttonThatWasClicked == buttonInc.get())
-    {
-        //[UserButtonCode_buttonInc] -- add your button handler code here..
-        for(int i = 0; i < pSpeakerSet->size(); i++)
-            pSpeakerSet->get(i)->getPoint()->setDistance(pSpeakerSet->get(i)->getPoint()->getDistance() + 1);
-        //[/UserButtonCode_buttonInc]
-    }
-
-    //[UserbuttonClicked_Post]
-    sendChangeMessage();
-    pZoomSettings->Reset(pSpeakerSet);
-    calculateAndDisplayRoomSize();
-    //[/UserbuttonClicked_Post]
-}
-
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void ScalingComponent::calculateAndDisplayRoomSize()
 {
-    double maxX = 0.0, maxY = 0.0;
+    double maxX = 0.0, maxY = 0.0, maxZ = 0.0;
     for(int i = 0; i < pSpeakerSet->size(); i++)
     {
         maxX = jmax(maxX, abs(pSpeakerSet->get(i)->getPoint()->getX()));
         maxY = jmax(maxY, abs(pSpeakerSet->get(i)->getPoint()->getY()));
+        maxZ = jmax(maxZ, abs(pSpeakerSet->get(i)->getPoint()->getZ()));
     }
-    
-    sliderRoomSizeX->setValue(maxX, dontSendNotification);
-    sliderRoomSizeY->setValue(maxY, dontSendNotification);
-    currentRoomSizeX = maxX;
-    currentRoomSizeY = maxY;
+
+    currentRoomSizeX = maxX * 2.0;
+    currentRoomSizeY = maxY * 2.0;
+    currentRoomSizeZ = maxZ * 2.0;
+
+    sliderRoomSizeX->setValue(currentRoomSizeX, dontSendNotification);
+    sliderRoomSizeY->setValue(currentRoomSizeY, dontSendNotification);
+    sliderRoomSizeZ->setValue(currentRoomSizeZ, dontSendNotification);
 }
 //[/MiscUserCode]
 
@@ -243,39 +236,43 @@ BEGIN_JUCER_METADATA
                  constructorParams="ChangeListener* pListener, AmbiSpeakerSet* pSpeakerSet, ZoomSettings* pZoomSettings"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="350" initialHeight="60">
+                 fixedSize="0" initialWidth="150" initialHeight="100">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <LABEL name="new label" id="8d4ea15fd03ab89d" memberName="labelProportionalScale"
-         virtualName="" explicitFocusOrder="0" pos="0 0 200 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Proportional distance scaling:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="new label" id="4c61197f8352080b" memberName="labelRoomSize"
-         virtualName="" explicitFocusOrder="0" pos="0 32 80 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="Room size:" editableSingleClick="0" editableDoubleClick="0"
+         virtualName="" explicitFocusOrder="0" pos="0 0 80 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Room size" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="25d6a4f96c7831e1" memberName="sliderRoomSizeX"
-          virtualName="" explicitFocusOrder="0" pos="80 32 120 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="24 24 120 24" min="0.1"
           max="1000.0" int="0.1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <SLIDER name="new slider" id="ffd4bd0a82928115" memberName="sliderRoomSizeY"
-          virtualName="" explicitFocusOrder="0" pos="228 32 120 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="24 48 120 24" min="0.1"
           max="1000.0" int="0.1" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="new label" id="1e24e82f0fe497f9" memberName="labelX" virtualName=""
-         explicitFocusOrder="0" pos="206 32 15 24" edTextCol="ff000000"
-         edBkgCol="0" labelText="x" editableSingleClick="0" editableDoubleClick="0"
+         explicitFocusOrder="0" pos="0 24 24 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="X:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="new button" id="370794d369b7d65e" memberName="buttonDec"
-              virtualName="" explicitFocusOrder="0" pos="226 0 56 24" buttonText="-"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="new button" id="ac7b38c1070661ed" memberName="buttonInc"
-              virtualName="" explicitFocusOrder="0" pos="290 0 56 24" buttonText="+"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <LABEL name="new label" id="ea9405f7cb5208df" memberName="labelY" virtualName=""
+         explicitFocusOrder="0" pos="0 48 24 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Y:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="new slider" id="b90acff5eb8097b1" memberName="sliderRoomSizeZ"
+          virtualName="" explicitFocusOrder="0" pos="24 72 120 24" min="0.1"
+          max="1000.0" int="0.1" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="new label" id="1dc54b9ae36a1875" memberName="labelZ" virtualName=""
+         explicitFocusOrder="0" pos="0 72 24 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="Z:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

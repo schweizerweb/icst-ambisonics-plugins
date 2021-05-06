@@ -37,8 +37,7 @@
 */
 class ScalingComponent  : public juce::Component,
                           public ChangeBroadcaster,
-                          public juce::Slider::Listener,
-                          public juce::Button::Listener
+                          public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -52,7 +51,6 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
-    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -63,16 +61,17 @@ private:
     ZoomSettings* pZoomSettings;
     double currentRoomSizeX;
     double currentRoomSizeY;
+    double currentRoomSizeZ;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::Label> labelProportionalScale;
     std::unique_ptr<juce::Label> labelRoomSize;
     std::unique_ptr<juce::Slider> sliderRoomSizeX;
     std::unique_ptr<juce::Slider> sliderRoomSizeY;
     std::unique_ptr<juce::Label> labelX;
-    std::unique_ptr<juce::TextButton> buttonDec;
-    std::unique_ptr<juce::TextButton> buttonInc;
+    std::unique_ptr<juce::Label> labelY;
+    std::unique_ptr<juce::Slider> sliderRoomSizeZ;
+    std::unique_ptr<juce::Label> labelZ;
 
 
     //==============================================================================
