@@ -14,10 +14,22 @@ class AnimatorAction
 public:
     AnimatorAction()
     {
-        enabled = false;
-        groupIndex = -1;
+        reset();
     }
 
+    void reset()
+    {
+        enabled = false;
+        groupIndex = -1;
+        rotationX = 0.0;
+        rotationY = 0.0;
+        rotationZ = 0.0;
+        rotationOriginX = 0.0;
+        rotationOriginY = 0.0;
+        rotationOriginZ = 0.0;
+        stretch = 0.0;
+    }
+    
     bool enabled;
     int groupIndex;
     double rotationX;

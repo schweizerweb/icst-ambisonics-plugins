@@ -69,10 +69,10 @@ private:
 
     void calculateStepsTo(PositionSet* pPositions, bool isPolar, double timeSec);
     void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
-
     void setPreset(PositionSet* pSet);
     void performAction(AnimatorAction* pAction);
-
+    void controlDimming();
+    
     AmbiSourceSet* pSourceSet;
     PositionSet set1;
     PositionSet set2;

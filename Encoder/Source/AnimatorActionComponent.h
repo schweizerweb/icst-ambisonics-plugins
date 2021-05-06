@@ -59,6 +59,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    void refreshControls();
     AmbiSourceSet* pSourceSet;
     //[/UserVariables]
 
@@ -84,6 +85,7 @@ private:
     std::unique_ptr<juce::GroupComponent> groupStretch;
     std::unique_ptr<juce::Label> labelStretchSimple;
     std::unique_ptr<juce::Slider> sliderStretchSimple;
+    std::unique_ptr<juce::TextButton> buttonReset;
 
 
     //==============================================================================

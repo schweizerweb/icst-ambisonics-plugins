@@ -144,13 +144,13 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderTime2->setTextValueSuffix(sliderSuffix);
     sliderTime3->setTextValueSuffix(sliderSuffix);
     sliderTime4->setTextValueSuffix(sliderSuffix);
+    controlDimming();
     //[/UserPreSize]
 
     setSize (700, 300);
 
 
     //[Constructor] You can add your own custom stuff here..
-
     startTimer(STEP_TIMER_ID, STEP_TIMER_INTERVAL);
     //[/Constructor]
 }
@@ -287,6 +287,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
+    controlDimming();
     //[/UserbuttonClicked_Post]
 }
 
@@ -382,7 +383,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 
     int stepCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
 
-    for(int i = 0; i < pSourceSet->size(); i++)
+    for(int i = 0; i < pSourceSet->size() && i < pPositions->sources.size(); i++)
     {
         if(!pSourceSet->get(i)->getEnabled())
             continue;
@@ -393,7 +394,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
         calculateStepsTo(origin, target, &steps[i], isPolar, stepCount);
     }
 
-    for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+    for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
     {
         if(!pSourceSet->getGroup(i)->getEnabled())
             continue;
@@ -453,6 +454,14 @@ void AnimatorComponent::setPreset(PositionSet *pSet)
         pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(i)->getPoint()));
         Logger::writeToLog(String(pSourceSet->getGroup(i)->getPoint()->getX()) + "; " + String(pSourceSet->getGroup(i)->getPoint()->getY()));
     }
+}
+
+void AnimatorComponent::controlDimming()
+{
+    buttonGo1->setEnabled(set1.groups.size() > 0 || set1.sources.size() > 0);
+    buttonGo2->setEnabled(set2.groups.size() > 0 || set2.sources.size() > 0);
+    buttonGo3->setEnabled(set3.groups.size() > 0 || set3.sources.size() > 0);
+    buttonGo4->setEnabled(set4.groups.size() > 0 || set4.sources.size() > 0);
 }
 //[/MiscUserCode]
 

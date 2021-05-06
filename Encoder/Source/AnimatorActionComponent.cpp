@@ -184,6 +184,11 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, Str
     sliderStretchSimple->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderStretchSimple->addListener (this);
 
+    buttonReset.reset (new juce::TextButton ("new button"));
+    addAndMakeVisible (buttonReset.get());
+    buttonReset->setButtonText (TRANS("reset"));
+    buttonReset->addListener (this);
+
 
     //[UserPreSize]
     groupMain->setText(title);
@@ -206,6 +211,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, Str
 
 
     //[Constructor] You can add your own custom stuff here..
+    refreshControls();
     //[/Constructor]
 }
 
@@ -235,6 +241,7 @@ AnimatorActionComponent::~AnimatorActionComponent()
     groupStretch = nullptr;
     labelStretchSimple = nullptr;
     sliderStretchSimple = nullptr;
+    buttonReset = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -279,6 +286,7 @@ void AnimatorActionComponent::resized()
     groupStretch->setBounds (0 + 8, 0 + 248, (getWidth() - 0) - 16, 48);
     labelStretchSimple->setBounds ((0 + 8) + 8, (0 + 248) + 16, 56, 24);
     sliderStretchSimple->setBounds ((0 + 8) + 72, (0 + 248) + 16, ((getWidth() - 0) - 16) - 80, 24);
+    buttonReset->setBounds (0 + (getWidth() - 0) - 8 - 111, 0 + 336 - 8 - 24, 111, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -309,6 +317,13 @@ void AnimatorActionComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_toggleEnable] -- add your button handler code here..
         action.enabled = toggleEnable->getToggleState();
         //[/UserButtonCode_toggleEnable]
+    }
+    else if (buttonThatWasClicked == buttonReset.get())
+    {
+        //[UserButtonCode_buttonReset] -- add your button handler code here..
+        action.reset();
+        refreshControls();
+        //[/UserButtonCode_buttonReset]
     }
 
     //[UserbuttonClicked_Post]
@@ -370,6 +385,18 @@ void AnimatorActionComponent::sliderValueChanged (juce::Slider* sliderThatWasMov
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void AnimatorActionComponent::refreshControls()
+{
+    toggleEnable->setToggleState(action.enabled, dontSendNotification);
+    sliderRotationX->setValue(action.rotationX, dontSendNotification);
+    sliderRotationY->setValue(action.rotationY, dontSendNotification);
+    sliderRotationZ->setValue(action.rotationZ, dontSendNotification);
+    sliderRotationOriginX->setValue(action.rotationOriginX, dontSendNotification);
+    sliderRotationOriginY->setValue(action.rotationOriginY, dontSendNotification);
+    sliderRotationOriginZ->setValue(action.rotationOriginZ, dontSendNotification);
+    sliderStretchSimple->setValue(action.stretch, dontSendNotification);
+    comboBoxGroup->setSelectedId(action.groupIndex);
+}
 //[/MiscUserCode]
 
 
@@ -498,6 +525,10 @@ BEGIN_JUCER_METADATA
           min="-5.0" max="5.0" int="0.01" style="LinearBar" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <TEXTBUTTON name="new button" id="51ff62138879b660" memberName="buttonReset"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 111 24" posRelativeX="673732692faf9b89"
+              posRelativeY="673732692faf9b89" buttonText="reset" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
