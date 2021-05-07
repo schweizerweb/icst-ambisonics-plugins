@@ -167,28 +167,37 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
     if (sliderThatWasMoved == sliderRoomSizeX.get())
     {
         //[UserSliderCode_sliderRoomSizeX] -- add your slider handling code here..
-        for(int i = 0; i < pSpeakerSet->size(); i++)
-            pSpeakerSet->get(i)->getPoint()->setX(pSpeakerSet->get(i)->getPoint()->getX() / currentRoomSizeX * sliderRoomSizeX->getValue());
+        if(currentRoomSizeX > 0.0)
+        {
+            for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setX(pSpeakerSet->get(i)->getPoint()->getX() / currentRoomSizeX * sliderRoomSizeX->getValue());
 
-        currentRoomSizeX = sliderRoomSizeX->getValue();
+            currentRoomSizeX = sliderRoomSizeX->getValue();
+        }
         //[/UserSliderCode_sliderRoomSizeX]
     }
     else if (sliderThatWasMoved == sliderRoomSizeY.get())
     {
         //[UserSliderCode_sliderRoomSizeY] -- add your slider handling code here..
-        for(int i = 0; i < pSpeakerSet->size(); i++)
-        pSpeakerSet->get(i)->getPoint()->setY(pSpeakerSet->get(i)->getPoint()->getY() / currentRoomSizeY * sliderRoomSizeY->getValue());
+        if(currentRoomSizeY > 0.0)
+        {
+            for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setY(pSpeakerSet->get(i)->getPoint()->getY() / currentRoomSizeY * sliderRoomSizeY->getValue());
 
-        currentRoomSizeY = sliderRoomSizeY->getValue();
+            currentRoomSizeY = sliderRoomSizeY->getValue();
+        }
         //[/UserSliderCode_sliderRoomSizeY]
     }
     else if (sliderThatWasMoved == sliderRoomSizeZ.get())
     {
         //[UserSliderCode_sliderRoomSizeZ] -- add your slider handling code here..
-        for(int i = 0; i < pSpeakerSet->size(); i++)
-        pSpeakerSet->get(i)->getPoint()->setZ(pSpeakerSet->get(i)->getPoint()->getZ() / currentRoomSizeZ * sliderRoomSizeZ->getValue());
+        if(currentRoomSizeZ > 0.0)
+        {
+            for(int i = 0; i < pSpeakerSet->size(); i++)
+                pSpeakerSet->get(i)->getPoint()->setZ(pSpeakerSet->get(i)->getPoint()->getZ() / currentRoomSizeZ * sliderRoomSizeZ->getValue());
 
-        currentRoomSizeZ = sliderRoomSizeZ->getValue();
+            currentRoomSizeZ = sliderRoomSizeZ->getValue();
+        }
         //[/UserSliderCode_sliderRoomSizeZ]
     }
 
@@ -218,6 +227,10 @@ void ScalingComponent::calculateAndDisplayRoomSize()
     sliderRoomSizeX->setValue(currentRoomSizeX, dontSendNotification);
     sliderRoomSizeY->setValue(currentRoomSizeY, dontSendNotification);
     sliderRoomSizeZ->setValue(currentRoomSizeZ, dontSendNotification);
+    
+    sliderRoomSizeX->setEnabled(currentRoomSizeX > 0.0);
+    sliderRoomSizeY->setEnabled(currentRoomSizeY > 0.0);
+    sliderRoomSizeZ->setEnabled(currentRoomSizeZ > 0.0);
 }
 //[/MiscUserCode]
 
