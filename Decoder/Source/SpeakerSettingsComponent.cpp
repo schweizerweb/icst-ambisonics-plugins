@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -27,6 +27,7 @@
 #include "../../Common/Constants.h"
 #include "FilterSettingsComponent.h"
 #include "CsvImportExport.h"
+#include "ScalingComponent.h"
 //[/Headers]
 
 #include "SpeakerSettingsComponent.h"
@@ -40,7 +41,6 @@
 #define	COLUMN_ID_Z			9
 #define	COLUMN_ID_A			10
 #define	COLUMN_ID_E			11
-#define	COLUMN_ID_D			12
 #define COLUMN_ID_DISTANCE	3
 #define COLUMN_ID_DELAY		4
 #define COLUMN_ID_DELAY_COMPENSATION 13
@@ -56,8 +56,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification)
-    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
+    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
@@ -130,13 +130,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    sliderDistanceScaler.reset (new juce::Slider ("sliderDistanceScaler"));
-    addAndMakeVisible (sliderDistanceScaler.get());
-    sliderDistanceScaler->setRange (1, 500, 0.1);
-    sliderDistanceScaler->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderDistanceScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
-    sliderDistanceScaler->addListener (this);
-
     ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
@@ -150,29 +143,10 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelChannelWeights->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelChannelWeights->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceScaler.reset (new juce::Label ("labelDistanceScaler",
-                                                TRANS("Distance scaler")));
-    addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceScaler->setJustificationType (juce::Justification::centredLeft);
-    labelDistanceScaler->setEditable (false, false, false);
-    labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     btnEditMode.reset (new juce::ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
     btnEditMode->setButtonText (TRANS("Edit mode"));
     btnEditMode->addListener (this);
-
-    textOscPort.reset (new juce::TextEditor ("textOscPort"));
-    addAndMakeVisible (textOscPort.get());
-    textOscPort->setMultiLine (false);
-    textOscPort->setReturnKeyStartsNewLine (false);
-    textOscPort->setReadOnly (false);
-    textOscPort->setScrollbarsShown (true);
-    textOscPort->setCaretVisible (true);
-    textOscPort->setPopupMenuEnabled (true);
-    textOscPort->setText (juce::String());
 
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS("OSC-Port:\n")));
@@ -182,16 +156,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelOscPort->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    textTimeout.reset (new juce::TextEditor ("textTimeout"));
-    addAndMakeVisible (textTimeout.get());
-    textTimeout->setMultiLine (false);
-    textTimeout->setReturnKeyStartsNewLine (false);
-    textTimeout->setReadOnly (false);
-    textTimeout->setScrollbarsShown (true);
-    textTimeout->setCaretVisible (true);
-    textTimeout->setPopupMenuEnabled (true);
-    textTimeout->setText (juce::String());
 
     labelTimeout.reset (new juce::Label ("labelTimeout",
                                          TRANS("Timeout [ms]:")));
@@ -209,7 +173,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
     buttonSpeakerTest.reset (new juce::TextButton ("buttonSpeakerTest"));
     addAndMakeVisible (buttonSpeakerTest.get());
-    buttonSpeakerTest->setButtonText (TRANS("Test all speakers"));
+    buttonSpeakerTest->setButtonText (TRANS("test all speakers"));
     buttonSpeakerTest->addListener (this);
 
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
@@ -252,14 +216,33 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
     buttonCsv.reset (new juce::TextButton ("buttonCsv"));
     addAndMakeVisible (buttonCsv.get());
-    buttonCsv->setButtonText (TRANS("CSV"));
+    buttonCsv->setButtonText (TRANS("csv"));
     buttonCsv->addListener (this);
+
+    buttonScaling.reset (new juce::TextButton ("buttonScaling"));
+    addAndMakeVisible (buttonScaling.get());
+    buttonScaling->setButtonText (TRANS("scaling"));
+    buttonScaling->addListener (this);
+
+    sliderPort.reset (new juce::Slider ("sliderPort"));
+    addAndMakeVisible (sliderPort.get());
+    sliderPort->setRange (0, 65535, 1);
+    sliderPort->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
+    sliderPort->addListener (this);
+
+    sliderTimeout.reset (new juce::Slider ("sliderTimeout"));
+    addAndMakeVisible (sliderTimeout.get());
+    sliderTimeout->setRange (10, 10000, 1);
+    sliderTimeout->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderTimeout->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 70, 20);
+    sliderTimeout->addListener (this);
 
 
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (1200, 800);
+    setSize (900, 700);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -280,10 +263,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("X", COLUMN_ID_X, 50);
 	speakerList->getHeader().addColumn("Y", COLUMN_ID_Y, 50);
 	speakerList->getHeader().addColumn("Z", COLUMN_ID_Z, 50);
-	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 50);
-	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 50);
-	//speakerList->getHeader().addColumn("D", COLUMN_ID_D, 50);
-	speakerList->getHeader().addColumn("Distance [m]", COLUMN_ID_DISTANCE, 80);
+	speakerList->getHeader().addColumn("A", COLUMN_ID_A, 60);
+	speakerList->getHeader().addColumn("E", COLUMN_ID_E, 60);
+	speakerList->getHeader().addColumn("D [m]", COLUMN_ID_DISTANCE, 60);
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 30);
@@ -300,11 +282,9 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
 
 	// OSC
-	textOscPort->addListener(this);
-	textTimeout->addListener(this);
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
-	textOscPort->setText(String(pDecoderSettings->oscReceivePort));
-	textTimeout->setText(String(pDecoderSettings->oscReceiveTimeoutMs));
+	sliderPort->setValue(pDecoderSettings->oscReceivePort);
+	sliderTimeout->setValue(pDecoderSettings->oscReceiveTimeoutMs);
 
 	controlDimming();
     //[/Constructor]
@@ -329,14 +309,10 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
-    sliderDistanceScaler = nullptr;
     ambiChannelControl = nullptr;
     labelChannelWeights = nullptr;
-    labelDistanceScaler = nullptr;
     btnEditMode = nullptr;
-    textOscPort = nullptr;
     labelOscPort = nullptr;
-    textTimeout = nullptr;
     labelTimeout = nullptr;
     toggleOsc = nullptr;
     buttonSpeakerTest = nullptr;
@@ -346,6 +322,9 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonManageFilters = nullptr;
     comboBoxApply = nullptr;
     buttonCsv = nullptr;
+    buttonScaling = nullptr;
+    sliderPort = nullptr;
+    sliderTimeout = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -369,34 +348,33 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 267)) + 199, ((getWidth() - 18) - 0) - 0, 60);
-    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 267), (getWidth() - 18) - 0, 199);
-    groupSpeakers->setBounds (8, 0, getWidth() - 18, getHeight() - 267);
+    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 267)) + 199, ((getWidth() - 16) - 0) - 0, 60);
+    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 267), (getWidth() - 16) - 0, 199);
+    groupSpeakers->setBounds (8, 0, getWidth() - 16, getHeight() - 267);
     comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 531, 24);
     labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
-    buttonSave->setBounds (8 + (getWidth() - 18) - 233 - 80, 0 + 24, 80, 24);
-    speakerList->setBounds (8 + 16, 0 + 56, (getWidth() - 18) - 32, (getHeight() - 267) - 96);
-    buttonAdd->setBounds ((8 + 16) + 0, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 16) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 64, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 16) + ((getWidth() - 18) - 32) - 136, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    sliderDistanceScaler->setBounds ((8 + 0) + 424, (0 + (getHeight() - 267)) + 20, getWidth() - 458, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 52, ((getWidth() - 18) - 0) - 32, 199 - 68);
-    labelChannelWeights->setBounds ((8 + 0) + 16, (0 + (getHeight() - 267)) + 20, 112, 24);
-    labelDistanceScaler->setBounds ((8 + 0) + 312, (0 + (getHeight() - 267)) + 20, 104, 24);
-    btnEditMode->setBounds (8 + 16, 0 + 24, 150, 24);
-    textOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 217 - 88, ((0 + (getHeight() - 267)) + 199) + 20, 88, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 313 - 81, ((0 + (getHeight() - 267)) + 199) + 20, 81, 24);
-    textTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 15 - 82, ((0 + (getHeight() - 267)) + 199) + 20, 82, 24);
-    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 18) - 0) - 0) - 108 - 93, ((0 + (getHeight() - 267)) + 199) + 20, 93, 24);
-    toggleOsc->setBounds (((8 + 0) + 0) + 16, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4977f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5006f) - (proportionOfWidth (0.3984f) / 2), 0, proportionOfWidth (0.3984f), 24);
-    buttonManage->setBounds (8 + (getWidth() - 18) - 145 - 80, 0 + 24, 80, 24);
-    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 136, (0 + (getHeight() - 267)) + 20, 120, 24);
-    buttonManageFilters->setBounds (8 + (getWidth() - 18) - 17 - 120, 0 + 24, 120, 24);
-    comboBoxApply->setBounds ((proportionOfWidth (0.4977f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4977f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonSave->setBounds (8 + (getWidth() - 16) - 224 - 80, 0 + 24, 80, 24);
+    speakerList->setBounds (8 + 8, 0 + 56, (getWidth() - 16) - 16, (getHeight() - 267) - 96);
+    buttonAdd->setBounds ((8 + 8) + 0, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 8) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
+    ambiChannelControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 267)) + 52, ((getWidth() - 16) - 0) - 16, 199 - 60);
+    labelChannelWeights->setBounds ((8 + 0) + 8, (0 + (getHeight() - 267)) + 20, 112, 24);
+    btnEditMode->setBounds (8 + 8, 0 + 24, 150, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 267)) + 199) + 20, 75, 24);
+    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 267)) + 199) + 20, 96, 24);
+    toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4978f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
+    buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
+    comboBoxChannelWeightingMode->setBounds ((8 + 0) + 128, (0 + (getHeight() - 267)) + 20, 120, 24);
+    buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
+    comboBoxApply->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
+    buttonCsv->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 267)) + 199) + 20, 100, 24);
+    sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 267)) + 199) + 20, 170, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -592,7 +570,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
             {
                 sendChangeMessage();
                 controlDimming();
-                updateDistanceScaler();
                 speakerList->updateContent();
                 speakerList->repaint();
                 AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Import", "Data import successful");
@@ -623,6 +600,12 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
         }
         //[/UserButtonCode_buttonCsv]
     }
+    else if (buttonThatWasClicked == buttonScaling.get())
+    {
+        //[UserButtonCode_buttonScaling] -- add your button handler code here..
+        CallOutBox::launchAsynchronously(std::make_unique<ScalingComponent>(this, pSpeakerSet, pZoomSettings), buttonScaling->getBounds(), this);
+        //[/UserButtonCode_buttonScaling]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
@@ -633,13 +616,19 @@ void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMo
     //[UsersliderValueChanged_Pre]
     //[/UsersliderValueChanged_Pre]
 
-    if (sliderThatWasMoved == sliderDistanceScaler.get())
+    if (sliderThatWasMoved == sliderPort.get())
     {
-        //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
-		pAmbiSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-		speakerList->updateContent();
-		speakerList->repaint();
-        //[/UserSliderCode_sliderDistanceScaler]
+        //[UserSliderCode_sliderPort] -- add your slider handling code here..
+        pDecoderSettings->oscReceivePort = (int)sliderPort->getValue();
+        sendChangeMessage();
+        //[/UserSliderCode_sliderPort]
+    }
+    else if (sliderThatWasMoved == sliderTimeout.get())
+    {
+        //[UserSliderCode_sliderTimeout] -- add your slider handling code here..
+        pDecoderSettings->oscReceiveTimeoutMs = (int)sliderTimeout->getValue();
+        sendChangeMessage();
+        //[/UserSliderCode_sliderTimeout]
     }
 
     //[UsersliderValueChanged_Post]
@@ -709,7 +698,7 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	{
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pt->getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler(), 2); break;
+	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance(), 2); break;
 	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pt), 2); break;
 	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
 	default: text = "";
@@ -726,7 +715,6 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		|| columnId == COLUMN_ID_Z
 		|| columnId == COLUMN_ID_A
 		|| columnId == COLUMN_ID_E
-		|| columnId == COLUMN_ID_D
 		|| columnId == COLUMN_ID_DISTANCE)
 	{
 		NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
@@ -816,8 +804,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_Z: pSpeakerSet->setZ(rowNumber, newValue); break;
 	case COLUMN_ID_A: pSpeakerSet->setAzimuth(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
-	case COLUMN_ID_D: pSpeakerSet->setDistance(rowNumber, newValue); break;
-	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue / pAmbiSettings->getDistanceScaler()); break;
+	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
     default: return; // do nothing
 	}
@@ -840,8 +827,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_Z: return pt->getPoint()->getZ();
 	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-	case COLUMN_ID_D: return pt->getPoint()->getDistance();
-	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance() * pAmbiSettings->getDistanceScaler();
+	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
 	default: return 0.0;
 	}
@@ -892,10 +878,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 	case COLUMN_ID_X:
 	case COLUMN_ID_Y:
 	case COLUMN_ID_Z:
-		return SliderRange(-1.0, 1.0, 0.001);
-
-	case COLUMN_ID_D:
-		return SliderRange(Constants::DistanceMin, sqrt(2.0), 0.001);
+		return SliderRange(-10000.0, 10000.0, 0.001);
 
 	case COLUMN_ID_A:
 		return SliderRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
@@ -907,7 +890,7 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 		return SliderRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
 
 	case COLUMN_ID_DISTANCE:
-		return SliderRange(0.0, pAmbiSettings->getDistanceScaler(), 0.001);
+		return SliderRange(0.0, 10000.0 * MathConstants<double>::sqrt2, 0.001);
 	}
 
 	return SliderRange(0.0, 1.0, 0.001);
@@ -916,11 +899,6 @@ SliderRange SpeakerSettingsComponent::getSliderRange(int columnId)
 bool SpeakerSettingsComponent::getEnabled(const int /*columnId*/, const int /*rowNumber*/)
 {
     return true;
-}
-
-void SpeakerSettingsComponent::updateDistanceScaler() const
-{
-	sliderDistanceScaler->setValue(pAmbiSettings->getDistanceScaler());
 }
 
 FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
@@ -947,7 +925,6 @@ void SpeakerSettingsComponent::updateUI() const
 	speakerList->updateContent();
 	speakerList->repaint();
 
-	updateDistanceScaler();
 	ambiChannelControl->updateValues();
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
@@ -1036,36 +1013,6 @@ void SpeakerSettingsComponent::controlDimming()
     }
 }
 
-void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
-{
-	if (&editor == textOscPort.get())
-	{
-		if (textOscPort->getText().containsOnly("0123456789"))
-		{
-			pDecoderSettings->oscReceivePort = textOscPort->getText().getIntValue();
-			sendChangeMessage();
-		}
-		else
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid port number");
-			editor.undo();
-		}
-	}
-	else if (&editor == textTimeout.get())
-	{
-		if (textTimeout->getText().containsOnly("0123456789"))
-		{
-			pDecoderSettings->oscReceiveTimeoutMs = textTimeout->getText().getIntValue();
-			sendChangeMessage();
-		}
-		else
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Invalid timeout");
-			editor.undo();
-		}
-	}
-}
-
 //[/MiscUserCode]
 
 
@@ -1079,11 +1026,11 @@ void SpeakerSettingsComponent::textEditorTextChanged(TextEditor& editor)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public TextEditor::Listener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification"
-                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification)"
+                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
+                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
+                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="1200" initialHeight="800">
+                 fixedSize="0" initialWidth="900" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
                   explicitFocusOrder="0" pos="0 0R 0M 60" posRelativeX="17eb4b418501687a"
@@ -1094,7 +1041,7 @@ BEGIN_JUCER_METADATA
                   posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                   title="Ambisonics"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 0 18M 267M" title="Speakers"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 0 16M 267M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="192 24 531M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
@@ -1106,11 +1053,11 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="233Rr 24 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="224Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
-                    virtualName="" explicitFocusOrder="0" pos="16 56 32M 96M" posRelativeX="450188aa0f332e78"
+                    virtualName="" explicitFocusOrder="0" pos="8 56 16M 96M" posRelativeX="450188aa0f332e78"
                     posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                     posRelativeH="450188aa0f332e78" class="TableListBox" params=""/>
   <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
@@ -1129,75 +1076,56 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="sliderDistanceScaler" id="8ae6ec5973e2470e" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="424 20 458M 24" posRelativeX="17eb4b418501687a"
-          posRelativeY="17eb4b418501687a" min="1.0" max="500.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
-                    virtualName="" explicitFocusOrder="0" pos="16 52 32M 68M" posRelativeX="17eb4b418501687a"
+                    virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
-         virtualName="" explicitFocusOrder="0" pos="16 20 112 24" posRelativeX="17eb4b418501687a"
+         virtualName="" explicitFocusOrder="0" pos="8 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
          labelText="Channel weights" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="labelDistanceScaler" id="bbbf87bcedfbda85" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="312 20 104 24" posRelativeX="17eb4b418501687a"
-         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
-         labelText="Distance scaler" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
-                virtualName="" explicitFocusOrder="0" pos="16 24 150 24" posRelativeX="450188aa0f332e78"
+                virtualName="" explicitFocusOrder="0" pos="8 24 150 24" posRelativeX="450188aa0f332e78"
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTEDITOR name="textOscPort" id="ef3c7d2594795ec7" memberName="textOscPort"
-              virtualName="" explicitFocusOrder="0" pos="217Rr 20 88 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="313Rr 20 81 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="398Rr 20 75 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTEDITOR name="textTimeout" id="337c3e6db7308866" memberName="textTimeout"
-              virtualName="" explicitFocusOrder="0" pos="15Rr 20 82 24" posRelativeX="f4cf3a53a6ef0d87"
-              posRelativeY="f4cf3a53a6ef0d87" initialText="" multiline="0"
-              retKeyStartsLine="0" readonly="0" scrollbars="1" caret="1" popupmenu="1"/>
   <LABEL name="labelTimeout" id="628a0500d66bc466" memberName="labelTimeout"
-         virtualName="" explicitFocusOrder="0" pos="108Rr 20 93 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="186Rr 20 96 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
-                virtualName="" explicitFocusOrder="0" pos="16 20 180 24" posRelativeX="f4cf3a53a6ef0d87"
+                virtualName="" explicitFocusOrder="0" pos="8 20 180 24" posRelativeX="f4cf3a53a6ef0d87"
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.772%c -8R 120 24"
-              posRelativeY="34ae3e87c64e62da" buttonText="Test all speakers"
+              virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
+              posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50.057%c 0 39.84% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
   <TEXTBUTTON name="buttonManage" id="a4621bea805565b3" memberName="buttonManage"
-              virtualName="" explicitFocusOrder="0" pos="145Rr 24 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="136Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="comboBoxChannelWeightingMode" id="e9f5f23a259dd1c0" memberName="comboBoxChannelWeightingMode"
-            virtualName="" explicitFocusOrder="0" pos="136 20 120 24" posRelativeX="17eb4b418501687a"
+            virtualName="" explicitFocusOrder="0" pos="128 20 120 24" posRelativeX="17eb4b418501687a"
             posRelativeY="17eb4b418501687a" editable="0" layout="33" items=""
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="buttonManageFilters" id="5b471faa99c7496b" memberName="buttonManageFilters"
-              virtualName="" explicitFocusOrder="0" pos="17Rr 24 120 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 24 120 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage filters..."
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <COMBOBOX name="comboBoxApply" id="30951c9518bbedeb" memberName="comboBoxApply"
@@ -1206,8 +1134,22 @@ BEGIN_JUCER_METADATA
             textWhenNonSelected="apply..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
               virtualName="" explicitFocusOrder="0" pos="-8r 0 64 24" posRelativeX="5fad387b688247bf"
-              posRelativeY="5fad387b688247bf" buttonText="CSV" connectedEdges="0"
+              posRelativeY="5fad387b688247bf" buttonText="csv" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <TEXTBUTTON name="buttonScaling" id="d872dac34b0e60ef" memberName="buttonScaling"
+              virtualName="" explicitFocusOrder="0" pos="-80r 0 64 24" posRelativeX="5fad387b688247bf"
+              posRelativeY="5fad387b688247bf" buttonText="scaling" connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
+  <SLIDER name="sliderPort" id="32291ecaacc9e3c0" memberName="sliderPort"
+          virtualName="" explicitFocusOrder="0" pos="290Rr 20 100 24" posRelativeX="f4cf3a53a6ef0d87"
+          posRelativeY="f4cf3a53a6ef0d87" min="0.0" max="65535.0" int="1.0"
+          style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <SLIDER name="sliderTimeout" id="781da96f4673e99c" memberName="sliderTimeout"
+          virtualName="" explicitFocusOrder="0" pos="8Rr 20 170 24" posRelativeX="f4cf3a53a6ef0d87"
+          posRelativeY="f4cf3a53a6ef0d87" min="10.0" max="10000.0" int="1.0"
+          style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
+          textBoxWidth="70" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

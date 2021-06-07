@@ -58,11 +58,6 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
 {
     loadWarningFlag = false;
     // ambisonics settings
-    XmlElement* xmlDistanceScaler = xmlElement->getChildByName(XML_TAG_PRESET_DISTANCESCALER);
-    if (xmlDistanceScaler != nullptr)
-    {
-       setDistanceScaler(xmlDistanceScaler->getDoubleAttribute(XML_VALUE));
-    }
     
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, AmbiSettings::INPHASE));
@@ -87,10 +82,6 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
 
 void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
 {
-    XmlElement* xmlDistanceScaler = new XmlElement(XML_TAG_PRESET_DISTANCESCALER);
-    xmlDistanceScaler->setAttribute(XML_VALUE, getDistanceScaler());
-    xmlElement->addChildElement(xmlDistanceScaler);
-    
     XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, int(weightMode));
     if(weightMode == MANUAL)

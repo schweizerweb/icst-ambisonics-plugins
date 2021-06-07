@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -33,6 +33,7 @@
 #include "DecoderPresetHelper.h"
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 
@@ -48,7 +49,6 @@
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
-                                  public TextEditor::Listener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
@@ -59,12 +59,11 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-	void textEditorTextChanged(TextEditor& editor) override;
 
     // table overrides
 	int getNumRows() override;
@@ -89,8 +88,7 @@ public:
 	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
-	void updateDistanceScaler() const;
-    void updateUI() const;
+	void updateUI() const;
 	FilterBankInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
@@ -117,6 +115,7 @@ private:
 	dsp::ProcessSpec* pFilterSpecification;
     PresetManagerDialog presetManagerDialog;
     std::unique_ptr<FilterPresetHelper> filterPresetHelper;
+    ZoomSettings* pZoomSettings;
     //[/UserVariables]
 
     //==============================================================================
@@ -131,14 +130,10 @@ private:
     std::unique_ptr<juce::TextButton> buttonRemove;
     std::unique_ptr<juce::TextButton> buttonMoveDown;
     std::unique_ptr<juce::TextButton> buttonMoveUp;
-    std::unique_ptr<juce::Slider> sliderDistanceScaler;
     std::unique_ptr<MultiSliderControl> ambiChannelControl;
     std::unique_ptr<juce::Label> labelChannelWeights;
-    std::unique_ptr<juce::Label> labelDistanceScaler;
     std::unique_ptr<juce::ToggleButton> btnEditMode;
-    std::unique_ptr<juce::TextEditor> textOscPort;
     std::unique_ptr<juce::Label> labelOscPort;
-    std::unique_ptr<juce::TextEditor> textTimeout;
     std::unique_ptr<juce::Label> labelTimeout;
     std::unique_ptr<juce::ToggleButton> toggleOsc;
     std::unique_ptr<juce::TextButton> buttonSpeakerTest;
@@ -148,6 +143,9 @@ private:
     std::unique_ptr<juce::TextButton> buttonManageFilters;
     std::unique_ptr<juce::ComboBox> comboBoxApply;
     std::unique_ptr<juce::TextButton> buttonCsv;
+    std::unique_ptr<juce::TextButton> buttonScaling;
+    std::unique_ptr<juce::Slider> sliderPort;
+    std::unique_ptr<juce::Slider> sliderTimeout;
 
 
     //==============================================================================
