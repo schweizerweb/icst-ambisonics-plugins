@@ -42,6 +42,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	radarOptions.editablePointsAsSquare = false;
 	radarOptions.audioParams = ownerProc.getAudioParams();
 	radarOptions.dawParameter = ownerProc.getDawParameter();
+    radarOptions.scalingInfo = ownerProc.getScalingInfo();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));
@@ -158,7 +159,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasC
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper(), processor.getDistanceEncodingPresetHelper()));
+		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper(), processor.getDistanceEncodingPresetHelper(), &oscLogDialogManager));
 		settingsWindow->setVisible(true);
         settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]

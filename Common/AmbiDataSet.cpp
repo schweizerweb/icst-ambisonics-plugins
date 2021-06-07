@@ -10,7 +10,7 @@
 
 #include "AmbiDataSet.h"
 
-AmbiDataSet::AmbiDataSet()
+AmbiDataSet::AmbiDataSet(ScalingInfo* pScaling) : pScalingInfo(pScaling)
 {
 }
 
@@ -55,6 +55,21 @@ bool AmbiDataSet::setChannelAED(int channel, double a, double e, double d) const
 	}
 
 	return false;
+}
+
+float AmbiDataSet::getMaxDistance() const
+{
+    float maxDistance = 0.0f;
+    for (int i = 0; i < size(); i++)
+    {
+        AmbiPoint* pt = get(i);
+        if (pt != nullptr)
+        {
+            maxDistance = jmax(maxDistance, (float)pt->getPoint()->getDistance());
+        }
+    }
+    
+    return maxDistance;
 }
 
 AmbiPoint* AmbiDataSet::getPointByName(String channelName) const
@@ -170,6 +185,9 @@ void AmbiDataSet::setX(int channel, double x, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        x = pScalingInfo->decompress(x);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setX(x, notify);
 }
@@ -178,6 +196,9 @@ void AmbiDataSet::setY(int channel, double y, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        y = pScalingInfo->decompress(y);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setY(y, notify);
 }
@@ -186,6 +207,9 @@ void AmbiDataSet::setZ(int channel, double z, bool notify) const
 {
 	AmbiPoint* pt = get(channel);
 
+    if(!notify)
+        z = pScalingInfo->decompress(z);
+    
 	if (pt != nullptr)
 		pt->getPoint()->setZ(z, notify);
 }
@@ -194,6 +218,9 @@ void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        x = pScalingInfo->decompress(x);
+    
     if (pt != nullptr)
         pt->getPoint()->setX(x, notify);
 }
@@ -202,6 +229,9 @@ void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        y = pScalingInfo->decompress(y);
+    
     if (pt != nullptr)
         pt->getPoint()->setY(y, notify);
 }
@@ -210,6 +240,9 @@ void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
 {
     AmbiPoint* pt = getGroup(channel);
 
+    if(!notify)
+        z = pScalingInfo->decompress(z);
+    
     if (pt != nullptr)
         pt->getPoint()->setZ(z, notify);
 }
@@ -417,7 +450,7 @@ bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bo
 
 AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
 {
-	AmbiGroup* group = new AmbiGroup(id, point, name, color);
+	AmbiGroup* group = new AmbiGroup(id, point, name, color, pScalingInfo);
 	groups.add(group);
 
 	return group;

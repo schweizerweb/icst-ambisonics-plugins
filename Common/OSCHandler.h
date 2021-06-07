@@ -8,15 +8,14 @@
   ==============================================================================
 */
 
-#ifndef OSCHANDLER_H_INCLUDED
-#define OSCHANDLER_H_INCLUDED
-
+#pragma once
 #include "JuceHeader.h"
 #include "StatusMessageHandler.h"
 #include "AmbiSourceSet.h"
 
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL "/icst/ambi/source/internal"
 #define ERROR_STRING_MALFORMATTED_OSC String("Malformatted OSC message received ")
+#define ERROR_STRING_UNKNOWN_OSC String("Unknown OSC message received ")
 #define ERROR_STRING_NONEXISTING_TARGET String("OSC message for non-existing target received ")
 
 class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCallback>
@@ -32,15 +31,8 @@ protected:
 	void oscMessageReceived(const OSCMessage& message) override;
 	void reportError(String message, const OSCMessage* pMsg) const;
 	void reportSuccess(const OSCMessage* pMsg) const;
-	bool checkAed(double a, double e, double d, String* errorString) const;
-	bool checkXyz(double x, double y, double z, String* errorString) const;
-    bool checkGain(double gain, String* errorString) const;
-    String oscMessageToString(const OSCMessage* pMsg) const;
+	String oscMessageToString(const OSCMessage* pMsg) const;
     
 	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 };
-
-
-
-#endif  // OSCHANDLER_H_INCLUDED

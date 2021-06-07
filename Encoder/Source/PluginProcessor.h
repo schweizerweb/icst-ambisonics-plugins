@@ -24,6 +24,7 @@
 #include "EncoderPresetHelper.h"
 #include "../../Common/AudioParams.h"
 #include "GroupAnimator.h"
+#include "../../Common/ScalingInfo.h"
 
 //==============================================================================
 /**
@@ -79,13 +80,14 @@ public:
 	DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
     DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
+    ScalingInfo* getScalingInfo();
 
 #if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
 #endif
 
 private:
-	AmbiSourceSet sources;
+	std::unique_ptr<AmbiSourceSet> sources;
 	EncoderSettings encoderSettings;
 	OSCHandler* pOscHandler;
 	AmbiOSCSender* pOscSender;
@@ -100,6 +102,8 @@ private:
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
     AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
     dsp::ProcessSpec iirFilterSpec;
+    ScalingInfo scalingInfo;
+    double lastScaler;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)

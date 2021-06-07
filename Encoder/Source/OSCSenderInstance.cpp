@@ -9,8 +9,10 @@
 */
 
 #include "OSCSenderInstance.h"
+#include <string>
+#include <regex>
 
-OSCSenderInstance::OSCSenderInstance(): isConnected(false)
+OSCSenderInstance::OSCSenderInstance(ScalingInfo* pScaling): isConnected(false), pScalingInfo(pScaling)
 {
     sender.reset(new OSCSender());
 }
@@ -42,54 +44,19 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
         return;
 
     String path = String(oscPath);
-
-    for (ParameterType parameter : parametersInPath)
+    double scaler = pScalingInfo->GetScaler();
+    
+    for (UserDefinedParameter parameter : parametersInPath)
     {
-        switch(parameter)
-        {
-        case Index: path = path.replace(escapeStringMap[Index], String(index + 1)); break;
-        case Name: path = path.replace(escapeStringMap[Name], pt->getName()); break;
-        case Color: path = path.replace(escapeStringMap[Color], pt->getColor().toDisplayString(true)); break;
-        case A: path = path.replace(escapeStringMap[A], String(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())))); break;
-        case E: path = path.replace(escapeStringMap[E], String(Constants::RadToGrad(double(pt->getPoint()->getElevation())))); break;
-        case D: path = path.replace(escapeStringMap[D], String(pt->getPoint()->getDistance())); break;
-        case X: path = path.replace(escapeStringMap[X], String(pt->getPoint()->getX())); break;
-        case Y: path = path.replace(escapeStringMap[Y], String(pt->getPoint()->getY())); break;
-        case Z: path = path.replace(escapeStringMap[Z], String(pt->getPoint()->getZ())); break;
-        case SA: path = path.replace(escapeStringMap[SA], String(pt->getPoint()->getAzimuth() / (2.0 * PI))); break;
-        case SE: path = path.replace(escapeStringMap[SE], String(pt->getPoint()->getElevation() / PI + 0.5)); break;
-        case SD: path = path.replace(escapeStringMap[SD], String(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * Globals::GetScaler()))); break;
-        case SX: path = path.replace(escapeStringMap[SX], String(pt->getPoint()->getX() / (2.0 * Globals::GetScaler()) + 0.5)); break;
-        case SY: path = path.replace(escapeStringMap[SY], String(pt->getPoint()->getY() / (2.0 * Globals::GetScaler()) + 0.5)); break;
-        case SZ: path = path.replace(escapeStringMap[SZ], String(pt->getPoint()->getZ() / (2.0 * Globals::GetScaler()) + 0.5)); break;
-        case Gain: path = path.replace(escapeStringMap[Gain], String(pt->getGain())); break;
-        default: ;
-        }
+        auto original = parameter.getOriginalString();
+        auto replace = parameter.getString(pt, scaler, index);
+        path = path.replace(original, replace);
     }
 
     OSCMessage message = OSCMessage(OSCAddressPattern(path));
     for (auto parameter : realParameters)
     {
-        switch (parameter)
-        {
-        case Index: message.addArgument(OSCArgument(index + 1)); break;
-        case Name: message.addArgument(OSCArgument(pt->getName())); break;
-        case Color: message.addArgument(OSCArgument(pt->getColor().toDisplayString(true))); break;
-        case A: message.addArgument(OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth()))))); break;
-        case E: message.addArgument(OSCArgument(float(Constants::RadToGrad(double(pt->getPoint()->getElevation()))))); break;
-        case D: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance()))); break;
-        case X: message.addArgument(OSCArgument(float(pt->getPoint()->getX()))); break;
-        case Y: message.addArgument(OSCArgument(float(pt->getPoint()->getY()))); break;
-        case Z: message.addArgument(OSCArgument(float(pt->getPoint()->getZ()))); break;
-        case SA: message.addArgument(OSCArgument(float(pt->getPoint()->getAzimuth() / (2.0 * PI)))); break;
-        case SE: message.addArgument(OSCArgument(float(pt->getPoint()->getElevation() / PI + 0.5))); break;
-        case SD: message.addArgument(OSCArgument(float(pt->getPoint()->getDistance() / (MathConstants<double>::sqrt2 * Globals::GetScaler())))); break;
-        case SX: message.addArgument(OSCArgument(float(pt->getPoint()->getX() / (2.0 * Globals::GetScaler()) + 0.5))); break;
-        case SY: message.addArgument(OSCArgument(float(pt->getPoint()->getY() / (2.0 * Globals::GetScaler()) + 0.5))); break;
-        case SZ: message.addArgument(OSCArgument(float(pt->getPoint()->getZ() / (2.0 * Globals::GetScaler()) + 0.5))); break;
-        case Gain: message.addArgument(OSCArgument(float(pt->getGain()))); break;
-        default:;
-        }
+        message.addArgument(parameter.getOSCArgument(pt, scaler, index));
     }
 
     sender->send(message);
@@ -97,35 +64,94 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
 
 bool OSCSenderInstance::setOscPath(String path)
 {
-    parametersInPath.clear();
-    realParameters.clear();
-
     oscPath = path.upToFirstOccurrenceOf(" ", false, false);
+    
+    std::string oscPathString = oscPath.toStdString();
+    std::string parameterString = path.substring(oscPath.length()).toStdString();
+    
+    return analyzeString(oscPathString, &parametersInPath) && analyzeString(parameterString, &realParameters);
+}
 
-    for (auto pair : escapeStringMap) 
-    {
-        if(oscPath.containsIgnoreCase(pair.second))
-        {
-            parametersInPath.add(pair.first);
-        }
-    }
+bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDefinedParameter> *pArray)
+{
+    // regex patterns
+    std::regex rParameter("[ ]*\\{[ ]*(.+?)[ ]*\\}[ ]*");
+    std::regex rTwoValues("s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+    std::regex rThreeValues("s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+    std::smatch parameterMatch;
+    
+    pArray->clear();
 
-    StringArray followingParameters;
-    followingParameters.addTokens(path.substring(oscPath.length()), String(" "), "");
-    for (String p : followingParameters)
+    while(regex_search(parameterString, parameterMatch, rParameter))
     {
-        if(p.isNotEmpty())
+        auto fullString = parameterMatch[0].str();
+        auto userString = parameterMatch[1].str();
+        if(userString.length() == 1)
         {
-            auto f = std::find_if(escapeStringMap.begin(), escapeStringMap.end(), [&p](const auto& x) { return x.second == p; });
-            if (f != escapeStringMap.end())
+            switch(userString.substr()[0])
             {
-                realParameters.add(f->first);
+                case 'a': pArray->add(UserDefinedParameter(fullString, ParameterType::A)); break;
+                case 'e': pArray->add(UserDefinedParameter(fullString, ParameterType::E)); break;
+                case 'd': pArray->add(UserDefinedParameter(fullString, ParameterType::D)); break;
+                case 'x': pArray->add(UserDefinedParameter(fullString, ParameterType::X)); break;
+                case 'y': pArray->add(UserDefinedParameter(fullString, ParameterType::Y)); break;
+                case 'z': pArray->add(UserDefinedParameter(fullString, ParameterType::Z)); break;
+                case 'i': pArray->add(UserDefinedParameter(fullString, ParameterType::Index)); break;
+                case 'n': pArray->add(UserDefinedParameter(fullString, ParameterType::Name)); break;
+                case 'c': pArray->add(UserDefinedParameter(fullString, ParameterType::Color)); break;
+                case 'g': pArray->add(UserDefinedParameter(fullString, ParameterType::Gain)); break;
+            }
+        }
+        else if(userString.substr()[0]== 's')
+        {
+            if(userString.length() == 2)
+            {
+                switch(userString.substr()[1])
+                {
+                    case 'a': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledA)); break;
+                    case 'e': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledE)); break;
+                    case 'd': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledD)); break;
+                    case 'x': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledX)); break;
+                    case 'y': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledY)); break;
+                    case 'z': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledZ)); break;
+                        default: return false;
+                }
             }
             else
             {
-                return false;
+                std::smatch sm;
+                        
+                if(regex_search(userString, sm, rThreeValues))
+                {
+                    double lo = std::stod(sm[2]);
+                    double zero = std::stod(sm[3]);
+                    double hi = std::stod(sm[4]);
+                    if(lo == hi && lo == zero)
+                        return false;
+                            
+                    pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi, zero));
+                }
+                else if(regex_search(userString, sm, rTwoValues))
+                {
+                    double lo = std::stod(sm[2]);
+                    double hi = std::stod(sm[3]);
+                    if(lo == hi)
+                        return false;
+                        
+                    pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi));
+                }
+                else
+                {
+                    return false;
+                }
             }
         }
+        else
+        {
+            return false;
+        }
+        
+        parameterString = parameterMatch.suffix();
     }
 
     return true;

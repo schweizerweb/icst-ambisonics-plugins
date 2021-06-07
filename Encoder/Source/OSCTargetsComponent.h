@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -39,8 +39,8 @@ class OSCTargetsComponent  : public juce::Component,
                              public ChangeBroadcaster,
                              public TextEditor::Listener,
                              public ActionListener,
-                             public juce::Button::Listener,
-                             public juce::Slider::Listener
+                             public juce::Slider::Listener,
+                             public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -54,8 +54,8 @@ public:
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
     // Binary resources:
     static const char* help_png;
@@ -71,23 +71,14 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::GroupComponent> groupStandard;
-    std::unique_ptr<juce::ToggleButton> toggleEnableStandardXyz;
-    std::unique_ptr<juce::TextEditor> textOscSendIpExtXyz;
-    std::unique_ptr<juce::Label> labelOscSendIpExtXyz;
-    std::unique_ptr<juce::GroupComponent> groupCustom;
+    std::unique_ptr<juce::GroupComponent> groupTargets;
     std::unique_ptr<TableListBox> targetList;
-    std::unique_ptr<juce::GroupComponent> groupGeneral;
     std::unique_ptr<juce::Slider> sliderInterval;
     std::unique_ptr<juce::Label> labelInterval;
-    std::unique_ptr<juce::ToggleButton> toggleEnableStandardAed;
-    std::unique_ptr<juce::TextEditor> textOscSendIpExtAed;
-    std::unique_ptr<juce::Label> labelOscSendIpExtAed;
-    std::unique_ptr<juce::Slider> sliderPortExtXyz;
-    std::unique_ptr<juce::Slider> sliderPortExtAed;
     std::unique_ptr<juce::TextButton> btnAdd;
     std::unique_ptr<juce::TextButton> btnDelete;
     std::unique_ptr<juce::ImageButton> btnInfo;
+    std::unique_ptr<juce::ToggleButton> toggleSendContinuous;
 
 
     //==============================================================================

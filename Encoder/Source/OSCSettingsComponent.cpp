@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
@@ -18,7 +18,6 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "OSCTargetsComponent.h"
 //[/Headers]
 
 #include "OSCSettingsComponent.h"
@@ -28,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler)
-    : pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler)
+OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager)
+    : pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -95,25 +94,6 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     toggleSendOscExt->setButtonText (TRANS("Send Positions for External Usage"));
     toggleSendOscExt->addListener (this);
 
-    groupLog.reset (new juce::GroupComponent ("groupLog",
-                                              TRANS("Log")));
-    addAndMakeVisible (groupLog.get());
-
-    textLog.reset (new juce::TextEditor ("textLog"));
-    addAndMakeVisible (textLog.get());
-    textLog->setMultiLine (true);
-    textLog->setReturnKeyStartsNewLine (false);
-    textLog->setReadOnly (true);
-    textLog->setScrollbarsShown (false);
-    textLog->setCaretVisible (false);
-    textLog->setPopupMenuEnabled (true);
-    textLog->setText (juce::String());
-
-    toggleLog.reset (new juce::ToggleButton ("toggleLog"));
-    addAndMakeVisible (toggleLog.get());
-    toggleLog->setButtonText (TRANS("Enable (may slow down OSC handling)"));
-    toggleLog->addListener (this);
-
     labelExternalOscInfo.reset (new juce::Label ("labelExternalOscInfo",
                                                  TRANS("no active targets")));
     addAndMakeVisible (labelExternalOscInfo.get());
@@ -122,11 +102,6 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     labelExternalOscInfo->setEditable (false, false, false);
     labelExternalOscInfo->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelExternalOscInfo->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    btnEdit.reset (new juce::TextButton ("btnEdit"));
-    addAndMakeVisible (btnEdit.get());
-    btnEdit->setButtonText (TRANS("edit..."));
-    btnEdit->addListener (this);
 
     sliderReceiveOscPort.reset (new juce::Slider ("sliderReceiveOscPort"));
     addAndMakeVisible (sliderReceiveOscPort.get());
@@ -144,10 +119,28 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
 
     sliderInterval.reset (new juce::Slider ("sliderInterval"));
     addAndMakeVisible (sliderInterval.get());
-    sliderInterval->setRange (10, 10000, 1);
+    sliderInterval->setRange (10, 1000, 1);
     sliderInterval->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderInterval->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderInterval->addListener (this);
+
+    buttonShowOscLog.reset (new juce::TextButton ("buttonShowOscLog"));
+    addAndMakeVisible (buttonShowOscLog.get());
+    buttonShowOscLog->setButtonText (TRANS("Show OSC Log"));
+    buttonShowOscLog->addListener (this);
+
+    oscTargets.reset (new OSCTargetsComponent (this, pSettings));
+    addAndMakeVisible (oscTargets.get());
+    oscTargets->setName ("oscTargets");
+
+    labelLoadInfo.reset (new juce::Label ("labelLoadInfo",
+                                          TRANS("no network traffic")));
+    addAndMakeVisible (labelLoadInfo.get());
+    labelLoadInfo->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelLoadInfo->setJustificationType (juce::Justification::centredLeft);
+    labelLoadInfo->setEditable (false, false, false);
+    labelLoadInfo->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelLoadInfo->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
 
     //[UserPreSize]
@@ -158,8 +151,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
 
     //[Constructor] You can add your own custom stuff here..
     textOscSendIp->addListener(this);
-    sliderReceiveOscPort->setSkewFactorFromMidPoint(100.0);
-    sliderSendOscPort->setSkewFactorFromMidPoint(100.0);
+    sliderInterval->setSkewFactorFromMidPoint(200.0);
     toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
     sliderReceiveOscPort->setValue(pSettings->oscReceivePort, dontSendNotification);
 
@@ -169,8 +161,6 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     sliderInterval->setValue(pSettings->oscSendIntervalMs, dontSendNotification);
 
     toggleSendOscExt->setToggleState(pSettings->oscSendExtMasterFlag, dontSendNotification);
-
-    textLog->setEnabled(false);
     controlDimming();
     //[/Constructor]
 }
@@ -178,7 +168,6 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
 OSCSettingsComponent::~OSCSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    pStatusMessageHandler->unregisterDetailLog();
     //[/Destructor_pre]
 
     groupExternal = nullptr;
@@ -190,14 +179,13 @@ OSCSettingsComponent::~OSCSettingsComponent()
     labelOscSendIp = nullptr;
     labelOscSendInterval = nullptr;
     toggleSendOscExt = nullptr;
-    groupLog = nullptr;
-    textLog = nullptr;
-    toggleLog = nullptr;
     labelExternalOscInfo = nullptr;
-    btnEdit = nullptr;
     sliderReceiveOscPort = nullptr;
     sliderSendOscPort = nullptr;
     sliderInterval = nullptr;
+    buttonShowOscLog = nullptr;
+    oscTargets = nullptr;
+    labelLoadInfo = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -221,23 +209,22 @@ void OSCSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupExternal->setBounds (8, 8, getWidth() - 16, 96);
-    groupInternal->setBounds (8, 112, getWidth() - 16, 96);
-    toggleReceiveOsc->setBounds (8 + 14, 8 + 27, 150, 24);
-    labelOscPort->setBounds (8 + (getWidth() - 16) - 123 - 49, 8 + 27, 49, 24);
-    toggleSendOsc->setBounds (8 + 14, 112 + 27, 199, 24);
-    textOscSendIp->setBounds (8 + (getWidth() - 16) - 123 - 106, 112 + 27, 106, 24);
-    labelOscSendIp->setBounds (8 + (getWidth() - 16) - 236 - 124, 112 + 27, 124, 24);
-    labelOscSendInterval->setBounds (8 + (getWidth() - 16) - 236 - 110, 112 + 57, 110, 24);
-    toggleSendOscExt->setBounds (8 + 14, 8 + 57, 245, 24);
-    groupLog->setBounds (8, 216, getWidth() - 16, getHeight() - 221);
-    textLog->setBounds (8 + 16, 216 + 56, (getWidth() - 16) - 30, (getHeight() - 221) - 72);
-    toggleLog->setBounds (8 + 16, 216 + 24, 280, 24);
-    labelExternalOscInfo->setBounds (8 + (getWidth() - 16) - 123 - 224, 8 + 57, 224, 24);
-    btnEdit->setBounds (8 + (getWidth() - 16) - 16 - 100, 8 + 57, 100, 24);
-    sliderReceiveOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 8 + 27, 100, 24);
-    sliderSendOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 112 + 27, 100, 24);
-    sliderInterval->setBounds (8 + (getWidth() - 16) - 16 - 210, 112 + 57, 210, 24);
+    groupExternal->setBounds (8, 113, getWidth() - 16, getHeight() - 155);
+    groupInternal->setBounds (8, 8, getWidth() - 16, 96);
+    toggleReceiveOsc->setBounds (8 + 14, 113 + 27, 150, 24);
+    labelOscPort->setBounds (8 + (getWidth() - 16) - 123 - 49, 113 + 27, 49, 24);
+    toggleSendOsc->setBounds (8 + 14, 8 + 27, 199, 24);
+    textOscSendIp->setBounds (8 + (getWidth() - 16) - 123 - 106, 8 + 27, 106, 24);
+    labelOscSendIp->setBounds (8 + (getWidth() - 16) - 236 - 124, 8 + 27, 124, 24);
+    labelOscSendInterval->setBounds (8 + (getWidth() - 16) - 236 - 110, 8 + 57, 110, 24);
+    toggleSendOscExt->setBounds (8 + 14, 113 + 57, 245, 24);
+    labelExternalOscInfo->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 280), 113 + 57, (getWidth() - 16) - 280, 24);
+    sliderReceiveOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 113 + 27, 100, 24);
+    sliderSendOscPort->setBounds (8 + (getWidth() - 16) - 16 - 100, 8 + 27, 100, 24);
+    sliderInterval->setBounds (8 + (getWidth() - 16) - 16 - 210, 8 + 57, 210, 24);
+    buttonShowOscLog->setBounds (getWidth() - 8 - 150, getHeight() - 8 - 24, 150, 24);
+    oscTargets->setBounds (8 + 24, 113 + 87, (getWidth() - 16) - 32, (getHeight() - 155) - 95);
+    labelLoadInfo->setBounds (8, getHeight() - 8 - 24, getWidth() - 182, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -269,25 +256,11 @@ void OSCSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 
         //[/UserButtonCode_toggleSendOscExt]
     }
-    else if (buttonThatWasClicked == toggleLog.get())
+    else if (buttonThatWasClicked == buttonShowOscLog.get())
     {
-        //[UserButtonCode_toggleLog] -- add your button handler code here..
-    if(toggleLog->getToggleState())
-    {
-        textLog->setEnabled(true);
-        pStatusMessageHandler->registerDetailLog(textLog.get());
-    }
-    else{
-        pStatusMessageHandler->unregisterDetailLog();
-        textLog->setEnabled(false);
-    }
-        //[/UserButtonCode_toggleLog]
-    }
-    else if (buttonThatWasClicked == btnEdit.get())
-    {
-        //[UserButtonCode_btnEdit] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(std::make_unique<OSCTargetsComponent>(this, pSettings), getScreenBounds(), this);
-        //[/UserButtonCode_btnEdit]
+        //[UserButtonCode_buttonShowOscLog] -- add your button handler code here..
+        pOscLogManager->show(pStatusMessageHandler, this);
+        //[/UserButtonCode_buttonShowOscLog]
     }
 
     //[UserbuttonClicked_Post]
@@ -321,6 +294,7 @@ void OSCSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 
     //[UsersliderValueChanged_Post]
     sendChangeMessage();
+    controlDimming();
     //[/UsersliderValueChanged_Post]
 }
 
@@ -338,21 +312,37 @@ void OSCSettingsComponent::textEditorTextChanged(TextEditor& textEditor)
 
 void OSCSettingsComponent::controlDimming() const
 {
-    sliderReceiveOscPort->setEnabled(pSettings->oscReceiveFlag);
+    toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
+    labelOscSendIp->setEnabled(pSettings->oscSendFlag);
+    labelOscSendInterval->setEnabled(pSettings->oscSendFlag);
     textOscSendIp->setEnabled(pSettings->oscSendFlag);
     sliderSendOscPort->setEnabled(pSettings->oscSendFlag);
     sliderInterval->setEnabled(pSettings->oscSendFlag);
-    btnEdit->setEnabled(pSettings->oscSendExtMasterFlag);
+    oscTargets->setEnabled(pSettings->oscSendExtMasterFlag);
     labelExternalOscInfo->setEnabled(pSettings->oscSendExtMasterFlag);
-    int targetCount = (pSettings->oscSendExtXyzFlag ? 1 : 0) + (pSettings->oscSendExtAedFlag ? 1 : 0);
-    for (auto target : pSettings->customOscTargets)
+    int targetCount = 0;
+    if(pSettings->oscSendExtMasterFlag)
     {
-        if (target->enabledFlag) targetCount++;
+        targetCount += (pSettings->oscSendExtXyz->enabledFlag ? 1 : 0) + (pSettings->oscSendExtAed->enabledFlag ? 1 : 0) +
+            (pSettings->oscSendExtXyzIndex->enabledFlag ? 1 : 0) +
+            (pSettings->oscSendExtAedIndex->enabledFlag ? 1 : 0);
+        for (auto target : pSettings->customOscTargets)
+        {
+            if (target->enabledFlag) targetCount++;
+        }
     }
 
     Colour textColor = pSettings->oscSendExtMasterFlag ? (targetCount > 0 ? Colours::green : Colours::orangered) : Colours::grey;
     labelExternalOscInfo->setText((targetCount > 0 ? (String(targetCount) + " active targets") : "no active targets"), dontSendNotification);
     labelExternalOscInfo->setColour(Label::textColourId, textColor);
+
+    double packetsPerSecond = targetCount / (pSettings->oscSendExtIntervalMs * 0.001) + (pSettings->oscSendFlag ? (1.0 / (pSettings->oscSendIntervalMs * 0.001)) : 0.0);
+    String info = packetsPerSecond == 0.0
+        ? "no network traffic"
+        : ("estimated network traffic: " + String(!pSettings->oscSendExtContinuousFlag ? "max. " : "") + (packetsPerSecond < 1.0
+                                            ? "<1/s"
+                                            : String(roundToInt(packetsPerSecond)) + "/s"));
+    labelLoadInfo->setText(info, dontSendNotification);
 }
 
 void OSCSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
@@ -376,15 +366,15 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCSettingsComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener, public ChangeBroadcaster, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler"
-                 variableInitialisers="pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager"
+                 variableInitialisers="pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupExternal" id="64cdd18a28c39177" memberName="groupExternal"
-                  virtualName="" explicitFocusOrder="0" pos="8 8 16M 96" title="External"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 113 16M 155M" title="External"/>
   <GROUPCOMPONENT name="groupInternal" id="99fa521234eba1bd" memberName="groupInternal"
-                  virtualName="" explicitFocusOrder="0" pos="8 112 16M 96" title="Internal"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 8 16M 96" title="Internal"/>
   <TOGGLEBUTTON name="toggleReceiveOsc" id="8d9b70b5bf27a026" memberName="toggleReceiveOsc"
                 virtualName="" explicitFocusOrder="0" pos="14 27 150 24" posRelativeX="64cdd18a28c39177"
                 posRelativeY="64cdd18a28c39177" buttonText="Receive OSC" connectedEdges="0"
@@ -419,27 +409,13 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="14 57 245 24" posRelativeX="64cdd18a28c39177"
                 posRelativeY="64cdd18a28c39177" buttonText="Send Positions for External Usage"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <GROUPCOMPONENT name="groupLog" id="1f10ffbcf9f07a8c" memberName="groupLog" virtualName=""
-                  explicitFocusOrder="0" pos="8 216 16M 221M" title="Log"/>
-  <TEXTEDITOR name="textLog" id="c68a1d41e12fc01" memberName="textLog" virtualName=""
-              explicitFocusOrder="0" pos="16 56 30M 72M" posRelativeX="1f10ffbcf9f07a8c"
-              posRelativeY="1f10ffbcf9f07a8c" posRelativeW="1f10ffbcf9f07a8c"
-              posRelativeH="1f10ffbcf9f07a8c" initialText="" multiline="1"
-              retKeyStartsLine="0" readonly="1" scrollbars="0" caret="0" popupmenu="1"/>
-  <TOGGLEBUTTON name="toggleLog" id="3acf4be5e0798efd" memberName="toggleLog"
-                virtualName="" explicitFocusOrder="0" pos="16 24 280 24" posRelativeX="1f10ffbcf9f07a8c"
-                posRelativeY="1f10ffbcf9f07a8c" buttonText="Enable (may slow down OSC handling)"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelExternalOscInfo" id="d8016ede58eb1df8" memberName="labelExternalOscInfo"
-         virtualName="" explicitFocusOrder="0" pos="123Rr 57 224 24" posRelativeX="64cdd18a28c39177"
-         posRelativeY="64cdd18a28c39177" edTextCol="ff000000" edBkgCol="0"
-         labelText="no active targets" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="34"/>
-  <TEXTBUTTON name="btnEdit" id="39868884fdb013a6" memberName="btnEdit" virtualName=""
-              explicitFocusOrder="0" pos="16Rr 57 100 24" posRelativeX="64cdd18a28c39177"
-              posRelativeY="64cdd18a28c39177" buttonText="edit..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
+         virtualName="" explicitFocusOrder="0" pos="8Rr 57 280M 24" posRelativeX="64cdd18a28c39177"
+         posRelativeY="64cdd18a28c39177" posRelativeW="64cdd18a28c39177"
+         edTextCol="ff000000" edBkgCol="0" labelText="no active targets"
+         editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
+         fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
+         italic="0" justification="34"/>
   <SLIDER name="sliderReceiveOscPort" id="591bcc850e858bff" memberName="sliderReceiveOscPort"
           virtualName="" explicitFocusOrder="0" pos="16Rr 27 100 24" posRelativeX="64cdd18a28c39177"
           posRelativeY="64cdd18a28c39177" min="0.0" max="65535.0" int="1.0"
@@ -452,9 +428,21 @@ BEGIN_JUCER_METADATA
           textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <SLIDER name="sliderInterval" id="d02cfad6a67a7536" memberName="sliderInterval"
           virtualName="" explicitFocusOrder="0" pos="16Rr 57 210 24" posRelativeX="99fa521234eba1bd"
-          posRelativeY="99fa521234eba1bd" min="10.0" max="10000.0" int="1.0"
+          posRelativeY="99fa521234eba1bd" min="10.0" max="1000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <TEXTBUTTON name="buttonShowOscLog" id="680b48d522ce99b2" memberName="buttonShowOscLog"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 150 24" buttonText="Show OSC Log"
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <GENERICCOMPONENT name="oscTargets" id="cd238de4b9ac3b7e" memberName="oscTargets"
+                    virtualName="" explicitFocusOrder="0" pos="24 87 32M 95M" posRelativeX="64cdd18a28c39177"
+                    posRelativeY="64cdd18a28c39177" posRelativeW="64cdd18a28c39177"
+                    posRelativeH="64cdd18a28c39177" class="OSCTargetsComponent" params="this, pSettings"/>
+  <LABEL name="labelLoadInfo" id="32af9a6495d86f3e" memberName="labelLoadInfo"
+         virtualName="" explicitFocusOrder="0" pos="8 8Rr 182M 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="no network traffic" editableSingleClick="0"
+         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
+         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

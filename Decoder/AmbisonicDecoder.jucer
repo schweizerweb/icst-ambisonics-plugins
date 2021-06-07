@@ -125,8 +125,6 @@
       <FILE id="np9zw9" name="FilterBankInfo.h" compile="0" resource="0"
             file="../Common/FilterBankInfo.h"/>
       <FILE id="aXFLQ3" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
-      <FILE id="MrEBYI" name="Globals.cpp" compile="1" resource="0" file="../Common/Globals.cpp"/>
-      <FILE id="nNZ3wi" name="Globals.h" compile="0" resource="0" file="../Common/Globals.h"/>
       <FILE id="zdzXxV" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="VrrN86" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
@@ -168,6 +166,8 @@
       <FILE id="r7DaUZ" name="RadarOptions.cpp" compile="1" resource="0"
             file="../Common/RadarOptions.cpp"/>
       <FILE id="ZPKu9U" name="RadarOptions.h" compile="0" resource="0" file="../Common/RadarOptions.h"/>
+      <FILE id="poQwVE" name="ScalingInfo.cpp" compile="1" resource="0" file="../Common/ScalingInfo.cpp"/>
+      <FILE id="D7ike2" name="ScalingInfo.h" compile="0" resource="0" file="../Common/ScalingInfo.h"/>
       <FILE id="dukqlN" name="SimpleGraph.cpp" compile="1" resource="0" file="../Common/SimpleGraph.cpp"/>
       <FILE id="KcvV3b" name="SimpleGraph.h" compile="0" resource="0" file="../Common/SimpleGraph.h"/>
       <FILE id="TSAtV3" name="SliderColumnCustomComponent.h" compile="0"

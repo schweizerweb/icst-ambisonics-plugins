@@ -65,6 +65,7 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void actionListenerCallback(const String &message) override;
+    ScalingInfo* getScalingInfo();
     
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();
@@ -76,8 +77,9 @@ public:
     DecoderPresetHelper* getPresetHelper();
 
 private:
-	AmbiSpeakerSet speakerSet;
-	AmbiSourceSet movingPoints;
+    ScalingInfo scalingInfo;
+    std::unique_ptr<AmbiSpeakerSet> speakerSet;
+	std::unique_ptr<AmbiSourceSet> movingPoints;
 	AmbiSettings ambiSettings;
 	DecoderSettings decoderSettings;
 	TestSoundGenerator* pTestSoundGenerator;

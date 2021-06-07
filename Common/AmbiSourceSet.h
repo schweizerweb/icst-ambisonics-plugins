@@ -21,6 +21,7 @@
 class AmbiSourceSet : public AmbiDataSet
 {
 public:
+    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling) {};
 	AmbiSource* get(int index) const override;
 
 	void add(AmbiSource* pt);

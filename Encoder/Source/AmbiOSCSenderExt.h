@@ -14,6 +14,8 @@
 #include "EncoderSettings.h"
 #include "OSCSenderInstance.h"
 #include "../../Common/StatusMessageHandler.h"
+#include "../../Common/ScalingInfo.h"
+
 #define COMPARISON_DELTA 0.00001
 
 class PointHistoryEntry
@@ -55,7 +57,7 @@ public:
 class AmbiOSCSenderExt : public Timer
 {
 public:
-	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler);
+	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler, ScalingInfo* pScaling);
     virtual ~AmbiOSCSenderExt();
 
     OSCSenderInstance* getOrCreateInstance(int index);
@@ -64,11 +66,14 @@ public:
 
 private:
 	void timerCallback() override;
-
+    int connectStandardSender(int* pIndex, StandardOscTarget* pTarget, String oscString, String description, String* pMessage);
+    
 private:
 	CriticalSection cs;
 	AmbiDataSet* pPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 	OwnedArray<PointHistoryEntry> history;
 	OwnedArray<OSCSenderInstance> oscSender;
+    ScalingInfo* pScalingInfo;
+    bool doContinuousUpdate;
 };

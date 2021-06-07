@@ -36,6 +36,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
 {
     $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
     $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
+    $codeBundle = 'O' + $order + $audioChannelNum + 'CH'
     $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 
@@ -59,7 +60,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     $node.pluginDesc = $description
     $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
 	$node.pluginCode = $pluginUniqueCode
-	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($code).ToLower())"
+	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($codeBundle).ToLower())"
     
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)

@@ -30,14 +30,14 @@ public:
 		owner.setTableText(columnId, row, getText());
 	}
 
-	void setRowAndColumn(const int newRow, const int newColumn)
+	void setRowAndColumn(const int newRow, const int newColumn, const bool readOnly = false)
 	{
 		row = newRow;
 		columnId = newColumn;
 		setText(owner.getTableText(columnId, row), dontSendNotification);
-        bool enabled = owner.getEnabled(columnId, row);
+        bool enabled = owner.getEnabled(columnId, row) && !readOnly;
         setEditable(false, enabled, false);
-        setColour(textColourId, enabled ? Colours::white : Colours::darkgrey);
+        setColour(textColourId, readOnly ? Colours:: yellow : (enabled ? Colours::white : Colours::darkgrey));
 	}
 
 	void paint(Graphics& g) override

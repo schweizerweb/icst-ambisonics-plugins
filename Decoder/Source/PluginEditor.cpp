@@ -44,6 +44,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	radarOptions.setTrackColorAccordingToName = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
+    radarOptions.scalingInfo = ownerProc.getScalingInfo();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));

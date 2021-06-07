@@ -10,7 +10,7 @@
 
 #pragma once
 #include "AudioParameterFloatAmbiAbs.h"
-#include "Constants.h"
+#include "ScalingInfo.h"
 
 class AudioParameterSet
 {
@@ -19,20 +19,54 @@ public:
 	AudioParameterFloatAmbiAbs* pY = nullptr;
 	AudioParameterFloatAmbiAbs* pZ = nullptr;
     AudioParameterFloatAmbiAbs* pGain = nullptr;
-	
-	void notifyX(double x) const
+    ScalingInfo* pScaling = nullptr;    // make sure to set this pointer to the scaling info of the plugin instance!
+    
+	double notifyX(double x) const
 	{
-		if (pX != nullptr) { pX->setUnscaledValue(float(x)); }
+        if(pScaling != nullptr)
+        {
+            makeValid(&x, pScaling->CartesianMin(), pScaling->CartesianMax());
+            double compressedX = pScaling->compress(x);
+        
+            if (pX != nullptr)
+            {
+                pX->setUnscaledValue(float(compressedX));
+            }
+        }
+        
+        return x;
 	}
 
-	void notifyY(double y) const
+	double notifyY(double y) const
 	{
-		if (pY != nullptr) { pY->setUnscaledValue(float(y)); }
+        if(pScaling != nullptr)
+        {
+            makeValid(&y, pScaling->CartesianMin(), pScaling->CartesianMax());
+            double compressedY = pScaling->compress(y);
+        
+            if (pY != nullptr)
+            {
+                pY->setUnscaledValue(float(compressedY));
+            }
+        }
+        
+        return y;
 	}
 
-	void notifyZ(double z) const
+	double notifyZ(double z) const
 	{
-		if (pZ != nullptr) { pZ->setUnscaledValue(float(z)); }
+        if(pScaling != nullptr)
+        {
+            makeValid(&z, pScaling->CartesianMin(), pScaling->CartesianMax());
+            double compressedZ = pScaling->compress(z);
+        
+            if (pZ != nullptr)
+            {
+                pZ->setUnscaledValue(float(compressedZ));
+            }
+        }
+        
+        return z;
 	}
     
     void notifyGain(double gain)
@@ -60,4 +94,10 @@ public:
         if (pY != nullptr) pY->endChangeGesture();
         if (pZ != nullptr) pZ->endChangeGesture();
 	}
+    
+    void makeValid(double* pValue, const double min, const double max) const
+    {
+        *pValue = jmin(*pValue, max);
+        *pValue = jmax(*pValue, min);
+    }
 };

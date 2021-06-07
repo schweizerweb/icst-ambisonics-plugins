@@ -14,6 +14,7 @@
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PresetHelper.h"
 #include "../../Common/TrackColors.h"
+#include "../../Common/ScalingInfo.h"
 #include "EncoderSettings.h"
 
 #define DEFAULT_PRESET_NAME "Single Source"
@@ -22,7 +23,7 @@
 class EncoderPresetHelper : public PresetHelper
 {
 public:
-    EncoderPresetHelper(File presetDirectory, ActionListener* pActionListener) : PresetHelper(presetDirectory, pActionListener)
+    EncoderPresetHelper(File presetDirectory, ActionListener* pActionListener, ScalingInfo* pScaling) : PresetHelper(presetDirectory, pActionListener), pScalingInfo(pScaling)
     {
     }
     
@@ -37,7 +38,7 @@ public:
         pEncoderSettings->loadFromPresetXml(rootElement->getChildByName("EncoderSettings"));
         // apply scaler if audio params attached
         if(pAudioParams != nullptr)
-            Globals::SetScaler(pEncoderSettings->getDistanceScaler());
+            pScalingInfo->SetScaler(pEncoderSettings->getDistanceScaler());
         
         pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
         pSourceSet->resetIds();
@@ -63,9 +64,9 @@ public:
     }
     
     bool checkValid(File presetFile) override {
-        AmbiSourceSet testSet;
+        std::unique_ptr<AmbiSourceSet> testSet(new AmbiSourceSet(pScalingInfo));
         EncoderSettings testSettings;
-        if(loadFromXmlFile(presetFile, nullptr, &testSet, &testSettings))
+        if(loadFromXmlFile(presetFile, nullptr, testSet.get(), &testSettings))
         {
             return true;
         }
@@ -74,17 +75,17 @@ public:
     }
     
     void restoreDefaultsInternal() override {
-        AmbiSourceSet sources;
+        std::unique_ptr<AmbiSourceSet> sources(new AmbiSourceSet(pScalingInfo));
         EncoderSettings settings;
         
-        sources.addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0), "1", TrackColors::getColor(1));
+        sources->addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0), "1", TrackColors::getColor(1));
         settings.distanceEncodingFlag = true;
         settings.distanceEncodingParams.setEncodingMode(EncoderConstants::Standard);
         settings.distanceEncodingParams.setUnitCircleRadius(0.1f);
         
         File file = getPathForPresetName(DEFAULT_PRESET_NAME);
         
-        writeToXmlFile(file, &sources, &settings);
+        writeToXmlFile(file, sources.get(), &settings);
         presetFiles.addIfNotAlreadyThere(file);
     }
     
@@ -104,4 +105,6 @@ public:
         return found;
     }
     
+private:
+    ScalingInfo* pScalingInfo;
 };

@@ -10,7 +10,7 @@
 
 #include "OSCHandlerEncoder.h"
 
-OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams) : OSCHandler(pAmbiPointArray, pStatusMessageHandler)
+OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling)
 {
     this->pDistanceEncodingParams = pDistanceEncodingParams;
 }
@@ -671,3 +671,57 @@ void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingInverseProportional(
         reportError(ERROR_STRING_INVALID_DISTANCE_ENCODING_PARAMETER, &message);
     }
 }
+
+bool OSCHandlerEncoder::checkAed(double a, double e, double d, String* errorString) const
+{
+    if(a < Constants::AzimuthRadMin || a > Constants::AzimuthRadMax)
+    {
+        *errorString = "OSC-Message Azimuth out of range: " + String(a);
+        return false;
+    }
+    if(e < Constants::ElevationRadMin || e > Constants::ElevationRadMax)
+    {
+        *errorString = "OSC-Message Elevation out of range: " + String(e);
+        return false;
+    }
+    if (d < Constants::DistanceMin)
+    {
+        *errorString = "OSC-Message Distance out of range: " + String(d);
+        return false;
+    }
+
+    return true;
+}
+
+bool OSCHandlerEncoder::checkXyz(double x, double y, double z, String* errorString) const
+{
+    if (x < pScalingInfo->CartesianMin() || x > pScalingInfo->CartesianMax())
+    {
+        *errorString = "OSC-Message X out of range: " + String(x);
+        return false;
+    }
+    if (y < pScalingInfo->CartesianMin() || y > pScalingInfo->CartesianMax())
+    {
+        *errorString = "OSC-Message Y out of range: " + String(y);
+        return false;
+    }
+    if (z < pScalingInfo->CartesianMin() || z > pScalingInfo->CartesianMax())
+    {
+        *errorString = "OSC-Message Z out of range: " + String(z);
+        return false;
+    }
+
+    return true;
+}
+
+bool OSCHandlerEncoder::checkGain(double gain, String *errorString) const
+{
+    if(gain < Constants::GainDbMin || gain > Constants::GainDbMax)
+    {
+        *errorString = "OSC-Message Gain out of range: " + String(gain);
+        return false;
+    }
+    
+    return true;
+}
+       

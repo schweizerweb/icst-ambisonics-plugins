@@ -15,7 +15,7 @@
 class AmbiDataSet
 {
 public:
-	AmbiDataSet();
+	AmbiDataSet(ScalingInfo* pScaling);
 	virtual ~AmbiDataSet();
 
 	virtual int size() const = 0;
@@ -50,7 +50,8 @@ public:
 	bool setGain(int channel, double gain, bool notify = true) const;
 	String getNewUniqueName() const;
 	int getEnabledCount() const;
-
+    float getMaxDistance() const;
+    
 	int groupCount() const;
 	AmbiGroup* getGroup(int index) const;
 	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);
@@ -77,4 +78,5 @@ private:
 protected:
 	CriticalSection cs;
 	OwnedArray<AmbiGroup> groups;
+    ScalingInfo* pScalingInfo;
 };

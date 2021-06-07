@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.0.8
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -51,17 +51,17 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void setPointInfoVisible(bool visible);
     void timerCallback() override;
-    ZoomSettings* getZoomSettingsPointer() {return &zoomSettings;}
+    ZoomSettings* getZoomSettingsPointer() {return zoomSettings.get();}
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    ZoomSettings zoomSettings;
+    std::unique_ptr<ZoomSettings> zoomSettings;
 	bool showPointInfo;
     //[/UserVariables]
 
