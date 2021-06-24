@@ -14,6 +14,20 @@
               jucerFormatVersion="1">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
+      <FILE id="lDMF5l" name="AnimatorAction.h" compile="0" resource="0"
+            file="Source/AnimatorAction.h"/>
+      <FILE id="vhhrU3" name="AnimatorActionComponent.cpp" compile="1" resource="0"
+            file="Source/AnimatorActionComponent.cpp"/>
+      <FILE id="OFVlKQ" name="AnimatorActionComponent.h" compile="0" resource="0"
+            file="Source/AnimatorActionComponent.h"/>
+      <FILE id="iEzhVQ" name="AnimatorDialogManager.h" compile="0" resource="0"
+            file="Source/AnimatorDialogManager.h"/>
+      <FILE id="wqvJSM" name="AnimatorDialog.h" compile="0" resource="0"
+            file="Source/AnimatorDialog.h"/>
+      <FILE id="FXQcgb" name="AnimatorComponent.cpp" compile="1" resource="0"
+            file="Source/AnimatorComponent.cpp"/>
+      <FILE id="sNux2i" name="AnimatorComponent.h" compile="0" resource="0"
+            file="Source/AnimatorComponent.h"/>
       <FILE id="qw16WF" name="AirAbsorbtionFilter.cpp" compile="1" resource="0"
             file="Source/AirAbsorbtionFilter.cpp"/>
       <FILE id="Wq3sFb" name="AirAbsorbtionFilter.h" compile="0" resource="0"
