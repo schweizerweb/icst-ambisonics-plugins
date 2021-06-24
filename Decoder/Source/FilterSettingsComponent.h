@@ -24,6 +24,8 @@
 #include "IIRFilterGraph.h"
 #include "FilterPresetHelper.h"
 #include "SingleFilterSettingsComponent.h"
+
+#define INITIAL_FFT_SCALER 10.0
 //[/Headers]
 
 
