@@ -43,6 +43,13 @@ public:
         
         writeToXmlFile(file, &filterInfo);
         presetFiles.addIfNotAlreadyThere(file);
+        
+        File fileHighPass = getPathForPresetName("HighPass 400 Hz");
+        filterInfo.get(0)->filterType = FilterInfo::HighPass;
+        filterInfo.get(0)->cutOffFrequencyHz = 400;
+        
+        writeToXmlFile(fileHighPass, &filterInfo);
+        presetFiles.addIfNotAlreadyThere(fileHighPass);
     }
     
     bool loadFromXmlFile(const File file, FilterBankInfo* pFilterInfo)
