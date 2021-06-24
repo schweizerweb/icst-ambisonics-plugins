@@ -34,12 +34,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
-    
-#if MULTI_ENCODER_MODE
-    groupAnimator.reset(new GroupAnimator());
-#endif
-	initializeOsc();
 
+	initializeOsc();
     initializeAudioParameter();
     
     presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this, getScalingInfo()));
@@ -74,8 +70,7 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
 #if MULTI_ENCODER_MODE
-    groupAnimator->initialize(this, sources.get());
-	encoderSettings.initialize(this);
+    encoderSettings.initialize(this);
 #endif
 	encoderSettings.distanceEncodingParams.initialize(this);
     // points (X, Y, Z, Gain)
@@ -223,11 +218,6 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
-#if MULTI_ENCODER_MODE
-	// group animator
-	groupAnimator->doStep((float)(buffer.getNumSamples() / getSampleRate()));
-#endif
-
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
