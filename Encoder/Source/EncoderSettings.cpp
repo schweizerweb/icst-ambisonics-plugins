@@ -14,6 +14,7 @@
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
+#define XML_TAG_MASTER_GAIN "MasterGain"
 #define XML_TAG_DISPLAY "Display"
 #define XML_TAG_OSC_SEND_EXT_XYZ "Xyz"
 #define XML_TAG_OSC_SEND_EXT_AED "Aed"
@@ -25,6 +26,7 @@
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_CONTINUOUS "Continuous"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
+#define XML_ATTRIBUTE_VALUE "Value"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 
@@ -159,6 +161,10 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
     xmlElement->addChildElement(dopplerEncoding);
+    
+    XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
+    masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
+    xmlElement->addChildElement(masterGainElement);
 }
 
 void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
@@ -175,6 +181,12 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
         setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
+    }
+    
+    XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
+    if (masterGainElement != nullptr)
+    {
+        setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
     }
 }
 
