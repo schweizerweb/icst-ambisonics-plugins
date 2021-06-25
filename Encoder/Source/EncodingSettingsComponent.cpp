@@ -311,6 +311,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
         pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
         pZoomSettings->getScalingInfo()->SetScaler(pEncoderSettings->getDistanceScaler());
+        pZoomSettings->Reset();
         sendChangeMessage();
         sourceDefinition->refresh();
         //[/UserSliderCode_sliderDistanceScaler]
