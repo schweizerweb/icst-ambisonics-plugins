@@ -39,7 +39,7 @@ const float EncoderConstants::MasterGainMax = 12.0f;
 const float EncoderConstants::MasterGainResolution = 0.1f;
 
 const float EncoderConstants::AirAbsorbtionIntensityMin = 0.1f;
-const float EncoderConstants::AirAbsorbtionIntensityMax = 10.0f;
+const float EncoderConstants::AirAbsorbtionIntensityMax = 100.0f;
 const float EncoderConstants::AirAbsorbtionIntensityResolution = 0.1f;
 
 const StringArray EncoderConstants::encodingModeStrings = {"None", "Standard", "Advanced", "Exponential", "Inverse Proportional"};

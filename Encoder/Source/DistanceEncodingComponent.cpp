@@ -214,7 +214,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
 
     sliderAirAbsorbtionIntensity.reset (new juce::Slider ("sliderAirAbsorbtionIntensity"));
     addAndMakeVisible (sliderAirAbsorbtionIntensity.get());
-    sliderAirAbsorbtionIntensity->setRange (0, 10, 0);
+    sliderAirAbsorbtionIntensity->setRange (0, 100, 0);
     sliderAirAbsorbtionIntensity->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderAirAbsorbtionIntensity->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderAirAbsorbtionIntensity->addListener (this);
@@ -253,6 +253,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderAdvancedFactor->setRange(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax, EncoderConstants::AdvancedFactorResolution);
     sliderAdvancedExponent->setRange(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax, EncoderConstants::AdvancedExponentResolution);
     sliderAirAbsorbtionIntensity->setRange(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax, EncoderConstants::AirAbsorbtionIntensityResolution);
+    sliderAirAbsorbtionIntensity->setSkewFactorFromMidPoint(10.0);
     pParams->addChangeListener(this);
 
     updatePresetComboBox();
@@ -629,7 +630,7 @@ BEGIN_JUCER_METADATA
             layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <SLIDER name="sliderAirAbsorbtionIntensity" id="d2648c461e85094" memberName="sliderAirAbsorbtionIntensity"
           virtualName="" explicitFocusOrder="0" pos="368 75R 382M 24" min="0.0"
-          max="10.0" int="0.0" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          max="100.0" int="0.0" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
   <LABEL name="labelIntensity" id="474bf2082d99f6e7" memberName="labelIntensity"
