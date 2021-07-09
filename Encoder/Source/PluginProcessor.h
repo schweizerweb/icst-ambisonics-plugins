@@ -96,7 +96,6 @@ private:
 	StatusMessageHandler statusMessageHandler;
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
-    std::unique_ptr<GroupAnimator> groupAnimator;
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];

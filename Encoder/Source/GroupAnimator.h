@@ -8,6 +8,9 @@
   ==============================================================================
 */
 
+// First version of group animation using automation parameters
+// Not used anymore!
+
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AmbiDataSet.h"
