@@ -115,6 +115,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInf
 
     updatePresetComboBox();
     pPresetHelper->addActionListener(this);
+    sliderFFTScaler->setValue(INITIAL_FFT_SCALER);
     //[/Constructor]
 }
 
