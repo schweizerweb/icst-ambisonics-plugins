@@ -51,8 +51,9 @@
 
 #define ID_APPLY_COLOR      1
 #define ID_APPLY_FILTER     2
-#define ID_APPLY_DEC_GAIN   3
-#define ID_APPLY_INC_GAIN   4
+#define ID_APPLY_GAIN       3
+#define ID_APPLY_DEC_GAIN   4
+#define ID_APPLY_INC_GAIN   5
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -430,6 +431,18 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
                     {
                         pSpeakerSet->get(selection[i])->getFilterInfo()->copyFrom(info);
                         pSpeakerSet->get(selection[i])->setFilterBypass(bypass);
+                    }
+                }
+            }
+            else if (comboBoxApply->getSelectedId() == ID_APPLY_GAIN)
+            {
+                float gainFactor = pSpeakerSet->get(mainSelection)->getGain();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != mainSelection)
+                    {
+                        pSpeakerSet->get(selection[i])->setGain(gainFactor, true);
                     }
                 }
             }
@@ -1005,7 +1018,8 @@ void SpeakerSettingsComponent::controlDimming()
         if(mainIndex >= 0 && mainIndex < pSpeakerSet->size())
         {
             comboBoxApply->addItem("Color from CH " + String(mainIndex + 1), ID_APPLY_COLOR);
-            comboBoxApply->addItem("Filter from CH " + String (mainIndex + 1), ID_APPLY_FILTER);
+            comboBoxApply->addItem("Filter from CH " + String(mainIndex + 1), ID_APPLY_FILTER);
+            comboBoxApply->addItem("Gain from CH " + String(mainIndex + 1), ID_APPLY_GAIN);
 
             comboBoxApply->addItem(TRANS("Gain -0.5 dB"), ID_APPLY_DEC_GAIN);
             comboBoxApply->addItem(TRANS("Gain +0.5 dB"), ID_APPLY_INC_GAIN);
