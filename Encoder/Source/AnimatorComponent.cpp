@@ -315,6 +315,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
             actionsPerformed = true;
         }
 
+#if MULTI_ENCODER_MODE
         for(int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
         {
             if(currentStep >= groupSteps[i].size())
@@ -327,6 +328,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
 
             actionsPerformed = true;
         }
+#endif
 
         if(actionsPerformed)
         {
@@ -378,8 +380,11 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 {
     for(auto& s : steps)
         s.clear();
+
+#if MULTI_ENCODER_MODE
     for(auto& s : groupSteps)
         s.clear();
+#endif
 
     int stepCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
 
@@ -394,6 +399,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
         calculateStepsTo(origin, target, &steps[i], isPolar, stepCount);
     }
 
+#if MULTI_ENCODER_MODE
     for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
     {
         if(!pSourceSet->getGroup(i)->getEnabled())
@@ -404,6 +410,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 
         calculateStepsTo(origin, target, &groupSteps[i], isPolar, stepCount);
     }
+#endif
 
     currentStep = 0;
 }
