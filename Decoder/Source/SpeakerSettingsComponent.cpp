@@ -436,7 +436,7 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
             }
             else if (comboBoxApply->getSelectedId() == ID_APPLY_GAIN)
             {
-                float gainFactor = pSpeakerSet->get(mainSelection)->getGain();
+                double gainFactor = pSpeakerSet->get(mainSelection)->getGain();
                 auto selection = pPointSelection->getSelectedIndices();
                 for (int i = 0; i < selection.size(); i++)
                 {
