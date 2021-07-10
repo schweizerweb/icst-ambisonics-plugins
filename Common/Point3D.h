@@ -111,30 +111,30 @@ public:
 		/** Changes the Point3D's x and y coordinates. */
 	void setXY(ValueType newX, ValueType newY, bool notify = true) noexcept
     {
-        x = notify ? audioParams.notifyX(newX) : newX;
-        y = notify ? audioParams.notifyY(newY) : newY;
+        x = notify ? (ValueType)audioParams.notifyX((double)newX) : newX;
+        y = notify ? (ValueType)audioParams.notifyY((double)newY) : newY;
     }
 
 		/** Changes the Point3D's x and z coordinates. */
 	void setXZ(ValueType newX, ValueType newZ, bool notify = true) noexcept
     {
-        x = notify ? audioParams.notifyX(newX) : newX;
-        z = notify ? audioParams.notifyZ(newZ) : newZ;
+        x = notify ? (ValueType)audioParams.notifyX((double)newX) : newX;
+        z = notify ? (ValueType)audioParams.notifyZ((double)newZ) : newZ;
     }
 
 		/** Changes the Point3D's y and z coordinates. */
 	void setYZ(ValueType newY, ValueType newZ, bool notify = true) noexcept
     {
-        y = notify ? audioParams.notifyY(newY) : newY;
-        z = notify ? audioParams.notifyZ(newZ) : newZ;
+        y = notify ? (ValueType)audioParams.notifyY((double)newY) : newY;
+        z = notify ? (ValueType)audioParams.notifyZ((double)newZ) : newZ;
     }
 
 	/** Changes the Point3D's x, y and z coordinates. */
 	void setXYZ(ValueType newX, ValueType newY, ValueType newZ, bool notify = true) noexcept
     {
-        x = notify ? audioParams.notifyX(newX) : newX;
-        y = notify ? audioParams.notifyY(newY) : newY;
-        z = notify ? audioParams.notifyZ(newZ) : newZ;
+        x = notify ? (ValueType)audioParams.notifyX((double)newX) : newX;
+        y = notify ? (ValueType)audioParams.notifyY((double)newY) : newY;
+        z = notify ? (ValueType)audioParams.notifyZ((double)newZ) : newZ;
     }
 
 		/** Returns a Point3D whose coordinates are multiplied by a given scalar value. */
@@ -360,9 +360,9 @@ private:
 		ValueType newY = distance * cos(elevation) * cos(azimuth);
 		ValueType newZ = distance * sin(elevation);
         
-		x = audioParams.notifyX(newX);
-        y = audioParams.notifyY(newY);
-        z = audioParams.notifyZ(newZ);
+		x = (ValueType)audioParams.notifyX((double)newX);
+        y = (ValueType)audioParams.notifyY((double)newY);
+        z = (ValueType)audioParams.notifyZ((double)newZ);
 	}
 };
 

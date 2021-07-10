@@ -419,9 +419,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         {
             auto newPt = new Point3D<float>();
             newPt->setAed(
-                            origin.getAzimuth() + da * (iStep + 1) / stepCount,
-                            origin.getElevation() + de * (iStep + 1) / stepCount,
-                            origin.getDistance() + dd * (iStep + 1) / stepCount);
+                            float(origin.getAzimuth() + da * (iStep + 1) / stepCount),
+                            float(origin.getElevation() + de * (iStep + 1) / stepCount),
+                            float(origin.getDistance() + dd * (iStep + 1) / stepCount));
             pStepArray->add(newPt);
         }
     }
@@ -433,9 +433,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         for(int iStep = 0; iStep < stepCount; iStep++)
         {
             pStepArray->add(new Point3D<float>(
-                                            origin.getX() + dx * (iStep + 1) / stepCount,
-                                            origin.getY() + dy * (iStep + 1) / stepCount,
-                                            origin.getZ() + dz * (iStep + 1) / stepCount));
+                                            float(origin.getX() + dx * (iStep + 1) / stepCount),
+                                            float(origin.getY() + dy * (iStep + 1) / stepCount),
+                                            float(origin.getZ() + dz * (iStep + 1) / stepCount)));
         }
     }
 }
