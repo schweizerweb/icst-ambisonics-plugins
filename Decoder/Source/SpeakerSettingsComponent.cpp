@@ -579,7 +579,7 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
         const int result = m.show();
         if (result == 1)
         {
-            if (CsvImportExport::importFromCsv(pAmbiSettings, pSpeakerSet))
+            if (CsvImportExport::importFromCsv(pSpeakerSet))
             {
                 sendChangeMessage();
                 controlDimming();
@@ -712,8 +712,8 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pt->getName(); break;
 	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance(), 2); break;
-	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pAmbiSettings, pt), 2); break;
-	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pAmbiSettings, pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
+	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pt), 2); break;
+	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);

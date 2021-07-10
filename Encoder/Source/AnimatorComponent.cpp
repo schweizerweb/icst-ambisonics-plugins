@@ -294,7 +294,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void AnimatorComponent::timerCallback(int timerID)
+void AnimatorComponent::timerCallback(int /*timerID*/)
 {
     if(currentStep >= 0)
     {
