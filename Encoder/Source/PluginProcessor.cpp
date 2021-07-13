@@ -182,6 +182,8 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0;
+
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
     return true;
