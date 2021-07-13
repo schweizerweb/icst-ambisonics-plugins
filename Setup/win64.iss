@@ -33,35 +33,67 @@ ArchitecturesAllowed=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\bin\VST3\AmbiDecoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiDecoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O1_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O2_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O3_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O4_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O5_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O6_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O7_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: "..\bin\VST3\AmbiEncoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion
-Source: ".\Redist\VC_redist.x64.exe"; DestDir: {tmp}; Flags: dontcopy
-; NOTE: Don't use "Flags: ignoreversion" on any shared system files
+Source: "..\bin\VST3\AmbiDecoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O1_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O2_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O3_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O4_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O5_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O6_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O7_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: ".\Redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
+Source: "ICST_AmbisonicsTemplates\ICST Mono Ambisonics.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
+Source: "ICST_AmbisonicsTemplates\ICST_Ambi_OSC_DEMO.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
+Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_O1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
+Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_O3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
+Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_O5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\dearVR_Binaural_Ambi_Micro.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat_O1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat_O3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat_O5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_O1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_O3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_O5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_4x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_8x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_16x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_O1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_O3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Multi_O5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Solo_O1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Solo_O3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Encoder-Solo_O5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\IEM_Binaural_Decoder_O1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\IEM_Binaural_Decoder_O3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
+Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\IEM_Binaural_Decoder_O5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST Ambisonics Plugins"; Flags: ignoreversion; Components: ReaperTrackTemplates
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Visual C++ Redistributables"; \
   Parameters: "/quiet"; Check: VCRedistNeedsInstall ; Flags: waituntilterminated
+
+[Components]
+Name: "VST3Plugins"; Description: "VST3 Plugins"; Types: compact custom full
+Name: "ReaperTemplates"; Description: "Reaper Templates"; Types: full custom
+Name: "ReaperTrackTemplates"; Description: "Reaper Track Templates"; Types: custom full
+
+[Dirs]
+Name: "{userappdata}/REAPER\ProjectTemplates"; Components: ReaperTemplates
+Name: "{userappdata}/REAPER\TrackTemplates"; Components: ReaperTrackTemplates
 
 [Code]
 function VCRedistNeedsInstall: Boolean;
