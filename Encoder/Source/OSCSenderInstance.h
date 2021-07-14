@@ -90,7 +90,7 @@ public:
                 case DualScaledY:
                 case DualScaledZ:
                 case DualScaledE:
-                    return OSCArgument(getValue(pt, scaler, index));
+                    return OSCArgument(getValue(pt, scaler));
                     
                 default:
                     return OSCArgument("Error");
@@ -122,7 +122,7 @@ public:
                 case DualScaledY:
                 case DualScaledZ:
                 case DualScaledE:
-                    return String(getValue(pt, scaler, index));
+                    return String(getValue(pt, scaler));
                     
                 default: return "Error";
             }
@@ -134,7 +134,7 @@ public:
         }
         
     private:
-        float getValue(AmbiPoint* pt, double scaler, int index)
+        float getValue(AmbiPoint* pt, double scaler)
         {
             switch(type)
             {

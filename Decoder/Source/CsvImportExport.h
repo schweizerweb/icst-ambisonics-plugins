@@ -27,7 +27,7 @@ private:
     };
 
 public:
-    static bool importFromCsv(AmbiSettings* pAmbiSettings, AmbiSpeakerSet* pSpeakerSet)
+    static bool importFromCsv(AmbiSpeakerSet* pSpeakerSet)
     {
         FileChooser chooser("Import from CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToOpen();

@@ -294,7 +294,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void AnimatorComponent::timerCallback(int timerID)
+void AnimatorComponent::timerCallback(int /*timerID*/)
 {
     if(currentStep >= 0)
     {
@@ -315,6 +315,7 @@ void AnimatorComponent::timerCallback(int timerID)
             actionsPerformed = true;
         }
 
+#if MULTI_ENCODER_MODE
         for(int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
         {
             if(currentStep >= groupSteps[i].size())
@@ -327,6 +328,7 @@ void AnimatorComponent::timerCallback(int timerID)
 
             actionsPerformed = true;
         }
+#endif
 
         if(actionsPerformed)
         {
@@ -378,8 +380,11 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 {
     for(auto& s : steps)
         s.clear();
+
+#if MULTI_ENCODER_MODE
     for(auto& s : groupSteps)
         s.clear();
+#endif
 
     int stepCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
 
@@ -394,6 +399,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
         calculateStepsTo(origin, target, &steps[i], isPolar, stepCount);
     }
 
+#if MULTI_ENCODER_MODE
     for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
     {
         if(!pSourceSet->getGroup(i)->getEnabled())
@@ -404,6 +410,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 
         calculateStepsTo(origin, target, &groupSteps[i], isPolar, stepCount);
     }
+#endif
 
     currentStep = 0;
 }
@@ -419,9 +426,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         {
             auto newPt = new Point3D<float>();
             newPt->setAed(
-                            origin.getAzimuth() + da * (iStep + 1) / stepCount,
-                            origin.getElevation() + de * (iStep + 1) / stepCount,
-                            origin.getDistance() + dd * (iStep + 1) / stepCount);
+                            float(origin.getAzimuth() + da * (iStep + 1) / stepCount),
+                            float(origin.getElevation() + de * (iStep + 1) / stepCount),
+                            float(origin.getDistance() + dd * (iStep + 1) / stepCount));
             pStepArray->add(newPt);
         }
     }
@@ -433,9 +440,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         for(int iStep = 0; iStep < stepCount; iStep++)
         {
             pStepArray->add(new Point3D<float>(
-                                            origin.getX() + dx * (iStep + 1) / stepCount,
-                                            origin.getY() + dy * (iStep + 1) / stepCount,
-                                            origin.getZ() + dz * (iStep + 1) / stepCount));
+                                            float(origin.getX() + dx * (iStep + 1) / stepCount),
+                                            float(origin.getY() + dy * (iStep + 1) / stepCount),
+                                            float(origin.getZ() + dz * (iStep + 1) / stepCount)));
         }
     }
 }
