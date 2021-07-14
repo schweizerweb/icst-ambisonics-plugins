@@ -87,8 +87,8 @@ Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Visual C++ Redistrib
   Parameters: "/quiet"; Check: VCRedistNeedsInstall ; Flags: waituntilterminated
 
 [Components]
-Name: "VST3Plugins"; Description: "VST3 Plugins"; Types: compact custom full
-Name: "ReaperTemplates"; Description: "Reaper Templates"; Types: full custom
+Name: "VST3Plugins"; Description: "ICST Ambisonics Plugins VST3"; Types: compact custom full
+Name: "ReaperTemplates"; Description: "Reaper Project Templates"; Types: full custom
 Name: "ReaperTrackTemplates"; Description: "Reaper Track Templates"; Types: custom full
 
 [Dirs]
