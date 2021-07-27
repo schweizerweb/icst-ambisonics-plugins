@@ -72,7 +72,7 @@ private:
     void setPreset(PositionSet* pSet);
     void performAction(AnimatorAction* pAction);
     void controlDimming();
-    
+
     AmbiSourceSet* pSourceSet;
     PositionSet set1;
     PositionSet set2;
