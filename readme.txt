@@ -13,3 +13,5 @@ Further information and help can be found here:
   https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/issues?status=new&status=open
 - Guide, Tutorials, Blog
   https://ambisonics.postach.io/post/zhdk-ambisonics-plugins
+
+Note: Some Reaper-Templates distributed with this package require 3rd-party plugins. More information including download links can be found here: https://ambisonics.ch/post/icst-ambisonics-plugins-templates
