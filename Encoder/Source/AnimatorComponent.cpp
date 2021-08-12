@@ -44,9 +44,9 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime1.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime1.get());
-    sliderTime1->setRange (0, 10, 0.1);
-    sliderTime1->setSliderStyle (juce::Slider::LinearBar);
-    sliderTime1->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime1->setRange (0, 999999, 1);
+    sliderTime1->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderTime1->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 150, 20);
 
     togglePolar1.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar1.get());
@@ -68,9 +68,9 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime2.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime2.get());
-    sliderTime2->setRange (0, 10, 0.1);
-    sliderTime2->setSliderStyle (juce::Slider::LinearBar);
-    sliderTime2->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime2->setRange (0, 999999, 1);
+    sliderTime2->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderTime2->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 150, 20);
 
     togglePolar2.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar2.get());
@@ -92,9 +92,9 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime3.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime3.get());
-    sliderTime3->setRange (0, 10, 0.1);
-    sliderTime3->setSliderStyle (juce::Slider::LinearBar);
-    sliderTime3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime3->setRange (0, 999999, 1);
+    sliderTime3->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderTime3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 150, 20);
 
     togglePolar3.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar3.get());
@@ -116,9 +116,9 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
 
     sliderTime4.reset (new juce::Slider ("new slider"));
     addAndMakeVisible (sliderTime4.get());
-    sliderTime4->setRange (0, 10, 0.1);
-    sliderTime4->setSliderStyle (juce::Slider::LinearBar);
-    sliderTime4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderTime4->setRange (0, 999999, 1);
+    sliderTime4->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderTime4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 150, 20);
 
     togglePolar4.reset (new juce::ToggleButton ("new toggle button"));
     addAndMakeVisible (togglePolar4.get());
@@ -229,6 +229,10 @@ void AnimatorComponent::resized()
     action1->setBounds (0, 200, proportionOfWidth (0.5012f), 340);
     action2->setBounds (getWidth() - proportionOfWidth (0.5012f), 200, proportionOfWidth (0.5012f), 340);
     //[UserResized] Add your own custom resize handling here..
+    sliderTime1->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime1->getWidth() - 50), sliderTime1->getHeight());
+    sliderTime2->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime2->getWidth() - 50), sliderTime2->getHeight());
+    sliderTime3->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime3->getWidth() - 50), sliderTime3->getHeight());
+    sliderTime4->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime4->getWidth() - 50), sliderTime4->getHeight());
     //[/UserResized]
 }
 
@@ -294,7 +298,7 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void AnimatorComponent::timerCallback(int timerID)
+void AnimatorComponent::timerCallback(int /*timerID*/)
 {
     if(currentStep >= 0)
     {
@@ -315,6 +319,7 @@ void AnimatorComponent::timerCallback(int timerID)
             actionsPerformed = true;
         }
 
+#if MULTI_ENCODER_MODE
         for(int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
         {
             if(currentStep >= groupSteps[i].size())
@@ -327,6 +332,7 @@ void AnimatorComponent::timerCallback(int timerID)
 
             actionsPerformed = true;
         }
+#endif
 
         if(actionsPerformed)
         {
@@ -378,8 +384,11 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 {
     for(auto& s : steps)
         s.clear();
+
+#if MULTI_ENCODER_MODE
     for(auto& s : groupSteps)
         s.clear();
+#endif
 
     int stepCount = jmax(1, (int)(timeSec * 1000.0 / STEP_TIMER_INTERVAL));
 
@@ -394,6 +403,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
         calculateStepsTo(origin, target, &steps[i], isPolar, stepCount);
     }
 
+#if MULTI_ENCODER_MODE
     for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
     {
         if(!pSourceSet->getGroup(i)->getEnabled())
@@ -404,6 +414,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
 
         calculateStepsTo(origin, target, &groupSteps[i], isPolar, stepCount);
     }
+#endif
 
     currentStep = 0;
 }
@@ -419,9 +430,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         {
             auto newPt = new Point3D<float>();
             newPt->setAed(
-                            origin.getAzimuth() + da * (iStep + 1) / stepCount,
-                            origin.getElevation() + de * (iStep + 1) / stepCount,
-                            origin.getDistance() + dd * (iStep + 1) / stepCount);
+                            float(origin.getAzimuth() + da * (iStep + 1) / stepCount),
+                            float(origin.getElevation() + de * (iStep + 1) / stepCount),
+                            float(origin.getDistance() + dd * (iStep + 1) / stepCount));
             pStepArray->add(newPt);
         }
     }
@@ -433,9 +444,9 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
         for(int iStep = 0; iStep < stepCount; iStep++)
         {
             pStepArray->add(new Point3D<float>(
-                                            origin.getX() + dx * (iStep + 1) / stepCount,
-                                            origin.getY() + dy * (iStep + 1) / stepCount,
-                                            origin.getZ() + dz * (iStep + 1) / stepCount));
+                                            float(origin.getX() + dx * (iStep + 1) / stepCount),
+                                            float(origin.getY() + dy * (iStep + 1) / stepCount),
+                                            float(origin.getZ() + dz * (iStep + 1) / stepCount)));
         }
     }
 }
@@ -490,8 +501,8 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="1406018e4c78eb13" memberName="sliderTime1"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="238ed80972cc4d19"
           posRelativeY="238ed80972cc4d19" posRelativeW="238ed80972cc4d19"
-          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
           needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="1c7a8ab484d0d51e" memberName="togglePolar1"
                 virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="238ed80972cc4d19"
@@ -510,8 +521,8 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="2bb561484b6a5dbb" memberName="sliderTime2"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="757958c6e56c2a33"
           posRelativeY="757958c6e56c2a33" posRelativeW="757958c6e56c2a33"
-          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
           needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="dab804a7a5be0515" memberName="togglePolar2"
                 virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="757958c6e56c2a33"
@@ -530,8 +541,8 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="74aa9d1365e4e818" memberName="sliderTime3"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="e8336da307c67c03"
           posRelativeY="e8336da307c67c03" posRelativeW="e8336da307c67c03"
-          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
           needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="1dd6eb466e28fccb" memberName="togglePolar3"
                 virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="e8336da307c67c03"
@@ -550,8 +561,8 @@ BEGIN_JUCER_METADATA
   <SLIDER name="new slider" id="9bf6f40205390b0d" memberName="sliderTime4"
           virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="996694d54e1d1607"
           posRelativeY="996694d54e1d1607" posRelativeW="996694d54e1d1607"
-          min="0.0" max="10.0" int="0.1" style="LinearBar" textBoxPos="TextBoxLeft"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
           needsCallback="0"/>
   <TOGGLEBUTTON name="new toggle button" id="54313aa8ce125a33" memberName="togglePolar4"
                 virtualName="" explicitFocusOrder="0" pos="70Rr 16 63 24" posRelativeX="996694d54e1d1607"

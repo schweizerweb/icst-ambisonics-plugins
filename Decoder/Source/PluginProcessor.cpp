@@ -129,7 +129,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
 		{
-			int requiredDelay = delayHelper.getDelayCompensationSamples(&ambiSettings, pt, maxDist, getSampleRate());
+			int requiredDelay = delayHelper.getDelayCompensationSamples(pt, maxDist, getSampleRate());
 			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
 		}
 	}

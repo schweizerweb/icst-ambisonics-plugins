@@ -228,7 +228,7 @@ void OSCTargetsComponent::actionListenerCallback(const String& message)
         sendChangeMessage();
 }
 
-void OSCTargetsComponent::textEditorTextChanged(TextEditor& textEditor)
+void OSCTargetsComponent::textEditorTextChanged(TextEditor& /*textEditor*/)
 {
     sendChangeMessage();
 }

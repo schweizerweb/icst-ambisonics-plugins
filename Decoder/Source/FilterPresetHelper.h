@@ -44,9 +44,9 @@ public:
         writeToXmlFile(file, &filterInfo);
         presetFiles.addIfNotAlreadyThere(file);
         
-        File fileHighPass = getPathForPresetName("HighPass 400 Hz");
+        File fileHighPass = getPathForPresetName("HighPass 120 Hz");
         filterInfo.get(0)->filterType = FilterInfo::HighPass;
-        filterInfo.get(0)->cutOffFrequencyHz = 400;
+        filterInfo.get(0)->cutOffFrequencyHz = 120;
         
         writeToXmlFile(fileHighPass, &filterInfo);
         presetFiles.addIfNotAlreadyThere(fileHighPass);
