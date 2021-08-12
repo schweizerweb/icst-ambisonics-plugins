@@ -303,7 +303,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
     if(currentStep >= 0)
     {
         bool actionsPerformed = false;
-        for(int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+        for(int i = 0; i < AMBI_MAX_NUM_INPUT_CHANNELS; i++)
         {
             if(currentStep >= steps[i].size())
             {

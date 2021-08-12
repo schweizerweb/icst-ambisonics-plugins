@@ -94,6 +94,8 @@ private:
     std::unique_ptr<juce::TextButton> btnManageDistanceEncodingPresets;
     std::unique_ptr<juce::Label> labelMasterGain;
     std::unique_ptr<juce::Slider> sliderMasterGain;
+    std::unique_ptr<juce::Label> labelMasterOrder;
+    std::unique_ptr<juce::Slider> sliderAmbisonicsOrder;
 
 
     //==============================================================================

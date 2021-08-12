@@ -92,7 +92,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceScaler->setBounds (14, 79, 109, 24);
+    labelDistanceScaler->setBounds (14, 139, 109, 24);
 
     btnEditDistanceEncoding.reset (new juce::TextButton ("btnEditDistanceEncoding"));
     addAndMakeVisible (btnEditDistanceEncoding.get());
@@ -132,6 +132,24 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     sliderMasterGain->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderMasterGain->addListener (this);
 
+    labelMasterOrder.reset (new juce::Label ("labelMasterOrder",
+                                             TRANS("Ambisonics order:")));
+    addAndMakeVisible (labelMasterOrder.get());
+    labelMasterOrder->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelMasterOrder->setJustificationType (juce::Justification::centredLeft);
+    labelMasterOrder->setEditable (false, false, false);
+    labelMasterOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelMasterOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelMasterOrder->setBounds (14, 79, 109, 24);
+
+    sliderAmbisonicsOrder.reset (new juce::Slider ("sliderAmbisonicsOrder"));
+    addAndMakeVisible (sliderAmbisonicsOrder.get());
+    sliderAmbisonicsOrder->setRange (1, 7, 1);
+    sliderAmbisonicsOrder->setSliderStyle (juce::Slider::LinearHorizontal);
+    sliderAmbisonicsOrder->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
+    sliderAmbisonicsOrder->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -150,6 +168,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     labelMasterGain->setVisible(MULTI_ENCODER_MODE);
     sliderMasterGain->setVisible(MULTI_ENCODER_MODE);
 
+    sliderAmbisonicsOrder->setValue(pEncoderSettings->getAmbisonicsOrder());
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
     sliderMasterGain->setTextValueSuffix(" dB");
@@ -183,6 +202,8 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     btnManageDistanceEncodingPresets = nullptr;
     labelMasterGain = nullptr;
     sliderMasterGain = nullptr;
+    labelMasterOrder = nullptr;
+    sliderAmbisonicsOrder = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -209,13 +230,14 @@ void EncodingSettingsComponent::resized()
     comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 290, 24);
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
-    sourceDefinition->setBounds (8, 144, getWidth() - 16, getHeight() - 186);
-    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 79, getWidth() - 301, 24);
+    sourceDefinition->setBounds (8, 168, getWidth() - 16, getHeight() - 210);
+    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 139, getWidth() - 301, 24);
     btnEditDistanceEncoding->setBounds (getWidth() - 108 - 86, 19, 86, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
-    toggleInfiniteDistance->setBounds (getWidth() - 82, 79, 72, 24);
+    toggleInfiniteDistance->setBounds (getWidth() - 82, 139, 72, 24);
     btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 19, 86, 24);
     sliderMasterGain->setBounds (getWidth() - 90 - (getWidth() - 301), 109, getWidth() - 301, 24);
+    sliderAmbisonicsOrder->setBounds (getWidth() - 90 - (getWidth() - 301), 79, getWidth() - 301, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -322,6 +344,12 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
         pEncoderSettings->setMasterGain((float)sliderMasterGain->getValue());
         //[/UserSliderCode_sliderMasterGain]
     }
+    else if (sliderThatWasMoved == sliderAmbisonicsOrder.get())
+    {
+        //[UserSliderCode_sliderAmbisonicsOrder] -- add your slider handling code here..
+        pEncoderSettings->setAmbisonicsOrder(sliderAmbisonicsOrder->getValue());
+        //[/UserSliderCode_sliderAmbisonicsOrder]
+    }
 
     //[UsersliderValueChanged_Post]
     //[/UsersliderValueChanged_Post]
@@ -414,7 +442,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
-                    virtualName="" explicitFocusOrder="0" pos="8 144 16M 186M" class="SourceDefinitionComponent"
+                    virtualName="" explicitFocusOrder="0" pos="8 168 16M 210M" class="SourceDefinitionComponent"
                     params="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pZoomSettings"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
@@ -425,12 +453,13 @@ BEGIN_JUCER_METADATA
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="90Rr 79 301M 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="90Rr 139 301M 24"
+          posRelativeX="b72378bdfe4e130" posRelativeY="b72378bdfe4e130"
+          min="1.0" max="1000.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
   <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="14 79 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="14 139 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -444,7 +473,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
-                virtualName="" explicitFocusOrder="0" pos="82R 79 72 24" buttonText="Infinite"
+                virtualName="" explicitFocusOrder="0" pos="82R 139 72 24" buttonText="Infinite"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="btnManageDistanceEncodingPresets" id="e79fc007bc779712"
               memberName="btnManageDistanceEncodingPresets" virtualName=""
@@ -463,6 +492,17 @@ BEGIN_JUCER_METADATA
           min="0.0" max="36.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <LABEL name="labelMasterOrder" id="2b0f5207c98dece9" memberName="labelMasterOrder"
+         virtualName="" explicitFocusOrder="0" pos="14 79 109 24" posRelativeX="b72378bdfe4e130"
+         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
+         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="sliderAmbisonicsOrder" id="761f58c4f0821049" memberName="sliderAmbisonicsOrder"
+          virtualName="" explicitFocusOrder="0" pos="90Rr 79 301M 24" posRelativeX="b72378bdfe4e130"
+          posRelativeY="b72378bdfe4e130" min="1.0" max="7.0" int="1.0"
+          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
+          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

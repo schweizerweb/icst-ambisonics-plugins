@@ -9,9 +9,8 @@
 */
 
 #include "AmbiBasicSettings.h"
-#include "Constants.h"
 
-AmbiBasicSettings::AmbiBasicSettings(double distanceScaler): distanceScaler(distanceScaler)
+AmbiBasicSettings::AmbiBasicSettings(double distanceScaler, int ambisonicsOrder): distanceScaler(distanceScaler), ambisonicsOrder(ambisonicsOrder)
 {
 }
 
@@ -23,4 +22,19 @@ double AmbiBasicSettings::getDistanceScaler() const
 void AmbiBasicSettings::setDistanceScaler(double newDistanceScaler)
 {
 	distanceScaler = newDistanceScaler;
+}
+
+int AmbiBasicSettings::getAmbisonicsOrder() const
+{
+    return ambisonicsOrder;
+}
+
+int AmbiBasicSettings::getAmbisonicsChannelCount() const
+{
+    return (ambisonicsOrder + 1) * (ambisonicsOrder + 1);
+}
+
+void AmbiBasicSettings::setAmbisonicsOrder(int order)
+{
+    ambisonicsOrder = order;
 }

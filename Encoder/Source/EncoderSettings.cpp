@@ -31,7 +31,7 @@
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 
 EncoderSettings::EncoderSettings():
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
+	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_AMBISONICS_ORDER),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
 	oscSendFlag(DEFAULT_SEND_FLAG),

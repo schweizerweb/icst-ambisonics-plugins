@@ -78,7 +78,7 @@ private:
     PositionSet set2;
     PositionSet set3;
     PositionSet set4;
-    OwnedArray<Point3D<float>> steps[JucePlugin_MaxNumInputChannels];
+    OwnedArray<Point3D<float>> steps[AMBI_MAX_NUM_INPUT_CHANNELS];
 #if MULTI_ENCODER_MODE
     OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
 #endif

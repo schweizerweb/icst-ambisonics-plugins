@@ -11,8 +11,6 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
-#include "../../Common/TrackColors.h"
-#include "EncoderConstants.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
@@ -74,7 +72,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 #endif
 	encoderSettings.distanceEncodingParams.initialize(this);
     // points (X, Y, Z, Gain)
-     for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+     for (int i = 0; i < AMBI_MAX_NUM_INPUT_CHANNELS; i++)
      {
         String indexStr = String(i + 1);
          
@@ -182,7 +180,8 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0;
+	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= AMBI_MAX_NUM_INPUT_CHANNELS
+        && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= AMBI_MAX_NUM_OUTPUT_CHANNELS;
 
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
@@ -224,8 +223,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
-	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
-	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
+	double currentCoefficients[AMBI_MAX_NUM_OUTPUT_CHANNELS];
+	float* outputBufferPointers[AMBI_MAX_NUM_OUTPUT_CHANNELS];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
@@ -247,11 +246,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     
     // prepare a buffer to reuse for doppler operation
 	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
+	int outputChannelCount = encoderSettings.getAmbisonicsChannelCount();
 
     // prepare write pointers
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
-	
+
     // loop through input channels
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
@@ -276,8 +276,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
-		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
+		pSourcePoint->getAmbisonicsCoefficients(outputChannelCount, &currentCoefficients[0], true, true);
+		applyDistanceGain(&currentCoefficients[0], outputChannelCount, pSourcePoint->getDistance());
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
@@ -297,12 +297,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		{
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
-			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+			for (iChannel = 0; iChannel < outputChannelCount; iChannel++)
 				outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
-		memcpy(&lastCoefficients[iSource], &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
+		memcpy(&lastCoefficients[iSource], &currentCoefficients, outputChannelCount * sizeof(double));
 	}
 }
 
