@@ -182,10 +182,15 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+#ifdef MULTI_ENCODER_MODE
 	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
         && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
+#else
+	return layouts.getMainInputChannelSet().size() == 1
+		&& layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
+#endif
 
-	/*
+    /*
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
     return true;
