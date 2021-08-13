@@ -348,6 +348,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     {
         //[UserSliderCode_sliderAmbisonicsOrder] -- add your slider handling code here..
         pEncoderSettings->setAmbisonicsOrder(int(sliderAmbisonicsOrder->getValue()));
+        updateEncodingUiElements();
         //[/UserSliderCode_sliderAmbisonicsOrder]
     }
 
@@ -358,7 +359,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void EncodingSettingsComponent::updateEncodingUiElements()
+void EncodingSettingsComponent::updateEncodingUiElements() const
 {
     toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
 
@@ -369,6 +370,12 @@ void EncodingSettingsComponent::updateEncodingUiElements()
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())
         sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
+
+    sliderAmbisonicsOrder->setColour(
+        Slider::ColourIds::textBoxBackgroundColourId, 
+        pEncoderSettings->getAmbisonicsChannelCount() > pAudioParams->pAudioProcessor->getTotalNumOutputChannels() 
+            ? Colours::lightsalmon
+            : Colours::green.withAlpha(0.5f));
 }
 
 void EncodingSettingsComponent::controlDimming() const

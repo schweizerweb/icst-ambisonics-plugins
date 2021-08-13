@@ -22,6 +22,7 @@ DecoderAmbiSettings::DecoderAmbiSettings(): AmbiBasicSettings(DEFAULT_AMBISONICS
     }
 
     prepareWeightings();
+    prepareManualWeightings();
 }
 
 double DecoderAmbiSettings::getAmbiChannelWeight(int ambiChannel)
@@ -97,14 +98,17 @@ void DecoderAmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
     xmlElement->addChildElement(xmlAmbiChannelWeight);
 }
 
-void DecoderAmbiSettings::prepareWeightings()
+void DecoderAmbiSettings::prepareManualWeightings()
 {
     // manual
     for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {
         manualOrderWeights[i] = 1.0;
     }
+}
 
+void DecoderAmbiSettings::prepareWeightings()
+{
     // standard
     for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {

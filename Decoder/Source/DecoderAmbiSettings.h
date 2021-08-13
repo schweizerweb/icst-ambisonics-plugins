@@ -40,7 +40,8 @@ public:
 private:
 	double fact(int n);
     void prepareWeightings();
-    
+    void prepareManualWeightings();
+
     int ambiChannelOrder[MAX_NUM_INPUT_CHANNELS];
 	double manualOrderWeights[MAX_NB_OF_AMBISONICS_GAINS];
     

@@ -59,7 +59,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, DecoderAmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, DecoderAmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings, AudioProcessor* pAudioProcessor);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
@@ -117,6 +117,7 @@ private:
     PresetManagerDialog presetManagerDialog;
     std::unique_ptr<FilterPresetHelper> filterPresetHelper;
     ZoomSettings* pZoomSettings;
+    AudioProcessor* pAudioProcessor;
     //[/UserVariables]
 
     //==============================================================================
@@ -147,6 +148,8 @@ private:
     std::unique_ptr<juce::TextButton> buttonScaling;
     std::unique_ptr<juce::Slider> sliderPort;
     std::unique_ptr<juce::Slider> sliderTimeout;
+    std::unique_ptr<juce::Label> labelChannelAmbiOrder;
+    std::unique_ptr<juce::Slider> sliderAmbiOrder;
 
 
     //==============================================================================

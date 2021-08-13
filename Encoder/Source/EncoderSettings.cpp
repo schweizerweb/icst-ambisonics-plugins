@@ -68,6 +68,11 @@ void EncoderSettings::setDistanceScaler(double newDistanceScaler)
     distanceScaler = newDistanceScaler;
 }
 
+void EncoderSettings::setAmbisonicsOrder(int order)
+{
+    AmbiBasicSettings::setAmbisonicsOrder(order);
+}
+
 XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 {
 	XmlElement* element = new XmlElement(tagName);

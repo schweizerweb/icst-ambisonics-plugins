@@ -19,6 +19,8 @@ MultiSliderControl::MultiSliderControl(): pSliderValueArray(nullptr)
 void MultiSliderControl::init(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
 {
 	removeAllChildren();
+	sliders.clear();
+	labels.clear();
 
 	// create sliders
 	for(int i = 0; i < numberOfSliders; i++)
@@ -62,6 +64,9 @@ void MultiSliderControl::paint (Graphics& g)
 
 void MultiSliderControl::resized()
 {
+	if (sliders.size() < 1)
+		return;
+
     int compWidth = getWidth() / (sliders.size());
 	int labelHeight = 30;
 	int sliderHeight = getHeight() - labelHeight - 8;

@@ -67,6 +67,8 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
+	audioParams.pAudioProcessor = this;
+
 #if MULTI_ENCODER_MODE
     encoderSettings.initialize(this);
 #endif
@@ -450,6 +452,11 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
         presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get(), &encoderSettings);
         presetHelper->notifyPresetChanged();
     }
+}
+
+void AmbisonicEncoderAudioProcessor::numChannelsChanged()
+{
+    // todo!!
 }
 
 //==============================================================================

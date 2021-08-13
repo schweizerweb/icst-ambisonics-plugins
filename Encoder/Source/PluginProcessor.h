@@ -13,7 +13,6 @@
 #include "AirAbsorbtionFilter.h"
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
-#include "../../Common/AmbiPoint.h"
 #include "OSCHandlerEncoder.h"
 #include "../../Common/DawParameter.h"
 #include "AmbiOSCSender.h"
@@ -23,7 +22,6 @@
 #include "../../Common/DelayHelper.h"
 #include "EncoderPresetHelper.h"
 #include "../../Common/AudioParams.h"
-#include "GroupAnimator.h"
 #include "../../Common/ScalingInfo.h"
 
 //==============================================================================
@@ -70,7 +68,8 @@ public:
     void setStateInformation (const void* data, int sizeInBytes) override;
 
     void actionListenerCallback(const juce::String &message) override;
-    
+    void numChannelsChanged() override;
+
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
 	void initializeOsc();

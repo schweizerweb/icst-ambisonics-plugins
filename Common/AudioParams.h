@@ -16,4 +16,5 @@ class AudioParams
 public:
     Array<AudioParameterSet> sourceParams;
     Array<AudioParameterSet> groupParams;
+    AudioProcessor* pAudioProcessor;
 };

@@ -50,6 +50,7 @@ public:
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 	double getDistanceScaler() const;
 	void setDistanceScaler(double newDistanceScaler);
+	void setAmbisonicsOrder(int order) override;
 
     bool oscReceiveFlag;
 	int oscReceivePort;

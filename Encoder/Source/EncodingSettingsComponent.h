@@ -55,7 +55,7 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
     void controlDimming() const;
     void initializePresets();
-    void updateEncodingUiElements();
+    void updateEncodingUiElements() const;
     void actionListenerCallback(const String &message) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
