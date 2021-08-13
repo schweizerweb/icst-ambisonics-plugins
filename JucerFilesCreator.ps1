@@ -1,47 +1,22 @@
-$ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36, 49, 64 )
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Order = 1; Input = 1; Description = "1st Order Ambisonic, 1 Channel Input"; PluginCode = "AE1S" },
-@{ Order = 2; Input = 1; Description = "2nd Order Ambisonic, 1 Channel Input"; PluginCode = "AE2S" },
-@{ Order = 3; Input = 1; Description = "3rd Order Ambisonic, 1 Channel Input"; PluginCode = "AE3S" },
-@{ Order = 4; Input = 1; Description = "4th Order Ambisonic, 1 Channel Input"; PluginCode = "AE4S" },
-@{ Order = 5; Input = 1; Description = "5th Order Ambisonic, 1 Channel Input"; PluginCode = "AE5S" },
-@{ Order = 6; Input = 1; Description = "6th Order Ambisonic, 1 Channel Input"; PluginCode = "AE6S" },
-@{ Order = 7; Input = 1; Description = "7th Order Ambisonic, 1 Channel Input"; PluginCode = "AE7S" },
-@{ Order = 1; Input = 64; Description = "1st Order Ambisonic, 64 Channel Input"; PluginCode = "AE1F" },
-@{ Order = 2; Input = 64; Description = "2nd Order Ambisonic, 64 Channel Input"; PluginCode = "AE2F" },
-@{ Order = 3; Input = 64; Description = "3rd Order Ambisonic, 64 Channel Input"; PluginCode = "AE3F" },
-@{ Order = 4; Input = 64; Description = "4th Order Ambisonic, 64 Channel Input"; PluginCode = "AE4F" },
-@{ Order = 5; Input = 64; Description = "5th Order Ambisonic, 64 Channel Input"; PluginCode = "AE5F" },
-@{ Order = 6; Input = 64; Description = "6th Order Ambisonic, 64 Channel Input"; PluginCode = "AE6F" },
-@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input"; PluginCode = "AE7F" },
-@{ Order = 1; Input = 8; Description = "1st Order Ambisonic, 8 Channel Input"; PluginCode = "AE18" }
+@{ Suffix = "_Mono"; Defines = "MULTI_ENCODER_MODE=0"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
+@{ Suffix = "_Multi"; Defines = "MULTI_ENCODER_MODE=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
 )
 
 $DecoderVersions =
 @(
-@{ Order = 1; Output = 64; Description = "1st Order Ambisonic, 64 Channel Output"; PluginCode = "AD1F" },
-@{ Order = 2; Output = 64; Description = "2nd Order Ambisonic, 64 Channel Output"; PluginCode = "AD2F" },
-@{ Order = 3; Output = 64; Description = "3rd Order Ambisonic, 64 Channel Output"; PluginCode = "AD3F" },
-@{ Order = 4; Output = 64; Description = "4th Order Ambisonic, 64 Channel Output"; PluginCode = "AD4F" },
-@{ Order = 5; Output = 64; Description = "5th Order Ambisonic, 64 Channel Output"; PluginCode = "AD5F" },
-@{ Order = 6; Output = 64; Description = "6th Order Ambisonic, 64 Channel Output"; PluginCode = "AD6F" },
-@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output"; PluginCode = "AD7F" },
-@{ Order = 1; Output = 8; Description = "1st Order Ambisonic, 8 Channel Output"; PluginCode = "AD18" }
+@{ Suffix = ""; Defines = ""; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
 )
 
-function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
+function createFile([string]$sourceFile, [string]$suffix, [string]$defines, [string]$description, [string]$pluginUniqueCode)
 {
-    $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
-    $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
-    $codeBundle = 'O' + $order + $audioChannelNum + 'CH'
-    $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
+    $codeBundle = $suffix.Replace('_', '-')
+    $target = $sourceFile.Replace('.jucer', "$($suffix)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 
-    Write-Output "ProjectId $($projectId)"
-    Write-Output "Code $($code)"
     Write-Output "Outputs $($output)"
 
     # Read
@@ -55,17 +30,17 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
         $node.version = $releaseVersion
     }
 
-    $node.id = $projectId
-    $node.pluginName = "$($node.pluginName)_$($code)"
+    $node.id = $pluginUniqueCode
+    $node.pluginName = "$($node.pluginName)$($suffix)"
     $node.pluginDesc = $description
-    $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
-	$node.pluginCode = $pluginUniqueCode
-	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($codeBundle).ToLower())"
-    
+    $node.pluginCode = $pluginUniqueCode
+	$node.bundleIdentifier = "$($node.bundleIdentifier)$(($codeBundle).ToLower())"
+	$node.setAttribute("defines", "$($defines)")
+	
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
     {
-        $format.targetFolder = "$($format.targetFolder)/$($code)"
+        $format.targetFolder = "$($format.targetFolder)/$($pluginUniqueCode)"
         foreach($configuration in $format.CONFIGURATIONS.ChildNodes)
         {
             $configuration.SetAttribute("targetName", "$($node.pluginName)")
@@ -89,16 +64,14 @@ Write-Output "Generating Encoder files"
 $source = '.\Encoder\AmbisonicEncoder.jucer'
 foreach ($element in $EncoderVersions) 
 {
-    $output = $ChannelsPerOrder[$element.Order]
-    createFile $source $element.Input $output $element.Order $element.Input $element.Description $element.PluginCode
+    createFile $source $element.Suffix $element.Defines $element.Description $element.PluginCode
 }
 
 Write-Output "Generating Decoder files"
 $source = '.\Decoder\AmbisonicDecoder.jucer'
 foreach ($element in $DecoderVersions) 
 {
-    $inputCount = $ChannelsPerOrder[$element.Order]
-    createFile $source $inputCount $element.Output $element.Order $element.Output $element.Description $element.PluginCode
+    createFile $source $element.Suffix $element.Defines $element.Description $element.PluginCode
 }
 return 0
 # program end
