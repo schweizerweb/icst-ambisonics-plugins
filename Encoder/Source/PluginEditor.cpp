@@ -38,7 +38,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	pEncoderSettings = ownerProc.getEncoderSettings();
 	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
-	radarOptions.maxNumberEditablePoints = AMBI_MAX_NUM_INPUT_CHANNELS;
+	radarOptions.maxNumberEditablePoints = MAX_NUM_INPUT_CHANNELS;
 	radarOptions.editablePointsAsSquare = false;
 	radarOptions.audioParams = ownerProc.getAudioParams();
 	radarOptions.dawParameter = ownerProc.getDawParameter();

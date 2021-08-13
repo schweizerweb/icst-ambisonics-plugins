@@ -303,7 +303,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
     if(currentStep >= 0)
     {
         bool actionsPerformed = false;
-        for(int i = 0; i < AMBI_MAX_NUM_INPUT_CHANNELS; i++)
+        for(int i = 0; i < MAX_NUM_INPUT_CHANNELS; i++)
         {
             if(currentStep >= steps[i].size())
             {
@@ -320,7 +320,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
         }
 
 #if MULTI_ENCODER_MODE
-        for(int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+        for(int i = 0; i < MAX_NUMBER_OF_GROUPS; i++)
         {
             if(currentStep >= groupSteps[i].size())
             {
@@ -404,7 +404,7 @@ void AnimatorComponent::calculateStepsTo(PositionSet* pPositions, bool isPolar, 
     }
 
 #if MULTI_ENCODER_MODE
-    for(int i = 0; i < pSourceSet->groupCount() && i < MAXIMUM_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
+    for(int i = 0; i < pSourceSet->groupCount() && i < MAX_NUMBER_OF_GROUPS && i < pPositions->groups.size(); i++)
     {
         if(!pSourceSet->getGroup(i)->getEnabled())
             continue;

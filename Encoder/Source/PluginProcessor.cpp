@@ -72,7 +72,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 #endif
 	encoderSettings.distanceEncodingParams.initialize(this);
     // points (X, Y, Z, Gain)
-     for (int i = 0; i < AMBI_MAX_NUM_INPUT_CHANNELS; i++)
+     for (int i = 0; i < MAX_NUM_INPUT_CHANNELS; i++)
      {
         String indexStr = String(i + 1);
          
@@ -90,7 +90,7 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         addParameter(set.pGain);
     }
     
-    for (int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
+    for (int i = 0; i < MAX_NUMBER_OF_GROUPS; i++)
     {
         String indexStr = String(i + 1);
         
@@ -180,9 +180,10 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= AMBI_MAX_NUM_INPUT_CHANNELS
-        && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= AMBI_MAX_NUM_OUTPUT_CHANNELS;
+	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
+        && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
 
+	/*
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
     return true;
@@ -201,6 +202,7 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
     return true;
   #endif
+  */
 }
 #endif
 
@@ -223,8 +225,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
-	double currentCoefficients[AMBI_MAX_NUM_OUTPUT_CHANNELS];
-	float* outputBufferPointers[AMBI_MAX_NUM_OUTPUT_CHANNELS];
+	double currentCoefficients[MAX_NUM_OUTPUT_CHANNELS];
+	float* outputBufferPointers[MAX_NUM_OUTPUT_CHANNELS];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 

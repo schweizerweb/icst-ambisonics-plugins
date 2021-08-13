@@ -78,9 +78,9 @@ private:
     PositionSet set2;
     PositionSet set3;
     PositionSet set4;
-    OwnedArray<Point3D<float>> steps[AMBI_MAX_NUM_INPUT_CHANNELS];
+    OwnedArray<Point3D<float>> steps[MAX_NUM_INPUT_CHANNELS];
 #if MULTI_ENCODER_MODE
-    OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
+    OwnedArray<Point3D<float>> groupSteps[MAX_NUMBER_OF_GROUPS];
 #endif
     int currentStep;
     //[/UserVariables]

@@ -347,7 +347,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     else if (sliderThatWasMoved == sliderAmbisonicsOrder.get())
     {
         //[UserSliderCode_sliderAmbisonicsOrder] -- add your slider handling code here..
-        pEncoderSettings->setAmbisonicsOrder(sliderAmbisonicsOrder->getValue());
+        pEncoderSettings->setAmbisonicsOrder(int(sliderAmbisonicsOrder->getValue()));
         //[/UserSliderCode_sliderAmbisonicsOrder]
     }
 

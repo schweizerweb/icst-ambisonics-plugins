@@ -28,7 +28,12 @@
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_MASTER_GAIN			0
-#define MAXIMUM_NUMBER_OF_GROUPS   (MULTI_ENCODER_MODE ? 4 : 0)
+
+#define MAX_NUMBER_OF_GROUPS   (MULTI_ENCODER_MODE ? 4 : 0)
+#define MAX_NUM_INPUT_CHANNELS (MULTI_ENCODER_MODE ? 64 : 1)
+#define MAX_NUM_OUTPUT_CHANNELS 64
+
+
 
 class EncoderSettings : public AmbiBasicSettings, public AudioProcessorParameter::Listener, public ChangeBroadcaster
 {

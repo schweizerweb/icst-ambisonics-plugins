@@ -163,9 +163,9 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
     xmlElement->addChildElement(dopplerEncoding);
     
-    XmlElement* ambisonicsOrder = new XmlElement(XML_TAG_AMBISONICS_ORDER);
-    ambisonicsOrder->setAttribute(XML_ATTRIBUTE_VALUE, getAmbisonicsOrder());
-    xmlElement->addChildElement(ambisonicsOrder);
+    XmlElement* ambiOrder = new XmlElement(XML_TAG_AMBISONICS_ORDER);
+    ambiOrder->setAttribute(XML_ATTRIBUTE_VALUE, getAmbisonicsOrder());
+    xmlElement->addChildElement(ambiOrder);
     
     XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
     masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
@@ -188,10 +188,10 @@ void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
         setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
     }
     
-    XmlElement* ambisonicsOrder = xmlElement->getChildByName(XML_TAG_AMBISONICS_ORDER);
-    if (ambisonicsOrder != nullptr)
+    XmlElement* ambiOrder = xmlElement->getChildByName(XML_TAG_AMBISONICS_ORDER);
+    if (ambiOrder != nullptr)
     {
-        setAmbisonicsOrder(int(ambisonicsOrder->getIntAttribute(XML_ATTRIBUTE_VALUE, DEFAULT_AMBISONICS_ORDER)));
+        setAmbisonicsOrder(int(ambiOrder->getIntAttribute(XML_ATTRIBUTE_VALUE, DEFAULT_AMBISONICS_ORDER)));
     }
     
     XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);

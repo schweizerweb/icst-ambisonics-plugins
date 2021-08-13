@@ -97,9 +97,9 @@ private:
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
-	double lastCoefficients[AMBI_MAX_NUM_INPUT_CHANNELS][AMBI_MAX_NUM_OUTPUT_CHANNELS];
-	VarDelayBuffer delayBuffers[AMBI_MAX_NUM_INPUT_CHANNELS];
-    AirAbsorbtionFilter airAbsorbtionFilters[AMBI_MAX_NUM_INPUT_CHANNELS];
+	double lastCoefficients[MAX_NUM_INPUT_CHANNELS][MAX_NUM_OUTPUT_CHANNELS];
+	VarDelayBuffer delayBuffers[MAX_NUM_INPUT_CHANNELS];
+    AirAbsorbtionFilter airAbsorbtionFilters[MAX_NUM_INPUT_CHANNELS];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     double lastScaler;
