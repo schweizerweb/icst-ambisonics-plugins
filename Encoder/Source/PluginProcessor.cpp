@@ -248,7 +248,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     
     // prepare a buffer to reuse for doppler operation
 	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
-	int outputChannelCount = encoderSettings.getAmbisonicsChannelCount();
+    const int outputChannelCount = jmin(encoderSettings.getAmbisonicsChannelCount(), totalNumOutputChannels);
 
     // prepare write pointers
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
