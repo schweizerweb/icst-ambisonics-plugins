@@ -12,8 +12,14 @@
 #include "MultiSliderControl.h"
 
 //==============================================================================
-MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
+MultiSliderControl::MultiSliderControl(): pSliderValueArray(nullptr)
 {
+}
+
+void MultiSliderControl::init(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
+{
+	removeAllChildren();
+
 	// create sliders
 	for(int i = 0; i < numberOfSliders; i++)
 	{
@@ -31,6 +37,7 @@ MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, Owne
 	}
 
 	pSliderValueArray = values;
+	resized();
 	updateValues();
 }
 

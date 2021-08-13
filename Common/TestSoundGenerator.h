@@ -19,7 +19,8 @@ class AmbiDataSet;
 class TestSoundGenerator : public Timer
 {
 public:
-	TestSoundGenerator(AmbiDataSet* speakerSet);
+	TestSoundGenerator(AmbiDataSet* speakerSet, int maxNumChannels);
+	~TestSoundGenerator();
 
 	void process(float* sampleData, int sampleCount, int speakerIndex);
 	void toggle(int speakerIndex);
@@ -30,7 +31,8 @@ private:
 	void timerCallback() override;
 
 private:
-	bool testSoundChannels[JucePlugin_MaxNumOutputChannels];
+	bool* testSoundChannels;
+	int maxChannelCount;
 	Random random;
 	AmbiDataSet* pSpeakerSet;
 	int tempChannel;

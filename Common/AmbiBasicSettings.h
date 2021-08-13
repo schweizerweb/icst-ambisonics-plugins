@@ -13,22 +13,19 @@
 #define SOUND_SPEED_MS_PER_M (1000.0 / SOUND_SPEED_M_PER_S)
 #define SOUND_SPEED_S_PER_M (1.0 / SOUND_SPEED_M_PER_S)
 
-#define DEFAULT_DISTANCE_SCALER	1.0
 #define DEFAULT_AMBISONICS_ORDER 1
 
 class AmbiBasicSettings
 {
 public:
-	AmbiBasicSettings(double distanceScaler, int ambisonicsOrder);
-
-	double getDistanceScaler() const;
-	void setDistanceScaler(double newDistanceScaler);
+	AmbiBasicSettings(int ambisonicsOrder);
 
 	int getAmbisonicsOrder() const;
 	int getAmbisonicsChannelCount() const;
-	void setAmbisonicsOrder(int order);
+
+protected:
+	virtual void setAmbisonicsOrder(int order);
 
 private:
-	double distanceScaler;
 	int ambisonicsOrder;
 };

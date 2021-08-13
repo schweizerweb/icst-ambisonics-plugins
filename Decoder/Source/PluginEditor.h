@@ -74,7 +74,7 @@ private:
 	AmbisonicsDecoderAudioProcessor& processor;
 	AmbiSpeakerSet* pSpeakerSet;
 	AmbiSourceSet* pMovingPoints;
-	AmbiSettings* pAmbiSettings;
+    DecoderAmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
 	DecoderPresetHelper* pPresetHelper;
 	OSCHandler* pOscHandler;

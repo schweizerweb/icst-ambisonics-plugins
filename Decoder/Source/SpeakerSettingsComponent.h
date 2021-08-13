@@ -22,7 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "../../Common/PointSelection.h"
-#include "../../Common/AmbiSettings.h"
+#include "DecoderAmbiSettings.h"
 #include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "../../Common/TableColumnCallback.h"
@@ -59,7 +59,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, DecoderAmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
@@ -93,6 +93,7 @@ public:
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
     FilterPresetHelper* getFilterPresetHelper() const;
+    void initChannelWeightSliders();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -108,7 +109,7 @@ private:
 	AmbiSpeakerSet* pSpeakerSet;
 	DecoderPresetHelper* pPresetHelper;
 	PointSelection* pPointSelection;
-	AmbiSettings* pAmbiSettings;
+	DecoderAmbiSettings* pAmbiSettings;
 	DecoderSettings* pDecoderSettings;
 	DelayHelper delayHelper;
 	TestSoundGenerator* pTestSoundGenerator;

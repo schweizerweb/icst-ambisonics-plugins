@@ -28,6 +28,7 @@
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_MASTER_GAIN			0
+#define DEFAULT_DISTANCE_SCALER		1.0
 
 #define MAX_NUMBER_OF_GROUPS   (MULTI_ENCODER_MODE ? 4 : 0)
 #define MAX_NUM_INPUT_CHANNELS (MULTI_ENCODER_MODE ? 64 : 1)
@@ -47,6 +48,8 @@ public:
     void initialize(AudioProcessor* pProcessor);
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
+	double getDistanceScaler() const;
+	void setDistanceScaler(double newDistanceScaler);
 
     bool oscReceiveFlag;
 	int oscReceivePort;
@@ -78,4 +81,5 @@ public:
 private:
 	AudioParameterFloat* masterGain;
 	float localMasterGain;
+	double distanceScaler;
 };

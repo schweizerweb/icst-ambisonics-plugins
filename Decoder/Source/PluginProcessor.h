@@ -11,7 +11,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiSettings.h"
+#include "DecoderAmbiSettings.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
 #include "../../Common/DelayBuffer.h"
@@ -70,7 +70,7 @@ public:
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();
 	AmbiSourceSet* getMovingPoints();
-	AmbiSettings* getAmbiSettings();
+	DecoderAmbiSettings* getAmbiSettings();
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
@@ -80,15 +80,15 @@ private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
 	std::unique_ptr<AmbiSourceSet> movingPoints;
-	AmbiSettings ambiSettings;
+	DecoderAmbiSettings ambiSettings;
 	DecoderSettings decoderSettings;
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
     std::unique_ptr<DecoderPresetHelper> presetHelper;
 
-    dsp::IIR::Filter<float> iirFilters[JucePlugin_MaxNumOutputChannels][MAX_FILTER_COUNT];
-    FilterBankInfo filterInfo[JucePlugin_MaxNumOutputChannels];
+    dsp::IIR::Filter<float> iirFilters[MAX_NUM_OUTPUT_CHANNELS][MAX_FILTER_COUNT];
+    FilterBankInfo filterInfo[MAX_NUM_OUTPUT_CHANNELS];
     dsp::ProcessSpec iirFilterSpec;
     
 

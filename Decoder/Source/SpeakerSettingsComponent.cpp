@@ -57,13 +57,10 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, DecoderAmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
     : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-	OwnedArray<String> ambiChannelNames;
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
-		ambiChannelNames.add(new String("m = " + String(i)));
 	this->pTestSoundGenerator = pTestSoundListener;
 
 	addChangeListener(pCallback);
@@ -131,7 +128,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
+    ambiChannelControl.reset (new MultiSliderControl());
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -250,11 +247,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
 
     // prepare weighting comboBox
-    comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);
-    comboBoxChannelWeightingMode->addItem("In-Phase", AmbiSettings::INPHASE);
-    comboBoxChannelWeightingMode->addItem("Max-rE", AmbiSettings::MAXRE);
-    comboBoxChannelWeightingMode->addItem("Manual", AmbiSettings::MANUAL);
+    comboBoxChannelWeightingMode->addItem("Basic", DecoderAmbiSettings::BASIC);
+    comboBoxChannelWeightingMode->addItem("In-Phase", DecoderAmbiSettings::INPHASE);
+    comboBoxChannelWeightingMode->addItem("Max-rE", DecoderAmbiSettings::MAXRE);
+    comboBoxChannelWeightingMode->addItem("Manual", DecoderAmbiSettings::MANUAL);
 
+    // weighting sliders
+    initChannelWeightSliders();
+    
     // speaker list elements
 	buttonSpeakerTest->setClickingTogglesState(true);
 	buttonSpeakerTest->setColour(TextButton::ColourIds::buttonOnColourId, Colours::darkred);
@@ -396,7 +396,7 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
     else if (comboBoxThatHasChanged == comboBoxChannelWeightingMode.get())
     {
         //[UserComboBoxCode_comboBoxChannelWeightingMode] -- add your combo box handling code here..
-        pAmbiSettings->setWeightMode(AmbiSettings::AmbiWeightMode( comboBoxChannelWeightingMode->getSelectedId()));
+        pAmbiSettings->setWeightMode(DecoderAmbiSettings::AmbiWeightMode( comboBoxChannelWeightingMode->getSelectedId()));
         ambiChannelControl->updateValues();
         controlDimming();
         //[/UserComboBoxCode_comboBoxChannelWeightingMode]
@@ -651,6 +651,15 @@ void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMo
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
+void SpeakerSettingsComponent::initChannelWeightSliders()
+{
+    OwnedArray<String> ambiChannelNames;
+    for (int i = 0; i < pAmbiSettings->getAmbisonicsOrder() + 1; i++)
+        ambiChannelNames.add(new String("m = " + String(i)));
+
+    ambiChannelControl->init(pAmbiSettings->getAmbisonicsOrder() + 1, pAmbiSettings->getManualOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001);
+}
+
 int SpeakerSettingsComponent::getNumRows()
 {
 	return pSpeakerSet->size();
@@ -978,12 +987,6 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
     }
     else if(message == ACTION_MESSAGE_PRESET_CHANGED)
     {
-        if(pAmbiSettings->getWarningFlag())
-        {
-            const MessageManagerLock lock;
-            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Inconsistent Ambisonic Order", "This preset was saved using a different order plugin. Ambisonic channel weighting may have to be adjusted.");
-        }
-
         updateUI();
         controlDimming();
         sendChangeMessage();
@@ -1007,7 +1010,7 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonMoveDown->setEnabled(en && !multiselection);
 	buttonSpeakerTest->setEnabled(en);
 
-    ambiChannelControl->setEnabled(pAmbiSettings->getWeightMode() == AmbiSettings::MANUAL);
+    ambiChannelControl->setEnabled(pAmbiSettings->getWeightMode() == DecoderAmbiSettings::MANUAL);
 
     comboBoxApply->setVisible(multiselection);
     if(multiselection)
@@ -1041,7 +1044,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
+                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, DecoderAmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
                  variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="900" initialHeight="700">
@@ -1093,7 +1096,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params=""/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
          virtualName="" explicitFocusOrder="0" pos="8 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"

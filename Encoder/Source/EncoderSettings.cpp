@@ -32,7 +32,7 @@
 #define XML_TAG_AMBISONICS_ORDER "AmbisonicsOrder"
 
 EncoderSettings::EncoderSettings():
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER, DEFAULT_AMBISONICS_ORDER),
+	AmbiBasicSettings(DEFAULT_AMBISONICS_ORDER),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
 	oscSendFlag(DEFAULT_SEND_FLAG),
@@ -49,12 +49,23 @@ EncoderSettings::EncoderSettings():
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
     masterGain(nullptr),
-    localMasterGain(DEFAULT_MASTER_GAIN)
+    localMasterGain(DEFAULT_MASTER_GAIN),
+    distanceScaler(DEFAULT_DISTANCE_SCALER)
 {
 }
 
 EncoderSettings::~EncoderSettings()
 {
+}
+
+double EncoderSettings::getDistanceScaler() const
+{
+    return distanceScaler;
+}
+
+void EncoderSettings::setDistanceScaler(double newDistanceScaler)
+{
+    distanceScaler = newDistanceScaler;
 }
 
 XmlElement* EncoderSettings::getAsXmlElement(String tagName) const

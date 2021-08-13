@@ -33,7 +33,7 @@ public:
     bool checkValid(juce::File presetFile) override
     {
         std::unique_ptr<AmbiSpeakerSet> testSet(new AmbiSpeakerSet(pScalingInfo));
-        AmbiSettings testSettings;
+        DecoderAmbiSettings testSettings;
         if(loadFromXmlFile(presetFile, testSet.get(), &testSettings))
         {
             return true;
@@ -315,7 +315,7 @@ public:
 		notifyPresetListChanged();
     }
     
-    void loadDefaultPreset(AmbiSpeakerSet* pSpeakerSet, AmbiSettings* pAmbiSettings)
+    void loadDefaultPreset(AmbiSpeakerSet* pSpeakerSet, DecoderAmbiSettings* pAmbiSettings)
     {
         for(File f : presetFiles)
         {
@@ -327,7 +327,7 @@ public:
         }
     }
     
-    bool loadFromXmlFile(const File file, AmbiSpeakerSet* pSpeakerSet, AmbiSettings* pAmbiSettings)
+    bool loadFromXmlFile(const File file, AmbiSpeakerSet* pSpeakerSet, DecoderAmbiSettings* pAmbiSettings)
     {
         XmlDocument doc(file);
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("AmbisonicsPreset");
@@ -342,7 +342,7 @@ public:
         return pSpeakerSet->size() > 0;
     }
     
-    bool writeToXmlFile(const File file, AmbiSpeakerSet* pSpeakerSet, AmbiSettings* pAmbiSettings)
+    bool writeToXmlFile(const File file, AmbiSpeakerSet* pSpeakerSet, DecoderAmbiSettings* pAmbiSettings)
     {
         XmlElement* rootElement = new XmlElement("AmbisonicsPreset");
 
@@ -359,18 +359,18 @@ public:
         return success;
     }
     
-    AmbiSettings getDefaultAmbiSettings()
+	DecoderAmbiSettings getDefaultAmbiSettings()
     {
-        AmbiSettings settings;
+		DecoderAmbiSettings settings;
         
-        settings.setWeightMode(AmbiSettings::INPHASE);
+        settings.setWeightMode(DecoderAmbiSettings::INPHASE);
             
         return settings;
     }
     
     void createPreset(String name, std::initializer_list<SSpeaker> speakerList)
     {
-        AmbiSettings defaultAmbiSettings = getDefaultAmbiSettings();
+		DecoderAmbiSettings defaultAmbiSettings = getDefaultAmbiSettings();
         std::unique_ptr<AmbiSpeakerSet> speakerSet(new AmbiSpeakerSet(pScalingInfo));
 
         File file = getPathForPresetName(name);

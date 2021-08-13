@@ -6,9 +6,8 @@
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiDecoder"
               pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
-              pluginCode="AADC" pluginChannelConfigs="{4,8}" pluginIsSynth="0"
-              pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
-              pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
+              pluginCode="AADC" pluginIsSynth="0" pluginWantsMidiIn="0" pluginProducesMidiOut="0"
+              pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
               companyName="ICST" pluginFormats="buildAU,buildVST3" companyWebsite="https://www.zhdk.ch/forschung/icst"
               jucerFormatVersion="1">
@@ -19,6 +18,10 @@
       <FILE id="wX5p6x" name="speaker.png" compile="0" resource="1" file="../Resources/speaker.png"/>
     </GROUP>
     <GROUP id="{06D36F25-A720-9DD4-921B-4E84593CE222}" name="Source">
+      <FILE id="F4VgMl" name="DecoderAmbiSettings.cpp" compile="1" resource="0"
+            file="Source/DecoderAmbiSettings.cpp"/>
+      <FILE id="pJSH4T" name="DecoderAmbiSettings.h" compile="0" resource="0"
+            file="Source/DecoderAmbiSettings.h"/>
       <FILE id="iDlZhE" name="ScalingComponent.cpp" compile="1" resource="0"
             file="Source/ScalingComponent.cpp"/>
       <FILE id="WfAU4e" name="ScalingComponent.h" compile="0" resource="0"
@@ -101,9 +104,6 @@
       <FILE id="IlJYQl" name="AmbiGroup.h" compile="0" resource="0" file="../Common/AmbiGroup.h"/>
       <FILE id="UfVsqN" name="AmbiPoint.cpp" compile="1" resource="0" file="../Common/AmbiPoint.cpp"/>
       <FILE id="CdwDS7" name="AmbiPoint.h" compile="0" resource="0" file="../Common/AmbiPoint.h"/>
-      <FILE id="GkEeEx" name="AmbiSettings.cpp" compile="1" resource="0"
-            file="../Common/AmbiSettings.cpp"/>
-      <FILE id="z0ap1U" name="AmbiSettings.h" compile="0" resource="0" file="../Common/AmbiSettings.h"/>
       <FILE id="VdXo71" name="AmbiSource.cpp" compile="1" resource="0" file="../Common/AmbiSource.cpp"/>
       <FILE id="tcnDd7" name="AmbiSource.h" compile="0" resource="0" file="../Common/AmbiSource.h"/>
       <FILE id="VZM8AX" name="AmbiSourceSet.cpp" compile="1" resource="0"

@@ -28,7 +28,7 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
 {
     speakerSet.reset(new AmbiSpeakerSet(&scalingInfo));
     movingPoints.reset(new AmbiSourceSet(&scalingInfo));
-    pTestSoundGenerator = new TestSoundGenerator(speakerSet.get());
+    pTestSoundGenerator = new TestSoundGenerator(speakerSet.get(), MAX_NUM_OUTPUT_CHANNELS);
     
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
     presetHelper->initialize();
@@ -138,6 +138,10 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+    return layouts.getMainInputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
+        && layouts.getMainOutputChannelSet().size() >= 1 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
+
+    /*
   #if JucePlugin_IsMidiEffect
     ignoreUnused (layouts);
     return true;
@@ -156,6 +160,7 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
 
     return true;
   #endif
+  */
 }
 #endif
 
@@ -199,8 +204,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 {
     const int totalNumInputChannels  = getTotalNumInputChannels();
     const int totalNumOutputChannels = getTotalNumOutputChannels();
-    double currentCoefficients[JucePlugin_MaxNumInputChannels];
-	const float* inputBufferPointers[JucePlugin_MaxNumInputChannels];
+    double currentCoefficients[MAX_NUM_INPUT_CHANNELS];
+	const float* inputBufferPointers[MAX_NUM_INPUT_CHANNELS];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
@@ -235,10 +240,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
 			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
-            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
+            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.getAmbisonicsOrder();
             int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
             
-			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
+			pt->getPoint()->getAmbisonicsCoefficients(usedChannelCount, &currentCoefficients[0], true, true);
 			
 			// gain of the W-signal depends on the used ambisonic order
             if(currentAmbisonicsOrder > 0)
@@ -364,7 +369,7 @@ AmbiSourceSet* AmbisonicsDecoderAudioProcessor::getMovingPoints()
 	return movingPoints.get();
 }
 
-AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings()
+DecoderAmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings()
 {
 	return &ambiSettings;
 }

@@ -10,11 +10,18 @@
 
 #include "TestSoundGenerator.h"
 
-TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet): tempChannel(NO_TEST_SOUND)
+TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet, int maxNumChannels): tempChannel(NO_TEST_SOUND)
 {
 	pSpeakerSet = speakerSet;
 	testSoundBaseGain = Decibels::decibelsToGain(-12.0);
+	maxChannelCount = maxNumChannels;
+	testSoundChannels = (bool*)calloc(maxChannelCount, sizeof(bool));
 	reset();
+}
+
+TestSoundGenerator::~TestSoundGenerator()
+{
+	free(testSoundChannels);
 }
 
 void TestSoundGenerator::process(float* sampleData, int sampleCount, int speakerIndex)
@@ -56,7 +63,7 @@ void TestSoundGenerator::reset()
 {
 	stopTimer();
 	tempChannel = NO_TEST_SOUND;
-	memset(testSoundChannels, 0, JucePlugin_MaxNumOutputChannels);
+	memset(testSoundChannels, 0, maxChannelCount);
 }
 
 void TestSoundGenerator::timerCallback()
