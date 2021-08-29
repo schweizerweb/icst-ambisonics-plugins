@@ -200,7 +200,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         }
         else
         {
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "No more groups allowed!");
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "No more groups allowed!");
         }
         //[/UserButtonCode_buttonAddGroup]
     }
@@ -231,7 +231,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         }
         else
         {
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "No more sources allowed!");
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "No more sources allowed!");
         }
 
         //[/UserButtonCode_buttonAdd]

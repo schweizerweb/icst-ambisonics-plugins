@@ -2,13 +2,13 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Suffix = "_Mono"; Defines = "MULTI_ENCODER_MODE=0"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
-@{ Suffix = "_Multi"; Defines = "MULTI_ENCODER_MODE=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
+@{ Suffix = "_Mono"; Defines = "MULTI_ENCODER_MODE=0, JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
+@{ Suffix = "_Multi"; Defines = "MULTI_ENCODER_MODE=1, JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
 )
 
 $DecoderVersions =
 @(
-@{ Suffix = ""; Defines = ""; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
+@{ Suffix = ""; Defines = "JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
 )
 
 function createFile([string]$sourceFile, [string]$suffix, [string]$defines, [string]$description, [string]$pluginUniqueCode)
