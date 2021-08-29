@@ -138,7 +138,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-    return layouts.getMainInputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
+    return layouts.getMainInputChannelSet().size() >= 4 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
         && layouts.getMainOutputChannelSet().size() >= 1 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
 
     /*
@@ -241,7 +241,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 			double speakerGain = pt->getGain();
 			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
             int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.getAmbisonicsOrder();
-            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
+            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : jmin(ambiSettings.getAmbisonicsChannelCount(), totalNumInputChannels);
             
 			pt->getPoint()->getAmbisonicsCoefficients(usedChannelCount, &currentCoefficients[0], true, true);
 			

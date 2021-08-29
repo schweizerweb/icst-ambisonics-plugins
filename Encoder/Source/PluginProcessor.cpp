@@ -171,6 +171,8 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
 	iirFilterSpec.numChannels = 1;
 	iirFilterSpec.maximumBlockSize = samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
+
+	std::fill(&lastCoefficients[0][0], &lastCoefficients[MAX_NUM_INPUT_CHANNELS - 1][MAX_NUM_OUTPUT_CHANNELS - 1], 0);
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -184,7 +186,7 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 {
 #ifdef MULTI_ENCODER_MODE
 	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
-        && layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
+        && layouts.getMainOutputChannelSet().size() >= 4 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
 #else
 	return layouts.getMainInputChannelSet().size() == 1
 		&& layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
