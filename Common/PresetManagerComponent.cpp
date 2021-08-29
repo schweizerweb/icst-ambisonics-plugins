@@ -181,7 +181,7 @@ void PresetManagerComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnRestoreDefaults.get())
     {
         //[UserButtonCode_btnRestoreDefaults] -- add your button handler code here..
-        if(AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Restore Defaults", "All user changes to default presets will be overwritten, continue?"))
+        if(AlertWindow::showOkCancelBox(AlertWindow::WarningIcon, "Restore Defaults", "All user changes to default presets will be overwritten, continue?", String(), String(), nullptr, nullptr))
         {
             pPresetHelper->restoreDefaults();
         }
@@ -279,7 +279,7 @@ void PresetManagerComponent::exportToFolder(Array<File> presetsToExport, String 
         }
         if (!file.copyFileTo(target))
         {
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + target.getFullPathName());
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Preset export", "Error exporting preset to " + target.getFullPathName());
         }
     }
 }
