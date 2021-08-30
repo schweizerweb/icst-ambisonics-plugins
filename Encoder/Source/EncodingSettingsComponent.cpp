@@ -414,6 +414,7 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
 void EncodingSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     sliderMasterGain->setValue(pEncoderSettings->getMasterGain());
+    updateEncodingUiElements();
 }
 
 //[/MiscUserCode]

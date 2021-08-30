@@ -70,7 +70,30 @@ void EncoderSettings::setDistanceScaler(double newDistanceScaler)
 
 void EncoderSettings::setAmbisonicsOrder(int order)
 {
-    AmbiBasicSettings::setAmbisonicsOrder(order);
+    if (getAmbisonicsOrder() != order)
+    {
+        AmbiBasicSettings::setAmbisonicsOrder(order);
+        sendChangeMessage();
+    }
+}
+
+int EncoderSettings::maxAmbisonicsOrderForChannelCount(int channelCount)
+{
+    if (channelCount >= 64)
+        return 7;
+    if (channelCount >= 49)
+        return 6;
+    if (channelCount >= 36)
+        return 5;
+    if (channelCount >= 25)
+        return 4;
+    if (channelCount >= 16)
+        return 3;
+    if (channelCount >= 9)
+        return 2;
+    if (channelCount >= 4)
+        return 1;
+    return 0;
 }
 
 XmlElement* EncoderSettings::getAsXmlElement(String tagName) const

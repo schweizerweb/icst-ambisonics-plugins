@@ -21,9 +21,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
      : AudioProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
+                       .withInput  ("Input",  AudioChannelSet::discreteChannels(64), true)
                       #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
+                       .withOutput ("Output", AudioChannelSet::discreteChannels(64), true)
                      #endif
                        )
 #endif
@@ -184,9 +184,15 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 #ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
+	return true;
+
 #ifdef MULTI_ENCODER_MODE
-	return layouts.getMainInputChannelSet().size() >= 1 && layouts.getMainInputChannelSet().size() <= MAX_NUM_INPUT_CHANNELS
-        && layouts.getMainOutputChannelSet().size() >= 4 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;
+	int inputChannels = layouts.getMainInputChannels();
+	int outputChannels = layouts.getMainOutputChannels();
+
+	return inputChannels >= 1 && inputChannels <= MAX_NUM_INPUT_CHANNELS
+		&& outputChannels >= 4 && outputChannels <= MAX_NUM_OUTPUT_CHANNELS;
+
 #else
 	return layouts.getMainInputChannelSet().size() == 1
 		&& layouts.getMainOutputChannelSet().getAmbisonicOrder() > 0 && layouts.getMainOutputChannelSet().size() <= MAX_NUM_OUTPUT_CHANNELS;

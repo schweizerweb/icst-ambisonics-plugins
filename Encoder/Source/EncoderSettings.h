@@ -51,6 +51,7 @@ public:
 	double getDistanceScaler() const;
 	void setDistanceScaler(double newDistanceScaler);
 	void setAmbisonicsOrder(int order) override;
+    static int maxAmbisonicsOrderForChannelCount(int channelCount);
 
     bool oscReceiveFlag;
 	int oscReceivePort;
