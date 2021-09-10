@@ -2,16 +2,16 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Suffix = "_Mono"; Defines = "MULTI_ENCODER_MODE=0, JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
-@{ Suffix = "_Multi"; Defines = "MULTI_ENCODER_MODE=1, JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
+@{ Suffix = "_Mono"; ChannelConfig = "{1,64}"; Defines = "MULTI_ENCODER_MODE=0; JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
+@{ Suffix = "_Multi"; ChannelConfig = "{64,64}"; Defines = "MULTI_ENCODER_MODE=1; JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
 )
 
 $DecoderVersions =
 @(
-@{ Suffix = ""; Defines = "JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
+@{ Suffix = ""; ChannelConfig = "{64,64}"; Defines = "JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
 )
 
-function createFile([string]$sourceFile, [string]$suffix, [string]$defines, [string]$description, [string]$pluginUniqueCode)
+function createFile([string]$sourceFile, [string]$suffix, [string]$channelConfig, [string]$defines, [string]$description, [string]$pluginUniqueCode)
 {
     $codeBundle = $suffix.Replace('_', '-')
     $target = $sourceFile.Replace('.jucer', "$($suffix)_AutoGen.jucer")
@@ -36,7 +36,7 @@ function createFile([string]$sourceFile, [string]$suffix, [string]$defines, [str
     $node.pluginCode = $pluginUniqueCode
 	$node.bundleIdentifier = "$($node.bundleIdentifier)$(($codeBundle).ToLower())"
 	$node.setAttribute("defines", "$($defines)")
-	
+	$node.setAttribute("pluginChannelConfigs", "$($channelConfig)")
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
     {
@@ -64,14 +64,14 @@ Write-Output "Generating Encoder files"
 $source = '.\Encoder\AmbisonicEncoder.jucer'
 foreach ($element in $EncoderVersions) 
 {
-    createFile $source $element.Suffix $element.Defines $element.Description $element.PluginCode
+    createFile $source $element.Suffix $element.ChannelConfig $element.Defines $element.Description $element.PluginCode
 }
 
 Write-Output "Generating Decoder files"
 $source = '.\Decoder\AmbisonicDecoder.jucer'
 foreach ($element in $DecoderVersions) 
 {
-    createFile $source $element.Suffix $element.Defines $element.Description $element.PluginCode
+    createFile $source $element.Suffix $element.ChannelConfig $element.Defines $element.Description $element.PluginCode
 }
 return 0
 # program end
