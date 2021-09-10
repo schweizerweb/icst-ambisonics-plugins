@@ -2,8 +2,8 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Suffix = "_Mono"; ChannelConfig = "{1,64}"; Defines = "MULTI_ENCODER_MODE=0; JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
-@{ Suffix = "_Multi"; ChannelConfig = "{64,64}"; Defines = "MULTI_ENCODER_MODE=1; JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
+@{ Suffix = "_Mono"; ChannelConfig = "{1,64}"; Defines = "MULTI_ENCODER_MODE=0 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
+@{ Suffix = "_Multi"; ChannelConfig = "{64,64}"; Defines = "MULTI_ENCODER_MODE=1 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
 )
 
 $DecoderVersions =
