@@ -2,13 +2,13 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Suffix = "_Mono"; ChannelConfig = "{1,64}"; Defines = "MULTI_ENCODER_MODE=0 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
-@{ Suffix = "_Multi"; ChannelConfig = "{64,64}"; Defines = "MULTI_ENCODER_MODE=1 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
+@{ Suffix = "_Mono"; ChannelConfig = "{1, 64},{1,49},{1,36},{1,25},{1,16},{1,9},{1,4}"; Defines = "MULTI_ENCODER_MODE=0 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Mono"; PluginCode = "AECS" },
+@{ Suffix = "_Multi"; ChannelConfig = "{64, 64},{64,49},{64,36},{64,25},{64,16},{64,9},{64,4},{24,16},{24,9},{24,4},{8,4}"; Defines = "MULTI_ENCODER_MODE=1 JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Encoder Multi"; PluginCode = "AECM" }
 )
 
 $DecoderVersions =
 @(
-@{ Suffix = ""; ChannelConfig = "{64,64}"; Defines = "JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
+@{ Suffix = ""; ChannelConfig = "{64,64},{49,64},{36,64},{25,64},{16,64},{9,64},{4,64},{16,24},{9,24},{4,24},{4,8}"; Defines = "JUCE_MODAL_LOOPS_PERMITTED=1"; Description = "ICST Ambisonics Decoder"; PluginCode = "ADCM" }
 )
 
 function createFile([string]$sourceFile, [string]$suffix, [string]$channelConfig, [string]$defines, [string]$description, [string]$pluginUniqueCode)
