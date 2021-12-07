@@ -11,7 +11,7 @@
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambiencoder" pluginAAXCategory="2"
               pluginFormats="buildAU,buildVST3" companyName="ICST" companyWebsite="https://www.zhdk.ch/forschung/icst"
-              jucerFormatVersion="1">
+              jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
       <FILE id="lDMF5l" name="AnimatorAction.h" compile="0" resource="0"

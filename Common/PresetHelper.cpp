@@ -90,7 +90,7 @@ File* PresetHelper::tryCreateNewPreset()
 
         if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
         {
-            AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
             return nullptr;
         }
 
@@ -194,7 +194,7 @@ void PresetHelper::tryImportFiles(Array<File> files)
     
     if(!errorMessage.isEmpty())
     {
-        AlertWindow::showMessageBox(AlertWindow::WarningIcon, "Preset import", "Error loading presets: \r\n" + errorMessage);
+        AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Preset import", "Error loading presets: \r\n" + errorMessage);
     }
 }
 

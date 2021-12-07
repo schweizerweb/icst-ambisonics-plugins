@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.2
 
   ------------------------------------------------------------------------------
 
@@ -227,7 +227,7 @@ void ScalingComponent::calculateAndDisplayRoomSize()
     sliderRoomSizeX->setValue(currentRoomSizeX, dontSendNotification);
     sliderRoomSizeY->setValue(currentRoomSizeY, dontSendNotification);
     sliderRoomSizeZ->setValue(currentRoomSizeZ, dontSendNotification);
-    
+
     sliderRoomSizeX->setEnabled(currentRoomSizeX > 0.0);
     sliderRoomSizeY->setEnabled(currentRoomSizeY > 0.0);
     sliderRoomSizeZ->setEnabled(currentRoomSizeZ > 0.0);
