@@ -147,6 +147,8 @@ bool AmbiPoint::getMute() const
 void AmbiPoint::setMute(bool newMute, bool notify)
 {
     mute = newMute;
+    if(newMute && solo)
+        setSolo(false);
     
     if(notify)
         audioParams.notifyMute(mute);

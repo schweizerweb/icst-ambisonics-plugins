@@ -468,6 +468,41 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	bool keyHandled = false;
 	double dx = 0.0, dy = 0.0, dz = 0.0;
 
+    if (key.getModifiers().isAltDown() && key.getModifiers().isShiftDown())
+    {
+        if(key.isKeyCode(77)) // 'm'
+        {
+            bool anyNotMuted = false;
+            for(auto i : selection)
+            {
+                if(!pEditablePoints->get(i)->getMute())
+                {
+                    anyNotMuted = true;
+                    break;
+                }
+            }
+            
+            for(auto i : selection)
+                pEditablePoints->setMute(i, anyNotMuted);
+        }
+        else if(key.isKeyCode(83)) // 's'
+        {
+            bool anyNotSolo = false;
+            for(auto i : selection)
+            {
+                if(!pEditablePoints->get(i)->getSolo())
+                {
+                    anyNotSolo = true;
+                    break;
+                }
+            }
+            
+            for(auto i : selection)
+                pEditablePoints->setSolo(i, anyNotSolo);
+        }
+        
+        return true;
+    }
 	if (key.isKeyCode(KeyPress::upKey))
 	{
 		if (radarMode == XY)
