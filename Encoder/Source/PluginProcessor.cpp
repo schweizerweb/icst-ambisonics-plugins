@@ -11,6 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "AudioParameterFloatAmbi.h"
+#include "AudioParameterBoolAmbi.h"
 #include "../../Common/TrackColors.h"
 #include "EncoderConstants.h"
 
@@ -84,12 +85,14 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
         set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
         set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
+        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
          
         audioParams.sourceParams.add(set);
         addParameter(set.pX);
         addParameter(set.pY);
         addParameter(set.pZ);
         addParameter(set.pGain);
+        addParameter(set.pMute);
     }
     
     for (int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
@@ -250,11 +253,16 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
+    bool soloOnly = sources->anySolo();
+    
     // loop through input channels
 	for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
 	{
 		AmbiSource* source = sources->get(iSource);
-		if (source == nullptr || !source->getEnabled())
+		if (source == nullptr
+            || !source->getEnabled()
+            || source->getMute()
+            || (soloOnly && !source->getSolo()))
 			continue;
 
 		Point3D<double>* pSourcePoint = source->getPoint();

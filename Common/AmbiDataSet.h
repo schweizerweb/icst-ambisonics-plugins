@@ -48,7 +48,9 @@ public:
 	void setElevation(int channel, double elevation) const;
 	void setDistance(int channel, double distance) const;
 	bool setGain(int channel, double gain, bool notify = true) const;
-	String getNewUniqueName() const;
+    bool setMute(int channel, bool mute, bool notify = true) const;
+	bool setSolo(int channel, bool solo) const;
+    String getNewUniqueName() const;
 	int getEnabledCount() const;
     float getMaxDistance() const;
     
@@ -70,7 +72,6 @@ public:
     bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     void swapGroup(int a, int b);
-   
 
 private:
 	bool nameExists(String name) const;

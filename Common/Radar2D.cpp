@@ -212,6 +212,16 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
+void Radar2D::drawEmptySquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const
+{
+    double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getX(), pt->getZ())) + PI * 0.25;
+
+    Path p;
+    p.addPolygon(*screenPt, 4, pointSize, float(angle));
+    p.closeSubPath();
+    g->strokePath(p, PathStrokeType(2.0));
+}
+
 void Radar2D::drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const
 {
 	Path p;
@@ -302,8 +312,9 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 		}
 	}
 
-	g->setColour(point->getColor());
-	
+    Colour c = point->getMute() ? point->getColor().withAlpha(0.2f) : point->getColor();
+	g->setColour(c);
+
 	if(shape == Square)
 		drawSquare(g, &screenPt, pt, pointSize);
 	else if (shape == Star)
@@ -313,6 +324,12 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 		Rectangle<float> rect(pointSize, pointSize);
 		g->fillEllipse(rect.withCentre(screenPt));
 	}
+    
+    if(point->getSolo())
+    {
+        g->setColour(Colours::red);
+        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2);
+    }
     
     if(extendedHandles)
     {
