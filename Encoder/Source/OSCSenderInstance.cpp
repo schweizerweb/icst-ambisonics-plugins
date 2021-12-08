@@ -46,7 +46,7 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     String path = String(oscPath);
     double scaler = pScalingInfo->GetScaler();
     
-    for (UserDefinedParameter parameter : parametersInPath)
+    for (auto& parameter : parametersInPath)
     {
         auto original = parameter.getOriginalString();
         auto replace = parameter.getString(pt, scaler, index);
@@ -54,7 +54,7 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     }
 
     OSCMessage message = OSCMessage(OSCAddressPattern(path));
-    for (auto parameter : realParameters)
+    for (auto& parameter : realParameters)
     {
         message.addArgument(parameter.getOSCArgument(pt, scaler, index));
     }
@@ -102,7 +102,7 @@ bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDef
                 case 'g': pArray->add(UserDefinedParameter(fullString, ParameterType::Gain)); break;
             }
         }
-        else if(userString.substr()[0]== 's')
+        else if(userString.length() > 0 && userString.substr()[0]== 's')
         {
             if(userString.length() == 2)
             {
@@ -145,6 +145,10 @@ bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDef
                     return false;
                 }
             }
+        }
+        else if(String(userString).startsWith("ex"))
+        {
+            pArray->add(UserDefinedParameter(fullString, ParameterType::Expression));
         }
         else
         {

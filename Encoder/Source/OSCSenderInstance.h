@@ -18,7 +18,8 @@ public:
     OSCSenderInstance(ScalingInfo* pScaling);
     ~OSCSenderInstance();
 
-    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain, DualScaledE, DualScaledX, DualScaledY, DualScaledZ };
+    enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain, DualScaledE, DualScaledX, DualScaledY, DualScaledZ, Expression };
+    
     class UserDefinedParameter
     {
     public:
@@ -58,6 +59,15 @@ public:
                 case ScaledY:
                 case ScaledZ:
                     loLim = 0.0; hiLim = 1.0; break;
+                    
+                case Expression:
+                    jsExpression = originalString.fromFirstOccurrenceOf(",", false, true).upToLastOccurrenceOf("}", false, true);
+                    jsEngine.reset(new JavascriptEngine());
+                    jsEngine->maximumExecutionTime = RelativeTime::seconds (5);
+                    jsContext = new JsContext (this);
+                    jsEngine->registerNativeObject ("p", jsContext);
+                    break;
+
                 default: break;
             }
         }
@@ -92,8 +102,26 @@ public:
                 case DualScaledE:
                     return OSCArgument(getValue(pt, scaler));
                     
+                case Expression:
+                {
+                    jsContext->jsAmbiPoint = pt;
+                    
+                    auto ret = jsEngine->evaluate(jsExpression);
+                    if(ret.isUndefined())
+                        return OSCArgument("error");
+                    else
+                    {
+                        // return OSC argument that fits the return type of the java script code
+                        if(ret.isInt() || ret.isBool())
+                            return OSCArgument((int)ret);
+                        else if(ret.isDouble())
+                            return OSCArgument((float)ret);
+                        return OSCArgument(ret.toString());
+                    }
+                }
+                    
                 default:
-                    return OSCArgument("Error");
+                    return OSCArgument("error");
             }
         }
         
@@ -124,7 +152,7 @@ public:
                 case DualScaledE:
                     return String(getValue(pt, scaler));
                     
-                default: return "Error";
+                default: return "error";
             }
         }
         
@@ -134,6 +162,102 @@ public:
         }
         
     private:
+        struct JsContext  : public DynamicObject
+            {
+                JsContext (UserDefinedParameter* demo) : owner (demo)
+                {
+                    setMethod ("x", x);
+                    setMethod ("y", y);
+                    setMethod ("z", z);
+                    setMethod ("a", a);
+                    setMethod ("e", e);
+                    setMethod ("d", d);
+                    setMethod ("gain", gain);
+                    setMethod ("name", name);
+                    setMethod ("color", color);
+                }
+        
+                static Identifier getClassName()    { return "p"; }
+        
+                static var x (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getX();
+        
+                    return var::undefined();
+                }
+
+                static var y (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getY();
+                
+                    return var::undefined();
+                }
+                   
+                static var z (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getZ();
+                
+                    return var::undefined();
+                }
+                   
+                static var a (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getAzimuth();
+                
+                    return var::undefined();
+                }
+                   
+                static var e (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getElevation();
+                
+                    return var::undefined();
+                }
+                   
+                static var d (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getPoint()->getDistance();
+                
+                    return var::undefined();
+                }
+                   
+                static var gain (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getGain();
+                
+                    return var::undefined();
+                }
+                   
+                static var name (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getName();
+                
+                    return var::undefined();
+                }
+                   
+                static var color (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAmbiPoint->getColor().toDisplayString(true);
+                
+                    return var::undefined();
+                }
+                  
+                
+                UserDefinedParameter* owner;
+                AmbiPoint* jsAmbiPoint;
+        
+                JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JsContext)
+            };
+        
         float getValue(AmbiPoint* pt, double scaler)
         {
             switch(type)
@@ -176,6 +300,9 @@ public:
         double loLim;
         double hiLim;
         double zero;
+        String jsExpression;
+        std::unique_ptr<JavascriptEngine> jsEngine;
+        JsContext* jsContext;
     };
     
     bool connect(String host, int port);
