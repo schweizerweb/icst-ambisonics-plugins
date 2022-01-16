@@ -63,6 +63,8 @@ public:
     
 	OwnedArray<CustomOscTarget> customOscTargets;
 
+    OwnedArray<CustomOscInput> customOscInput;
+    
 	bool distanceEncodingFlag;
 	DistanceEncodingParams distanceEncodingParams;
 	

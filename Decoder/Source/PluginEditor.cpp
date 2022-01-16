@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.1.4
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -51,35 +51,35 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
-    labelVersion.reset (new Label ("labelVersion",
-                                   TRANS("Version")));
+    labelVersion.reset (new juce::Label ("labelVersion",
+                                         TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (Font (15.00f, Font::plain).withTypefaceStyle ("Regular"));
-    labelVersion->setJustificationType (Justification::centredRight);
+    labelVersion->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setJustificationType (juce::Justification::centredRight);
     labelVersion->setEditable (false, false, false);
-    labelVersion->setColour (TextEditor::textColourId, Colours::black);
-    labelVersion->setColour (TextEditor::backgroundColourId, Colour (0x00000000));
+    labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    btnSettings.reset (new ImageButton ("btnSettings"));
+    btnSettings.reset (new juce::ImageButton ("btnSettings"));
     addAndMakeVisible (btnSettings.get());
-    btnSettings->setButtonText (String());
+    btnSettings->setButtonText (juce::String());
     btnSettings->addListener (this);
 
     btnSettings->setImages (false, true, true,
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0x00000000),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, Colour (0x6eee1010),
-                            ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, Colour (0xc0ee1010));
+                            juce::ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, juce::Colour (0x00000000),
+                            juce::ImageCache::getFromMemory (settings_png, settings_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                            juce::ImageCache::getFromMemory (settings_png, settings_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     btnSettings->setBounds (0, 0, 32, 32);
 
-    btnHelp.reset (new ImageButton ("btnHelp"));
+    btnHelp.reset (new juce::ImageButton ("btnHelp"));
     addAndMakeVisible (btnHelp.get());
     btnHelp->setButtonText (TRANS("new button"));
     btnHelp->addListener (this);
 
     btnHelp->setImages (false, true, true,
-                        ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, Colour (0x00000000),
-                        ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, Colour (0x6eee1010),
-                        ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, Colour (0xc0ee1010));
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     btnHelp->setBounds (32, 4, 24, 24);
 
 
@@ -119,12 +119,12 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
 }
 
 //==============================================================================
-void AmbisonicsDecoderAudioProcessorEditor::paint (Graphics& g)
+void AmbisonicsDecoderAudioProcessorEditor::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -143,7 +143,7 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserResized]
 }
 
-void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (Button* buttonThatWasClicked)
+void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.2
+  Created with Projucer version: 6.1.4
 
   ------------------------------------------------------------------------------
 
@@ -167,13 +167,13 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
     else if (buttonThatWasClicked == btnHelp.get())
     {
         //[UserButtonCode_btnHelp] -- add your button handler code here..
-        
+
         if(ModifierKeys::currentModifiers.isCommandDown() && ModifierKeys::currentModifiers.isCtrlDown() && ModifierKeys::currentModifiers.isAltDown() && ModifierKeys::currentModifiers.isShiftDown())
         {
             animatorDialogManager.show(pSources, this);
             return;
         }
-        
+
         helpDialogManager.show(true, this);
         //[/UserButtonCode_btnHelp]
     }

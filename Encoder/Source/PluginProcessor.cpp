@@ -32,7 +32,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #endif
 {
     sources.reset(new AmbiSourceSet(getScalingInfo()));
-	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, getScalingInfo());
+	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, &encoderSettings.customOscInput, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
 

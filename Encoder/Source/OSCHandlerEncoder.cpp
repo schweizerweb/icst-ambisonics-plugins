@@ -10,9 +10,10 @@
 
 #include "OSCHandlerEncoder.h"
 
-OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling)
+OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, OwnedArray<CustomOscInput>* pCustomOscInput, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling), pCustomOscInput(pCustomOscInput)
 {
     this->pDistanceEncodingParams = pDistanceEncodingParams;
+    jsEngine.reset(new JavascriptEngine());
 }
 
 bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
@@ -94,10 +95,22 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     }
     else
     {
+        for(auto& c : *pCustomOscInput)
+        {
+            if(pattern.matches(OSCAddress(c->oscString)))
+            {
+                handleCustomOsc(c, message);
+            }
+        }
         return false;
     }
     
     return true;
+}
+
+void OSCHandlerEncoder::handleCustomOsc(CustomOscInput* pCustomDefinition, const OSCMessage& message) const
+{
+    
 }
 
 void OSCHandlerEncoder::handleMusescoreSSMNStyle(const OSCMessage& message) const
