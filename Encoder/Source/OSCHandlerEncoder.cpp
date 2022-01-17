@@ -16,6 +16,17 @@ OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessa
     jsEngine.reset(new JavascriptEngine());
 }
 
+bool OSCHandlerEncoder::initSpecific()
+{
+    customOscReceivers.clear();
+    for(auto& c : *pCustomOscInput)
+    {
+        customOscReceivers.add(new CustomOscReceiver(c));
+    }
+    
+    return true;
+}
+
 bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
 {
     OSCAddressPattern pattern = message.getAddressPattern();
@@ -95,22 +106,20 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     }
     else
     {
-        for(auto& c : *pCustomOscInput)
+        bool hasMatch = false;
+        for(auto& r : customOscReceivers)
         {
-            if(pattern.matches(OSCAddress(c->oscString)))
+            if(r->matchesPattern(&pattern))
             {
-                handleCustomOsc(c, message);
+                r->handleMessage(pAmbiPoints, &message);
+                hasMatch = true;
             }
         }
-        return false;
+        
+        return hasMatch;
     }
     
     return true;
-}
-
-void OSCHandlerEncoder::handleCustomOsc(CustomOscInput* pCustomDefinition, const OSCMessage& message) const
-{
-    
 }
 
 void OSCHandlerEncoder::handleMusescoreSSMNStyle(const OSCMessage& message) const

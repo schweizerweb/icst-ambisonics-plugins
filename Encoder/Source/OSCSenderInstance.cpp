@@ -90,16 +90,16 @@ bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDef
         {
             switch(userString.substr()[0])
             {
-                case 'a': pArray->add(UserDefinedParameter(fullString, ParameterType::A)); break;
-                case 'e': pArray->add(UserDefinedParameter(fullString, ParameterType::E)); break;
-                case 'd': pArray->add(UserDefinedParameter(fullString, ParameterType::D)); break;
-                case 'x': pArray->add(UserDefinedParameter(fullString, ParameterType::X)); break;
-                case 'y': pArray->add(UserDefinedParameter(fullString, ParameterType::Y)); break;
-                case 'z': pArray->add(UserDefinedParameter(fullString, ParameterType::Z)); break;
-                case 'i': pArray->add(UserDefinedParameter(fullString, ParameterType::Index)); break;
-                case 'n': pArray->add(UserDefinedParameter(fullString, ParameterType::Name)); break;
-                case 'c': pArray->add(UserDefinedParameter(fullString, ParameterType::Color)); break;
-                case 'g': pArray->add(UserDefinedParameter(fullString, ParameterType::Gain)); break;
+                case 'a': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::A)); break;
+                case 'e': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::E)); break;
+                case 'd': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::D)); break;
+                case 'x': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::X)); break;
+                case 'y': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Y)); break;
+                case 'z': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Z)); break;
+                case 'i': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Index)); break;
+                case 'n': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Name)); break;
+                case 'c': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Color)); break;
+                case 'g': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Gain)); break;
             }
         }
         else if(userString.length() > 0 && userString.substr()[0]== 's')
@@ -108,12 +108,12 @@ bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDef
             {
                 switch(userString.substr()[1])
                 {
-                    case 'a': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledA)); break;
-                    case 'e': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledE)); break;
-                    case 'd': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledD)); break;
-                    case 'x': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledX)); break;
-                    case 'y': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledY)); break;
-                    case 'z': pArray->add(UserDefinedParameter(fullString, ParameterType::ScaledZ)); break;
+                    case 'a': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledA)); break;
+                    case 'e': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledE)); break;
+                    case 'd': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledD)); break;
+                    case 'x': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledX)); break;
+                    case 'y': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledY)); break;
+                    case 'z': pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledZ)); break;
                         default: return false;
                 }
             }
@@ -148,7 +148,7 @@ bool OSCSenderInstance::analyzeString(std::string parameterString, Array<UserDef
         }
         else if(String(userString).startsWith("ex"))
         {
-            pArray->add(UserDefinedParameter(fullString, ParameterType::Expression));
+            pArray->add(UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Expression));
         }
         else
         {

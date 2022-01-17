@@ -13,6 +13,7 @@
 #include "../../Common/AmbiBasicSettings.h"
 #include "DistanceEncodingParams.h"
 #include "CustomOscTarget.h"
+#include "CustomOscInput.h"
 #include "StandardOscTarget.h"
 
 
@@ -62,7 +63,6 @@ public:
     std::unique_ptr<StandardOscTarget> oscSendExtAedIndex;
     
 	OwnedArray<CustomOscTarget> customOscTargets;
-
     OwnedArray<CustomOscInput> customOscInput;
     
 	bool distanceEncodingFlag;

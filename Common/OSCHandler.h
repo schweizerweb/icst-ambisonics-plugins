@@ -26,6 +26,7 @@ public:
 	void stop();
 
 protected:
+    virtual bool initSpecific() = 0;
     virtual bool handleSpecific(const OSCMessage& message) = 0;
 	static double GetIntOrFloat(const OSCArgument* pOscArgument);
 	void oscMessageReceived(const OSCMessage& message) override;

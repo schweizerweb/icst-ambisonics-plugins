@@ -22,10 +22,13 @@ bool OSCHandler::start(int portNb)
 {
 	disconnect();
 	bool ok = connect(portNb);
-
 	if (!ok)
 		return false;
 
+    ok = initSpecific();
+    if (!ok)
+        return false;
+    
 	addListener(this);
 
 	return true;

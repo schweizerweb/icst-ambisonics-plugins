@@ -12,6 +12,8 @@
 #include "JuceHeader.h"
 #include "../../Common/OSCHandler.h"
 #include "CustomOscTarget.h"
+#include "CustomOscInput.h"
+#include "CustomOscReceiver.h"
 #include "DistanceEncodingParams.h"
 
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
@@ -44,9 +46,9 @@ class OSCHandlerEncoder : public OSCHandler
 public:
     OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, OwnedArray<CustomOscInput>* pCustomOscInput, ScalingInfo* pScaling);
     bool handleSpecific(const juce::OSCMessage &message) override;
+    bool initSpecific() override;
     
 private:
-    void handleCustomOsc(CustomOscInput* pCustomDefinition, const OSCMessage& message) const;
     void handleMusescoreSSMNStyle(const OSCMessage& message) const;
     void handleOwnExternStyleAed(const OSCMessage& message) const;
     void handleOwnExternStyleXyz(const OSCMessage& message) const;
@@ -71,5 +73,6 @@ private:
     DistanceEncodingParams* pDistanceEncodingParams;
     ScalingInfo* pScalingInfo;
     OwnedArray<CustomOscInput>* pCustomOscInput;
+    OwnedArray<CustomOscReceiver> customOscReceivers;
     std::unique_ptr<JavascriptEngine> jsEngine;
 };
