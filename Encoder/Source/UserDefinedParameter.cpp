@@ -9,6 +9,7 @@
 */
 
 #include "UserDefinedParameter.h"
+#include <string.h>
 
 UserDefinedParameter::UserDefinedParameter(String originalString, std::string typeString, double lo, double hi) : originalString(originalString), loLim(lo), hiLim(hi)
 {
@@ -46,6 +47,18 @@ UserDefinedParameter::UserDefinedParameter(String originalString, ParameterType 
         case ScaledY:
         case ScaledZ:
             loLim = 0.0; hiLim = 1.0; break;
+
+        case ConstInt:
+            constInt = std::stoi(originalString.fromFirstOccurrenceOf(",", false, true).toStdString());
+            break;
+            
+        case ConstFloat:
+            constFloat = std::stof(originalString.fromFirstOccurrenceOf(",", false, true).toStdString());
+            break;
+            
+        case ConstString:
+            constString = originalString.fromFirstOccurrenceOf(",", false, true);
+            break;
             
         case Expression:
             jsExpression = originalString.fromFirstOccurrenceOf(",", false, true).upToLastOccurrenceOf("}", false, true);
@@ -88,6 +101,18 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
         case DualScaledZ:
         case DualScaledE:
             return OSCArgument(getValue(pt, scaler));
+            
+        case ConstInt:
+            return OSCArgument(constInt);
+            
+        case ConstFloat:
+            return OSCArgument(constFloat);
+            
+        case ConstString:
+            return OSCArgument(constString);
+            
+        case Ignore:
+            return OSCArgument("");
             
         case Expression:
         {
@@ -139,6 +164,11 @@ String UserDefinedParameter::getString(AmbiPoint* pt, double scaler, int index)
         case DualScaledE:
             return String(getValue(pt, scaler));
             
+        case ConstInt: return String(constInt);
+        case ConstFloat: return String(constFloat);
+        case ConstString: return constString;
+        case Ignore: return "";
+            
         default: return "error";
     }
 }
@@ -170,9 +200,14 @@ float UserDefinedParameter::getValue(AmbiPoint* pt, double scaler)
     case DualScaledZ: return dualMap(pt->getPoint()->getZ(), scaler);
     case DualScaledE: return dualMap(pt->getPoint()->getElevation(), Constants::ElevationRadMax);
     
+    case ConstInt: return float(constInt);
+    case ConstFloat: return constFloat;
+            
     case Index:
     case Name:
     case Color:
+    case ConstString:
+    case Ignore:
     default:
         throw;
     }
@@ -185,3 +220,98 @@ float UserDefinedParameter::dualMap(double value, double maxValue)
     : float(jmap(value, 0.0, maxValue, zero, hiLim));
 }
 
+float UserDefinedParameter::inverseDualMap(double value, double maxValue)
+{
+    return value <= 0.0
+    ? float(jmap(value, loLim, zero, -maxValue, 0.0))
+    : float(jmap(value, zero, hiLim, 0.0, maxValue));
+}
+
+void UserDefinedParameter::getValueFromOsc(int* pInt, OSCArgument* pArgument)
+{
+    switch(type)
+    {
+        case Index:
+            if(pArgument->isInt32())
+                *pInt = pArgument->getInt32();
+            break;
+        default:
+            break;
+    }
+}
+
+void UserDefinedParameter::getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler)
+{
+    if(!pArgument->isFloat32())
+        return;
+    
+    double value = pArgument->getFloat32();
+    
+    switch(type)
+    {
+        case A:
+        case E:
+        case D:
+        case X:
+        case Y:
+        case Z:
+        case Gain:
+            *pDouble = value;
+            break;
+            
+        case ScaledX:
+        case ScaledY:
+        case ScaledZ:
+            *pDouble = jmap(value, loLim, hiLim, -scaler, scaler);
+            break;
+            
+        case ScaledA:
+            *pDouble = jmap(value, loLim, hiLim, double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax));
+            break;
+            
+        case ScaledE:
+            *pDouble = jmap(value, loLim, hiLim, double(Constants::ElevationRadMin), double(Constants::ElevationRadMin));
+            break;
+            
+        case ScaledD:
+            *pDouble = jmap(value, loLim, hiLim, -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler);
+            break;
+            
+        case DualScaledX:
+        case DualScaledY:
+        case DualScaledZ:
+            *pDouble = inverseDualMap(value, scaler);
+            break;
+            
+        case DualScaledE:
+            *pDouble = inverseDualMap(value, Constants::ElevationRadMax);
+            break;
+            
+        default:
+            break;
+    }
+}
+
+void UserDefinedParameter::getValueFromOsc(String *pString, OSCArgument *pArgument)
+{
+    switch (type) {
+        case Name:
+            if(pArgument->isString())
+                *pString = pArgument->getString();
+            break;
+        default:
+            break;
+    }
+}
+
+bool UserDefinedParameter::checkConst(OSCArgument* pArgument)
+{
+    switch (type) {
+        case ConstInt: return pArgument->isInt32() && pArgument->getInt32() == constInt;
+        case ConstFloat: return pArgument->isFloat32() && pArgument->getFloat32() == constFloat;
+        case ConstString: return pArgument->isString() && pArgument->getString() == constString;
+            
+        default:
+            return true;
+    }
+}

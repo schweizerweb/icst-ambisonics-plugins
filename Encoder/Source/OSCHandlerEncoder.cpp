@@ -21,7 +21,7 @@ bool OSCHandlerEncoder::initSpecific()
     customOscReceivers.clear();
     for(auto& c : *pCustomOscInput)
     {
-        customOscReceivers.add(new CustomOscReceiver(c));
+        customOscReceivers.add(new CustomOscReceiver(c, pScalingInfo));
     }
     
     return true;

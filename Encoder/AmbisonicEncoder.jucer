@@ -47,6 +47,9 @@
             file="Source/AudioParameterFloatAmbi.cpp"/>
       <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
             file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="QtiuD8" name="CustomOscBase.cpp" compile="1" resource="0"
+            file="Source/CustomOscBase.cpp"/>
+      <FILE id="DzPqvI" name="CustomOscBase.h" compile="0" resource="0" file="Source/CustomOscBase.h"/>
       <FILE id="d0Pozp" name="CustomOscInput.cpp" compile="1" resource="0"
             file="Source/CustomOscInput.cpp"/>
       <FILE id="LBS1fA" name="CustomOscInput.h" compile="0" resource="0"

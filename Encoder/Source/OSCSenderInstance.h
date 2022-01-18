@@ -12,8 +12,9 @@
 #include "JuceHeader.h"
 #include "../../Common/AmbiPoint.h"
 #include "UserDefinedParameter.h"
+#include "CustomOscBase.h"
 
-class OSCSenderInstance
+class OSCSenderInstance : public CustomOscBase
 {
 public:
     OSCSenderInstance(ScalingInfo* pScaling);
@@ -22,19 +23,10 @@ public:
     bool connect(String host, int port);
 	void disconnect();
 	void sendMessage(AmbiPoint* pt, int index);
-	bool setOscPath(String path);
-	String getOscPath();
-
+	
 private:
-    bool analyzeString(std::string parameterString, Array<UserDefinedParameter>* pArray);
-    
-    float dualMap(double value, double maxValue, UserDefinedParameter* pParam);
     std::unique_ptr<OSCSender> sender;
-	String oscPath;
-	Array<UserDefinedParameter> parametersInPath;
-    Array<UserDefinedParameter> realParameters;
 	bool isConnected;
-	CriticalSection cs;
-    ScalingInfo* pScalingInfo;
+    CriticalSection cs;
 };
 

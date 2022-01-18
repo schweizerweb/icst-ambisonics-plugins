@@ -15,7 +15,7 @@
     class UserDefinedParameter
     {
     public:
-        enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain, DualScaledE, DualScaledX, DualScaledY, DualScaledZ, Expression };
+        enum ParameterType { Index, Name, Color, A, E, D, X, Y, Z, ScaledA, ScaledE, ScaledD, ScaledX, ScaledY, ScaledZ, Gain, DualScaledE, DualScaledX, DualScaledY, DualScaledZ, Expression, ConstInt, ConstFloat, ConstString, Ignore };
 
         UserDefinedParameter(String originalString, std::string typeString, double lo, double hi);
         UserDefinedParameter(String originalString, std::string typeString, double lo, double hi, double zero);
@@ -24,6 +24,12 @@
         OSCArgument getOSCArgument(AmbiPoint* pt, double scaler, int index);
         String getString(AmbiPoint* pt, double scaler, int index);
         String getOriginalString();
+        ParameterType getType() {return type;}
+        
+        void getValueFromOsc(int* pInt, OSCArgument* pArgument);
+        void getValueFromOsc(String* pString, OSCArgument* pArgument);
+        void getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler);
+        bool checkConst(OSCArgument* pArgument);
         
     private:
         struct JsContext  : public DynamicObject
@@ -124,6 +130,7 @@
         
         float getValue(AmbiPoint* pt, double scaler);
         float dualMap(double value, double maxValue);
+        float inverseDualMap(double value, double maxValue);
         
         String originalString;
         ParameterType type;
@@ -133,6 +140,10 @@
         String jsExpression;
         std::unique_ptr<JavascriptEngine> jsEngine;
         JsContext* jsContext;
+        
+        int constInt;
+        float constFloat;
+        String constString;
 };
     
     
