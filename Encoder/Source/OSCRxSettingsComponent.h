@@ -20,9 +20,11 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "JuceHeader.h"
+#include <JuceHeader.h>
 #include "EncoderSettings.h"
-#include "OSCTargetsComponent.h"
+#include "CustomOscInputTableListModel.h"
+#include "../../Common/StatusMessageHandler.h"
+#include "../../Common/OSCLogDialogManager.h"
 //[/Headers]
 
 
@@ -35,17 +37,16 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
-class OSCSettingsComponent  : public Component,
-                              public TextEditor::Listener,
-                              public ChangeBroadcaster,
-                              public ChangeListener,
-                              public juce::Button::Listener,
-                              public juce::Slider::Listener
+class OSCRxSettingsComponent  : public Component,
+                                public ChangeBroadcaster,
+                                public ActionListener,
+                                public juce::Button::Listener,
+                                public juce::Slider::Listener
 {
 public:
     //==============================================================================
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings);
-    ~OSCSettingsComponent() override;
+    OSCRxSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager);
+    ~OSCRxSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
@@ -56,34 +57,36 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
+    // Binary resources:
+    static const char* help_png;
+    static const int help_pngSize;
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    void textEditorTextChanged(TextEditor&) override;
-    void controlDimming() const;
-    void changeListenerCallback(ChangeBroadcaster* source) override;
+    void controlDimming();
+    void actionListenerCallback(const String& message) override;
 
     EncoderSettings* pSettings;
+    StatusMessageHandler* pStatusMessageHandler;
+    OSCLogDialogManager* pOscLogManager;
+    std::unique_ptr<CustomOscInputTableListModel> customOscTableModel;
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::GroupComponent> groupExternal;
-    std::unique_ptr<juce::GroupComponent> groupInternal;
-    std::unique_ptr<juce::ToggleButton> toggleSendOsc;
-    std::unique_ptr<juce::TextEditor> textOscSendIp;
-    std::unique_ptr<juce::Label> labelOscSendIp;
-    std::unique_ptr<juce::Label> labelOscSendInterval;
-    std::unique_ptr<juce::ToggleButton> toggleSendOscExt;
-    std::unique_ptr<juce::Label> labelExternalOscInfo;
-    std::unique_ptr<juce::Slider> sliderSendOscPort;
-    std::unique_ptr<juce::Slider> sliderInterval;
-    std::unique_ptr<OSCTargetsComponent> oscTargets;
-    std::unique_ptr<juce::Label> labelLoadInfo;
+    std::unique_ptr<juce::ToggleButton> toggleReceiveOsc;
+    std::unique_ptr<juce::Label> labelOscPort;
+    std::unique_ptr<juce::Slider> sliderReceiveOscPort;
+    std::unique_ptr<juce::GroupComponent> groupDefinitions;
+    std::unique_ptr<TableListBox> customOscList;
+    std::unique_ptr<juce::TextButton> btnAdd;
+    std::unique_ptr<juce::TextButton> btnDelete;
+    std::unique_ptr<juce::ImageButton> btnInfo;
+    std::unique_ptr<juce::TextButton> buttonShowOscLog;
 
 
     //==============================================================================
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OSCSettingsComponent)
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (OSCRxSettingsComponent)
 };
 
 //[EndFile] You can add extra defines here...

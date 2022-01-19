@@ -16,9 +16,8 @@
 #include "../../Common/CheckBoxCustomComponent.h"
 
 #define COLUMN_ID_ENABLE		201
-#define COLUMN_ID_HOST			202
-#define	COLUMN_ID_PORT			203
 #define	COLUMN_ID_PATH			204
+#define COLUMN_ID_COMMAND       205
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
 
@@ -29,19 +28,15 @@ public:
 	CustomOscInputTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED Name", pSettings->oscSendExtAed.get()));
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Index", pSettings->oscSendExtXyzIndex.get()));
-        standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard AED Index", pSettings->oscSendExtAedIndex.get()));
 	}
 
-	~CustomOsInputcTableListModel() override
+	~CustomOscInputTableListModel() override
 	{
 		removeAllActionListeners();
 	}
 
 	int getNumRows() override {
-		return standardTargets.size() + pSettings->customOscTargets.size();
+		return pSettings->customOscInput.size();
 	}
 
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -62,23 +57,14 @@ public:
 
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override
 	{
-		if (columnId == COLUMN_ID_PORT)
-		{
-			SliderColumnCustomComponent* sliderBox = static_cast<SliderColumnCustomComponent*> (existingComponentToUpdate);
-			if (sliderBox == nullptr)
-				sliderBox = new SliderColumnCustomComponent(*this);
-
-			sliderBox->setRowAndColumn(rowNumber, columnId);
-			return sliderBox;
-		}
-		else if (columnId == COLUMN_ID_HOST
-			|| columnId == COLUMN_ID_PATH)
+		if (columnId == COLUMN_ID_PATH
+            || columnId == COLUMN_ID_COMMAND)
 		{
 			EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
 			if (textLabel == nullptr)
 				textLabel = new EditableTextCustomComponent(*this);
 
-			textLabel->setRowAndColumn(rowNumber, columnId, columnId == COLUMN_ID_PATH && rowNumber < standardTargets.size());
+			textLabel->setRowAndColumn(rowNumber, columnId);
 			return textLabel;
 		}
 		else if (columnId == COLUMN_ID_ENABLE)
@@ -101,23 +87,12 @@ public:
 
 	double getValue(int columnId, int rowNumber) override 
 	{
-		if(rowNumber < standardTargets.size())
-        {
-            switch (columnId)
-            {
-                case COLUMN_ID_PORT: return standardTargets[rowNumber]->pTarget->targetPort;
-                case COLUMN_ID_ENABLE: return standardTargets[rowNumber]->pTarget->enabledFlag;
-                default: return 0.0;
-            }
-        }
-        
-		CustomOscTarget* t = pSettings->customOscTargets[rowNumber - standardTargets.size()];
+		CustomOscInput* t = pSettings->customOscInput[rowNumber];
 		if (t == nullptr)
 			return 0.0;
 
 		switch (columnId)
 		{
-		case COLUMN_ID_PORT: return t->targetPort;
 		case COLUMN_ID_ENABLE: return t->enabledFlag;
 		default: return 0.0;
 		}
@@ -125,24 +100,10 @@ public:
 
 	void setValue(int columnId, int rowNumber, double newValue) override
 	{
-        if(rowNumber < standardTargets.size())
+        switch (columnId)
         {
-            switch (columnId)
-            {
-                case COLUMN_ID_PORT: standardTargets[rowNumber]->pTarget->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = newValue != 0.0; break;
-                default: ;
-            }
-        }
-        else
-        {
-            rowNumber -= standardTargets.size();
-            switch (columnId)
-            {
-                case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = newValue != 0.0; break;
-                default: ;
-            }
+            case COLUMN_ID_ENABLE: pSettings->customOscInput[rowNumber]->enabledFlag = newValue != 0.0; break;
+            default: ;
         }
         
 		getTable()->updateContent();
@@ -155,8 +116,6 @@ public:
 	{
 		switch (columnId)
 		{
-		case COLUMN_ID_PORT:
-			return SliderRange(0, 65535, 1);
 		default: return SliderRange(0.0, 1.0, 0.001);
 		}
 	}
@@ -168,45 +127,21 @@ public:
 
 	String getTableText(const int columnId, const int rowNumber) override
 	{
-        if(rowNumber < standardTargets.size())
-        {
-            switch (columnId)
-            {
-                case COLUMN_ID_HOST: return standardTargets[rowNumber]->pTarget->targetHost;
-                case COLUMN_ID_PATH: return standardTargets[rowNumber]->name;
-            default: return "";
-            }
-        }
-        
-        int row = rowNumber - standardTargets.size();
-		switch (columnId)
+        switch (columnId)
 		{
-		case COLUMN_ID_HOST: return pSettings->customOscTargets[row]->targetHost; break;
-		case COLUMN_ID_PATH: return pSettings->customOscTargets[row]->oscString; break;
-		default: return "";
+		case COLUMN_ID_PATH: return pSettings->customOscInput[rowNumber]->oscString; break;
+		case COLUMN_ID_COMMAND: return pSettings->customOscInput[rowNumber]->commandString; break;
+        default: return "";
 		}
 	}
 
 	void setTableText(const int columnId, const int rowNumber, const String& newText) override
 	{
-        if(rowNumber < standardTargets.size())
+        switch (columnId)
         {
-            switch (columnId)
-            {
-                case COLUMN_ID_HOST: standardTargets[rowNumber]->pTarget->targetHost = newText; break;
-                case COLUMN_ID_PATH: return;
-            default: return;
-            }
-        }
-        else
-        {
-            int row = rowNumber - standardTargets.size();
-            switch (columnId)
-            {
-                case COLUMN_ID_HOST: pSettings->customOscTargets[row]->targetHost = newText; break;
-                case COLUMN_ID_PATH: pSettings->customOscTargets[row]->oscString = newText; break;
-                default: ;
-            }
+            case COLUMN_ID_PATH: pSettings->customOscInput[rowNumber]->oscString = newText; break;
+            case COLUMN_ID_COMMAND: pSettings->customOscInput[rowNumber]->commandString = newText; break;
+            default: ;
         }
         
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
@@ -217,9 +152,8 @@ public:
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
-		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 70);
-		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
-		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 320);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 250);
+        tableListBox->getHeader().addColumn("OSC-Command", COLUMN_ID_COMMAND, 150);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -229,20 +163,14 @@ public:
 	    return true;
 	}
     
-    int getCustomTargetIndex(int selectedIndex)
+    int getCustomIndex(int selectedIndex)
     {
-        return jmax(-1, selectedIndex - standardTargets.size());
+        return selectedIndex;
     }
 
 private:
-    struct StandardTarget {
-        StandardTarget(String name, StandardOscTarget* pTarget) : name(name), pTarget(pTarget) {};
-        String name;
-        StandardOscTarget* pTarget;
-    };
     
 	EncoderSettings* pSettings;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
-    OwnedArray<StandardTarget> standardTargets;
 };

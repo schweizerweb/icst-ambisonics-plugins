@@ -109,6 +109,10 @@
             file="Source/OSCHandlerEncoder.cpp"/>
       <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
             file="Source/OSCHandlerEncoder.h"/>
+      <FILE id="oDGiTA" name="OSCRxSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/OSCRxSettingsComponent.cpp"/>
+      <FILE id="kHPJpo" name="OSCRxSettingsComponent.h" compile="0" resource="0"
+            file="Source/OSCRxSettingsComponent.h"/>
       <FILE id="yRnDlX" name="OSCSenderInstance.cpp" compile="1" resource="0"
             file="Source/OSCSenderInstance.cpp"/>
       <FILE id="WkVcFY" name="OSCSenderInstance.h" compile="0" resource="0"

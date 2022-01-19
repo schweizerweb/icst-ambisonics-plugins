@@ -22,6 +22,7 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "OSCSettingsComponent.h"
+#include "OSCRxSettingsComponent.h"
 #include "RadarSettingsComponent.h"
 #include "EncodingSettingsComponent.h"
 //[/Headers]

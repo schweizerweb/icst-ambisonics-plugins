@@ -21,7 +21,8 @@ bool OSCHandlerEncoder::initSpecific()
     customOscReceivers.clear();
     for(auto& c : *pCustomOscInput)
     {
-        customOscReceivers.add(new CustomOscReceiver(c, pScalingInfo));
+        if(c->enabledFlag)
+            customOscReceivers.add(new CustomOscReceiver(c, pScalingInfo));
     }
     
     return true;
@@ -107,17 +108,21 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     else
     {
         bool hasMatch = false;
-        for(auto& r : customOscReceivers)
-        {
-            if(r->matchesPattern(&pattern))
+        if(!pattern.containsWildcards()) {
+            OSCAddress address(pattern.toString());
+        
+            for(auto& r : customOscReceivers)
             {
-                r->handleMessage(pAmbiPoints, &message);
-                hasMatch = true;
+                if(r->matchesPattern(&address) && r->handleMessage(pAmbiPoints, &message)) {
+                    reportSuccess(&message);
+                    hasMatch = true;
+                }
             }
         }
         
         return hasMatch;
     }
+    
     
     return true;
 }

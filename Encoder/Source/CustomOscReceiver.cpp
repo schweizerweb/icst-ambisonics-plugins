@@ -13,8 +13,8 @@
 CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScaling) : CustomOscBase(pScaling)
 {
     setOscPath(pInput->oscString);
-    String matchString = getOscPath().replace("{i}", "#");
-    addressToMatch.reset(new OSCAddress(matchString));
+    String matchString = getOscPath().replace("{i}", "*");
+    patternToMatch.reset(new OSCAddressPattern(matchString));
     
     hasIndex = false;
     hasName = false;
@@ -47,9 +47,9 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     isValid &= (hasIndex || hasName);
 }
 
-bool CustomOscReceiver::matchesPattern(OSCAddressPattern* pPattern)
+bool CustomOscReceiver::matchesPattern(OSCAddress* pAddress)
 {
-    return isValid && pPattern->matches(*addressToMatch);
+    return isValid && patternToMatch->matches(*pAddress);
 }
 
 bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage* pMessage)

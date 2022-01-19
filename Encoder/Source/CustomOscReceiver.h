@@ -20,11 +20,11 @@ public:
     CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScaling);
     
 public:
-    bool matchesPattern(OSCAddressPattern* pPattern);
+    bool matchesPattern(OSCAddress* pAddress);
     bool handleMessage(AmbiSourceSet* pSources, const OSCMessage* pMessage);
     
 private:
-    std::unique_ptr<OSCAddress> addressToMatch;
+    std::unique_ptr<OSCAddressPattern> patternToMatch;
     bool hasIndex;
     bool hasName;
     bool xyzMode;
