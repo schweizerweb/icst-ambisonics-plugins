@@ -23,6 +23,8 @@
 #include <JuceHeader.h>
 #include "EncoderSettings.h"
 #include "CustomOscTableListModel.h"
+
+#define COMMON_OSC_INFO_STRING "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}\n\nDual-Scaling for sx, sy, sz, se:\nSyntax: {s*,[lowLimit],[zeroValue],[highLimit]}\nExample: {sz, 1.0, 0.1, 1.0}\n\n{ci,[int]} = Constant integer value\n{cf,[float]} = Constant float value\n{cs,[string]} = Constant string"
 //[/Headers]
 
 

@@ -18,6 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
+#include "OSCTargetsComponent.h"
 //[/Headers]
 
 #include "OSCRxSettingsComponent.h"
@@ -189,8 +190,8 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnInfo.get())
     {
         //[UserButtonCode_btnInfo] -- add your button handler code here..
-        auto label = std::make_unique<Label>("", "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}\nDual-Scaling for sx, sy, sz, se:\nSyntax: {s*,[lowLimit],[zeroValue],[highLimit]}\nExample: {sz, 1.0, 0.1, 1.0}");
-        label->setSize(370, 240);
+        auto label = std::make_unique<Label>("", String(COMMON_OSC_INFO_STRING) + String("\nNote: constant values have to match, otherwise entire message is ignored.\n\n{} = Ignore this argument"));
+        label->setSize(370, 400);
         label->setJustificationType(Justification::left);
         CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]

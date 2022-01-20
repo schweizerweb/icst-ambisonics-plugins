@@ -26,9 +26,9 @@
         String getOriginalString();
         ParameterType getType() {return type;}
         
-        void getValueFromOsc(int* pInt, OSCArgument* pArgument);
-        void getValueFromOsc(String* pString, OSCArgument* pArgument);
-        void getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler);
+        bool getValueFromOsc(int* pInt, OSCArgument* pArgument);
+        bool getValueFromOsc(String* pString, OSCArgument* pArgument);
+        bool getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler);
         bool checkConst(OSCArgument* pArgument);
         
     private:

@@ -12,8 +12,8 @@
 
 CustomOscInput::CustomOscInput()
 {
-    enabledFlag = false;
-    oscString = "/demo/{i}";
+    enabledFlag = true;
+    oscString = "/demo/{i} {x} {y}";
     commandString = "";
 }
 

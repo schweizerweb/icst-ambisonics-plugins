@@ -227,23 +227,28 @@ float UserDefinedParameter::inverseDualMap(double value, double maxValue)
     : float(jmap(value, zero, hiLim, 0.0, maxValue));
 }
 
-void UserDefinedParameter::getValueFromOsc(int* pInt, OSCArgument* pArgument)
+bool UserDefinedParameter::getValueFromOsc(int* pInt, OSCArgument* pArgument)
 {
     switch(type)
     {
         case Index:
             if(pArgument->isInt32())
+            {
                 *pInt = pArgument->getInt32();
+                return true;
+            }
             break;
         default:
             break;
     }
+    
+    return false;
 }
 
-void UserDefinedParameter::getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler)
+bool UserDefinedParameter::getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler)
 {
     if(!pArgument->isFloat32())
-        return;
+        return false;
     
     double value = pArgument->getFloat32();
     
@@ -257,51 +262,56 @@ void UserDefinedParameter::getValueFromOsc(double* pDouble, OSCArgument* pArgume
         case Z:
         case Gain:
             *pDouble = value;
-            break;
+            return true;
             
         case ScaledX:
         case ScaledY:
         case ScaledZ:
             *pDouble = jmap(value, loLim, hiLim, -scaler, scaler);
-            break;
+            return true;
             
         case ScaledA:
             *pDouble = jmap(value, loLim, hiLim, double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax));
-            break;
+            return true;
             
         case ScaledE:
             *pDouble = jmap(value, loLim, hiLim, double(Constants::ElevationRadMin), double(Constants::ElevationRadMin));
-            break;
+            return true;
             
         case ScaledD:
             *pDouble = jmap(value, loLim, hiLim, -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler);
-            break;
+            return true;
             
         case DualScaledX:
         case DualScaledY:
         case DualScaledZ:
             *pDouble = inverseDualMap(value, scaler);
-            break;
+            return true;
             
         case DualScaledE:
             *pDouble = inverseDualMap(value, Constants::ElevationRadMax);
-            break;
+            return true;
             
         default:
-            break;
+            return false;
     }
 }
 
-void UserDefinedParameter::getValueFromOsc(String *pString, OSCArgument *pArgument)
+bool UserDefinedParameter::getValueFromOsc(String *pString, OSCArgument *pArgument)
 {
     switch (type) {
         case Name:
             if(pArgument->isString())
+            {
                 *pString = pArgument->getString();
+                return true;
+            }
             break;
         default:
             break;
     }
+    
+    return false;
 }
 
 bool UserDefinedParameter::checkConst(OSCArgument* pArgument)

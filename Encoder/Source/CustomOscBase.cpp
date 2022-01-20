@@ -29,7 +29,7 @@ bool CustomOscBase::setOscPath(String path)
 bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefinedParameter> *pArray)
 {
     // regex patterns
-    std::regex rParameter("[ ]*\\{[ ]*(.+?)[ ]*\\}[ ]*");
+    std::regex rParameter("[ ]*\\{[ ]*(.*?)[ ]*\\}[ ]*");
     std::regex rTwoValues("s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
     std::regex rThreeValues("s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
     std::smatch parameterMatch;
