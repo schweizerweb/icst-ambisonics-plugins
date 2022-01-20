@@ -22,4 +22,5 @@ protected:
     
 private:
     void handleOwnInternalStyle(const OSCMessage& message) const;
+    bool initSpecific() override;
 };
