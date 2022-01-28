@@ -66,8 +66,8 @@ void AudioParameterBoolAmbi::setValue(float newValue)
 {
     if(!enabled)
         return;
-    
-	float newValueScaled = newValue;
+
+    const bool newValueScaled = newValue != 0.0f;
 	if (value != newValueScaled)
 	{
 		value = newValueScaled;

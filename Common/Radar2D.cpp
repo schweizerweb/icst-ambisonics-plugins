@@ -328,7 +328,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
     if(point->getSolo())
     {
         g->setColour(Colours::red);
-        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2);
+        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2f);
     }
     
     if(extendedHandles)
