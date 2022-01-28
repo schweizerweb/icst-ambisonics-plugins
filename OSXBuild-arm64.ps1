@@ -3,9 +3,9 @@ $projucer = "./../../JUCE/Projucer.app/Contents/MacOS/Projucer"
 $buildExecutable = "xcodebuild"
 #xcodebuild -project ./Decoder/Builds/MacOSX/AmbisonicDecoder.xcodeproj -configuration Release build  
 $buildArgumentsPre = "-project"
-$buildArgumentsPost = "ARCHS=x86_64 ONLY_ACTIVE_ARCH=NO -configuration Release build"
+$buildArgumentsPost = "-arch arm64 -only_active_arch=no -configuration Release build"
 $projectFileExtension = "*.xcodeproj"
-$platformString = "osx"
+$platformString = "osx-arm64"
 $pluginTypeStrings = @("VST3;*.vst3", "AU;*.component")
 $buildInstallScript = "Installer_OSX.ps1"
 
