@@ -112,12 +112,13 @@ public:
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
 	}
 	
-	SliderRange getSliderRange(int columnId) override 
+	SliderRange getSliderRange(int /*columnId*/) override 
 	{
-		switch (columnId)
-		{
-		default: return SliderRange(0.0, 1.0, 0.001);
-		}
+		// switch (columnId)
+		// {
+		// default:
+		    return SliderRange(0.0, 1.0, 0.001);
+		// }
 	}
 
 	TableListBox* getTable() override
