@@ -30,6 +30,7 @@ protected:
     virtual bool handleSpecific(const OSCMessage& message) = 0;
 	static double GetIntOrFloat(const OSCArgument* pOscArgument);
 	void oscMessageReceived(const OSCMessage& message) override;
+    void oscBundleReceived(const OSCBundle &) override;
 	void reportError(String message, const OSCMessage* pMsg) const;
 	void reportSuccess(const OSCMessage* pMsg) const;
 	String oscMessageToString(const OSCMessage* pMsg) const;

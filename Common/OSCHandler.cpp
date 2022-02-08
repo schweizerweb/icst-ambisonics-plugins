@@ -42,6 +42,17 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	}
 }
 
+void OSCHandler::oscBundleReceived(const OSCBundle & bundle)
+{
+    for(auto & e : bundle)
+    {
+        if(e.isBundle())
+            oscBundleReceived(e.getBundle());
+        else
+            oscMessageReceived(e.getMessage());
+    }
+}
+
 void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 {
 	if(pStatusMessageHandler != nullptr)
