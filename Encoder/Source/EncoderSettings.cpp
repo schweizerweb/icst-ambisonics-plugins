@@ -10,6 +10,7 @@
 
 #include "EncoderSettings.h"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
+#define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
@@ -49,6 +50,7 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
+    hideWarnings(DEFAULT_HIDE_WARNINGS),
     masterGain(nullptr),
     localMasterGain(DEFAULT_MASTER_GAIN)
 {
@@ -99,7 +101,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	}
 	oscSendExt->addChildElement(customTargets);
     element->addChildElement(oscSendExt);
-
+    
+    XmlElement* hideWarningsXml = new XmlElement(XML_TAG_OSC_HIDE_WARNINGS);
+    hideWarningsXml->setAttribute(XML_ATTRIBUTE_ENABLE, hideWarnings);
+    element->addChildElement(hideWarningsXml);
 	
     writeToPresetXmlElement(element);
 	
@@ -166,6 +171,10 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		}
 	}
 
+    XmlElement* hideWarningsXml = element->getChildByName(XML_TAG_OSC_HIDE_WARNINGS);
+    if(hideWarningsXml != nullptr)
+    hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    
     loadFromPresetXml(element);
 }
 

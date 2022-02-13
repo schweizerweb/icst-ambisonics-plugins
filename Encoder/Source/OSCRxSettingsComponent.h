@@ -83,6 +83,7 @@ private:
     std::unique_ptr<juce::TextButton> btnDelete;
     std::unique_ptr<juce::ImageButton> btnInfo;
     std::unique_ptr<juce::TextButton> buttonShowOscLog;
+    std::unique_ptr<juce::ToggleButton> toggleHideWarnings;
 
 
     //==============================================================================

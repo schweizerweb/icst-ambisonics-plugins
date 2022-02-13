@@ -413,6 +413,7 @@ EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 
 void AmbisonicEncoderAudioProcessor::initializeOsc()
 {
+    pOscHandler->setVerbosity(true, !encoderSettings.hideWarnings);
 	if (encoderSettings.oscReceiveFlag)
 	{
 		if (!pOscHandler->start(encoderSettings.oscReceivePort))

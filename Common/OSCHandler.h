@@ -22,9 +22,10 @@ class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCa
 {
 public:
 	OSCHandler(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
-	bool start(int portNb);
-	void stop();
-
+    bool start(int portNb);
+    void stop();
+    void setVerbosity(bool reportSuccess = true, bool reportError = true);
+    
 protected:
     virtual bool initSpecific() = 0;
     virtual bool handleSpecific(const OSCMessage& message) = 0;
@@ -37,4 +38,8 @@ protected:
     
 	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
+    
+private:
+    bool reportSuccessFlag;
+    bool reportErrorFlag;
 };

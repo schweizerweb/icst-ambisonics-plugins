@@ -52,7 +52,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelOscPort->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelOscPort->setBounds (121, 10, 49, 24);
+    labelOscPort->setBounds (120, 10, 42, 24);
 
     sliderReceiveOscPort.reset (new juce::Slider ("sliderReceiveOscPort"));
     addAndMakeVisible (sliderReceiveOscPort.get());
@@ -61,7 +61,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     sliderReceiveOscPort->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 60, 20);
     sliderReceiveOscPort->addListener (this);
 
-    sliderReceiveOscPort->setBounds (177, 10, 100, 24);
+    sliderReceiveOscPort->setBounds (170, 10, 100, 24);
 
     groupDefinitions.reset (new juce::GroupComponent ("groupDefinitions",
                                                       TRANS("Definitions")));
@@ -95,6 +95,11 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     buttonShowOscLog->setButtonText (TRANS("Show OSC Log"));
     buttonShowOscLog->addListener (this);
 
+    toggleHideWarnings.reset (new juce::ToggleButton ("toggleHideWarnings"));
+    addAndMakeVisible (toggleHideWarnings.get());
+    toggleHideWarnings->setButtonText (TRANS("hide warnings"));
+    toggleHideWarnings->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -106,7 +111,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
     sliderReceiveOscPort->setValue(pSettings->oscReceivePort, dontSendNotification);
     customOscTableModel->initTable(customOscList.get());
-
+    toggleHideWarnings->setToggleState(pSettings->hideWarnings, dontSendNotification);
     controlDimming();
     //[/Constructor]
 }
@@ -125,6 +130,7 @@ OSCRxSettingsComponent::~OSCRxSettingsComponent()
     btnDelete = nullptr;
     btnInfo = nullptr;
     buttonShowOscLog = nullptr;
+    toggleHideWarnings = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -154,7 +160,8 @@ void OSCRxSettingsComponent::resized()
     btnAdd->setBounds (0 + (getWidth() - 0) - 16 - 70, 40 + (getHeight() - 44) - 10 - 24, 70, 24);
     btnDelete->setBounds (0 + (getWidth() - 0) - 92 - 70, 40 + (getHeight() - 44) - 10 - 24, 70, 24);
     btnInfo->setBounds (0 + 16, 40 + (getHeight() - 44) - 10 - 24, 23, 24);
-    buttonShowOscLog->setBounds (getWidth() - 9 - 150, 10, 150, 24);
+    buttonShowOscLog->setBounds (getWidth() - 9 - 120, 10, 120, 24);
+    toggleHideWarnings->setBounds (getWidth() - 130 - 120, 10, 120, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -201,6 +208,13 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_buttonShowOscLog] -- add your button handler code here..
         pOscLogManager->show(pStatusMessageHandler, this);
         //[/UserButtonCode_buttonShowOscLog]
+    }
+    else if (buttonThatWasClicked == toggleHideWarnings.get())
+    {
+        //[UserButtonCode_toggleHideWarnings] -- add your button handler code here..
+        pSettings->hideWarnings = toggleHideWarnings->getToggleState();
+        sendChangeMessage();
+        //[/UserButtonCode_toggleHideWarnings]
     }
 
     //[UserbuttonClicked_Post]
@@ -264,13 +278,13 @@ BEGIN_JUCER_METADATA
                 posRelativeY="64cdd18a28c39177" buttonText="Receive OSC" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="121 10 49 24" posRelativeX="64cdd18a28c39177"
+         virtualName="" explicitFocusOrder="0" pos="120 10 42 24" posRelativeX="64cdd18a28c39177"
          posRelativeY="64cdd18a28c39177" edTextCol="ff000000" edBkgCol="0"
          labelText="Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="34"/>
   <SLIDER name="sliderReceiveOscPort" id="591bcc850e858bff" memberName="sliderReceiveOscPort"
-          virtualName="" explicitFocusOrder="0" pos="177 10 100 24" posRelativeX="64cdd18a28c39177"
+          virtualName="" explicitFocusOrder="0" pos="170 10 100 24" posRelativeX="64cdd18a28c39177"
           posRelativeY="64cdd18a28c39177" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
@@ -296,8 +310,11 @@ BEGIN_JUCER_METADATA
                opacityOver="0.4000000059604645" colourOver="6eee1010" resourceDown="help_png"
                opacityDown="1.0" colourDown="c0ee1010"/>
   <TEXTBUTTON name="buttonShowOscLog" id="680b48d522ce99b2" memberName="buttonShowOscLog"
-              virtualName="" explicitFocusOrder="0" pos="9Rr 10 150 24" buttonText="Show OSC Log"
+              virtualName="" explicitFocusOrder="0" pos="9Rr 10 120 24" buttonText="Show OSC Log"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <TOGGLEBUTTON name="toggleHideWarnings" id="a5f38067a572b96c" memberName="toggleHideWarnings"
+                virtualName="" explicitFocusOrder="0" pos="130Rr 10 120 24" buttonText="hide warnings"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
