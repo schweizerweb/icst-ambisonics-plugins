@@ -25,6 +25,7 @@
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
+#include "../../Common/ColorDefinition.h"
 #include "FilterSettingsComponent.h"
 #include "CsvImportExport.h"
 #include "ScalingComponent.h"
@@ -685,15 +686,16 @@ void SpeakerSettingsComponent::paintRowBackground(Graphics& g, int rowNumber, in
 {
 	if (rowIsSelected)
     {
+        Colour baseColor = COLOR_DEFINITION_SELECTED_ROW;
         if (pPointSelection->getMainSelectedPointIndex() == rowNumber)
-            g.fillAll(Colours::lightblue.withAlpha(0.8f));
+            g.fillAll(baseColor);
         else
-            g.fillAll(Colours::lightblue.withAlpha(0.3f));
+            g.fillAll(baseColor.withAlpha(0.4f));
     }
     else if (rowNumber % 2)
     {
         const Colour alternateColour(getLookAndFeel().findColour(ListBox::backgroundColourId)
-            .interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+            .interpolatedWith(getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
 
         g.fillAll(alternateColour);
     }

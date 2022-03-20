@@ -201,6 +201,8 @@
       <FILE id="UZ8YsX" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
       <FILE id="mW2oB3" name="CheckBoxCustomComponent.h" compile="0" resource="0"
             file="../Common/CheckBoxCustomComponent.h"/>
+      <FILE id="UuTbsf" name="ColorDefinition.h" compile="0" resource="0"
+            file="../Common/ColorDefinition.h"/>
       <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"
             file="../Common/ColorEditorCustomComponent.h"/>
       <FILE id="XOuO2j" name="ColorSelectionComponent.h" compile="0" resource="0"
