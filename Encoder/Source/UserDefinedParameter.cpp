@@ -57,7 +57,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, ParameterType 
             break;
             
         case ConstString:
-            constString = originalString.fromFirstOccurrenceOf(",", false, true);
+            constString = originalString.fromFirstOccurrenceOf(",", false, true).upToLastOccurrenceOf("}", false, true).trimCharactersAtStart(" ");
             break;
             
         case Expression:
