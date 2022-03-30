@@ -23,13 +23,12 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         // java script mode
         javaScriptMode = true;
         oscPath = pInput->oscString;
-        String matchString = oscPath.replace("{}", "*");
-        patternToMatch.reset(new OSCAddressPattern(matchString));
+        patternToMatch.reset(new OSCAddressPattern(oscPath));
         jsExpression = pInput->commandString;
         jsEngine.reset(new JavascriptEngine());
         jsEngine->maximumExecutionTime = RelativeTime::seconds (5);
         jsContext = new JsContext (this);
-        jsEngine->registerNativeObject ("p", jsContext);
+        jsEngine->registerNativeObject ("s", jsContext);
         
         isValid = true;
         return;
@@ -88,7 +87,32 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     if(javaScriptMode)
     {
         jsContext->jsAmbiSourceSet = pSources;
-        //jsContext->jsPointIndex = index;
+        
+        // address path elements
+        jsContext->jsPathElements.clear();
+        jsContext->jsArguments.clear();
+        String address = pMessage->getAddressPattern().toString();
+        StringArray tokens;
+        tokens.addTokens (address, "/", "\"");
+        tokens.removeEmptyStrings();
+        for(auto& t : tokens)
+        {
+            if(t.containsOnly("0123456789"))
+                jsContext->jsPathElements.add(t.getIntValue());
+            else if(t.containsOnly("0123456789."))
+                jsContext->jsPathElements.add(t.getFloatValue());
+            else
+                jsContext->jsPathElements.add(t);
+        }
+        for(auto& a : *pMessage)
+        {
+            if(a.isInt32())
+                jsContext->jsArguments.add(a.getInt32());
+            else if(a.isFloat32())
+                jsContext->jsArguments.add(a.getFloat32());
+            else
+                jsContext->jsArguments.add(a.getString());
+        }
         
         auto ret = jsEngine->execute(jsExpression);
         if(ret.failed())

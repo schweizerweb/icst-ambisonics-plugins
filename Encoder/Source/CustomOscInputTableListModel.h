@@ -155,8 +155,7 @@ public:
 		tableListBox->setModel(this);
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
 		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 450);
-        // TODO: add javascript column
-        // tableListBox->getHeader().addColumn("OSC-Command", COLUMN_ID_COMMAND, 150);
+        tableListBox->getHeader().addColumn("OSC-Command", COLUMN_ID_COMMAND, 150);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
