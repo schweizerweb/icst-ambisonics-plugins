@@ -16,14 +16,278 @@ CustomOscBase::CustomOscBase(ScalingInfo* pScaling) : pScalingInfo(pScaling)
     
 }
 
-bool CustomOscBase::setOscPath(String path)
+bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
 {
-    oscPath = path.upToFirstOccurrenceOf(" ", false, false);
+    int index;
+
+    parametersInPath.clear();
+    realParameters.clear();
+    oscPath = "";
     
-    std::string oscPathString = oscPath.toStdString();
-    std::string parameterString = path.substring(oscPath.length()).toStdString();
+    //oscPath = path.upToFirstOccurrenceOf(" ", false, false);
+    if(!path.startsWith("/"))
+    {
+        *pErrorMessage = "Invalid OSC address - missing / at the beginning";
+        return false;
+    }
     
-    return analyzeString(oscPathString, &parametersInPath) && analyzeString(parameterString, &realParameters);
+    index = 0;
+    while(index < path.length())
+    {
+        // termination
+        if(path[index] == ' ')
+            break;
+        
+        if(path[index] == '{')
+        {
+            UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
+            if(param != nullptr)
+            {
+                parametersInPath.add(param);
+                oscPath += param->getOriginalString();
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            oscPath += path[index];
+        }
+        
+        index++;
+    }
+    
+    // arguments
+    while(index < path.length())
+    {
+        if(path[index] == ' ')
+            index++;
+        else if(path[index] == '{')
+        {
+            UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
+            if(param != nullptr)
+            {
+                realParameters.add(param);
+                index++;
+            }
+            else
+            {
+                return false;
+            }
+        }
+        else
+        {
+            *pErrorMessage = "Invalid character " + String(path[index]) + " at position " + String(index);
+            return false;
+        }
+    }
+    
+    //std::string oscPathString = oscPath.toStdString();
+    //std::string parameterString = path.substring(oscPath.length()).toStdString();
+    
+    // return analyzeString(oscPathString, &parametersInPath) && analyzeString(parameterString, &realParameters);
+    
+    return true;
+}
+
+UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* pIndex, String* pErrorMessage)
+{
+    String fullString;
+    String commandString;
+    String paramString;
+    
+    if(fullPath[*pIndex] != '{')
+    {
+        *pErrorMessage = "Programm error, parameter should start with '{'";
+        return nullptr;
+    }
+    
+    fullString = "{";
+    
+    while(++(*pIndex) < fullPath.length())
+    {
+        fullString += fullPath[*pIndex];
+        
+        // ignore whitespace
+        if(fullPath[*pIndex] == ' ')
+            continue;
+    
+        // comma delimiter to separate command and user parameters
+        if(fullPath[*pIndex] == ',')
+            break;
+        
+        // end of parameter (command only)
+        if(fullPath[*pIndex] == '}')
+            break;
+        
+        commandString += fullPath[*pIndex];
+    }
+    
+    if(*pIndex >= fullPath.length())
+    {
+        *pErrorMessage = "Closing '}' missing";
+        return nullptr;
+    }
+    else if(fullPath[*pIndex] == '}')
+    {
+        // means, it's a single command without params
+        commandString = commandString.toLowerCase();
+        if(commandString == "a")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::A);
+        else if(commandString == "e")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::E);
+        else if(commandString == "d")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::D);
+        else if(commandString == "x")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::X);
+        else if(commandString == "y")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Y);
+        else if(commandString == "z")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Z);
+        else if(commandString == "i")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Index);
+        else if(commandString == "n")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Name);
+        else if(commandString == "c")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Color);
+        else if(commandString == "g")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Gain);
+        else if(commandString == "sa")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledA);
+        else if(commandString == "se")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledE);
+        else if(commandString == "sd")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledD);
+        else if(commandString == "sx")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledX);
+        else if(commandString == "sy")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledY);
+        else if(commandString == "sz")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledZ);
+        else
+        {
+            *pErrorMessage = "Unknown command: " + commandString;
+            return nullptr;
+        }
+    }
+    else if(fullPath[*pIndex] == ',')
+    {
+        // rest is command params
+        int nestedBracketLevel = 0;
+        while(++(*pIndex) < fullPath.length())
+        {
+            fullString += fullPath[*pIndex];
+            paramString += fullPath[*pIndex];
+            
+            if(fullPath[*pIndex] == '{')
+                nestedBracketLevel++;
+            
+            if(fullPath[*pIndex] == '}')
+            {
+                if(nestedBracketLevel > 0)
+                    nestedBracketLevel--;
+                else
+                    break;
+            }
+        }
+        if(*pIndex >= fullPath.length())
+        {
+            *pErrorMessage = "Closing '}' missing";
+            return nullptr;
+        }
+        
+        // build parameter
+        if(commandString == "expr")
+        {
+            auto p = new UserDefinedParameter(fullString, UserDefinedParameter::Expression);
+            // TODO: try evaluate
+            return p;
+        }
+        else if(commandString == "ci")
+        {
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ConstInt);
+        }
+        else if(commandString == "cf")
+        {
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ConstFloat);
+        }
+        else if(commandString == "cs")
+        {
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ConstString);
+        }
+        else if(commandString.matchesWildcard("s?", true))
+        {
+            std::regex rTwoValues("s([xyzaed])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+            std::regex rThreeValues("s([xyze])[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)[ ]*,[ ]*([-+]?[0-9]*\\.?[0-9]+|[0-9]+)");
+            std::smatch sm;
+            std::string userString = commandString.toStdString() + "," + paramString.toStdString();
+            if(regex_search(userString, sm, rThreeValues))
+            {
+                double lo = std::stod(sm[2]);
+                double zero = std::stod(sm[3]);
+                double hi = std::stod(sm[4]);
+                if(lo == hi && lo == zero)
+                {
+                    *pErrorMessage = "Invalid arguments for command " + commandString;
+                    return nullptr;
+                }
+                        
+                return new UserDefinedParameter(fullString, sm[1].str(), lo, hi, zero);
+            }
+            else if(regex_search(userString, sm, rTwoValues))
+            {
+                double lo = std::stod(sm[2]);
+                double hi = std::stod(sm[3]);
+                if(lo == hi)
+                {
+                    *pErrorMessage = "Invalid arguments for command " + commandString;
+                    return nullptr;
+                }
+                    
+                return new UserDefinedParameter(fullString, sm[1].str(), lo, hi);
+            }
+            else
+            {
+                *pErrorMessage = "Invalid number of arguments for command " + commandString;
+                return nullptr;
+            }
+            /*
+            if(paramString.matchesWildcard("*,*,*", true))
+            {
+                String first = paramString
+                    .upToFirstOccurrenceOf(",", false, true)
+                    .trimCharactersAtStart(" ")
+                    .trimCharactersAtEnd(" ");
+                String second = paramString
+                    .fromFirstOccurrenceOf(",", false, true)
+                    .upToFirstOccurrenceOf(",", false, true)
+                    .trimCharactersAtStart(" ")
+                    .trimCharactersAtEnd(" ");
+                String third = paramString
+            }
+            else if(paramString.matchesWildcard("*,*", true))
+            {
+                
+            }
+            else
+            {
+                *pErrorMessage = "Wrong number of arguments for command " + commandString;
+                return errorParam;
+            }
+             */
+        }
+        else
+        {
+            *pErrorMessage = "Unknown command with parameters: " + commandString;
+            return nullptr;
+        }
+    }
+    
+    
+    *pErrorMessage = "Program error: unhandled error in custom OSC target";
+    return nullptr;
 }
 
 bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefinedParameter> *pArray)

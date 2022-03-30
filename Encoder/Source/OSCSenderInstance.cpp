@@ -47,15 +47,15 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     
     for (auto& parameter : parametersInPath)
     {
-        auto original = parameter.getOriginalString();
-        auto replace = parameter.getString(pt, scaler, index);
+        auto original = parameter->getOriginalString();
+        auto replace = parameter->getString(pt, scaler, index);
         path = path.replace(original, replace);
     }
 
     OSCMessage message = OSCMessage(OSCAddressPattern(path));
     for (auto& parameter : realParameters)
     {
-        message.addArgument(parameter.getOSCArgument(pt, scaler, index));
+        message.addArgument(parameter->getOSCArgument(pt, scaler, index));
     }
 
     sender->send(message);

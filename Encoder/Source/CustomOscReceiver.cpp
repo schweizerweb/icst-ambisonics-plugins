@@ -12,28 +12,50 @@
 
 CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScaling) : CustomOscBase(pScaling)
 {
-    setOscPath(pInput->oscString);
-    String matchString = getOscPath().replace("{i}", "*").replace("{n}", "*");
-    patternToMatch.reset(new OSCAddressPattern(matchString));
-    
     hasIndex = false;
     hasName = false;
     xyzMode = false;
-    isValid = true;
+    javaScriptMode = false;
+    isValid = false;
+    
+    if(!pInput->commandString.isEmpty())
+    {
+        // java script mode
+        javaScriptMode = true;
+        oscPath = pInput->oscString;
+        String matchString = oscPath.replace("{}", "*");
+        patternToMatch.reset(new OSCAddressPattern(matchString));
+        jsExpression = pInput->commandString;
+        jsEngine.reset(new JavascriptEngine());
+        jsEngine->maximumExecutionTime = RelativeTime::seconds (5);
+        jsContext = new JsContext (this);
+        jsEngine->registerNativeObject ("p", jsContext);
+        
+        isValid = true;
+        return;
+    }
+    
+    bool ok = setOscPath(pInput->oscString, &errorMessage);
+    if(!ok)
+    {
+        errorMessage = "Error setting OSC path";
+        return;
+    }
+    
+    String matchString = getOscPath().replace("{i}", "*").replace("{n}", "*");
+    patternToMatch.reset(new OSCAddressPattern(matchString));
     
     for(auto& p : parametersInPath)
     {
-        if(p.getType() == UserDefinedParameter::ParameterType::Index)
+        if(p->getType() == UserDefinedParameter::ParameterType::Index)
             hasIndex = true;
-        else if(p.getType() == UserDefinedParameter::ParameterType::Name)
+        else if(p->getType() == UserDefinedParameter::ParameterType::Name)
             hasName = true;
-        else
-            isValid = false;
     }
     
     for(auto& p : realParameters)
     {
-        UserDefinedParameter::ParameterType t = p.getType();
+        UserDefinedParameter::ParameterType t = p->getType();
         if(t == UserDefinedParameter::ParameterType::Index)
             hasIndex = true;
         else if(t == UserDefinedParameter::ParameterType::Name)
@@ -44,7 +66,13 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
             xyzMode = true;
     }
     
-    isValid &= (hasIndex || hasName);
+    if(!hasIndex && !hasName)
+    {
+        errorMessage = "Either index or name is required in custom input pattern";
+        return;
+    }
+    
+    isValid = true;;
 }
 
 bool CustomOscReceiver::matchesPattern(OSCAddress* pAddress)
@@ -56,6 +84,24 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
 {
     if(!isValid)
         return false;
+    
+    if(javaScriptMode)
+    {
+        jsContext->jsAmbiSourceSet = pSources;
+        //jsContext->jsPointIndex = index;
+        
+        auto ret = jsEngine->execute(jsExpression);
+        if(ret.failed())
+        {
+            String message = ret.getErrorMessage();
+            return false;
+        }
+        else
+        {
+            // success
+        }
+        return true;
+    }
     
     // check for enough parameters
     if(pMessage->size() < realParameters.size())
@@ -76,14 +122,14 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     
     for(auto& p : parametersInPath)
     {
-        int i = oscPath.indexOf(p.getOriginalString());
+        int i = oscPath.indexOf(p->getOriginalString());
         String interestingPart = pMessage->getAddressPattern().toString().substring(i);
         
-        if(p.getType() == UserDefinedParameter::ParameterType::Index)
+        if(p->getType() == UserDefinedParameter::ParameterType::Index)
         {
             index = std::stoi(interestingPart.toStdString());
         }
-        else if(p.getType() == UserDefinedParameter::ParameterType::Name)
+        else if(p->getType() == UserDefinedParameter::ParameterType::Name)
         {
             name = interestingPart.upToFirstOccurrenceOf("/", false, true);
         }
@@ -92,72 +138,72 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     for(int i = 0; i < realParameters.size(); i++)
     {
         auto oscParam = (*pMessage)[i];
-        auto& param = realParameters.getReference(i);
-        switch(param.getType())
+        auto param = realParameters.getUnchecked(i);
+        switch(param->getType())
         {
             case UserDefinedParameter::ParameterType::Index:
-                if(!param.getValueFromOsc(&index, &oscParam))
+                if(!param->getValueFromOsc(&index, &oscParam))
                     return false;
                 break;
             case UserDefinedParameter::ParameterType::Name:
-                if(!param.getValueFromOsc(&name, &oscParam))
+                if(!param->getValueFromOsc(&name, &oscParam))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::Color:
-                if(!param.getValueFromOsc(&color, &oscParam))
+                if(!param->getValueFromOsc(&color, &oscParam))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::X:
             case UserDefinedParameter::ParameterType::ScaledX:
             case UserDefinedParameter::ParameterType::DualScaledX:
-                if(!param.getValueFromOsc(&x, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&x, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::Y:
             case UserDefinedParameter::ParameterType::ScaledY:
             case UserDefinedParameter::ParameterType::DualScaledY:
-                if(!param.getValueFromOsc(&y, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&y, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::Z:
             case UserDefinedParameter::ParameterType::ScaledZ:
             case UserDefinedParameter::ParameterType::DualScaledZ:
-                if(!param.getValueFromOsc(&z, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&z, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::A:
             case UserDefinedParameter::ParameterType::ScaledA:
-                if(!param.getValueFromOsc(&a, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&a, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::E:
             case UserDefinedParameter::ParameterType::ScaledE:
             case UserDefinedParameter::ParameterType::DualScaledE:
-                if(!param.getValueFromOsc(&e, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&e, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
                 
             case UserDefinedParameter::ParameterType::D:
             case UserDefinedParameter::ParameterType::ScaledD:
-                if(!param.getValueFromOsc(&d, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&d, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
          
             case UserDefinedParameter::ParameterType::Gain:
-                if(!param.getValueFromOsc(&gain, &oscParam, pScalingInfo->GetScaler()))
+                if(!param->getValueFromOsc(&gain, &oscParam, pScalingInfo->GetScaler()))
                     return false;
                 break;
             
             case UserDefinedParameter::ParameterType::ConstInt:
             case UserDefinedParameter::ParameterType::ConstFloat:
             case UserDefinedParameter::ParameterType::ConstString:
-                if(!param.checkConst(&oscParam))
+                if(!param->checkConst(&oscParam))
                     return false;
                 break;
             

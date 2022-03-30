@@ -18,14 +18,15 @@ class CustomOscBase
 public:
     CustomOscBase(ScalingInfo* pScaling);
     
-    bool setOscPath(String path);
+    bool setOscPath(String path, String* pErrorMessage);
     String getOscPath();
 
 protected:
     bool analyzeString(std::string parameterString, Array<UserDefinedParameter>* pArray);
+    UserDefinedParameter* analyzeEscapedString(String fullPath, int* pIndex, String* pErrorMessage);
     float dualMap(double value, double maxValue, UserDefinedParameter* pParam);
     String oscPath;
-    Array<UserDefinedParameter> parametersInPath;
-    Array<UserDefinedParameter> realParameters;
+    OwnedArray<UserDefinedParameter> parametersInPath;
+    OwnedArray<UserDefinedParameter> realParameters;
     ScalingInfo* pScalingInfo;
 };

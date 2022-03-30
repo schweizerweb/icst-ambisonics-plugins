@@ -117,6 +117,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
         case Expression:
         {
             jsContext->jsAmbiPoint = pt;
+            jsContext->jsPointIndex = index;
             
             auto ret = jsEngine->evaluate(jsExpression);
             if(ret.isUndefined())
@@ -168,7 +169,20 @@ String UserDefinedParameter::getString(AmbiPoint* pt, double scaler, int index)
         case ConstFloat: return String(constFloat);
         case ConstString: return constString;
         case Ignore: return "";
+        case Expression:
+        {
+            jsContext->jsAmbiPoint = pt;
+            jsContext->jsPointIndex = index;
             
+            Result errorMessage(Result::ok());
+            auto ret = jsEngine->evaluate(jsExpression, &errorMessage);
+            if(ret.isUndefined())
+                return "error";
+            else
+            {
+                return ret.toString();
+            }
+        }
         default: return "error";
     }
 }

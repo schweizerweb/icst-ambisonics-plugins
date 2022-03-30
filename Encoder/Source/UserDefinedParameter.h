@@ -45,6 +45,7 @@
                     setMethod ("gain", gain);
                     setMethod ("name", name);
                     setMethod ("color", color);
+                    setMethod ("i", i);
                 }
         
                 static Identifier getClassName()    { return "p"; }
@@ -121,10 +122,19 @@
                     return var::undefined();
                 }
                   
+                static var i (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsPointIndex + 1; // 0-based to 1-based
+                
+                    return var::undefined();
+                }
+                  
                 
                 UserDefinedParameter* owner;
                 AmbiPoint* jsAmbiPoint;
-        
+                int jsPointIndex;
+                
                 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JsContext)
             };
         
