@@ -197,8 +197,8 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnInfo.get())
     {
         //[UserButtonCode_btnInfo] -- add your button handler code here..
-        auto label = std::make_unique<Label>("", String(COMMON_OSC_INFO_STRING) + String("\nNote: constant values have to match, otherwise entire message is ignored.\n\n{} = Ignore this argument"));
-        label->setSize(370, 400);
+        auto label = std::make_unique<Label>("", String(COMMON_OSC_INFO_STRING) + String("\nNote: constant values have to match, otherwise entire message is ignored.\n\n{} = Ignore this argument\n\nIf 'OSC Command' is not empty, JavaScript mode is used:\n- 'OSC Message' defines the pattern to match incoming messages\n- 'OSC Command' defines the JavaScript code to be executed\n\nExample:\nMessage: /path/to/source/*/xy\nCommand: s.setXYZ(s.path(4), s.arg(1), s.arg(2))"));
+        label->setSize(420, 520);
         label->setJustificationType(Justification::left);
         CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]
