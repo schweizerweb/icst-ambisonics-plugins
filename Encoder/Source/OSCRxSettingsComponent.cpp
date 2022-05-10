@@ -190,7 +190,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_btnDelete] -- add your button handler code here..
         int row = customOscTableModel->getCustomIndex(customOscList->getSelectedRow());
         if (row >= 0 && row < pSettings->customOscInput.size())
-            pSettings->customOscTargets.remove(row);
+            pSettings->customOscInput.remove(row);
         customOscList->updateContent();
         //[/UserButtonCode_btnDelete]
     }
