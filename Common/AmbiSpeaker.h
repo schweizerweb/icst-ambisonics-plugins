@@ -31,6 +31,9 @@ public:
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
 
+    bool allowMute() const override { return true; }
+    bool allowSolo() const override { return false; }
+    
 private:
 	FilterBankInfo filterInfo;
     bool filterBypass;

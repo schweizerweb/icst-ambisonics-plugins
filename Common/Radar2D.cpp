@@ -468,7 +468,9 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	bool keyHandled = false;
 	double dx = 0.0, dy = 0.0, dz = 0.0;
 
-    if (key.getModifiers().isCtrlDown() && key.getModifiers().isShiftDown())
+    if(pPointSelection->getSelectionMode() == PointSelection::Point
+       && key.getModifiers().isCtrlDown()
+       && key.getModifiers().isShiftDown())
     {
         if(key.isKeyCode(77)) // 'm'
         {

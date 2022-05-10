@@ -27,6 +27,9 @@ public:
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
 
+    bool allowMute() const override { return true; }
+    bool allowSolo() const override { return true; }
+    
 private:
 	float rms;
 };
