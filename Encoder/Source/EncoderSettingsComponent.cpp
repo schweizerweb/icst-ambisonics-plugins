@@ -39,8 +39,8 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     tabbedComponent->setTabBarDepth (35);
     tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings, pDistanceEncodingPresetHelper), true);
     tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pZoomSettings), true);
-    tabbedComponent->addTab (TRANS("OSC"), juce::Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings), true);
-    tabbedComponent->addTab (TRANS("OSC RX"), juce::Colours::lightgrey, new OSCRxSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler, pOscLogManager), true);
+    tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler, pOscLogManager), true);
+    tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings), true);
     tabbedComponent->setCurrentTabIndex (0);
 
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
