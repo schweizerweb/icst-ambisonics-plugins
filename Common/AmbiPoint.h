@@ -21,6 +21,7 @@
 #define XML_ATTRIBUTE_POINT_COLOR_OLD "Color"
 #define XML_ATTRIBUTE_POINT_COLOR_NEW "ColorCode"
 #define XML_ATTRIBUTE_POINT_GAIN "Gain"
+#define XML_ATTRIBUTE_POINT_MUTE "Mute"
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
 
@@ -29,7 +30,7 @@ class AmbiPoint
 protected:
 	AmbiPoint(AmbiPoint* other, bool copyImage = false);
 	AmbiPoint();
-	AmbiPoint(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
+	AmbiPoint(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0, bool mute = false, bool solo = false);
     AmbiPoint(XmlElement* element);
 	AmbiPoint(XmlElement* element, AudioParameterSet audioParams);
     AmbiPoint(AudioParameterSet audioParams);
@@ -48,6 +49,12 @@ public:
     double getGain() const;
 	void setGain(double newGain, bool notify);
 	
+    bool getMute() const;
+    void setMute(bool newMute, bool notify);
+    
+    bool getSolo() const;
+    void setSolo(bool newSolo);
+    
     String getId();
 	void resetId();
 	
@@ -71,6 +78,8 @@ private:
 	Colour color;
 	String name;
 	double gain;
+    bool mute;
+    bool solo;
 	int64 lastUpdate = 0;
 	Image labelImage;
     AudioParameterSet audioParams;

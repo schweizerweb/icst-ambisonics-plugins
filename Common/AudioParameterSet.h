@@ -10,6 +10,7 @@
 
 #pragma once
 #include "AudioParameterFloatAmbiAbs.h"
+#include "AudioParameterBoolAmbiAbs.h"
 #include "ScalingInfo.h"
 
 class AudioParameterSet
@@ -19,6 +20,8 @@ public:
 	AudioParameterFloatAmbiAbs* pY = nullptr;
 	AudioParameterFloatAmbiAbs* pZ = nullptr;
     AudioParameterFloatAmbiAbs* pGain = nullptr;
+    AudioParameterBoolAmbiAbs* pMute = nullptr;
+    
     ScalingInfo* pScaling = nullptr;    // make sure to set this pointer to the scaling info of the plugin instance!
     
 	double notifyX(double x) const
@@ -72,6 +75,11 @@ public:
     void notifyGain(double gain)
     {
         if (pGain != nullptr) { pGain->setUnscaledValue((float)Decibels::gainToDecibels(gain)); }
+    }
+    
+    void notifyMute(bool mute)
+    {
+        if (pMute != nullptr) { pMute->setUnscaledValue((float)mute); }
     }
     
     void setEnabled(bool enable)

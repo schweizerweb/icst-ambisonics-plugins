@@ -38,7 +38,9 @@ public:
 	void loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams);
 	void writeToXmlElement(XmlElement* xml) const;
     void resetIds();
-
+    
+    bool anySolo() const;
+    
 private:
 	OwnedArray<AmbiSource> elements;
 	OwnedArray<AmbiSource> removedElements;
