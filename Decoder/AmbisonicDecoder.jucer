@@ -45,8 +45,8 @@
             resource="0" file="Source/SingleFilterSettingsComponent.cpp"/>
       <FILE id="LYnxJP" name="SingleFilterSettingsComponent.h" compile="0"
             resource="0" file="Source/SingleFilterSettingsComponent.h"/>
-      <FILE id="vFgvO3" name="CheckBoxCustomComponent.h" compile="0" resource="0"
-            file="Source/CheckBoxCustomComponent.h"/>
+      <FILE id="vFgvO3" name="CheckBoxFilterCustomComponent.h" compile="0"
+            resource="0" file="Source/CheckBoxFilterCustomComponent.h"/>
       <FILE id="xF0pSM" name="SpeakerSettingsDialog.h" compile="0" resource="0"
             file="Source/SpeakerSettingsDialog.h"/>
       <FILE id="yP0JFj" name="DecoderSettings.cpp" compile="1" resource="0"
@@ -116,6 +116,8 @@
       <FILE id="EzUhBa" name="AmbiSpeakerSet.h" compile="0" resource="0"
             file="../Common/AmbiSpeakerSet.h"/>
       <FILE id="rEXoft" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
+      <FILE id="rRezuX" name="CheckBoxCustomComponent.h" compile="0" resource="0"
+            file="../Common/CheckBoxCustomComponent.h"/>
       <FILE id="EcBciD" name="ColorDefinition.h" compile="0" resource="0"
             file="../Common/ColorDefinition.h"/>
       <FILE id="RAo2Ku" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>

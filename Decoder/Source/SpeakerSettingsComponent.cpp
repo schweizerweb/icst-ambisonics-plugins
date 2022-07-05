@@ -19,9 +19,10 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/EditableTextCustomComponent.h"
-#include "CheckBoxCustomComponent.h"
+#include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
+#include "CheckBoxFilterCustomComponent.h"
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
@@ -272,7 +273,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 30);
-    speakerList->getHeader().addColumn("Mute", COLUMN_ID_MUTE, 40);
+    speakerList->getHeader().addColumn("Mute", COLUMN_ID_MUTE, 30);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
     speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
@@ -768,7 +769,16 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 		textLabel->setRowAndColumn(rowNumber, columnId);
 		return textLabel;
 	}
-    else if(columnId == COLUMN_ID_FILTER || columnId == COLUMN_ID_MUTE)
+    else if(columnId == COLUMN_ID_FILTER)
+    {
+        CheckBoxFilterCustomComponent* checkBox = static_cast<CheckBoxFilterCustomComponent*> (existingComponentToUpdate);
+        if(checkBox == nullptr)
+            checkBox = new CheckBoxFilterCustomComponent(*this);
+
+        checkBox->setRowAndColumn(rowNumber, columnId);
+        return checkBox;
+    }
+    else if(columnId == COLUMN_ID_MUTE)
     {
         CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
         if(checkBox == nullptr)
@@ -823,6 +833,8 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
+    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, newValue == 1); break;
+            
         default: return; // do nothing
 	}
 
@@ -846,6 +858,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
 	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
+        case COLUMN_ID_MUTE: return pt->getMute() ? 1 : 0;
         default: return 0.0;
 	}
 }
@@ -857,9 +870,6 @@ void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValu
     case COLUMN_ID_FILTER:
         pSpeakerSet->setFilterBypass(rowNumber, !newValue);
     	break;
-    case COLUMN_ID_MUTE:
-        pSpeakerSet->setMute(rowNumber, newValue == 1);
-        break;
             
     default: throw;
     }
@@ -877,7 +887,6 @@ bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
     switch (columnId)
     {
     case COLUMN_ID_FILTER: return !pt->getFilterBypass();
-    case COLUMN_ID_MUTE: return pt->getMute();
     default: return false;
     }
 }

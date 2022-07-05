@@ -14,10 +14,10 @@
 #define MIN_FREQUENCY_THUMBNAIL    20
 #define FREQUENCY_STEP_THUMBNAIL 1.1
 
-class CheckBoxCustomComponent : public Component, private  ToggleButton::Listener
+class CheckBoxFilterCustomComponent : public Component, private  ToggleButton::Listener
 {
 public:
-	CheckBoxCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	CheckBoxFilterCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
         addAndMakeVisible(toggle);
         toggle.addListener(this);
@@ -44,7 +44,7 @@ public:
         graphArea.reset(new Rectangle<int>(0, 0, 150, 40));
 	}
 
-    ~CheckBoxCustomComponent()
+    ~CheckBoxFilterCustomComponent()
 	{
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
         {
