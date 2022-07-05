@@ -212,9 +212,15 @@
       <FILE id="n9fEOI" name="DawParameter.h" compile="0" resource="0" file="../Common/DawParameter.h"/>
       <FILE id="Fo1nOJ" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
       <FILE id="vLva8d" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
+      <FILE id="fcJwqo" name="EditableCodeCustomComponent.h" compile="0"
+            resource="0" file="../Common/EditableCodeCustomComponent.h"/>
       <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
+            file="../Common/JsEditorComponent.cpp"/>
+      <FILE id="fu4V4a" name="JsEditorComponent.h" compile="0" resource="0"
+            file="../Common/JsEditorComponent.h"/>
       <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>

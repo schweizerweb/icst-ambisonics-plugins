@@ -23,7 +23,15 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         // java script mode
         javaScriptMode = true;
         oscPath = pInput->oscString;
-        patternToMatch.reset(new OSCAddressPattern(oscPath));
+        try
+        {
+            patternToMatch.reset(new OSCAddressPattern(oscPath));
+        }
+        catch(OSCException e)
+        {
+            errorMessage = "Invalid OSC path";
+            return;
+        }
         jsExpression = pInput->commandString;
         jsEngine.reset(new JavascriptEngine());
         jsEngine->maximumExecutionTime = RelativeTime::seconds (5);
@@ -42,7 +50,15 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     }
     
     String matchString = getOscPath().replace("{i}", "*").replace("{n}", "*");
-    patternToMatch.reset(new OSCAddressPattern(matchString));
+    try
+    {
+        patternToMatch.reset(new OSCAddressPattern(matchString));
+    }
+    catch (OSCException e)
+    {
+        errorMessage = "Invalid OSC path";
+        return;
+    }
     
     for(auto& p : parametersInPath)
     {
@@ -71,7 +87,12 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         return;
     }
     
-    isValid = true;;
+    isValid = true;
+}
+
+String CustomOscReceiver::getErrorMessage()
+{
+    return errorMessage;
 }
 
 bool CustomOscReceiver::matchesPattern(OSCAddress* pAddress)
@@ -81,6 +102,9 @@ bool CustomOscReceiver::matchesPattern(OSCAddress* pAddress)
 
 bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage* pMessage)
 {
+    // reset error message
+    errorMessage = "";
+    
     if(!isValid)
         return false;
     
@@ -118,6 +142,7 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
         if(ret.failed())
         {
             String message = ret.getErrorMessage();
+            errorMessage = message;
             return false;
         }
         else

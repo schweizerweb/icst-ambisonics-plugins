@@ -22,7 +22,17 @@ bool OSCHandlerEncoder::initSpecific()
     for(auto& c : *pCustomOscInput)
     {
         if(c->enabledFlag)
-            customOscReceivers.add(new CustomOscReceiver(c, pScalingInfo));
+        {
+            auto r = new CustomOscReceiver(c, pScalingInfo);
+            if(!r->getErrorMessage().isEmpty())
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "OSC error", "Error initializing custom OSC receiver (" + String(pCustomOscInput->indexOf(c)) + "): " + r->getErrorMessage());
+            }
+            else
+            {
+                customOscReceivers.add(r);
+            }
+        }
     }
     
     return true;
@@ -113,9 +123,20 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
         
             for(auto& r : customOscReceivers)
             {
-                if(r->matchesPattern(&address) && r->handleMessage(pAmbiPoints, &message)) {
-                    reportSuccess(&message);
+                if(r->matchesPattern(&address))
+                {
                     hasMatch = true;
+                    if(r->handleMessage(pAmbiPoints, &message))
+                    {
+                        reportSuccess(&message);
+                    }
+                    else
+                    {
+                        if(!r->getErrorMessage().isEmpty())
+                        {
+                            reportError(r->getErrorMessage(), &message);
+                        }
+                    }
                 }
             }
         }

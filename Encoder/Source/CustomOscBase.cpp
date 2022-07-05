@@ -24,7 +24,6 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
     realParameters.clear();
     oscPath = "";
     
-    //oscPath = path.upToFirstOccurrenceOf(" ", false, false);
     if(!path.startsWith("/"))
     {
         *pErrorMessage = "Invalid OSC address - missing / at the beginning";

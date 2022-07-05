@@ -13,6 +13,7 @@
 #include "EncoderSettings.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
+#include "../../Common/EditableCodeCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
 
@@ -58,8 +59,7 @@ public:
 
 	Component* refreshComponentForCell(int rowNumber, int columnId, bool /*isRowSelected*/, Component* existingComponentToUpdate) override
 	{
-		if (columnId == COLUMN_ID_PATH
-            || columnId == COLUMN_ID_COMMAND)
+		if (columnId == COLUMN_ID_PATH)
 		{
 			EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
 			if (textLabel == nullptr)
@@ -68,6 +68,15 @@ public:
 			textLabel->setRowAndColumn(rowNumber, columnId);
 			return textLabel;
 		}
+        else if (columnId == COLUMN_ID_COMMAND)
+        {
+            EditableCodeCustomComponent* textLabel = static_cast<EditableCodeCustomComponent*> (existingComponentToUpdate);
+            if (textLabel == nullptr)
+                textLabel = new EditableCodeCustomComponent(*this);
+
+            textLabel->setRowAndColumn(rowNumber, columnId);
+            return textLabel;
+        }
 		else if (columnId == COLUMN_ID_ENABLE)
 		{
 			CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
@@ -142,7 +151,11 @@ public:
         switch (columnId)
         {
             case COLUMN_ID_PATH: pSettings->customOscInput[rowNumber]->oscString = newText; break;
-            case COLUMN_ID_COMMAND: pSettings->customOscInput[rowNumber]->commandString = newText; break;
+            case COLUMN_ID_COMMAND:
+                pSettings->customOscInput[rowNumber]->commandString = newText;
+                getTable()->updateContent();
+                getTable()->repaint();
+                break;
             default: ;
         }
         
