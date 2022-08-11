@@ -20,14 +20,16 @@
 #define COLUMN_ID_ENABLE		201
 #define	COLUMN_ID_PATH			204
 #define COLUMN_ID_COMMAND       205
+#define COLUMN_ID_SAVE_AS_PRESET    206
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
+#define ACTION_MESSAGE_SAVE_PRESET "savepreset"
 
 
-class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster
+class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	CustomOscInputTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
 	{
 		addActionListener(pActionListener);
 	}
@@ -35,7 +37,13 @@ public:
 	~CustomOscInputTableListModel() override
 	{
 		removeAllActionListeners();
-	}
+    }
+    
+    void buttonClicked(juce::Button *b) override {
+        int rowIndex = b->getComponentID().getIntValue();
+        sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+    }
+    
 
 	int getNumRows() override {
 		return pSettings->customOscInput.size();
@@ -86,6 +94,22 @@ public:
 			checkBox->setRowAndColumn(rowNumber, columnId);
 			return checkBox;
 		}
+        else if (columnId == COLUMN_ID_SAVE_AS_PRESET)
+        {
+            ImageButton* btn = static_cast<ImageButton*>(existingComponentToUpdate);
+            if (btn == nullptr) {
+                btn = new ImageButton();
+                btn->setImages (false, true, true,
+                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                btn->setTooltip("Add to presets...");
+                btn->addListener(this);
+            }
+            
+            btn->setComponentID(String(rowNumber));
+            return btn;
+        }
 		
 		return nullptr;
 	}
@@ -168,7 +192,8 @@ public:
 		tableListBox->setModel(this);
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
 		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 450);
-        tableListBox->getHeader().addColumn("OSC-Command", COLUMN_ID_COMMAND, 150);
+        tableListBox->getHeader().addColumn("JS-Code", COLUMN_ID_COMMAND, 150);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -188,4 +213,6 @@ private:
 	EncoderSettings* pSettings;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
+    const char* save_png;
+    const int save_pngSize;
 };

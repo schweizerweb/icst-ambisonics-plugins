@@ -60,6 +60,8 @@
             file="Source/CustomOscReceiver.cpp"/>
       <FILE id="Emnrs2" name="CustomOscReceiver.h" compile="0" resource="0"
             file="Source/CustomOscReceiver.h"/>
+      <FILE id="yCCVbJ" name="CustomOscRxPresetHelper.h" compile="0" resource="0"
+            file="Source/CustomOscRxPresetHelper.h"/>
       <FILE id="CP1A8I" name="CustomOscTableListModel.h" compile="0" resource="0"
             file="Source/CustomOscTableListModel.h"/>
       <FILE id="KgMm41" name="CustomOscTarget.cpp" compile="1" resource="0"

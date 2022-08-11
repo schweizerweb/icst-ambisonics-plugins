@@ -17,6 +17,7 @@ class EditableCodeCustomComponent : public Label, public AsyncUpdater
 public:
 	EditableCodeCustomComponent(TableColumnCallback& td) : owner(td)
 	{
+        standardTextColour = findColour(Label::textColourId);
 		setEditable(false, true, false);
 	}
 
@@ -36,20 +37,36 @@ public:
 		row = newRow;
 		columnId = newColumn;
         String text = owner.getTableText(columnId, row);
-        if(text.contains(NewLine::getDefault()))
+        
+        // if code starts with a comment, show the comment only
+        if(text.startsWith("//"))
+        {
+            text = text.fromFirstOccurrenceOf("//", false, true).upToFirstOccurrenceOf(NewLine::getDefault(), false, true);
+
+            textColour = Colours::lightgreen;
+        }
+        // otherwise, if more than one code line, just show the number of code lines
+        else if(text.contains(NewLine::getDefault()))
         {
             int count = 0;
             int index = 0;
             while((index = text.indexOf(index+1, NewLine::getDefault())) != -1)
                 count++;
             text = String(count + 1) + " lines of code";
+            textColour = Colours::lightblue;
         }
+        else
+        {
+            textColour = standardTextColour;
+        }
+        
 		setText(text, dontSendNotification);
 	}
 
 private:
 	void paint(Graphics& g) override
 	{
+        setColour(Label::textColourId, textColour);
 		Label::paint(g);
     }
 	
@@ -83,6 +100,7 @@ private:
 	TableColumnCallback& owner;
 	int row, columnId;
 	Colour textColour;
+    Colour standardTextColour;
     String localCode;
     bool localCloseFlag;
 };

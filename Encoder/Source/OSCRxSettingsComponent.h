@@ -23,8 +23,10 @@
 #include <JuceHeader.h>
 #include "EncoderSettings.h"
 #include "CustomOscInputTableListModel.h"
+#include "CustomOscRxPresetHelper.h"
 #include "../../Common/StatusMessageHandler.h"
 #include "../../Common/OSCLogDialogManager.h"
+#include "../../Common/PresetManagerDialog.h"
 //[/Headers]
 
 
@@ -45,7 +47,7 @@ class OSCRxSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    OSCRxSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager);
+    OSCRxSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager);
     ~OSCRxSettingsComponent() override;
 
     //==============================================================================
@@ -60,6 +62,8 @@ public:
     // Binary resources:
     static const char* help_png;
     static const int help_pngSize;
+    static const char* save_png;
+    static const int save_pngSize;
 
 
 private:
@@ -70,7 +74,9 @@ private:
     EncoderSettings* pSettings;
     StatusMessageHandler* pStatusMessageHandler;
     OSCLogDialogManager* pOscLogManager;
+    CustomOscRxPresetHelper* pCustomOscRxPresetHelper;
     std::unique_ptr<CustomOscInputTableListModel> customOscTableModel;
+    PresetManagerDialog presetManagerDialog;
     //[/UserVariables]
 
     //==============================================================================
@@ -84,6 +90,7 @@ private:
     std::unique_ptr<juce::ImageButton> btnInfo;
     std::unique_ptr<juce::TextButton> buttonShowOscLog;
     std::unique_ptr<juce::ToggleButton> toggleHideWarnings;
+    std::unique_ptr<juce::TextButton> btnManagePresets;
 
 
     //==============================================================================

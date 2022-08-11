@@ -25,6 +25,7 @@
 #include "../../Common/AudioParams.h"
 #include "GroupAnimator.h"
 #include "../../Common/ScalingInfo.h"
+#include "CustomOscRxPresetHelper.h"
 
 //==============================================================================
 /**
@@ -80,6 +81,7 @@ public:
 	DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
     DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
+    CustomOscRxPresetHelper* getCustomOscRxPresetHelper();
     ScalingInfo* getScalingInfo();
 
 #if (!MULTI_ENCODER_MODE)
@@ -97,6 +99,7 @@ private:
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
+    std::unique_ptr<CustomOscRxPresetHelper> customOscRxPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
     AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];

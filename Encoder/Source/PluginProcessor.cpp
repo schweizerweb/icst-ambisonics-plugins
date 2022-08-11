@@ -43,6 +43,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     presetHelper->initialize();
 	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
 	distanceEncodingPresetHelper->initialize();
+    customOscRxPresetHelper.reset(new CustomOscRxPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/CustomOscRx"), this));
+    customOscRxPresetHelper->initialize();
 
 #if(!MULTI_ENCODER_MODE)
     // initialize mono encoder with one source
@@ -385,6 +387,11 @@ EncoderPresetHelper* AmbisonicEncoderAudioProcessor::getPresetHelper()
 DistanceEncodingPresetHelper* AmbisonicEncoderAudioProcessor::getDistanceEncodingPresetHelper()
 {
 	return distanceEncodingPresetHelper.get();
+}
+
+CustomOscRxPresetHelper* AmbisonicEncoderAudioProcessor::getCustomOscRxPresetHelper()
+{
+    return customOscRxPresetHelper.get();
 }
 
 ScalingInfo* AmbisonicEncoderAudioProcessor::getScalingInfo()
