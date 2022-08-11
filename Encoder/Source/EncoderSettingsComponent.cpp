@@ -132,9 +132,11 @@ BEGIN_JUCER_METADATA
          jucerComponentFile=""/>
     <TAB name="Radar" colour="ffd3d3d3" useJucerComp="0" contentClassName="RadarSettingsComponent"
          constructorParams="pChangeListener, pZoomSettings" jucerComponentFile=""/>
-    <TAB name="OSC" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCSettingsComponent"
-         constructorParams="pChangeListener, pSettings, pStatusMessageHandler, pOscLogManager"
+    <TAB name="OSC In" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCRxSettingsComponent"
+         constructorParams="pChangeListener, pSettings, pStatusMessageHandler, pCustomOscRxPresetHelper, pOscLogManager"
          jucerComponentFile=""/>
+    <TAB name="OSC Out" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCSettingsComponent"
+         constructorParams="pChangeListener, pSettings" jucerComponentFile=""/>
   </TABBEDCOMPONENT>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
          virtualName="" explicitFocusOrder="0" pos="10Rr 8 245 24" bkgCol="bded0d0d"
