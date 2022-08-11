@@ -303,7 +303,7 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
     }
     if(message.startsWith(String(ACTION_MESSAGE_SAVE_PRESET)))
     {
-        int index = message.fromFirstOccurrenceOf(String(ACTION_MESSAGE_SELECT_PRESET), false, true).getIntValue();
+        int index = message.getTrailingIntValue();
         
         if(index < 0 || index >= pSettings->customOscInput.size())
             return;
