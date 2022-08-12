@@ -9,8 +9,8 @@
 */
 
 #include "AudioParameterBoolAmbi.h"
-AudioParameterBoolAmbi::AudioParameterBoolAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)
-	: AudioParameterBoolAmbiAbs(idToUse, nameToUse, labelToUse, AudioProcessorParameter::genericParameter),
+AudioParameterBoolAmbi::AudioParameterBoolAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)
+	: AudioParameterBoolAmbiAbs(idToUse, versionToUse, nameToUse, labelToUse, AudioProcessorParameter::genericParameter),
 	type(paramType),
 	value(def),
 	defaultValue(def),

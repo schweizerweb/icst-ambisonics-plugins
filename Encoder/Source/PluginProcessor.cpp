@@ -83,11 +83,11 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
          
         AudioParameterSet set;
         set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::X);
-        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
-        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
-        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
-        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
+        set.pX = new AudioParameterFloatAmbi("X" + indexStr, 1, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::X);
+        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, 1, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
+        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, 1, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
+        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, 1, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
+        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, 1, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
          
         audioParams.sourceParams.add(set);
         addParameter(set.pX);
@@ -103,9 +103,9 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         
         AudioParameterSet set;
         set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GX);
-        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GY);
-        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GZ);
+        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, 1, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GX);
+        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, 1, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GY);
+        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, 1, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GZ);
         
         audioParams.groupParams.add(set);
         addParameter(set.pX);

@@ -190,8 +190,8 @@ public:
 	{
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
-		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
-		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 450);
+		tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLE, 20);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 420);
         tableListBox->getHeader().addColumn("JS-Code", COLUMN_ID_COMMAND, 150);
         tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
 		tableListBox->getHeader().setStretchToFitActive(true);

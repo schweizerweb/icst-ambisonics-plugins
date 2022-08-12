@@ -14,8 +14,8 @@
 class AudioParameterFloatAmbiAbs : public AudioProcessorParameterWithID
 {
 public:
-	AudioParameterFloatAmbiAbs(const String& parameterID, const String& name, const String& label, Category category)
-		: AudioProcessorParameterWithID(parameterID, name, AudioProcessorParameterWithIDAttributes().withLabel(label).withCategory(category))
+	AudioParameterFloatAmbiAbs(const String& parameterID, const int version, const String& name, const String& label, Category category)
+    : AudioProcessorParameterWithID(ParameterID { parameterID, version }, name, AudioProcessorParameterWithIDAttributes().withLabel(label).withCategory(category))
 	{
 	}
 
