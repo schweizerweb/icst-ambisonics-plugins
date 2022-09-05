@@ -16,21 +16,21 @@ void GroupAnimator::initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDa
     {
         String indexString = "G" + String(i+1) + " ";
         
-        animationSets[i].audioParameterAnimationToggle = new AudioParameterBool(indexString + "Animation Toggle", indexString + "Animation Toggle", false, AudioParameterBoolAttributes().withLabel("Turn On/Off Animation"));
+        animationSets[i].audioParameterAnimationToggle = new AudioParameterBool(indexString + "Animation Toggle", indexString + "Animation Toggle", false, "Turn On/Off Animation");
     
-        animationSets[i].audioParameterGroupRotationX = new AudioParameterFloat(indexString + "Rotation X", indexString + "Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (X-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterGroupRotationX = new AudioParameterFloat(indexString + "Rotation X", indexString + "Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (X-Axis) in Degrees per Second");
         
-        animationSets[i].audioParameterGroupRotationY = new AudioParameterFloat(indexString + "Rotation Y", indexString + "Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (Y-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterGroupRotationY = new AudioParameterFloat(indexString + "Rotation Y", indexString + "Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Y-Axis) in Degrees per Second");
         
-        animationSets[i].audioParameterGroupRotationZ = new AudioParameterFloat(indexString + "Rotation Z", indexString + "Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (Z-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterGroupRotationZ = new AudioParameterFloat(indexString + "Rotation Z", indexString + "Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Z-Axis) in Degrees per Second");
     
-        animationSets[i].audioParameterOriginRotationX = new AudioParameterFloat(indexString + "Origin Rotation X", indexString + "Origin Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (X-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterOriginRotationX = new AudioParameterFloat(indexString + "Origin Rotation X", indexString + "Origin Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (X-Axis) in Degrees per Second");
         
-        animationSets[i].audioParameterOriginRotationY = new AudioParameterFloat(indexString + "Origin Rotation Y", indexString + "Origin Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (Y-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterOriginRotationY = new AudioParameterFloat(indexString + "Origin Rotation Y", indexString + "Origin Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Y-Axis) in Degrees per Second");
         
-        animationSets[i].audioParameterOriginRotationZ = new AudioParameterFloat(indexString + "Origin Rotation Z", indexString + "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (Z-Axis) in Degrees per Second"));
+        animationSets[i].audioParameterOriginRotationZ = new AudioParameterFloat(indexString + "Origin Rotation Z", indexString + "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Z-Axis) in Degrees per Second");
     
-        animationSets[i].audioParameterGroupStretch = new AudioParameterFloat(indexString + "Stretch", indexString + "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Stretch in Units per Second"));
+        animationSets[i].audioParameterGroupStretch = new AudioParameterFloat(indexString + "Stretch", indexString + "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, "Group Stretch in Units per Second");
     
     
         pAudioProcessor->addParameter(animationSets[i].audioParameterAnimationToggle);

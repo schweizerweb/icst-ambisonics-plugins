@@ -58,25 +58,25 @@ public:
     }
 
     void initialize(AudioProcessor* pProcessor){
-        encodingMode = new AudioParameterChoice(ParameterID { "EncodingMode", 1 }, "Encoding Mode",
-                                                EncoderConstants::encodingModeStrings, localEncodingMode, AudioParameterChoiceAttributes().withLabel("Distance Encoding: Mode"));
+        encodingMode = new AudioParameterChoice("EncodingMode", "Encoding Mode",
+                                                EncoderConstants::encodingModeStrings, localEncodingMode, "Distance Encoding: Mode");
         
-        unitCircleRadius = new AudioParameterFloat(ParameterID { "UnitCircle", 1 }, "Unit Circle", NormalisableRange<float>(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax), localUnitCircleRadius, AudioParameterFloatAttributes().withLabel("Distance Encoding: Unit Circle"));
+        unitCircleRadius = new AudioParameterFloat("UnitCircle", "Unit Circle", NormalisableRange<float>(EncoderConstants::UnitCircleRadiusMin, EncoderConstants::UnitCircleRadiusMax), localUnitCircleRadius, "Distance Encoding: Unit Circle");
         
-        dbUnit = new AudioParameterFloat(ParameterID { "dBUnit", 1 }, "dB Unit", NormalisableRange<float>(EncoderConstants::DbUnitMin, EncoderConstants::DbUnitMax), localDbUnit, AudioParameterFloatAttributes().withLabel("Distance Encoding: dB Unit"));
+        dbUnit = new AudioParameterFloat("dBUnit", "dB Unit", NormalisableRange<float>(EncoderConstants::DbUnitMin, EncoderConstants::DbUnitMax), localDbUnit, "Distance Encoding: dB Unit");
         
-        inverseProportionalDistanceAttenuation = new AudioParameterFloat(ParameterID { "DistanceAttenuation", 1 }, "Distance Attenuation", NormalisableRange<float>(EncoderConstants::DistanceAttenuationMin, EncoderConstants::DistanceAttenuationMax), localInverseProportionalDistanceAttenuation, AudioParameterFloatAttributes().withLabel("Distance Encoding: Inverse Proportional Distance Attenuation"));
+        inverseProportionalDistanceAttenuation = new AudioParameterFloat("DistanceAttenuation", "Distance Attenuation", NormalisableRange<float>(EncoderConstants::DistanceAttenuationMin, EncoderConstants::DistanceAttenuationMax), localInverseProportionalDistanceAttenuation, "Distance Encoding: Inverse Proportional Distance Attenuation");
         
-        centerCurve = new AudioParameterFloat(ParameterID { "CenterCurve", 1 }, "Center Curve", NormalisableRange<float>(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax), localCenterCurve, AudioParameterFloatAttributes().withLabel("Distance Encoding: Center Curve"));
+        centerCurve = new AudioParameterFloat("CenterCurve", "Center Curve", NormalisableRange<float>(EncoderConstants::CenterCurveMin, EncoderConstants::CenterCurveMax), localCenterCurve, "Distance Encoding: Center Curve");
         
-        advancedFactor = new AudioParameterFloat(ParameterID { "AdvancedFactor", 1 }, "Advanced Factor", NormalisableRange<float>(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax), localAdvancedFactor, AudioParameterFloatAttributes().withLabel("Distance Encoding: Advanced Factor"));
+        advancedFactor = new AudioParameterFloat("AdvancedFactor", "Advanced Factor", NormalisableRange<float>(EncoderConstants::AdvancedFactorMin, EncoderConstants::AdvancedFactorMax), localAdvancedFactor, "Distance Encoding: Advanced Factor");
         
-        advancedExponent = new AudioParameterFloat(ParameterID { "AdvancedExponent", 1 }, "Advanced Exponent", NormalisableRange<float>(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax), localAdvancedExponent, AudioParameterFloatAttributes().withLabel("Distance Encoding: Advanced Exponent"));
+        advancedExponent = new AudioParameterFloat("AdvancedExponent", "Advanced Exponent", NormalisableRange<float>(EncoderConstants::AdvancedExponentMin, EncoderConstants::AdvancedExponentMax), localAdvancedExponent, "Distance Encoding: Advanced Exponent");
 
-        airAbsorbtionMode = new AudioParameterChoice(ParameterID { "AirAbsorbtionMode", 1 }, "Air Absorbtion Mode",
-            EncoderConstants::airAbsorbtionModeStrings, localAirAbsorbtionMode, AudioParameterChoiceAttributes().withLabel("Distance Encoding: Air Absorbtion Mode"));
+        airAbsorbtionMode = new AudioParameterChoice("AirAbsorbtionMode", "Air Absorbtion Mode",
+            EncoderConstants::airAbsorbtionModeStrings, localAirAbsorbtionMode, "Distance Encoding: Air Absorbtion Mode");
 
-        airAbsorbtionIntensity = new AudioParameterFloat(ParameterID { "AirAbsorbtionIntensity", 1 }, "Air Absorbtion Intensity", NormalisableRange<float>(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax), localAirAbsorbtionIntensity, AudioParameterFloatAttributes().withLabel("Distance Encoding: Air Absorbtion Intensity"));
+        airAbsorbtionIntensity = new AudioParameterFloat("AirAbsorbtionIntensity", "Air Absorbtion Intensity", NormalisableRange<float>(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax), localAirAbsorbtionIntensity, "Distance Encoding: Air Absorbtion Intensity");
 
         pProcessor->addParameter(encodingMode);
         pProcessor->addParameter(unitCircleRadius);

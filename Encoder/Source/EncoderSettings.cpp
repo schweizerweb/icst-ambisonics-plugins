@@ -238,7 +238,7 @@ bool EncoderSettings::setMasterGain(float gainDb)
 
 void EncoderSettings::initialize(AudioProcessor* pProcessor)
 {
-    masterGain = new AudioParameterFloat(ParameterID { "MasterGain", 1 }, "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, AudioParameterFloatAttributes().withLabel("Master Gain for B-Format output"));
+    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
 
     pProcessor->addParameter(masterGain);
 
