@@ -39,6 +39,9 @@ private:
         {
             JsContext (CustomOscReceiver* demo) : owner (demo)
             {
+                // set buffer values to 0
+                memset(buffer, 0, sizeof(buffer));
+                
                 setMethod ("setXYZ", setXYZ);
                 setMethod ("setXYZbyName", setXYZbyName);
                 setMethod ("setAED", setAED);
@@ -50,6 +53,15 @@ private:
                 setMethod ("e", e);
                 setMethod ("d", d);
                 setMethod ("name", name);
+                
+                // (incomplete) additional functions
+                setMethod ("rotateGroup", rotateGroup);
+                setMethod ("rotateOrigin", rotateOrigin);
+                setMethod ("stretch", stretch);
+                
+                // per-receiver buffer
+                setMethod ("getBuf", getBuf);
+                setMethod ("setBuf", setBuf);
                 
                 setMethod ("path", path);
                 setMethod ("arg", arg);
@@ -88,6 +100,40 @@ private:
                         if(index < thisObject->jsArguments.size())
                         {
                             return thisObject->jsArguments[index];
+                        }
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            // access to buffer
+            static var getBuf(const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 1)
+                    {
+                        int index = args.arguments[0];
+                        if(index < thisObject->buffer_size && index >= 0)
+                        {
+                            return thisObject->buffer[index];
+                        }
+                    }
+                }
+                
+                return var::undefined();
+            }
+            static var setBuf(const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 2)
+                    {
+                        int index = args.arguments[0];
+                        if(index < thisObject->buffer_size && index >= 0)
+                        {
+                            thisObject->buffer[index] = args.arguments[1];
                         }
                     }
                 }
@@ -282,11 +328,73 @@ private:
                 return var::undefined();
             }
             
+            static var rotateGroup (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 4)
+                    {
+                        int index = args.arguments[0];
+                        double x = args.arguments[1];
+                        double y = args.arguments[2];
+                        double z = args.arguments[3];
+                    
+                        if(index > 0)
+                            thisObject->jsAmbiSourceSet->rotateGroup(index - 1, x, y, z); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var rotateOrigin (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        int index = args.arguments[0];
+                        double x = args.arguments[1];
+                        double y = args.arguments[2];
+                        double z = args.arguments[3];
+                        
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        if(index > 0)
+                            thisObject->jsAmbiSourceSet->rotateGroupAroundOrigin(index - 1, x, y, z, moveSub); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var stretch (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 2)
+                    {
+                        int index = args.arguments[0];
+                        double stretch = args.arguments[1];
+                        
+                        if(index > 0)
+                            thisObject->jsAmbiSourceSet->stretchGroup(index - 1, stretch); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
             CustomOscReceiver* owner;
             AmbiSourceSet* jsAmbiSourceSet;
             Array<var> jsPathElements;
             Array<var> jsArguments;
             int jsPointIndex;
+            static const int buffer_size = 1000;
+            float buffer[buffer_size];
             
             JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JsContext)
         };
