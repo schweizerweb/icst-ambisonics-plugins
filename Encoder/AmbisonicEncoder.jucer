@@ -47,6 +47,8 @@
             file="Source/AudioParameterFloatAmbi.cpp"/>
       <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
             file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="Wd4DSG" name="ComponentArguments.h" compile="0" resource="0"
+            file="Source/ComponentArguments.h"/>
       <FILE id="QtiuD8" name="CustomOscBase.cpp" compile="1" resource="0"
             file="Source/CustomOscBase.cpp"/>
       <FILE id="DzPqvI" name="CustomOscBase.h" compile="0" resource="0" file="Source/CustomOscBase.h"/>
@@ -68,6 +70,8 @@
             file="Source/CustomOscTarget.cpp"/>
       <FILE id="ZZTaMA" name="CustomOscTarget.h" compile="0" resource="0"
             file="Source/CustomOscTarget.h"/>
+      <FILE id="wdq3PJ" name="CustomOscTxPresetHelper.h" compile="0" resource="0"
+            file="Source/CustomOscTxPresetHelper.h"/>
       <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
             resource="0" file="Source/DistanceEncodingComponent.cpp"/>
       <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"

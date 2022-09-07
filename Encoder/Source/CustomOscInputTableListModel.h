@@ -23,7 +23,6 @@
 #define COLUMN_ID_SAVE_AS_PRESET    206
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
-#define ACTION_MESSAGE_SAVE_PRESET "savepreset"
 
 
 class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener

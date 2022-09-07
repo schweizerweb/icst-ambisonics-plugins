@@ -304,10 +304,10 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
     if(message.startsWith(String(ACTION_MESSAGE_SAVE_PRESET)))
     {
         int index = message.getTrailingIntValue();
-        
+
         if(index < 0 || index >= pSettings->customOscInput.size())
             return;
-        
+
         File* f = pCustomOscRxPresetHelper->tryCreateNewPreset();
         if(f != nullptr)
         {

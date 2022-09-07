@@ -159,7 +159,21 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper(), processor.getDistanceEncodingPresetHelper(), processor.getCustomOscRxPresetHelper(), &oscLogDialogManager));
+        EncoderSettingsComponentArgs args {
+            this,
+            pEncoderSettings,
+            pSources,
+            &pointSelection,
+            processor.getAudioParams(),
+            radarComponent->getZoomSettingsPointer(),
+            processor.getStatusMessageHandler(),
+            processor.getPresetHelper(),
+            processor.getDistanceEncodingPresetHelper(),
+            processor.getCustomOscRxPresetHelper(),
+            processor.getCustomOscTxPresetHelper(),
+            &oscLogDialogManager
+        };
+		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
         settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]

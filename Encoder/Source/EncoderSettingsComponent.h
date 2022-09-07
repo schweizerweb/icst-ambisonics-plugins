@@ -25,6 +25,7 @@
 #include "OSCRxSettingsComponent.h"
 #include "RadarSettingsComponent.h"
 #include "EncodingSettingsComponent.h"
+#include "ComponentArguments.h"
 //[/Headers]
 
 
@@ -42,7 +43,7 @@ class EncoderSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager);
+    EncoderSettingsComponent (EncoderSettingsComponentArgs args);
     ~EncoderSettingsComponent() override;
 
     //==============================================================================

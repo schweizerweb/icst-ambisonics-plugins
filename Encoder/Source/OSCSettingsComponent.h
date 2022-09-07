@@ -44,7 +44,7 @@ class OSCSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings);
+    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper);
     ~OSCSettingsComponent() override;
 
     //==============================================================================

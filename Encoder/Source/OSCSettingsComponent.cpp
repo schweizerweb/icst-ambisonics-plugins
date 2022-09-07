@@ -27,7 +27,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings)
+OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
     : pSettings(pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
@@ -103,7 +103,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     sliderInterval->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderInterval->addListener (this);
 
-    oscTargets.reset (new OSCTargetsComponent (this, pSettings));
+    oscTargets.reset (new OSCTargetsComponent (this, pSettings, pCustomOscTxPresetHelper));
     addAndMakeVisible (oscTargets.get());
     oscTargets->setName ("oscTargets");
 
@@ -310,7 +310,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCSettingsComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener, public ChangeBroadcaster, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper"
                  variableInitialisers="pSettings(pSettings)" snapPixels="8" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
                  initialHeight="400">
@@ -363,7 +363,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="oscTargets" id="cd238de4b9ac3b7e" memberName="oscTargets"
                     virtualName="" explicitFocusOrder="0" pos="16 55 24M 63M" posRelativeX="64cdd18a28c39177"
                     posRelativeY="64cdd18a28c39177" posRelativeW="64cdd18a28c39177"
-                    posRelativeH="64cdd18a28c39177" class="OSCTargetsComponent" params="this, pSettings"/>
+                    posRelativeH="64cdd18a28c39177" class="OSCTargetsComponent" params="this, pSettings, pCustomOscTxPresetHelper"/>
   <LABEL name="labelLoadInfo" id="32af9a6495d86f3e" memberName="labelLoadInfo"
          virtualName="" explicitFocusOrder="0" pos="8 8Rr 15M 24" edTextCol="ff000000"
          edBkgCol="0" labelText="no network traffic" editableSingleClick="0"

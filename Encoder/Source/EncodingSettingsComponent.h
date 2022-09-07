@@ -26,6 +26,7 @@
 #include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
 #include "DistanceEncodingPresetHelper.h"
+#include "ComponentArguments.h"
 //[/Headers]
 
 
@@ -48,7 +49,7 @@ class EncodingSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper);
+    EncodingSettingsComponent (EncoderSettingsComponentArgs args);
     ~EncodingSettingsComponent() override;
 
     //==============================================================================
@@ -70,13 +71,8 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    EncoderSettings* pEncoderSettings;
-    AmbiSourceSet* pSources;
-    AudioParams* pAudioParams;
     PresetManagerDialog presetManagerDialog;
-    EncoderPresetHelper* pPresetHelper;
-    ZoomSettings* pZoomSettings;
-    DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper;
+    EncoderSettingsComponentArgs m_args;
     //[/UserVariables]
 
     //==============================================================================

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -31,13 +31,13 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings)
-    : pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)
+SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentArgs args)
+    : m_args(args)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    addChangeListener(pChangeListener);
-    groupModel.reset(new GroupTableListModel(pSourceSet, pPointSelection, this, pZoomSettings->getScalingInfo()));
-    sourceModel.reset(new SourceTableListModel(pSourceSet, pPointSelection, this, pZoomSettings->getScalingInfo()));
+    addChangeListener(m_args.pChangeListener);
+    groupModel.reset(new GroupTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo()));
+    sourceModel.reset(new SourceTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo()));
     //[/Constructor_pre]
 
     groupGroups.reset (new juce::GroupComponent ("groupGroups",
@@ -119,7 +119,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
 
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
-    pPointSelection->addChangeListener(this);
+    m_args.pPointSelection->addChangeListener(this);
     controlDimming();
     //[/Constructor]
 }
@@ -127,7 +127,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (ChangeListener* pChangeLis
 SourceDefinitionComponent::~SourceDefinitionComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    pPointSelection->removeChangeListener(this);
+    m_args.pPointSelection->removeChangeListener(this);
     //[/Destructor_pre]
 
     groupGroups = nullptr;
@@ -190,11 +190,11 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     if (buttonThatWasClicked == buttonAddGroup.get())
     {
         //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
-        if(pAudioParams != nullptr && pSources->groupCount() < pAudioParams->groupParams.size())
+        if(m_args.pAudioParams != nullptr && m_args.pSourceSet->groupCount() < m_args.pAudioParams->groupParams.size())
         {
             Uuid newId = Uuid();
-            pSources->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->groupParams.getUnchecked(pSources->groupCount())), "G", Colours::orange);
-            pPointSelection->selectGroup(pSources->groupCount() - 1, false);
+            m_args.pSourceSet->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, m_args.pAudioParams->groupParams.getUnchecked(m_args.pSourceSet->groupCount())), "G", Colours::orange);
+            m_args.pPointSelection->selectGroup(m_args.pSourceSet->groupCount() - 1, false);
             groupList->updateContent();
             groupList->repaint();
         }
@@ -207,11 +207,11 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonRemoveGroup.get())
     {
         //[UserButtonCode_buttonRemoveGroup] -- add your button handler code here..
-        int selection = pPointSelection->getMainSelectedPointIndex();
-        if (pPointSelection->getSelectionMode() == PointSelection::Group && selection >= 0 && selection < pSources->size())
+        int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+        if (m_args.pPointSelection->getSelectionMode() == PointSelection::Group && selection >= 0 && selection < m_args.pSourceSet->size())
         {
-            pPointSelection->unselectPoint();
-            pSources->removeGroup(selection);
+            m_args.pPointSelection->unselectPoint();
+            m_args.pSourceSet->removeGroup(selection);
             groupList->updateContent();
             groupList->repaint();
         }
@@ -221,11 +221,11 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-        if (pAudioParams != nullptr && pSources->size() < pAudioParams->sourceParams.size())
+        if (m_args.pAudioParams != nullptr && m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size())
         {
             Uuid newId = Uuid();
-            pSources->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->sourceParams.getUnchecked(pSources->size())), pSources->getNewUniqueName(), TrackColors::getColor(pSources->size() + 1));
-            pPointSelection->selectPoint(pSources->size() - 1);
+            m_args.pSourceSet->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, m_args.pAudioParams->sourceParams.getUnchecked(m_args.pSourceSet->size())), m_args.pSourceSet->getNewUniqueName(), TrackColors::getColor(m_args.pSourceSet->size() + 1));
+            m_args.pPointSelection->selectPoint(m_args.pSourceSet->size() - 1);
             sourceList->updateContent();
             sourceList->repaint();
         }
@@ -239,11 +239,11 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonRemove.get())
     {
         //[UserButtonCode_buttonRemove] -- add your button handler code here..
-        int selection = pPointSelection->getMainSelectedPointIndex();
-        if (pPointSelection->getSelectionMode() == PointSelection::Point && selection >= 0 && selection < pSources->size())
+        int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+        if (m_args.pPointSelection->getSelectionMode() == PointSelection::Point && selection >= 0 && selection < m_args.pSourceSet->size())
         {
-            pPointSelection->unselectPoint();
-            pSources->remove(selection);
+            m_args.pPointSelection->unselectPoint();
+            m_args.pSourceSet->remove(selection);
             sourceList->updateContent();
             sourceList->repaint();
         }
@@ -253,38 +253,38 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
         //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
-        int selection = pPointSelection->getMainSelectedPointIndex();
-        if (selection >= 0 && selection < pSources->size() - 1)
+        int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+        if (selection >= 0 && selection < m_args.pSourceSet->size() - 1)
         {
-            pPointSelection->unselectPoint();
-            pSources->swap(selection, selection + 1);
-            pPointSelection->selectPoint(selection + 1);
+            m_args.pPointSelection->unselectPoint();
+            m_args.pSourceSet->swap(selection, selection + 1);
+            m_args.pPointSelection->selectPoint(selection + 1);
         }
         //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
         //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
-        int selection = pPointSelection->getMainSelectedPointIndex();
-        if (selection >= 1 && selection < pSources->size())
+        int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+        if (selection >= 1 && selection < m_args.pSourceSet->size())
         {
-            pPointSelection->unselectPoint();
-            pSources->swap(selection, selection - 1);
-            pPointSelection->selectPoint(selection - 1);
+            m_args.pPointSelection->unselectPoint();
+            m_args.pSourceSet->swap(selection, selection - 1);
+            m_args.pPointSelection->selectPoint(selection - 1);
         }
         //[/UserButtonCode_buttonMoveUp]
     }
     else if (buttonThatWasClicked == buttonMoveGroupDown.get())
     {
         //[UserButtonCode_buttonMoveGroupDown] -- add your button handler code here..
-        if(pPointSelection->getSelectionMode() == PointSelection::Group)
+        if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
-            int selection = pPointSelection->getMainSelectedPointIndex();
-            if (selection >= 0 && selection < pSources->groupCount() - 1)
+            int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+            if (selection >= 0 && selection < m_args.pSourceSet->groupCount() - 1)
             {
-                pPointSelection->unselectPoint();
-                pSources->swapGroup(selection, selection + 1);
-                pPointSelection->selectGroup(selection + 1, false);
+                m_args.pPointSelection->unselectPoint();
+                m_args.pSourceSet->swapGroup(selection, selection + 1);
+                m_args.pPointSelection->selectGroup(selection + 1, false);
             }
         }
         //[/UserButtonCode_buttonMoveGroupDown]
@@ -292,14 +292,14 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonMoveGroupUp.get())
     {
         //[UserButtonCode_buttonMoveGroupUp] -- add your button handler code here..
-        if(pPointSelection->getSelectionMode() == PointSelection::Group)
+        if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
-            int selection = pPointSelection->getMainSelectedPointIndex();
-            if (selection >= 1 && selection < pSources->groupCount())
+            int selection = m_args.pPointSelection->getMainSelectedPointIndex();
+            if (selection >= 1 && selection < m_args.pSourceSet->groupCount())
             {
-                pPointSelection->unselectPoint();
-                pSources->swapGroup(selection, selection - 1);
-                pPointSelection->selectGroup(selection - 1, false);
+                m_args.pPointSelection->unselectPoint();
+                m_args.pSourceSet->swapGroup(selection, selection - 1);
+                m_args.pPointSelection->selectGroup(selection - 1, false);
             }
         }
         //[/UserButtonCode_buttonMoveGroupUp]
@@ -316,17 +316,17 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
 {
     refresh();
 
-    if (source == pPointSelection)
+    if (source == m_args.pPointSelection)
     {
-        if (pPointSelection->getSelectionMode() == PointSelection::Point)
+        if (m_args.pPointSelection->getSelectionMode() == PointSelection::Point)
         {
-            sourceList->selectRow(pPointSelection->getMainSelectedPointIndex());
+            sourceList->selectRow(m_args.pPointSelection->getMainSelectedPointIndex());
             groupList->selectRow(-1);
         }
         else
         {
             sourceList->selectRow(-1);
-            groupList->selectRow(pPointSelection->getMainSelectedPointIndex());
+            groupList->selectRow(m_args.pPointSelection->getMainSelectedPointIndex());
         }
 
         controlDimming();
@@ -335,12 +335,12 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
 
 void SourceDefinitionComponent::controlDimming() const
 {
-    buttonAdd->setEnabled(pSources->size() < pAudioParams->sourceParams.size());
-    buttonRemove->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pSources->size() > 0);
-    buttonMoveUp->setEnabled(pPointSelection->getMainSelectedPointIndex() > 0);
-    buttonMoveDown->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getMainSelectedPointIndex() < pSources->size() - 1);
+    buttonAdd->setEnabled(m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size());
+    buttonRemove->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pSourceSet->size() > 0);
+    buttonMoveUp->setEnabled(m_args.pPointSelection->getMainSelectedPointIndex() > 0);
+    buttonMoveDown->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
     buttonAddGroup->setEnabled(true);
-    buttonRemoveGroup->setEnabled(pPointSelection->getSelectionMode() == PointSelection::Group && pSources->groupCount() > 0);
+    buttonRemoveGroup->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Group && m_args.pSourceSet->groupCount() > 0);
 }
 
 void SourceDefinitionComponent::refresh() const
@@ -364,16 +364,14 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
                  componentName="" parentClasses="public Component, public ChangeListener, public ChangeBroadcaster"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pSources(pSourceSet), pPointSelection(pPointSelection), pAudioParams(pAudioParams), pEncoderSettings(pSettings)"
+                 constructorParams="EncoderSettingsComponentArgs args" variableInitialisers="m_args(args)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.127%"
-                  posRelativeX="73249ab85d6bba3a" posRelativeY="73249ab85d6bba3a"
-                  posRelativeW="73249ab85d6bba3a" posRelativeH="73249ab85d6bba3a"
-                  title="Groups"/>
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 40.09%" posRelativeX="73249ab85d6bba3a"
+                  posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
+                  posRelativeH="73249ab85d6bba3a" title="Groups"/>
   <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="983b0a3b2c5c945a"
                     posRelativeY="983b0a3b2c5c945a" posRelativeW="983b0a3b2c5c945a"
@@ -387,7 +385,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.873%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 59.91%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="73249ab85d6bba3a" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="73249ab85d6bba3a" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"

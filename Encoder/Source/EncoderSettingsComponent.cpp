@@ -29,7 +29,7 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager)
+EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs args)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -37,10 +37,10 @@ EncoderSettingsComponent::EncoderSettingsComponent (ChangeListener* pChangeListe
     tabbedComponent.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (tabbedComponent.get());
     tabbedComponent->setTabBarDepth (35);
-    tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings, pDistanceEncodingPresetHelper), true);
-    tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (pChangeListener, pZoomSettings), true);
-    tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (pChangeListener, pSettings, pStatusMessageHandler, pCustomOscRxPresetHelper, pOscLogManager), true);
-    tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (pChangeListener, pSettings), true);
+    tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (args), true);
+    tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (args.pChangeListener, args.pZoomSettings), true);
+    tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (args.pChangeListener, args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager), true);
+    tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper), true);
     tabbedComponent->setCurrentTabIndex (0);
 
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
@@ -120,23 +120,24 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncoderSettingsComponent"
                  componentName="" parentClasses="public Component, public ActionBroadcaster"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager"
-                 variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
-                 overlayOpacity="0.330" fixedSize="0" initialWidth="650" initialHeight="300">
+                 constructorParams="EncoderSettingsComponentArgs args" variableInitialisers=""
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="650" initialHeight="300">
   <BACKGROUND backgroundColour="ff505050"/>
   <TABBEDCOMPONENT name="tabbedComponent" id="3a0bd97c3580beb3" memberName="tabbedComponent"
                    virtualName="" explicitFocusOrder="0" pos="8 8 15M 13M" orientation="top"
                    tabBarDepth="35" initialTab="0">
     <TAB name="Encoding" colour="ffd3d3d3" useJucerComp="0" contentClassName="EncodingSettingsComponent"
-         constructorParams="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pPresetHelper, pZoomSettings, pDistanceEncodingPresetHelper"
-         jucerComponentFile=""/>
+         constructorParams="args" jucerComponentFile=""/>
     <TAB name="Radar" colour="ffd3d3d3" useJucerComp="0" contentClassName="RadarSettingsComponent"
-         constructorParams="pChangeListener, pZoomSettings" jucerComponentFile=""/>
+         constructorParams="args.pChangeListener, args.pZoomSettings"
+         jucerComponentFile=""/>
     <TAB name="OSC In" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCRxSettingsComponent"
-         constructorParams="pChangeListener, pSettings, pStatusMessageHandler, pCustomOscRxPresetHelper, pOscLogManager"
+         constructorParams="args.pChangeListener, args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager"
          jucerComponentFile=""/>
     <TAB name="OSC Out" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCSettingsComponent"
-         constructorParams="pChangeListener, pSettings" jucerComponentFile=""/>
+         constructorParams="args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper"
+         jucerComponentFile=""/>
   </TABBEDCOMPONENT>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
          virtualName="" explicitFocusOrder="0" pos="10Rr 8 245 24" bkgCol="bded0d0d"

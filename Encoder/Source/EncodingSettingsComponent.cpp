@@ -29,11 +29,11 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper)
-    : pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings), pDistanceEncodingPresetHelper(pDistanceEncodingPresetHelper)
+EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentArgs args)
+    : m_args(args)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    addChangeListener(pChangeListener);
+    addChangeListener(m_args.pChangeListener);
     //[/Constructor_pre]
 
     comboBoxPresets.reset (new juce::ComboBox ("comboBoxPresets"));
@@ -58,7 +58,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
-    sourceDefinition.reset (new SourceDefinitionComponent (pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pZoomSettings));
+    sourceDefinition.reset (new SourceDefinitionComponent (args));
     addAndMakeVisible (sourceDefinition.get());
     sourceDefinition->setName ("sourceDefinition");
 
@@ -153,10 +153,10 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
     sliderMasterGain->setTextValueSuffix(" dB");
-    sliderMasterGain->setValue(pEncoderSettings->getMasterGain());
+    sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
     // load stored presets
-    pPresetHelper->addActionListener(this);
-    pEncoderSettings->addChangeListener(this);
+    m_args.pPresetHelper->addActionListener(this);
+    m_args.pSettings->addChangeListener(this);
     initializePresets();
     controlDimming();
     //[/Constructor]
@@ -165,8 +165,8 @@ EncodingSettingsComponent::EncodingSettingsComponent (ChangeListener* pChangeLis
 EncodingSettingsComponent::~EncodingSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    pEncoderSettings->removeChangeListener(this);
-    pPresetHelper->removeActionListener(this);
+    m_args.pSettings->removeChangeListener(this);
+    m_args.pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
     comboBoxPresets = nullptr;
@@ -228,7 +228,7 @@ void EncodingSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHas
     if (comboBoxThatHasChanged == comboBoxPresets.get())
     {
         //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
-        pPresetHelper->selectPresetName(comboBoxPresets->getText());
+        m_args.pPresetHelper->selectPresetName(comboBoxPresets->getText());
         comboBoxPresets->setText("", dontSendNotification);
         //[/UserComboBoxCode_comboBoxPresets]
     }
@@ -245,11 +245,11 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = pPresetHelper->tryCreateNewPreset();
+        File* newFile = m_args.pPresetHelper->tryCreateNewPreset();
         if(newFile == nullptr)
                 return;
 
-        pPresetHelper->writeToXmlFile(*newFile, pSources, pEncoderSettings);
+        m_args.pPresetHelper->writeToXmlFile(*newFile, m_args.pSourceSet, m_args.pSettings);
         comboBoxPresets->setText("", dontSendNotification);
         delete newFile;
         //[/UserButtonCode_buttonSave]
@@ -257,34 +257,34 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleDistanceEncoding.get())
     {
         //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
-        pEncoderSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
+        m_args.pSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
         sendChangeMessage();
         //[/UserButtonCode_toggleDistanceEncoding]
     }
     else if (buttonThatWasClicked == toggleDoppler.get())
     {
         //[UserButtonCode_toggleDoppler] -- add your button handler code here..
-        pEncoderSettings->dopplerEncodingFlag = toggleDoppler->getToggleState();
+        m_args.pSettings->dopplerEncodingFlag = toggleDoppler->getToggleState();
         sendChangeMessage();
         //[/UserButtonCode_toggleDoppler]
     }
     else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
     {
         //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&pEncoderSettings->distanceEncodingParams, pDistanceEncodingPresetHelper, pZoomSettings->getScalingInfo()), getScreenBounds(), this);
+        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings->getScalingInfo()), getScreenBounds(), this);
         //[/UserButtonCode_btnEditDistanceEncoding]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
     {
         //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
-        presetManagerDialog.show(this, pPresetHelper);
+        presetManagerDialog.show(this, m_args.pPresetHelper);
         //[/UserButtonCode_buttonManagePresets]
     }
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
         //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        pEncoderSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
-        pZoomSettings->getScalingInfo()->SetScaler(pEncoderSettings->getDistanceScaler());
+        m_args.pSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? m_args.pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
+        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
         sourceDefinition->refresh();
         updateEncodingUiElements();
         //[/UserButtonCode_toggleInfiniteDistance]
@@ -292,7 +292,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == btnManageDistanceEncodingPresets.get())
     {
         //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
-        presetManagerDialog.show(this, pDistanceEncodingPresetHelper, false);
+        presetManagerDialog.show(this, m_args.pDistanceEncodingPresetHelper, false);
         //[/UserButtonCode_btnManageDistanceEncodingPresets]
     }
 
@@ -309,9 +309,9 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     if (sliderThatWasMoved == sliderDistanceScaler.get())
     {
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
-        pEncoderSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-        pZoomSettings->getScalingInfo()->SetScaler(pEncoderSettings->getDistanceScaler());
-        pZoomSettings->Reset();
+        m_args.pSettings->setDistanceScaler(sliderDistanceScaler->getValue());
+        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
+        m_args.pZoomSettings->Reset();
         sendChangeMessage();
         sourceDefinition->refresh();
         //[/UserSliderCode_sliderDistanceScaler]
@@ -319,7 +319,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     else if (sliderThatWasMoved == sliderMasterGain.get())
     {
         //[UserSliderCode_sliderMasterGain] -- add your slider handling code here..
-        pEncoderSettings->setMasterGain((float)sliderMasterGain->getValue());
+        m_args.pSettings->setMasterGain((float)sliderMasterGain->getValue());
         //[/UserSliderCode_sliderMasterGain]
     }
 
@@ -332,20 +332,20 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void EncodingSettingsComponent::updateEncodingUiElements()
 {
-    toggleDistanceEncoding->setToggleState(pEncoderSettings->distanceEncodingFlag, dontSendNotification);
+    toggleDistanceEncoding->setToggleState(m_args.pSettings->distanceEncodingFlag, dontSendNotification);
 
-    toggleDoppler->setToggleState(pEncoderSettings->dopplerEncodingFlag, dontSendNotification);
+    toggleDoppler->setToggleState(m_args.pSettings->dopplerEncodingFlag, dontSendNotification);
 
-    toggleInfiniteDistance->setToggleState(pEncoderSettings->getDistanceScaler() == 0.0, dontSendNotification);
+    toggleInfiniteDistance->setToggleState(m_args.pSettings->getDistanceScaler() == 0.0, dontSendNotification);
     labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())
-        sliderDistanceScaler->setValue(pEncoderSettings->getDistanceScaler());
+        sliderDistanceScaler->setValue(m_args.pSettings->getDistanceScaler());
 }
 
 void EncodingSettingsComponent::controlDimming() const
 {
-    btnEditDistanceEncoding->setEnabled(pEncoderSettings->distanceEncodingFlag);
+    btnEditDistanceEncoding->setEnabled(m_args.pSettings->distanceEncodingFlag);
 }
 
 void EncodingSettingsComponent::initializePresets()
@@ -353,7 +353,7 @@ void EncodingSettingsComponent::initializePresets()
     comboBoxPresets->clear();
 
     int id = 1;
-    for(File file : pPresetHelper->presetFiles)
+    for(File file : m_args.pPresetHelper->presetFiles)
     {
         comboBoxPresets->addItem(file.getFileNameWithoutExtension(), id++);
     }
@@ -370,7 +370,7 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
     {
         sourceDefinition->refresh();
         updateEncodingUiElements();
-        pZoomSettings->Reset();
+        m_args.pZoomSettings->Reset();
         controlDimming();
         sendChangeMessage();
     }
@@ -378,7 +378,7 @@ void EncodingSettingsComponent::actionListenerCallback(const String &message)
 
 void EncodingSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
-    sliderMasterGain->setValue(pEncoderSettings->getMasterGain());
+    sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
 }
 
 //[/MiscUserCode]
@@ -395,8 +395,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, EncoderPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper"
-                 variableInitialisers="pEncoderSettings(pSettings), pSources(pSourceSet), pAudioParams(pAudioParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings), pDistanceEncodingPresetHelper(pDistanceEncodingPresetHelper)"
+                 constructorParams="EncoderSettingsComponentArgs args" variableInitialisers="m_args(args)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -415,7 +414,7 @@ BEGIN_JUCER_METADATA
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
                     virtualName="" explicitFocusOrder="0" pos="8 144 16M 186M" class="SourceDefinitionComponent"
-                    params="pChangeListener, pSettings,pSourceSet, pPointSelection, pAudioParams, pZoomSettings"/>
+                    params="args"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
                 virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
