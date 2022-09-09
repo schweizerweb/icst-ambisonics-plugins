@@ -99,7 +99,7 @@ Image Radar2D::createRadarBackground() const
 {
 	const MessageManagerLock lock;
 
-	Rectangle<float> localBounds = radarViewport.toFloat();
+    Rectangle<float> localBounds = radarViewport.toFloat().withZeroOrigin();
 
 	Image img = Image(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
 	Graphics g(img);
