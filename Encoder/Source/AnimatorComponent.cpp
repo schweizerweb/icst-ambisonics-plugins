@@ -155,7 +155,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderG1->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderG1->addListener (this);
 
-    sliderG1->setBounds (48, 16, 63, 24);
+    sliderG1->setBounds (48, 16, 88, 24);
 
     labelG2.reset (new juce::Label ("new label",
                                     TRANS("G:")));
@@ -175,7 +175,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderG2->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderG2->addListener (this);
 
-    sliderG2->setBounds (48, 64, 63, 24);
+    sliderG2->setBounds (48, 64, 88, 24);
 
     labelG3.reset (new juce::Label ("new label",
                                     TRANS("G:")));
@@ -195,7 +195,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderG3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderG3->addListener (this);
 
-    sliderG3->setBounds (48, 112, 63, 24);
+    sliderG3->setBounds (48, 112, 88, 24);
 
     labelG4.reset (new juce::Label ("new label",
                                     TRANS("G:")));
@@ -215,7 +215,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderG4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderG4->addListener (this);
 
-    sliderG4->setBounds (48, 160, 63, 24);
+    sliderG4->setBounds (48, 160, 88, 24);
 
 
     //[UserPreSize]
@@ -224,7 +224,7 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderTime2->setTextValueSuffix(sliderSuffix);
     sliderTime3->setTextValueSuffix(sliderSuffix);
     sliderTime4->setTextValueSuffix(sliderSuffix);
-    
+
     if(pSourceSet->groupCount() > 1)
     {
     sliderG1->setRange(0, pSourceSet->groupCount()-1);
@@ -310,23 +310,23 @@ void AnimatorComponent::resized()
     //[/UserPreResize]
 
     group1->setBounds (0, 0, getWidth() - 0, 48);
-    buttonSet1->setBounds (0 + 120, 0 + 16, 55, 24);
-    sliderTime1->setBounds (0 + 184, 0 + 16, (getWidth() - 0) - 320, 24);
+    buttonSet1->setBounds (0 + 144, 0 + 16, 55, 24);
+    sliderTime1->setBounds (0 + 208, 0 + 16, (getWidth() - 0) - 344, 24);
     togglePolar1->setBounds (0 + (getWidth() - 0) - 70 - 63, 0 + 16, 63, 24);
     buttonGo1->setBounds (0 + (getWidth() - 0) - 9 - 55, 0 + 16, 55, 24);
     group2->setBounds (0, 48, getWidth() - 0, 48);
-    buttonSet2->setBounds (0 + 120, 48 + 16, 55, 24);
-    sliderTime2->setBounds (0 + 184, 48 + 16, (getWidth() - 0) - 320, 24);
+    buttonSet2->setBounds (0 + 144, 48 + 16, 55, 24);
+    sliderTime2->setBounds (0 + 208, 48 + 16, (getWidth() - 0) - 344, 24);
     togglePolar2->setBounds (0 + (getWidth() - 0) - 70 - 63, 48 + 16, 63, 24);
     buttonGo2->setBounds (0 + (getWidth() - 0) - 9 - 55, 48 + 16, 55, 24);
     group3->setBounds (0, 96, getWidth() - 0, 48);
-    buttonSet3->setBounds (0 + 120, 96 + 16, 55, 24);
-    sliderTime3->setBounds (0 + 184, 96 + 16, (getWidth() - 0) - 320, 24);
+    buttonSet3->setBounds (0 + 144, 96 + 16, 55, 24);
+    sliderTime3->setBounds (0 + 208, 96 + 16, (getWidth() - 0) - 344, 24);
     togglePolar3->setBounds (0 + (getWidth() - 0) - 70 - 63, 96 + 16, 63, 24);
     buttonGo3->setBounds (0 + (getWidth() - 0) - 9 - 55, 96 + 16, 55, 24);
     group4->setBounds (0, 144, getWidth() - 0, 48);
-    buttonSet4->setBounds (0 + 120, 144 + 16, 55, 24);
-    sliderTime4->setBounds (0 + 184, 144 + 16, (getWidth() - 0) - 320, 24);
+    buttonSet4->setBounds (0 + 144, 144 + 16, 55, 24);
+    sliderTime4->setBounds (0 + 208, 144 + 16, (getWidth() - 0) - 344, 24);
     togglePolar4->setBounds (0 + (getWidth() - 0) - 70 - 63, 144 + 16, 63, 24);
     buttonGo4->setBounds (0 + (getWidth() - 0) - 9 - 55, 144 + 16, 55, 24);
     action1->setBounds (0, 200, proportionOfWidth (0.5000f), 340);
@@ -592,7 +592,7 @@ void AnimatorComponent::setPreset(PositionSet *pSet, int groupIndex)
 {
     pSet->sources.clear();
     pSet->groups.clear();
-    
+
     /*
     for(int i = 0; i < pSourceSet->size(); i++)
     {
@@ -636,11 +636,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="238ed80972cc4d19" memberName="group1" virtualName=""
                   explicitFocusOrder="0" pos="0 0 0M 48" title="Preset 1"/>
   <TEXTBUTTON name="new button" id="6f8d2fc9df3bb657" memberName="buttonSet1"
-              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="238ed80972cc4d19"
+              virtualName="" explicitFocusOrder="0" pos="144 16 55 24" posRelativeX="238ed80972cc4d19"
               posRelativeY="238ed80972cc4d19" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="1406018e4c78eb13" memberName="sliderTime1"
-          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="238ed80972cc4d19"
+          virtualName="" explicitFocusOrder="0" pos="208 16 344M 24" posRelativeX="238ed80972cc4d19"
           posRelativeY="238ed80972cc4d19" posRelativeW="238ed80972cc4d19"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -656,11 +656,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="757958c6e56c2a33" memberName="group2" virtualName=""
                   explicitFocusOrder="0" pos="0 48 0M 48" title="Preset 2"/>
   <TEXTBUTTON name="new button" id="5d84d95099e73bb4" memberName="buttonSet2"
-              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="757958c6e56c2a33"
+              virtualName="" explicitFocusOrder="0" pos="144 16 55 24" posRelativeX="757958c6e56c2a33"
               posRelativeY="757958c6e56c2a33" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="2bb561484b6a5dbb" memberName="sliderTime2"
-          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="757958c6e56c2a33"
+          virtualName="" explicitFocusOrder="0" pos="208 16 344M 24" posRelativeX="757958c6e56c2a33"
           posRelativeY="757958c6e56c2a33" posRelativeW="757958c6e56c2a33"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -676,11 +676,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="e8336da307c67c03" memberName="group3" virtualName=""
                   explicitFocusOrder="0" pos="0 96 0M 48" title="Preset 3"/>
   <TEXTBUTTON name="new button" id="6514609962c325db" memberName="buttonSet3"
-              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="e8336da307c67c03"
+              virtualName="" explicitFocusOrder="0" pos="144 16 55 24" posRelativeX="e8336da307c67c03"
               posRelativeY="e8336da307c67c03" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="74aa9d1365e4e818" memberName="sliderTime3"
-          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="e8336da307c67c03"
+          virtualName="" explicitFocusOrder="0" pos="208 16 344M 24" posRelativeX="e8336da307c67c03"
           posRelativeY="e8336da307c67c03" posRelativeW="e8336da307c67c03"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -696,11 +696,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="996694d54e1d1607" memberName="group4" virtualName=""
                   explicitFocusOrder="0" pos="0 144 0M 48" title="Preset 4"/>
   <TEXTBUTTON name="new button" id="16b3ac053bc2130" memberName="buttonSet4"
-              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="996694d54e1d1607"
+              virtualName="" explicitFocusOrder="0" pos="144 16 55 24" posRelativeX="996694d54e1d1607"
               posRelativeY="996694d54e1d1607" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="9bf6f40205390b0d" memberName="sliderTime4"
-          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="996694d54e1d1607"
+          virtualName="" explicitFocusOrder="0" pos="208 16 344M 24" posRelativeX="996694d54e1d1607"
           posRelativeY="996694d54e1d1607" posRelativeW="996694d54e1d1607"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -725,7 +725,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="4e587d8ba9574cdb" memberName="sliderG1"
-          virtualName="" explicitFocusOrder="0" pos="48 16 63 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="48 16 88 24" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
@@ -735,7 +735,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="fa534e49d7755462" memberName="sliderG2"
-          virtualName="" explicitFocusOrder="0" pos="48 64 63 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="48 64 88 24" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
@@ -745,7 +745,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="2bb9759e114e9b88" memberName="sliderG3"
-          virtualName="" explicitFocusOrder="0" pos="48 112 63 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="48 112 88 24" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
@@ -755,7 +755,7 @@ BEGIN_JUCER_METADATA
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="new slider" id="893dce9ce162f2b9" memberName="sliderG4"
-          virtualName="" explicitFocusOrder="0" pos="48 160 63 24" min="0.0"
+          virtualName="" explicitFocusOrder="0" pos="48 160 88 24" min="0.0"
           max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
