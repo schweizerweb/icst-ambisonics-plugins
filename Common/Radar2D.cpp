@@ -45,6 +45,12 @@ Radar2D::~Radar2D()
 	openGLContext.detach();
 }
 
+void Radar2D::setAnchor(AnchorX x, AnchorY y)
+{
+    anchorX = x;
+    anchorY = y;
+}
+
 Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
 {
 	switch(radarMode)
@@ -612,30 +618,44 @@ void Radar2D::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-	double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
-
 	if (getBounds().getWidth() * getBounds().getHeight() <= 0)
 		return;
 
-	if(getBounds().getAspectRatio() >= wantedRatioWidthToHeight)
-	{
-		// add additional space left and right
-		radarViewport = Rectangle<int>(
-			int((getBounds().getWidth() - getBounds().getHeight() * wantedRatioWidthToHeight) / 2), 
-			0, 
-			int(getBounds().getHeight() * wantedRatioWidthToHeight), 
-			int(getBounds().getHeight()));
-	}
-	else
-	{
-		// add space on top or bottom, depending on radar mode
-		radarViewport = Rectangle<int>(
-			0,
-			(radarMode != XZ_Half) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
-			getBounds().getWidth(),
-			int(getBounds().getWidth() / wantedRatioWidthToHeight));
-	}
+    double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
 
+    auto bounds = getBounds();
+    double fullSize = jmin((double)bounds.getWidth(), bounds.getHeight() * wantedRatioWidthToHeight);
+    
+    double x, y, w, h;
+    w = fullSize;
+    h = fullSize / wantedRatioWidthToHeight;
+    switch (anchorX) {
+        case X_Left:
+            x = 0;
+            break;
+        case X_Right:
+            x = bounds.getWidth() - fullSize;
+            break;
+        case X_Center:
+        default:
+            x = (bounds.getWidth() - fullSize) / 2.0;
+            break;
+    }
+    
+    switch (anchorY) {
+        case Y_Top:
+            y = 0;
+            break;
+        case Y_Bottom:
+            y = bounds.getHeight() - fullSize / wantedRatioWidthToHeight;
+            break;
+        default:
+        case Y_Center:
+            y = (bounds.getHeight() - fullSize / wantedRatioWidthToHeight) / 2.0;
+            break;
+    }
+    
+    radarViewport = Rectangle<int>(x, y, w, h);
 	updateRadarBackground();
 }
 

@@ -99,11 +99,27 @@ void Radar3D::resized()
     //[/UserPreResize]
 
     //[UserResized] Add your own custom resize handling here..
-	int secondRadarHeight = int((getHeight() - 6) / (fullRadarFlag ? 2.0 : 3.0));
-	int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
-	xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
-	xzRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
-	btnFull->setBounds(0, topRadarHeight + secondRadarHeight, getWidth(), getHeight() - topRadarHeight - secondRadarHeight);
+    if(getWidth() > getHeight())
+    {
+        xzRadar->setRadarMode(Radar2D::XZ_Full);
+        xyRadar->setAnchor(Radar2D::X_Right, Radar2D::Y_Center);
+        xzRadar->setAnchor(Radar2D::X_Left, Radar2D::Y_Center);
+        xyRadar->setBounds(0, 0, getWidth()/2, getHeight());
+        xzRadar->setBounds(getWidth()/2, 0, getWidth()/2, getHeight());
+        btnFull->setVisible(false);
+    }
+    else
+    {
+        xzRadar->setRadarMode(fullRadarFlag ? Radar2D::XZ_Full : Radar2D::XZ_Half);
+        int secondRadarHeight = int((getHeight() - 6) / (fullRadarFlag ? 2.0 : 3.0));
+        int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
+        xyRadar->setAnchor(Radar2D::X_Center, Radar2D::Y_Bottom);
+        xzRadar->setAnchor(Radar2D::X_Center, Radar2D::Y_Top);
+        xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
+        xzRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
+        btnFull->setBounds(0, topRadarHeight + secondRadarHeight, getWidth(), getHeight() - topRadarHeight - secondRadarHeight);
+        btnFull->setVisible(true);
+    }
     //[/UserResized]
 }
 
