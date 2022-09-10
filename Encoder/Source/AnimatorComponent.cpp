@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -137,6 +137,86 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     addAndMakeVisible (action2.get());
     action2->setName ("new component");
 
+    labelG.reset (new juce::Label ("new label",
+                                   TRANS("G:")));
+    addAndMakeVisible (labelG.get());
+    labelG->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelG->setJustificationType (juce::Justification::centredLeft);
+    labelG->setEditable (false, false, false);
+    labelG->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelG->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelG->setBounds (16, 16, 32, 24);
+
+    sliderG1.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderG1.get());
+    sliderG1->setRange (0, 10, 1);
+    sliderG1->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderG1->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderG1->addListener (this);
+
+    sliderG1->setBounds (48, 16, 63, 24);
+
+    labelG2.reset (new juce::Label ("new label",
+                                    TRANS("G:")));
+    addAndMakeVisible (labelG2.get());
+    labelG2->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelG2->setJustificationType (juce::Justification::centredLeft);
+    labelG2->setEditable (false, false, false);
+    labelG2->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelG2->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelG2->setBounds (16, 64, 32, 24);
+
+    sliderG2.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderG2.get());
+    sliderG2->setRange (0, 10, 1);
+    sliderG2->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderG2->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderG2->addListener (this);
+
+    sliderG2->setBounds (48, 64, 63, 24);
+
+    labelG3.reset (new juce::Label ("new label",
+                                    TRANS("G:")));
+    addAndMakeVisible (labelG3.get());
+    labelG3->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelG3->setJustificationType (juce::Justification::centredLeft);
+    labelG3->setEditable (false, false, false);
+    labelG3->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelG3->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelG3->setBounds (16, 112, 32, 24);
+
+    sliderG3.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderG3.get());
+    sliderG3->setRange (0, 10, 1);
+    sliderG3->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderG3->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderG3->addListener (this);
+
+    sliderG3->setBounds (48, 112, 63, 24);
+
+    labelG4.reset (new juce::Label ("new label",
+                                    TRANS("G:")));
+    addAndMakeVisible (labelG4.get());
+    labelG4->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelG4->setJustificationType (juce::Justification::centredLeft);
+    labelG4->setEditable (false, false, false);
+    labelG4->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelG4->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    labelG4->setBounds (16, 160, 32, 24);
+
+    sliderG4.reset (new juce::Slider ("new slider"));
+    addAndMakeVisible (sliderG4.get());
+    sliderG4->setRange (0, 10, 1);
+    sliderG4->setSliderStyle (juce::Slider::IncDecButtons);
+    sliderG4->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
+    sliderG4->addListener (this);
+
+    sliderG4->setBounds (48, 160, 63, 24);
+
 
     //[UserPreSize]
     String sliderSuffix = " s (Smoothing)";
@@ -144,6 +224,21 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet)
     sliderTime2->setTextValueSuffix(sliderSuffix);
     sliderTime3->setTextValueSuffix(sliderSuffix);
     sliderTime4->setTextValueSuffix(sliderSuffix);
+    
+    if(pSourceSet->groupCount() > 1)
+    {
+    sliderG1->setRange(0, pSourceSet->groupCount()-1);
+    sliderG2->setRange(0, pSourceSet->groupCount()-1);
+    sliderG3->setRange(0, pSourceSet->groupCount()-1);
+    sliderG4->setRange(0, pSourceSet->groupCount()-1);
+    }
+    else
+    {
+        sliderG1->setEnabled(false);
+        sliderG2->setEnabled(false);
+        sliderG3->setEnabled(false);
+        sliderG4->setEnabled(false);
+    }
     controlDimming();
     //[/UserPreSize]
 
@@ -183,6 +278,14 @@ AnimatorComponent::~AnimatorComponent()
     buttonGo4 = nullptr;
     action1 = nullptr;
     action2 = nullptr;
+    labelG = nullptr;
+    sliderG1 = nullptr;
+    labelG2 = nullptr;
+    sliderG2 = nullptr;
+    labelG3 = nullptr;
+    sliderG3 = nullptr;
+    labelG4 = nullptr;
+    sliderG4 = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -207,27 +310,27 @@ void AnimatorComponent::resized()
     //[/UserPreResize]
 
     group1->setBounds (0, 0, getWidth() - 0, 48);
-    buttonSet1->setBounds (0 + 16, 0 + 16, 55, 24);
-    sliderTime1->setBounds (0 + 80, 0 + 16, (getWidth() - 0) - 216, 24);
+    buttonSet1->setBounds (0 + 120, 0 + 16, 55, 24);
+    sliderTime1->setBounds (0 + 184, 0 + 16, (getWidth() - 0) - 320, 24);
     togglePolar1->setBounds (0 + (getWidth() - 0) - 70 - 63, 0 + 16, 63, 24);
     buttonGo1->setBounds (0 + (getWidth() - 0) - 9 - 55, 0 + 16, 55, 24);
     group2->setBounds (0, 48, getWidth() - 0, 48);
-    buttonSet2->setBounds (0 + 16, 48 + 16, 55, 24);
-    sliderTime2->setBounds (0 + 80, 48 + 16, (getWidth() - 0) - 216, 24);
+    buttonSet2->setBounds (0 + 120, 48 + 16, 55, 24);
+    sliderTime2->setBounds (0 + 184, 48 + 16, (getWidth() - 0) - 320, 24);
     togglePolar2->setBounds (0 + (getWidth() - 0) - 70 - 63, 48 + 16, 63, 24);
     buttonGo2->setBounds (0 + (getWidth() - 0) - 9 - 55, 48 + 16, 55, 24);
     group3->setBounds (0, 96, getWidth() - 0, 48);
-    buttonSet3->setBounds (0 + 16, 96 + 16, 55, 24);
-    sliderTime3->setBounds (0 + 80, 96 + 16, (getWidth() - 0) - 216, 24);
+    buttonSet3->setBounds (0 + 120, 96 + 16, 55, 24);
+    sliderTime3->setBounds (0 + 184, 96 + 16, (getWidth() - 0) - 320, 24);
     togglePolar3->setBounds (0 + (getWidth() - 0) - 70 - 63, 96 + 16, 63, 24);
     buttonGo3->setBounds (0 + (getWidth() - 0) - 9 - 55, 96 + 16, 55, 24);
     group4->setBounds (0, 144, getWidth() - 0, 48);
-    buttonSet4->setBounds (0 + 16, 144 + 16, 55, 24);
-    sliderTime4->setBounds (0 + 80, 144 + 16, (getWidth() - 0) - 216, 24);
+    buttonSet4->setBounds (0 + 120, 144 + 16, 55, 24);
+    sliderTime4->setBounds (0 + 184, 144 + 16, (getWidth() - 0) - 320, 24);
     togglePolar4->setBounds (0 + (getWidth() - 0) - 70 - 63, 144 + 16, 63, 24);
     buttonGo4->setBounds (0 + (getWidth() - 0) - 9 - 55, 144 + 16, 55, 24);
-    action1->setBounds (0, 200, proportionOfWidth (0.5012f), 340);
-    action2->setBounds (getWidth() - proportionOfWidth (0.5012f), 200, proportionOfWidth (0.5012f), 340);
+    action1->setBounds (0, 200, proportionOfWidth (0.5000f), 340);
+    action2->setBounds (getWidth() - proportionOfWidth (0.5000f), 200, proportionOfWidth (0.5000f), 340);
     //[UserResized] Add your own custom resize handling here..
     sliderTime1->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime1->getWidth() - 50), sliderTime1->getHeight());
     sliderTime2->setTextBoxStyle(Slider::TextBoxLeft, false, jmax(0, sliderTime2->getWidth() - 50), sliderTime2->getHeight());
@@ -244,7 +347,8 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonSet1.get())
     {
         //[UserButtonCode_buttonSet1] -- add your button handler code here..
-        setPreset(&set1);
+        setPreset(&set1, sliderG1->getValue());
+        buttonSet1->setColour(TextButton::buttonColourId, Colours::green);
         //[/UserButtonCode_buttonSet1]
     }
     else if (buttonThatWasClicked == buttonGo1.get())
@@ -256,7 +360,8 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonSet2.get())
     {
         //[UserButtonCode_buttonSet2] -- add your button handler code here..
-        setPreset(&set2);
+        setPreset(&set2, sliderG2->getValue());
+        buttonSet2->setColour(TextButton::buttonColourId, Colours::green);
         //[/UserButtonCode_buttonSet2]
     }
     else if (buttonThatWasClicked == buttonGo2.get())
@@ -268,7 +373,8 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonSet3.get())
     {
         //[UserButtonCode_buttonSet3] -- add your button handler code here..
-        setPreset(&set3);
+        setPreset(&set3, sliderG3->getValue());
+        buttonSet3->setColour(TextButton::buttonColourId, Colours::green);
         //[/UserButtonCode_buttonSet3]
     }
     else if (buttonThatWasClicked == buttonGo3.get())
@@ -280,7 +386,8 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == buttonSet4.get())
     {
         //[UserButtonCode_buttonSet4] -- add your button handler code here..
-        setPreset(&set4);
+        setPreset(&set4, sliderG4->getValue());
+        buttonSet4->setColour(TextButton::buttonColourId, Colours::green);
         //[/UserButtonCode_buttonSet4]
     }
     else if (buttonThatWasClicked == buttonGo4.get())
@@ -293,6 +400,36 @@ void AnimatorComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     //[UserbuttonClicked_Post]
     controlDimming();
     //[/UserbuttonClicked_Post]
+}
+
+void AnimatorComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    //[UsersliderValueChanged_Pre]
+    //[/UsersliderValueChanged_Pre]
+
+    if (sliderThatWasMoved == sliderG1.get())
+    {
+        //[UserSliderCode_sliderG1] -- add your slider handling code here..
+        //[/UserSliderCode_sliderG1]
+    }
+    else if (sliderThatWasMoved == sliderG2.get())
+    {
+        //[UserSliderCode_sliderG2] -- add your slider handling code here..
+        //[/UserSliderCode_sliderG2]
+    }
+    else if (sliderThatWasMoved == sliderG3.get())
+    {
+        //[UserSliderCode_sliderG3] -- add your slider handling code here..
+        //[/UserSliderCode_sliderG3]
+    }
+    else if (sliderThatWasMoved == sliderG4.get())
+    {
+        //[UserSliderCode_sliderG4] -- add your slider handling code here..
+        //[/UserSliderCode_sliderG4]
+    }
+
+    //[UsersliderValueChanged_Post]
+    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -328,7 +465,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
             }
 
             auto p = *groupSteps[i].getUnchecked(currentStep);
-            pSourceSet->setGroupXyz(i, p.getX(), p.getY(), p.getZ(), false);
+            pSourceSet->setGroupXyz(i, p.getX(), p.getY(), p.getZ(), true);
 
             actionsPerformed = true;
         }
@@ -344,7 +481,7 @@ void AnimatorComponent::timerCallback(int /*timerID*/)
             return;
         }
     }
-    else
+    //else
     {
         performAction(&action1->action);
         performAction(&action2->action);
@@ -451,10 +588,12 @@ void AnimatorComponent::calculateStepsTo(Point3D<double> origin, Point3D<double>
     }
 }
 
-void AnimatorComponent::setPreset(PositionSet *pSet)
+void AnimatorComponent::setPreset(PositionSet *pSet, int groupIndex)
 {
     pSet->sources.clear();
     pSet->groups.clear();
+    
+    /*
     for(int i = 0; i < pSourceSet->size(); i++)
     {
         pSet->sources.add(new Point3D<double>(*pSourceSet->get(i)->getPoint()));
@@ -465,6 +604,8 @@ void AnimatorComponent::setPreset(PositionSet *pSet)
         pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(i)->getPoint()));
         Logger::writeToLog(String(pSourceSet->getGroup(i)->getPoint()->getX()) + "; " + String(pSourceSet->getGroup(i)->getPoint()->getY()));
     }
+     */
+    pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(groupIndex)->getPoint()));
 }
 
 void AnimatorComponent::controlDimming()
@@ -495,11 +636,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="238ed80972cc4d19" memberName="group1" virtualName=""
                   explicitFocusOrder="0" pos="0 0 0M 48" title="Preset 1"/>
   <TEXTBUTTON name="new button" id="6f8d2fc9df3bb657" memberName="buttonSet1"
-              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="238ed80972cc4d19"
+              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="238ed80972cc4d19"
               posRelativeY="238ed80972cc4d19" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="1406018e4c78eb13" memberName="sliderTime1"
-          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="238ed80972cc4d19"
+          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="238ed80972cc4d19"
           posRelativeY="238ed80972cc4d19" posRelativeW="238ed80972cc4d19"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -515,11 +656,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="757958c6e56c2a33" memberName="group2" virtualName=""
                   explicitFocusOrder="0" pos="0 48 0M 48" title="Preset 2"/>
   <TEXTBUTTON name="new button" id="5d84d95099e73bb4" memberName="buttonSet2"
-              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="757958c6e56c2a33"
+              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="757958c6e56c2a33"
               posRelativeY="757958c6e56c2a33" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="2bb561484b6a5dbb" memberName="sliderTime2"
-          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="757958c6e56c2a33"
+          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="757958c6e56c2a33"
           posRelativeY="757958c6e56c2a33" posRelativeW="757958c6e56c2a33"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -535,11 +676,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="e8336da307c67c03" memberName="group3" virtualName=""
                   explicitFocusOrder="0" pos="0 96 0M 48" title="Preset 3"/>
   <TEXTBUTTON name="new button" id="6514609962c325db" memberName="buttonSet3"
-              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="e8336da307c67c03"
+              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="e8336da307c67c03"
               posRelativeY="e8336da307c67c03" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="74aa9d1365e4e818" memberName="sliderTime3"
-          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="e8336da307c67c03"
+          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="e8336da307c67c03"
           posRelativeY="e8336da307c67c03" posRelativeW="e8336da307c67c03"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -555,11 +696,11 @@ BEGIN_JUCER_METADATA
   <GROUPCOMPONENT name="new group" id="996694d54e1d1607" memberName="group4" virtualName=""
                   explicitFocusOrder="0" pos="0 144 0M 48" title="Preset 4"/>
   <TEXTBUTTON name="new button" id="16b3ac053bc2130" memberName="buttonSet4"
-              virtualName="" explicitFocusOrder="0" pos="16 16 55 24" posRelativeX="996694d54e1d1607"
+              virtualName="" explicitFocusOrder="0" pos="120 16 55 24" posRelativeX="996694d54e1d1607"
               posRelativeY="996694d54e1d1607" buttonText="Set" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="new slider" id="9bf6f40205390b0d" memberName="sliderTime4"
-          virtualName="" explicitFocusOrder="0" pos="80 16 216M 24" posRelativeX="996694d54e1d1607"
+          virtualName="" explicitFocusOrder="0" pos="184 16 320M 24" posRelativeX="996694d54e1d1607"
           posRelativeY="996694d54e1d1607" posRelativeW="996694d54e1d1607"
           min="0.0" max="999999.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
           textBoxEditable="1" textBoxWidth="150" textBoxHeight="20" skewFactor="1.0"
@@ -573,11 +714,51 @@ BEGIN_JUCER_METADATA
               posRelativeY="996694d54e1d1607" buttonText="Go" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="new component" id="99e58b8d05f9c746" memberName="action1"
-                    virtualName="" explicitFocusOrder="0" pos="0 200 50.118% 340"
-                    class="AnimatorActionComponent" params="pSourceSet, &quot;Action 1&quot;"/>
+                    virtualName="" explicitFocusOrder="0" pos="0 200 50% 340" class="AnimatorActionComponent"
+                    params="pSourceSet, &quot;Action 1&quot;"/>
   <GENERICCOMPONENT name="new component" id="658f4eddb6e6b401" memberName="action2"
-                    virtualName="" explicitFocusOrder="0" pos="0Rr 200 50.118% 340"
-                    class="AnimatorActionComponent" params="pSourceSet, &quot;Action 2&quot;"/>
+                    virtualName="" explicitFocusOrder="0" pos="0Rr 200 50% 340" class="AnimatorActionComponent"
+                    params="pSourceSet, &quot;Action 2&quot;"/>
+  <LABEL name="new label" id="72ff250a95e104d5" memberName="labelG" virtualName=""
+         explicitFocusOrder="0" pos="16 16 32 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="G:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="new slider" id="4e587d8ba9574cdb" memberName="sliderG1"
+          virtualName="" explicitFocusOrder="0" pos="48 16 63 24" min="0.0"
+          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="new label" id="d71ef83fa2ffe1b5" memberName="labelG2" virtualName=""
+         explicitFocusOrder="0" pos="16 64 32 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="G:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="new slider" id="fa534e49d7755462" memberName="sliderG2"
+          virtualName="" explicitFocusOrder="0" pos="48 64 63 24" min="0.0"
+          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="new label" id="97cf14e8bf8b643c" memberName="labelG3" virtualName=""
+         explicitFocusOrder="0" pos="16 112 32 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="G:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="new slider" id="2bb9759e114e9b88" memberName="sliderG3"
+          virtualName="" explicitFocusOrder="0" pos="48 112 63 24" min="0.0"
+          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
+  <LABEL name="new label" id="111823e32102b980" memberName="labelG4" virtualName=""
+         explicitFocusOrder="0" pos="16 160 32 24" edTextCol="ff000000"
+         edBkgCol="0" labelText="G:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <SLIDER name="new slider" id="893dce9ce162f2b9" memberName="sliderG4"
+          virtualName="" explicitFocusOrder="0" pos="48 160 63 24" min="0.0"
+          max="10.0" int="1.0" style="IncDecButtons" textBoxPos="TextBoxLeft"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

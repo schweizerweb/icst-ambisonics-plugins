@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -41,7 +41,8 @@
 */
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
-                           public juce::Button::Listener
+                           public juce::Button::Listener,
+                           public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -56,6 +57,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -69,7 +71,7 @@ private:
 
     void calculateStepsTo(PositionSet* pPositions, bool isPolar, double timeSec);
     void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
-    void setPreset(PositionSet* pSet);
+    void setPreset(PositionSet* pSet, int groupIndex);
     void performAction(AnimatorAction* pAction);
     void controlDimming();
 
@@ -108,6 +110,14 @@ private:
     std::unique_ptr<juce::TextButton> buttonGo4;
     std::unique_ptr<AnimatorActionComponent> action1;
     std::unique_ptr<AnimatorActionComponent> action2;
+    std::unique_ptr<juce::Label> labelG;
+    std::unique_ptr<juce::Slider> sliderG1;
+    std::unique_ptr<juce::Label> labelG2;
+    std::unique_ptr<juce::Slider> sliderG2;
+    std::unique_ptr<juce::Label> labelG3;
+    std::unique_ptr<juce::Slider> sliderG3;
+    std::unique_ptr<juce::Label> labelG4;
+    std::unique_ptr<juce::Slider> sliderG4;
 
 
     //==============================================================================
