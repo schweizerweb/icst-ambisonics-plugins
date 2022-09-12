@@ -25,12 +25,20 @@
             file="Source/AmbiOSCSenderExt.cpp"/>
       <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
             file="Source/AmbiOSCSenderExt.h"/>
+      <FILE id="cmQH00" name="AnimatorDataset.h" compile="0" resource="0"
+            file="Source/AnimatorDataset.h"/>
       <FILE id="lDMF5l" name="AnimatorAction.h" compile="0" resource="0"
             file="Source/AnimatorAction.h"/>
       <FILE id="vhhrU3" name="AnimatorActionComponent.cpp" compile="1" resource="0"
             file="Source/AnimatorActionComponent.cpp"/>
       <FILE id="OFVlKQ" name="AnimatorActionComponent.h" compile="0" resource="0"
             file="Source/AnimatorActionComponent.h"/>
+      <FILE id="YlOBh0" name="AnimatorMovement.h" compile="0" resource="0"
+            file="Source/AnimatorMovement.h"/>
+      <FILE id="UWV0Rc" name="AnimatorMovementComponent.cpp" compile="1"
+            resource="0" file="Source/AnimatorMovementComponent.cpp"/>
+      <FILE id="oW7dxS" name="AnimatorMovementComponent.h" compile="0" resource="0"
+            file="Source/AnimatorMovementComponent.h"/>
       <FILE id="FXQcgb" name="AnimatorComponent.cpp" compile="1" resource="0"
             file="Source/AnimatorComponent.cpp"/>
       <FILE id="sNux2i" name="AnimatorComponent.h" compile="0" resource="0"

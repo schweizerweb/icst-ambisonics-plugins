@@ -184,7 +184,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
 
         if(ModifierKeys::currentModifiers.isCommandDown() && ModifierKeys::currentModifiers.isCtrlDown() && ModifierKeys::currentModifiers.isAltDown() && ModifierKeys::currentModifiers.isShiftDown())
         {
-            animatorDialogManager.show(pSources, this);
+            animatorDialogManager.show(pSources, processor.getAnimatorDataset(), this);
             return;
         }
 

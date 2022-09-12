@@ -17,6 +17,7 @@
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
+#define XML_TAG_ENCODER_ANIMATOR "Animator"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -335,7 +336,7 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
-	
+    xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
 	delete xml;
@@ -355,6 +356,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			// load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();
+            animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
 		}
 	}
 
@@ -404,6 +406,11 @@ CustomOscTxPresetHelper* AmbisonicEncoderAudioProcessor::getCustomOscTxPresetHel
 ScalingInfo* AmbisonicEncoderAudioProcessor::getScalingInfo()
 {
     return &scalingInfo;
+}
+
+AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
+{
+    return &animatorDataset;
 }
 
 #if (!MULTI_ENCODER_MODE)

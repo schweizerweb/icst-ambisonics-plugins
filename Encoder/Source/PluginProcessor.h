@@ -27,6 +27,7 @@
 #include "../../Common/ScalingInfo.h"
 #include "CustomOscRxPresetHelper.h"
 #include "CustomOscTxPresetHelper.h"
+#include "AnimatorDataset.h"
 
 //==============================================================================
 /**
@@ -85,6 +86,7 @@ public:
     CustomOscRxPresetHelper* getCustomOscRxPresetHelper();
     CustomOscTxPresetHelper* getCustomOscTxPresetHelper();
     ScalingInfo* getScalingInfo();
+    AnimatorDataset* getAnimatorDataset();
 
 #if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
@@ -109,6 +111,7 @@ private:
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     double lastScaler;
+    AnimatorDataset animatorDataset;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
