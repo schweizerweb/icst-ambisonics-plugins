@@ -138,6 +138,7 @@ void AnimatorComponent::refreshControls()
 
 void AnimatorComponent::actionListenerCallback(const juce::String &message)
 {
+#if MULTI_ENCODER_MODE
     AnimatorMovement* pMov = nullptr;
     for(auto& m : pAnimatorDataset->movements)
     {
@@ -169,6 +170,7 @@ void AnimatorComponent::actionListenerCallback(const juce::String &message)
             }
         }
     }
+#endif
 }
 
 void AnimatorComponent::timerCallback(int /*timerID*/)
