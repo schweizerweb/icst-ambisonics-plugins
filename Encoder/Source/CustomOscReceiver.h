@@ -42,27 +42,38 @@ private:
                 // set buffer values to 0
                 memset(buffer, 0, sizeof(buffer));
                 
+                // setter
                 setMethod ("setXYZ", setXYZ);
                 setMethod ("setXYZbyName", setXYZbyName);
                 setMethod ("setAED", setAED);
                 setMethod ("setAEDbyName", setAEDbyName);
-                setMethod ("x", x);
-                setMethod ("y", y);
-                setMethod ("z", z);
-                setMethod ("a", a);
-                setMethod ("e", e);
-                setMethod ("d", d);
-                setMethod ("name", name);
                 
-                // (incomplete) additional functions
+                // getter
+                setMethod ("getX", x);
+                setMethod ("getY", y);
+                setMethod ("getZ", z);
+                setMethod ("getA", a);
+                setMethod ("getE", e);
+                setMethod ("getD", d);
+                setMethod ("getName", name);
+                
+                // group functions
                 setMethod ("rotateGroup", rotateGroup);
-                setMethod ("rotateOrigin", rotateOrigin);
-                setMethod ("stretch", stretch);
+                setMethod ("rotateGroupByName", rotateGroupByName);
+                setMethod ("rotateGroupAroundOrigin", rotateOrigin);
+                setMethod ("rotateGroupAroundOriginByName", rotateOriginByName);
+                setMethod ("stretchGroup", stretch);
+                setMethod ("stretchGroupByName", stretchByName);
+                setMethod ("setGroupXYZ", setGroupXYZ);
+                setMethod ("setGroupXYZbyName", setGroupXYZbyName);
+                setMethod ("setGroupAED", setGroupAED);
+                setMethod ("setGroupAEDbyName", setGroupAEDbyName);
                 
                 // per-receiver buffer
-                setMethod ("getBuf", getBuf);
-                setMethod ("setBuf", setBuf);
+                setMethod ("getBufferValue", getBuf);
+                setMethod ("setBufferValue", setBuf);
                 
+                // OSC message functions
                 setMethod ("path", path);
                 setMethod ("arg", arg);
             }
@@ -216,6 +227,101 @@ private:
                 return var::undefined();
             }
             
+            static var setGroupXYZ (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        int index = args.arguments[0];
+                        index--;    // make 0-based
+                        double x = args.arguments[1];
+                        double y = args.arguments[2];
+                        double z = args.arguments[3];
+                    
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        thisObject->jsAmbiSourceSet->setGroupXyz(index, x, y, z, moveSub);
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var setGroupXYZbyName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        String name = args.arguments[0];
+                        double x = args.arguments[1];
+                        double y = args.arguments[2];
+                        double z = args.arguments[3];
+                    
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        thisObject->jsAmbiSourceSet->setGroupXyz(name, x, y, z, moveSub);
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            
+            static var setGroupAED (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        int index = args.arguments[0];
+                        index--;    // make 0-based
+                        double a = args.arguments[1];
+                        double e = args.arguments[2];
+                        double d = args.arguments[3];
+                    
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        thisObject->jsAmbiSourceSet->setGroupAed(index, a, e, d, moveSub);
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var setGroupAEDbyName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        String name = args.arguments[0];
+                        double a = args.arguments[1];
+                        double e = args.arguments[2];
+                        double d = args.arguments[3];
+                    
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        thisObject->jsAmbiSourceSet->setGroupAed(name, a, e, d, moveSub);
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
             static var x (const var::NativeFunctionArgs& args)
             {
                 if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
@@ -335,12 +441,30 @@ private:
                     if(args.numArguments == 4)
                     {
                         int index = args.arguments[0];
-                        double x = args.arguments[1];
-                        double y = args.arguments[2];
-                        double z = args.arguments[3];
+                        double x = (double)args.arguments[1] / 180.0 * PI;
+                        double y = (double)args.arguments[2] / 180.0 * PI;
+                        double z = (double)args.arguments[3] / 180.0 * PI;
                     
                         if(index > 0)
                             thisObject->jsAmbiSourceSet->rotateGroup(index - 1, x, y, z); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var rotateGroupByName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 4)
+                    {
+                        String name = args.arguments[0];
+                        double x = (double)args.arguments[1] / 180.0 * PI;
+                        double y = (double)args.arguments[2] / 180.0 * PI;
+                        double z = (double)args.arguments[3] / 180.0 * PI;
+                    
+                        thisObject->jsAmbiSourceSet->rotateGroup(name, x, y, z);
                     }
                 }
                 
@@ -354,9 +478,9 @@ private:
                     if(args.numArguments >= 4)
                     {
                         int index = args.arguments[0];
-                        double x = args.arguments[1];
-                        double y = args.arguments[2];
-                        double z = args.arguments[3];
+                        double x = (double)args.arguments[1] / 180.0 * PI;
+                        double y = (double)args.arguments[2] / 180.0 * PI;
+                        double z = (double)args.arguments[3] / 180.0 * PI;
                         
                         // optional move sub elements flag
                         bool moveSub = false;
@@ -365,6 +489,29 @@ private:
                         
                         if(index > 0)
                             thisObject->jsAmbiSourceSet->rotateGroupAroundOrigin(index - 1, x, y, z, moveSub); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var rotateOriginByName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments >= 4)
+                    {
+                        String name = args.arguments[0];
+                        double x = (double)args.arguments[1] / 180.0 * PI;
+                        double y = (double)args.arguments[2] / 180.0 * PI;
+                        double z = (double)args.arguments[3] / 180.0 * PI;
+                        
+                        // optional move sub elements flag
+                        bool moveSub = false;
+                        if(args.numArguments >= 5)
+                            moveSub = args.arguments[4];
+                        
+                        thisObject->jsAmbiSourceSet->rotateGroupAroundOrigin(name, x, y, z, moveSub);
                     }
                 }
                 
@@ -382,6 +529,22 @@ private:
                         
                         if(index > 0)
                             thisObject->jsAmbiSourceSet->stretchGroup(index - 1, stretch); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var stretchByName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 2)
+                    {
+                        String name = args.arguments[0];
+                        double stretch = args.arguments[1];
+                        
+                        thisObject->jsAmbiSourceSet->stretchGroup(name, stretch);
                     }
                 }
                 

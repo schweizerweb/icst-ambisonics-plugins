@@ -14,7 +14,7 @@
 #include "TableColumnCallback.h"
 
 #define JS_EDITOR_COMPONENT_WIDTH 400
-#define JS_EDITOR_ADDITIONAL_WIDTH  380
+#define JS_EDITOR_ADDITIONAL_WIDTH  450
 #define JS_EDITOR_COMPONENT_HEIGHT 400
 //==============================================================================
 /*
@@ -36,7 +36,7 @@ private:
     std::unique_ptr<juce::CodeTokeniser> codeTokenizer;
     std::unique_ptr<juce::TextButton> btnSave;
     std::unique_ptr<juce::TextButton> btnHelp;
-    std::unique_ptr<juce::Label> help;
+    std::unique_ptr<juce::TextEditor> help;
     bool helpFlag;
     
     CodeDocument codeDocument;
