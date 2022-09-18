@@ -41,11 +41,15 @@ JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdat
     
     btnHelp.reset(new TextButton("btnHelp"));
     addAndMakeVisible(btnHelp.get());
-    btnHelp->setButtonText("?");
+    btnHelp->setButtonText("JS Help");
     btnHelp->addListener(this);
     
     std::vector<String> lines;
-    lines.push_back("Custom OSC Help:");
+    lines.push_back("Custom OSC - JS Help:");
+    lines.push_back("");
+    lines.push_back("Title (optional):");
+    lines.push_back("  If the first line starts with a comment (//), this comment");
+    lines.push_back("  is used as title and will be shown in the Custom OSC list.");
     lines.push_back("");
     lines.push_back("Access to OSC data:");
     lines.push_back("  s.path([index]);");
@@ -165,9 +169,10 @@ void JsEditorComponent::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-    label->setBounds(0, 0, JS_EDITOR_COMPONENT_WIDTH - 20, 20);
-    btnHelp->setBounds(JS_EDITOR_COMPONENT_WIDTH - 20, 0, 20, 20);
-    codeEditor->setBounds(0, 20, JS_EDITOR_COMPONENT_WIDTH, JS_EDITOR_COMPONENT_HEIGHT - 50);
+    label->setBounds(0, 0, JS_EDITOR_COMPONENT_WIDTH - 60, 25);
+    btnHelp->setBounds(JS_EDITOR_COMPONENT_WIDTH - 60, 0, 60, 25);
+    btnHelp->setColour(TextButton::buttonColourId, helpFlag ? Colours::darkred : Colours::darkgreen);
+    codeEditor->setBounds(0, 27, JS_EDITOR_COMPONENT_WIDTH, JS_EDITOR_COMPONENT_HEIGHT - 54);
     btnSave->setBounds(0, JS_EDITOR_COMPONENT_HEIGHT-25, JS_EDITOR_COMPONENT_WIDTH, 25);
     if(helpFlag)
         help->setBounds(JS_EDITOR_COMPONENT_WIDTH, 0, JS_EDITOR_ADDITIONAL_WIDTH, JS_EDITOR_COMPONENT_HEIGHT);

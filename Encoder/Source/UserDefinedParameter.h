@@ -36,16 +36,16 @@
             {
                 JsContext (UserDefinedParameter* demo) : owner (demo)
                 {
-                    setMethod ("x", x);
-                    setMethod ("y", y);
-                    setMethod ("z", z);
-                    setMethod ("a", a);
-                    setMethod ("e", e);
-                    setMethod ("d", d);
-                    setMethod ("gain", gain);
-                    setMethod ("name", name);
-                    setMethod ("color", color);
-                    setMethod ("i", i);
+                    setMethod ("getX", x);
+                    setMethod ("getY", y);
+                    setMethod ("getZ", z);
+                    setMethod ("getA", a);
+                    setMethod ("getE", e);
+                    setMethod ("getD", d);
+                    setMethod ("getGain", gain);
+                    setMethod ("getName", name);
+                    setMethod ("getColor", color);
+                    setMethod ("getIndex", i);
                 }
         
                 static Identifier getClassName()    { return "p"; }

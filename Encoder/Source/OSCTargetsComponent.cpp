@@ -202,10 +202,12 @@ void OSCTargetsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     else if (buttonThatWasClicked == btnInfo.get())
     {
         //[UserButtonCode_btnInfo] -- add your button handler code here..
-        auto label = std::make_unique<Label>("", COMMON_OSC_INFO_STRING);
-        label->setSize(370, 340);
-        label->setJustificationType(Justification::left);
-        CallOutBox::launchAsynchronously(std::move(label), btnInfo->getBounds(), this);
+        auto textEditor = std::make_unique<TextEditor>("");
+        textEditor->setReadOnly(true);
+        textEditor->setMultiLine(true);
+        textEditor->setText(COMMON_OSC_INFO_STRING + String("\n\nJavaScript:\nEvery object can also be dynamically calculated using a JavaScript expression:\n{expr, #}\nwhere # defines the expression.\n\n The object p represents the current source point, the following methods provide access to the point's information:\n- p.getX()\n- p.getY()\n- p.getZ()\n- p.getA()\n- p.getE()\n- p.getD()\n- p.getName()\n- p.getColor()\n- p.getGain()\n- p.getIndex()\n\nExample to calculate the distance from (0,0,0) of the projection to the XY-plane:\n{expr, Math.sqrt(Math.pow(p.getX(), 2) + Math.pow(p.getY(), 2))}"));
+        textEditor->setSize(390, 250);
+        CallOutBox::launchAsynchronously(std::move(textEditor), btnInfo->getBounds(), this);
         //[/UserButtonCode_btnInfo]
     }
     else if (buttonThatWasClicked == toggleSendContinuous.get())
