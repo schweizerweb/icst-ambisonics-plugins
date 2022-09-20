@@ -661,7 +661,6 @@ void Radar2D::resized()
 
 void Radar2D::mouseExit(const MouseEvent&)
 {
-	startTimerHz(INACTIVE_REFRESH_RATE);
 	updateInfoLabel("");
     specialGroupManipulationMode = false;
     currentSpecialHandlingMode = None;
@@ -669,7 +668,6 @@ void Radar2D::mouseExit(const MouseEvent&)
 
 void Radar2D::mouseEnter(const MouseEvent&)
 {
-	startTimerHz(ACTIVE_REFRESH_RATE);
 }
 
 double Radar2D::getMaxPointSelectionDist() const
@@ -1060,4 +1058,10 @@ bool Radar2D::checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode
         return mode == MoveGroupPointOnly;
 
     return mode == Standard;
+}
+
+void Radar2D::setRefreshRate(int rateHz)
+{
+    stopTimer();
+    startTimerHz(rateHz);
 }

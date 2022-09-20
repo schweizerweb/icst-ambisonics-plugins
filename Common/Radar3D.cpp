@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -45,15 +45,15 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
     xyRadar->setBounds (0, 0, 336, 240);
 
-    btnFull.reset (new ImageButton ("btnFull"));
+    btnFull.reset (new juce::ImageButton ("btnFull"));
     addAndMakeVisible (btnFull.get());
     btnFull->setButtonText (TRANS("Full"));
     btnFull->addListener (this);
 
     btnFull->setImages (false, true, false,
-                        ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, Colour (0x00000000),
-                        Image(), 1.000f, Colour (0xffdd6060),
-                        ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, Colour (0x00000000));
+                        juce::ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, juce::Colour (0x00000000),
+                        juce::Image(), 1.000f, juce::Colour (0xffdd6060),
+                        juce::ImageCache::getFromMemory (flatArrowDownT_png, flatArrowDownT_pngSize), 1.000f, juce::Colour (0x00000000));
     btnFull->setBounds (0, 360, 336, 6);
 
 
@@ -64,12 +64,16 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
 
     //[Constructor] You can add your own custom stuff here..
+    xyRadar->addMouseListener(this, true);
+    xzRadar->addMouseListener(this, true);
     //[/Constructor]
 }
 
 Radar3D::~Radar3D()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    xyRadar->removeMouseListener(this);
+    xzRadar->removeMouseListener(this);
     //[/Destructor_pre]
 
     xzRadar = nullptr;
@@ -82,12 +86,12 @@ Radar3D::~Radar3D()
 }
 
 //==============================================================================
-void Radar3D::paint (Graphics& g)
+void Radar3D::paint (juce::Graphics& g)
 {
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff505050));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -123,7 +127,7 @@ void Radar3D::resized()
     //[/UserResized]
 }
 
-void Radar3D::buttonClicked (Button* buttonThatWasClicked)
+void Radar3D::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
@@ -141,6 +145,22 @@ void Radar3D::buttonClicked (Button* buttonThatWasClicked)
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
+}
+
+void Radar3D::mouseEnter (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseEnter] -- Add your code here...
+    xyRadar->setRefreshRate(ACTIVE_REFRESH_RATE);
+    xzRadar->setRefreshRate(ACTIVE_REFRESH_RATE);
+    //[/UserCode_mouseEnter]
+}
+
+void Radar3D::mouseExit (const juce::MouseEvent& e)
+{
+    //[UserCode_mouseExit] -- Add your code here...
+    xyRadar->setRefreshRate(INACTIVE_REFRESH_RATE);
+    xzRadar->setRefreshRate(INACTIVE_REFRESH_RATE);
+    //[/UserCode_mouseExit]
 }
 
 
@@ -168,6 +188,10 @@ BEGIN_JUCER_METADATA
                  parentClasses="public Component" constructorParams="AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
+  <METHODS>
+    <METHOD name="mouseEnter (const juce::MouseEvent&amp; e)"/>
+    <METHOD name="mouseExit (const juce::MouseEvent&amp; e)"/>
+  </METHODS>
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="xzRadar" id="9b35aa2c2da622df" memberName="xzRadar" virtualName=""
                     explicitFocusOrder="0" pos="0 240 336 120" class="Radar2D" params="Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
