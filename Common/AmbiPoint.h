@@ -25,6 +25,8 @@
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
 
+class AmbiGroup;
+
 class AmbiPoint
 {
 protected:
@@ -66,6 +68,9 @@ public:
 	
     Image* getLabelImage();
 	void ensureLabelImage();
+    
+    void setGroup(AmbiGroup* pG);
+    AmbiGroup* getGroup();
 	
     virtual float getDisplayScaler() = 0;
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
@@ -87,6 +92,7 @@ private:
 	Image labelImage;
     AudioParameterSet audioParams;
     bool enabled = true;
+    AmbiGroup* pGroup;
 };
 
 

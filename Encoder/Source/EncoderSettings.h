@@ -17,6 +17,7 @@
 #include "StandardOscTarget.h"
 
 
+#define DEFAULT_GROUP_MODE_FLAG     false
 #define DEFAULT_RECEIVE_FLAG		false
 #define DEFAULT_RECEIVE_PORT		50001
 #define DEFAULT_SEND_FLAG			true
@@ -46,6 +47,8 @@ public:
     void parameterValueChanged(int parameterIndex, float newValue) override;
     void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
 
+    bool groupModeFlag;
+    
     bool oscReceiveFlag;
 	int oscReceivePort;
 

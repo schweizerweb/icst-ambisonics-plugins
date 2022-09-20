@@ -57,11 +57,13 @@ void GroupAnimator::toggleOnOff(int parameterIndex)
         {
             bool enablePoints = !animationSets[i].audioParameterAnimationToggle->get();
             
-            for(AmbiPoint* p: pSourceSet->getGroup(i)->groupPoints)
+            // TODO: to be updated or deleted:
+            /*
+            for(AmbiPoint* p: pSourceSet->get(i)->groupPoints)
             {
                 p->getPoint()->getAudioParameterSet().setEnabled(enablePoints);
             }
-            
+            */
             break;
         }
     }

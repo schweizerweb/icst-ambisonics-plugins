@@ -9,6 +9,7 @@
 */
 
 #include "EncoderSettings.h"
+#define XML_TAG_GROUP_MODE "GroupMode"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
 #define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
 #define XML_TAG_OSC_SEND "OscSend"
@@ -35,6 +36,7 @@
 
 EncoderSettings::EncoderSettings():
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
+    groupModeFlag(DEFAULT_GROUP_MODE_FLAG),
     oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
 	oscSendFlag(DEFAULT_SEND_FLAG),
@@ -64,6 +66,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 {
 	XmlElement* element = new XmlElement(tagName);
 
+    XmlElement* groupMode = new XmlElement(XML_TAG_GROUP_MODE);
+    groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
+    element->addChildElement(groupMode);
+    
 	XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
@@ -117,6 +123,12 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		return;
 
     customOscTargets.clear();
+    
+    XmlElement* groupMode = element->getChildByName(XML_TAG_GROUP_MODE);
+    if(groupMode != nullptr)
+    {
+        groupModeFlag = groupMode->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_GROUP_MODE_FLAG);
+    }
     
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
 	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);

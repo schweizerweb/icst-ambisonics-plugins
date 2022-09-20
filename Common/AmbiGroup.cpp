@@ -24,7 +24,8 @@ AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, A
 			{
 				if (pSources->getUnchecked(i)->getId() == idStr)
 				{
-					groupPoints.add(pSources->getUnchecked(i));
+					//groupPoints.add(pSources->getUnchecked(i));
+                    addPointToGroup(pSources->getUnchecked(i));
 					break;
 				}
 			}
@@ -280,3 +281,33 @@ void AmbiGroup::setChildrenColor()
         p->setColor(getColor());
     }
 }
+
+void AmbiGroup::addPointToGroup(AmbiPoint *pt)
+{
+    if(pt->getGroup() != nullptr)
+    {
+        pt->getGroup()->removePointFromGroup(pt);
+    }
+    
+    pt->setGroup(this);
+    groupPoints.add(pt);
+}
+
+void AmbiGroup::removePointFromGroup(AmbiPoint *pt)
+{
+    for(int i = 0; i < groupPoints.size(); i++)
+    {
+        if(groupPoints[i] == pt)
+        {
+            pt->setGroup(nullptr);
+            groupPoints.remove(i);
+        }
+    }
+}
+
+int AmbiGroup::groupPointCount() { 
+    return groupPoints.size();
+}
+
+
+

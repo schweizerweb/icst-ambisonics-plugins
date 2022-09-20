@@ -66,7 +66,7 @@ public:
 		{
 		case COLUMN_ID_GROUP_NB: text = String(rowNumber + 1); break;
 		case COLUMN_ID_GROUP_NAME: text = pt->getName(); break;
-		case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPoints.size()); break;
+		case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPointCount()); break;
 		default: text = "";
 		}
 		g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);

@@ -171,11 +171,7 @@ void AmbiDataSet::setEnabled(int channel, bool enable) const
         {
             for(AmbiGroup* g : groups)
             {
-                for(int i = 0; i < g->groupPoints.size(); i++)
-                {
-                    if(g->groupPoints[i] == pt)
-                        g->groupPoints.remove(i);
-                }
+                g->removePointFromGroup(pt);
             }
         }
     }

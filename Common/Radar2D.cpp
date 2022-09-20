@@ -398,6 +398,13 @@ void Radar2D::renderOpenGL()
 				{
 					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare ? Square : Circle, pPointSelection->isPointSelected(i), getSelectedPointSize(scaler));
+                    AmbiGroup* grp = pt->getGroup();
+                    if(grp != nullptr)
+                    {
+                        if(grp->getEnabled()) {
+                            paintConnection(&g, grp, pt);
+                        }
+                    }
 				}
 			}
 
@@ -408,12 +415,7 @@ void Radar2D::renderOpenGL()
 				if(gPt != nullptr)
 				{
 					float scaler = gPt->getDisplayScaler();
-					for(int iSub = 0; iSub < gPt->groupPoints.size(); iSub++)
-					{
-                        if(gPt->groupPoints[iSub]->getEnabled())
-                            paintConnection(&g, gPt, gPt->groupPoints[iSub]);
-					}
-
+					
 					paintPoint(&g, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler), specialGroupManipulationMode);
 				}
 			}
@@ -763,6 +765,8 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	{
 		if (isGroup)
 		{
+            // this should never happen anyway!
+            /*
             // do not allow multiple group move if groups have common points
 			if (checkMouseActionMode(e.mods, MoveGroupPointOnly) && pPointSelection->getSelectionMode() == PointSelection::Group && !pPointSelection->isGroupSelected(minDistIndex))
 			{
@@ -775,7 +779,8 @@ void Radar2D::mouseDown(const MouseEvent& e)
 					}
 				}
 			}
-
+            */
+            
 			pPointSelection->selectGroup(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
             currentSpecialHandlingMode = specialHandlingMode;
             lastSpecialModePosition = e.getPosition();
@@ -849,17 +854,20 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
 		    Point3D<double>* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex())->getPoint();
-            std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack, pZoomSettings->getScalingInfo()));
-            for (int i : selection)
-            {
-                localGroup->groupPoints.add(pEditablePoints->get(i));
-            }
-
+            //std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack, pZoomSettings->getScalingInfo()));
+            
 			double dx = valuePoint.getX() - ref->getX();
 			double dy = radarMode == XY ? valuePoint.getY() - ref->getY() : 0.0;
 			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getZ();
 
-            localGroup->moveXYZ(dx, dy, dz, true);
+            for (int i : selection)
+            {
+                //localGroup->addPointToGroup(pEditablePoints->get(i));
+                Point3D<double>* p = pEditablePoints->get(i)->getPoint();
+                p->setXYZ(p->getX() + dx, p->getY() + dy, p->getZ() + dz);
+            }
+
+//            localGroup->moveXYZ(dx, dy, dz, true);
 		}
 		else if(pPointSelection->getSelectionMode() == PointSelection::Group)
 		{

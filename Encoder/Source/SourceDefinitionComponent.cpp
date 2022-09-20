@@ -337,8 +337,8 @@ void SourceDefinitionComponent::controlDimming() const
 {
     buttonAdd->setEnabled(m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size());
     buttonRemove->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pSourceSet->size() > 0);
-    buttonMoveUp->setEnabled(m_args.pPointSelection->getMainSelectedPointIndex() > 0);
-    buttonMoveDown->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
+    buttonMoveUp->setEnabled(!m_args.pSettings->groupModeFlag && m_args.pPointSelection->getMainSelectedPointIndex() > 0);
+    buttonMoveDown->setEnabled(!m_args.pSettings->groupModeFlag && m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
     buttonAddGroup->setEnabled(true);
     buttonRemoveGroup->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Group && m_args.pSourceSet->groupCount() > 0);
 }

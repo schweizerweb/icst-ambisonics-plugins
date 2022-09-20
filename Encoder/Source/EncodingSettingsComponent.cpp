@@ -67,14 +67,14 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     toggleDistanceEncoding->setButtonText (TRANS("Enable Distance Encoding"));
     toggleDistanceEncoding->addListener (this);
 
-    toggleDistanceEncoding->setBounds (14, 19, 199, 24);
+    toggleDistanceEncoding->setBounds (14, 43, 199, 24);
 
     toggleDoppler.reset (new juce::ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
     toggleDoppler->setButtonText (TRANS("Enable Doppler"));
     toggleDoppler->addListener (this);
 
-    toggleDoppler->setBounds (14, 49, 199, 24);
+    toggleDoppler->setBounds (14, 73, 199, 24);
 
     sliderDistanceScaler.reset (new juce::Slider ("sliderDistanceScaler"));
     addAndMakeVisible (sliderDistanceScaler.get());
@@ -92,7 +92,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceScaler->setBounds (14, 79, 109, 24);
+    labelDistanceScaler->setBounds (14, 103, 109, 24);
 
     btnEditDistanceEncoding.reset (new juce::TextButton ("btnEditDistanceEncoding"));
     addAndMakeVisible (btnEditDistanceEncoding.get());
@@ -123,7 +123,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     labelMasterGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelMasterGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelMasterGain->setBounds (14, 109, 109, 24);
+    labelMasterGain->setBounds (14, 133, 109, 24);
 
     sliderMasterGain.reset (new juce::Slider ("sliderMasterGain"));
     addAndMakeVisible (sliderMasterGain.get());
@@ -131,6 +131,13 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     sliderMasterGain->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderMasterGain->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderMasterGain->addListener (this);
+
+    toggleGroupMode.reset (new juce::ToggleButton ("toggleGroupMode"));
+    addAndMakeVisible (toggleGroupMode.get());
+    toggleGroupMode->setButtonText (TRANS("Group Mode"));
+    toggleGroupMode->addListener (this);
+
+    toggleGroupMode->setBounds (14, 12, 199, 24);
 
 
     //[UserPreSize]
@@ -183,6 +190,7 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     btnManageDistanceEncodingPresets = nullptr;
     labelMasterGain = nullptr;
     sliderMasterGain = nullptr;
+    toggleGroupMode = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -209,13 +217,13 @@ void EncodingSettingsComponent::resized()
     comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 290, 24);
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
-    sourceDefinition->setBounds (8, 144, getWidth() - 16, getHeight() - 186);
-    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 79, getWidth() - 301, 24);
-    btnEditDistanceEncoding->setBounds (getWidth() - 108 - 86, 19, 86, 24);
+    sourceDefinition->setBounds (8, 168, getWidth() - 16, getHeight() - 210);
+    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 103, getWidth() - 301, 24);
+    btnEditDistanceEncoding->setBounds (getWidth() - 108 - 86, 43, 86, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
-    toggleInfiniteDistance->setBounds (getWidth() - 82, 79, 72, 24);
-    btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 19, 86, 24);
-    sliderMasterGain->setBounds (getWidth() - 90 - (getWidth() - 301), 109, getWidth() - 301, 24);
+    toggleInfiniteDistance->setBounds (getWidth() - 82, 103, 72, 24);
+    btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 43, 86, 24);
+    sliderMasterGain->setBounds (getWidth() - 90 - (getWidth() - 301), 133, getWidth() - 301, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -294,6 +302,13 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
         //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
         presetManagerDialog.show(this, m_args.pDistanceEncodingPresetHelper, false);
         //[/UserButtonCode_btnManageDistanceEncodingPresets]
+    }
+    else if (buttonThatWasClicked == toggleGroupMode.get())
+    {
+        //[UserButtonCode_toggleGroupMode] -- add your button handler code here..
+        m_args.pSettings->groupModeFlag = toggleGroupMode->getToggleState();
+        sourceDefinition->refresh();
+        //[/UserButtonCode_toggleGroupMode]
     }
 
     //[UserbuttonClicked_Post]
@@ -413,29 +428,30 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
-                    virtualName="" explicitFocusOrder="0" pos="8 144 16M 186M" class="SourceDefinitionComponent"
+                    virtualName="" explicitFocusOrder="0" pos="8 168 16M 210M" class="SourceDefinitionComponent"
                     params="args"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
-                virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
+                virtualName="" explicitFocusOrder="0" pos="14 43 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TOGGLEBUTTON name="toggleDoppler" id="8a9ea68cd17e7a8c" memberName="toggleDoppler"
-                virtualName="" explicitFocusOrder="0" pos="14 49 199 24" posRelativeX="b72378bdfe4e130"
+                virtualName="" explicitFocusOrder="0" pos="14 73 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="90Rr 79 301M 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+          virtualName="" explicitFocusOrder="0" pos="90Rr 103 301M 24"
+          posRelativeX="b72378bdfe4e130" posRelativeY="b72378bdfe4e130"
+          min="1.0" max="1000.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
+          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
+          needsCallback="1"/>
   <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="14 79 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="14 103 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
-              virtualName="" explicitFocusOrder="0" pos="108Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              virtualName="" explicitFocusOrder="0" pos="108Rr 43 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
@@ -443,25 +459,29 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
-                virtualName="" explicitFocusOrder="0" pos="82R 79 72 24" buttonText="Infinite"
+                virtualName="" explicitFocusOrder="0" pos="82R 103 72 24" buttonText="Infinite"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="btnManageDistanceEncodingPresets" id="e79fc007bc779712"
               memberName="btnManageDistanceEncodingPresets" virtualName=""
-              explicitFocusOrder="0" pos="12Rr 19 86 24" posRelativeX="b72378bdfe4e130"
+              explicitFocusOrder="0" pos="12Rr 43 86 24" posRelativeX="b72378bdfe4e130"
               posRelativeY="b72378bdfe4e130" buttonText="presets..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelMasterGain" id="5a6c2906ed7799ee" memberName="labelMasterGain"
-         virtualName="" explicitFocusOrder="0" pos="14 109 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="14 133 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Master Gain [dB]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderMasterGain" id="48f17ace33ebcbca" memberName="sliderMasterGain"
-          virtualName="" explicitFocusOrder="0" pos="90Rr 109 301M 24"
+          virtualName="" explicitFocusOrder="0" pos="90Rr 133 301M 24"
           posRelativeX="b72378bdfe4e130" posRelativeY="b72378bdfe4e130"
           min="0.0" max="36.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
           textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
           needsCallback="1"/>
+  <TOGGLEBUTTON name="toggleGroupMode" id="88b6a5b9193adc18" memberName="toggleGroupMode"
+                virtualName="" explicitFocusOrder="0" pos="14 12 199 24" posRelativeX="b72378bdfe4e130"
+                posRelativeY="b72378bdfe4e130" buttonText="Group Mode" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

@@ -36,7 +36,7 @@ public:
 		{
             AmbiSource* s = pSources->get(i);
 			ToggleButton* b = new ToggleButton(s->getName());
-			b->setToggleState(pGroup->groupPoints.contains(s), dontSendNotification);
+			b->setToggleState(s->getGroup() == pGroup, dontSendNotification);
             b->setEnabled(s->getEnabled());
 			b->addListener(this);
 			toggleButtons.add(b);
@@ -77,17 +77,12 @@ public:
 		if(index >= 0)
 		{
 			if (static_cast<ToggleButton*>(b)->getToggleState())
-				pGroup->groupPoints.add(pSources->get(index));
+            {
+                pGroup->addPointToGroup(pSources->get(index));
+            }
 			else
 			{
-				for (int i = 0; i < pGroup->groupPoints.size(); i++)
-				{
-					if (pGroup->groupPoints[i] == pSources->get(index))
-					{
-						pGroup->groupPoints.remove(i);
-						break;
-					}
-				}
+                pGroup->removePointFromGroup(pSources->get(index));
 			}
 
 			sendChangeMessage();

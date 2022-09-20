@@ -38,9 +38,15 @@ public:
     void rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
 
-	Array<AmbiPoint*> groupPoints;
     ScalingInfo* pScalingInfo;
     
     bool allowMute() const override { return false; }
     bool allowSolo() const override { return false; }
+    
+    void addPointToGroup(AmbiPoint* pt);
+    void removePointFromGroup(AmbiPoint* pt);
+    int groupPointCount();
+    
+private:
+    Array<AmbiPoint*> groupPoints;
 };

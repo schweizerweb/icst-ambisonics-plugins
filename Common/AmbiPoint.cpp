@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams), enabled(other->enabled)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams), enabled(other->enabled), pGroup(other->pGroup)
 {
 	if (copyImage)
 	{
@@ -24,7 +24,7 @@ AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(oth
 	}
 }
 
-AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0)
+AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0), pGroup(nullptr)
 {
 }
 
@@ -36,7 +36,8 @@ AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color
 	gain(gain),
     mute(mute),
     solo(solo),
-    enabled(true)
+    enabled(true),
+    pGroup(nullptr)
 {
 }
 
@@ -50,7 +51,8 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
     solo(false),
-    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true)),
+    pGroup(nullptr)
 {
 }
 
@@ -66,7 +68,8 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
     mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
     solo(false),
     audioParams(audioParams),
-    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true)),
+    pGroup(nullptr)
 {
 }
 
@@ -78,7 +81,8 @@ AmbiPoint::AmbiPoint(AudioParameterSet audioParams) :
     mute(false),
     solo(false),
     audioParams(audioParams),
-    enabled(false)
+    enabled(false),
+    pGroup(nullptr)
 {
 }
 
@@ -240,3 +244,13 @@ Colour AmbiPoint::loadColorAttribute(XmlElement* element)
 
     return Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR_OLD))).withAlpha(1.0f);
 }
+
+void AmbiPoint::setGroup(AmbiGroup* pG) {
+    this->pGroup = pG;
+}
+
+AmbiGroup* AmbiPoint::getGroup() {
+    return pGroup;
+}
+
+

@@ -384,7 +384,7 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
             AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(centerXY.getX(), centerXY.getY(), centerZ, pRadarOptions->getAudioParamForIndex(pEditablePoints->groupCount(), true)), "G", Colours::orange);
             for (int i : selection)
             {
-                g->groupPoints.add(pEditablePoints->get(i));
+                g->addPointToGroup(pEditablePoints->get(i));
             }
 
             pPointSelection->selectGroup(pEditablePoints->groupCount() - 1, false);
