@@ -508,10 +508,34 @@ bool Radar2D::keyPressed(const KeyPress& key)
             for(auto i : selection)
                 pEditablePoints->setSolo(i, anyNotSolo);
         }
+        else if(key.isKeyCode(KeyPress::backspaceKey))
+        {
+            for(auto i : selection)
+            {
+                pEditablePoints->setEnabled(i, false);
+            }
+        }
         
         return true;
     }
-	if (key.isKeyCode(KeyPress::upKey))
+    if(pPointSelection->getSelectionMode() == PointSelection::Group
+       && key.getModifiers().isCtrlDown()
+       && key.getModifiers().isShiftDown()
+       && key.isKeyCode(KeyPress::backspaceKey))
+    {
+        {
+            for(auto i : selection)
+            {
+                pEditablePoints->removeGroup(i);
+            }
+            
+            pPointSelection->unselectPoint();
+        }
+        
+        return true;
+    }
+    
+    if (key.isKeyCode(KeyPress::upKey))
 	{
 		if (radarMode == XY)
 		{
@@ -905,7 +929,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
                 Array<int> selectedIndices;
                 for (int i : selection)
                 {
-                    if (i != pPointSelection->getMainSelectedPointIndex())
+                    if (i != mainGroupIndex)
                     {
                         selectedIndices.add(i);
                         relativePositions.add(*pEditablePoints->getGroup(i)->getPoint() - referencePoint);
