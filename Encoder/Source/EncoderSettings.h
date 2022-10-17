@@ -31,7 +31,7 @@
 #define DEFAULT_MASTER_GAIN			0
 #define DEFAULT_HIDE_WARNINGS       false
 #define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
-#define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 4 : 0)
+#define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 8 : 0)
 
 class EncoderSettings : public AmbiBasicSettings, public AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
