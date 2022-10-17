@@ -309,5 +309,9 @@ int AmbiGroup::groupPointCount() {
     return groupPoints.size();
 }
 
-
+void AmbiGroup::removeAllPoints() {
+    while (groupPoints.size()) {
+        removePointFromGroup(groupPoints[0]);
+    }
+}
 

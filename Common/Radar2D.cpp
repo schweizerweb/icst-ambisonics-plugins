@@ -526,12 +526,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
        && key.isKeyCode(KeyPress::backspaceKey))
     {
         {
+            pPointSelection->unselectPoint();
+         
             for(auto i : selection)
             {
                 pEditablePoints->removeGroup(i);
             }
-            
-            pPointSelection->unselectPoint();
         }
         
         return true;
@@ -876,7 +876,6 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
 		    Point3D<double>* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex())->getPoint();
-            //std::unique_ptr<AmbiGroup> localGroup(new AmbiGroup("TEMP", Point3D<double>(ref->getX(), ref->getY(), ref->getZ()), "temp", Colours::transparentBlack, pZoomSettings->getScalingInfo()));
             
 			double dx = valuePoint.getX() - ref->getX();
 			double dy = radarMode == XY ? valuePoint.getY() - ref->getY() : 0.0;
@@ -884,12 +883,9 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
             for (int i : selection)
             {
-                //localGroup->addPointToGroup(pEditablePoints->get(i));
                 Point3D<double>* p = pEditablePoints->get(i)->getPoint();
                 p->setXYZ(p->getX() + dx, p->getY() + dy, p->getZ() + dz);
             }
-
-//            localGroup->moveXYZ(dx, dy, dz, true);
 		}
 		else if(pPointSelection->getSelectionMode() == PointSelection::Group)
 		{

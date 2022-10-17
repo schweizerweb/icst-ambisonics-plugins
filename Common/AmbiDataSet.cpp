@@ -353,6 +353,9 @@ void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, 
 
 void AmbiDataSet::removeGroup(int groupIndex)
 {
+    const ScopedLock lock(cs);
+    
+    groups[groupIndex]->removeAllPoints();
 	groups.remove(groupIndex);
 }
 

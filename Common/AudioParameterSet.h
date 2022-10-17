@@ -19,6 +19,10 @@ public:
 	AudioParameterFloatAmbiAbs* pX = nullptr;
 	AudioParameterFloatAmbiAbs* pY = nullptr;
 	AudioParameterFloatAmbiAbs* pZ = nullptr;
+    AudioParameterFloat* pQ0 = nullptr;
+    AudioParameterFloat* pQ1 = nullptr;
+    AudioParameterFloat* pQ2 = nullptr;
+    AudioParameterFloat* pQ3 = nullptr;
     AudioParameterFloatAmbiAbs* pGain = nullptr;
     AudioParameterBoolAmbiAbs* pMute = nullptr;
     
@@ -71,6 +75,50 @@ public:
         
         return z;
 	}
+    
+    double notifyQ0(double q) const
+    {
+        makeValid(&q, -1.0, 1.0);
+        if(pQ0 != nullptr)
+        {
+            pQ0->setValueNotifyingHost(q);
+        }
+        
+        return q;
+    }
+    
+    double notifyQ1(double q) const
+    {
+        makeValid(&q, -1.0, 1.0);
+        if(pQ1 != nullptr)
+        {
+            pQ1->setValueNotifyingHost(q);
+        }
+        
+        return q;
+    }
+    
+    double notifyQ2(double q) const
+    {
+        makeValid(&q, -1.0, 1.0);
+        if(pQ2 != nullptr)
+        {
+            pQ2->setValueNotifyingHost(q);
+        }
+        
+        return q;
+    }
+    
+    double notifyQ3(double q) const
+    {
+        makeValid(&q, -1.0, 1.0);
+        if(pQ3 != nullptr)
+        {
+            pQ3->setValueNotifyingHost(q);
+        }
+        
+        return q;
+    }
     
     void notifyGain(double gain)
     {

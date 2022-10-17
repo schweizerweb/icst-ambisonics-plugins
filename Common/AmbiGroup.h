@@ -46,6 +46,7 @@ public:
     void addPointToGroup(AmbiPoint* pt);
     void removePointFromGroup(AmbiPoint* pt);
     int groupPointCount();
+    void removeAllPoints();
     
 private:
     Array<AmbiPoint*> groupPoints;
