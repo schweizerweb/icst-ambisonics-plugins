@@ -51,15 +51,15 @@ void Radar2D::setAnchor(AnchorX x, AnchorY y)
     anchorY = y;
 }
 
-Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
+Point<double> Radar2D::getProjectedPoint(Vector3D<double>* point3_d) const
 {
 	switch(radarMode)
 	{
 	case XY:
-		return Point<double>(point3_d->getX(), point3_d->getY());
+		return Point<double>(point3_d->x, point3_d->y);
 	case XZ_Half:
 	case XZ_Full:
-		return Point<double>(point3_d->getX(), point3_d->getZ());
+		return Point<double>(point3_d->x, point3_d->z);
 	}
 
 	return Point<double>();
@@ -208,9 +208,9 @@ Point<float> Radar2D::getSpecialIconPositionForCenter(Point<float> centerPt, Spe
     }
 }
 
-void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const
+void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const
 {
-	double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getX(), pt->getZ())) + PI * 0.25;
+	double angle = (radarMode == XY ? atan2(pt->x, pt->y) : atan2(pt->x, pt->z)) + PI * 0.25;
 
 	Path p;
 	p.addPolygon(*screenPt, 4, pointSize, float(angle));
@@ -218,9 +218,9 @@ void Radar2D::drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* p
 	g->fillPath(p);
 }
 
-void Radar2D::drawEmptySquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const
+void Radar2D::drawEmptySquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const
 {
-    double angle = (radarMode == XY ? pt->getAzimuth() : atan2(pt->getX(), pt->getZ())) + PI * 0.25;
+    double angle = (radarMode == XY ? atan2(pt->x, pt->y) : atan2(pt->x, pt->z)) + PI * 0.25;
 
     Path p;
     p.addPolygon(*screenPt, 4, pointSize, float(angle));
@@ -296,10 +296,9 @@ bool Radar2D::containsIncludingBoder(const Rectangle<int> *rect, Point<int> poin
     return point.x >= rect->getX() && point.y >= rect->getY() && point.x <= rect->getRight() && point.y <= rect->getBottom();
 }
 
-void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize, bool extendedHandles) const
+void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize, bool extendedHandles) const
 {
-	Point3D<double>* pt = point->getPoint();
-	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(pt).toFloat());
+	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat());
     
     if(!containsIncludingBoder(&radarViewport, screenPt.toInt()))
         return;
@@ -308,7 +307,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 	{
 		g->setColour(radarColors.getPointSelectionColor());
 		if (shape == Square)
-			drawSquare(g, &screenPt, pt, selectionSize);
+			drawSquare(g, &screenPt, &absPoint, selectionSize);
 		else if (shape == Star)
 			drawStar(g, &screenPt, selectionSize);
 		else
@@ -322,7 +321,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 	g->setColour(c);
 
 	if(shape == Square)
-		drawSquare(g, &screenPt, pt, pointSize);
+		drawSquare(g, &screenPt, &absPoint, pointSize);
 	else if (shape == Star)
 		drawStar(g, &screenPt, pointSize);
 	else
@@ -334,7 +333,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
     if(point->getSolo())
     {
         g->setColour(Colours::red);
-        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2f);
+        drawEmptySquare(g, &screenPt, &absPoint, pointSize * 1.2f);
     }
     
     if(extendedHandles)
@@ -353,11 +352,12 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
 	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f));
 }
 
-void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const
+void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const
 {
 	const float dashLengths[2] = { 4, 4 };
-	Point<float> screenPtA = getAbsoluteScreenPoint(getProjectedPoint(group->getPoint()).toFloat());
-	Point<float> screenPtB = getAbsoluteScreenPoint(getProjectedPoint(point->getPoint()).toFloat());
+    Vector3D<double> groupPos = group->getVector3D();
+    Point<float> screenPtA = getAbsoluteScreenPoint(getProjectedPoint(&groupPos).toFloat());
+	Point<float> screenPtB = getAbsoluteScreenPoint(getProjectedPoint(&absSourcePoint).toFloat());
 
 	g->setColour(group->getColor());
 	g->drawDashedLine(Line<float>(screenPtA, screenPtB), dashLengths, 2);
@@ -394,15 +394,16 @@ void Radar2D::renderOpenGL()
 			for (int i = 0; i < pEditablePoints->size(); i++)
 			{
 				AmbiPoint* pt = pEditablePoints->get(i);
+                Vector3D<double> absPoint = pEditablePoints->getAbsSourcePoint(i);
 				if (pt != nullptr && pt->getEnabled())
 				{
 					float scaler = pt->getDisplayScaler();
-					paintPoint(&g, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare ? Square : Circle, pPointSelection->isPointSelected(i), getSelectedPointSize(scaler));
+					paintPoint(&g, absPoint, pt, getEditablePointSize(scaler), pRadarOptions->editablePointsAsSquare ? Square : Circle, pPointSelection->isPointSelected(i), getSelectedPointSize(scaler));
                     AmbiGroup* grp = pt->getGroup();
                     if(grp != nullptr)
                     {
                         if(grp->getEnabled()) {
-                            paintConnection(&g, grp, pt);
+                            paintConnection(&g, grp, absPoint);
                         }
                     }
 				}
@@ -412,11 +413,12 @@ void Radar2D::renderOpenGL()
 			for(int i = 0; i < pEditablePoints->groupCount(); i++)
 			{
 				AmbiGroup* gPt = pEditablePoints->getGroup(i);
+                Vector3D<double> absGrpPoint = gPt->getVector3D();
 				if(gPt != nullptr)
 				{
 					float scaler = gPt->getDisplayScaler();
 					
-					paintPoint(&g, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler), specialGroupManipulationMode);
+					paintPoint(&g, absGrpPoint, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler), specialGroupManipulationMode);
 				}
 			}
 		}
@@ -427,10 +429,11 @@ void Radar2D::renderOpenGL()
 			for (int i = pDisplayOnlyPoints->size() - 1; i >= 0 ; i--)
 			{
 				AmbiPoint* pt = pDisplayOnlyPoints->get(i, referenceTime, pRadarOptions->displayTimeout);
+                Vector3D<double> absPt = pDisplayOnlyPoints->getAbsSourcePoint(i);
 				if (pt != nullptr && pt->getEnabled())
 				{
 					float scaler = pt->getDisplayScaler();
-					paintPoint(&g, pt, getDisplayOnlyPointSize(scaler), Circle);
+					paintPoint(&g, absPt, pt, getDisplayOnlyPointSize(scaler), Circle);
 				}
 			}
 		}
@@ -581,15 +584,15 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	{
 		for (int i : selection)
 		{
-			pEditablePoints->getGroup(i)->moveXYZ(dx, dy, dz, !key.getModifiers().isShiftDown());
+			pEditablePoints->moveGroupXyz(i, dx, dy, dz, !key.getModifiers().isShiftDown());
 		}
 	}
 	else if(pPointSelection->getSelectionMode() == PointSelection::Point)
 	{
 		for (int i : selection)
 		{
-			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
-			p->setXYZ(p->getX() + dx, p->getY() + dy, p->getZ() + dz);
+			Vector3D<double> p = pEditablePoints->getAbsSourcePoint(i);
+            pEditablePoints->setAbsSourcePoint(i, Vector3D<double>(p.x + dx, p.y + dy, p.z + dz));
 		}
 	}
 
@@ -738,11 +741,11 @@ void Radar2D::mouseDown(const MouseEvent& e)
     
 	for (int i = 0; i < pEditablePoints->size(); i++)
 	{
-		AmbiPoint* pt = pEditablePoints->get(i);
-		if (!pt->getEnabled())
+		if (!pEditablePoints->get(i)->getEnabled())
 			continue;
 		double dist;
-		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
+        Vector3D<double> absPoint = pEditablePoints->getAbsSourcePoint(i);
+		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -756,7 +759,8 @@ void Radar2D::mouseDown(const MouseEvent& e)
 		if (!pt->getEnabled())
 			continue;
 	    double dist;
-		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(pt->getPoint()).toFloat())) < minDist)
+        Vector3D<double> absPoint = pt->getVector3D();
+        if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -765,7 +769,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 		}
         if(specialGroupManipulationMode)
         {
-            Point<float> groupScreenPoint = getAbsoluteScreenPoint(getProjectedPoint(pt->getPoint()).toFloat());
+            Point<float> groupScreenPoint = getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat());
             SpecialHandlingMode specialHandleModes[3];
             specialHandleModes[0] = Stretch;
             specialHandleModes[1] = RotateAroundGroupPoint;
@@ -787,26 +791,11 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	{
 		if (isGroup)
 		{
-            // this should never happen anyway!
-            /*
-            // do not allow multiple group move if groups have common points
-			if (checkMouseActionMode(e.mods, MoveGroupPointOnly) && pPointSelection->getSelectionMode() == PointSelection::Group && !pPointSelection->isGroupSelected(minDistIndex))
-			{
-				for (int i : pPointSelection->getSelectedIndices())
-				{
-					for (int iNewPt = 0; iNewPt < pEditablePoints->getGroup(minDistIndex)->groupPoints.size(); iNewPt++)
-					{
-						if (pEditablePoints->getGroup(i)->groupPoints.contains(pEditablePoints->getGroup(minDistIndex)->groupPoints[iNewPt]))
-							return;
-					}
-				}
-			}
-            */
-            
-			pPointSelection->selectGroup(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
+            pPointSelection->selectGroup(minDistIndex, checkMouseActionMode(e.mods, MoveGroupPointOnly));
             currentSpecialHandlingMode = specialHandlingMode;
             lastSpecialModePosition = e.getPosition();
-            Point<float> originalGroupPointPosition = getProjectedPoint(pEditablePoints->getGroup(minDistIndex)->getPoint()).toFloat();
+            Vector3D<double> absPoint = pEditablePoints->getGroup(minDistIndex)->getVector3D();
+            Point<float> originalGroupPointPosition = getProjectedPoint(&absPoint).toFloat();
             specialHandlingOffset = getSpecialIconPositionForCenter(originalGroupPointPosition, specialHandlingMode) - originalGroupPointPosition;
 		}
 		else
@@ -821,7 +810,7 @@ void Radar2D::mouseDown(const MouseEvent& e)
 	}
 }
 
-void Radar2D::calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ) {
+void Radar2D::calculateRotationAroundReference(Point<int> currentMousePosition, Vector3D<double> &referencePoint, double* rotationY, double* rotationZ) {
     Point<float> referencePointScreenCoordinates = getAbsoluteScreenPoint(getProjectedPoint(&referencePoint).toFloat());
     Point<float> relativeOld = lastSpecialModePosition.toFloat() - referencePointScreenCoordinates;
     Point<float> relativeNew = currentMousePosition.toFloat() - referencePointScreenCoordinates;
@@ -875,26 +864,26 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
 		if (pPointSelection->getSelectionMode() == PointSelection::Point)
 		{
-		    Point3D<double>* ref = pEditablePoints->get(pPointSelection->getMainSelectedPointIndex())->getPoint();
+		    Vector3D<double> ref = pEditablePoints->getAbsSourcePoint(pPointSelection->getMainSelectedPointIndex());
             
-			double dx = valuePoint.getX() - ref->getX();
-			double dy = radarMode == XY ? valuePoint.getY() - ref->getY() : 0.0;
-			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref->getZ();
+			double dx = valuePoint.getX() - ref.x;
+			double dy = radarMode == XY ? valuePoint.getY() - ref.y : 0.0;
+			double dz = radarMode == XY ? 0.0 : valuePoint.getY() - ref.z;
 
             for (int i : selection)
             {
-                Point3D<double>* p = pEditablePoints->get(i)->getPoint();
-                p->setXYZ(p->getX() + dx, p->getY() + dy, p->getZ() + dz);
+                Vector3D<double> p = pEditablePoints->getAbsSourcePoint(i);
+                pEditablePoints->setAbsSourcePoint(i, Vector3D<double>(p.x + dx, p.y + dy, p.z + dz));
             }
 		}
 		else if(pPointSelection->getSelectionMode() == PointSelection::Group)
 		{
 			// keep relative positions
 			int mainGroupIndex = pPointSelection->getMainSelectedPointIndex();
-			Point3D<double> referencePoint = *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
-			std::unique_ptr<Point3D<double>> newPoint = radarMode == XY
-				? std::make_unique<Point3D<double>>(valuePoint.getX(), valuePoint.getY(), referencePoint.getZ())
-				: std::make_unique<Point3D<double>>(valuePoint.getX(), referencePoint.getY(), valuePoint.getY());
+			Vector3D<double> referencePoint = pEditablePoints->getGroup(mainGroupIndex)->getVector3D();
+			Vector3D<double> newPoint = radarMode == XY
+				? Vector3D<double>(valuePoint.getX(), valuePoint.getY(), referencePoint.z)
+				: Vector3D<double>(valuePoint.getX(), referencePoint.y, valuePoint.getY());
 
             if(currentSpecialHandlingMode == Stretch)
             {
@@ -917,7 +906,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
             }
             else if(currentSpecialHandlingMode == RotateInAedSpace)
             {
-                Point3D<double> zeroPoint(0.0, 0.0, 0.0);
+                Vector3D<double> zeroPoint(0.0, 0.0, 0.0);
                 double rotationZ;
                 double rotationY;
                 calculateRotationAroundReference(e.getPosition(), zeroPoint, &rotationY, &rotationZ);
@@ -929,27 +918,28 @@ void Radar2D::mouseDrag(const MouseEvent& e)
             }
             else
             {
-                Array<Point3D<double>> relativePositions;
+                // move
+                Array<Vector3D<double>> relativePositions;
                 Array<int> selectedIndices;
                 for (int i : selection)
                 {
                     if (i != mainGroupIndex)
                     {
                         selectedIndices.add(i);
-                        relativePositions.add(*pEditablePoints->getGroup(i)->getPoint() - referencePoint);
+                        relativePositions.add(pEditablePoints->getGroup(i)->getVector3D() - referencePoint);
                     }
                 }
 
-                pEditablePoints->setGroupXyz(mainGroupIndex, newPoint->getX(), newPoint->getY(), newPoint->getZ(), !checkMouseActionMode(e.mods, MoveGroupPointOnly));
+                pEditablePoints->setGroupXyz(mainGroupIndex, newPoint.x, newPoint.y, newPoint.z, !checkMouseActionMode(e.mods, MoveGroupPointOnly));
                 
                 // other groups
-                Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getPoint();
+                Point3D<double> mainPt= *pEditablePoints->getGroup(mainGroupIndex)->getRawPoint();
                 for(int i = 0; i < selectedIndices.size(); i++)
                 {
                     pEditablePoints->setGroupXyz(selectedIndices[i],
-                                                 mainPt.getX() + relativePositions[i].getX(),
-                                                 mainPt.getY() + relativePositions[i].getY(),
-                                                 mainPt.getZ() + relativePositions[i].getZ(),
+                                                 mainPt.getX() + relativePositions[i].x,
+                                                 mainPt.getY() + relativePositions[i].y,
+                                                 mainPt.getZ() + relativePositions[i].z,
                                                  !checkMouseActionMode(e.mods, MoveGroupPointOnly));
                 }
             }
@@ -1002,10 +992,10 @@ void Radar2D::mouseUp(const MouseEvent& e)
 		{
 			if (!pEditablePoints->get(i)->getEnabled())
 				continue;
-			Point3D<double>* p = pEditablePoints->get(i)->getPoint();
+			Vector3D<double> p = pEditablePoints->getAbsSourcePoint(i);
 			Point<float> realCoords;
-			realCoords.x = float(radarMode == XY ? p->getX() : p->getX());
-			realCoords.y = float(radarMode == XY ? p->getY() : p->getZ());
+			realCoords.x = float(radarMode == XY ? p.x : p.x);
+			realCoords.y = float(radarMode == XY ? p.y : p.z);
 			if(rectangle.contains(realCoords))
 			{
 				pPointSelection->selectPoint(i, true);

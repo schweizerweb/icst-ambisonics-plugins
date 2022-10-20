@@ -47,15 +47,16 @@ void AmbiOSCSender::timerCallback()
 	for (int i = 0; i < pPoints->size(); i++)
 	{
 		AmbiSource* pt = pPoints->get(i);
-		if (pt != nullptr && pt->getEnabled())
+        Vector3D<double> absPt = pPoints->getAbsSourcePoint(i);
+        if (pt != nullptr && pt->getEnabled())
 		{
-			OSCMessage message = OSCMessage(
+            OSCMessage message = OSCMessage(
 				OSCAddressPattern(OSC_ADDRESS_AMBISONIC_PLUGINS_INTERNAL),
 				OSCArgument(pt->getId()),
 				OSCArgument(pt->getName()),
-				OSCArgument(float(pt->getPoint()->getX())),
-				OSCArgument(float(pt->getPoint()->getY())),
-				OSCArgument(float(pt->getPoint()->getZ())),
+				OSCArgument(float(absPt.x)),
+				OSCArgument(float(absPt.y)),
+				OSCArgument(float(absPt.z)),
 				OSCArgument(pt->getRms()),
 				OSCArgument(int32(pt->getColor().getARGB())));
 			oscSender->send(message);

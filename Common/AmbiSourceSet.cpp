@@ -42,7 +42,7 @@ void AmbiSourceSet::remove(int index)
 	// rearrange audio parameter
 	for (int i = elements.size() - 1; i > index; i--)
 	{
-		elements[i]->getPoint()->setAudioParameterSet(elements[i-1]->getPoint()->getAudioParameterSet());
+		elements[i]->getRawPoint()->setAudioParameterSet(elements[i-1]->getRawPoint()->getAudioParameterSet());
 	}
 	
 	AmbiSource* removedPt = elements.removeAndReturn(index);
@@ -58,8 +58,8 @@ void AmbiSourceSet::swap(int a, int b)
 	if (elements.size() > a && elements.size() > b)
 	{
 		// keep audio parameter for index
-		Point3D<double>* pointA = elements.getUnchecked(a)->getPoint();
-		Point3D<double>* pointB = elements.getUnchecked(b)->getPoint();
+		Point3D<double>* pointA = elements.getUnchecked(a)->getRawPoint();
+		Point3D<double>* pointB = elements.getUnchecked(b)->getRawPoint();
 		
 		AudioParameterSet setA = pointA->getAudioParameterSet();
 		pointA->setAudioParameterSet(pointB->getAudioParameterSet());
@@ -117,7 +117,7 @@ void AmbiSourceSet::setChannelXYZExt(String id, String name, double x, double y,
 	}
 
 	matchingPt->setName(name);
-	matchingPt->getPoint()->setXYZ(x, y, z);
+	matchingPt->getRawPoint()->setXYZ(x, y, z);
 	matchingPt->setRms(rms);
 	matchingPt->setColor(color);
 	matchingPt->setAlive(Time::currentTimeMillis());
@@ -139,6 +139,12 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 
 void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams)
 {
+    XmlElement* groupMode = xmlElement->getChildByName(XML_TAG_GROUP_MODE);
+    if(groupMode != nullptr)
+    {
+        groupModeFlag = groupMode->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_GROUP_MODE_FLAG);
+    }
+    
 	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	clear();
 	if (sourcesElement != nullptr)
@@ -188,7 +194,12 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 {
-	// load sources
+    // group mode flag
+    XmlElement* groupMode = new XmlElement(XML_TAG_GROUP_MODE);
+    groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
+    xml->addChildElement(groupMode);
+    
+	// sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
 	for (int i = 0; i < size(); i++)
 	{

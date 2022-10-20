@@ -371,12 +371,12 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
 
             for (int i : selection)
             {
-                minX = jmin(minX, pEditablePoints->get(i)->getPoint()->getX());
-                maxX = jmax(maxX, pEditablePoints->get(i)->getPoint()->getX());
-                minY = jmin(minY, pEditablePoints->get(i)->getPoint()->getY());
-                maxY = jmax(maxY, pEditablePoints->get(i)->getPoint()->getY());
-                minZ = jmin(minZ, pEditablePoints->get(i)->getPoint()->getZ());
-                maxZ = jmax(maxZ, pEditablePoints->get(i)->getPoint()->getZ());
+                minX = jmin(minX, pEditablePoints->get(i)->getRawPoint()->getX());
+                maxX = jmax(maxX, pEditablePoints->get(i)->getRawPoint()->getX());
+                minY = jmin(minY, pEditablePoints->get(i)->getRawPoint()->getY());
+                maxY = jmax(maxY, pEditablePoints->get(i)->getRawPoint()->getY());
+                minZ = jmin(minZ, pEditablePoints->get(i)->getRawPoint()->getZ());
+                maxZ = jmax(maxZ, pEditablePoints->get(i)->getRawPoint()->getZ());
             }
             Point<double> centerXY = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
             double centerZ = (minZ + maxZ) / 2.0;
@@ -422,12 +422,12 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 		setFieldsEnabled(true);
 		textName->setText(point->getName());
 		textCH->setText(String(selection + 1));
-		if (exceptField != textX->getName()) textX->setText(String(point->getPoint()->getX(), 3));
-		if (exceptField != textY->getName()) textY->setText(String(point->getPoint()->getY(), 3));
-		if (exceptField != textZ->getName()) textZ->setText(String(point->getPoint()->getZ(), 3));
-		if (exceptField != textA->getName()) textA->setText(String(Constants::RadToGrad(point->getPoint()->getAzimuth()), 2));
-		if (exceptField != textE->getName()) textE->setText(String(Constants::RadToGrad(point->getPoint()->getElevation()), 2));
-		if (exceptField != textD->getName()) textD->setText(String(point->getPoint()->getDistance(), 3));
+		if (exceptField != textX->getName()) textX->setText(String(point->getRawPoint()->getX(), 3));
+		if (exceptField != textY->getName()) textY->setText(String(point->getRawPoint()->getY(), 3));
+		if (exceptField != textZ->getName()) textZ->setText(String(point->getRawPoint()->getZ(), 3));
+		if (exceptField != textA->getName()) textA->setText(String(Constants::RadToGrad(point->getRawPoint()->getAzimuth()), 2));
+		if (exceptField != textE->getName()) textE->setText(String(Constants::RadToGrad(point->getRawPoint()->getElevation()), 2));
+		if (exceptField != textD->getName()) textD->setText(String(point->getRawPoint()->getDistance(), 3));
 	}
 	else
 	{

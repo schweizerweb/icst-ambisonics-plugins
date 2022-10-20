@@ -53,7 +53,7 @@
                 static var x (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getX();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getX();
         
                     return var::undefined();
                 }
@@ -61,7 +61,7 @@
                 static var y (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getY();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getY();
                 
                     return var::undefined();
                 }
@@ -69,7 +69,7 @@
                 static var z (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getZ();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getZ();
                 
                     return var::undefined();
                 }
@@ -77,7 +77,7 @@
                 static var a (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getAzimuth();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getAzimuth();
                 
                     return var::undefined();
                 }
@@ -85,7 +85,7 @@
                 static var e (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getElevation();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getElevation();
                 
                     return var::undefined();
                 }
@@ -93,7 +93,7 @@
                 static var d (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getDistance();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getDistance();
                 
                     return var::undefined();
                 }

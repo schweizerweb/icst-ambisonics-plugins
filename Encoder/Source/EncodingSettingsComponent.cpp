@@ -306,7 +306,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleGroupMode.get())
     {
         //[UserButtonCode_toggleGroupMode] -- add your button handler code here..
-        m_args.pSettings->groupModeFlag = toggleGroupMode->getToggleState();
+        m_args.pSourceSet->setGroupModeFlag(toggleGroupMode->getToggleState());
         sourceDefinition->refresh();
         //[/UserButtonCode_toggleGroupMode]
     }
@@ -347,6 +347,7 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void EncodingSettingsComponent::updateEncodingUiElements()
 {
+    toggleGroupMode->setToggleState(m_args.pSourceSet->getGroupModeFlag(), dontSendNotification);
     toggleDistanceEncoding->setToggleState(m_args.pSettings->distanceEncodingFlag, dontSendNotification);
 
     toggleDoppler->setToggleState(m_args.pSettings->dopplerEncodingFlag, dontSendNotification);

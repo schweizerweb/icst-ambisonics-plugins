@@ -94,9 +94,9 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 {
 	XmlElement* element = new XmlElement(tagName);
 	element->setAttribute(XML_ATTRIBUTE_POINT_ID, getId());
-	element->setAttribute(XML_ATTRIBUTE_POINT_X, getPoint()->getX());
-	element->setAttribute(XML_ATTRIBUTE_POINT_Y, getPoint()->getY());
-	element->setAttribute(XML_ATTRIBUTE_POINT_Z, getPoint()->getZ());
+	element->setAttribute(XML_ATTRIBUTE_POINT_X, getRawPoint()->getX());
+	element->setAttribute(XML_ATTRIBUTE_POINT_Y, getRawPoint()->getY());
+	element->setAttribute(XML_ATTRIBUTE_POINT_Z, getRawPoint()->getZ());
 	element->setAttribute(XML_ATTRIBUTE_POINT_NAME, getName());
 	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW, getColor().toString());
 	element->setAttribute(XML_ATTRIBUTE_POINT_GAIN, getGain());
@@ -105,9 +105,14 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 	return element;
 }
 
-Point3D<double>* AmbiPoint::getPoint()
+Point3D<double>* AmbiPoint::getRawPoint()
 {
 	return &point;
+}
+
+Vector3D<double> AmbiPoint::getVector3D()
+{
+    return Vector3D<double>(point.getX(), point.getY(), point.getZ());
 }
 
 Colour AmbiPoint::getColor() const

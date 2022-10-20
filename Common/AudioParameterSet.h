@@ -76,48 +76,31 @@ public:
         return z;
 	}
     
-    double notifyQ0(double q) const
+    void notifyQ(double q0, double q1, double q2, double q3)
     {
-        makeValid(&q, -1.0, 1.0);
+        makeValid(&q0, -1.0, 1.0);
         if(pQ0 != nullptr)
         {
-            pQ0->setValueNotifyingHost(q);
+            *pQ0 = q0;
         }
         
-        return q;
-    }
-    
-    double notifyQ1(double q) const
-    {
-        makeValid(&q, -1.0, 1.0);
+        makeValid(&q1, -1.0, 1.0);
         if(pQ1 != nullptr)
         {
-            pQ1->setValueNotifyingHost(q);
+            *pQ1 = q1;
         }
         
-        return q;
-    }
-    
-    double notifyQ2(double q) const
-    {
-        makeValid(&q, -1.0, 1.0);
+        makeValid(&q2, -1.0, 1.0);
         if(pQ2 != nullptr)
         {
-            pQ2->setValueNotifyingHost(q);
+            *pQ2 = q2;
         }
         
-        return q;
-    }
-    
-    double notifyQ3(double q) const
-    {
-        makeValid(&q, -1.0, 1.0);
+        makeValid(&q3, -1.0, 1.0);
         if(pQ3 != nullptr)
         {
-            pQ3->setValueNotifyingHost(q);
+            *pQ3 = q3;
         }
-        
-        return q;
     }
     
     void notifyGain(double gain)

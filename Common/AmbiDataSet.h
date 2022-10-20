@@ -11,6 +11,7 @@
 #pragma once
 #include "AmbiPoint.h"
 #include "AmbiGroup.h"
+#define DEFAULT_GROUP_MODE_FLAG     false
 
 class AmbiDataSet
 {
@@ -72,7 +73,15 @@ public:
     bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     void swapGroup(int a, int b);
+    
+    void setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
 
+    Vector3D<double> getAbsSourcePoint(int index) const;
+    void setAbsSourcePoint(int index, Vector3D<double> absPoint);
+    
+    bool getGroupModeFlag() const;
+    void setGroupModeFlag(bool en);
+    
 private:
 	bool nameExists(String name) const;
 
@@ -80,4 +89,6 @@ protected:
 	CriticalSection cs;
 	OwnedArray<AmbiGroup> groups;
     ScalingInfo* pScalingInfo;
+    
+    bool groupModeFlag;
 };

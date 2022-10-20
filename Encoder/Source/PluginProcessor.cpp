@@ -233,10 +233,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
             || (soloOnly && !source->getSolo()))
 			continue;
 
-		Point3D<double>* pSourcePoint = source->getPoint();
-
+        Vector3D<double> sourceVector = sources->getAbsSourcePoint(iSource);
+        Point3D<double> sourcePoint(sourceVector.x, sourceVector.y, sourceVector.z);
+        double sourcePointDistance = sourcePoint.getDistance();
+        
 		// air absorbtion filter
-		if (encoderSettings.distanceEncodingFlag && airAbsorbtionFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
+		if (encoderSettings.distanceEncodingFlag && airAbsorbtionFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, sourcePointDistance, &iirFilterSpec))
 		{
             float* writePointer = inputBuffer.getWritePointer(iSource);
             AirAbsorbtionFilter* filter = &airAbsorbtionFilters[iSource];
@@ -250,15 +252,15 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
-		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
+		sourcePoint.getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
+		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, sourcePointDistance);
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
 			delayBuffers[iSource].check(int(DelayHelper::getDelaySamples(scalingInfo.GetScaler() * MathConstants<float>::sqrt2, getSampleRate())));
             localBuffer.copyFrom(0, 0, inputBuffer, iSource, 0, inputBuffer.getNumSamples());
 			// check doppler delay buffers
-			float currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance(), getSampleRate());
+			float currentDelayInSamples = DelayHelper::getDelaySamples(sourcePointDistance, getSampleRate());
 			delayBuffers[iSource].process(currentDelayInSamples, localBuffer.getReadPointer(0), inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
 		}
 

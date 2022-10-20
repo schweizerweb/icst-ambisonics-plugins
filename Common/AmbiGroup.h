@@ -25,18 +25,18 @@ public:
 
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
-    void moveXYZ(double dx, double dy, double dz, bool moveSubElements);
+    void moveXYZ(double dx, double dy, double dz, bool moveSubElements, bool groupModeFlag);
     bool checkXYZ(double x, double y, double z);
     bool checkAED(double a, double e, double d);
     void checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz);
-    void setXYZ(double newX, double newY, double newZ, bool moveSubElements);
-    void setAED(double newA, double newE, double newD, bool moveSubElements);
+    void setXYZ(double newX, double newY, double newZ, bool moveSubElements, bool groupModeFlag);
+    void setAED(double newA, double newE, double newD, bool moveSubElements, bool groupModeFlag);
     void setChildrenColor();
-    void stretch(double stretchValue);
+    void stretch(double stretchValue, bool groupModeFlag);
     void extracted(Point3D<double> &center, double cx, AmbiPoint *p, double sx);
     
-    void rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
-    void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
+    void rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool groupModeFlag);
+    void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements, bool groupModeFlag);
 
     ScalingInfo* pScalingInfo;
     
@@ -48,6 +48,16 @@ public:
     int groupPointCount();
     void removeAllPoints();
     
+    void setRotation(Quaternion<double> rotation, bool notify = true);
+    
+    void applyTransform(Vector3D<double>* pt);
+    void applyInverseTransform(Vector3D<double>* pt);
+    
+private:
+    void compensateGroupPointMovement(Vector3D<double> originalVector);
+    
 private:
     Array<AmbiPoint*> groupPoints;
+    Quaternion<double> rotationQuaternion;
+    Matrix3D<double> rotationMatrix;
 };

@@ -13,15 +13,18 @@
 #include "AmbiSource.h"
 #include "AudioParams.h"
 
+#define XML_TAG_GROUP_MODE "GroupMode"
 #define XML_TAG_SOURCES "Sources"
 #define XML_TAG_SOURCE "Source"
 #define XML_TAG_GROUPS "Groups"
 #define XML_TAG_GROUP "Group"
+#define XML_ATTRIBUTE_ENABLE "Enable"
 
 class AmbiSourceSet : public AmbiDataSet
 {
 public:
-    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling) {};
+    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling)
+    {};
 	AmbiSource* get(int index) const override;
 
 	void add(AmbiSource* pt);

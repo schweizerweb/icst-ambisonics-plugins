@@ -196,23 +196,23 @@ float UserDefinedParameter::getValue(AmbiPoint* pt, double scaler)
 {
     switch(type)
     {
-    case A: return float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())));
-    case E: return float(Constants::RadToGrad(double(pt->getPoint()->getElevation())));
-    case D: return float(pt->getPoint()->getDistance());
-    case X: return float(pt->getPoint()->getX());
-    case Y: return float(pt->getPoint()->getY());
-    case Z: return float(pt->getPoint()->getZ());
-    case ScaledX: return float(jmap(pt->getPoint()->getX(), -scaler, scaler, loLim, hiLim));
-    case ScaledY: return float(jmap(pt->getPoint()->getY(), -scaler, scaler, loLim, hiLim));
-    case ScaledZ: return float(jmap(pt->getPoint()->getZ(), -scaler, scaler, loLim, hiLim));
-    case ScaledA: return float(jmap(pt->getPoint()->getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), loLim, hiLim));
-    case ScaledE: return float(jmap(pt->getPoint()->getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), loLim, hiLim));
-    case ScaledD: return float(jmap(pt->getPoint()->getDistance(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
+    case A: return float(Constants::RadToGrad(double(pt->getRawPoint()->getAzimuth())));
+    case E: return float(Constants::RadToGrad(double(pt->getRawPoint()->getElevation())));
+    case D: return float(pt->getRawPoint()->getDistance());
+    case X: return float(pt->getRawPoint()->getX());
+    case Y: return float(pt->getRawPoint()->getY());
+    case Z: return float(pt->getRawPoint()->getZ());
+    case ScaledX: return float(jmap(pt->getRawPoint()->getX(), -scaler, scaler, loLim, hiLim));
+    case ScaledY: return float(jmap(pt->getRawPoint()->getY(), -scaler, scaler, loLim, hiLim));
+    case ScaledZ: return float(jmap(pt->getRawPoint()->getZ(), -scaler, scaler, loLim, hiLim));
+    case ScaledA: return float(jmap(pt->getRawPoint()->getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), loLim, hiLim));
+    case ScaledE: return float(jmap(pt->getRawPoint()->getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), loLim, hiLim));
+    case ScaledD: return float(jmap(pt->getRawPoint()->getDistance(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
     case Gain: return float(pt->getGain());
-    case DualScaledX: return dualMap(pt->getPoint()->getX(), scaler);
-    case DualScaledY: return dualMap(pt->getPoint()->getY(), scaler);
-    case DualScaledZ: return dualMap(pt->getPoint()->getZ(), scaler);
-    case DualScaledE: return dualMap(pt->getPoint()->getElevation(), Constants::ElevationRadMax);
+    case DualScaledX: return dualMap(pt->getRawPoint()->getX(), scaler);
+    case DualScaledY: return dualMap(pt->getRawPoint()->getY(), scaler);
+    case DualScaledZ: return dualMap(pt->getRawPoint()->getZ(), scaler);
+    case DualScaledE: return dualMap(pt->getRawPoint()->getElevation(), Constants::ElevationRadMax);
     
     case ConstInt: return float(constInt);
     case ConstFloat: return constFloat;

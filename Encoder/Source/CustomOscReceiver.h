@@ -331,7 +331,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getX();
+                            return p->getRawPoint()->getX();
                     }
                 }
                 
@@ -347,7 +347,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getY();
+                            return p->getRawPoint()->getY();
                     }
                 }
                 
@@ -363,7 +363,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getZ();
+                            return p->getRawPoint()->getZ();
                     }
                 }
                 
@@ -379,7 +379,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getAzimuth();
+                            return p->getRawPoint()->getAzimuth();
                     }
                 }
                 
@@ -395,7 +395,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getElevation();
+                            return p->getRawPoint()->getElevation();
                     }
                 }
                 
@@ -411,7 +411,7 @@ private:
                         int index = args.arguments[0];
                         auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
                         if(p != nullptr)
-                            return p->getPoint()->getDistance();
+                            return p->getRawPoint()->getDistance();
                     }
                 }
                 

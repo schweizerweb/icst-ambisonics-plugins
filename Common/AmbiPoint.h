@@ -40,7 +40,8 @@ protected:
 	XmlElement* getBaseXmlElement(String tagName);
 
 public:
-	Point3D<double>* getPoint();
+	Point3D<double>* getRawPoint();
+    Vector3D<double> getVector3D();
     
 	Colour getColor() const;
 	void setColor(Colour newColor);
@@ -78,6 +79,9 @@ public:
     virtual bool allowSolo() const = 0;
     virtual bool allowMute() const = 0;
     
+protected:
+    AudioParameterSet audioParams;
+    
 private:
 	Colour loadColorAttribute(XmlElement* element);
 
@@ -90,7 +94,6 @@ private:
     bool solo;
 	int64 lastUpdate = 0;
 	Image labelImage;
-    AudioParameterSet audioParams;
     bool enabled = true;
     AmbiGroup* pGroup;
 };

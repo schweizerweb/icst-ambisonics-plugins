@@ -11,20 +11,20 @@
 #include "DelayHelper.h"
 #include "AmbiBasicSettings.h"
 
-double DelayHelper::getTotalDelayMs(AmbiPoint* pPoint) const
+double DelayHelper::getTotalDelayMs(double distance) const
 {
-	return pPoint->getPoint()->getDistance() * SOUND_SPEED_MS_PER_M;
+	return distance * SOUND_SPEED_MS_PER_M;
 }
 
-double DelayHelper::getDelayCompensationMs(double maxNormalizedDistance, AmbiPoint* pPoint) const
+double DelayHelper::getDelayCompensationMs(double distance, double maxNormalizedDistance) const
 {
-	return (maxNormalizedDistance - pPoint->getPoint()->getDistance())
+	return (maxNormalizedDistance - distance)
 		* SOUND_SPEED_MS_PER_M;
 }
 
-int DelayHelper::getDelayCompensationSamples(AmbiPoint* pPoint, double maxNormalizedDistance, double samplingRate)
+int DelayHelper::getDelayCompensationSamples(double distance, double maxNormalizedDistance, double samplingRate)
 {
-	return int((maxNormalizedDistance - pPoint->getPoint()->getDistance())
+	return int((maxNormalizedDistance - distance)
 		* SOUND_SPEED_S_PER_M
 		* samplingRate);
 }

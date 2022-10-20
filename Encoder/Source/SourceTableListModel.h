@@ -175,12 +175,12 @@ private:
         case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
         case COLUMN_ID_MUTE: return pt->getMute();
         case COLUMN_ID_SOLO: return pt->getSolo();
-        case COLUMN_ID_X: return pt->getPoint()->getX();
-        case COLUMN_ID_Y: return pt->getPoint()->getY();
-        case COLUMN_ID_Z: return pt->getPoint()->getZ();
-        case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-        case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-        case COLUMN_ID_D: return pt->getPoint()->getDistance();
+        case COLUMN_ID_X: return pt->getRawPoint()->getX();
+        case COLUMN_ID_Y: return pt->getRawPoint()->getY();
+        case COLUMN_ID_Z: return pt->getRawPoint()->getZ();
+        case COLUMN_ID_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
+        case COLUMN_ID_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
+        case COLUMN_ID_D: return pt->getRawPoint()->getDistance();
         case COLUMN_ID_COLOR: return pt->getColor().getARGB();
         case COLUMN_ID_ENABLED: return pt->getEnabled() ? 1 : 0;
         default: return 0.0;

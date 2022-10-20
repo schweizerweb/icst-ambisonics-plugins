@@ -37,7 +37,7 @@ public:
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
-	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
+	Point<double> getProjectedPoint(Vector3D<double>* point3_d) const;
 	Point<float> getAbsoluteScreenPoint(Point<float> point) const;
 	void paint (Graphics&) override;
 	
@@ -71,13 +71,13 @@ private:
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
 	Point<float> getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const;
-    void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
-	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
+    void drawSquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
+	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
     void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
     void drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const;
     void drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const;
-	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
-	void paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const;
+	void paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
+	void paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const;
 
 	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
@@ -91,7 +91,7 @@ private:
 	void updateInfoLabel(String info);
 	void timerCallback() override;
     bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
-    void calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ);
+    void calculateRotationAroundReference(Point<int> currentMousePosition, Vector3D<double> &referencePoint, double* rotationY, double* rotationZ);
     bool containsIncludingBoder(const Rectangle<int>* rect, Point<int> point) const;
     
     

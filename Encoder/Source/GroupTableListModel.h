@@ -134,12 +134,12 @@ public:
 
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_X: return pt->getPoint()->getX();
-		case COLUMN_ID_GROUP_Y: return pt->getPoint()->getY();
-		case COLUMN_ID_GROUP_Z: return pt->getPoint()->getZ();
-		case COLUMN_ID_GROUP_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-		case COLUMN_ID_GROUP_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-		case COLUMN_ID_GROUP_D: return pt->getPoint()->getDistance();
+		case COLUMN_ID_GROUP_X: return pt->getRawPoint()->getX();
+		case COLUMN_ID_GROUP_Y: return pt->getRawPoint()->getY();
+		case COLUMN_ID_GROUP_Z: return pt->getRawPoint()->getZ();
+		case COLUMN_ID_GROUP_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
+		case COLUMN_ID_GROUP_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
+		case COLUMN_ID_GROUP_D: return pt->getRawPoint()->getDistance();
 		case COLUMN_ID_GROUP_COLOR: return pt->getColor().getARGB();
 		default: return 0.0;
 		}
@@ -154,12 +154,12 @@ public:
 	{
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_X: pSources->getGroup(rowNumber)->getPoint()->setX(newValue); break;
-		case COLUMN_ID_GROUP_Y: pSources->getGroup(rowNumber)->getPoint()->setY(newValue); break;
-		case COLUMN_ID_GROUP_Z: pSources->getGroup(rowNumber)->getPoint()->setZ(newValue); break;
-		case COLUMN_ID_GROUP_A: pSources->getGroup(rowNumber)->getPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_E: pSources->getGroup(rowNumber)->getPoint()->setElevation(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_D: pSources->getGroup(rowNumber)->getPoint()->setDistance(newValue); break;
+		case COLUMN_ID_GROUP_X: pSources->getGroup(rowNumber)->getRawPoint()->setX(newValue); break;
+		case COLUMN_ID_GROUP_Y: pSources->getGroup(rowNumber)->getRawPoint()->setY(newValue); break;
+		case COLUMN_ID_GROUP_Z: pSources->getGroup(rowNumber)->getRawPoint()->setZ(newValue); break;
+		case COLUMN_ID_GROUP_A: pSources->getGroup(rowNumber)->getRawPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_E: pSources->getGroup(rowNumber)->getRawPoint()->setElevation(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_D: pSources->getGroup(rowNumber)->getRawPoint()->setDistance(newValue); break;
 		case COLUMN_ID_GROUP_COLOR:
             if(newValue < 0) // code for setting children
             {
