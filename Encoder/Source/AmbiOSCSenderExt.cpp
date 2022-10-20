@@ -110,15 +110,16 @@ void AmbiOSCSenderExt::timerCallback()
 	for (int i = 0; i < pPoints->size(); i++)
 	{
 		AmbiPoint* pt = pPoints->get(i);
+        Vector3D<double> absPt = pPoints->getAbsSourcePoint(i);
 		if (pt != nullptr && pt->getEnabled())
 		{
-			if (doContinuousUpdate || history[i]->update(pt))
+			if (doContinuousUpdate || history[i]->update(absPt, pt))
 			{
 				for (auto sender : oscSender)
 				{
                     try
                     {
-						sender->sendMessage(pt, i);
+						sender->sendMessage(absPt, pt, i);
                     }
                     catch (...)
                     {

@@ -21,8 +21,8 @@
         UserDefinedParameter(String originalString, std::string typeString, double lo, double hi, double zero);
         UserDefinedParameter(String originalString, ParameterType t);
         
-        OSCArgument getOSCArgument(AmbiPoint* pt, double scaler, int index);
-        String getString(AmbiPoint* pt, double scaler, int index);
+        OSCArgument getOSCArgument(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index);
+        String getString(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index);
         String getOriginalString();
         ParameterType getType() {return type;}
         
@@ -133,12 +133,13 @@
                 
                 UserDefinedParameter* owner;
                 AmbiPoint* jsAmbiPoint;
+                Vector3D<double> jsAbsPos; // TODO
                 int jsPointIndex;
                 
                 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JsContext)
             };
         
-        float getValue(AmbiPoint* pt, double scaler);
+        float getValue(Vector3D<double> absPt, AmbiPoint* pt, double scaler);
         float dualMap(double value, double maxValue);
         float inverseDualMap(double value, double maxValue);
         
