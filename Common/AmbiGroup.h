@@ -26,9 +26,9 @@ public:
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
     void moveXYZ(double dx, double dy, double dz, bool moveSubElements, bool groupModeFlag);
-    bool checkXYZ(double x, double y, double z);
+    bool checkXYZ(Vector3D<double> v);
     bool checkAED(double a, double e, double d);
-    void checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz);
+    void checkAndAdjustDeltaXYZ(Vector3D<double> v, Vector3D<double>* pDelta);
     void setXYZ(double newX, double newY, double newZ, bool moveSubElements, bool groupModeFlag);
     void setAED(double newA, double newE, double newD, bool moveSubElements, bool groupModeFlag);
     void setChildrenColor();

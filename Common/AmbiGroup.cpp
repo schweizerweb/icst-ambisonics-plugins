@@ -55,6 +55,7 @@ XmlElement* AmbiGroup::getAsXmlElement(String tagName)
 void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements, bool groupModeFlag)
 {
     Vector3D<double> p = getVector3D();
+    Vector3D<double> delta(dx, dy, dz);
     
     if(groupModeFlag)
     {
@@ -71,16 +72,16 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements, b
         if(moveSubElements)
         {
             // check borders first
-            checkAndAdjustDeltaXYZ(p.x, &dx, p.y, &dy, p.z, &dz);
+            checkAndAdjustDeltaXYZ(p, &delta);
             for (AmbiPoint* sp : groupPoints)
-                checkAndAdjustDeltaXYZ(sp->getRawPoint()->getX(), &dx, sp->getRawPoint()->getY(), &dy, sp->getRawPoint()->getZ(), &dz);
+                checkAndAdjustDeltaXYZ(sp->getVector3D(), &delta);
 
-            if (!checkXYZ(p.x + dx, p.y + dy, p.z + dz))
+            if (!checkXYZ(p + delta))
                 return;
             
             for (AmbiPoint* sp : groupPoints)
             {
-                if(!checkXYZ(sp->getRawPoint()->getX() + dx, sp->getRawPoint()->getY() + dy, sp->getRawPoint()->getZ() + dz))
+                if(!checkXYZ(sp->getVector3D() + delta))
                     return;
             }
         }
@@ -97,11 +98,11 @@ void AmbiGroup::moveXYZ(double dx, double dy, double dz, bool moveSubElements, b
     }
 }
 
-bool AmbiGroup::checkXYZ(double x, double y, double z)
+bool AmbiGroup::checkXYZ(Vector3D<double> v)
 {
-    return (pScalingInfo->CartesianMin() <= x && x <= pScalingInfo->CartesianMax())
-        && (pScalingInfo->CartesianMin() <= y && y <= pScalingInfo->CartesianMax())
-        && (pScalingInfo->CartesianMin() <= z && z <= pScalingInfo->CartesianMax());
+    return (pScalingInfo->CartesianMin() <= v.x && v.x <= pScalingInfo->CartesianMax())
+        && (pScalingInfo->CartesianMin() <= v.y && v.y <= pScalingInfo->CartesianMax())
+        && (pScalingInfo->CartesianMin() <= v.z && v.z <= pScalingInfo->CartesianMax());
 }
 
 bool AmbiGroup::checkAED(double a, double e, double d)
@@ -110,17 +111,17 @@ bool AmbiGroup::checkAED(double a, double e, double d)
     double y = d * cos(e) * sin(a);
     double z = d * sin(e);
 
-    return checkXYZ(x, y, z);
+    return checkXYZ(Vector3D<double>(x, y, z));
 }
 
-void AmbiGroup::checkAndAdjustDeltaXYZ(double x, double* dx, double y, double* dy, double z, double* dz)
+void AmbiGroup::checkAndAdjustDeltaXYZ(Vector3D<double> v, Vector3D<double>* pDelta)
 {
-    *dx = (x + *dx) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - x : *dx;
-    *dx = (x + *dx) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - x : *dx;
-    *dy = (y + *dy) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - y : *dy;
-    *dy = (y + *dy) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - y : *dy;
-    *dz = (z + *dz) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - z : *dz;
-    *dz = (z + *dz) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - z : *dz;
+    pDelta->x = (v.x + pDelta->x) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - v.x : pDelta->x;
+    pDelta->x = (v.x + pDelta->x) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - v.x : pDelta->x;
+    pDelta->y = (v.y + pDelta->y) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - v.y : pDelta->y;
+    pDelta->y = (v.y + pDelta->y) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - v.y : pDelta->y;
+    pDelta->z = (v.z + pDelta->z) < pScalingInfo->CartesianMin() ? pScalingInfo->CartesianMin() - v.z : pDelta->z;
+    pDelta->z = (v.z + pDelta->z) > pScalingInfo->CartesianMax() ? pScalingInfo->CartesianMax() - v.z : pDelta->z;
 }
 
 void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElements, bool groupModeFlag)
@@ -137,23 +138,19 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
     }
     else
     {
-        double dx = newX - getRawPoint()->getX();
-        double dy = newY - getRawPoint()->getY();
-        double dz = newZ - getRawPoint()->getZ();
-
+        Vector3D<double> d = Vector3D<double>(newX, newY, newZ) - getVector3D();
+        
         // check new coordinates first
-        checkAndAdjustDeltaXYZ(getRawPoint()->getX(), &dx, getRawPoint()->getY(), &dy, getRawPoint()->getZ(), &dz);
+        checkAndAdjustDeltaXYZ(getVector3D(), &d);
         if(moveSubElements)
         {
             for (AmbiPoint* sp : groupPoints)
-                checkAndAdjustDeltaXYZ(sp->getRawPoint()->getX(), &dx, sp->getRawPoint()->getY(), &dy, sp->getRawPoint()->getZ(), &dz);
+                checkAndAdjustDeltaXYZ(sp->getVector3D(), &d);
         }
         
-        newX = getRawPoint()->getX() + dx;
-        newY = getRawPoint()->getY() + dy;
-        newZ = getRawPoint()->getZ() + dz;
+        Vector3D<double> nV = getVector3D() + d;
 
-        if (!checkXYZ(newX, newY, newZ))
+        if (!checkXYZ(nV))
             return;
 
         if (moveSubElements)
@@ -161,7 +158,7 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
             // bounding box
             for (AmbiPoint* p : groupPoints)
             {
-                if (!checkXYZ(p->getRawPoint()->getX() + dx, p->getRawPoint()->getY() + dy, p->getRawPoint()->getZ() + dz))
+                if (!checkXYZ(p->getVector3D() + d))
                     return;
             }
         }
@@ -172,7 +169,8 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
         {
             for (AmbiPoint* p : groupPoints)
             {
-                p->getRawPoint()->setXYZ(p->getRawPoint()->getX() + dx, p->getRawPoint()->getY() + dy, p->getRawPoint()->getZ() + dz);
+                Vector3D<double> nV = p->getVector3D() + d;
+                p->getRawPoint()->setXYZ(nV.x, nV.y, nV.z);
             }
         }
     }
