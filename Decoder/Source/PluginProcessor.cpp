@@ -129,7 +129,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
 		{
-			int requiredDelay = delayHelper.getDelayCompensationSamples(pt, maxDist, getSampleRate());
+			int requiredDelay = delayHelper.getDelayCompensationSamples(pt->getRawPoint()->getDistance(), maxDist, getSampleRate());
 			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
 		}
 	}
@@ -238,7 +238,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
             int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
             int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
             
-			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
+			pt->getRawPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
 			
 			// gain of the W-signal depends on the used ambisonic order
             if(currentAmbisonicsOrder > 0)

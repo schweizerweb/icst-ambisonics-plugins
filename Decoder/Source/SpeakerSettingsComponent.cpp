@@ -716,9 +716,9 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	{
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pt->getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance(), 2); break;
-	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pt), 2); break;
-	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
+	case COLUMN_ID_DISTANCE: text = String(pt->getRawPoint()->getDistance(), 2); break;
+	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pt->getRawPoint()->getDistance()), 2); break;
+	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pt->getRawPoint()->getDistance(), pSpeakerSet->getMaxNormalizedDistance()), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -851,12 +851,12 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	switch (columnId)
 	{
     case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
-	case COLUMN_ID_X: return pt->getPoint()->getX();
-	case COLUMN_ID_Y: return pt->getPoint()->getY();
-	case COLUMN_ID_Z: return pt->getPoint()->getZ();
-	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
+	case COLUMN_ID_X: return pt->getRawPoint()->getX();
+	case COLUMN_ID_Y: return pt->getRawPoint()->getY();
+	case COLUMN_ID_Z: return pt->getRawPoint()->getZ();
+	case COLUMN_ID_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
+	case COLUMN_ID_DISTANCE: return pt->getRawPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
         case COLUMN_ID_MUTE: return pt->getMute() ? 1 : 0;
         default: return 0.0;

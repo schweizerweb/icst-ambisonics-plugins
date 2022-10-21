@@ -79,7 +79,7 @@ double AmbiSpeakerSet::getMaxNormalizedDistance() const
 	for (AmbiSpeaker* pt : elements)
 	{
 		if (pt != nullptr)
-			maxDist = jmax(maxDist, pt->getPoint()->getDistance());
+			maxDist = jmax(maxDist, pt->getRawPoint()->getDistance());
 	}
 
 	return maxDist;
