@@ -56,6 +56,9 @@ private:
                 setMethod ("getE", e);
                 setMethod ("getD", d);
                 setMethod ("getName", name);
+                setMethod ("getAbsX", absX);
+                setMethod ("getAbsY", absY);
+                setMethod ("getAbsZ", absZ);
                 
                 // group functions
                 setMethod ("rotateGroup", rotateGroup);
@@ -68,6 +71,9 @@ private:
                 setMethod ("setGroupXYZbyName", setGroupXYZbyName);
                 setMethod ("setGroupAED", setGroupAED);
                 setMethod ("setGroupAEDbyName", setGroupAEDbyName);
+                
+                setMethod ("setGroupRotation", setGroupRotation);
+                setMethod ("setGroupStretch", setGroupStretch);
                 
                 // per-receiver buffer
                 setMethod ("getBufferValue", getBuf);
@@ -370,6 +376,54 @@ private:
                 return var::undefined();
             }
                
+            static var absX (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 1)
+                    {
+                        int index = args.arguments[0];
+                        index--; // make 0-based
+                        if(thisObject->jsAmbiSourceSet->get(index) != nullptr)
+                            return thisObject->jsAmbiSourceSet->getAbsSourcePoint(index).x;
+                    }
+                }
+                
+                return var::undefined();
+            }
+
+            static var absY (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 1)
+                    {
+                        int index = args.arguments[0];
+                        index--; // make 0-based
+                        if(thisObject->jsAmbiSourceSet->get(index) != nullptr)
+                            return thisObject->jsAmbiSourceSet->getAbsSourcePoint(index).y;
+                    }
+                }
+                
+                return var::undefined();
+            }
+               
+            static var absZ (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 1)
+                    {
+                        int index = args.arguments[0];
+                        index--; // make 0-based
+                        if(thisObject->jsAmbiSourceSet->get(index) != nullptr)
+                            return thisObject->jsAmbiSourceSet->getAbsSourcePoint(index).z;
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
             static var a (const var::NativeFunctionArgs& args)
             {
                 if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
@@ -545,6 +599,43 @@ private:
                         double stretch = args.arguments[1];
                         
                         thisObject->jsAmbiSourceSet->stretchGroup(name, stretch);
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var setGroupRotation (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 5)
+                    {
+                        int index = args.arguments[0];
+                        double x = (double)args.arguments[1];
+                        double y = (double)args.arguments[2];
+                        double z = (double)args.arguments[3];
+                        double w = (double)args.arguments[4];
+                    
+                        if(index > 0)
+                            thisObject->jsAmbiSourceSet->setGroupRotation(index - 1, Quaternion<double>(x, y, z, w)); // make index 0-based
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var setGroupStretch (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                {
+                    if(args.numArguments == 2)
+                    {
+                        int index = args.arguments[0];
+                        double stretch = args.arguments[1];
+                        
+                        if(index > 0)
+                            thisObject->jsAmbiSourceSet->setGroupStretch(index - 1, stretch); // make index 0-based
                     }
                 }
                 
