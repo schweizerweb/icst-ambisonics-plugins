@@ -41,7 +41,7 @@ public:
 	~GroupTableListModel() override {}
 
 	int getNumRows() override {
-		return pSources->groupCount();
+		return pSources->activeGroupCount();
 	}
 
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -56,7 +56,8 @@ public:
 
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override 
 	{
-		AmbiGroup* pt = pSources->getGroup(rowNumber);
+        int grpIndex;
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber, &grpIndex);
 		if (pt == nullptr)
 			return;
 
@@ -64,7 +65,7 @@ public:
 		String text;
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_NB: text = String(rowNumber + 1); break;
+		case COLUMN_ID_GROUP_NB: text = String(grpIndex + 1); break;
 		case COLUMN_ID_GROUP_NAME: text = pt->getName(); break;
 		case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPointCount()); break;
 		default: text = "";
@@ -128,7 +129,7 @@ public:
 	double getValue(int columnId, int rowNumber) override 
 	{
 		// group table handling
-		AmbiGroup* pt = pSources->getGroup(rowNumber);
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber);
 		if (pt == nullptr)
 			return 0.0;
 
@@ -154,21 +155,21 @@ public:
 	{
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_X: pSources->getGroup(rowNumber)->getRawPoint()->setX(newValue); break;
-		case COLUMN_ID_GROUP_Y: pSources->getGroup(rowNumber)->getRawPoint()->setY(newValue); break;
-		case COLUMN_ID_GROUP_Z: pSources->getGroup(rowNumber)->getRawPoint()->setZ(newValue); break;
-		case COLUMN_ID_GROUP_A: pSources->getGroup(rowNumber)->getRawPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_E: pSources->getGroup(rowNumber)->getRawPoint()->setElevation(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_D: pSources->getGroup(rowNumber)->getRawPoint()->setDistance(newValue); break;
+		case COLUMN_ID_GROUP_X: pSources->getActiveGroup(rowNumber)->getRawPoint()->setX(newValue); break;
+		case COLUMN_ID_GROUP_Y: pSources->getActiveGroup(rowNumber)->getRawPoint()->setY(newValue); break;
+		case COLUMN_ID_GROUP_Z: pSources->getActiveGroup(rowNumber)->getRawPoint()->setZ(newValue); break;
+		case COLUMN_ID_GROUP_A: pSources->getActiveGroup(rowNumber)->getRawPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_E: pSources->getActiveGroup(rowNumber)->getRawPoint()->setElevation(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_D: pSources->getActiveGroup(rowNumber)->getRawPoint()->setDistance(newValue); break;
 		case COLUMN_ID_GROUP_COLOR:
             if(newValue < 0) // code for setting children
             {
-                pSources->getGroup(rowNumber)->setChildrenColor();
+                pSources->getActiveGroup(rowNumber)->setChildrenColor();
                 pPointSelection->notifyChange();
             }
             else
             {
-                pSources->getGroup(rowNumber)->setColor(Colour(uint32(newValue)));
+                pSources->getActiveGroup(rowNumber)->setColor(Colour(uint32(newValue)));
             }
             break;
 		default: throw;
@@ -206,7 +207,7 @@ public:
 
 	String getTableText(const int columnId, const int rowNumber) override
 	{
-		AmbiPoint* pt = pSources->getGroup(rowNumber);
+		AmbiPoint* pt = pSources->getActiveGroup(rowNumber);
 		if (pt == nullptr)
 			return "";
 

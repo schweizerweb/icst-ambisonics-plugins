@@ -414,7 +414,7 @@ void Radar2D::renderOpenGL()
 			{
 				AmbiGroup* gPt = pEditablePoints->getGroup(i);
                 Vector3D<double> absGrpPoint = gPt->getVector3D();
-				if(gPt != nullptr)
+				if(gPt != nullptr && gPt->getEnabled())
 				{
 					float scaler = gPt->getDisplayScaler();
 					
@@ -887,7 +887,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
             if(currentSpecialHandlingMode == Stretch)
             {
-                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pZoomSettings->getCurrentRadius() * 0.005;
+                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pZoomSettings->getCurrentRadius() * 0.01;
                 for(int i : selection)
                     pEditablePoints->stretchGroup(i, stretchFactor);
                 

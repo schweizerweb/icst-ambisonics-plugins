@@ -56,8 +56,10 @@ public:
     float getMaxDistance() const;
     
 	int groupCount() const;
+    int activeGroupCount() const;
 	AmbiGroup* getGroup(int index) const;
-	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);
+    AmbiGroup* getActiveGroup(int index, int* pRealIndex = nullptr) const;
+	int addGroup(String id, Vector3D<double> point, String name, Colour color);
 	void moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
 	void removeGroup(int groupIndex);
 	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
@@ -75,7 +77,8 @@ public:
     void swapGroup(int a, int b);
     
     void setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
-
+    void setGroupStretch(int groupIndex, double stretchFactor, bool notify);
+    
     Vector3D<double> getAbsSourcePoint(int index) const;
     void setAbsSourcePoint(int index, Vector3D<double> absPoint);
     

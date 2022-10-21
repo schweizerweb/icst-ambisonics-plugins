@@ -44,6 +44,7 @@ public:
             pProcessor->addParameter(set.pMute);
         }
         
+        // groups
         for (int i = 0; i < numberOfGroups; i++)
         {
             String indexStr = String(i + 1);
@@ -58,6 +59,10 @@ public:
             set.pQ2 = new AudioParameterFloat("G_Q2_" + indexStr, "G_Q2 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, "Group " + indexStr + ": Rotation Quaternion 2", AudioProcessorParameter::genericParameter);
             set.pQ3 = new AudioParameterFloat("G_Q3_" + indexStr, "G_Q3 " + indexStr, NormalisableRange<float>(-1, 1), 1.0f, "Group " + indexStr + ": Rotation Quaternion 3", AudioProcessorParameter::genericParameter);
             
+            NormalisableRange<float> stretchRange(Constants::StretchMin, Constants::StretchMax);
+            stretchRange.setSkewForCentre(1.0);
+            set.pStretch = new AudioParameterFloat("G_Stretch_" + indexStr, "G_Stretch " + indexStr, stretchRange, 1.0, "Group " + indexStr + ": Stretch Factor", AudioProcessorParameter::genericParameter);
+            
             groupParams.add(set);
             pProcessor->addParameter(set.pX);
             pProcessor->addParameter(set.pY);
@@ -66,6 +71,7 @@ public:
             pProcessor->addParameter(set.pQ1);
             pProcessor->addParameter(set.pQ2);
             pProcessor->addParameter(set.pQ3);
+            pProcessor->addParameter(set.pStretch);
             
             paramIndexGroupIndexMap[set.pX->getParameterIndex()] = i;
             paramIndexGroupIndexMap[set.pY->getParameterIndex()] = i;
@@ -74,11 +80,13 @@ public:
             paramIndexGroupIndexMap[set.pQ1->getParameterIndex()] = i;
             paramIndexGroupIndexMap[set.pQ2->getParameterIndex()] = i;
             paramIndexGroupIndexMap[set.pQ3->getParameterIndex()] = i;
+            paramIndexGroupIndexMap[set.pStretch->getParameterIndex()] = i;
             
             set.pQ0->addListener(this);
             set.pQ1->addListener(this);
             set.pQ2->addListener(this);
             set.pQ3->addListener(this);
+            set.pStretch->addListener(this);
         }
     }
     
@@ -87,13 +95,21 @@ public:
         if(i != paramIndexGroupIndexMap.end())
         {
             int index = i->second;
-            ((AmbiDataSet*)pSourceSet)->setGroupRotation(index,
-                Quaternion<double>(
-                    groupParams[index].pQ0->get(),
-                    groupParams[index].pQ1->get(),
-                    groupParams[index].pQ2->get(),
-                    groupParams[index].pQ3->get()),
-                false);
+            if(parameterIndex == groupParams[index].pStretch->getParameterIndex())
+            {
+                ((AmbiDataSet*)pSourceSet)->setGroupStretch(index, groupParams[index].pStretch->get(), false);
+            }
+            else
+            {
+                // rotation
+                ((AmbiDataSet*)pSourceSet)->setGroupRotation(index,
+                    Quaternion<double>(
+                        groupParams[index].pQ0->get(),
+                        groupParams[index].pQ1->get(),
+                        groupParams[index].pQ2->get(),
+                        groupParams[index].pQ3->get()).normalised(),
+                    false);
+            }
         }
     }
     

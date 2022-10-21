@@ -371,23 +371,26 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
 
             for (int i : selection)
             {
-                minX = jmin(minX, pEditablePoints->get(i)->getRawPoint()->getX());
-                maxX = jmax(maxX, pEditablePoints->get(i)->getRawPoint()->getX());
-                minY = jmin(minY, pEditablePoints->get(i)->getRawPoint()->getY());
-                maxY = jmax(maxY, pEditablePoints->get(i)->getRawPoint()->getY());
-                minZ = jmin(minZ, pEditablePoints->get(i)->getRawPoint()->getZ());
-                maxZ = jmax(maxZ, pEditablePoints->get(i)->getRawPoint()->getZ());
+                auto origPos = pEditablePoints->getAbsSourcePoint(i);
+                minX = jmin(minX, origPos.x);
+                maxX = jmax(maxX, origPos.x);
+                minY = jmin(minY, origPos.y);
+                maxY = jmax(maxY, origPos.y);
+                minZ = jmin(minZ, origPos.z);
+                maxZ = jmax(maxZ, origPos.z);
             }
             Point<double> centerXY = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
             double centerZ = (minZ + maxZ) / 2.0;
 
-            AmbiGroup* g = pEditablePoints->addGroup(Uuid().toString(), Point3D<double>(centerXY.getX(), centerXY.getY(), centerZ, pRadarOptions->getAudioParamForIndex(pEditablePoints->groupCount(), true)), "G", Colours::orange);
+            int newIndex = pEditablePoints->addGroup(Uuid().toString(), Vector3D<double>(centerXY.getX(), centerXY.getY(), centerZ), "G", Colours::orange);
             for (int i : selection)
             {
-                g->addPointToGroup(pEditablePoints->get(i));
+                auto origPos = pEditablePoints->getAbsSourcePoint(i);
+                pEditablePoints->getGroup(newIndex)->addPointToGroup(pEditablePoints->get(i));
+                pEditablePoints->setAbsSourcePoint(i, origPos);
             }
 
-            pPointSelection->selectGroup(pEditablePoints->groupCount() - 1, false);
+            pPointSelection->selectGroup(newIndex, false);
         }
         //[/UserButtonCode_btnGroup]
     }
@@ -443,7 +446,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	}
 
 	btnGroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
-                         && ( pRadarOptions->audioParams == nullptr || pEditablePoints->groupCount() < pRadarOptions->audioParams->groupParams.size()));
+                         && ( pRadarOptions->audioParams == nullptr || pEditablePoints->activeGroupCount() < pRadarOptions->audioParams->groupParams.size()));
 	btnUngroup->setVisible(pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1);
 	textX->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
 	textY->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);

@@ -28,6 +28,9 @@ public:
 	
     const static float CompressedMin;
     const static float CompressedMax;
+    
+    const static float StretchMin;
+    const static float StretchMax;
 
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);

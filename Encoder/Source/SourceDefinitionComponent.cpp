@@ -190,11 +190,11 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     if (buttonThatWasClicked == buttonAddGroup.get())
     {
         //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
-        if(m_args.pAudioParams != nullptr && m_args.pSourceSet->groupCount() < m_args.pAudioParams->groupParams.size())
+        if(m_args.pAudioParams != nullptr && m_args.pSourceSet->activeGroupCount() < m_args.pAudioParams->groupParams.size())
         {
             Uuid newId = Uuid();
-            m_args.pSourceSet->addGroup(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, m_args.pAudioParams->groupParams.getUnchecked(m_args.pSourceSet->groupCount())), "G", Colours::orange);
-            m_args.pPointSelection->selectGroup(m_args.pSourceSet->groupCount() - 1, false);
+            int newIndex = m_args.pSourceSet->addGroup(newId.toString(), Vector3D<double>(0.0, 0.0, 0.0), "G", Colours::orange);
+            m_args.pPointSelection->selectGroup(newIndex, false);
             groupList->updateContent();
             groupList->repaint();
         }
@@ -280,7 +280,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
             int selection = m_args.pPointSelection->getMainSelectedPointIndex();
-            if (selection >= 0 && selection < m_args.pSourceSet->groupCount() - 1)
+            if (selection >= 0 && selection < m_args.pSourceSet->activeGroupCount() - 1)
             {
                 m_args.pPointSelection->unselectPoint();
                 m_args.pSourceSet->swapGroup(selection, selection + 1);
@@ -295,7 +295,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
             int selection = m_args.pPointSelection->getMainSelectedPointIndex();
-            if (selection >= 1 && selection < m_args.pSourceSet->groupCount())
+            if (selection >= 1 && selection < m_args.pSourceSet->activeGroupCount())
             {
                 m_args.pPointSelection->unselectPoint();
                 m_args.pSourceSet->swapGroup(selection, selection - 1);
@@ -340,7 +340,7 @@ void SourceDefinitionComponent::controlDimming() const
     buttonMoveUp->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getMainSelectedPointIndex() > 0);
     buttonMoveDown->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
     buttonAddGroup->setEnabled(true);
-    buttonRemoveGroup->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Group && m_args.pSourceSet->groupCount() > 0);
+    buttonRemoveGroup->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Group && m_args.pSourceSet->activeGroupCount() > 0);
 }
 
 void SourceDefinitionComponent::refresh() const

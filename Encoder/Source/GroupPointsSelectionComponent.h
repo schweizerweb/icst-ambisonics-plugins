@@ -27,7 +27,7 @@ public:
 		
     	this->addChangeListener(pListener);
 		
-    	pGroup = pSources->getGroup(groupIndex);
+    	pGroup = pSources->getActiveGroup(groupIndex);
 
         columnCount = (int)std::ceil(pSources->size() / 16.0);
         rowCount = columnCount > 0 ?  (int)(std::ceil(pSources->size() / (double)columnCount)) : 0;

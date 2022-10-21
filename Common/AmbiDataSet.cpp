@@ -337,9 +337,39 @@ int AmbiDataSet::groupCount() const
 	return groups.size();
 }
 
+int AmbiDataSet::activeGroupCount() const
+{
+    int cnt = 0;
+    for(auto& g : groups)
+    {
+        if(g->getEnabled())
+            cnt++;
+    }
+    
+    return cnt;
+}
+
 AmbiGroup* AmbiDataSet::getGroup(int index) const
 {
 	return groups[index];
+}
+
+AmbiGroup* AmbiDataSet::getActiveGroup(int index, int* pRealIndex) const
+{
+    for(int i = 0; i < groups.size(); i++)
+    {
+        if(groups[i]->getEnabled())
+        {
+            if(index == 0)
+            {
+                if(pRealIndex != nullptr)
+                    *pRealIndex = i;
+                return groups[i];
+            }
+            
+            index--;
+        }
+    }
 }
 
 void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
@@ -356,7 +386,7 @@ void AmbiDataSet::removeGroup(int groupIndex)
     const ScopedLock lock(cs);
     
     groups[groupIndex]->removeAllPoints();
-	groups.remove(groupIndex);
+    groups[groupIndex]->setEnabled(false);
 }
 
 void AmbiDataSet::setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
@@ -473,12 +503,35 @@ bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bo
 	return found;
 }
 
-AmbiGroup* AmbiDataSet::addGroup(String id, Point3D<double> point, String name, Colour color)
+int AmbiDataSet::addGroup(String id, Vector3D<double> point, String name, Colour color)
 {
-	AmbiGroup* group = new AmbiGroup(id, point, name, color, pScalingInfo);
-	groups.add(group);
+    // returns the index of the group
+    int index = -1;
+    
+    // find existing disabled groups first
+    for(int i = 0; i < groups.size(); i++)
+    {
+        if(!groups[i]->getEnabled())
+        {
+            index = i;
+            groups[i]->setEnabled(true);
+            groups[i]->setStretch(1.0);
+            groups[i]->setRotation(Quaternion<double>(0.0, 0.0, 0.0, 1.0));
+            break;
+        }
+    }
+    
+    // otherwise create a new one
+    if(index == -1)
+    {
+        AmbiGroup* group = new AmbiGroup(id, Point3D<double>(point.x, point.y, point.z, AudioParameterSet()), name, color, pScalingInfo);
+        groups.add(group);
+        index = groups.size() - 1;
+    }
 
-	return group;
+    groups[index]->setXYZ(point.x, point.y, point.z, false, groupModeFlag);
+    
+	return index;
 }
 
 bool AmbiDataSet::setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const
@@ -531,6 +584,14 @@ void AmbiDataSet::setGroupRotation(int groupIndex, Quaternion<double> rotation, 
         group->setRotation(rotation, notify);
 }
 
+void AmbiDataSet::setGroupStretch(int groupIndex, double stretchFactor, bool notify)
+{
+    const ScopedLock lock(cs);
+
+    AmbiGroup* group = groups[groupIndex];
+    if (group != nullptr)
+        group->setStretch(stretchFactor, notify);
+}
 
 bool AmbiDataSet::getGroupModeFlag() const
 {

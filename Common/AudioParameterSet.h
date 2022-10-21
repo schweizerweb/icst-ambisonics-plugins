@@ -12,6 +12,7 @@
 #include "AudioParameterFloatAmbiAbs.h"
 #include "AudioParameterBoolAmbiAbs.h"
 #include "ScalingInfo.h"
+#include "Constants.h"
 
 class AudioParameterSet
 {
@@ -23,6 +24,7 @@ public:
     AudioParameterFloat* pQ1 = nullptr;
     AudioParameterFloat* pQ2 = nullptr;
     AudioParameterFloat* pQ3 = nullptr;
+    AudioParameterFloat* pStretch = nullptr;
     AudioParameterFloatAmbiAbs* pGain = nullptr;
     AudioParameterBoolAmbiAbs* pMute = nullptr;
     
@@ -101,6 +103,17 @@ public:
         {
             *pQ3 = q3;
         }
+    }
+    
+    double notifyStretch(double stretch)
+    {
+        makeValid(&stretch, Constants::StretchMin, Constants::StretchMax);
+        if(pStretch != nullptr)
+        {
+            *pStretch = stretch;
+        }
+        
+        return stretch;
     }
     
     void notifyGain(double gain)

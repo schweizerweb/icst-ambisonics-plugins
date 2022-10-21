@@ -26,6 +26,9 @@ const double Constants::GainDbMax = 12.0;
 const float Constants::CompressedMin = -1.0f;
 const float Constants::CompressedMax = 1.0f;
 
+const float Constants::StretchMin = 0.0;
+const float Constants::StretchMax = 100.0;
+
 double Constants::RadToGrad(double rad)
 {
 	return rad * 180.0 / PI;

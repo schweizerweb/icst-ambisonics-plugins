@@ -19,7 +19,7 @@
 class AmbiGroup : public AmbiPoint
 {
 public:
-	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling) {}
+	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), stretchFactor(1.0), rotationQuaternion(Quaternion<double>(0,0,0,1)) {}
 	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
 	virtual ~AmbiGroup() = default;
 
@@ -49,6 +49,7 @@ public:
     void removeAllPoints();
     
     void setRotation(Quaternion<double> rotation, bool notify = true);
+    void setStretch(double stretchFactor, bool notify = true);
     
     void applyTransform(Vector3D<double>* pt);
     void applyInverseTransform(Vector3D<double>* pt);
@@ -60,4 +61,5 @@ private:
     Array<AmbiPoint*> groupPoints;
     Quaternion<double> rotationQuaternion;
     Matrix3D<double> rotationMatrix;
+    double stretchFactor;
 };

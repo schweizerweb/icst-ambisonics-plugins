@@ -10,7 +10,7 @@
 
 #include "AmbiGroup.h"
 
-AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1))
+AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
 {
 	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
 	groupPoints.clear();
@@ -241,7 +241,7 @@ void AmbiGroup::stretch(double stretchValue, bool groupModeFlag)
 {
     if(groupModeFlag)
     {
-        // TODO: set stretch
+        setStretch(stretchFactor + stretchValue);
     }
     else
     {
@@ -402,12 +402,22 @@ void AmbiGroup::removeAllPoints() {
 
 void AmbiGroup::setRotation(Quaternion<double> rotation, bool notify)
 {
-    rotationQuaternion = rotation;
+    rotationQuaternion = rotation.normalised();
     rotationMatrix = rotation.getRotationMatrix();
     
     if(notify)
     {
-        audioParams.notifyQ(rotation.vector.x, rotation.vector.y, rotation.vector.z, rotation.scalar);
+        audioParams.notifyQ(rotationQuaternion.vector.x, rotationQuaternion.vector.y, rotationQuaternion.vector.z, rotationQuaternion.scalar);
+    }
+}
+
+void AmbiGroup::setStretch(double stretch, bool notify)
+{
+    stretchFactor = stretch;
+
+    if(notify)
+    {
+        stretchFactor = audioParams.notifyStretch(stretch);
     }
 }
 
@@ -418,11 +428,13 @@ void AmbiGroup::applyTransform(Vector3D<double> *pt)
                rotationMatrix.mat[0] * o.x + rotationMatrix.mat[1] * o.y + rotationMatrix.mat[2] * o.z + rotationMatrix.mat[3] * 1,
                rotationMatrix.mat[4] * o.x + rotationMatrix.mat[5] * o.y + rotationMatrix.mat[6] * o.z + rotationMatrix.mat[7] * 1,
                rotationMatrix.mat[8] * o.x + rotationMatrix.mat[9] * o.y + rotationMatrix.mat[10] * o.z + rotationMatrix.mat[11] * 1);
+    *pt *= stretchFactor;
 }
 
 void AmbiGroup::applyInverseTransform(Vector3D<double> *pt)
 {
     auto o = *pt;
+    o /= stretchFactor;
     *pt = Vector3D<double>(
                rotationMatrix.mat[0] * o.x + rotationMatrix.mat[4] * o.y + rotationMatrix.mat[8] * o.z + rotationMatrix.mat[12] * 1,
                rotationMatrix.mat[1] * o.x + rotationMatrix.mat[5] * o.y + rotationMatrix.mat[9] * o.z + rotationMatrix.mat[13] * 1,

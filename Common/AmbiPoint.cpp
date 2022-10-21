@@ -36,6 +36,7 @@ AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color
 	gain(gain),
     mute(mute),
     solo(solo),
+    audioParams(point.getAudioParameterSet()),
     enabled(true),
     pGroup(nullptr)
 {
