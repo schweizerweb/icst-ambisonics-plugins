@@ -117,6 +117,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(Vector3D<double> absPt, AmbiPoi
         case Expression:
         {
             jsContext->jsAmbiPoint = pt;
+            jsContext->jsAbsPos = absPt;
             jsContext->jsPointIndex = index;
             
             auto ret = jsEngine->evaluate(jsExpression);

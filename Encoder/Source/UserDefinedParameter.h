@@ -46,6 +46,9 @@
                     setMethod ("getName", name);
                     setMethod ("getColor", color);
                     setMethod ("getIndex", i);
+                    setMethod ("getAbsX", absX);
+                    setMethod ("getAbsY", absY);
+                    setMethod ("getAbsZ", absZ);
                 }
         
                 static Identifier getClassName()    { return "p"; }
@@ -73,7 +76,31 @@
                 
                     return var::undefined();
                 }
+                
+                static var absX (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.x;
+        
+                    return var::undefined();
+                }
+
+                static var absY (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.y;
+                
+                    return var::undefined();
+                }
                    
+                static var absZ (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.z;
+                
+                    return var::undefined();
+                }
+                
                 static var a (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
