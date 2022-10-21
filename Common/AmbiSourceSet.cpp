@@ -194,7 +194,7 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
             while (groups.size() < pAudioParams->groupParams.size())
             {
                 String indexString = String(index + 1);
-                AmbiGroup* g = new AmbiGroup(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->groupParams.getUnchecked(index)), "G"+indexString, Colours::red, pScalingInfo);
+                AmbiGroup* g = new AmbiGroup(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->groupParams.getUnchecked(index)), "G"+indexString, Colours::orangered, pScalingInfo);
                 g->setEnabled(false);
                 groups.add(g);
                 index++;

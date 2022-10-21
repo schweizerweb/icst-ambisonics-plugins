@@ -77,7 +77,7 @@ public:
     void swapGroup(int a, int b);
     
     void setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
-    void setGroupStretch(int groupIndex, double stretchFactor, bool notify);
+    void setGroupStretch(int groupIndex, double stretchFactor, bool notify = true);
     
     Vector3D<double> getAbsSourcePoint(int index) const;
     void setAbsSourcePoint(int index, Vector3D<double> absPoint);

@@ -385,8 +385,22 @@ void AmbiDataSet::removeGroup(int groupIndex)
 {
     const ScopedLock lock(cs);
     
+    // keep absolute positions
+    std::map<int, Vector3D<double>> origPos;
+    for(int i = 0; i < size(); i++)
+    {
+        auto p = get(i);
+        if(p != nullptr && p->getGroup() == groups[groupIndex])
+        {
+            origPos[i] = getAbsSourcePoint(i);
+        }
+    }
+    
     groups[groupIndex]->removeAllPoints();
     groups[groupIndex]->setEnabled(false);
+    
+    for(auto& p : origPos)
+        setAbsSourcePoint(p.first, p.second);
 }
 
 void AmbiDataSet::setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
