@@ -19,7 +19,7 @@
 class AmbiGroup : public AmbiPoint
 {
 public:
-	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), stretchFactor(1.0), rotationQuaternion(Quaternion<double>(0,0,0,1)) {}
+	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
 	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
 	virtual ~AmbiGroup() = default;
 

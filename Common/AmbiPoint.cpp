@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams), enabled(other->enabled), pGroup(other->pGroup)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): audioParams(other->audioParams), id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), enabled(other->enabled), pGroup(other->pGroup)
 {
 	if (copyImage)
 	{
@@ -29,14 +29,14 @@ AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0), pGroup(nullptr)
 }
 
 AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color, double gain, bool mute, bool solo):
-	id(id),
+    audioParams(point.getAudioParameterSet()),
+    id(id),
 	point(point),
 	color(color),
 	name(name),
 	gain(gain),
     mute(mute),
     solo(solo),
-    audioParams(point.getAudioParameterSet()),
     enabled(true),
     pGroup(nullptr)
 {
@@ -58,7 +58,8 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 }
 
 AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
-	id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
+    audioParams(audioParams),
+    id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z),
@@ -68,20 +69,19 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
     solo(false),
-    audioParams(audioParams),
     enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true)),
     pGroup(nullptr)
 {
 }
 
 AmbiPoint::AmbiPoint(AudioParameterSet audioParams) :
+    audioParams(audioParams),
     id(Uuid().toString()),
     point(Point3D<double>(0.0, 0.0, 0.0, audioParams)),
     color(Colours::black),
     gain(1.0),
     mute(false),
     solo(false),
-    audioParams(audioParams),
     enabled(false),
     pGroup(nullptr)
 {

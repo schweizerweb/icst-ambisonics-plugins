@@ -370,6 +370,8 @@ AmbiGroup* AmbiDataSet::getActiveGroup(int index, int* pRealIndex) const
             index--;
         }
     }
+    
+    return nullptr;
 }
 
 void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const
