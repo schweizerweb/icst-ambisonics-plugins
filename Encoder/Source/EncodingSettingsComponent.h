@@ -26,6 +26,7 @@
 #include "../../Common/ZoomSettings.h"
 #include "DistanceEncodingPresetHelper.h"
 #include "ComponentArguments.h"
+#include "DistanceEncodingComponent.h"
 //[/Headers]
 
 
@@ -49,7 +50,6 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    void controlDimming() const;
     void initializePresets();
     void updateEncodingUiElements();
     //[/UserMethods]
@@ -64,13 +64,16 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     PresetManagerDialog presetManagerDialog;
     EncoderSettingsComponentArgs m_args;
+    
+    void controlDimming();
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<juce::GroupComponent> groupDistanceEncoding;
     std::unique_ptr<juce::ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<juce::ToggleButton> toggleDoppler;
-    std::unique_ptr<juce::TextButton> btnEditDistanceEncoding;
     std::unique_ptr<juce::TextButton> btnManageDistanceEncodingPresets;
+    std::unique_ptr<DistanceEncodingComponent> distanceEncodingComponent;
 
 
     //==============================================================================

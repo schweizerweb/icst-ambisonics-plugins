@@ -106,6 +106,16 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     hideWarningsXml->setAttribute(XML_ATTRIBUTE_ENABLE, hideWarnings);
     element->addChildElement(hideWarningsXml);
 	
+    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
+    distanceEncodingParams.writeToXmlElement(distanceEncoding);
+    element->addChildElement(distanceEncoding);
+
+    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
+    element->addChildElement(dopplerEncoding);
+    
     writeToPresetXmlElement(element);
 	
 	return element;
@@ -175,21 +185,25 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     if(hideWarningsXml != nullptr)
     hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
     
+    XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
+    if (distanceEncoding != nullptr)
+    {
+        distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
+        distanceEncodingParams.loadFromXmlElement(distanceEncoding);
+    }
+
+    XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);
+    if (dopplerEncoding != nullptr)
+    {
+        dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
+        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
+    }
+    
     loadFromPresetXml(element);
 }
 
 void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
 {
-    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-    distanceEncodingParams.writeToXmlElement(distanceEncoding);
-    xmlElement->addChildElement(distanceEncoding);
-
-    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
-    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
-    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
-    xmlElement->addChildElement(dopplerEncoding);
-    
     XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
     masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
     xmlElement->addChildElement(masterGainElement);
@@ -197,20 +211,6 @@ void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
 
 void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
 {
-    XmlElement* distanceEncoding = xmlElement->getChildByName(XML_TAG_DISTANCE_ENCODING);
-    if (distanceEncoding != nullptr)
-    {
-        distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-        distanceEncodingParams.loadFromXmlElement(distanceEncoding);     
-    }
-
-    XmlElement* dopplerEncoding = xmlElement->getChildByName(XML_TAG_DOPPLER_ENCODING);
-    if (dopplerEncoding != nullptr)
-    {
-        dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
-        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
-    }
-    
     XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
     if (masterGainElement != nullptr)
     {

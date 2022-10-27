@@ -10,7 +10,7 @@
 
 #pragma once
 #include "../../Common/SimpleGraph.h"
-#include "../../Common/ScalingInfo.h"
+#include "../../Common/ZoomSettings.h"
 #include "DistanceEncodingParams.h"
 
 #define NB_STEPS 200
@@ -18,12 +18,12 @@
 class DistanceEncodingGraph : public SimpleGraph
 {
 public:
-	DistanceEncodingGraph(DistanceEncodingParams* params, ScalingInfo* pScaling);
+	DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings);
 	~DistanceEncodingGraph();
 
 	void paintData(Graphics&) override;
 
 private:
 	DistanceEncodingParams* pParams;
-    ScalingInfo* pScalingInfo;
+    ZoomSettings* pZoomSettings;
 };

@@ -24,6 +24,7 @@
 #include "DistanceEncodingParams.h"
 #include "DistanceEncodingGraph.h"
 #include "DistanceEncodingPresetHelper.h"
+#include "../../Common/ZoomSettings.h"
 //[/Headers]
 
 
@@ -45,7 +46,7 @@ class DistanceEncodingComponent  : public Component,
 {
 public:
     //==============================================================================
-    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling);
+    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
     ~DistanceEncodingComponent() override;
 
     //==============================================================================
@@ -69,6 +70,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	DistanceEncodingParams* pParams;
     DistanceEncodingPresetHelper* pPresetHelper;
+    ZoomSettings* pZoomSettings;
     //[/UserVariables]
 
     //==============================================================================
