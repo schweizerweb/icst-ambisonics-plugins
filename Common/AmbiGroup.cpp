@@ -12,6 +12,23 @@
 
 AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
 {
+    XmlElement* rot = xmlElement->getChildByName(XML_TAG_ROTATION);
+    if(rot != nullptr)
+    {
+        double x = rot->getDoubleAttribute(XML_ATTRIBUTE_ROTATION_Q0);
+        double y = rot->getDoubleAttribute(XML_ATTRIBUTE_ROTATION_Q1);
+        double z = rot->getDoubleAttribute(XML_ATTRIBUTE_ROTATION_Q2);
+        double w = rot->getDoubleAttribute(XML_ATTRIBUTE_ROTATION_Q3);
+        setRotation(Quaternion<double>(x, y, z, w));
+    }
+    
+    XmlElement* stretch = xmlElement->getChildByName(XML_TAG_STRETCH);
+    if(stretch != nullptr)
+    {
+        double f = stretch->getDoubleAttribute(XML_ATTRIBUTE_FACTOR);
+        setStretch(f);
+    }
+    
 	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
 	groupPoints.clear();
 	if (subPointsElement != nullptr)
@@ -49,6 +66,16 @@ XmlElement* AmbiGroup::getAsXmlElement(String tagName)
 		XmlElement* xmlPt = subPoints->createNewChildElement(XML_TAG_SUBPOINT);
 		xmlPt->setAttribute(XML_ATTRIBUTE_GROUP_ID, groupPoints.getUnchecked(i)->getId());
 	}
+    
+    XmlElement* rot = element->createNewChildElement(XML_TAG_ROTATION);
+    rot->setAttribute(XML_ATTRIBUTE_ROTATION_Q0, rotationQuaternion.vector.x);
+    rot->setAttribute(XML_ATTRIBUTE_ROTATION_Q1, rotationQuaternion.vector.y);
+    rot->setAttribute(XML_ATTRIBUTE_ROTATION_Q2, rotationQuaternion.vector.z);
+    rot->setAttribute(XML_ATTRIBUTE_ROTATION_Q3, rotationQuaternion.scalar);
+    
+    XmlElement* stretch = element->createNewChildElement(XML_TAG_STRETCH);
+    stretch->setAttribute(XML_ATTRIBUTE_FACTOR, stretchFactor);
+    
 	return element;
 }
 

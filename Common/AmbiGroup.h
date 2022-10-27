@@ -13,7 +13,14 @@
 #include "AmbiSource.h"
 #define XML_TAG_SUBPOINTS "SubPoints"
 #define XML_TAG_SUBPOINT "SubPoint"
+#define XML_TAG_ROTATION "Rotation"
+#define XML_TAG_STRETCH "Stretch"
 #define XML_ATTRIBUTE_GROUP_ID "Id"
+#define XML_ATTRIBUTE_ROTATION_Q0 "Q0"
+#define XML_ATTRIBUTE_ROTATION_Q1 "Q1"
+#define XML_ATTRIBUTE_ROTATION_Q2 "Q2"
+#define XML_ATTRIBUTE_ROTATION_Q3 "Q3"
+#define XML_ATTRIBUTE_FACTOR "Factor"
 
 
 class AmbiGroup : public AmbiPoint
