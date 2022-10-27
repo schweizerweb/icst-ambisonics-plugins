@@ -37,6 +37,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs
     tabbedComponent.reset (new juce::TabbedComponent (juce::TabbedButtonBar::TabsAtTop));
     addAndMakeVisible (tabbedComponent.get());
     tabbedComponent->setTabBarDepth (35);
+    tabbedComponent->addTab (TRANS("Sources"), juce::Colours::lightgrey, new SourceDefinitionComponent (args), true);
     tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (args), true);
     tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (args.pChangeListener, args.pZoomSettings), true);
     tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (args.pChangeListener, args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager), true);
@@ -127,6 +128,8 @@ BEGIN_JUCER_METADATA
   <TABBEDCOMPONENT name="tabbedComponent" id="3a0bd97c3580beb3" memberName="tabbedComponent"
                    virtualName="" explicitFocusOrder="0" pos="8 8 15M 13M" orientation="top"
                    tabBarDepth="35" initialTab="0">
+    <TAB name="Sources" colour="ffd3d3d3" useJucerComp="0" contentClassName="SourceDefinitionComponent"
+         constructorParams="args" jucerComponentFile=""/>
     <TAB name="Encoding" colour="ffd3d3d3" useJucerComp="0" contentClassName="EncodingSettingsComponent"
          constructorParams="args" jucerComponentFile=""/>
     <TAB name="Radar" colour="ffd3d3d3" useJucerComp="0" contentClassName="RadarSettingsComponent"

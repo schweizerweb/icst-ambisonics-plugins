@@ -20,7 +20,7 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "GroupTableListModel.h"
 #include "SourceTableListModel.h"
 #include "../../Common/AmbiSourceSet.h"
@@ -29,6 +29,8 @@
 #include "../../Common/ZoomSettings.h"
 #include "EncoderSettings.h"
 #include "ComponentArguments.h"
+#include "EncoderPresetHelper.h"
+#include "../../Common/PresetManagerDialog.h"
 //[/Headers]
 
 
@@ -43,8 +45,11 @@
 */
 class SourceDefinitionComponent  : public Component,
                                    public ChangeListener,
+                                   public ActionListener,
                                    public ChangeBroadcaster,
-                                   public juce::Button::Listener
+                                   public juce::Button::Listener,
+                                   public juce::Slider::Listener,
+                                   public juce::ComboBox::Listener
 {
 public:
     //==============================================================================
@@ -61,6 +66,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
 
 
 
@@ -69,6 +76,11 @@ private:
     EncoderSettingsComponentArgs m_args;
     std::unique_ptr<GroupTableListModel> groupModel;
     std::unique_ptr<SourceTableListModel> sourceModel;
+    PresetManagerDialog presetManagerDialog;
+
+    void initializePresets();
+    void updateEncodingUiElements();
+    void actionListenerCallback(const String &message) override;
     //[/UserVariables]
 
     //==============================================================================
@@ -84,6 +96,17 @@ private:
     std::unique_ptr<juce::TextButton> buttonMoveUp;
     std::unique_ptr<juce::TextButton> buttonMoveGroupDown;
     std::unique_ptr<juce::TextButton> buttonMoveGroupUp;
+    std::unique_ptr<juce::Slider> sliderDistanceScaler;
+    std::unique_ptr<juce::Label> labelDistanceScaler;
+    std::unique_ptr<juce::ToggleButton> toggleInfiniteDistance;
+    std::unique_ptr<juce::Label> labelMasterGain;
+    std::unique_ptr<juce::Slider> sliderMasterGain;
+    std::unique_ptr<juce::ToggleButton> toggleGroupMode;
+    std::unique_ptr<juce::ComboBox> comboBoxPresets;
+    std::unique_ptr<juce::Label> labelPresets;
+    std::unique_ptr<juce::TextButton> buttonSave;
+    std::unique_ptr<juce::TextButton> buttonManagePresets;
+    std::unique_ptr<juce::Component> dummyHeight;
 
 
     //==============================================================================
