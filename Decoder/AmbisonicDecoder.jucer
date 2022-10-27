@@ -91,10 +91,6 @@
       </GROUP>
       <FILE id="A4by6z" name="AdditionalWindow.h" compile="0" resource="0"
             file="../Common/AdditionalWindow.h"/>
-      <FILE id="ahivly" name="AmbiBasicSettings.cpp" compile="1" resource="0"
-            file="../Common/AmbiBasicSettings.cpp"/>
-      <FILE id="YlGBqj" name="AmbiBasicSettings.h" compile="0" resource="0"
-            file="../Common/AmbiBasicSettings.h"/>
       <FILE id="ZopgEv" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
       <FILE id="E8U6Mo" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
       <FILE id="TRetkJ" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>

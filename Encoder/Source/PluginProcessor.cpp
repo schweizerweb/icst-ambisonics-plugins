@@ -11,7 +11,7 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "../../Common/TrackColors.h"
-#include "EncoderConstants.h"
+#include "../../Common/EncoderConstants.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
@@ -74,7 +74,7 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
 #if MULTI_ENCODER_MODE
-    encoderSettings.initialize(this);
+    sources->initialize(this);
 #endif
 	encoderSettings.distanceEncodingParams.initialize(this);
     audioParams.initialize(this, getScalingInfo(), sources.get(), MAXIMUM_NUMBER_OF_GROUPS);
@@ -190,7 +190,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-    const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
+    const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];

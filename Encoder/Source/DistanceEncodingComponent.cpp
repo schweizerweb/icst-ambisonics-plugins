@@ -18,7 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "EncoderConstants.h"
+#include "../../Common/EncoderConstants.h"
 //[/Headers]
 
 #include "DistanceEncodingComponent.h"

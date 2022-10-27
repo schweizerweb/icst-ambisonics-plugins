@@ -9,6 +9,7 @@
 */
 
 #include "AmbiSourceSet.h"
+#include "EncoderConstants.h"
 
 AmbiSource* AmbiSourceSet::get(int index) const
 {
@@ -151,6 +152,12 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
         setDistanceScaler(float(distanceScalerXml->getDoubleAttribute(XML_ATTRIBUTE_FACTOR, DEFAULT_DISTANCE_SCALER)));
     }
     
+    XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
+    if (masterGainElement != nullptr)
+    {
+        setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
+    }
+    
 	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	clear();
 	if (sourcesElement != nullptr)
@@ -220,6 +227,10 @@ void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
     distanceScaler->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
     xml->addChildElement(distanceScaler);
     
+    XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
+    masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
+    xml->addChildElement(masterGainElement);
+    
 	// sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
 	for (int i = 0; i < size(); i++)
@@ -270,4 +281,40 @@ void AmbiSourceSet::setDistanceScaler(double newDistanceScaler)
 double AmbiSourceSet::getDistanceScaler() const
 {
     return distanceScaler;
+}
+
+float AmbiSourceSet::getMasterGain() const
+{
+    return masterGain != nullptr ? masterGain->get() : localMasterGain;
+}
+
+bool AmbiSourceSet::setMasterGain(float gainDb)
+{
+    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
+        return false;
+
+    if (masterGain != nullptr)
+        *masterGain = gainDb;
+    else
+        localMasterGain = gainDb;
+
+    return true;
+}
+
+void AmbiSourceSet::initialize(AudioProcessor* pProcessor)
+{
+    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
+
+    pProcessor->addParameter(masterGain);
+
+    masterGain->addListener(this);
+}
+
+void AmbiSourceSet::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
+{
+    sendChangeMessage();
+}
+
+void AmbiSourceSet::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
+{
 }

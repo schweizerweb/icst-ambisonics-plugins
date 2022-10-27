@@ -27,24 +27,18 @@
 #define DEFAULT_SEND_EXT_CONTINUOUS_FLAG    false
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
-#define DEFAULT_MASTER_GAIN			0
 #define DEFAULT_HIDE_WARNINGS       false
 #define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
 #define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 4 : 0)
 
-class EncoderSettings : public AudioProcessorParameter::Listener, public ChangeBroadcaster
+class EncoderSettings
 {
 public:
 	EncoderSettings();
 	~EncoderSettings();
 	XmlElement* getAsXmlElement(String tagName) const;
 	void loadFromXml(XmlElement* xml_element);
-    void writeToPresetXmlElement(XmlElement* xmlElement) const;
-    void loadFromPresetXml(XmlElement* xmlElement);
-    void initialize(AudioProcessor* pProcessor);
-    void parameterValueChanged(int parameterIndex, float newValue) override;
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override;
-
+    
     bool oscReceiveFlag;
 	int oscReceivePort;
 
@@ -71,11 +65,4 @@ public:
 	bool dopplerEncodingFlag;
 
     bool hideWarnings;
-    
-    float getMasterGain() const;
-    bool setMasterGain(float gainDb);
-
-private:
-	AudioParameterFloat* masterGain;
-	float localMasterGain;
 };

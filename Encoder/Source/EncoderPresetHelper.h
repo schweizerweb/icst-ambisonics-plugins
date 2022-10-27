@@ -35,13 +35,12 @@ public:
         if (rootElement == nullptr || rootElement->getTagName() != "EncoderPreset")
             return false;
         
-        pEncoderSettings->loadFromPresetXml(rootElement->getChildByName("EncoderSettings"));
+        pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
+        pSourceSet->resetIds();
+        
         // apply scaler if audio params attached
         if(pAudioParams != nullptr)
             pScalingInfo->SetScaler(pSourceSet->getDistanceScaler());
-        
-        pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
-        pSourceSet->resetIds();
         
         return pSourceSet->size() > 0;
     }
@@ -54,10 +53,6 @@ public:
         pSourceSet->writeToXmlElement(xmlSources);
         rootElement->addChildElement(xmlSources);
         
-        XmlElement* xmlSettings = new XmlElement("EncoderSettings");
-        pEncoderSettings->writeToPresetXmlElement(xmlSettings);
-        rootElement->addChildElement(xmlSettings);
-
         bool success = rootElement->writeTo(file);
         delete rootElement;
         return success;

@@ -84,10 +84,6 @@
             file="Source/DistanceEncodingParams.h"/>
       <FILE id="aenO0C" name="DistanceEncodingPresetHelper.h" compile="0"
             resource="0" file="Source/DistanceEncodingPresetHelper.h"/>
-      <FILE id="F7eoPa" name="EncoderConstants.cpp" compile="1" resource="0"
-            file="Source/EncoderConstants.cpp"/>
-      <FILE id="g37xg9" name="EncoderConstants.h" compile="0" resource="0"
-            file="Source/EncoderConstants.h"/>
       <FILE id="zbf72D" name="EncoderPresetHelper.h" compile="0" resource="0"
             file="Source/EncoderPresetHelper.h"/>
       <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
@@ -226,6 +222,10 @@
             resource="0" file="../Common/EditableCodeCustomComponent.h"/>
       <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
+      <FILE id="qVzLdX" name="EncoderConstants.cpp" compile="1" resource="0"
+            file="../Common/EncoderConstants.cpp"/>
+      <FILE id="B0KcF5" name="EncoderConstants.h" compile="0" resource="0"
+            file="../Common/EncoderConstants.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
       <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
             file="../Common/JsEditorComponent.cpp"/>

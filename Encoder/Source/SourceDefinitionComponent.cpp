@@ -213,10 +213,10 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
     sliderMasterGain->setNumDecimalPlacesToDisplay(1);
     sliderMasterGain->setTextValueSuffix(" dB");
-    sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
+    sliderMasterGain->setValue(m_args.pSourceSet->getMasterGain());
     // load stored presets
     m_args.pPresetHelper->addActionListener(this);
-    m_args.pSettings->addChangeListener(this);
+    m_args.pSourceSet->addChangeListener(this);
     initializePresets();
 
     controlDimming();
@@ -227,7 +227,7 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     m_args.pPointSelection->removeChangeListener(this);
-    m_args.pSettings->removeChangeListener(this);
+    m_args.pSourceSet->removeChangeListener(this);
     m_args.pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
@@ -481,7 +481,7 @@ void SourceDefinitionComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     else if (sliderThatWasMoved == sliderMasterGain.get())
     {
         //[UserSliderCode_sliderMasterGain] -- add your slider handling code here..
-        m_args.pSettings->setMasterGain((float)sliderMasterGain->getValue());
+        m_args.pSourceSet->setMasterGain((float)sliderMasterGain->getValue());
         //[/UserSliderCode_sliderMasterGain]
     }
 
@@ -530,7 +530,7 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
     }
     else
     {
-        sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
+        sliderMasterGain->setValue(m_args.pSourceSet->getMasterGain());
     }
 }
 
@@ -559,7 +559,7 @@ void SourceDefinitionComponent::updateEncodingUiElements()
     labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())
-        sliderDistanceScaler->setValue(m_args.pSourceSet->getDistanceScaler());
+        sliderDistanceScaler->setValue(m_args.pSourceSet->getDistanceScaler(), dontSendNotification);
 }
 
 void SourceDefinitionComponent::initializePresets()

@@ -15,7 +15,6 @@
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
-#define XML_TAG_MASTER_GAIN "MasterGain"
 #define XML_TAG_DISPLAY "Display"
 #define XML_TAG_OSC_SEND_EXT_XYZ "Xyz"
 #define XML_TAG_OSC_SEND_EXT_AED "Aed"
@@ -49,9 +48,7 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-    hideWarnings(DEFAULT_HIDE_WARNINGS),
-    masterGain(nullptr),
-    localMasterGain(DEFAULT_MASTER_GAIN)
+    hideWarnings(DEFAULT_HIDE_WARNINGS)
 {
 }
 
@@ -113,8 +110,6 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
     element->addChildElement(dopplerEncoding);
-    
-    writeToPresetXmlElement(element);
 	
 	return element;
 }
@@ -195,58 +190,4 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
     }
-    
-    loadFromPresetXml(element);
-}
-
-void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
-{
-    XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
-    masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
-    xmlElement->addChildElement(masterGainElement);
-}
-
-void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
-{
-    XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
-    if (masterGainElement != nullptr)
-    {
-        setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
-    }
-}
-
-float EncoderSettings::getMasterGain() const
-{
-    return masterGain != nullptr ? masterGain->get() : localMasterGain;
-}
-
-bool EncoderSettings::setMasterGain(float gainDb)
-{
-    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
-        return false;
-
-    if (masterGain != nullptr)
-        *masterGain = gainDb;
-    else
-        localMasterGain = gainDb;
-
-    return true;
-}
-
-void EncoderSettings::initialize(AudioProcessor* pProcessor)
-{
-    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
-
-    pProcessor->addParameter(masterGain);
-
-    masterGain->addListener(this);
-}
-
-void EncoderSettings::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
-{
-    sendChangeMessage();
-}
-
-void EncoderSettings::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
-{
 }
