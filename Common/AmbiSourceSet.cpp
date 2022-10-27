@@ -145,6 +145,12 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
         groupModeFlag = groupMode->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_GROUP_MODE_FLAG);
     }
     
+    XmlElement* distanceScalerXml = xmlElement->getChildByName(XML_TAG_DISTANCE_SCALER);
+    if (distanceScalerXml != nullptr)
+    {
+        setDistanceScaler(float(distanceScalerXml->getDoubleAttribute(XML_ATTRIBUTE_FACTOR, DEFAULT_DISTANCE_SCALER)));
+    }
+    
 	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	clear();
 	if (sourcesElement != nullptr)
@@ -210,6 +216,10 @@ void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
     groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
     xml->addChildElement(groupMode);
     
+    XmlElement* distanceScaler = new XmlElement(XML_TAG_DISTANCE_SCALER);
+    distanceScaler->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
+    xml->addChildElement(distanceScaler);
+    
 	// sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
 	for (int i = 0; i < size(); i++)
@@ -250,4 +260,14 @@ bool AmbiSourceSet::anySolo() const
             return true;
     
     return false;
+}
+
+void AmbiSourceSet::setDistanceScaler(double newDistanceScaler)
+{
+    distanceScaler = newDistanceScaler;
+}
+
+double AmbiSourceSet::getDistanceScaler() const
+{
+    return distanceScaler;
 }

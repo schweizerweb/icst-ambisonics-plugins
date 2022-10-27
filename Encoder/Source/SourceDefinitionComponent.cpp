@@ -427,8 +427,8 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
         //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        m_args.pSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? m_args.pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
-        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
+        m_args.pSourceSet->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? m_args.pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
+        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSourceSet->getDistanceScaler());
         refresh();
         updateEncodingUiElements();
         //[/UserButtonCode_toggleInfiniteDistance]
@@ -471,8 +471,8 @@ void SourceDefinitionComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     if (sliderThatWasMoved == sliderDistanceScaler.get())
     {
         //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
-        m_args.pSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
+        m_args.pSourceSet->setDistanceScaler(sliderDistanceScaler->getValue());
+        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSourceSet->getDistanceScaler());
         m_args.pZoomSettings->Reset();
         sendChangeMessage();
         refresh();
@@ -555,11 +555,11 @@ void SourceDefinitionComponent::refresh() const
 void SourceDefinitionComponent::updateEncodingUiElements()
 {
     toggleGroupMode->setToggleState(m_args.pSourceSet->getGroupModeFlag(), dontSendNotification);
-    toggleInfiniteDistance->setToggleState(m_args.pSettings->getDistanceScaler() == 0.0, dontSendNotification);
+    toggleInfiniteDistance->setToggleState(m_args.pSourceSet->getDistanceScaler() == 0.0, dontSendNotification);
     labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())
-        sliderDistanceScaler->setValue(m_args.pSettings->getDistanceScaler());
+        sliderDistanceScaler->setValue(m_args.pSourceSet->getDistanceScaler());
 }
 
 void SourceDefinitionComponent::initializePresets()

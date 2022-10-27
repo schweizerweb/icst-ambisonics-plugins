@@ -10,6 +10,9 @@
 
 #pragma once
 #define PI 3.1415926535897932384626433832795
+#define SOUND_SPEED_M_PER_S    343.0
+#define SOUND_SPEED_MS_PER_M (1000.0 / SOUND_SPEED_M_PER_S)
+#define SOUND_SPEED_S_PER_M (1.0 / SOUND_SPEED_M_PER_S)
 
 class Constants
 {

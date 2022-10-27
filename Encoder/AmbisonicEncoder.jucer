@@ -183,10 +183,6 @@
             file="../Common/ActivationDialog.h"/>
       <FILE id="t6mAXi" name="AdditionalWindow.h" compile="0" resource="0"
             file="../Common/AdditionalWindow.h"/>
-      <FILE id="R5Yz8G" name="AmbiBasicSettings.cpp" compile="1" resource="0"
-            file="../Common/AmbiBasicSettings.cpp"/>
-      <FILE id="nLYHF0" name="AmbiBasicSettings.h" compile="0" resource="0"
-            file="../Common/AmbiBasicSettings.h"/>
       <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
       <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
       <FILE id="QjJM5Y" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>

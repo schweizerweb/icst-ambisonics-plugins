@@ -18,12 +18,16 @@
 #define XML_TAG_SOURCE "Source"
 #define XML_TAG_GROUPS "Groups"
 #define XML_TAG_GROUP "Group"
+#define XML_TAG_DISTANCE_SCALER "DistanceScaler"
 #define XML_ATTRIBUTE_ENABLE "Enable"
+#define XML_ATTRIBUTE_FACTOR "Factor"
+
+#define DEFAULT_DISTANCE_SCALER    1.0
 
 class AmbiSourceSet : public AmbiDataSet
 {
 public:
-    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling)
+    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling), distanceScaler(DEFAULT_DISTANCE_SCALER)
     {};
 	AmbiSource* get(int index) const override;
 
@@ -44,7 +48,11 @@ public:
     
     bool anySolo() const;
     
+    double getDistanceScaler() const;
+    void setDistanceScaler(double newDistanceScaler);
+    
 private:
 	OwnedArray<AmbiSource> elements;
 	OwnedArray<AmbiSource> removedElements;
+    double distanceScaler;
 };

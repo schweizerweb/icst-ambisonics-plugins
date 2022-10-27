@@ -34,8 +34,7 @@
 #define XML_TAG_CUSTOM_OSC_INPUT "CustomOscInput"
 
 EncoderSettings::EncoderSettings():
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
-    oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
+	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
 	oscSendFlag(DEFAULT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
@@ -113,7 +112,6 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 
     XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
-    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
     element->addChildElement(dopplerEncoding);
     
     writeToPresetXmlElement(element);
@@ -196,7 +194,6 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     if (dopplerEncoding != nullptr)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
-        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
     }
     
     loadFromPresetXml(element);

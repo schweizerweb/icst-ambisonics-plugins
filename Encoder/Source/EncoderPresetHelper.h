@@ -38,7 +38,7 @@ public:
         pEncoderSettings->loadFromPresetXml(rootElement->getChildByName("EncoderSettings"));
         // apply scaler if audio params attached
         if(pAudioParams != nullptr)
-            pScalingInfo->SetScaler(pEncoderSettings->getDistanceScaler());
+            pScalingInfo->SetScaler(pSourceSet->getDistanceScaler());
         
         pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
         pSourceSet->resetIds();

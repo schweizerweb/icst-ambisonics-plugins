@@ -317,7 +317,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		{
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
-            scalingInfo.SetScaler(encoderSettings.getDistanceScaler());
+            scalingInfo.SetScaler(sources->getDistanceScaler());
 			// load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();

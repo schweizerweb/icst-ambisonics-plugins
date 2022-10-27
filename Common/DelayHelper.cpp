@@ -9,7 +9,7 @@
 */
 
 #include "DelayHelper.h"
-#include "AmbiBasicSettings.h"
+#include "Constants.h"
 
 double DelayHelper::getTotalDelayMs(double distance) const
 {

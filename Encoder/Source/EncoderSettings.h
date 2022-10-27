@@ -10,7 +10,6 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "../../Common/AmbiBasicSettings.h"
 #include "DistanceEncodingParams.h"
 #include "CustomOscTarget.h"
 #include "CustomOscInput.h"
@@ -33,7 +32,7 @@
 #define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
 #define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 4 : 0)
 
-class EncoderSettings : public AmbiBasicSettings, public AudioProcessorParameter::Listener, public ChangeBroadcaster
+class EncoderSettings : public AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
 public:
 	EncoderSettings();
