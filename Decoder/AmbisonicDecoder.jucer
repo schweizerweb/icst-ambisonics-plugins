@@ -124,6 +124,10 @@
       <FILE id="Bo1T5o" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
       <FILE id="ge1KYj" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
+      <FILE id="M9qX4E" name="EncoderConstants.cpp" compile="1" resource="0"
+            file="../Common/EncoderConstants.cpp"/>
+      <FILE id="XLBtUZ" name="EncoderConstants.h" compile="0" resource="0"
+            file="../Common/EncoderConstants.h"/>
       <FILE id="KZOybF" name="FFTAnalyzer.cpp" compile="1" resource="0" file="../Common/FFTAnalyzer.cpp"/>
       <FILE id="DDXe4J" name="FFTAnalyzer.h" compile="0" resource="0" file="../Common/FFTAnalyzer.h"/>
       <FILE id="np9zw9" name="FilterBankInfo.h" compile="0" resource="0"

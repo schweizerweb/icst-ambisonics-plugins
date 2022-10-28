@@ -1016,6 +1016,8 @@ void SpeakerSettingsComponent::controlDimming()
 	labelPresets->setEnabled(en);
 	comboBoxChannelConfig->setEnabled(en);
 	speakerList->setEnabled(en);
+    buttonCsv->setEnabled(en);
+    buttonScaling->setEnabled(en);
 	buttonManage->setEnabled(en);
 	buttonSave->setEnabled(en);
 	buttonAdd->setEnabled(en);
