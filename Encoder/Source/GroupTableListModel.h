@@ -27,6 +27,8 @@
 #define	COLUMN_ID_GROUP_A		110
 #define	COLUMN_ID_GROUP_E		111
 #define	COLUMN_ID_GROUP_D		112
+#define COLUMN_ID_GROUP_STRETCH 120
+#define COLUMN_ID_GROUP_ROTATION    121
 #define COLUMN_ID_GROUP_COLOR	113
 #define COLUMN_ID_GROUP_POINTS	114
 
@@ -67,7 +69,7 @@ public:
 		{
 		case COLUMN_ID_GROUP_NB: text = String(grpIndex + 1); break;
 		case COLUMN_ID_GROUP_NAME: text = pt->getName(); break;
-		case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPointCount()); break;
+        case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPointCount()); break;
 		default: text = "";
 		}
 		g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -89,7 +91,8 @@ public:
 			|| columnId == COLUMN_ID_GROUP_Z
 			|| columnId == COLUMN_ID_GROUP_A
 			|| columnId == COLUMN_ID_GROUP_E
-			|| columnId == COLUMN_ID_GROUP_D)
+			|| columnId == COLUMN_ID_GROUP_D
+            || columnId == COLUMN_ID_GROUP_STRETCH)
 		{
 			NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
 			if (numericBox == nullptr)
@@ -98,7 +101,8 @@ public:
 			numericBox->setRowAndColumn(rowNumber, columnId);
 			return numericBox;
 		}
-		else if (columnId == COLUMN_ID_GROUP_NAME)
+		else if (columnId == COLUMN_ID_GROUP_NAME
+            || columnId == COLUMN_ID_GROUP_ROTATION)
 		{
 			EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
 			if (textLabel == nullptr)
@@ -141,6 +145,7 @@ public:
 		case COLUMN_ID_GROUP_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
 		case COLUMN_ID_GROUP_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
 		case COLUMN_ID_GROUP_D: return pt->getRawPoint()->getDistance();
+        case COLUMN_ID_GROUP_STRETCH: return pt->getStretch();
 		case COLUMN_ID_GROUP_COLOR: return pt->getColor().getARGB();
 		default: return 0.0;
 		}
@@ -161,6 +166,9 @@ public:
 		case COLUMN_ID_GROUP_A: pSources->getActiveGroup(rowNumber)->getRawPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
 		case COLUMN_ID_GROUP_E: pSources->getActiveGroup(rowNumber)->getRawPoint()->setElevation(Constants::GradToRad(newValue)); break;
 		case COLUMN_ID_GROUP_D: pSources->getActiveGroup(rowNumber)->getRawPoint()->setDistance(newValue); break;
+        case COLUMN_ID_GROUP_STRETCH:
+            pSources->getActiveGroup(rowNumber)->setStretch(newValue);
+            break;
 		case COLUMN_ID_GROUP_COLOR:
             if(newValue < 0) // code for setting children
             {
@@ -196,6 +204,10 @@ public:
 
 		case COLUMN_ID_GROUP_E:
 			return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+                
+        case COLUMN_ID_GROUP_STRETCH:
+            return SliderRange(Constants::StretchMin, Constants::StretchMax, 0.01);
+                
 		default: return SliderRange(0.0, 1.0, 0.001);
 		}
 	}
@@ -207,13 +219,21 @@ public:
 
 	String getTableText(const int columnId, const int rowNumber) override
 	{
-		AmbiPoint* pt = pSources->getActiveGroup(rowNumber);
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber);
 		if (pt == nullptr)
 			return "";
 
 		switch (columnId)
 		{
 		case COLUMN_ID_GROUP_NAME: return pt->getName();
+        case COLUMN_ID_GROUP_ROTATION:
+            {
+                auto rot = pt->getRotation();
+                String text;
+                text << String(rot.vector.x, 2) << "; " << String(rot.vector.y, 2) << "; " << String(rot.vector.z, 2) << "; " << String(rot.scalar, 2);
+                return text;
+            }
+                
 		default: return "";
 		}
 	}
@@ -223,6 +243,21 @@ public:
 		switch (columnId)
 		{
 		case COLUMN_ID_GROUP_NAME: pSources->setGroupName(rowNumber, newText); break;
+        case COLUMN_ID_GROUP_ROTATION:
+            {
+                StringArray tokens;
+                tokens.addTokens (newText, ";");
+
+                if(tokens.size() == 4)
+                {
+                    pSources->setGroupRotation(rowNumber, Quaternion<double>(
+                                                tokens[0].getDoubleValue(),
+                                                tokens[1].getDoubleValue(),
+                                                tokens[2].getDoubleValue(),
+                                                tokens[3].getDoubleValue()));
+                }
+                break;
+            }
 		default: throw;
 		}
 	}
@@ -239,6 +274,8 @@ public:
 		tableListBox->getHeader().addColumn("A", COLUMN_ID_GROUP_A, 50);
 		tableListBox->getHeader().addColumn("E", COLUMN_ID_GROUP_E, 50);
 		tableListBox->getHeader().addColumn("D", COLUMN_ID_GROUP_D, 50);
+        tableListBox->getHeader().addColumn("Stretch", COLUMN_ID_GROUP_STRETCH, 60);
+        tableListBox->getHeader().addColumn("Rotation", COLUMN_ID_GROUP_ROTATION, 120);
 		tableListBox->getHeader().addColumn("# Points", COLUMN_ID_GROUP_POINTS, 60);
 		tableListBox->getHeader().addColumn("Color", COLUMN_ID_GROUP_COLOR, 60);
 		tableListBox->getHeader().setStretchToFitActive(true);
