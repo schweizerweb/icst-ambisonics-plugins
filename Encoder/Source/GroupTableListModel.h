@@ -99,6 +99,7 @@ public:
 				numericBox = new NumericColumnCustomComponent(*this);
 
 			numericBox->setRowAndColumn(rowNumber, columnId);
+            numericBox->setJustificationType(Justification::right);
 			return numericBox;
 		}
 		else if (columnId == COLUMN_ID_GROUP_NAME

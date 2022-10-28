@@ -24,7 +24,7 @@ public:
 		addActionListener(actionListener);
         setResizable(true, true);
 		setUsingNativeTitleBar(false);
-		setResizeLimits(800, 750, 3000, 3000);
+		setResizeLimits(900, 750, 3000, 3000);
 	}
 
 	void closeButtonPressed() override

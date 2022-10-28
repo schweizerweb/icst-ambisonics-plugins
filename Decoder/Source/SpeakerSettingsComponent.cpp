@@ -740,7 +740,8 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 			numericBox = new NumericColumnCustomComponent(*this);
 
 		numericBox->setRowAndColumn(rowNumber, columnId);
-		return numericBox;
+        numericBox->setJustificationType(Justification::right);
+        return numericBox;
 	}
 	else if(columnId == COLUMN_ID_GAIN)
 	{
