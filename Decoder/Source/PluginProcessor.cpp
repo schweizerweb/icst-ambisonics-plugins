@@ -307,14 +307,12 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
 	// save general decoder settings
 	decoderSettings.saveToXml(xml);
 	
-    XmlElement* speakerSettings = new XmlElement("Points");
-    speakerSet->writeToXmlElement(speakerSettings);
+    speakerSet->writeToXmlElement(xml);
     
     XmlElement* ambiSettingsXml = new XmlElement("General");
     ambiSettings.writeToPresetXmlElement(ambiSettingsXml);
     
     XmlElement* presetSettings = new XmlElement("AmbisonicsPreset");
-    presetSettings->addChildElement(speakerSettings);
     presetSettings->addChildElement(ambiSettingsXml);
     xml->addChildElement(presetSettings);
 
@@ -338,11 +336,7 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
             XmlElement* presetElement = xmlState->getChildByName("AmbisonicsPreset");
             if (presetElement != nullptr)
             {
-                XmlElement* speakerXml = presetElement->getChildByName("Points");
-                if(speakerXml != nullptr)
-                {
-                    speakerSet->loadFromXml(speakerXml);
-                }
+                speakerSet->loadFromXml(xmlState.get());
                 
                 XmlElement* ambiXml = presetElement->getChildByName("General");
                 if(ambiXml != nullptr)

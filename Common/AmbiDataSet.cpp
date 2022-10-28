@@ -405,6 +405,20 @@ void AmbiDataSet::removeGroup(int groupIndex)
         setAbsSourcePoint(p.first, p.second);
 }
 
+void AmbiDataSet::addPointToGroup(int groupIndex, int pointIndex)
+{
+    auto origPos = getAbsSourcePoint(pointIndex);
+    getGroup(groupIndex)->addPointToGroup(get(pointIndex));
+    setAbsSourcePoint(pointIndex, origPos);
+}
+
+void AmbiDataSet::removePointFromGroup(int groupIndex, int pointIndex)
+{
+    auto origPos = getAbsSourcePoint(pointIndex);
+    getGroup(groupIndex)->removePointFromGroup(get(pointIndex));
+    setAbsSourcePoint(pointIndex, origPos);
+}
+
 void AmbiDataSet::setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const
 {
 	const ScopedLock lock(cs);
@@ -616,7 +630,25 @@ bool AmbiDataSet::getGroupModeFlag() const
 
 void AmbiDataSet::setGroupModeFlag(bool en)
 {
+    std::map<int, Vector3D<double>> origPos;
+    
+    if(groupModeFlag != en)
+    {
+        // rearrange all source positions
+        for(int i = 0; i < size(); i++)
+        {
+            auto p = get(i);
+            if(p != nullptr)
+            {
+                origPos[i] = getAbsSourcePoint(i);
+            }
+        }
+    }
+    
     groupModeFlag = en;
+    
+    for(auto& p : origPos)
+        setAbsSourcePoint(p.first, p.second);
 }
 
 

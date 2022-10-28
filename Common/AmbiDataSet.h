@@ -11,7 +11,10 @@
 #pragma once
 #include "AmbiPoint.h"
 #include "AmbiGroup.h"
+
 #define DEFAULT_GROUP_MODE_FLAG     false
+#define XML_TAG_GROUPS "Groups"
+#define XML_TAG_GROUP "Group"
 
 class AmbiDataSet
 {
@@ -62,6 +65,8 @@ public:
 	int addGroup(String id, Vector3D<double> point, String name, Colour color);
 	void moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
 	void removeGroup(int groupIndex);
+    void addPointToGroup(int groupIndex, int pointIndex);
+    void removePointFromGroup(int groupIndex, int pointIndex);
 	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
 	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;

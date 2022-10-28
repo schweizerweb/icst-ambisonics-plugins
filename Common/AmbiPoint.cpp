@@ -43,7 +43,7 @@ AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color
 }
 
 AmbiPoint::AmbiPoint(XmlElement* element):
-	id(Uuid().toString()),
+	id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z))),

@@ -11,6 +11,7 @@
 #pragma once
 #include "AmbiPoint.h"
 #include "AmbiSource.h"
+
 #define XML_TAG_SUBPOINTS "SubPoints"
 #define XML_TAG_SUBPOINT "SubPoint"
 #define XML_TAG_ROTATION "Rotation"
@@ -22,13 +23,12 @@
 #define XML_ATTRIBUTE_ROTATION_Q3 "Q3"
 #define XML_ATTRIBUTE_FACTOR "Factor"
 
-
 class AmbiGroup : public AmbiPoint
 {
 public:
 	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
-	AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
-	virtual ~AmbiGroup() = default;
+	AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
+    virtual ~AmbiGroup() = default;
 
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
@@ -57,6 +57,9 @@ public:
     
     void setRotation(Quaternion<double> rotation, bool notify = true);
     void setStretch(double stretchFactor, bool notify = true);
+    
+    Quaternion<double> getRotation() const;
+    double getStretch() const;
     
     void applyTransform(Vector3D<double>* pt);
     void applyInverseTransform(Vector3D<double>* pt);

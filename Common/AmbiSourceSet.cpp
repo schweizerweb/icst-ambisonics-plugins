@@ -192,12 +192,16 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 	{
 		int index = 0;
 		XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
+        // create base type pointer array
+        Array<AmbiPoint*> ambiPointPointers;
+        for(int i = 0; i < elements.size(); i++)
+            ambiPointPointers.add(elements[i]);
 		while (xmlGroup != nullptr)
 		{
             if(pAudioParams != nullptr && pAudioParams->groupParams.size() > index)
-                groups.add(new AmbiGroup(xmlGroup, &elements, pAudioParams->groupParams.getUnchecked(index), pScalingInfo));
+                groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, pAudioParams->groupParams.getUnchecked(index), pScalingInfo));
             else
-                groups.add(new AmbiGroup(xmlGroup, &elements, AudioParameterSet(), pScalingInfo));
+                groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, AudioParameterSet(), pScalingInfo));
             
 			xmlGroup = xmlGroup->getNextElement();
 			index++;

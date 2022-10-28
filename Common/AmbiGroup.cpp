@@ -10,7 +10,7 @@
 
 #include "AmbiGroup.h"
 
-AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
+AmbiGroup::AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
 {
     XmlElement* rot = xmlElement->getChildByName(XML_TAG_ROTATION);
     if(rot != nullptr)
@@ -41,8 +41,7 @@ AmbiGroup::AmbiGroup(XmlElement* xmlElement, OwnedArray<AmbiSource>* pSources, A
 			{
 				if (pSources->getUnchecked(i)->getId() == idStr)
 				{
-					//groupPoints.add(pSources->getUnchecked(i));
-                    addPointToGroup(pSources->getUnchecked(i));
+					addPointToGroup(pSources->getUnchecked(i));
 					break;
 				}
 			}
@@ -446,6 +445,16 @@ void AmbiGroup::setStretch(double stretch, bool notify)
     {
         stretchFactor = audioParams.notifyStretch(stretch);
     }
+}
+
+Quaternion<double> AmbiGroup::getRotation() const
+{
+    return rotationQuaternion;
+}
+
+double AmbiGroup::getStretch() const
+{
+    return stretchFactor;
 }
 
 void AmbiGroup::applyTransform(Vector3D<double> *pt)

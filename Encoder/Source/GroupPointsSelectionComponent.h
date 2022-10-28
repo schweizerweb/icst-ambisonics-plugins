@@ -20,15 +20,13 @@
 class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:
-    GroupPointsSelectionComponent(AmbiSourceSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources)
+    GroupPointsSelectionComponent(AmbiSourceSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources), groupIndex(groupIndex)
     {
 	    // In your constructor, you should add any child components, and
 	    // initialise any special settings that your component needs.
 		
     	this->addChangeListener(pListener);
 		
-    	pGroup = pSources->getActiveGroup(groupIndex);
-
         columnCount = (int)std::ceil(pSources->size() / 16.0);
         rowCount = columnCount > 0 ?  (int)(std::ceil(pSources->size() / (double)columnCount)) : 0;
         
@@ -36,7 +34,7 @@ public:
 		{
             AmbiSource* s = pSources->get(i);
 			ToggleButton* b = new ToggleButton(s->getName());
-			b->setToggleState(s->getGroup() == pGroup, dontSendNotification);
+			b->setToggleState(s->getGroup() == pSources->getActiveGroup(groupIndex), dontSendNotification);
             b->setEnabled(s->getEnabled());
 			b->addListener(this);
 			toggleButtons.add(b);
@@ -78,11 +76,11 @@ public:
 		{
 			if (static_cast<ToggleButton*>(b)->getToggleState())
             {
-                pGroup->addPointToGroup(pSources->get(index));
+                pSources->addPointToGroup(groupIndex, index);
             }
 			else
 			{
-                pGroup->removePointFromGroup(pSources->get(index));
+                pSources->removePointFromGroup(groupIndex, index);
 			}
 
 			sendChangeMessage();
@@ -94,7 +92,7 @@ private:
 
 	AmbiSourceSet* pSources;
 	Array<ToggleButton*> toggleButtons;
-	AmbiGroup* pGroup;
+	int groupIndex;
     int columnCount;
     int rowCount;
 };

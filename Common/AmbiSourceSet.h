@@ -16,8 +16,6 @@
 #define XML_TAG_GROUP_MODE "GroupMode"
 #define XML_TAG_SOURCES "Sources"
 #define XML_TAG_SOURCE "Source"
-#define XML_TAG_GROUPS "Groups"
-#define XML_TAG_GROUP "Group"
 #define XML_TAG_DISTANCE_SCALER "DistanceScaler"
 #define XML_TAG_MASTER_GAIN "MasterGain"
 #define XML_ATTRIBUTE_ENABLE "Enable"

@@ -335,8 +335,7 @@ public:
         if (rootElement == nullptr || rootElement->getTagName() != "AmbisonicsPreset")
             return false;
         
-        pSpeakerSet->loadFromXml(rootElement->getChildByName("Points"));
-    
+        pSpeakerSet->loadFromXml(rootElement.get());
         pAmbiSettings->loadFromPresetXml(rootElement->getChildByName("General"));
 
         return pSpeakerSet->size() > 0;
@@ -346,9 +345,7 @@ public:
     {
         XmlElement* rootElement = new XmlElement("AmbisonicsPreset");
 
-        XmlElement* xmlSpeakers = new XmlElement("Points");
-        pSpeakerSet->writeToXmlElement(xmlSpeakers);
-        rootElement->addChildElement(xmlSpeakers);
+        pSpeakerSet->writeToXmlElement(rootElement);
         
         XmlElement* xmlSettings = new XmlElement("General");
         pAmbiSettings->writeToPresetXmlElement(xmlSettings);
