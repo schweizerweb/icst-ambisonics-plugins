@@ -517,20 +517,32 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
     {
         if (m_args.pPointSelection->getSelectionMode() == PointSelection::Point)
         {
-            sourceList->selectRow(m_args.pPointSelection->getMainSelectedPointIndex());
-            groupList->selectRow(-1);
+            groupList->setSelectedRows(SparseSet<int>(), dontSendNotification);
+            SparseSet<int> sel;
+            for (int index : m_args.pPointSelection->getSelectedIndices())
+            {
+                sel.addRange(Range<int>(index, index + 1));
+            }
+
+            sourceList->setSelectedRows(sel, dontSendNotification);
         }
         else
         {
-            sourceList->selectRow(-1);
-            groupList->selectRow(m_args.pPointSelection->getMainSelectedPointIndex());
+            sourceList->setSelectedRows(SparseSet<int>(), dontSendNotification);
+            SparseSet<int> sel;
+            for (int index : m_args.pPointSelection->getSelectedIndices())
+            {
+                sel.addRange(Range<int>(index, index + 1));
+            }
+
+            groupList->setSelectedRows(sel, dontSendNotification);
         }
 
         controlDimming();
     }
     else
     {
-        sliderMasterGain->setValue(m_args.pSourceSet->getMasterGain());
+        sliderMasterGain->setValue(m_args.pSourceSet->getMasterGain(), dontSendNotification);
     }
 }
 

@@ -63,6 +63,7 @@ public:
         tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
         tableListBox->getHeader().setStretchToFitActive(true);
         tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
+        tableListBox->setMultipleSelectionEnabled(true);
     }
 
 private:
@@ -73,12 +74,21 @@ private:
 
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
     {
-        const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
         if (rowIsSelected)
-            g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
+        {
+            Colour baseColor = COLOR_DEFINITION_SELECTED_ROW;
+            if (pPointSelection->getMainSelectedPointIndex() == rowNumber)
+                g.fillAll(baseColor);
+            else
+                g.fillAll(baseColor.withAlpha(0.4f));
+        }
         else if (rowNumber % 2)
+        {
+            const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
+                .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
+
             g.fillAll(alternateColour);
+        }
     }
 
     void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override
@@ -102,8 +112,26 @@ private:
 
     void selectedRowsChanged(int lastRowSelected) override
     {
+        pPointSelection->unselectPoint();
+
+        bool first = true;
         if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
-            pPointSelection->selectPoint(lastRowSelected);
+        {
+            auto set = pTableListBox->getSelectedRows();
+            for (auto r : set.getRanges())
+            {
+                for (int i = r.getStart(); i < r.getEnd(); i++)
+                {
+                    if (i != lastRowSelected)
+                    {
+                        pPointSelection->selectPoint(i, !first);
+                        first = false;
+                    }
+                }
+            }
+
+            pPointSelection->selectPoint(lastRowSelected, !first);
+        }
     }
 
     Component* refreshComponentForCell(int rowNumber, int columnId, bool, Component* existingComponentToUpdate) override
