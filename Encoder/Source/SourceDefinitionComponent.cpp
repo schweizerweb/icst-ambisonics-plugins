@@ -218,7 +218,10 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     m_args.pPresetHelper->addActionListener(this);
     m_args.pSourceSet->addChangeListener(this);
     initializePresets();
-
+    
+    sourceList->addMouseListener(this, true);
+    groupList->addMouseListener(this, true);
+    
     controlDimming();
     //[/Constructor]
 }
@@ -601,6 +604,118 @@ void SourceDefinitionComponent::actionListenerCallback(const String &message)
         sendChangeMessage();
     }
 }
+
+
+void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
+{
+    if(event.mods.isCtrlDown() || event.mods.isRightButtonDown())
+    {
+        if(sourceList->getScreenBounds().contains(event.getScreenPosition()))
+        {
+            auto rel = event.getScreenPosition()-sourceList->getScreenPosition();
+            int row = sourceList->getRowContainingPosition(rel.x, rel.y);
+
+            if(row != -1)
+            {
+                bool multirow = m_args.pPointSelection->getSelectionMode() == PointSelection::SelectionMode::Point && m_args.pPointSelection->getSelectedIndices().size() > 1;
+            
+                PopupMenu m;
+                m.addItem(TRANS("Mute selected"), [this](){
+                    auto selection = m_args.pPointSelection->getSelectedIndices();
+                    for (auto index : selection)
+                    {
+                        m_args.pSourceSet->get(index)->setMute(true, true);
+                    }
+                    sourceList->updateContent();
+                    sourceList->repaint();
+                });
+                m.addItem(TRANS("Unmute selected"), [this](){
+                    auto selection = m_args.pPointSelection->getSelectedIndices();
+                    for (auto index : selection)
+                    {
+                        m_args.pSourceSet->get(index)->setMute(false, true);
+                    }
+                    sourceList->updateContent();
+                    sourceList->repaint();
+                });
+                m.addSeparator();
+                m.addItem(TRANS("Solo selected"), [this](){
+                    auto selection = m_args.pPointSelection->getSelectedIndices();
+                    for (auto index : selection)
+                    {
+                        m_args.pSourceSet->get(index)->setSolo(true);
+                    }
+                    sourceList->updateContent();
+                    sourceList->repaint();
+                });
+                m.addItem(TRANS("Un-Solo selected"), [this](){
+                    auto selection = m_args.pPointSelection->getSelectedIndices();
+                    for (auto index : selection)
+                    {
+                        m_args.pSourceSet->get(index)->setSolo(false);
+                    }
+                    sourceList->updateContent();
+                    sourceList->repaint();
+                });
+                if(multirow)
+                {
+                    m.addSeparator();
+                    m.addItem("Apply Color from CH " + String(row + 1), [this, row](){
+                        Colour color = m_args.pSourceSet->get(row)->getColor();
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (int i = 0; i < selection.size(); i++)
+                        {
+                            if (selection[i] != row)
+                            {
+                                m_args.pSourceSet->get(selection[i])->setColor(color);
+                            }
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    });
+                    m.addSeparator();
+                    m.addItem("Apply Gain from CH " + String(row + 1), [this, row](){
+                        double gainFactor = m_args.pSourceSet->get(row)->getGain();
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (int i = 0; i < selection.size(); i++)
+                        {
+                            if (selection[i] != row)
+                            {
+                                m_args.pSourceSet->get(selection[i])->setGain(gainFactor, true);
+                            }
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    });
+
+                    m.addItem(TRANS("Gain -0.5 dB"), [this](){
+                        float gainFactor = float(Decibels::decibelsToGain(-0.5));
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    });
+                    m.addItem(TRANS("Gain +0.5 dB"), [this](){
+                        float gainFactor = float(Decibels::decibelsToGain(0.5));
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    });
+                }
+                
+                m.show();
+            }
+        }
+    }
+}
+
 
 //[/MiscUserCode]
 

@@ -81,6 +81,7 @@ private:
     void initializePresets();
     void updateEncodingUiElements();
     void actionListenerCallback(const String &message) override;
+    void mouseUp(const MouseEvent &event) override;
     //[/UserVariables]
 
     //==============================================================================
