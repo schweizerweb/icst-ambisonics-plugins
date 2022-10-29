@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -93,6 +93,8 @@ public:
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
     FilterPresetHelper* getFilterPresetHelper() const;
+
+    void mouseUp(const MouseEvent &event) override;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -141,7 +143,6 @@ private:
     std::unique_ptr<juce::TextButton> buttonManage;
     std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
     std::unique_ptr<juce::TextButton> buttonManageFilters;
-    std::unique_ptr<juce::ComboBox> comboBoxApply;
     std::unique_ptr<juce::TextButton> buttonCsv;
     std::unique_ptr<juce::TextButton> buttonScaling;
     std::unique_ptr<juce::Slider> sliderPort;
