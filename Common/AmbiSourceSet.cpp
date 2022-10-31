@@ -158,8 +158,8 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
         setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
     }
     
-	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
-	clear();
+    clear();
+    XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	if (sourcesElement != nullptr)
 	{
 		int index = 0;
@@ -186,8 +186,8 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 	}
 
 	// groups
-	XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
-	groups.clear();
+    groups.clear();
+    XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
 	if(groupsElement != nullptr)
 	{
 		int index = 0;

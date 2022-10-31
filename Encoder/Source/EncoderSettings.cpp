@@ -122,26 +122,32 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     customOscTargets.clear();
     
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
-	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
-	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
-    XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
-    if (customInputs != nullptr)
+    if(oscReceive != nullptr)
     {
-        XmlElement* i = customInputs->getChildByName(XML_TAG_CUSTOM_OSC_INPUT);
-        while (i != nullptr)
+        oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
+        oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
+        XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
+        if (customInputs != nullptr)
         {
-            customOscInput.add(new CustomOscInput(i));
+            XmlElement* i = customInputs->getChildByName(XML_TAG_CUSTOM_OSC_INPUT);
+            while (i != nullptr)
+            {
+                customOscInput.add(new CustomOscInput(i));
 
-            i = i->getNextElement();
+                i = i->getNextElement();
+            }
         }
     }
     
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
-	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
-	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
-	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_HOST);
-	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
-
+    if(oscSend != nullptr)
+    {
+        oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
+        oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
+        oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_HOST);
+        oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
+    }
+    
 	XmlElement* oscSendExt = element->getChildByName(XML_TAG_OSC_SEND_EXT);
 	if (oscSendExt != nullptr)
 	{
@@ -176,7 +182,9 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 
     XmlElement* hideWarningsXml = element->getChildByName(XML_TAG_OSC_HIDE_WARNINGS);
     if(hideWarningsXml != nullptr)
-    hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    {
+        hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    }
     
     XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
     if (distanceEncoding != nullptr)
