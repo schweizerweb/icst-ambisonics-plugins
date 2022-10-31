@@ -611,12 +611,68 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
 {
     if(event.mods.isCtrlDown() || event.mods.isRightButtonDown())
     {
-        if(sourceList->getScreenBounds().contains(event.getScreenPosition()))
+        if(groupList->getScreenBounds().contains(event.getScreenPosition()))
+        {
+            auto rel = event.getScreenPosition()-groupList->getScreenPosition();
+            int row = groupList->getRowContainingPosition(rel.x, rel.y);
+
+            if(row != -1 && m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
+            {
+                PopupMenu m;
+                
+                // reset stretch
+                m.addItem(PopupMenu::Item("Reset Stretch")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("R", Colours::lightgrey, Colours::red, Colours::black, false)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->getGroup(index)->setStretch(1.0f);
+                        }
+                        groupList->updateContent();
+                        groupList->repaint();
+                    })
+                );
+                
+                // reset rotation
+                m.addItem(PopupMenu::Item("Reset Rotation")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("R", Colours::lightgrey, Colours::red, Colours::black, false)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->getGroup(index)->setRotation(Quaternion<double>(0.0, 0.0, 0.0, 1.0));
+                        }
+                        groupList->updateContent();
+                        groupList->repaint();
+                    })
+                );
+                
+                // apply color to sources
+                m.addItem(PopupMenu::Item("Apply color to sources")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("C", Colours::lightgrey, Colours::red, Colours::black, false)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->getGroup(index)->setChildrenColor();
+                        }
+                        groupList->updateContent();
+                        groupList->repaint();
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    })
+                );
+                
+                m.show();
+            }
+        }
+        else if(sourceList->getScreenBounds().contains(event.getScreenPosition()))
         {
             auto rel = event.getScreenPosition()-sourceList->getScreenPosition();
             int row = sourceList->getRowContainingPosition(rel.x, rel.y);
 
-            if(row != -1)
+            if(row != -1 && m_args.pPointSelection->getSelectionMode() == PointSelection::Point)
             {
                 bool multirow = m_args.pPointSelection->getSelectionMode() == PointSelection::SelectionMode::Point && m_args.pPointSelection->getSelectedIndices().size() > 1;
             
