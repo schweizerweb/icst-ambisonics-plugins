@@ -378,19 +378,19 @@ AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
     return &animatorDataset;
 }
 
-#if (!MULTI_ENCODER_MODE)
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
 {
 	dawParameter.updateTrackPropertiesWorking = true;
 	dawParameter.lastTrackProperties = properties;
 
+#if (!MULTI_ENCODER_MODE)
 	if (sources->size() > 0)
 	{
 		sources->get(0)->setName(properties.name);
 		sources->get(0)->setColor(properties.colour);
 	}
-}
 #endif
+}
 
 EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 {

@@ -21,6 +21,7 @@
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/LabelCreator.h"
 //[/Headers]
 
 #include "SourceDefinitionComponent.h"
@@ -620,94 +621,146 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                 bool multirow = m_args.pPointSelection->getSelectionMode() == PointSelection::SelectionMode::Point && m_args.pPointSelection->getSelectedIndices().size() > 1;
             
                 PopupMenu m;
-                m.addItem(TRANS("Mute selected"), [this](){
-                    auto selection = m_args.pPointSelection->getSelectedIndices();
-                    for (auto index : selection)
-                    {
-                        m_args.pSourceSet->get(index)->setMute(true, true);
-                    }
-                    sourceList->updateContent();
-                    sourceList->repaint();
-                });
-                m.addItem(TRANS("Unmute selected"), [this](){
-                    auto selection = m_args.pPointSelection->getSelectedIndices();
-                    for (auto index : selection)
-                    {
-                        m_args.pSourceSet->get(index)->setMute(false, true);
-                    }
-                    sourceList->updateContent();
-                    sourceList->repaint();
-                });
+                
+                m.addItem(PopupMenu::Item("Mute selected")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, false)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setMute(true, true);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    })
+                );
+                
+                m.addItem(PopupMenu::Item("Unmute selected")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, true)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setMute(false, true);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    })
+                );
+                
                 m.addSeparator();
-                m.addItem(TRANS("Solo selected"), [this](){
-                    auto selection = m_args.pPointSelection->getSelectedIndices();
-                    for (auto index : selection)
-                    {
-                        m_args.pSourceSet->get(index)->setSolo(true);
-                    }
-                    sourceList->updateContent();
-                    sourceList->repaint();
-                });
-                m.addItem(TRANS("Un-Solo selected"), [this](){
-                    auto selection = m_args.pPointSelection->getSelectedIndices();
-                    for (auto index : selection)
-                    {
-                        m_args.pSourceSet->get(index)->setSolo(false);
-                    }
-                    sourceList->updateContent();
-                    sourceList->repaint();
-                });
+                m.addItem(PopupMenu::Item("Solo selected")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, false)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setSolo(true);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    })
+                );
+                
+                m.addItem(PopupMenu::Item("Un-Solo selected")
+                    .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, true)))
+                    .setAction([this](){
+                        auto selection = m_args.pPointSelection->getSelectedIndices();
+                        for (auto index : selection)
+                        {
+                            m_args.pSourceSet->get(index)->setSolo(false);
+                        }
+                        sourceList->updateContent();
+                        sourceList->repaint();
+                    })
+                );
+                
                 if(multirow)
                 {
+                    // color
                     m.addSeparator();
-                    m.addItem("Apply Color from CH " + String(row + 1), [this, row](){
-                        Colour color = m_args.pSourceSet->get(row)->getColor();
-                        auto selection = m_args.pPointSelection->getSelectedIndices();
-                        for (int i = 0; i < selection.size(); i++)
-                        {
-                            if (selection[i] != row)
+                    m.addItem(PopupMenu::Item("Apply Color from CH " + String(row + 1))
+                        .setImage(std::unique_ptr<Drawable>(LabelCreator::createColorField(m_args.pSourceSet->get(row)->getColor())))
+                        .setAction([this, row](){
+                            Colour color = m_args.pSourceSet->get(row)->getColor();
+                            auto selection = m_args.pPointSelection->getSelectedIndices();
+                            for (int i = 0; i < selection.size(); i++)
                             {
-                                m_args.pSourceSet->get(selection[i])->setColor(color);
+                                if (selection[i] != row)
+                                {
+                                    m_args.pSourceSet->get(selection[i])->setColor(color);
+                                }
                             }
-                        }
-                        sourceList->updateContent();
-                        sourceList->repaint();
-                    });
+                            sourceList->updateContent();
+                            sourceList->repaint();
+                        })
+                    );
+                    
+                    if(m_args.pDawParams->updateTrackPropertiesWorking)
+                    {
+                        m.addItem(PopupMenu::Item("Apply Track Color")
+                            .setImage(std::unique_ptr<Drawable>(LabelCreator::createColorField(m_args.pDawParams->lastTrackProperties.colour)))
+                            .setAction([this, row](){
+                                Colour color = m_args.pDawParams->lastTrackProperties.colour;
+                                auto selection = m_args.pPointSelection->getSelectedIndices();
+                                for (int i = 0; i < selection.size(); i++)
+                                {
+                                    if (selection[i] != row)
+                                    {
+                                        m_args.pSourceSet->get(selection[i])->setColor(color);
+                                    }
+                                }
+                                sourceList->updateContent();
+                                sourceList->repaint();
+                            })
+                        );
+                    }
+                    // gain
                     m.addSeparator();
-                    m.addItem("Apply Gain from CH " + String(row + 1), [this, row](){
-                        double gainFactor = m_args.pSourceSet->get(row)->getGain();
-                        auto selection = m_args.pPointSelection->getSelectedIndices();
-                        for (int i = 0; i < selection.size(); i++)
-                        {
-                            if (selection[i] != row)
+                    m.addItem(PopupMenu::Item("Apply Gain from CH " + String(row + 1) + " (" + String(Decibels::gainToDecibels(m_args.pSourceSet->get(row)->getGain()), 1) + " dB)")
+                        .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("=", Colours::white, Colours::black, Colours::black, false)))
+                        .setAction([this, row](){
+                            double gainFactor = m_args.pSourceSet->get(row)->getGain();
+                            auto selection = m_args.pPointSelection->getSelectedIndices();
+                            for (int i = 0; i < selection.size(); i++)
                             {
-                                m_args.pSourceSet->get(selection[i])->setGain(gainFactor, true);
+                                if (selection[i] != row)
+                                {
+                                    m_args.pSourceSet->get(selection[i])->setGain(gainFactor, true);
+                                }
                             }
-                        }
-                        sourceList->updateContent();
-                        sourceList->repaint();
-                    });
+                            sourceList->updateContent();
+                            sourceList->repaint();
+                        })
+                    );
 
-                    m.addItem(TRANS("Gain -0.5 dB"), [this](){
-                        float gainFactor = float(Decibels::decibelsToGain(-0.5));
-                        auto selection = m_args.pPointSelection->getSelectedIndices();
-                        for (auto index : selection)
-                        {
-                            m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
-                        }
-                        sourceList->updateContent();
-                        sourceList->repaint();
-                    });
-                    m.addItem(TRANS("Gain +0.5 dB"), [this](){
-                        float gainFactor = float(Decibels::decibelsToGain(0.5));
-                        auto selection = m_args.pPointSelection->getSelectedIndices();
-                        for (auto index : selection)
-                        {
-                            m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
-                        }
-                        sourceList->updateContent();
-                        sourceList->repaint();
-                    });
+                    m.addItem(PopupMenu::Item("Gain -0.5 dB")
+                        .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("-", Colours::white, Colours::black, Colours::black, false)))
+                        .setAction([this](){
+                            float gainFactor = float(Decibels::decibelsToGain(-0.5));
+                            auto selection = m_args.pPointSelection->getSelectedIndices();
+                            for (auto index : selection)
+                            {
+                                m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
+                            }
+                            sourceList->updateContent();
+                            sourceList->repaint();
+                        })
+                    );
+                    
+                    m.addItem(PopupMenu::Item("Gain +0.5 dB")
+                        .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("+", Colours::white, Colours::black, Colours::black, false)))
+                        .setAction([this](){
+                            float gainFactor = float(Decibels::decibelsToGain(0.5));
+                            auto selection = m_args.pPointSelection->getSelectedIndices();
+                            for (auto index : selection)
+                            {
+                                m_args.pSourceSet->get(index)->setGain(m_args.pSourceSet->get(index)->getGain() * gainFactor, true);
+                            }
+                            sourceList->updateContent();
+                            sourceList->repaint();
+                        })
+                    );
                 }
                 
                 m.show();

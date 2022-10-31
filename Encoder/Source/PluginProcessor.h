@@ -88,9 +88,7 @@ public:
     ScalingInfo* getScalingInfo();
     AnimatorDataset* getAnimatorDataset();
 
-#if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
-#endif
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;

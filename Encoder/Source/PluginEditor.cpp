@@ -172,7 +172,8 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             processor.getDistanceEncodingPresetHelper(),
             processor.getCustomOscRxPresetHelper(),
             processor.getCustomOscTxPresetHelper(),
-            &oscLogDialogManager
+            &oscLogDialogManager,
+            processor.getDawParameter()
         };
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
