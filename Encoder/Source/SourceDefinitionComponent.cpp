@@ -678,7 +678,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
             
                 PopupMenu m;
                 
-                m.addItem(PopupMenu::Item("Mute selected")
+                m.addItem(PopupMenu::Item("Mute")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, false)))
                     .setAction([this](){
                         auto selection = m_args.pPointSelection->getSelectedIndices();
@@ -691,7 +691,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                     })
                 );
                 
-                m.addItem(PopupMenu::Item("Unmute selected")
+                m.addItem(PopupMenu::Item("Unmute")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, true)))
                     .setAction([this](){
                         auto selection = m_args.pPointSelection->getSelectedIndices();
@@ -705,7 +705,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                 );
                 
                 m.addSeparator();
-                m.addItem(PopupMenu::Item("Solo selected")
+                m.addItem(PopupMenu::Item("Solo On")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, false)))
                     .setAction([this](){
                         auto selection = m_args.pPointSelection->getSelectedIndices();
@@ -718,7 +718,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                     })
                 );
                 
-                m.addItem(PopupMenu::Item("Un-Solo selected")
+                m.addItem(PopupMenu::Item("Solo Off")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, true)))
                     .setAction([this](){
                         auto selection = m_args.pPointSelection->getSelectedIndices();
