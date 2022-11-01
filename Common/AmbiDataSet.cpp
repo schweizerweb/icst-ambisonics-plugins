@@ -173,6 +173,12 @@ void AmbiDataSet::setEnabled(int channel, bool enable) const
             {
                 g->removePointFromGroup(pt);
             }
+            
+            // reset
+            pt->setSolo(false);
+            pt->setMute(false, true);
+            pt->setGain(1.0, true);
+            pt->getRawPoint()->setXYZ(0.0, 0.0, 0.0);
         }
     }
 }

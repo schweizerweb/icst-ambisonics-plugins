@@ -35,6 +35,8 @@ public:
         row = newRow;
         columnId = newColumn;
         setToggleState(owner.getValue(columnId, row) == 1, dontSendNotification);
+        bool enabled = owner.getEnabled(columnId, row);
+        setEnabled(enabled);
     }
 
     void paint(Graphics& g) override

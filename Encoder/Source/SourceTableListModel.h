@@ -216,8 +216,11 @@ private:
         }
     }
 
-    bool getEnabled(int /*columnId*/, int rowNumber) override
+    bool getEnabled(int columnId, int rowNumber) override
     {
+        if(columnId == COLUMN_ID_ENABLED)
+            return true;
+        
         AmbiSource* pt = pSources->get(rowNumber);
         return (pt != nullptr && pt->getEnabled());
     }
