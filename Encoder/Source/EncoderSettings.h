@@ -18,6 +18,7 @@
 
 #define DEFAULT_RECEIVE_FLAG		false
 #define DEFAULT_RECEIVE_PORT		50001
+#define DEFAULT_HANDLE_STANDARD_FORMAT_FLAG true
 #define DEFAULT_SEND_FLAG			true
 #define DEFAULT_SEND_PORT			50000
 #define DEFAULT_SEND_HOST			"127.0.0.1"
@@ -41,7 +42,8 @@ public:
     
     bool oscReceiveFlag;
 	int oscReceivePort;
-
+    bool oscHandleStandardFormatFlag;
+    
 	bool oscSendFlag;
 	int oscSendPort;
 	String oscSendTargetHost;

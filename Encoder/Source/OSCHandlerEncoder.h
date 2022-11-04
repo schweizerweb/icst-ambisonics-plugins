@@ -15,6 +15,7 @@
 #include "CustomOscInput.h"
 #include "CustomOscReceiver.h"
 #include "DistanceEncodingParams.h"
+#include "EncoderSettings.h"
 
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED "/icst/ambi/source/aed"
@@ -44,7 +45,7 @@
 class OSCHandlerEncoder : public OSCHandler
 {
 public:
-    OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, OwnedArray<CustomOscInput>* pCustomOscInput, ScalingInfo* pScaling);
+    OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, EncoderSettings* pEncoderSettings, ScalingInfo* pScaling);
     bool handleSpecific(const juce::OSCMessage &message) override;
     bool initSpecific() override;
     
@@ -70,9 +71,10 @@ private:
     bool checkXyz(double x, double y, double z, String* errorString) const;
     bool checkGain(double gain, String* errorString) const;
     
-    DistanceEncodingParams* pDistanceEncodingParams;
     ScalingInfo* pScalingInfo;
     OwnedArray<CustomOscInput>* pCustomOscInput;
+    DistanceEncodingParams* pDistanceEncodingParams;
     OwnedArray<CustomOscReceiver> customOscReceivers;
     std::unique_ptr<JavascriptEngine> jsEngine;
+    EncoderSettings* pEncoderSettings;
 };

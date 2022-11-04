@@ -10,6 +10,7 @@
 
 #include "EncoderSettings.h"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
+#define XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT "HandleStandardFormat"
 #define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
@@ -35,6 +36,7 @@
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
+    oscHandleStandardFormatFlag(DEFAULT_HANDLE_STANDARD_FORMAT_FLAG),
 	oscSendFlag(DEFAULT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
 	oscSendTargetHost(DEFAULT_SEND_HOST),
@@ -63,6 +65,7 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
+    oscReceive->setAttribute(XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT, oscHandleStandardFormatFlag);
 	XmlElement* customInputs = new XmlElement(XML_TAG_CUSTOM_OSC_INPUTS);
     for (auto i : customOscInput)
     {
@@ -126,6 +129,7 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
         oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
+        oscHandleStandardFormatFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT, DEFAULT_HANDLE_STANDARD_FORMAT_FLAG);
         XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
         if (customInputs != nullptr)
         {
