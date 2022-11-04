@@ -30,6 +30,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     movingPoints.reset(new AmbiSourceSet(&scalingInfo));
     pTestSoundGenerator = new TestSoundGenerator(speakerSet.get());
     
+    zoomSettings.reset(new ZoomSettings(getScalingInfo()));
+
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
     presetHelper->initialize();
     presetHelper->loadDefaultPreset(speakerSet.get(), &ambiSettings);
@@ -315,6 +317,8 @@ void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData
     XmlElement* presetSettings = new XmlElement("AmbisonicsPreset");
     presetSettings->addChildElement(ambiSettingsXml);
     xml->addChildElement(presetSettings);
+    
+    zoomSettings->writeToXmlElement(xml);
 
 	copyXmlToBinary(*xml, destData);
 
@@ -344,6 +348,8 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
                     ambiSettings.loadFromPresetXml(ambiXml);
                 }
             }
+            
+            zoomSettings->loadFromXml(xmlState.get());
 		}
 	}
 }
@@ -386,6 +392,11 @@ DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
 ScalingInfo* AmbisonicsDecoderAudioProcessor::getScalingInfo()
 {
     return &scalingInfo;
+}
+
+ZoomSettings* AmbisonicsDecoderAudioProcessor::getZoomSettingsPointer()
+{
+    return zoomSettings.get();
 }
 
 void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)

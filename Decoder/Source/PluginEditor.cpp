@@ -45,6 +45,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
     radarOptions.scalingInfo = ownerProc.getScalingInfo();
+    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));
@@ -153,7 +154,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettings()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
