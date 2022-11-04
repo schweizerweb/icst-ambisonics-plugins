@@ -22,7 +22,8 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDis
 	radarMode(mode),
 	pPointSelection(pPointSelection),
 	pRadarOptions(pRadarOptions),
-    specialGroupManipulationMode(false)
+    specialGroupManipulationMode(false),
+    border(15)
 {
 	radarBackground = Image();
 	infoImage = Image();
@@ -50,6 +51,7 @@ void Radar2D::setAnchor(AnchorX x, AnchorY y)
 {
     anchorX = x;
     anchorY = y;
+    border = 15;
 }
 
 Point<double> Radar2D::getProjectedPoint(Vector3D<double>* point3_d) const
@@ -94,7 +96,7 @@ float Radar2D::getFontSize() const
 void Radar2D::drawRadar(Graphics* g) const
 {
 	const ScopedLock lock(radarBackgroundLock);
-	g->drawImageAt(radarBackground, radarViewport.getX(), radarViewport.getY());
+	g->drawImageAt(radarBackground, radarViewportWithBorder.getX(), radarViewportWithBorder.getY());
 }
 
 void Radar2D::drawInfoLabel(Graphics* g) const
@@ -150,9 +152,19 @@ Image Radar2D::createRadarBackground() const
     g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
     // axis label
+    Rectangle<int> label1Rect(int(localBounds.getWidth()-22), int(centerPoint.getY() - 10), 20, 20);
+    g.setColour(radarColors.getRadarBackground());
+    g.fillRect(label1Rect);
     g.setColour(radarColors.getRadarAxisColor());
-    g.drawSingleLineText("X", int(localBounds.getWidth()-12), int(centerPoint.getY() - 2));
-    g.drawSingleLineText(radarMode == XY ? "Y" : "Z", int(centerPoint.getX() - 10), 15);
+    g.drawRect(label1Rect);
+    g.drawFittedText("X", label1Rect, Justification::centred, 1);
+    
+    Rectangle<int> label2Rect(int(centerPoint.getX() - 10), labelUp ? localBounds.getHeight() -22 : 2, 20, 20);
+    g.setColour(radarColors.getRadarBackground());
+    g.fillRect(label2Rect);
+    g.setColour(radarColors.getRadarAxisColor());
+    g.drawRect(label2Rect);
+    g.drawFittedText(radarMode == XY ? "Y" : "Z", label2Rect, Justification::centred, 1);
     
     if(!pRadarOptions->scalingInfo->IsInfinite())
     {
@@ -164,7 +176,24 @@ Image Radar2D::createRadarBackground() const
         g.fillRect(x, y, squareSize, squareSize);
     }
     
-	return img;
+    Rectangle<float> localBoundsAll = radarViewportWithBorder.toFloat().withZeroOrigin();
+    Image imgAll = Image(Image::ARGB, int(localBoundsAll.getWidth()), int(localBoundsAll.getHeight()), true);
+    Graphics gAll(imgAll);
+    gAll.drawImage(img, localBounds.withPosition(border, border));
+    
+    // labels
+    gAll.setFont(border);
+    gAll.drawText(radarMode == XY ? "Front" : "Top", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+    gAll.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
+    if(radarMode != XZ_Half)
+    {
+        gAll.addTransform(AffineTransform::rotation(PI/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        gAll.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+        gAll.addTransform(AffineTransform::rotation(-PI, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        gAll.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+    }
+    
+	return imgAll;
 }
 
 void Radar2D::updateRadarBackground()
@@ -397,8 +426,7 @@ void Radar2D::renderOpenGL()
 		g.addTransform(AffineTransform::scale(desktopScale));
 		g.setColour(radarColors.getRadarLineColor());
 		g.drawRect(radarViewport, 1);   // draw an outline around the component
-
-		drawRadar(&g);
+        drawRadar(&g);
 		
 		if (pEditablePoints != nullptr && pRadarOptions->showEditablePoints)
 		{
@@ -664,17 +692,17 @@ void Radar2D::resized()
     double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
 
     auto bounds = getBounds();
-    double fullSize = jmin((double)bounds.getWidth(), bounds.getHeight() * wantedRatioWidthToHeight);
+    double fullSize = jmin((double)bounds.getWidth(), bounds.getHeight() * wantedRatioWidthToHeight) - 2 * border;
     
     double x, y, w, h;
     w = fullSize;
     h = fullSize / wantedRatioWidthToHeight;
     switch (anchorX) {
         case X_Left:
-            x = 0;
+            x = border;
             break;
         case X_Right:
-            x = bounds.getWidth() - fullSize;
+            x = bounds.getWidth() - fullSize - border;
             break;
         case X_Center:
         default:
@@ -684,10 +712,10 @@ void Radar2D::resized()
     
     switch (anchorY) {
         case Y_Top:
-            y = 0;
+            y = border;
             break;
         case Y_Bottom:
-            y = bounds.getHeight() - fullSize / wantedRatioWidthToHeight;
+            y = bounds.getHeight() - fullSize / wantedRatioWidthToHeight - border;
             break;
         default:
         case Y_Center:
@@ -696,6 +724,7 @@ void Radar2D::resized()
     }
     
     radarViewport = Rectangle<int>(x, y, w, h);
+    radarViewportWithBorder = Rectangle<int>(x-border, y-border, w+2*border, h+2*border);
 	updateRadarBackground();
 }
 

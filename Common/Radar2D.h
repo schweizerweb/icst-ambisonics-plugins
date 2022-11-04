@@ -105,6 +105,7 @@ private:
 	Image radarBackground;
 	Image infoImage;
 	Rectangle<int> radarViewport;
+    Rectangle<int> radarViewportWithBorder;
 	RadarMode radarMode;
 	PointSelection* pPointSelection;
 	RadarColors radarColors;
@@ -122,6 +123,7 @@ private:
     float lastCartesianLimit;
     AnchorX anchorX;
     AnchorY anchorY;
+    double border;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };
