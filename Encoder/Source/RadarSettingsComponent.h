@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -37,8 +37,8 @@
 class RadarSettingsComponent  : public Component,
                                 public ChangeBroadcaster,
                                 public ChangeListener,
-                                public Slider::Listener,
-                                public Button::Listener
+                                public juce::Slider::Listener,
+                                public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -51,10 +51,10 @@ public:
     void changeListenerCallback(ChangeBroadcaster *source) override;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void sliderValueChanged (Slider* sliderThatWasMoved) override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
@@ -64,19 +64,21 @@ private:
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<GroupComponent> groupZoom;
-    std::unique_ptr<Slider> sliderCenterPointX;
-    std::unique_ptr<Label> labelCenterPointX;
-    std::unique_ptr<Slider> sliderCenterPointY;
-    std::unique_ptr<Label> labelCenterPointY;
-    std::unique_ptr<Slider> sliderCenterPointZ;
-    std::unique_ptr<Label> labelCenterPointZ;
-    std::unique_ptr<GroupComponent> groupDisplay;
-    std::unique_ptr<Slider> sliderPointScaler;
-    std::unique_ptr<Label> labelPointScaler;
-    std::unique_ptr<Slider> sliderRadius;
-    std::unique_ptr<Label> labelRadius;
-    std::unique_ptr<TextButton> btnReset;
+    std::unique_ptr<juce::GroupComponent> groupZoom;
+    std::unique_ptr<juce::Slider> sliderCenterPointX;
+    std::unique_ptr<juce::Label> labelCenterPointX;
+    std::unique_ptr<juce::Slider> sliderCenterPointY;
+    std::unique_ptr<juce::Label> labelCenterPointY;
+    std::unique_ptr<juce::Slider> sliderCenterPointZ;
+    std::unique_ptr<juce::Label> labelCenterPointZ;
+    std::unique_ptr<juce::GroupComponent> groupDisplay;
+    std::unique_ptr<juce::Slider> sliderPointScaler;
+    std::unique_ptr<juce::Label> labelPointScaler;
+    std::unique_ptr<juce::Slider> sliderRadius;
+    std::unique_ptr<juce::Label> labelRadius;
+    std::unique_ptr<juce::TextButton> btnReset;
+    std::unique_ptr<juce::Slider> sliderGroupPointScaler;
+    std::unique_ptr<juce::Label> labelGroupPointScaler;
 
 
     //==============================================================================

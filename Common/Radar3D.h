@@ -40,7 +40,7 @@ class Radar3D  : public Component,
 {
 public:
     //==============================================================================
-    Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+    Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar3D() override;
 
     //==============================================================================

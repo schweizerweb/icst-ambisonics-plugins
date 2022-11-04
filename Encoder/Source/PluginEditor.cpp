@@ -43,6 +43,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	radarOptions.audioParams = ownerProc.getAudioParams();
 	radarOptions.dawParameter = ownerProc.getDawParameter();
     radarOptions.scalingInfo = ownerProc.getScalingInfo();
+    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));
@@ -100,8 +101,6 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     //[Constructor] You can add your own custom stuff here..
 	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
 	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
-    radarComponent->getZoomSettingsPointer()->getScalingInfo()->SetScaler(pSources->getDistanceScaler());
-    radarComponent->getZoomSettingsPointer()->Reset();
     //[/Constructor]
 }
 
@@ -166,7 +165,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             pSources,
             &pointSelection,
             processor.getAudioParams(),
-            radarComponent->getZoomSettingsPointer(),
+            processor.getZoomSettingsPointer(),
             processor.getStatusMessageHandler(),
             processor.getPresetHelper(),
             processor.getDistanceEncodingPresetHelper(),

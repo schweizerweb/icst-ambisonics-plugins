@@ -16,10 +16,9 @@
 #include "LabelCreator.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions):
+Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions):
 	pEditablePoints(pEditablePoints),
 	pDisplayOnlyPoints(pDisplayOnlyPoints),
-	pZoomSettings(pZoomSettings), 
 	radarMode(mode),
 	pPointSelection(pPointSelection),
 	pRadarOptions(pRadarOptions),
@@ -33,13 +32,15 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDis
 
 	setWantsKeyboardFocus(true);
 
-	pZoomSettings->addChangeListener(this);
+	pRadarOptions->zoomSettings->addChangeListener(this);
 
 	startTimerHz(INACTIVE_REFRESH_RATE);
 }
 
 Radar2D::~Radar2D()
 {
+    pRadarOptions->zoomSettings->removeChangeListener(this);
+
 	stopTimer();
 
 	openGLContext.detach();
@@ -72,12 +73,17 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 
 float Radar2D::getEditablePointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 30.0f * scaler * float(pZoomSettings->getPointScaler());
+	return radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
+}
+
+float Radar2D::getGroupPointSize(float scaler) const
+{
+    return radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getGroupPointScaler());
 }
 
 float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
-    return radarViewport.getWidth() / 50.0f * scaler * float(pZoomSettings->getPointScaler());
+    return radarViewport.getWidth() / 50.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
 }
 
 float Radar2D::getFontSize() const
@@ -112,13 +118,13 @@ Image Radar2D::createRadarBackground() const
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
     
-    float ringResolution = pZoomSettings->getRingResolution();
+    float ringResolution = pRadarOptions->zoomSettings->getRingResolution();
     float dist = ringResolution * getValueToScreenRatio();
 	Point<float> centerPoint = getRelativeScreenPoint(Point<float>(0.0, 0.0));
     int nbRings = 0;
     bool labelUp = centerPoint.getY() >= localBounds.getHeight()/2;
     
-    for(int i = 1; i * ringResolution < pZoomSettings->getScalingInfo()->DistanceMax(); i++)
+    for(int i = 1; i * ringResolution < pRadarOptions->zoomSettings->getScalingInfo()->DistanceMax(); i++)
     {
         float absDist = i * dist;
         float ringValue = i * ringResolution;
@@ -184,7 +190,7 @@ void Radar2D::timerCallback()
 
 float Radar2D::getValueToScreenRatio() const
 {
-	return radarViewport.getWidth() / (2 * pZoomSettings->getCurrentRadius());
+	return radarViewport.getWidth() / (2 * pRadarOptions->zoomSettings->getCurrentRadius());
 }
 
 float Radar2D::getSelectedPointSize(float scaler) const
@@ -192,9 +198,14 @@ float Radar2D::getSelectedPointSize(float scaler) const
 	return getEditablePointSize(scaler) * 1.5f;
 }
 
+float Radar2D::getSelectedGroupPointSize(float scaler) const
+{
+    return getGroupPointSize(scaler) * 1.5f;
+}
+
 Point<float> Radar2D::getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const
 {
-    float offset = getEditablePointSize(1.0f)*2.1f;
+    float offset = getGroupPointSize(1.0f)*2.1f;
     switch(mode)
     {
         case Stretch:
@@ -274,7 +285,7 @@ void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize
 
 void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
 {
-    double baseScaler = pZoomSettings->getPointScaler();
+    double baseScaler = pRadarOptions->zoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
     int y = screenPt.getY() > offset + scaledImageHeight
@@ -418,7 +429,7 @@ void Radar2D::renderOpenGL()
 				{
 					float scaler = gPt->getDisplayScaler();
 					
-					paintPoint(&g, absGrpPoint, gPt, getEditablePointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedPointSize(scaler), specialGroupManipulationMode);
+					paintPoint(&g, absGrpPoint, gPt, getGroupPointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedGroupPointSize(scaler), specialGroupManipulationMode);
 				}
 			}
 		}
@@ -459,7 +470,7 @@ void Radar2D::openGLContextClosing()
 
 void Radar2D::changeListenerCallback(ChangeBroadcaster* source)
 {
-	if (source == pZoomSettings)
+	if (source == pRadarOptions->zoomSettings)
 		updateRadarBackground();
 }
 
@@ -468,7 +479,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	if(key.isKeyCode(KeyPress::homeKey))
 	{
 		// reset zoom
-        pZoomSettings->Reset(pEditablePoints);
+        pRadarOptions->zoomSettings->Reset(pEditablePoints);
 		return true;
 	}
 
@@ -617,7 +628,7 @@ void Radar2D::setRadarMode(RadarMode mode)
 
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
+	Rectangle<float> currentViewValueRect = pRadarOptions->zoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
 		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
@@ -628,7 +639,7 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 
 Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const
 {
-	Rectangle<float> currentViewValueRect = pZoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
+	Rectangle<float> currentViewValueRect = pRadarOptions->zoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
 		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
@@ -701,7 +712,7 @@ void Radar2D::mouseEnter(const MouseEvent&)
 
 double Radar2D::getMaxPointSelectionDist() const
 {
-	return pZoomSettings->getCurrentRadius()/15.0;
+	return pRadarOptions->zoomSettings->getCurrentRadius()/15.0;
 }
 
 void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetails& wheel)
@@ -710,11 +721,11 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
     {
         if(specialGroupManipulationMode && currentSpecialHandlingMode == Stretch && pPointSelection->getSelectionMode() == PointSelection::Group)
         {
-            pEditablePoints->stretchGroup(pPointSelection->getMainSelectedPointIndex(), pZoomSettings->getCurrentRadius() * wheel.deltaY);
+            pEditablePoints->stretchGroup(pPointSelection->getMainSelectedPointIndex(), pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
         }
         else
         {
-            pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * (1 + wheel.deltaY));
+            pRadarOptions->zoomSettings->setCurrentRadius(pRadarOptions->zoomSettings->getCurrentRadius() * (1 + wheel.deltaY));
         }
     }
     
@@ -831,17 +842,17 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
             
-        move.setX(move.getX() / radarViewport.getWidth() * pZoomSettings->getCurrentRadius() * 2.0f);
-        move.setY(move.getY() / radarViewport.getHeight() * pZoomSettings->getCurrentRadius() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
+        move.setX(move.getX() / radarViewport.getWidth() * pRadarOptions->zoomSettings->getCurrentRadius() * 2.0f);
+        move.setY(move.getY() / radarViewport.getHeight() * pRadarOptions->zoomSettings->getCurrentRadius() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
             
         switch (radarMode)
         {
         case XY:
-            pZoomSettings->setCurrentCenterPointXY(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getY() - move.getY());
+            pRadarOptions->zoomSettings->setCurrentCenterPointXY(pRadarOptions->zoomSettings->getCurrentCenterPoint().getX() + move.getX(), pRadarOptions->zoomSettings->getCurrentCenterPoint().getY() - move.getY());
             break;
         case XZ_Half:
         case XZ_Full:
-            pZoomSettings->setCurrentCenterPointXZ(pZoomSettings->getCurrentCenterPoint().getX() + move.getX(), pZoomSettings->getCurrentCenterPoint().getZ() - move.getY());
+            pRadarOptions->zoomSettings->setCurrentCenterPointXZ(pRadarOptions->zoomSettings->getCurrentCenterPoint().getX() + move.getX(), pRadarOptions->zoomSettings->getCurrentCenterPoint().getZ() - move.getY());
             break;
         }
             
@@ -887,7 +898,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
             if(currentSpecialHandlingMode == Stretch)
             {
-                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pZoomSettings->getCurrentRadius() * 0.01;
+                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pRadarOptions->zoomSettings->getCurrentRadius() * 0.01;
                 for(int i : selection)
                     pEditablePoints->stretchGroup(i, stretchFactor);
                 
@@ -957,11 +968,11 @@ void Radar2D::setCenterPoint(Point<float> valuePoint) const
 	switch (radarMode)
 	{
 	case XY:
-		pZoomSettings->setCurrentCenterPointXY(valuePoint.getX(), valuePoint.getY());
+        pRadarOptions->zoomSettings->setCurrentCenterPointXY(valuePoint.getX(), valuePoint.getY());
 		break;
 	case XZ_Half:
 	case XZ_Full:
-		pZoomSettings->setCurrentCenterPointXZ(valuePoint.getX(), valuePoint.getY());
+        pRadarOptions->zoomSettings->setCurrentCenterPointXZ(valuePoint.getX(), valuePoint.getY());
 		break;
 	}
 }
@@ -976,11 +987,11 @@ void Radar2D::mouseUp(const MouseEvent& e)
 
 		if (checkMouseActionMode(e.mods, RadarZoomOut))
 		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() / 0.8f);
+            pRadarOptions->zoomSettings->setCurrentRadius(pRadarOptions->zoomSettings->getCurrentRadius() / 0.8f);
 		}
 		else
 		{
-			pZoomSettings->setCurrentRadius(pZoomSettings->getCurrentRadius() * 0.8f);
+            pRadarOptions->zoomSettings->setCurrentRadius(pRadarOptions->zoomSettings->getCurrentRadius() * 0.8f);
 		}
 	}
 

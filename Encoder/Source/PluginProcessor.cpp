@@ -38,6 +38,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	initializeOsc();
     initializeAudioParameter();
     
+    zoomSettings.reset(new ZoomSettings(getScalingInfo()));
     presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this, getScalingInfo()));
     presetHelper->initialize();
 	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
@@ -301,6 +302,7 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
+    zoomSettings->writeToXmlElement(xml);
     xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
@@ -321,6 +323,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			// load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();
+            zoomSettings->loadFromXml(xmlState.get());
             animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
 		}
 	}
@@ -371,6 +374,11 @@ CustomOscTxPresetHelper* AmbisonicEncoderAudioProcessor::getCustomOscTxPresetHel
 ScalingInfo* AmbisonicEncoderAudioProcessor::getScalingInfo()
 {
     return &scalingInfo;
+}
+
+ZoomSettings* AmbisonicEncoderAudioProcessor::getZoomSettingsPointer()
+{
+    return zoomSettings.get();
 }
 
 AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()

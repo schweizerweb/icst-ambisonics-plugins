@@ -13,6 +13,7 @@
 #include "AudioParams.h"
 #include "DawParameter.h"
 #include "ScalingInfo.h"
+#include "ZoomSettings.h"
 
 class RadarOptions
 {
@@ -32,4 +33,5 @@ public:
     AudioParams* audioParams;
 	DawParameter* dawParameter;
     ScalingInfo* scalingInfo;
+    ZoomSettings* zoomSettings;
 };

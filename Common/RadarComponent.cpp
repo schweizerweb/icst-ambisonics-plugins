@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -30,11 +30,10 @@
 RadarComponent::RadarComponent (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    zoomSettings.reset(new ZoomSettings(pRadarOptions->scalingInfo));
-	showPointInfo = true;
+    showPointInfo = true;
     //[/Constructor_pre]
 
-    radar.reset (new Radar3D (pEditablePoints, pDisplayOnlyPoints, zoomSettings.get(), pPointSelection, pRadarOptions));
+    radar.reset (new Radar3D (pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions));
     addAndMakeVisible (radar.get());
     radar->setName ("radar");
 
@@ -129,7 +128,7 @@ BEGIN_JUCER_METADATA
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radar" id="bb1556089d26688f" memberName="radar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0 0M 100M" class="Radar3D" params="pEditablePoints, pDisplayOnlyPoints, zoomSettings.get(), pPointSelection, pRadarOptions"/>
+                    explicitFocusOrder="0" pos="0 0 0M 100M" class="Radar3D" params="pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="pointInfo" id="328b0557e3704175" memberName="pointInfo"
                     virtualName="" explicitFocusOrder="0" pos="0 100R 0M 100" class="PointInfoControl"
                     params="pEditablePoints, pPointSelection, pRadarOptions"/>

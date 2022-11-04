@@ -34,7 +34,7 @@ public:
     enum SpecialHandlingMode { None, Stretch, RotateAroundGroupPoint, RotateInAedSpace };
     enum AnchorX { X_Left, X_Center, X_Right };
     enum AnchorY { Y_Top, Y_Center, Y_Bottom };
-	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
 	Point<double> getProjectedPoint(Vector3D<double>* point3_d) const;
@@ -70,6 +70,7 @@ private:
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
+    float getSelectedGroupPointSize(float scaler) const;
 	Point<float> getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const;
     void drawSquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
 	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
@@ -82,6 +83,7 @@ private:
 	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
+    float getGroupPointSize(float scaler) const;
 	float getFontSize() const;
 	void drawRadar(Graphics* g) const;
 	void drawInfoLabel(Graphics* g) const;
@@ -103,7 +105,6 @@ private:
 	Image radarBackground;
 	Image infoImage;
 	Rectangle<int> radarViewport;
-	ZoomSettings* pZoomSettings;
 	RadarMode radarMode;
 	PointSelection* pPointSelection;
 	RadarColors radarColors;

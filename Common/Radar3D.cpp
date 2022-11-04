@@ -27,19 +27,19 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	fullRadarFlag = false;
     //[/Constructor_pre]
 
-    xzRadar.reset (new Radar2D (Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions));
+    xzRadar.reset (new Radar2D (Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions));
     addAndMakeVisible (xzRadar.get());
     xzRadar->setName ("xzRadar");
 
     xzRadar->setBounds (0, 240, 336, 120);
 
-    xyRadar.reset (new Radar2D (Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions));
+    xyRadar.reset (new Radar2D (Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions));
     addAndMakeVisible (xyRadar.get());
     xyRadar->setName ("xyRadar");
 
@@ -185,7 +185,7 @@ void Radar3D::setRadarMode(bool fullRadar)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="Radar3D" componentName=""
-                 parentClasses="public Component" constructorParams="AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
+                 parentClasses="public Component" constructorParams="AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
                  variableInitialisers="" snapPixels="8" snapActive="1" snapShown="1"
                  overlayOpacity="0.330" fixedSize="0" initialWidth="600" initialHeight="400">
   <METHODS>
@@ -194,9 +194,9 @@ BEGIN_JUCER_METADATA
   </METHODS>
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="xzRadar" id="9b35aa2c2da622df" memberName="xzRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 240 336 120" class="Radar2D" params="Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
+                    explicitFocusOrder="0" pos="0 240 336 120" class="Radar2D" params="Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions"/>
   <GENERICCOMPONENT name="xyRadar" id="952154a5b6ffaa65" memberName="xyRadar" virtualName=""
-                    explicitFocusOrder="0" pos="0 0 336 240" class="Radar2D" params="Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pZoomSettings, pPointSelection, pRadarOptions"/>
+                    explicitFocusOrder="0" pos="0 0 336 240" class="Radar2D" params="Radar2D::XY, pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions"/>
   <IMAGEBUTTON name="btnFull" id="7f9ff0bdbe393e2c" memberName="btnFull" virtualName=""
                explicitFocusOrder="0" pos="0 360 336 6" buttonText="Full" connectedEdges="0"
                needsCallback="1" radioGroupId="0" keepProportions="0" resourceNormal="flatArrowDownT_png"
