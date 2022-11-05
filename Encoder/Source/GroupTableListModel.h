@@ -15,7 +15,7 @@
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
-#include "GroupPointsSelectionComponent.h"
+#include "../../Common/GroupPointsSelectionComponent.h"
 #include "../../Common/ScalingInfo.h"
 #include "../../Common/ColorDefinition.h"
 

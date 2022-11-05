@@ -12,6 +12,7 @@
 #include "Radar2D.h"
 
 #include "ActivationDialog.h"
+#include "MultiActivationDialog.h"
 #include "TrackColors.h"
 #include "LabelCreator.h"
 
@@ -1082,8 +1083,14 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	}
 	else 
 	{
-		// otherwise enable a disabled point
-		CallOutBox::launchAsynchronously(std::make_unique<ActivationDialog>(pEditablePoints, valuePoint, radarMode == XY), Rectangle<int>(e.getPosition(), e.getPosition().translated(3, 3)), this);
+        if(e.mods.isShiftDown())
+        {
+            CallOutBox::launchAsynchronously(std::make_unique<MultiActivationDialog>(pEditablePoints, valuePoint, radarMode == XY), Rectangle<int>(e.getPosition().translated(3, 3), e.getPosition().translated(3, 3)), this);
+        }
+        else {
+            // otherwise enable a disabled point
+            CallOutBox::launchAsynchronously(std::make_unique<ActivationDialog>(pEditablePoints, valuePoint, radarMode == XY), Rectangle<int>(e.getPosition(), e.getPosition().translated(3, 3)), this);
+        }
 	}
 }
 

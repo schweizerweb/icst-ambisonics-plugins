@@ -103,8 +103,6 @@
       <FILE id="CXnIL9" name="GroupAnimator.cpp" compile="1" resource="0"
             file="Source/GroupAnimator.cpp"/>
       <FILE id="cLqXqH" name="GroupAnimator.h" compile="0" resource="0" file="Source/GroupAnimator.h"/>
-      <FILE id="wzVHPY" name="GroupPointsSelectionComponent.h" compile="0"
-            resource="0" file="Source/GroupPointsSelectionComponent.h"/>
       <FILE id="qLSobP" name="GroupTableListModel.h" compile="0" resource="0"
             file="Source/GroupTableListModel.h"/>
       <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"
@@ -227,6 +225,8 @@
       <FILE id="B0KcF5" name="EncoderConstants.h" compile="0" resource="0"
             file="../Common/EncoderConstants.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="VvC9ea" name="GroupPointsSelectionComponent.h" compile="0"
+            resource="0" file="../Common/GroupPointsSelectionComponent.h"/>
       <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
             file="../Common/JsEditorComponent.cpp"/>
       <FILE id="fu4V4a" name="JsEditorComponent.h" compile="0" resource="0"
@@ -234,6 +234,8 @@
       <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
+      <FILE id="II5Tak" name="MultiActivationDialog.h" compile="0" resource="0"
+            file="../Common/MultiActivationDialog.h"/>
       <FILE id="lzw3Wj" name="NumericColumnCustomComponent.h" compile="0"
             resource="0" file="../Common/NumericColumnCustomComponent.h"/>
       <FILE id="v8HVwz" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>

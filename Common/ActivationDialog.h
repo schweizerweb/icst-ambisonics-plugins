@@ -91,6 +91,7 @@ private:
     std::unique_ptr<TextEditor> text;
 
     std::unique_ptr<TextButton> btn;
+    
     AmbiDataSet* pData;
     Point<float> newPosition;
     bool xyRadar;

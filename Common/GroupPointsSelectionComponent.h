@@ -20,7 +20,7 @@
 class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:
-    GroupPointsSelectionComponent(AmbiSourceSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources), groupIndex(groupIndex)
+    GroupPointsSelectionComponent(AmbiDataSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources), groupIndex(groupIndex)
     {
 	    // In your constructor, you should add any child components, and
 	    // initialise any special settings that your component needs.
@@ -32,8 +32,9 @@ public:
         
 		for (int i = 0; i < pSources->size(); i++)
 		{
-            AmbiSource* s = pSources->get(i);
-			ToggleButton* b = new ToggleButton(s->getName());
+            AmbiPoint* s = pSources->get(i);
+            String label = String(i+1) + (s->getName() != String(i + 1) ? (": " + s->getName()) : "");
+			ToggleButton* b = new ToggleButton(label);
 			b->setToggleState(s->getGroup() == pSources->getActiveGroup(groupIndex), dontSendNotification);
             b->setEnabled(s->getEnabled());
 			b->addListener(this);
@@ -90,7 +91,7 @@ public:
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (GroupPointsSelectionComponent)
 
-	AmbiSourceSet* pSources;
+	AmbiDataSet* pSources;
 	Array<ToggleButton*> toggleButtons;
 	int groupIndex;
     int columnCount;
