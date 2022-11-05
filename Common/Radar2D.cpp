@@ -152,14 +152,14 @@ Image Radar2D::createRadarBackground() const
     g.drawLine(0.0f, centerPoint.getY(), localBounds.getWidth(), centerPoint.getY(), 2.0f);
 	
     // axis label
-    Rectangle<int> label1Rect(int(localBounds.getWidth()-22), int(centerPoint.getY() - 10), 20, 20);
+    Rectangle<int> label1Rect(int(localBounds.getWidth()-22), int(centerPoint.getY() - (radarMode == XZ_Half ? 22 : 10)), 20, 20);
     g.setColour(radarColors.getRadarBackground());
     g.fillRect(label1Rect);
     g.setColour(radarColors.getRadarAxisColor());
     g.drawRect(label1Rect);
     g.drawFittedText("X", label1Rect, Justification::centred, 1);
     
-    Rectangle<int> label2Rect(int(centerPoint.getX() - 10), labelUp ? localBounds.getHeight() -22 : 2, 20, 20);
+    Rectangle<int> label2Rect(int(centerPoint.getX() - (radarMode == XZ_Half ? 22 : 10)), (!labelUp || radarMode == XZ_Half) ? 2 : localBounds.getHeight() -22, 20, 20);
     g.setColour(radarColors.getRadarBackground());
     g.fillRect(label2Rect);
     g.setColour(radarColors.getRadarAxisColor());
