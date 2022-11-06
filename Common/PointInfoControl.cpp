@@ -354,7 +354,22 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
         if(pPointSelection->getSelectionMode() == PointSelection::SelectionMode::Point)
         {
             for(auto i : pPointSelection->getSelectedIndices())
-                    pEditablePoints->setEnabled(i, false);
+                pEditablePoints->setEnabled(i, false);
+        }
+        else if(pPointSelection->getSelectionMode() == PointSelection::Group)
+        {
+            for(auto g : pPointSelection->getSelectedIndices())
+            {
+                // delete all children
+                for(int i = 0; i < pEditablePoints->size(); i++)
+                {
+                    if(pEditablePoints->get(i)->getGroup() == pEditablePoints->getGroup(g))
+                        pEditablePoints->get(i)->setEnabled(false);
+                }
+                
+                // finally delete the group
+                pEditablePoints->removeGroup(g);
+            }
         }
         pPointSelection->unselectPoint();
         //[/UserButtonCode_btnDelete]
@@ -402,7 +417,7 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
     bool enGroup = pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
     && ( pRadarOptions->audioParams == nullptr || pEditablePoints->activeGroupCount() < pRadarOptions->audioParams->groupParams.size());
     bool enUngroup = pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1;
-    bool enDelete = pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 0;
+    bool enDelete = pPointSelection->getSelectedIndices().size() > 0;
 	btnGroup->setEnabled(enGroup);
 	btnUngroup->setEnabled(enUngroup);
     btnDelete->setEnabled(enDelete);
