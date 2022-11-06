@@ -13,6 +13,8 @@
 #include "AmbiSourceSet.h"
 #include "ScalingInfo.h"
 #include "GroupPointsSelectionComponent.h"
+#include "ColorSelectionComponent.h"
+#include "ColorDefinition.h"
 
 enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGLE, SHAPE_ID_STAR };
 
@@ -22,9 +24,11 @@ public:
     MultiActivationDialog(AmbiDataSet* pData, Point<float> newPosition, ScalingInfo* pScaling, bool xyRadar) : pData(pData), newPosition(newPosition), xyRadar(xyRadar)
     {
         // copy to local data set
+        color = COLOR_DEFINITION_GROUP_DEFAULT;
+        defaultRadius = pScaling->CartesianMax() / 5;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
         localDataSet->setGroupModeFlag(true);
-        localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", Colours::red);
+        localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
         for(int i = 0; i < pData->size(); i++)
         {
             auto p = pData->get(i)->getRawPoint();
@@ -71,23 +75,46 @@ public:
         sliderRadius.reset(new Slider("Radius"));
         sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
         sliderRadius->setRange(0.01, pScaling->CartesianMax());
-        sliderRadius->setValue(pScaling->CartesianMax() / 5);
+        sliderRadius->setValue(defaultRadius);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
         addAndMakeVisible(sliderRadius.get());
-
+        
+        labelGroupName.reset(new Label("GroupName"));
+        labelGroupName->setText("Group Name", dontSendNotification);
+        addAndMakeVisible(labelGroupName.get());
+        
+        textGroupName.reset(new TextEditor("GroupName"));
+        textGroupName->setText("Shape");
+        addAndMakeVisible(textGroupName.get());
+        
+        toggleApplyName.reset(new ToggleButton("ApplyName"));
+        toggleApplyName->setButtonText("Apply Name to Sources");
+        toggleApplyName->setToggleState(false, dontSendNotification);
+        addAndMakeVisible(toggleApplyName.get());
+        
+        labelColor.reset(new Label("Color"));
+        labelColor->setText("Color", dontSendNotification);
+        addAndMakeVisible(labelColor.get());
+        
+        btnColor.reset(new TextButton("Color"));
+        btnColor->setButtonText("");
+        btnColor->setColour(TextButton::ColourIds::buttonColourId, color);
+        btnColor->addListener(this);
+        addAndMakeVisible(btnColor.get());
+        
         zoomSettings.reset(new ZoomSettings(&scalingInfo));
         RadarOptions radarOptions;
         radarOptions.zoomSettings = zoomSettings.get();
         
-        btn.reset(new TextButton("btn"));
-        btn->setButtonText("Activate");
-        btn->addListener(this);
-        addAndMakeVisible(btn.get());
+        btnApply.reset(new TextButton("btn"));
+        btnApply->setButtonText("Activate");
+        btnApply->addListener(this);
+        addAndMakeVisible(btnApply.get());
 
         comboShape->setSelectedItemIndex(0);
 
-        setSize(350, 120);
+        setSize(350, 210);
     }
 
     ~MultiActivationDialog() override
@@ -99,23 +126,37 @@ public:
         comboShape = nullptr;
         labelRadius = nullptr;
         sliderRadius = nullptr;
-        btn = nullptr;
+        labelGroupName = nullptr;
+        textGroupName = nullptr;
+        toggleApplyName = nullptr;
+        labelColor = nullptr;
+        btnColor = nullptr;
+        btnApply = nullptr;
     }
 
 private:
     void resized() override
     {
-        labelPointCount->setBounds(0, 0, getWidth() / 3, 24);
-        sliderPointCount->setBounds(labelPointCount->getRight(), 0, getWidth() - labelPointCount->getRight() - 70, 24);
-        btnSelectPoints->setBounds(getWidth()-70, 0, 70, 24);
+        int controlHeight = 24;
+        labelPointCount->setBounds(0, 0, getWidth() / 3, controlHeight);
+        sliderPointCount->setBounds(labelPointCount->getRight(), labelPointCount->getY(), getWidth() - labelPointCount->getRight() - 70, controlHeight);
+        btnSelectPoints->setBounds(getWidth()-70, labelPointCount->getY(), 70, controlHeight);
 
-        labelShape->setBounds(0, 30, getWidth() / 3, 24);
-        comboShape->setBounds(labelShape->getRight(), 30, getWidth() - labelShape->getRight(), 24);
+        labelShape->setBounds(0, 30, getWidth() / 3, controlHeight);
+        comboShape->setBounds(labelShape->getRight(), labelShape->getY(), getWidth() - labelShape->getRight(), controlHeight);
 
-        labelRadius->setBounds(0, 60, getWidth() / 3, 24);
-        sliderRadius->setBounds(labelRadius->getRight(), 60, getWidth() - labelRadius->getRight(), 24);
+        labelRadius->setBounds(0, 60, getWidth() / 3, controlHeight);
+        sliderRadius->setBounds(labelRadius->getRight(), labelRadius->getY(), getWidth() - labelRadius->getRight(), controlHeight);
         
-        btn->setBounds(0, getHeight()-30, getWidth(), 24);
+        labelGroupName->setBounds(0, 90, getWidth() / 3, controlHeight);
+        textGroupName->setBounds(labelGroupName->getRight(), 90, getWidth() - labelGroupName->getRight(), controlHeight);
+        
+        toggleApplyName->setBounds(labelGroupName->getRight(), 120, getWidth() - labelGroupName->getRight(), controlHeight);
+        
+        labelColor->setBounds(0, 150, getWidth() / 3, controlHeight);
+        btnColor->setBounds(labelColor->getRight(), labelColor->getY(), getWidth() - labelColor->getRight(), jmin(controlHeight, getHeight() - 180));
+        
+        btnApply->setBounds(0, getHeight()-30, getWidth(), controlHeight);
     }
 
     void comboBoxChanged(ComboBox*) override
@@ -131,10 +172,14 @@ private:
         {
             CallOutBox::launchAsynchronously(std::make_unique<GroupPointsSelectionComponent>(localDataSet.get(), 0, this), btnSelectPoints->getScreenBounds(), nullptr);
         }
-        else if(b == btn.get())
+        else if(b == btnApply.get())
         {
             if(buildShape() && applyDataSet())
                 findParentComponentOfClass<CallOutBox>()->exitModalState(0);
+        }
+        else if(b == btnColor.get())
+        {
+            CallOutBox::launchAsynchronously(std::make_unique<ColorSelectionComponent>(color, this, nullptr, false), getScreenBounds(), nullptr);
         }
     }
     
@@ -159,7 +204,7 @@ private:
         }
         else if(slider == sliderRadius.get())
         {
-            
+            // nothing to do
         }
         
         controlDimming();
@@ -168,23 +213,45 @@ private:
 
     void changeListenerCallback(ChangeBroadcaster *source) override
     {
-        int count = 0;
-        for(int i = 0; i < localDataSet->size(); i++)
+        ColourSelector* selector = dynamic_cast<ColourSelector*> (source);
+        if (selector != nullptr)
         {
-            if(localDataSet->get(i)->getGroup() != nullptr)
-                count++;
+            color = selector->getCurrentColour();
+            btnColor->setColour(TextButton::ColourIds::buttonColourId, color);
         }
-        
-        sliderPointCount->setValue(count, dontSendNotification);
-        
-        controlDimming();
-        buildShape();
+        else
+        {
+            int count = 0;
+            for(int i = 0; i < localDataSet->size(); i++)
+            {
+                if(localDataSet->get(i)->getGroup() != nullptr)
+                    count++;
+            }
+            
+            sliderPointCount->setValue(count, dontSendNotification);
+            
+            controlDimming();
+            buildShape();
+        }
     }
     
     void controlDimming()
     {
-        btn->setEnabled(sliderPointCount->getValue()>0);
-        sliderRadius->setSliderStyle(comboShape->getSelectedId() == SHAPE_ID_STAR ? Slider::TwoValueHorizontal : Slider::LinearHorizontal);
+        btnApply->setEnabled(sliderPointCount->getValue()>0);
+        
+        if(comboShape->getSelectedId() == SHAPE_ID_STAR && sliderRadius->getSliderStyle() != Slider::TwoValueHorizontal)
+        {
+            defaultRadius = sliderRadius->getValue();
+            sliderRadius->setSliderStyle(Slider::TwoValueHorizontal);
+            sliderRadius->setMaxValue(defaultRadius, dontSendNotification);
+            sliderRadius->setMinValue(defaultRadius * 0.6, dontSendNotification);
+        }
+        else if(comboShape->getSelectedId() != SHAPE_ID_STAR && sliderRadius->getSliderStyle() != Slider::LinearHorizontal)
+        {
+            defaultRadius = sliderRadius->getMaxValue();
+            sliderRadius->setSliderStyle(Slider::LinearHorizontal);
+            sliderRadius->setValue(defaultRadius);
+        }
     }
     
 private:
@@ -194,13 +261,16 @@ private:
             return false;
         
         // first add a group point
+        String groupName = textGroupName->getText();
         Vector3D<double> gp = xyRadar
             ? Vector3D<double>(newPosition.x, newPosition.y, 0)
             : Vector3D<double>(newPosition.x, 0, newPosition.y);
-        int newGroupIndex = pData->addGroup(Uuid().toString(), gp, "Shape", Colours::red);
+        int newGroupIndex = pData->addGroup(Uuid().toString(), gp, groupName, color);
         if(newGroupIndex < 0)
             return false;
         
+        pData->getGroup(newGroupIndex)->setName(groupName);
+        pData->getGroup(newGroupIndex)->setColor(color);
         for(int i = 0; i < localDataSet->size(); i++)
         {
             auto p = localDataSet->get(i);
@@ -213,6 +283,15 @@ private:
                     ? Vector3D<double>(p->getRawPoint()->getX(), p->getRawPoint()->getY(), 0)
                     : Vector3D<double>(p->getRawPoint()->getX(), 0, p->getRawPoint()->getY());
                 pData->get(pointIndex)->getRawPoint()->setXYZ(pp.x, pp.y, pp.z);
+                pData->get(pointIndex)->setColor(color);
+                if(toggleApplyName->getToggleState())
+                {
+                    pData->get(pointIndex)->setName(groupName + "_" + String(i + 1));
+                }
+                else
+                {
+                    pData->get(pointIndex)->setName(String(pointIndex + 1));
+                }
             }
         }
         return true;
@@ -271,7 +350,14 @@ private:
     std::unique_ptr<Label> labelRadius;
     std::unique_ptr<Slider> sliderRadius;
     
-    std::unique_ptr<TextButton> btn;
+    std::unique_ptr<Label> labelGroupName;
+    std::unique_ptr<TextEditor> textGroupName;
+    std::unique_ptr<ToggleButton> toggleApplyName;
+    
+    std::unique_ptr<Label> labelColor;
+    std::unique_ptr<TextButton> btnColor;
+    
+    std::unique_ptr<TextButton> btnApply;
    
     
     AmbiDataSet* pData;
@@ -280,5 +366,7 @@ private:
     std::unique_ptr<ZoomSettings> zoomSettings;
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiDataSet> localDataSet;
+    double defaultRadius;
+    Colour color;
 };
 

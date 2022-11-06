@@ -21,6 +21,7 @@
 #include "RadarOptions.h"
 #include "TrackColors.h"
 #include "Constants.h"
+#include "ColorDefinition.h"
 //[/Headers]
 
 #include "PointInfoControl.h"
@@ -336,7 +337,7 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
             Point<double> centerXY = Rectangle<double>(minX, minY, maxX - minX, maxY - minY).getCentre();
             double centerZ = (minZ + maxZ) / 2.0;
 
-            int newIndex = pEditablePoints->addGroup(Uuid().toString(), Vector3D<double>(centerXY.getX(), centerXY.getY(), centerZ), "G", Colours::orange);
+            int newIndex = pEditablePoints->addGroup(Uuid().toString(), Vector3D<double>(centerXY.getX(), centerXY.getY(), centerZ), "G", COLOR_DEFINITION_GROUP_DEFAULT);
             for (int i : selection)
             {
                 auto origPos = pEditablePoints->getAbsSourcePoint(i);

@@ -317,7 +317,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         if(m_args.pAudioParams != nullptr && m_args.pSourceSet->activeGroupCount() < m_args.pAudioParams->groupParams.size())
         {
             Uuid newId = Uuid();
-            int newIndex = m_args.pSourceSet->addGroup(newId.toString(), Vector3D<double>(0.0, 0.0, 0.0), "G", Colours::orange);
+            int newIndex = m_args.pSourceSet->addGroup(newId.toString(), Vector3D<double>(0.0, 0.0, 0.0), "G", COLOR_DEFINITION_GROUP_DEFAULT);
             m_args.pPointSelection->selectGroup(newIndex, false);
             groupList->updateContent();
             groupList->repaint();
