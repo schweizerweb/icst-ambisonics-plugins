@@ -469,9 +469,9 @@ void Radar2D::renderOpenGL()
 			for (int i = pDisplayOnlyPoints->size() - 1; i >= 0 ; i--)
 			{
 				AmbiPoint* pt = pDisplayOnlyPoints->get(i, referenceTime, pRadarOptions->displayTimeout);
-                Vector3D<double> absPt = pDisplayOnlyPoints->getAbsSourcePoint(i);
-				if (pt != nullptr && pt->getEnabled())
+                if (pt != nullptr && pt->getEnabled())
 				{
+                    Vector3D<double> absPt = pDisplayOnlyPoints->getAbsSourcePoint(i);
 					float scaler = pt->getDisplayScaler();
 					paintPoint(&g, absPt, pt, getDisplayOnlyPointSize(scaler), Circle);
 				}

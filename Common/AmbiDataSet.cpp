@@ -660,6 +660,8 @@ void AmbiDataSet::setGroupModeFlag(bool en)
 
 Vector3D<double> AmbiDataSet::getAbsSourcePoint(int index) const
 {
+    const ScopedLock lock(cs);
+
     if(groupModeFlag)
     {
         Vector3D<double> pt = get(index)->getVector3D();
