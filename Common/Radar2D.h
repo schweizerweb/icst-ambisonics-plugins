@@ -77,10 +77,10 @@ private:
     void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
     void drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const;
     void drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const;
-	void paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
+	void paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false, bool groupFlag = false) const;
 	void paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const;
 
-	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
     float getGroupPointSize(float scaler) const;

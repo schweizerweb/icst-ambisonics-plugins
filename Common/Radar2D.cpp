@@ -313,9 +313,9 @@ void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize
     }
 }
 
-void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const
 {
-    double baseScaler = pRadarOptions->zoomSettings->getPointScaler();
+    double baseScaler = groupFlag ? pRadarOptions->zoomSettings->getGroupPointScaler() : pRadarOptions->zoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
     int y = screenPt.getY() > offset + scaledImageHeight
@@ -337,7 +337,7 @@ bool Radar2D::containsIncludingBoder(const Rectangle<int> *rect, Point<int> poin
     return point.x >= rect->getX() && point.y >= rect->getY() && point.x <= rect->getRight() && point.y <= rect->getBottom();
 }
 
-void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize, bool extendedHandles) const
+void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select, float selectionSize, bool extendedHandles, bool groupFlag) const
 {
 	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat());
     
@@ -390,7 +390,7 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
     }
 	
 	Image* img = point->getLabelImage();
-	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f));
+	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
 }
 
 void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const
@@ -458,7 +458,7 @@ void Radar2D::renderOpenGL()
 				{
 					float scaler = gPt->getDisplayScaler();
 					
-					paintPoint(&g, absGrpPoint, gPt, getGroupPointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedGroupPointSize(scaler), specialGroupManipulationMode);
+					paintPoint(&g, absGrpPoint, gPt, getGroupPointSize(scaler), Shape::Star, pPointSelection->isGroupSelected(i), getSelectedGroupPointSize(scaler), specialGroupManipulationMode, true);
 				}
 			}
 		}
