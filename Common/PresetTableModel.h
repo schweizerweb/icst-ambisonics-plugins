@@ -63,6 +63,9 @@ private:
 
     void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override
     {
+        if(rowNumber >= pPresetHelper->presetFiles.size())
+            return;
+        
         File file = pPresetHelper->presetFiles.getReference(rowNumber);
         
         g.setColour(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId));
