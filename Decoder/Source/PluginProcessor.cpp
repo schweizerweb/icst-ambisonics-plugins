@@ -12,6 +12,11 @@
 #include "PluginEditor.h"
 #include "../../Common/FFTAnalyzer.h"
 
+#define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
+#define XML_ROOT_TAG "AMBISONICDECODERPLUGINSETTINGS"
+#define XML_TAG_GENERAL "General"
+#define XML_TAG_AMBISONICS_PRESET "AmbisonicsPreset"
+
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
@@ -304,17 +309,18 @@ AudioProcessorEditor* AmbisonicsDecoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    XmlElement* xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
-
+    XmlElement* xml = new XmlElement(XML_ROOT_TAG);
+    xml->setAttribute(XML_ATTRIBUTE_VERSION, ProjectInfo::versionNumber);
+    
 	// save general decoder settings
 	decoderSettings.saveToXml(xml);
 	
     speakerSet->writeToXmlElement(xml);
     
-    XmlElement* ambiSettingsXml = new XmlElement("General");
+    XmlElement* ambiSettingsXml = new XmlElement(XML_TAG_GENERAL);
     ambiSettings.writeToPresetXmlElement(ambiSettingsXml);
     
-    XmlElement* presetSettings = new XmlElement("AmbisonicsPreset");
+    XmlElement* presetSettings = new XmlElement(XML_TAG_AMBISONICS_PRESET);
     presetSettings->addChildElement(ambiSettingsXml);
     xml->addChildElement(presetSettings);
     
@@ -332,17 +338,25 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 	if (xmlState != nullptr)
 	{
 		// make sure that it's actually our type of XML object..
-		if (xmlState->hasTagName("AMBISONICDECODERPLUGINSETTINGS"))
+		if (xmlState->hasTagName(XML_ROOT_TAG))
 		{
+            int versionNumber = xmlState->getIntAttribute(XML_ATTRIBUTE_VERSION, 0);
+            
+            if(versionNumber > ProjectInfo::versionNumber)
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "Outdated AmbiDecoder version", "The state to be loaded has been saved with a newer version of the AmbiDecoder plugin");
+            }
+            // future implementation of backward compatibility
+            
 			// load general decoder settings
 			decoderSettings.loadFromXml(xmlState.get());
 			
-            XmlElement* presetElement = xmlState->getChildByName("AmbisonicsPreset");
+            XmlElement* presetElement = xmlState->getChildByName(XML_TAG_AMBISONICS_PRESET);
             if (presetElement != nullptr)
             {
                 speakerSet->loadFromXml(xmlState.get());
                 
-                XmlElement* ambiXml = presetElement->getChildByName("General");
+                XmlElement* ambiXml = presetElement->getChildByName(XML_TAG_GENERAL);
                 if(ambiXml != nullptr)
                 {
                     ambiSettings.loadFromPresetXml(ambiXml);

@@ -16,6 +16,7 @@
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
 #define XML_TAG_ENCODER_ANIMATOR "Animator"
+#define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -298,7 +299,8 @@ AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
 	XmlElement* xml = new XmlElement(XML_ROOT_TAG);
-
+    xml->setAttribute(XML_ATTRIBUTE_VERSION, ProjectInfo::versionNumber);
+    
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
@@ -317,6 +319,14 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		// make sure that it's actually our type of XML object..
 		if (xmlState->hasTagName(XML_ROOT_TAG))
 		{
+            int versionNumber = xmlState->getIntAttribute(XML_ATTRIBUTE_VERSION, 0);
+            
+            if(versionNumber > ProjectInfo::versionNumber)
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "Outdated AmbiEncoder version", "The state to be loaded has been saved with a newer version of the AmbiEncoder plugin");
+            }
+            // future implementation of backward compatibility
+            
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
             scalingInfo.SetScaler(sources->getDistanceScaler());
