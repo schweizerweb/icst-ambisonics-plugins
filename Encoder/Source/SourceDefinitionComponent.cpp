@@ -196,6 +196,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
+    toggleGroupMode->setVisible(MULTI_ENCODER_MODE);
 
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
