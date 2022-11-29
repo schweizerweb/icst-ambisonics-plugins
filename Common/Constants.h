@@ -40,4 +40,5 @@ public:
 	static int NormalizeAzimuthGrad(int grad);
 
 	static bool isDevelopmentVersion();
+    static bool isNonVisibleVersionPrerelease();
 };

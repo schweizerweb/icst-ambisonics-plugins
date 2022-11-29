@@ -48,3 +48,8 @@ bool Constants::isDevelopmentVersion()
 {
 	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");
 }
+
+bool Constants::isNonVisibleVersionPrerelease()
+{
+    return String(ProjectInfo::versionString).endsWith("-t");
+}

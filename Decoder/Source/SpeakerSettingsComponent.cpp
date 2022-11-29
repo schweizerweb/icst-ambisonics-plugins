@@ -236,7 +236,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 
     //[Constructor] You can add your own custom stuff here..
-    labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
+    labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion() && !Constants::isNonVisibleVersionPrerelease());
 
     // prepare weighting comboBox
     comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);

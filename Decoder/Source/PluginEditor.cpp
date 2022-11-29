@@ -93,7 +93,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
+	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + (Constants::isNonVisibleVersionPrerelease() ? "" : (" " + String(ProjectInfo::versionString))), dontSendNotification);
 	updateRadarOptions();
     //[/Constructor]
 }

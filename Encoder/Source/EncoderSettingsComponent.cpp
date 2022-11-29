@@ -64,7 +64,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
+	labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion() && !Constants::isNonVisibleVersionPrerelease());
     //[/Constructor]
 }
 
