@@ -37,8 +37,8 @@ public:
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
 	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
     bool setChannelNameGain(String channelName, double gain) const;
-	void setChannelXY(int channel, double x, double y) const;
-	void setChannelYZ(int channel, double y, double z) const;
+	bool setChannelXY(int channel, double x, double y) const;
+	bool setChannelYZ(int channel, double y, double z) const;
 	void setChannelName(int channel, String name) const;
 	void setChannelColor(int channel, Colour colour) const;
     void setEnabled(int channel, bool enable) const;
@@ -67,12 +67,12 @@ public:
 	void removeGroup(int groupIndex);
     void addPointToGroup(int groupIndex, int pointIndex);
     void removePointFromGroup(int groupIndex, int pointIndex);
-	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
-	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
+	bool setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
+	bool setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;
-	void stretchGroup(int groupIndex, double stretchValue);
-    void rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
-    void rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
+	bool stretchGroup(int groupIndex, double stretchValue);
+    bool rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
+    bool rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     
     bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
 	bool setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const;
@@ -81,8 +81,10 @@ public:
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     void swapGroup(int a, int b);
     
-    void setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
-    void setGroupStretch(int groupIndex, double stretchFactor, bool notify = true);
+    bool setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
+    bool setGroupStretch(int groupIndex, double stretchFactor, bool notify = true);
+    bool setGroupRotation(String groupName, Quaternion<double> rotation, bool notify = true);
+    bool setGroupStretch(String groupName, double stretchFactor, bool notify = true);
     
     Vector3D<double> getAbsSourcePoint(int index) const;
     void setAbsSourcePoint(int index, Vector3D<double> absPoint);

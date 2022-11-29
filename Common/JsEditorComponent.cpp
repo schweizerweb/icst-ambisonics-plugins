@@ -70,6 +70,12 @@ JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdat
     lines.push_back("  s.getAbsX([index]); (group mode only)");
     lines.push_back("  s.getAbsY([index]); (group mode only)");
     lines.push_back("  s.getAbsZ([index]); (group mode only)");
+    lines.push_back("  s.getGroupX([index]);");
+    lines.push_back("  s.getGroupY([index]);");
+    lines.push_back("  s.getGroupZ([index]);");
+    lines.push_back("  s.getGroupA([index]);");
+    lines.push_back("  s.getGroupE([index]);");
+    lines.push_back("  s.getGroupD([index]);");
     lines.push_back("(*) Note: in group mode, positions are relative to the attached group!");
     lines.push_back("");
     lines.push_back("Manipulation of data set:");
@@ -108,12 +114,16 @@ JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdat
     lines.push_back("  The optional parameter moveSub defines:");
     lines.push_back("    0: group point only");
     lines.push_back("    1: group point and attached sources, preserving relative positions.");
+    lines.push_back("    (default is 1)");
     lines.push_back("");
-    lines.push_back("Additional methods for group mode:");
+    lines.push_back("Additional methods for group mode (absolute rotation and stretch):");
     lines.push_back("  s.setGroupRotation([index], [x], [y], [z], [w]);");
     lines.push_back("    Sets the absolute rotation of the group to the specified quaternion.");
     lines.push_back("  s.setGroupStretch([index], [stretchFactor]);");
     lines.push_back("    Sets the absolute stretch factor.");
+    lines.push_back("  s.setGroupRotationByName([name], [x], [y], [z], [w]);");
+    lines.push_back("  s.setGroupStretchByName([name], [stretchFactor]);");
+    lines.push_back("    Same with identification of the group by name.");
     lines.push_back("");
     lines.push_back("Local buffer:");
     lines.push_back("  The local buffer allows to store values between OSC messages.");
@@ -125,7 +135,19 @@ JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdat
     lines.push_back("    Gets the value stored at buffer position [index].");
     lines.push_back("    Example: s.getBufferValue(1);");
     lines.push_back("");
-    lines.push_back("Note: all 'index' parameters are 1-based");
+    lines.push_back("Error handling:");
+    lines.push_back("  Java Script syntax errors will be displayed at interpretation time. ");
+    lines.push_back("  Errors in the methods defined above, will be automatically displayed,");
+    lines.push_back("  however, it's possible to handle these errors in the Java Script code:");
+    lines.push_back("    All getter-methods return the value if available, 'undefined' otherwise.");
+    lines.push_back("    All setter-methods return true if successful, 'undefined' otherwise.");
+    lines.push_back("    s.reportError([message]);");
+    lines.push_back("      Allows custom error reporting.");
+    lines.push_back("      Example: if(s.setXYZ(i, x, y, z) != true) s.reportError(\"beep\");");
+    lines.push_back("    s.reportError(\"\")");
+    lines.push_back("      Resets the automatically generated error message to ignore the error.");
+    lines.push_back("");
+    lines.push_back("Note: all 'index' parameters are 1-based, except for the 'Local Buffer' methods");
     String helpText;
     
     for(auto l : lines)
