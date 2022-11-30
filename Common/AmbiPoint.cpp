@@ -141,11 +141,14 @@ void AmbiPoint::setGain(double newGain, bool notify)
 
 bool AmbiPoint::getMute() const
 {
-    return mute;
+    return allowMute() ? mute : false;
 }
 
 void AmbiPoint::setMute(bool newMute, bool notify)
 {
+    if(!allowMute())
+        return;
+    
     mute = newMute;
     if(newMute && solo)
         setSolo(false);
@@ -156,11 +159,14 @@ void AmbiPoint::setMute(bool newMute, bool notify)
 
 bool AmbiPoint::getSolo() const
 {
-    return solo;
+    return allowSolo() ? solo : false;
 }
 
 void AmbiPoint::setSolo(bool newSolo)
 {
+    if(!allowSolo())
+        return;
+    
     solo = newSolo;
     if(newSolo && mute)
         setMute(false, true);

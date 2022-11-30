@@ -45,6 +45,12 @@ Radar2D::~Radar2D()
 	openGLContext.detach();
 }
 
+void Radar2D::setAnchor(AnchorX x, AnchorY y)
+{
+    anchorX = x;
+    anchorY = y;
+}
+
 Point<double> Radar2D::getProjectedPoint(Point3D<double>* point3_d) const
 {
 	switch(radarMode)
@@ -99,7 +105,7 @@ Image Radar2D::createRadarBackground() const
 {
 	const MessageManagerLock lock;
 
-	Rectangle<float> localBounds = radarViewport.toFloat();
+    Rectangle<float> localBounds = radarViewport.toFloat().withZeroOrigin();
 
 	Image img = Image(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
 	Graphics g(img);
@@ -328,7 +334,7 @@ void Radar2D::paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape s
     if(point->getSolo())
     {
         g->setColour(Colours::red);
-        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2);
+        drawEmptySquare(g, &screenPt, pt, pointSize * 1.2f);
     }
     
     if(extendedHandles)
@@ -468,7 +474,9 @@ bool Radar2D::keyPressed(const KeyPress& key)
 	bool keyHandled = false;
 	double dx = 0.0, dy = 0.0, dz = 0.0;
 
-    if (key.getModifiers().isAltDown() && key.getModifiers().isShiftDown())
+    if(pPointSelection->getSelectionMode() == PointSelection::Point
+       && key.getModifiers().isCtrlDown()
+       && key.getModifiers().isShiftDown())
     {
         if(key.isKeyCode(77)) // 'm'
         {
@@ -500,10 +508,34 @@ bool Radar2D::keyPressed(const KeyPress& key)
             for(auto i : selection)
                 pEditablePoints->setSolo(i, anyNotSolo);
         }
+        else if(key.isKeyCode(KeyPress::backspaceKey))
+        {
+            for(auto i : selection)
+            {
+                pEditablePoints->setEnabled(i, false);
+            }
+        }
         
         return true;
     }
-	if (key.isKeyCode(KeyPress::upKey))
+    if(pPointSelection->getSelectionMode() == PointSelection::Group
+       && key.getModifiers().isCtrlDown()
+       && key.getModifiers().isShiftDown()
+       && key.isKeyCode(KeyPress::backspaceKey))
+    {
+        {
+            for(auto i : selection)
+            {
+                pEditablePoints->removeGroup(i);
+            }
+            
+            pPointSelection->unselectPoint();
+        }
+        
+        return true;
+    }
+    
+    if (key.isKeyCode(KeyPress::upKey))
 	{
 		if (radarMode == XY)
 		{
@@ -610,36 +642,49 @@ void Radar2D::resized()
     // This method is where you should set the bounds of any child
     // components that your component contains..
 
-	double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
-
 	if (getBounds().getWidth() * getBounds().getHeight() <= 0)
 		return;
 
-	if(getBounds().getAspectRatio() >= wantedRatioWidthToHeight)
-	{
-		// add additional space left and right
-		radarViewport = Rectangle<int>(
-			int((getBounds().getWidth() - getBounds().getHeight() * wantedRatioWidthToHeight) / 2), 
-			0, 
-			int(getBounds().getHeight() * wantedRatioWidthToHeight), 
-			int(getBounds().getHeight()));
-	}
-	else
-	{
-		// add space on top or bottom, depending on radar mode
-		radarViewport = Rectangle<int>(
-			0,
-			(radarMode != XZ_Half) ? int(getBounds().getHeight() - getBounds().getWidth() * wantedRatioWidthToHeight) : 0,
-			getBounds().getWidth(),
-			int(getBounds().getWidth() / wantedRatioWidthToHeight));
-	}
+    double wantedRatioWidthToHeight = (radarMode == XZ_Half) ? 2 : 1;
 
+    auto bounds = getBounds();
+    double fullSize = jmin((double)bounds.getWidth(), bounds.getHeight() * wantedRatioWidthToHeight);
+    
+    double x, y, w, h;
+    w = fullSize;
+    h = fullSize / wantedRatioWidthToHeight;
+    switch (anchorX) {
+        case X_Left:
+            x = 0;
+            break;
+        case X_Right:
+            x = bounds.getWidth() - fullSize;
+            break;
+        case X_Center:
+        default:
+            x = (bounds.getWidth() - fullSize) / 2.0;
+            break;
+    }
+    
+    switch (anchorY) {
+        case Y_Top:
+            y = 0;
+            break;
+        case Y_Bottom:
+            y = bounds.getHeight() - fullSize / wantedRatioWidthToHeight;
+            break;
+        default:
+        case Y_Center:
+            y = (bounds.getHeight() - fullSize / wantedRatioWidthToHeight) / 2.0;
+            break;
+    }
+    
+    radarViewport = Rectangle<int>(x, y, w, h);
 	updateRadarBackground();
 }
 
 void Radar2D::mouseExit(const MouseEvent&)
 {
-	startTimerHz(INACTIVE_REFRESH_RATE);
 	updateInfoLabel("");
     specialGroupManipulationMode = false;
     currentSpecialHandlingMode = None;
@@ -647,7 +692,6 @@ void Radar2D::mouseExit(const MouseEvent&)
 
 void Radar2D::mouseEnter(const MouseEvent&)
 {
-	startTimerHz(ACTIVE_REFRESH_RATE);
 }
 
 double Radar2D::getMaxPointSelectionDist() const
@@ -885,7 +929,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
                 Array<int> selectedIndices;
                 for (int i : selection)
                 {
-                    if (i != pPointSelection->getMainSelectedPointIndex())
+                    if (i != mainGroupIndex)
                     {
                         selectedIndices.add(i);
                         relativePositions.add(*pEditablePoints->getGroup(i)->getPoint() - referencePoint);
@@ -1038,4 +1082,10 @@ bool Radar2D::checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode
         return mode == MoveGroupPointOnly;
 
     return mode == Standard;
+}
+
+void Radar2D::setRefreshRate(int rateHz)
+{
+    stopTimer();
+    startTimerHz(rateHz);
 }

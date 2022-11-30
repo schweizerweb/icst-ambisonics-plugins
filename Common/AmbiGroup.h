@@ -40,4 +40,7 @@ public:
 
 	Array<AmbiPoint*> groupPoints;
     ScalingInfo* pScalingInfo;
+    
+    bool allowMute() const override { return false; }
+    bool allowSolo() const override { return false; }
 };

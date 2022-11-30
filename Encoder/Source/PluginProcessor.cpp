@@ -17,6 +17,7 @@
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
+#define XML_TAG_ENCODER_ANIMATOR "Animator"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -32,7 +33,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #endif
 {
     sources.reset(new AmbiSourceSet(getScalingInfo()));
-	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, getScalingInfo());
+	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, &encoderSettings.customOscInput, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
 
@@ -43,6 +44,10 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     presetHelper->initialize();
 	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
 	distanceEncodingPresetHelper->initialize();
+    customOscRxPresetHelper.reset(new CustomOscRxPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/CustomOscRx"), this));
+    customOscRxPresetHelper->initialize();
+    customOscTxPresetHelper.reset(new CustomOscTxPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/CustomOscTx"), this));
+    customOscTxPresetHelper->initialize();
 
 #if(!MULTI_ENCODER_MODE)
     // initialize mono encoder with one source
@@ -81,11 +86,11 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
          
         AudioParameterSet set;
         set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("X" + indexStr, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::X);
-        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
-        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
-        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
-        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
+        set.pX = new AudioParameterFloatAmbi("X" + indexStr, 1, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::X);
+        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, 1, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
+        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, 1, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
+        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, 1, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
+        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, 1, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
          
         audioParams.sourceParams.add(set);
         addParameter(set.pX);
@@ -101,9 +106,9 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
         
         AudioParameterSet set;
         set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GX);
-        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GY);
-        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GZ);
+        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, 1, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GX);
+        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, 1, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GY);
+        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, 1, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GZ);
         
         audioParams.groupParams.add(set);
         addParameter(set.pX);
@@ -331,7 +336,7 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
-	
+    xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
 	delete xml;
@@ -351,6 +356,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 			// load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();
+            animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
 		}
 	}
 
@@ -387,9 +393,24 @@ DistanceEncodingPresetHelper* AmbisonicEncoderAudioProcessor::getDistanceEncodin
 	return distanceEncodingPresetHelper.get();
 }
 
+CustomOscRxPresetHelper* AmbisonicEncoderAudioProcessor::getCustomOscRxPresetHelper()
+{
+    return customOscRxPresetHelper.get();
+}
+
+CustomOscTxPresetHelper* AmbisonicEncoderAudioProcessor::getCustomOscTxPresetHelper()
+{
+    return customOscTxPresetHelper.get();
+}
+
 ScalingInfo* AmbisonicEncoderAudioProcessor::getScalingInfo()
 {
     return &scalingInfo;
+}
+
+AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
+{
+    return &animatorDataset;
 }
 
 #if (!MULTI_ENCODER_MODE)
@@ -413,6 +434,7 @@ EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 
 void AmbisonicEncoderAudioProcessor::initializeOsc()
 {
+    pOscHandler->setVerbosity(true, !encoderSettings.hideWarnings);
 	if (encoderSettings.oscReceiveFlag)
 	{
 		if (!pOscHandler->start(encoderSettings.oscReceivePort))

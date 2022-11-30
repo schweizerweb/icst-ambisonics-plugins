@@ -70,6 +70,9 @@ public:
     virtual float getDisplayScaler() = 0;
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
+    virtual bool allowSolo() const = 0;
+    virtual bool allowMute() const = 0;
+    
 private:
 	Colour loadColorAttribute(XmlElement* element);
 

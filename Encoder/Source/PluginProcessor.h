@@ -25,6 +25,9 @@
 #include "../../Common/AudioParams.h"
 #include "GroupAnimator.h"
 #include "../../Common/ScalingInfo.h"
+#include "CustomOscRxPresetHelper.h"
+#include "CustomOscTxPresetHelper.h"
+#include "AnimatorDataset.h"
 
 //==============================================================================
 /**
@@ -80,7 +83,10 @@ public:
 	DawParameter* getDawParameter();
     EncoderPresetHelper* getPresetHelper();
     DistanceEncodingPresetHelper* getDistanceEncodingPresetHelper();
+    CustomOscRxPresetHelper* getCustomOscRxPresetHelper();
+    CustomOscTxPresetHelper* getCustomOscTxPresetHelper();
     ScalingInfo* getScalingInfo();
+    AnimatorDataset* getAnimatorDataset();
 
 #if (!MULTI_ENCODER_MODE)
 	void updateTrackProperties(const TrackProperties& properties) override;
@@ -97,12 +103,15 @@ private:
 	DawParameter dawParameter;
     std::unique_ptr<EncoderPresetHelper> presetHelper;
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
+    std::unique_ptr<CustomOscTxPresetHelper> customOscTxPresetHelper;
+    std::unique_ptr<CustomOscRxPresetHelper> customOscRxPresetHelper;
 	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
 	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
     AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     double lastScaler;
+    AnimatorDataset animatorDataset;
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)

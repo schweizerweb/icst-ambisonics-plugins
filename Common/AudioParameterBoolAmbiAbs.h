@@ -15,8 +15,8 @@
 class AudioParameterBoolAmbiAbs : public AudioProcessorParameterWithID
 {
 public:
-	AudioParameterBoolAmbiAbs(const String& parameterID, const String& name, const String& label, Category category)
-		: AudioProcessorParameterWithID(parameterID, name, label, category)
+	AudioParameterBoolAmbiAbs(const String& parameterID, const int version, const String& name, const String& label, Category category)
+    : AudioProcessorParameterWithID(parameterID, name, label, category)
 	{
 	}
 

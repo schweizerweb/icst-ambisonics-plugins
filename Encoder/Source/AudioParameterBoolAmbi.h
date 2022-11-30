@@ -19,7 +19,7 @@ class AudioParameterBoolAmbi : public AudioParameterBoolAmbiAbs
 public:
 	enum ParamType { Mute };
 
-	AudioParameterBoolAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
+	AudioParameterBoolAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterBoolAmbi();
 
     void setEnabled(bool enabled) override;

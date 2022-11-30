@@ -14,20 +14,6 @@
               jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
   <MAINGROUP id="kUoKTp" name="AmbiEncoder">
     <GROUP id="{806F15F9-4C71-47F4-7E1D-68E6105FFFCC}" name="Source">
-      <FILE id="lDMF5l" name="AnimatorAction.h" compile="0" resource="0"
-            file="Source/AnimatorAction.h"/>
-      <FILE id="vhhrU3" name="AnimatorActionComponent.cpp" compile="1" resource="0"
-            file="Source/AnimatorActionComponent.cpp"/>
-      <FILE id="OFVlKQ" name="AnimatorActionComponent.h" compile="0" resource="0"
-            file="Source/AnimatorActionComponent.h"/>
-      <FILE id="iEzhVQ" name="AnimatorDialogManager.h" compile="0" resource="0"
-            file="Source/AnimatorDialogManager.h"/>
-      <FILE id="wqvJSM" name="AnimatorDialog.h" compile="0" resource="0"
-            file="Source/AnimatorDialog.h"/>
-      <FILE id="FXQcgb" name="AnimatorComponent.cpp" compile="1" resource="0"
-            file="Source/AnimatorComponent.cpp"/>
-      <FILE id="sNux2i" name="AnimatorComponent.h" compile="0" resource="0"
-            file="Source/AnimatorComponent.h"/>
       <FILE id="qw16WF" name="AirAbsorbtionFilter.cpp" compile="1" resource="0"
             file="Source/AirAbsorbtionFilter.cpp"/>
       <FILE id="Wq3sFb" name="AirAbsorbtionFilter.h" compile="0" resource="0"
@@ -39,20 +25,61 @@
             file="Source/AmbiOSCSenderExt.cpp"/>
       <FILE id="S8rufo" name="AmbiOSCSenderExt.h" compile="0" resource="0"
             file="Source/AmbiOSCSenderExt.h"/>
-      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
-            file="Source/AudioParameterFloatAmbi.cpp"/>
-      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
-            file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="cmQH00" name="AnimatorDataset.h" compile="0" resource="0"
+            file="Source/AnimatorDataset.h"/>
+      <FILE id="lDMF5l" name="AnimatorAction.h" compile="0" resource="0"
+            file="Source/AnimatorAction.h"/>
+      <FILE id="vhhrU3" name="AnimatorActionComponent.cpp" compile="1" resource="0"
+            file="Source/AnimatorActionComponent.cpp"/>
+      <FILE id="OFVlKQ" name="AnimatorActionComponent.h" compile="0" resource="0"
+            file="Source/AnimatorActionComponent.h"/>
+      <FILE id="YlOBh0" name="AnimatorMovement.h" compile="0" resource="0"
+            file="Source/AnimatorMovement.h"/>
+      <FILE id="UWV0Rc" name="AnimatorMovementComponent.cpp" compile="1"
+            resource="0" file="Source/AnimatorMovementComponent.cpp"/>
+      <FILE id="oW7dxS" name="AnimatorMovementComponent.h" compile="0" resource="0"
+            file="Source/AnimatorMovementComponent.h"/>
+      <FILE id="FXQcgb" name="AnimatorComponent.cpp" compile="1" resource="0"
+            file="Source/AnimatorComponent.cpp"/>
+      <FILE id="sNux2i" name="AnimatorComponent.h" compile="0" resource="0"
+            file="Source/AnimatorComponent.h"/>
+      <FILE id="wqvJSM" name="AnimatorDialog.h" compile="0" resource="0"
+            file="Source/AnimatorDialog.h"/>
+      <FILE id="iEzhVQ" name="AnimatorDialogManager.h" compile="0" resource="0"
+            file="Source/AnimatorDialogManager.h"/>
       <FILE id="LPis9l" name="AudioParameterBoolAmbi.cpp" compile="1" resource="0"
             file="Source/AudioParameterBoolAmbi.cpp"/>
       <FILE id="UO28Oh" name="AudioParameterBoolAmbi.h" compile="0" resource="0"
             file="Source/AudioParameterBoolAmbi.h"/>
+      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
+            file="Source/AudioParameterFloatAmbi.cpp"/>
+      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
+            file="Source/AudioParameterFloatAmbi.h"/>
+      <FILE id="Wd4DSG" name="ComponentArguments.h" compile="0" resource="0"
+            file="Source/ComponentArguments.h"/>
+      <FILE id="QtiuD8" name="CustomOscBase.cpp" compile="1" resource="0"
+            file="Source/CustomOscBase.cpp"/>
+      <FILE id="DzPqvI" name="CustomOscBase.h" compile="0" resource="0" file="Source/CustomOscBase.h"/>
+      <FILE id="d0Pozp" name="CustomOscInput.cpp" compile="1" resource="0"
+            file="Source/CustomOscInput.cpp"/>
+      <FILE id="LBS1fA" name="CustomOscInput.h" compile="0" resource="0"
+            file="Source/CustomOscInput.h"/>
+      <FILE id="Rr9Hwb" name="CustomOscInputTableListModel.h" compile="0"
+            resource="0" file="Source/CustomOscInputTableListModel.h"/>
+      <FILE id="Wwmdqg" name="CustomOscReceiver.cpp" compile="1" resource="0"
+            file="Source/CustomOscReceiver.cpp"/>
+      <FILE id="Emnrs2" name="CustomOscReceiver.h" compile="0" resource="0"
+            file="Source/CustomOscReceiver.h"/>
+      <FILE id="yCCVbJ" name="CustomOscRxPresetHelper.h" compile="0" resource="0"
+            file="Source/CustomOscRxPresetHelper.h"/>
       <FILE id="CP1A8I" name="CustomOscTableListModel.h" compile="0" resource="0"
             file="Source/CustomOscTableListModel.h"/>
       <FILE id="KgMm41" name="CustomOscTarget.cpp" compile="1" resource="0"
             file="Source/CustomOscTarget.cpp"/>
       <FILE id="ZZTaMA" name="CustomOscTarget.h" compile="0" resource="0"
             file="Source/CustomOscTarget.h"/>
+      <FILE id="wdq3PJ" name="CustomOscTxPresetHelper.h" compile="0" resource="0"
+            file="Source/CustomOscTxPresetHelper.h"/>
       <FILE id="KwdMMo" name="DistanceEncodingComponent.cpp" compile="1"
             resource="0" file="Source/DistanceEncodingComponent.cpp"/>
       <FILE id="buS8u9" name="DistanceEncodingComponent.h" compile="0" resource="0"
@@ -96,6 +123,10 @@
             file="Source/OSCHandlerEncoder.cpp"/>
       <FILE id="isoJ6Q" name="OSCHandlerEncoder.h" compile="0" resource="0"
             file="Source/OSCHandlerEncoder.h"/>
+      <FILE id="oDGiTA" name="OSCRxSettingsComponent.cpp" compile="1" resource="0"
+            file="Source/OSCRxSettingsComponent.cpp"/>
+      <FILE id="kHPJpo" name="OSCRxSettingsComponent.h" compile="0" resource="0"
+            file="Source/OSCRxSettingsComponent.h"/>
       <FILE id="yRnDlX" name="OSCSenderInstance.cpp" compile="1" resource="0"
             file="Source/OSCSenderInstance.cpp"/>
       <FILE id="WkVcFY" name="OSCSenderInstance.h" compile="0" resource="0"
@@ -129,6 +160,10 @@
             file="Source/StandardOscTarget.cpp"/>
       <FILE id="l1djzL" name="StandardOscTarget.h" compile="0" resource="0"
             file="Source/StandardOscTarget.h"/>
+      <FILE id="QrQ38Z" name="UserDefinedParameter.cpp" compile="1" resource="0"
+            file="Source/UserDefinedParameter.cpp"/>
+      <FILE id="S8OIRx" name="UserDefinedParameter.h" compile="0" resource="0"
+            file="Source/UserDefinedParameter.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
       <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
@@ -180,6 +215,8 @@
       <FILE id="UZ8YsX" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
       <FILE id="mW2oB3" name="CheckBoxCustomComponent.h" compile="0" resource="0"
             file="../Common/CheckBoxCustomComponent.h"/>
+      <FILE id="UuTbsf" name="ColorDefinition.h" compile="0" resource="0"
+            file="../Common/ColorDefinition.h"/>
       <FILE id="L2EjaT" name="ColorEditorCustomComponent.h" compile="0" resource="0"
             file="../Common/ColorEditorCustomComponent.h"/>
       <FILE id="XOuO2j" name="ColorSelectionComponent.h" compile="0" resource="0"
@@ -189,9 +226,15 @@
       <FILE id="n9fEOI" name="DawParameter.h" compile="0" resource="0" file="../Common/DawParameter.h"/>
       <FILE id="Fo1nOJ" name="DelayHelper.cpp" compile="1" resource="0" file="../Common/DelayHelper.cpp"/>
       <FILE id="vLva8d" name="DelayHelper.h" compile="0" resource="0" file="../Common/DelayHelper.h"/>
+      <FILE id="fcJwqo" name="EditableCodeCustomComponent.h" compile="0"
+            resource="0" file="../Common/EditableCodeCustomComponent.h"/>
       <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
+            file="../Common/JsEditorComponent.cpp"/>
+      <FILE id="fu4V4a" name="JsEditorComponent.h" compile="0" resource="0"
+            file="../Common/JsEditorComponent.h"/>
       <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
@@ -271,10 +314,12 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Encoder"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Encoder"
+                       osxArchitecture="Native"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Encoder"
                        vstBinaryLocation="$(PROJECT_DIR)/build/Release/" vst3BinaryLocation="$(PROJECT_DIR)/build/Release/"
-                       auBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"/>
+                       auBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"
+                       osxArchitecture="Native"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_core" path="../../JUCE/modules"/>

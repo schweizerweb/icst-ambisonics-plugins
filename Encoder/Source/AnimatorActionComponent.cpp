@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, String title)
-    : pSourceSet(pSourceSet)
+AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction)
+    : pSourceSet(pSourceSet), pAnimatorAction(pAnimatorAction)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -191,7 +191,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, Str
 
 
     //[UserPreSize]
-    groupMain->setText(title);
+    groupMain->setText(pAnimatorAction->name);
     for(int i = 0; i < pSourceSet->groupCount(); i++)
     {
         comboBoxGroup->addItem(String(i + 1) + ": " + pSourceSet->getGroup(i)->getName(), i + 1);
@@ -299,7 +299,7 @@ void AnimatorActionComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasCh
     if (comboBoxThatHasChanged == comboBoxGroup.get())
     {
         //[UserComboBoxCode_comboBoxGroup] -- add your combo box handling code here..
-        action.groupIndex = comboBoxGroup->getSelectedId() - 1;
+        pAnimatorAction->groupIndex = comboBoxGroup->getSelectedId() - 1;
         //[/UserComboBoxCode_comboBoxGroup]
     }
 
@@ -315,13 +315,13 @@ void AnimatorActionComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == toggleEnable.get())
     {
         //[UserButtonCode_toggleEnable] -- add your button handler code here..
-        action.enabled = toggleEnable->getToggleState();
+        pAnimatorAction->enabled = toggleEnable->getToggleState();
         //[/UserButtonCode_toggleEnable]
     }
     else if (buttonThatWasClicked == buttonReset.get())
     {
         //[UserButtonCode_buttonReset] -- add your button handler code here..
-        action.reset();
+        pAnimatorAction->reset();
         refreshControls();
         //[/UserButtonCode_buttonReset]
     }
@@ -338,43 +338,43 @@ void AnimatorActionComponent::sliderValueChanged (juce::Slider* sliderThatWasMov
     if (sliderThatWasMoved == sliderRotationX.get())
     {
         //[UserSliderCode_sliderRotationX] -- add your slider handling code here..
-        action.rotationX = sliderRotationX->getValue();
+        pAnimatorAction->rotationX = sliderRotationX->getValue();
         //[/UserSliderCode_sliderRotationX]
     }
     else if (sliderThatWasMoved == sliderRotationY.get())
     {
         //[UserSliderCode_sliderRotationY] -- add your slider handling code here..
-        action.rotationY = sliderRotationY->getValue();
+        pAnimatorAction->rotationY = sliderRotationY->getValue();
         //[/UserSliderCode_sliderRotationY]
     }
     else if (sliderThatWasMoved == sliderRotationZ.get())
     {
         //[UserSliderCode_sliderRotationZ] -- add your slider handling code here..
-        action.rotationZ = sliderRotationZ->getValue();
+        pAnimatorAction->rotationZ = sliderRotationZ->getValue();
         //[/UserSliderCode_sliderRotationZ]
     }
     else if (sliderThatWasMoved == sliderRotationOriginX.get())
     {
         //[UserSliderCode_sliderRotationOriginX] -- add your slider handling code here..
-        action.rotationOriginX = sliderRotationOriginX->getValue();
+        pAnimatorAction->rotationOriginX = sliderRotationOriginX->getValue();
         //[/UserSliderCode_sliderRotationOriginX]
     }
     else if (sliderThatWasMoved == sliderRotationOriginY.get())
     {
         //[UserSliderCode_sliderRotationOriginY] -- add your slider handling code here..
-        action.rotationOriginY = sliderRotationOriginY->getValue();
+        pAnimatorAction->rotationOriginY = sliderRotationOriginY->getValue();
         //[/UserSliderCode_sliderRotationOriginY]
     }
     else if (sliderThatWasMoved == sliderRotationOriginZ.get())
     {
         //[UserSliderCode_sliderRotationOriginZ] -- add your slider handling code here..
-        action.rotationOriginZ = sliderRotationOriginZ->getValue();
+        pAnimatorAction->rotationOriginZ = sliderRotationOriginZ->getValue();
         //[/UserSliderCode_sliderRotationOriginZ]
     }
     else if (sliderThatWasMoved == sliderStretchSimple.get())
     {
         //[UserSliderCode_sliderStretchSimple] -- add your slider handling code here..
-        action.stretch = sliderStretchSimple->getValue();
+        pAnimatorAction->stretch = sliderStretchSimple->getValue();
         //[/UserSliderCode_sliderStretchSimple]
     }
 
@@ -387,15 +387,15 @@ void AnimatorActionComponent::sliderValueChanged (juce::Slider* sliderThatWasMov
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AnimatorActionComponent::refreshControls()
 {
-    toggleEnable->setToggleState(action.enabled, dontSendNotification);
-    sliderRotationX->setValue(action.rotationX, dontSendNotification);
-    sliderRotationY->setValue(action.rotationY, dontSendNotification);
-    sliderRotationZ->setValue(action.rotationZ, dontSendNotification);
-    sliderRotationOriginX->setValue(action.rotationOriginX, dontSendNotification);
-    sliderRotationOriginY->setValue(action.rotationOriginY, dontSendNotification);
-    sliderRotationOriginZ->setValue(action.rotationOriginZ, dontSendNotification);
-    sliderStretchSimple->setValue(action.stretch, dontSendNotification);
-    comboBoxGroup->setSelectedId(action.groupIndex);
+    sliderRotationX->setValue(pAnimatorAction->rotationX, dontSendNotification);
+    sliderRotationY->setValue(pAnimatorAction->rotationY, dontSendNotification);
+    sliderRotationZ->setValue(pAnimatorAction->rotationZ, dontSendNotification);
+    sliderRotationOriginX->setValue(pAnimatorAction->rotationOriginX, dontSendNotification);
+    sliderRotationOriginY->setValue(pAnimatorAction->rotationOriginY, dontSendNotification);
+    sliderRotationOriginZ->setValue(pAnimatorAction->rotationOriginZ, dontSendNotification);
+    sliderStretchSimple->setValue(pAnimatorAction->stretch, dontSendNotification);
+    comboBoxGroup->setSelectedId(pAnimatorAction->groupIndex + 1, dontSendNotification);
+    toggleEnable->setToggleState(pAnimatorAction->enabled, dontSendNotification);
 }
 //[/MiscUserCode]
 
@@ -410,10 +410,10 @@ void AnimatorActionComponent::refreshControls()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AnimatorActionComponent"
-                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* pSourceSet, String title"
-                 variableInitialisers="pSourceSet(pSourceSet)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="300" initialHeight="340">
+                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction"
+                 variableInitialisers="pSourceSet(pSourceSet), pAnimatorAction(pAnimatorAction)"
+                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
+                 fixedSize="0" initialWidth="300" initialHeight="340">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="new group" id="673732692faf9b89" memberName="groupMain"
                   virtualName="" explicitFocusOrder="0" pos="0 0 0M 336" title="Action 1"/>

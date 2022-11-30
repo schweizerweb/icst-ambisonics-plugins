@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -28,6 +28,7 @@
 #include "../../Common/TableColumnCallback.h"
 #include "../../Common/ZoomSettings.h"
 #include "EncoderSettings.h"
+#include "ComponentArguments.h"
 //[/Headers]
 
 
@@ -47,7 +48,7 @@ class SourceDefinitionComponent  : public Component,
 {
 public:
     //==============================================================================
-    SourceDefinitionComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings);
+    SourceDefinitionComponent (EncoderSettingsComponentArgs args);
     ~SourceDefinitionComponent() override;
 
     //==============================================================================
@@ -65,12 +66,9 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    AmbiSourceSet* pSources;
-    PointSelection* pPointSelection;
-    AudioParams* pAudioParams;
+    EncoderSettingsComponentArgs m_args;
     std::unique_ptr<GroupTableListModel> groupModel;
     std::unique_ptr<SourceTableListModel> sourceModel;
-    EncoderSettings* pEncoderSettings;
     //[/UserVariables]
 
     //==============================================================================

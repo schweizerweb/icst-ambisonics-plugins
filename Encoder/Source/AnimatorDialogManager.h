@@ -37,11 +37,11 @@ public:
         }
     }
     
-    void show(AmbiSourceSet* pSourceSet, Component* pParent)
+    void show(AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset, Component* pParent)
     {
         if(window)
             delete window;
-        window = new AnimatorDialog(this, new AnimatorComponent(pSourceSet));
+        window = new AnimatorDialog(this, new AnimatorComponent(pSourceSet, pAnimatorDataset));
         window->setVisible(true);
         window->updatePosition(pParent->getScreenBounds());
     }

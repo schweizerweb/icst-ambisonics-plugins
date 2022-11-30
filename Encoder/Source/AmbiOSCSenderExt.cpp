@@ -55,14 +55,20 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 		if (target->enabledFlag)
 		{
 			OSCSenderInstance* pInstance = getOrCreateInstance(index++);
-            if(!pInstance->setOscPath(target->oscString) || !pInstance->connect(target->targetHost, target->targetPort))
+            String errorStringBase = "- custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + NewLine::getDefault()  + "  --> ";
+            String localErrorString;
+            if(!pInstance->setOscPath(target->oscString, &localErrorString))
+            {
+                pMessage->append(errorStringBase + localErrorString + NewLine::getDefault(), 1000);
+                continue;
+            }
+            if(!pInstance->connect(target->targetHost, target->targetPort))
 			{
-            	pMessage->append("- custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + NewLine::getDefault() + "  --> " + target->oscString + NewLine::getDefault(), 500);
+            	pMessage->append(errorStringBase + "connection failed" + NewLine::getDefault(), 1000);
+                continue;
 			}
-			else
-			{
-                successfulCount++;
-			}
+			
+            successfulCount++;
 		}
         else
         {
@@ -130,9 +136,15 @@ int AmbiOSCSenderExt::connectStandardSender(int *pIndex, StandardOscTarget *pTar
     if (pTarget->enabledFlag)
     {
         OSCSenderInstance* pInstance = getOrCreateInstance((*pIndex)++);
-    
-        pInstance->setOscPath(oscString);
-        bool ret = pInstance->connect(pTarget->targetHost, pTarget->targetPort);
+        String localErrorMessage;
+        bool ret = pInstance->setOscPath(oscString, &localErrorMessage);
+        if(!ret)
+        {
+            pMessage->append("- Program error for standard sender (" + description + "): " + localErrorMessage + NewLine::getDefault(), 1000);
+            return 0;
+        }
+        
+        ret = pInstance->connect(pTarget->targetHost, pTarget->targetPort);
         if (!ret) {
             pMessage->append("- standard " + description + " sender @ " + pTarget->targetHost + ":" + String(pTarget->targetPort) + NewLine::getDefault(), 500);
             return 0;
