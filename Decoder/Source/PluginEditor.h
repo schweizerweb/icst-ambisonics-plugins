@@ -7,12 +7,12 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 5.4.7
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
   The Projucer is part of the JUCE library.
-  Copyright (c) 2017 - ROLI Ltd.
+  Copyright (c) 2020 - Raw Material Software Limited.
 
   ==============================================================================
 */
@@ -43,7 +43,7 @@
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
                                                public ChangeListener,
                                                public ActionListener,
-                                               public Button::Listener
+                                               public juce::Button::Listener
 {
 public:
     //==============================================================================
@@ -58,9 +58,9 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     //[/UserMethods]
 
-    void paint (Graphics& g) override;
+    void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (Button* buttonThatWasClicked) override;
+    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
     // Binary resources:
     static const char* settings_png;
@@ -87,9 +87,9 @@ private:
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
-    std::unique_ptr<Label> labelVersion;
-    std::unique_ptr<ImageButton> btnSettings;
-    std::unique_ptr<ImageButton> btnHelp;
+    std::unique_ptr<juce::Label> labelVersion;
+    std::unique_ptr<juce::ImageButton> btnSettings;
+    std::unique_ptr<juce::ImageButton> btnHelp;
 
 
     //==============================================================================

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -23,6 +23,10 @@
 #include <JuceHeader.h>
 #include "EncoderSettings.h"
 #include "CustomOscTableListModel.h"
+#include "CustomOscTxPresetHelper.h"
+#include "../../Common/PresetManagerDialog.h"
+
+#define COMMON_OSC_INFO_STRING "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}\n\nDual-Scaling for sx, sy, sz, se:\nSyntax: {s*,[lowLimit],[zeroValue],[highLimit]}\nExample: {sz, 1.0, 0.1, 1.0}\n\nConstant values:\n{ci,[int]} = Constant integer value\n{cf,[float]} = Constant float value\n{cs,[string]} = Constant string"
 //[/Headers]
 
 
@@ -44,7 +48,7 @@ class OSCTargetsComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings);
+    OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper);
     ~OSCTargetsComponent() override;
 
     //==============================================================================
@@ -60,6 +64,8 @@ public:
     // Binary resources:
     static const char* help_png;
     static const int help_pngSize;
+    static const char* save_png;
+    static const int save_pngSize;
 
 
 private:
@@ -68,6 +74,8 @@ private:
     void actionListenerCallback(const String& message) override;
     EncoderSettings* pSettings;
     std::unique_ptr<CustomOscTableListModel> customOscTableModel;
+    CustomOscTxPresetHelper* pCustomOscTxPresetHelper;
+    PresetManagerDialog presetManagerDialog;
     //[/UserVariables]
 
     //==============================================================================
@@ -79,6 +87,7 @@ private:
     std::unique_ptr<juce::TextButton> btnDelete;
     std::unique_ptr<juce::ImageButton> btnInfo;
     std::unique_ptr<juce::ToggleButton> toggleSendContinuous;
+    std::unique_ptr<juce::TextButton> btnManagePresets;
 
 
     //==============================================================================

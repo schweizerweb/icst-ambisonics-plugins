@@ -284,6 +284,32 @@ bool AmbiDataSet::setGain(int channel, double gain, bool notify) const
     return false;
 }
 
+bool AmbiDataSet::setMute(int channel, bool mute, bool notify) const
+{
+    AmbiPoint* pt = get(channel);
+
+    if (pt != nullptr)
+    {
+        pt->setMute(mute, notify);
+        return true;
+    }
+    
+    return false;
+}
+
+bool AmbiDataSet::setSolo(int channel, bool solo) const
+{
+    AmbiPoint* pt = get(channel);
+
+    if (pt != nullptr)
+    {
+        pt->setSolo(solo);
+        return true;
+    }
+    
+    return false;
+}
+
 String AmbiDataSet::getNewUniqueName() const
 {
 	String nameBase = String(size() + 1);

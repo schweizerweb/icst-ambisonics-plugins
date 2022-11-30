@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -41,12 +41,11 @@ class AnimatorActionComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    AnimatorActionComponent (AmbiSourceSet* pSourceSet, String title);
+    AnimatorActionComponent (AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction);
     ~AnimatorActionComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
-    AnimatorAction action;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -60,7 +59,9 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void refreshControls();
+    
     AmbiSourceSet* pSourceSet;
+    AnimatorAction* pAnimatorAction;
     //[/UserVariables]
 
     //==============================================================================

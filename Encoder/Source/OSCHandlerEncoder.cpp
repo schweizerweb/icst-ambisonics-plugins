@@ -10,9 +10,32 @@
 
 #include "OSCHandlerEncoder.h"
 
-OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling)
+OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, OwnedArray<CustomOscInput>* pCustomOscInput, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling), pCustomOscInput(pCustomOscInput)
 {
     this->pDistanceEncodingParams = pDistanceEncodingParams;
+    jsEngine.reset(new JavascriptEngine());
+}
+
+bool OSCHandlerEncoder::initSpecific()
+{
+    customOscReceivers.clear();
+    for(auto& c : *pCustomOscInput)
+    {
+        if(c->enabledFlag)
+        {
+            auto r = new CustomOscReceiver(c, pScalingInfo);
+            if(!r->getErrorMessage().isEmpty())
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "OSC error", "Error initializing custom OSC receiver (" + String(pCustomOscInput->indexOf(c)) + "): " + r->getErrorMessage());
+            }
+            else
+            {
+                customOscReceivers.add(r);
+            }
+        }
+    }
+    
+    return true;
 }
 
 bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
@@ -94,8 +117,33 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
     }
     else
     {
-        return false;
+        bool hasMatch = false;
+        if(!pattern.containsWildcards()) {
+            OSCAddress address(pattern.toString());
+        
+            for(auto& r : customOscReceivers)
+            {
+                if(r->matchesPattern(&address))
+                {
+                    hasMatch = true;
+                    if(r->handleMessage(pAmbiPoints, &message))
+                    {
+                        reportSuccess(&message);
+                    }
+                    else
+                    {
+                        if(!r->getErrorMessage().isEmpty())
+                        {
+                            reportError(r->getErrorMessage(), &message);
+                        }
+                    }
+                }
+            }
+        }
+        
+        return hasMatch;
     }
+    
     
     return true;
 }

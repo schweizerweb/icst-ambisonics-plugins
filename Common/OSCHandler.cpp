@@ -14,18 +14,29 @@
 
 OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
 {
+    reportErrorFlag = true;
+    reportSuccessFlag = true;
 	pAmbiPoints = pAmbiPointArr;
 	this->pStatusMessageHandler = pStatusMessageHandler;
+}
+
+void OSCHandler::setVerbosity(bool reportSuccess, bool reportError)
+{
+    reportErrorFlag = reportError;
+    reportSuccessFlag = reportSuccess;
 }
 
 bool OSCHandler::start(int portNb)
 {
 	disconnect();
 	bool ok = connect(portNb);
-
 	if (!ok)
 		return false;
 
+    ok = initSpecific();
+    if (!ok)
+        return false;
+    
 	addListener(this);
 
 	return true;
@@ -39,9 +50,20 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 	}
 }
 
+void OSCHandler::oscBundleReceived(const OSCBundle & bundle)
+{
+    for(auto & e : bundle)
+    {
+        if(e.isBundle())
+            oscBundleReceived(e.getBundle());
+        else
+            oscMessageReceived(e.getMessage());
+    }
+}
+
 void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 {
-	if(pStatusMessageHandler != nullptr)
+	if(reportErrorFlag && pStatusMessageHandler != nullptr)
 	{
 		pStatusMessageHandler->showMessage(message, message + oscMessageToString(pMsg), StatusMessage::Error);
 	}
@@ -49,7 +71,7 @@ void OSCHandler::reportError(String message, const OSCMessage* pMsg) const
 
 void OSCHandler::reportSuccess(const OSCMessage* pMsg) const
 {
-    if (pStatusMessageHandler != nullptr)
+    if (reportSuccessFlag && pStatusMessageHandler != nullptr)
 	{
 		pStatusMessageHandler->showMessage("OSC", oscMessageToString(pMsg), StatusMessage::Success);
 	}

@@ -28,12 +28,14 @@ AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0)
 {
 }
 
-AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color, double gain):
+AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color, double gain, bool mute, bool solo):
 	id(id),
 	point(point),
 	color(color),
 	name(name),
 	gain(gain),
+    mute(mute),
+    solo(solo),
     enabled(true)
 {
 }
@@ -46,6 +48,8 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	color(loadColorAttribute(element)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
+    mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
+    solo(false),
     enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
 {
 }
@@ -59,6 +63,8 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	color(loadColorAttribute(element)),
 	name(element->getStringAttribute(XML_ATTRIBUTE_POINT_NAME)),
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
+    mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
+    solo(false),
     audioParams(audioParams),
     enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
 {
@@ -69,6 +75,8 @@ AmbiPoint::AmbiPoint(AudioParameterSet audioParams) :
     point(Point3D<double>(0.0, 0.0, 0.0, audioParams)),
     color(Colours::black),
     gain(1.0),
+    mute(false),
+    solo(false),
     audioParams(audioParams),
     enabled(false)
 {
@@ -88,6 +96,7 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 	element->setAttribute(XML_ATTRIBUTE_POINT_NAME, getName());
 	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW, getColor().toString());
 	element->setAttribute(XML_ATTRIBUTE_POINT_GAIN, getGain());
+    element->setAttribute(XML_ATTRIBUTE_POINT_MUTE, getMute());
     element->setAttribute(XML_ATTRIBUTE_POINT_ENABLED, getEnabled());
 	return element;
 }
@@ -128,6 +137,39 @@ void AmbiPoint::setGain(double newGain, bool notify)
     
     if(notify)
         audioParams.notifyGain(gain);
+}
+
+bool AmbiPoint::getMute() const
+{
+    return allowMute() ? mute : false;
+}
+
+void AmbiPoint::setMute(bool newMute, bool notify)
+{
+    if(!allowMute())
+        return;
+    
+    mute = newMute;
+    if(newMute && solo)
+        setSolo(false);
+    
+    if(notify)
+        audioParams.notifyMute(mute);
+}
+
+bool AmbiPoint::getSolo() const
+{
+    return allowSolo() ? solo : false;
+}
+
+void AmbiPoint::setSolo(bool newSolo)
+{
+    if(!allowSolo())
+        return;
+    
+    solo = newSolo;
+    if(newSolo && mute)
+        setMute(false, true);
 }
 
 String AmbiPoint::getId()

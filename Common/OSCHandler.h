@@ -22,17 +22,24 @@ class OSCHandler : OSCReceiver, OSCReceiver::Listener<OSCReceiver::MessageLoopCa
 {
 public:
 	OSCHandler(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler = nullptr);
-	bool start(int portNb);
-	void stop();
-
+    bool start(int portNb);
+    void stop();
+    void setVerbosity(bool reportSuccess = true, bool reportError = true);
+    
 protected:
+    virtual bool initSpecific() = 0;
     virtual bool handleSpecific(const OSCMessage& message) = 0;
 	static double GetIntOrFloat(const OSCArgument* pOscArgument);
 	void oscMessageReceived(const OSCMessage& message) override;
+    void oscBundleReceived(const OSCBundle &) override;
 	void reportError(String message, const OSCMessage* pMsg) const;
 	void reportSuccess(const OSCMessage* pMsg) const;
 	String oscMessageToString(const OSCMessage* pMsg) const;
     
 	AmbiSourceSet* pAmbiPoints;
 	StatusMessageHandler* pStatusMessageHandler;
+    
+private:
+    bool reportSuccessFlag;
+    bool reportErrorFlag;
 };

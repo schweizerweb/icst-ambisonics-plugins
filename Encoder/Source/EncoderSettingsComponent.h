@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -22,8 +22,10 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "OSCSettingsComponent.h"
+#include "OSCRxSettingsComponent.h"
 #include "RadarSettingsComponent.h"
 #include "EncodingSettingsComponent.h"
+#include "ComponentArguments.h"
 //[/Headers]
 
 
@@ -41,7 +43,7 @@ class EncoderSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    EncoderSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, AmbiSourceSet* pSourceSet, PointSelection* pPointSelection, AudioParams* pAudioParams, ZoomSettings* pZoomSettings, StatusMessageHandler* pStatusMessageHandler, EncoderPresetHelper* pPresetHelper, DistanceEncodingPresetHelper* pDistanceEncodingPresetHelper, OSCLogDialogManager* pOscLogManager);
+    EncoderSettingsComponent (EncoderSettingsComponentArgs args);
     ~EncoderSettingsComponent() override;
 
     //==============================================================================

@@ -219,3 +219,13 @@ void AmbiSourceSet::resetIds()
     for (AmbiGroup* g : groups)
         g->resetId();
 }
+
+
+bool AmbiSourceSet::anySolo() const
+{
+    for(auto& p : elements)
+        if(p->getSolo())
+            return true;
+    
+    return false;
+}

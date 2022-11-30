@@ -14,6 +14,7 @@
 #define ACTION_MESSAGE_PRESET_CHANGED "PresetChanged"
 #define ACTION_MESSAGE_PRESET_LIST_CHANGED "PresetListChanged"
 #define ACTION_MESSAGE_SELECT_PRESET "SelectPreset "
+#define ACTION_MESSAGE_SAVE_PRESET "SavePreset"
 
 #define RETURN_TYPE_NO          1
 #define RETURN_TYPE_YES         2

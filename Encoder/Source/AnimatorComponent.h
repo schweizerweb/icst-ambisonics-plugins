@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -23,7 +23,9 @@
 #include <JuceHeader.h>
 #include "../../Common/AmbiSourceSet.h"
 #include "AnimatorActionComponent.h"
+#include "AnimatorMovementComponent.h"
 #include "EncoderSettings.h"
+#include "AnimatorDataset.h"
 
 #define STEP_TIMER_ID       1
 #define STEP_TIMER_INTERVAL 50
@@ -41,71 +43,49 @@
 */
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
-                           public juce::Button::Listener
+                           public ActionListener
 {
 public:
     //==============================================================================
-    AnimatorComponent (AmbiSourceSet* pSourceSet);
+    AnimatorComponent (AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset);
     ~AnimatorComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void timerCallback(int timerID) override;
+    void actionListenerCallback(const juce::String &message) override;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    struct PositionSet
-    {
-        OwnedArray<Point3D<double>> sources;
-        OwnedArray<Point3D<double>> groups;
-    };
 
-    void calculateStepsTo(PositionSet* pPositions, bool isPolar, double timeSec);
+
     void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
-    void setPreset(PositionSet* pSet);
+    void setPreset(PositionSet* pSet, int groupIndex);
     void performAction(AnimatorAction* pAction);
-    void controlDimming();
+    void refreshControls();
     
     AmbiSourceSet* pSourceSet;
-    PositionSet set1;
-    PositionSet set2;
-    PositionSet set3;
-    PositionSet set4;
-    OwnedArray<Point3D<float>> steps[JucePlugin_MaxNumInputChannels];
+    AnimatorDataset* pAnimatorDataset;
+
+#if MULTI_ENCODER_MODE
     OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
-    int currentStep;
+    int currentStep[MAXIMUM_NUMBER_OF_GROUPS];
+#endif
     //[/UserVariables]
 
     //==============================================================================
-    std::unique_ptr<juce::GroupComponent> group1;
-    std::unique_ptr<juce::TextButton> buttonSet1;
-    std::unique_ptr<juce::Slider> sliderTime1;
-    std::unique_ptr<juce::ToggleButton> togglePolar1;
-    std::unique_ptr<juce::TextButton> buttonGo1;
-    std::unique_ptr<juce::GroupComponent> group2;
-    std::unique_ptr<juce::TextButton> buttonSet2;
-    std::unique_ptr<juce::Slider> sliderTime2;
-    std::unique_ptr<juce::ToggleButton> togglePolar2;
-    std::unique_ptr<juce::TextButton> buttonGo2;
-    std::unique_ptr<juce::GroupComponent> group3;
-    std::unique_ptr<juce::TextButton> buttonSet3;
-    std::unique_ptr<juce::Slider> sliderTime3;
-    std::unique_ptr<juce::ToggleButton> togglePolar3;
-    std::unique_ptr<juce::TextButton> buttonGo3;
-    std::unique_ptr<juce::GroupComponent> group4;
-    std::unique_ptr<juce::TextButton> buttonSet4;
-    std::unique_ptr<juce::Slider> sliderTime4;
-    std::unique_ptr<juce::ToggleButton> togglePolar4;
-    std::unique_ptr<juce::TextButton> buttonGo4;
     std::unique_ptr<AnimatorActionComponent> action1;
     std::unique_ptr<AnimatorActionComponent> action2;
+    std::unique_ptr<AnimatorMovementComponent> preset1;
+    std::unique_ptr<AnimatorMovementComponent> preset2;
+    std::unique_ptr<AnimatorMovementComponent> preset3;
+    std::unique_ptr<AnimatorMovementComponent> preset4;
 
 
     //==============================================================================

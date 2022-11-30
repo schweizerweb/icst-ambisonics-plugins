@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.4
 
   ------------------------------------------------------------------------------
 
@@ -159,7 +159,21 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(this, pEncoderSettings, pSources, &pointSelection, processor.getAudioParams(), radarComponent->getZoomSettingsPointer(), processor.getStatusMessageHandler(), processor.getPresetHelper(), processor.getDistanceEncodingPresetHelper(), &oscLogDialogManager));
+        EncoderSettingsComponentArgs args {
+            this,
+            pEncoderSettings,
+            pSources,
+            &pointSelection,
+            processor.getAudioParams(),
+            radarComponent->getZoomSettingsPointer(),
+            processor.getStatusMessageHandler(),
+            processor.getPresetHelper(),
+            processor.getDistanceEncodingPresetHelper(),
+            processor.getCustomOscRxPresetHelper(),
+            processor.getCustomOscTxPresetHelper(),
+            &oscLogDialogManager
+        };
+		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
         settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
@@ -167,12 +181,13 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
     else if (buttonThatWasClicked == btnHelp.get())
     {
         //[UserButtonCode_btnHelp] -- add your button handler code here..
+
         if(ModifierKeys::currentModifiers.isCommandDown() && ModifierKeys::currentModifiers.isCtrlDown() && ModifierKeys::currentModifiers.isAltDown() && ModifierKeys::currentModifiers.isShiftDown())
         {
-            animatorDialogManager.show(pSources, this);
+            animatorDialogManager.show(pSources, processor.getAnimatorDataset(), this);
             return;
         }
-        
+
         helpDialogManager.show(true, this);
         //[/UserButtonCode_btnHelp]
     }

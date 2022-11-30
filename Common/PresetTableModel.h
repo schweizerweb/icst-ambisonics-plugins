@@ -16,6 +16,7 @@
 #include "SliderColumnCustomComponent.h"
 #include "PresetHelper.h"
 #include "PresetComparators.h"
+#include "ColorDefinition.h"
 
 #define COLUMN_ID_PRESET_NAME 1
 #define COLUMN_ID_PRESET_DATE 2
@@ -53,9 +54,9 @@ private:
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
     {
         const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
         if (rowIsSelected)
-            g.fillAll(Colours::lightblue);
+            g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
         else if (rowNumber % 2)
             g.fillAll(alternateColour);
     }

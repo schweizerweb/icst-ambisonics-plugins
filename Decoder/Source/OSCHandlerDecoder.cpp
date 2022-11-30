@@ -14,6 +14,12 @@ OSCHandlerDecoder::OSCHandlerDecoder(AmbiSourceSet* pAmbiPointArray) : OSCHandle
 {
 }
 
+bool OSCHandlerDecoder::initSpecific()
+{
+    // no specific init yet
+    return true;
+}
+
 bool OSCHandlerDecoder::handleSpecific(const OSCMessage &message)
 {
     OSCAddressPattern pattern = message.getAddressPattern();

@@ -10,8 +10,8 @@
 
 #include "AudioParameterFloatAmbi.h"
 
-AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)
-	: AudioParameterFloatAmbiAbs(idToUse, nameToUse, labelToUse, categoryToUse), 
+AudioParameterFloatAmbi::AudioParameterFloatAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)
+	: AudioParameterFloatAmbiAbs(idToUse, versionToUse, nameToUse, labelToUse, categoryToUse), 
 	type(paramType),
 	value(def),
 	defaultValue(def),

@@ -129,7 +129,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
 		{
-			int requiredDelay = delayHelper.getDelayCompensationSamples(&ambiSettings, pt, maxDist, getSampleRate());
+			int requiredDelay = delayHelper.getDelayCompensationSamples(pt, maxDist, getSampleRate());
 			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
 		}
 	}
@@ -228,7 +228,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 	for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		AmbiSpeaker* pt = speakerSet->get(iSpeaker);
-		if (pt == nullptr)
+		if (pt == nullptr || pt->getMute())
 			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
 		else
 		{

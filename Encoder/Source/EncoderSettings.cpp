@@ -10,6 +10,7 @@
 
 #include "EncoderSettings.h"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
+#define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
@@ -29,6 +30,8 @@
 #define XML_ATTRIBUTE_VALUE "Value"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
+#define XML_TAG_CUSTOM_OSC_INPUTS "CustomOscInputs"
+#define XML_TAG_CUSTOM_OSC_INPUT "CustomOscInput"
 
 EncoderSettings::EncoderSettings():
 	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
@@ -47,6 +50,7 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
+    hideWarnings(DEFAULT_HIDE_WARNINGS),
     masterGain(nullptr),
     localMasterGain(DEFAULT_MASTER_GAIN)
 {
@@ -63,8 +67,14 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
-	element->addChildElement(oscReceive);
-
+	XmlElement* customInputs = new XmlElement(XML_TAG_CUSTOM_OSC_INPUTS);
+    for (auto i : customOscInput)
+    {
+        customInputs->addChildElement(i->getAsXmlElement(XML_TAG_CUSTOM_OSC_INPUT));
+    }
+    oscReceive->addChildElement(customInputs);
+    element->addChildElement(oscReceive);
+    
 	XmlElement* oscSend = new XmlElement(XML_TAG_OSC_SEND);
 	oscSend->setAttribute(XML_ATTRIBUTE_ENABLE, oscSendFlag);
 	oscSend->setAttribute(XML_ATTRIBUTE_PORT, oscSendPort);
@@ -91,7 +101,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 	}
 	oscSendExt->addChildElement(customTargets);
     element->addChildElement(oscSendExt);
-
+    
+    XmlElement* hideWarningsXml = new XmlElement(XML_TAG_OSC_HIDE_WARNINGS);
+    hideWarningsXml->setAttribute(XML_ATTRIBUTE_ENABLE, hideWarnings);
+    element->addChildElement(hideWarningsXml);
 	
     writeToPresetXmlElement(element);
 	
@@ -108,7 +121,18 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
 	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
 	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
-	
+    XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
+    if (customInputs != nullptr)
+    {
+        XmlElement* i = customInputs->getChildByName(XML_TAG_CUSTOM_OSC_INPUT);
+        while (i != nullptr)
+        {
+            customOscInput.add(new CustomOscInput(i));
+
+            i = i->getNextElement();
+        }
+    }
+    
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
 	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
 	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
@@ -147,6 +171,10 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		}
 	}
 
+    XmlElement* hideWarningsXml = element->getChildByName(XML_TAG_OSC_HIDE_WARNINGS);
+    if(hideWarningsXml != nullptr)
+    hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    
     loadFromPresetXml(element);
 }
 

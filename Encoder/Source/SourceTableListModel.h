@@ -18,6 +18,7 @@
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ScalingInfo.h"
+#include "../../Common/ColorDefinition.h"
 
 #define COLUMN_ID_NB        2
 #define COLUMN_ID_NAME        3
@@ -28,6 +29,8 @@
 #define COLUMN_ID_E            11
 #define COLUMN_ID_D            12
 #define COLUMN_ID_GAIN        5
+#define COLUMN_ID_MUTE          14
+#define COLUMN_ID_SOLO          15
 #define COLUMN_ID_COLOR        13
 #define COLUMN_ID_ENABLED       1
 
@@ -54,6 +57,8 @@ public:
         tableListBox->getHeader().addColumn("A", COLUMN_ID_A, 50);
         tableListBox->getHeader().addColumn("E", COLUMN_ID_E, 50);
         tableListBox->getHeader().addColumn("D", COLUMN_ID_D, 50);
+        tableListBox->getHeader().addColumn("Mute", COLUMN_ID_MUTE, 40);
+        tableListBox->getHeader().addColumn("Solo", COLUMN_ID_SOLO, 40);
         tableListBox->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
         tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
         tableListBox->getHeader().setStretchToFitActive(true);
@@ -69,9 +74,9 @@ private:
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
     {
         const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+            .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
         if (rowIsSelected)
-            g.fillAll(Colours::lightblue);
+            g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
         else if (rowNumber % 2)
             g.fillAll(alternateColour);
     }
@@ -144,7 +149,9 @@ private:
             colorBox->setRowAndColumn(rowNumber, columnId);
             return colorBox;
         }
-        else if (columnId == COLUMN_ID_ENABLED)
+        else if (columnId == COLUMN_ID_ENABLED
+                 || columnId == COLUMN_ID_MUTE
+                 || columnId == COLUMN_ID_SOLO)
         {
             CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*>(existingComponentToUpdate);
             if(checkBox == nullptr)
@@ -153,6 +160,7 @@ private:
             checkBox->setRowAndColumn(rowNumber, columnId);
             return checkBox;
         }
+        
         return nullptr;
     }
 
@@ -165,6 +173,8 @@ private:
         switch (columnId)
         {
         case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
+        case COLUMN_ID_MUTE: return pt->getMute();
+        case COLUMN_ID_SOLO: return pt->getSolo();
         case COLUMN_ID_X: return pt->getPoint()->getX();
         case COLUMN_ID_Y: return pt->getPoint()->getY();
         case COLUMN_ID_Z: return pt->getPoint()->getZ();
@@ -188,6 +198,8 @@ private:
         switch (columnId)
         {
         case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
+        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, newValue == 1); break;
+        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, newValue == 1); break;
         case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
         case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
         case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;

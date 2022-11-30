@@ -32,6 +32,8 @@ public:
 	enum Shape { Circle, Square, Star };
     enum MouseActionMode { Standard, RadarMove, RadarZoomOut, MoveGroupPointOnly };
     enum SpecialHandlingMode { None, Stretch, RotateAroundGroupPoint, RotateInAedSpace };
+    enum AnchorX { X_Left, X_Center, X_Right };
+    enum AnchorY { Y_Top, Y_Center, Y_Bottom };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
@@ -59,7 +61,9 @@ public:
     void modifierKeysChanged(const ModifierKeys &modifiers) override;
 	void setRadarMode(RadarMode radarMode);
     void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) override;
-
+    void setAnchor(AnchorX x, AnchorY y);
+    void setRefreshRate(int rateHz);
+    
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;
 	Point<float> getValuePointFromRelativeScreenPoint(Point<float> relativeScreenPoint) const;
@@ -68,7 +72,8 @@ private:
 	float getSelectedPointSize(float scaler) const;
 	Point<float> getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const;
     void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
-	void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
+	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
+    void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
     void drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const;
     void drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const;
 	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
@@ -114,6 +119,8 @@ private:
     Point<float> specialHandlingOffset;
     Point<int> lastSpecialModePosition;
     float lastCartesianLimit;
+    AnchorX anchorX;
+    AnchorY anchorY;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };

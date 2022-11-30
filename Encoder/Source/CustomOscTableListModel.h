@@ -14,19 +14,22 @@
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
+#include "../../Common/ColorDefinition.h"
+#include "../../Common/PresetHelper.h"
 
 #define COLUMN_ID_ENABLE		201
 #define COLUMN_ID_HOST			202
 #define	COLUMN_ID_PORT			203
 #define	COLUMN_ID_PATH			204
+#define COLUMN_ID_SAVE_AS_PRESET    206
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
 
 
-class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster
+class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -40,6 +43,11 @@ public:
 		removeAllActionListeners();
 	}
 
+    void buttonClicked(juce::Button *b) override {
+        int rowIndex = b->getComponentID().getIntValue();
+        sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+    }
+    
 	int getNumRows() override {
 		return standardTargets.size() + pSettings->customOscTargets.size();
 	}
@@ -47,9 +55,9 @@ public:
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
 	{
 		const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-			.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), 0.03f));
+			.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
 		if (rowIsSelected)
-			g.fillAll(Colours::lightblue);
+			g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
 		else if (rowNumber % 2)
 			g.fillAll(alternateColour);
 	}
@@ -90,7 +98,26 @@ public:
 			checkBox->setRowAndColumn(rowNumber, columnId);
 			return checkBox;
 		}
-		
+        else if (columnId == COLUMN_ID_SAVE_AS_PRESET)
+        {
+            int customTargetIndex = getCustomTargetIndex(rowNumber);
+            if(customTargetIndex >= 0)
+            {
+                ImageButton* btn = static_cast<ImageButton*>(existingComponentToUpdate);
+                if (btn == nullptr) {
+                    btn = new ImageButton();
+                    btn->setImages (false, true, true,
+                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                    btn->setTooltip("Add to presets...");
+                    btn->addListener(this);
+                }
+                btn->setComponentID(String(customTargetIndex));
+                return btn;
+            }
+        }
+        
 		return nullptr;
 	}
 
@@ -219,8 +246,9 @@ public:
 		tableListBox->getHeader().addColumn("Enable", COLUMN_ID_ENABLE, 20);
 		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 70);
 		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
-		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 320);
-		tableListBox->getHeader().setStretchToFitActive(true);
+		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 300);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
+        tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
 
@@ -245,4 +273,6 @@ private:
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
     OwnedArray<StandardTarget> standardTargets;
+    const char* save_png;
+    const int save_pngSize;
 };

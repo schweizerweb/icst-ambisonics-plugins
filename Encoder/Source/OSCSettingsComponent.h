@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -20,10 +20,8 @@
 #pragma once
 
 //[Headers]     -- You can add your own extra header files here --
-#include "../JuceLibraryCode/JuceHeader.h"
+#include "JuceHeader.h"
 #include "EncoderSettings.h"
-#include "../../Common/StatusMessageHandler.h"
-#include "../../Common/OSCLogDialogManager.h"
 #include "OSCTargetsComponent.h"
 //[/Headers]
 
@@ -46,7 +44,7 @@ class OSCSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, OSCLogDialogManager* pOscLogManager);
+    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper);
     ~OSCSettingsComponent() override;
 
     //==============================================================================
@@ -67,25 +65,19 @@ private:
     void changeListenerCallback(ChangeBroadcaster* source) override;
 
     EncoderSettings* pSettings;
-    StatusMessageHandler* pStatusMessageHandler;
-    OSCLogDialogManager* pOscLogManager;
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupExternal;
     std::unique_ptr<juce::GroupComponent> groupInternal;
-    std::unique_ptr<juce::ToggleButton> toggleReceiveOsc;
-    std::unique_ptr<juce::Label> labelOscPort;
     std::unique_ptr<juce::ToggleButton> toggleSendOsc;
     std::unique_ptr<juce::TextEditor> textOscSendIp;
     std::unique_ptr<juce::Label> labelOscSendIp;
     std::unique_ptr<juce::Label> labelOscSendInterval;
     std::unique_ptr<juce::ToggleButton> toggleSendOscExt;
     std::unique_ptr<juce::Label> labelExternalOscInfo;
-    std::unique_ptr<juce::Slider> sliderReceiveOscPort;
     std::unique_ptr<juce::Slider> sliderSendOscPort;
     std::unique_ptr<juce::Slider> sliderInterval;
-    std::unique_ptr<juce::TextButton> buttonShowOscLog;
     std::unique_ptr<OSCTargetsComponent> oscTargets;
     std::unique_ptr<juce::Label> labelLoadInfo;
 

@@ -11,7 +11,7 @@
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
               companyName="ICST" pluginFormats="buildAU,buildVST3" companyWebsite="https://www.zhdk.ch/forschung/icst"
-              jucerFormatVersion="1">
+              jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
   <MAINGROUP id="oa5A98" name="AmbiDecoder">
     <GROUP id="{04039441-02D5-B804-F108-5DDEE09B31E8}" name="Resources">
       <FILE id="VcLCoa" name="help.png" compile="0" resource="1" file="../Resources/help.png"/>
@@ -45,8 +45,8 @@
             resource="0" file="Source/SingleFilterSettingsComponent.cpp"/>
       <FILE id="LYnxJP" name="SingleFilterSettingsComponent.h" compile="0"
             resource="0" file="Source/SingleFilterSettingsComponent.h"/>
-      <FILE id="vFgvO3" name="CheckBoxCustomComponent.h" compile="0" resource="0"
-            file="Source/CheckBoxCustomComponent.h"/>
+      <FILE id="vFgvO3" name="CheckBoxFilterCustomComponent.h" compile="0"
+            resource="0" file="Source/CheckBoxFilterCustomComponent.h"/>
       <FILE id="xF0pSM" name="SpeakerSettingsDialog.h" compile="0" resource="0"
             file="Source/SpeakerSettingsDialog.h"/>
       <FILE id="yP0JFj" name="DecoderSettings.cpp" compile="1" resource="0"
@@ -116,6 +116,10 @@
       <FILE id="EzUhBa" name="AmbiSpeakerSet.h" compile="0" resource="0"
             file="../Common/AmbiSpeakerSet.h"/>
       <FILE id="rEXoft" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
+      <FILE id="rRezuX" name="CheckBoxCustomComponent.h" compile="0" resource="0"
+            file="../Common/CheckBoxCustomComponent.h"/>
+      <FILE id="EcBciD" name="ColorDefinition.h" compile="0" resource="0"
+            file="../Common/ColorDefinition.h"/>
       <FILE id="RAo2Ku" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
       <FILE id="rdwYUW" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="clRUKZ" name="DelayBuffer.cpp" compile="1" resource="0" file="../Common/DelayBuffer.cpp"/>
@@ -196,10 +200,12 @@
   <EXPORTFORMATS>
     <XCODE_MAC targetFolder="Builds/MacOSX">
       <CONFIGURATIONS>
-        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Decoder"/>
+        <CONFIGURATION name="Debug" isDebug="1" optimisation="1" targetName="Ambisonic Decoder"
+                       osxArchitecture="Native"/>
         <CONFIGURATION name="Release" isDebug="0" optimisation="3" targetName="Ambisonic Decoder"
                        vst3BinaryLocation="$(PROJECT_DIR)/build/Release/" auBinaryLocation="$(PROJECT_DIR)/build/Release/"
-                       vstBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"/>
+                       vstBinaryLocation="$(PROJECT_DIR)/build/Release/" enablePluginBinaryCopyStep="0"
+                       osxArchitecture="Native"/>
       </CONFIGURATIONS>
       <MODULEPATHS>
         <MODULEPATH id="juce_osc" path="../../JUCE/modules"/>

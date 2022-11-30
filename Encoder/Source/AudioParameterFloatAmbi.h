@@ -18,7 +18,7 @@ class AudioParameterFloatAmbi : public AudioParameterFloatAmbiAbs
 public:
 	enum ParamType { X, Y, Z, Gain, GX, GY, GZ };
 
-	AudioParameterFloatAmbi(const String& idToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
+	AudioParameterFloatAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
 		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
 	~AudioParameterFloatAmbi();
 
