@@ -255,10 +255,6 @@ public:
 			{ 0, -1, 0, "SB"},
 			});
 
-		createPreset("Standard - Mono", {
-			{ 0, 1, 0, "Mono"},
-			});
-
 		createPreset("Regular 2D - Octagon (8)", {
 			{ -0.382683, 0.92388, 0, "1"},
 			{ 0.382683, 0.92388, 0, "2"},
@@ -292,7 +288,11 @@ public:
 			{ 0, 0, 1, "T"},
 			});
 
-		createPreset("Standard - Stereo 15deg", {
+        createPreset("Standard - Mono", {
+            { 0, 1, 0, "Mono"},
+            });
+
+        createPreset("Standard - Stereo 15deg", {
 			{ -0.258819, 0.965926, 0, "L"},
 			{ 0.258819, 0.965926, 0, "R"},
 			});

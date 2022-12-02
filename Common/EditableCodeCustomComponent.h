@@ -41,7 +41,7 @@ public:
         // if code starts with a comment, show the comment only
         if(text.startsWith("//"))
         {
-            text = text.fromFirstOccurrenceOf("//", false, true).upToFirstOccurrenceOf(NewLine::getDefault(), false, true);
+            text = text.fromFirstOccurrenceOf("//", false, true).upToFirstOccurrenceOf("\n", false, true);
 
             textColour = Colours::lightgreen;
         }
