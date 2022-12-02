@@ -117,61 +117,6 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 </EncoderPreset>)"
         );
         
-        buildDefaultPreset("Atmos 9.1.4",
-R"(<?xml version="1.0" encoding="UTF-8"?>
-
-<EncoderPreset>
-  <AmbiSourceSet>
-    <GroupMode Enable="0"/>
-    <DistanceScaler Factor="1.0"/>
-    <MasterGain Value="0.0"/>
-    <Sources>
-      <Source Uuid="0d5e15314e1a418aaf5698c7a5c0c61d" X="-0.5000000000000004"
-              Y="0.8660254037844384" Z="0.0" Name="L" ColorCode="ff0b0b0b"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="a0482b8b9a734756929f29c09782b263" X="0.4999999999999999"
-              Y="0.8660254037844387" Z="0.0" Name="R" ColorCode="ff0b0a0a"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="c22ce13e88bc49b39d4d2d4afe32ef03" X="0.02014370563295657"
-              Y="0.8997494906692651" Z="-0.006714548664726473" Name="C" ColorCode="ff000000"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="d5a937dd2a56462993daf2b614f3a583" X="-0.08004629611968994"
-              Y="0.9939076900482178" Z="0.0" Name="Sub" ColorCode="fff50c0c"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="b76fbb3b14114fc9b3d026e6a08fca42" X="-0.8660254037844386"
-              Y="0.5" Z="0.0" Name="LS1" ColorCode="ff000000" Gain="1.0" Mute="0"
-              Enabled="1"/>
-      <Source Uuid="31b949f80c7e4fe5ae4e4bbb1620f6b0" X="0.8677192166366717"
-              Y="0.5009779233061937" Z="0.0" Name="RS1" ColorCode="ff000000"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="d2f46b5b620e42a282ac16491a91650a" X="-1.0" Y="-1.83697019872103e-16"
-              Z="0.0" Name="RLW" ColorCode="ff000000" Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="7b96a4def9fd46918dedf67bd4c3a4df" X="1.0" Y="6.123233995736766e-17"
-              Z="0.0" Name="RRW" ColorCode="ff000000" Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="a09452f1b1d74511b59f6cadb6524cfd" X="-0.6427876096865389"
-              Y="-0.7660444431189783" Z="0.0" Name="RL" ColorCode="ff000000"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="ce9d012c862b4284a3f4d11e2713781c" X="0.6427876096865395"
-              Y="-0.7660444431189779" Z="0.0" Name="RR" ColorCode="ff000000"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="444c360c11ac40d6928464af45628d5a" X="-0.4010695219039917"
-              Y="0.3686878264946125" Z="0.8235294222831726" Name="UpFL" ColorCode="ff054a06"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="bc3945fdfc2c41a7aae6ec89235daebe" X="0.405579787672639"
-              Y="0.405579787672639" Z="0.8191520442889917" Name="UpFR" ColorCode="ff054a06"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="b583f40862e34fef8618da898583108e" X="-0.4393850417707048"
-              Y="-0.368687826494613" Z="0.8191520442889917" Name="UpRL" ColorCode="ff054a06"
-              Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="bd0d84ceb6d44dda9be6573371293ca5" X="0.4698463103929545"
-              Y="-0.3289899283371656" Z="0.8191520442889917" Name="UpRR" ColorCode="ff054a06"
-              Gain="1.0" Mute="0" Enabled="1"/>
-    </Sources>
-    <Groups />
-  </AmbiSourceSet>
-</EncoderPreset>)"
-        );
-        
         buildDefaultPreset("Cube",
 R"(<?xml version="1.0" encoding="UTF-8"?>
 

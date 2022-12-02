@@ -39,6 +39,16 @@ public:
 	{
 		return Colours::darkblue;
 	}
+    
+    static Colour getSpeakerColorAlt1()
+    {
+        return Colours::dodgerblue;
+    }
+    
+    static Colour getSpeakerColorAlt2()
+    {
+        return Colours::darkred;
+    }
 
     static Colour getSubwooferColor()
 	{
