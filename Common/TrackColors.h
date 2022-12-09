@@ -47,9 +47,14 @@ public:
     
     static Colour getSpeakerColorAlt2()
     {
-        return Colours::darkred;
+        return Colours::indianred;
     }
 
+    static Colour getSpeakerColorAlt3()
+    {
+        return Colours::darkgreen;
+    }
+    
     static Colour getSubwooferColor()
 	{
 		return Colours::darkred;

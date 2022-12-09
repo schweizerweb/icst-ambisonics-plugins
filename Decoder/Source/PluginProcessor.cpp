@@ -182,7 +182,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
                     Logger::writeToLog("Error in Filterbank!");
                     return;
                 }
-                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter))
+                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < JucePlugin_MaxNumOutputChannels)
                 {
                     if (filterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
                     {
