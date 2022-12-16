@@ -2,35 +2,35 @@
 
 <AmbisonicsPreset>
   <Points>
-    <Point Uuid="2aa570ac6cef41a6b80d7006fce575e2" X="-0.5" Y="0.8660253882408143"
+    <Point Uuid="c5dc496357944e399bdcbdd3a8211d36" X="-0.5" Y="0.8660253882408143"
            Z="0.0" Name="L" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"
            ByPass="1"/>
-    <Point Uuid="8e34ffd4674b488090256aa863b977cb" X="0.5" Y="0.8660253882408143"
+    <Point Uuid="88b406d294b846c29b457862e0dde2f4" X="0.5" Y="0.8660253882408143"
            Z="0.0" Name="R" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"
            ByPass="1"/>
-    <Point Uuid="e7092672243e48109e9d7fd58095a88d" X="0.0" Y="1.0" Z="0.0"
+    <Point Uuid="d61ad9a48b40470d8f732374ce61a7ba" X="0.0" Y="1.0" Z="0.0"
            Name="C" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"
            ByPass="1"/>
-    <Point Uuid="e697f38edd4a426bb045cf999c2e0967" X="-0.939693" Y="-0.34202"
+    <Point Uuid="5c528a0c2ef444e0a55b5576ae2d423f" X="-0.939693" Y="-0.34202"
            Z="0.0" Name="SL" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"
            ByPass="1"/>
-    <Point Uuid="918f9abdf99e409bbb6f20aad10c6a4b" X="0.939693" Y="-0.34202"
+    <Point Uuid="819dc265835c44fc9d2ed97ac9b35904" X="0.939693" Y="-0.34202"
            Z="0.0" Name="SR" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"

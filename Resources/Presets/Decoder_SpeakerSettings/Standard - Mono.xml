@@ -2,7 +2,7 @@
 
 <AmbisonicsPreset>
   <Points>
-    <Point Uuid="df74156363804242b46fefc4dcad93c5" X="0.0" Y="1.0" Z="0.0"
+    <Point Uuid="1396ab61388443d3ac1b0c1a383244c9" X="0.0" Y="1.0" Z="0.0"
            Name="Mono" ColorCode="ff00008b" Gain="1.0" Mute="0" Enabled="1"
            FilterType="0" FilterFrequency="200.0" FilterQ="1.0" GainFactor="1.0"
            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
