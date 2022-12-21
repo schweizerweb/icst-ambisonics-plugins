@@ -6416,7 +6416,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/dearVR_Binaural_Ambi_Micro.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6432,7 +6432,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6448,7 +6448,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6464,7 +6464,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6480,7 +6480,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6496,7 +6496,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6512,7 +6512,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6528,7 +6528,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_4x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6544,7 +6544,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_8x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6560,7 +6560,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_16x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_IA-Space_Decoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6576,7 +6576,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6592,7 +6592,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6608,7 +6608,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6624,7 +6624,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6640,7 +6640,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6656,7 +6656,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6672,7 +6672,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6688,7 +6688,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6704,7 +6704,23 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6725,6 +6741,153 @@
 													<integer>509</integer>
 													<key>TYPE</key>
 													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/AMBEO A-to-B.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/DearVR_BINAURAL.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_BFormat_Manipulator_o3.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o1.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o3.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o5.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/RODE_Soundfield.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/ZYLIA_to_Bformat.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>EXPANDED</key>
+													<true/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
+													<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party</string>
+													<key>PATH_TYPE</key>
+													<integer>1</integer>
+													<key>PERMISSIONS</key>
+													<integer>493</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
 													<key>UID</key>
 													<integer>0</integer>
 												</dict>
