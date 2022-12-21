@@ -749,7 +749,7 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
 {
     if(wheel.deltaY != 0)
     {
-        if(specialGroupManipulationMode && currentSpecialHandlingMode == Stretch && pPointSelection->getSelectionMode() == PointSelection::Group)
+        if(specialGroupManipulationMode && pPointSelection->getSelectionMode() == PointSelection::Group)
         {
             pEditablePoints->stretchGroup(pPointSelection->getMainSelectedPointIndex(), pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
         }
