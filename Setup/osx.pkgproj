@@ -5726,7 +5726,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST Mono Ambisonics.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o1.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5742,7 +5742,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_Ambi_OSC_DEMO.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o3.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5758,7 +5758,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O1.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o5.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5772,11 +5772,11 @@
 													<key>CHILDREN</key>
 													<array/>
 													<key>GID</key>
-													<integer>80</integer>
+													<integer>0</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O3.RPP</string>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o1.RPP</string>
 													<key>PATH_TYPE</key>
-													<integer>1</integer>
+													<integer>0</integer>
 													<key>PERMISSIONS</key>
 													<integer>420</integer>
 													<key>TYPE</key>
@@ -5788,11 +5788,27 @@
 													<key>CHILDREN</key>
 													<array/>
 													<key>GID</key>
-													<integer>80</integer>
+													<integer>0</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O5.RPP</string>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o3.RPP</string>
 													<key>PATH_TYPE</key>
-													<integer>1</integer>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>420</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+												<dict>
+													<key>CHILDREN</key>
+													<array/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o5.RPP</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
 													<key>PERMISSIONS</key>
 													<integer>420</integer>
 													<key>TYPE</key>
