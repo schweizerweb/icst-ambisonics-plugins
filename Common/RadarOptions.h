@@ -22,7 +22,6 @@ public:
 	AudioParameterSet getAudioParamForIndex(int index, bool isGroup) const;
 
 public:
-	bool nameFieldEditable;
 	int maxNumberEditablePoints;
 	bool editablePointsAsSquare;
 	int displayTimeout;

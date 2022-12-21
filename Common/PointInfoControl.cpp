@@ -206,7 +206,6 @@ PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection
                           juce::ImageCache::getFromMemory (trashbinicon_png, trashbinicon_pngSize), 1.000f, juce::Colours::blue);
 
     //[UserPreSize]
-    textName->setReadOnly(!pRadarOptions->nameFieldEditable);
     textX->setJustification(Justification::centredRight);
     textY->setJustification(Justification::centredRight);
     textZ->setJustification(Justification::centredRight);
@@ -427,13 +426,14 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
     btnUngroup->setVisible(show);
     btnDelete->setVisible(show);
     labelBackground->setVisible(show);
-	textX->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textY->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textZ->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textA->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textE->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textD->setReadOnly(pPointSelection->getSelectionMode() != PointSelection::Point);
-	textName->setReadOnly(!pRadarOptions->nameFieldEditable || (pRadarOptions->dawParameter != nullptr && pRadarOptions->dawParameter->updateTrackPropertiesWorking));
+    bool makeReadOnly = pPointSelection->getSelectionMode() == PointSelection::None;
+	textX->setReadOnly(makeReadOnly);
+	textY->setReadOnly(makeReadOnly);
+	textZ->setReadOnly(makeReadOnly);
+	textA->setReadOnly(makeReadOnly);
+	textE->setReadOnly(makeReadOnly);
+	textD->setReadOnly(makeReadOnly);
+    textName->setReadOnly(makeReadOnly);
 	enableListeners();
 }
 
@@ -453,6 +453,32 @@ void PointInfoControl::textEditorTextChanged(TextEditor& source)
 		{
 			pEditablePoints->setGroupName(selection, textName->getText());
 		}
+        
+        if (source.getName() == textX->getName())
+        {
+            pEditablePoints->setGroupX(selection, textX->getText().getFloatValue());
+        }
+        if (source.getName() == textY->getName())
+        {
+            pEditablePoints->setGroupY(selection, textY->getText().getFloatValue());
+        }
+        if (source.getName() == textZ->getName())
+        {
+            pEditablePoints->setGroupZ(selection, textZ->getText().getFloatValue());
+        }
+
+        if (source.getName() == textA->getName())
+        {
+            pEditablePoints->setGroupAed(selection, Constants::GradToRad(textA->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
+        }
+        if (source.getName() == textE->getName())
+        {
+            pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), Constants::GradToRad(textE->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
+        }
+        if (source.getName() == textD->getName())
+        {
+            pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), textD->getText().getFloatValue(), pEditablePoints->getGroupModeFlag());
+        }
 	}
 	else
 	{

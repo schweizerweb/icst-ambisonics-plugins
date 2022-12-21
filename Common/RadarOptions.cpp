@@ -12,7 +12,6 @@
 
 RadarOptions::RadarOptions()
 {
-	nameFieldEditable = false;
 	maxNumberEditablePoints = -1;
 	audioParams = nullptr;
 	displayTimeout = 1000;

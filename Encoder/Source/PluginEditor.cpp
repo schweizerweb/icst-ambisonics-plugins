@@ -36,7 +36,6 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	settingsWindow = nullptr;
     pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
-	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
 	radarOptions.editablePointsAsSquare = false;
