@@ -91,14 +91,14 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
-      <Source Uuid="54a33757f2a640a79746e6b9abea0f90" X="-0.5000000000000004"
+      <Source Uuid="54a33757f2a640a79746e6b9abea0f90" X="-0.5"
               Y="0.8660254037844384" Z="0.0" Name="L" ColorCode="ff000000"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="1b6e1bcebe63496fa9a6f30d0d33878d" X="0.4999999999999999"
+      <Source Uuid="1b6e1bcebe63496fa9a6f30d0d33878d" X="0.5"
               Y="0.8660254037844387" Z="0.0" Name="R" ColorCode="ff000000"
               Gain="1.0" Mute="0" Enabled="1"/>
       <Source Uuid="18146304124348c094f26e424adb5289" X="0.0" Y="1.0" Z="0.0"
@@ -183,26 +183,26 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
-      <Source Uuid="397960bd6d764818997f58504e399c18" X="-0.3941190455056673"
-              Y="0.4840203451964563" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
+      <Source Uuid="397960bd6d764818997f58504e399c18" X="-0.707106"
+              Y="0.707106" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.4742049971075997"
-              Y="0.3951239116572702" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
+      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.707106"
+              Y="0.707106" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.3853085635684135"
-              Y="-0.4732001309559968" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
+      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.707106"
+              Y="-0.707106" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.4830154790448534"
-              Y="-0.3843036974168108" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
+      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.707106"
+              Y="-0.707106" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
     <Groups>
-      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.007992982864379883"
-             Y="-0.007992982864379883" Z="0.0" Name="Src" ColorCode="ff0042ff"
+      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.0"
+             Y="0.0" Z="0.0" Name="Src" ColorCode="ff0042ff"
              Gain="1.0" Mute="0" Enabled="1">
         <SubPoints>
           <SubPoint Id="397960bd6d764818997f58504e399c18"/>
@@ -210,8 +210,8 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
           <SubPoint Id="15bb166235a640129d0d1184ce5c03ec"/>
           <SubPoint Id="ae282f49b6e941cc8b4b2fbe4ee230a0"/>
         </SubPoints>
-        <Rotation Q0="0.0" Q1="0.0" Q2="-0.05098867333465824" Q3="-0.9986992315965662"/>
-        <Stretch Factor="1.620201700925827"/>
+        <Rotation Q0="0.0" Q1="0.0" Q2="0.0" Q3="1.0"/>
+        <Stretch Factor="1.0"/>
       </Group>
     </Groups>
   </AmbiSourceSet>
@@ -266,8 +266,8 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
           <SubPoint Id="969f20205d3e40d7bd825371bcfba995"/>
           <SubPoint Id="7c82da2b92834a249219a4f3aa5c61fb"/>
         </SubPoints>
-        <Rotation Q0="0.0" Q1="0.0" Q2="0.4504049802279626" Q3="0.8928243689471344"/>
-        <Stretch Factor="0.73"/>
+        <Rotation Q0="0.0" Q1="0.0" Q2="0.0" Q3="1.0"/>
+        <Stretch Factor="1.0"/>
       </Group>
       <Group Uuid="f6a95285572f41aea0c4ee7abf676b3f" X="0.4476743936538696"
              Y="-0.7267441749572754" Z="0.0" Name="G2" ColorCode="ff767881"
@@ -312,7 +312,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
@@ -342,7 +342,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
     <Groups>
-      <Group Uuid="dda19e6bd4324d63880c2a20cd4f7207" X="0.0" Y="-0.006750941276550293"
+      <Group Uuid="dda19e6bd4324d63880c2a20cd4f7207" X="0.0" Y="0.0"
              Z="0.0" Name="Src" ColorCode="ff224e92" Gain="1.0" Mute="0" Enabled="1">
         <SubPoints>
           <SubPoint Id="af87a5aae3c54a65b7dcae7c7f1b2cff"/>
@@ -368,7 +368,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
@@ -398,7 +398,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
     <Groups>
-      <Group Uuid="a6e0a8cc97074fde81ad32aa018fd054" X="0.0" Y="-0.006750941276550293"
+      <Group Uuid="a6e0a8cc97074fde81ad32aa018fd054" X="0.0" Y="0.0"
              Z="0.0" Name="Src" ColorCode="ff224e92" Gain="1.0" Mute="0" Enabled="1">
         <SubPoints>
           <SubPoint Id="ec321ef91bcf406db26cf25e246cfdea"/>
@@ -424,25 +424,25 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
-      <Source Uuid="397960bd6d764818997f58504e399c18" X="-0.4313109257555716"
-              Y="0.4313109257555705" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
+      <Source Uuid="397960bd6d764818997f58504e399c18" X="0.0"
+              Y="1.0" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.4313109257555705"
-              Y="0.4313109257555705" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
+      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="1.0"
+              Y="0.0" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.43131092575557"
-              Y="-0.4313109257555698" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
+      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.0"
+              Y="-1.0" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.4313109257555703"
-              Y="-0.4313109257555705" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
+      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-1.0"
+              Y="0.0" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
     <Groups>
-      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.0" Y="-0.01201939582824707"
+      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.0" Y="0.0"
              Z="0.0" Name="Src" ColorCode="ff0042ff" Gain="1.0" Mute="0" Enabled="1">
         <SubPoints>
           <SubPoint Id="397960bd6d764818997f58504e399c18"/>
@@ -450,8 +450,8 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
           <SubPoint Id="15bb166235a640129d0d1184ce5c03ec"/>
           <SubPoint Id="ae282f49b6e941cc8b4b2fbe4ee230a0"/>
         </SubPoints>
-        <Rotation Q0="0.0" Q1="0.0" Q2="0.3830754839857818" Q3="-0.9237170419392829"/>
-        <Stretch Factor="1.620201700925827"/>
+        <Rotation Q0="0.0" Q1="0.0" Q2="0.0" Q3="1.0"/>
+        <Stretch Factor="1.0"/>
       </Group>
     </Groups>
   </AmbiSourceSet>
@@ -464,25 +464,25 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
-      <Source Uuid="397960bd6d764818997f58504e399c18" X="-0.4313109257555716"
-              Y="0.4313109257555705" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
+      <Source Uuid="397960bd6d764818997f58504e399c18" X="-0.707106"
+              Y="0.707106" Z="0.0" Name="Src_1" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.4313109257555705"
-              Y="0.4313109257555705" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
+      <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.707106"
+              Y="0.707106" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.43131092575557"
-              Y="-0.4313109257555698" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
+      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.707106"
+              Y="-0.707106" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.4313109257555703"
-              Y="-0.4313109257555705" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
+      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.707106"
+              Y="-0.707106" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
     <Groups>
-      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.0" Y="-0.01201939582824707"
+      <Group Uuid="dc784286f3b04668b0a9b142d3f1cf5f" X="0.0" Y="0.0"
              Z="0.0" Name="Src" ColorCode="ff0042ff" Gain="1.0" Mute="0" Enabled="1">
         <SubPoints>
           <SubPoint Id="397960bd6d764818997f58504e399c18"/>
@@ -491,7 +491,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
           <SubPoint Id="ae282f49b6e941cc8b4b2fbe4ee230a0"/>
         </SubPoints>
         <Rotation Q0="0.0" Q1="0.0" Q2="0.0" Q3="1.0"/>
-        <Stretch Factor="1.620201700925827"/>
+        <Stretch Factor="1.0"/>
       </Group>
     </Groups>
   </AmbiSourceSet>
@@ -504,7 +504,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="0.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
@@ -580,7 +580,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
           <SubPoint Id="fd33f4e593d74453943584b87e2cfe9e"/>
         </SubPoints>
         <Rotation Q0="0.0" Q1="0.0" Q2="0.0" Q3="1.0"/>
-        <Stretch Factor="1.599319931268692"/>
+        <Stretch Factor="1.0"/>
       </Group>
     </Groups>
   </AmbiSourceSet>
@@ -593,7 +593,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
 
 <EncoderPreset>
   <AmbiSourceSet>
-    <GroupMode Enable="1"/>
+    <GroupMode Enable="0"/>
     <DistanceScaler Factor="1.0"/>
     <MasterGain Value="0.0"/>
     <Sources>
