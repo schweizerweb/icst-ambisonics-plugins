@@ -33,29 +33,29 @@ ArchitecturesAllowed=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
-Source: "..\bin\VST3\AmbiDecoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiDecoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O1_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O1_8CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O1_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O2_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O2_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O3_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O3_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O4_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O4_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O5_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O5_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O6_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O6_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O7_1CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_O7_64CH.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o1_8ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o1_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o2_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o3_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o4_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o5_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o6_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiDecoder_o7_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o1_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o1_8ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o1_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o2_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o2_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o3_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o3_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o4_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o4_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o5_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o5_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o6_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o6_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o7_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\bin\VST3\AmbiEncoder_o7_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
 Source: ".\Redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "ICST_AmbisonicsTemplates\ICST Mono Ambisonics.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
 Source: "ICST_AmbisonicsTemplates\ICST_Ambi_OSC_DEMO.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion; Components: ReaperTemplates
