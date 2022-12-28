@@ -43,6 +43,9 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	radarOptions.dawParameter = ownerProc.getDawParameter();
     radarOptions.scalingInfo = ownerProc.getScalingInfo();
     radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
+#if !MULTI_ENCODER_MODE
+    radarOptions.checkNameFieldEditable = true;
+#endif
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));

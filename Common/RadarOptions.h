@@ -28,7 +28,8 @@ public:
 	bool showEditablePoints;
 	bool showDisplayOnlyPoints;
 	bool setTrackColorAccordingToName;
-
+    bool checkNameFieldEditable;
+    
     AudioParams* audioParams;
 	DawParameter* dawParameter;
     ScalingInfo* scalingInfo;

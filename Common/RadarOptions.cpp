@@ -20,6 +20,7 @@ RadarOptions::RadarOptions()
 	showEditablePoints = true;
 	dawParameter = nullptr;
 	setTrackColorAccordingToName = true;
+    checkNameFieldEditable = false;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index, bool isGroup) const

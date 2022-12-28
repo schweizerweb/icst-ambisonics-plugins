@@ -433,6 +433,10 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 	textA->setReadOnly(makeReadOnly);
 	textE->setReadOnly(makeReadOnly);
 	textD->setReadOnly(makeReadOnly);
+    if(pRadarOptions->checkNameFieldEditable)
+    {
+        makeReadOnly = pRadarOptions->dawParameter->updateTrackPropertiesWorking;
+    }
     textName->setReadOnly(makeReadOnly);
 	enableListeners();
 }
