@@ -193,10 +193,10 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
       <Source Uuid="0d957af4d70f4246a84249c3a3f2680c" X="0.707106"
               Y="0.707106" Z="0.0" Name="Src_2" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="0.707106"
+      <Source Uuid="15bb166235a640129d0d1184ce5c03ec" X="-0.707106"
               Y="-0.707106" Z="0.0" Name="Src_3" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
-      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="-0.707106"
+      <Source Uuid="ae282f49b6e941cc8b4b2fbe4ee230a0" X="0.707106"
               Y="-0.707106" Z="0.0" Name="Src_4" ColorCode="ff0042ff"
               Gain="1.0" Mute="0" Enabled="1"/>
     </Sources>
