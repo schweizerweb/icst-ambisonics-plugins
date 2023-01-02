@@ -188,7 +188,7 @@ private:
         // modify point selection
         if(slider == sliderPointCount.get())
         {
-            int count = sliderPointCount->getValue();
+            int count = (int)sliderPointCount->getValue();
             for(int i = 0; i < localDataSet->size(); i++)
             {
                 if(count > 0)
@@ -299,7 +299,7 @@ private:
     
     bool buildShape()
     {
-        double radius = sliderRadius->getSliderStyle() == Slider::TwoValueHorizontal ? sliderRadius->getMaxValue() : sliderRadius->getValue();
+        float radius = float(sliderRadius->getSliderStyle() == Slider::TwoValueHorizontal ? sliderRadius->getMaxValue() : sliderRadius->getValue());
         ShapeId shapeId = (ShapeId)comboShape->getSelectedId();
         int pointCount = localDataSet->getGroup(0)->groupPointCount();
         
@@ -316,10 +316,10 @@ private:
                 p.addRectangle(-radius, -radius, 2*radius, 2*radius);
                 break;
             case SHAPE_ID_TRIANGLE:
-                p.addTriangle(0.0f, radius, cos(PI/6)*radius, -sin(PI/6)*radius, -cos(PI/6)*radius, -sin(PI/6)*radius);
+                p.addTriangle(0.0f, radius, cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius, -cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius);
                 break;
             case SHAPE_ID_STAR:
-                double innerRadius = sliderRadius->getMinValue();
+                float innerRadius = float(sliderRadius->getMinValue());
                 p.addStar(Point<float>(0.0f, 0.0f), pointCount/2, innerRadius, radius);
                 break;
         }

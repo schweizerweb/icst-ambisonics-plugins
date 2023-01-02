@@ -163,7 +163,7 @@ void AnimatorMovementComponent::buttonClicked (juce::Button* buttonThatWasClicke
     if (buttonThatWasClicked == buttonSet.get())
     {
         //[UserButtonCode_buttonSet] -- add your button handler code here..
-        int groupIndex = sliderGroup->getValue()-1;
+        int groupIndex = (int)sliderGroup->getValue()-1;
         pAnimatorMovement->groupPositions.clear();
         Point3D<double> p(*pSourceSet->getGroup(groupIndex)->getRawPoint());
         pAnimatorMovement->groupPositions[groupIndex] = p;

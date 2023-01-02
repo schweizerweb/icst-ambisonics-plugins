@@ -227,9 +227,9 @@ void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
     groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
     xml->addChildElement(groupMode);
     
-    XmlElement* distanceScaler = new XmlElement(XML_TAG_DISTANCE_SCALER);
-    distanceScaler->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
-    xml->addChildElement(distanceScaler);
+    XmlElement* distanceScalerXml = new XmlElement(XML_TAG_DISTANCE_SCALER);
+    distanceScalerXml->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
+    xml->addChildElement(distanceScalerXml);
     
     XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
     masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());

@@ -123,7 +123,7 @@ private:
     float lastCartesianLimit;
     AnchorX anchorX;
     AnchorY anchorY;
-    double border;
+    float border;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };

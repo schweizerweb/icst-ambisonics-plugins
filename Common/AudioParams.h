@@ -19,9 +19,9 @@ class AmbiSourceSet;
 class AudioParams : AudioParameterFloat::Listener
 {
 public:
-    void initialize(AudioProcessor* pProcessor, ScalingInfo* pScalingInfo, AmbiSourceSet* pSourceSet, int numberOfGroups) {
+    void initialize(AudioProcessor* pProcessor, ScalingInfo* pScalingInfo, AmbiSourceSet* pSources, int numberOfGroups) {
         
-        this->pSourceSet = pSourceSet;
+        this->pSourceSet = pSources;
         
         // points (X, Y, Z, Gain)
          for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
@@ -90,7 +90,7 @@ public:
         }
     }
     
-    void parameterValueChanged(int parameterIndex, float newValue) override {
+    void parameterValueChanged(int parameterIndex, float /*newValue*/) override {
         auto i = paramIndexGroupIndexMap.find(parameterIndex);
         if(i != paramIndexGroupIndexMap.end())
         {
@@ -113,7 +113,7 @@ public:
         }
     }
     
-    void parameterGestureChanged(int parameterIndex, bool gestureIsStarting) override {
+    void parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/) override {
         // currently nothing to do
     }
     

@@ -147,7 +147,7 @@ void Radar3D::buttonClicked (juce::Button* buttonThatWasClicked)
     //[/UserbuttonClicked_Post]
 }
 
-void Radar3D::mouseEnter (const juce::MouseEvent& e)
+void Radar3D::mouseEnter (const juce::MouseEvent& /*e*/)
 {
     //[UserCode_mouseEnter] -- Add your code here...
     xyRadar->setRefreshRate(ACTIVE_REFRESH_RATE);
@@ -155,7 +155,7 @@ void Radar3D::mouseEnter (const juce::MouseEvent& e)
     //[/UserCode_mouseEnter]
 }
 
-void Radar3D::mouseExit (const juce::MouseEvent& e)
+void Radar3D::mouseExit (const juce::MouseEvent& /*e*/)
 {
     //[UserCode_mouseExit] -- Add your code here...
     xyRadar->setRefreshRate(INACTIVE_REFRESH_RATE);

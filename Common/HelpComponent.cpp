@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.5
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -64,7 +64,7 @@ HelpComponent::HelpComponent (bool isEncoder)
     tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/page/icst-ambisonics-plugins"), true);
 
     label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " +  String(ProjectInfo::versionString) + " " + String::fromUTF8("\xc2\xa9 2022 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
-    
+
     //[/UserPreSize]
 
     setSize (600, 400);

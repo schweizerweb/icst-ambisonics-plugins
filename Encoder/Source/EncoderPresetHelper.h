@@ -26,7 +26,7 @@ public:
     {
     }
     
-    bool loadFromXmlFile(const File file, AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    bool loadFromXmlFile(const File file, AudioParams* pAudioParams, AmbiSourceSet* pSourceSet)
     {
         XmlDocument doc(file);
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("EncoderPreset");
@@ -59,8 +59,7 @@ public:
     
     bool checkValid(File presetFile) override {
         std::unique_ptr<AmbiSourceSet> testSet(new AmbiSourceSet(pScalingInfo));
-        EncoderSettings testSettings;
-        if(loadFromXmlFile(presetFile, nullptr, testSet.get(), &testSettings))
+        if(loadFromXmlFile(presetFile, nullptr, testSet.get()))
         {
             return true;
         }
@@ -621,14 +620,14 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
         );
     }
     
-    bool loadDefaultPreset(AudioParams* pAudioParams, AmbiSourceSet* pSourceSet, EncoderSettings* pEncoderSettings)
+    bool loadDefaultPreset(AudioParams* pAudioParams, AmbiSourceSet* pSourceSet)
     {
         bool found = false;
         for(File f : presetFiles)
         {
             if(f.getFileNameWithoutExtension() == DEFAULT_PRESET_NAME)
             {
-                loadFromXmlFile(f, pAudioParams, pSourceSet, pEncoderSettings);
+                loadFromXmlFile(f, pAudioParams, pSourceSet);
                 found = true;
                 break;
             }

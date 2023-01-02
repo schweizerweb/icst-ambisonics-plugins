@@ -195,8 +195,8 @@ void AmbiGroup::setXYZ(double newX, double newY, double newZ, bool moveSubElemen
         {
             for (AmbiPoint* p : groupPoints)
             {
-                Vector3D<double> nV = p->getVector3D() + d;
-                p->getRawPoint()->setXYZ(nV.x, nV.y, nV.z);
+                Vector3D<double> nSV = p->getVector3D() + d;
+                p->getRawPoint()->setXYZ(nSV.x, nSV.y, nSV.z);
             }
         }
     }

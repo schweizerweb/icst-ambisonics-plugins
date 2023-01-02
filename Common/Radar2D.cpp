@@ -160,7 +160,7 @@ Image Radar2D::createRadarBackground() const
     g.drawRect(label1Rect);
     g.drawFittedText("X", label1Rect, Justification::centred, 1);
     
-    Rectangle<int> label2Rect(int(centerPoint.getX() - (radarMode == XZ_Half ? 22 : 10)), (!labelUp || radarMode == XZ_Half) ? 2 : localBounds.getHeight() -22, 20, 20);
+    Rectangle<int> label2Rect(int(centerPoint.getX() - (radarMode == XZ_Half ? 22 : 10)), int((!labelUp || radarMode == XZ_Half) ? 2 : localBounds.getHeight() -22), 20, 20);
     g.setColour(radarColors.getRadarBackground());
     g.fillRect(label2Rect);
     g.setColour(radarColors.getRadarAxisColor());
@@ -188,9 +188,9 @@ Image Radar2D::createRadarBackground() const
     gAll.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
     if(radarMode != XZ_Half)
     {
-        gAll.addTransform(AffineTransform::rotation(PI/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        gAll.addTransform(AffineTransform::rotation(float(PI)/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
         gAll.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
-        gAll.addTransform(AffineTransform::rotation(-PI, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        gAll.addTransform(AffineTransform::rotation(-float(PI), localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
         gAll.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
     }
     
@@ -724,8 +724,8 @@ void Radar2D::resized()
             break;
     }
     
-    radarViewport = Rectangle<int>(x, y, w, h);
-    radarViewportWithBorder = Rectangle<int>(x-border, y-border, w+2*border, h+2*border);
+    radarViewport = Rectangle<double>(x, y, w, h).toNearestInt();
+    radarViewportWithBorder = Rectangle<double>(x-border, y-border, w+2*border, h+2*border).toNearestInt();
 	updateRadarBackground();
 }
 

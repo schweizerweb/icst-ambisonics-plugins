@@ -83,25 +83,25 @@ public:
         makeValid(&q0, -1.0, 1.0);
         if(pQ0 != nullptr)
         {
-            *pQ0 = q0;
+            *pQ0 = float(q0);
         }
         
         makeValid(&q1, -1.0, 1.0);
         if(pQ1 != nullptr)
         {
-            *pQ1 = q1;
+            *pQ1 = float(q1);
         }
         
         makeValid(&q2, -1.0, 1.0);
         if(pQ2 != nullptr)
         {
-            *pQ2 = q2;
+            *pQ2 = float(q2);
         }
         
         makeValid(&q3, -1.0, 1.0);
         if(pQ3 != nullptr)
         {
-            *pQ3 = q3;
+            *pQ3 = float(q3);
         }
     }
     
@@ -110,7 +110,7 @@ public:
         makeValid(&stretch, Constants::StretchMin, Constants::StretchMax);
         if(pStretch != nullptr)
         {
-            *pStretch = stretch;
+            *pStretch = float(stretch);
         }
         
         return stretch;

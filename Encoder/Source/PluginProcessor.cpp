@@ -59,7 +59,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
         sources->addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
-    if(!presetHelper->loadDefaultPreset(&audioParams, sources.get(), &encoderSettings))
+    if(!presetHelper->loadDefaultPreset(&audioParams, sources.get()))
     {
 		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
@@ -456,7 +456,7 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
     if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
     {
         File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
-        presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get(), &encoderSettings);
+        presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get());
         presetHelper->notifyPresetChanged();
     }
 }
