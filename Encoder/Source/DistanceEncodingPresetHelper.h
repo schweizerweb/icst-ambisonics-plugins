@@ -66,28 +66,6 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
             AirAbsorbtionIntensity="4.200000286102295"/>
 </DistanceEncodingPreset>)"
         );
-        
-        buildDefaultPreset("Demo Fast Train",
-R"(<?xml version="1.0" encoding="UTF-8"?>
-
-<DistanceEncodingPreset>
-  <Settings DistEncMode="1" UnitCircleRadius="0.02709999866783619" DistEncDbUnit="10.0"
-            DistEncDistanceAttenuation="5.0" DistEncCenterCurve="0.01999999955296516"
-            DistEncAdvancedFactor="1.0" DistEncAdvancedExponent="1.0" AirAbsorbtionMode="1"
-            AirAbsorbtionIntensity="2.400000095367432"/>
-</DistanceEncodingPreset>)"
-        );
-        
-        buildDefaultPreset("Demo Slow Train",
-R"(<?xml version="1.0" encoding="UTF-8"?>
-
-<DistanceEncodingPreset>
-  <Settings DistEncMode="1" UnitCircleRadius="0.1000000014901161" DistEncDbUnit="10.0"
-            DistEncDistanceAttenuation="5.0" DistEncCenterCurve="0.01999999955296516"
-            DistEncAdvancedFactor="1.0" DistEncAdvancedExponent="1.0" AirAbsorbtionMode="1"
-            AirAbsorbtionIntensity="3.299999952316284"/>
-</DistanceEncodingPreset>)"
-        );
     }
     
     bool loadFromXmlFile(const File file, DistanceEncodingParams* pEncodingParams)
