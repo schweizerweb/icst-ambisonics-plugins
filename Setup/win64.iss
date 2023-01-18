@@ -19,8 +19,6 @@ DisableDirPage=no
 DefaultGroupName=ICST_AmbiPlugins
 DisableProgramGroupPage=yes
 InfoBeforeFile=..\readme.txt
-; Uncomment the following line to run in non administrative install mode (install for current user only.)
-PrivilegesRequired=admin
 OutputBaseFilename=AmbiPluginPackageName
 OutputDir=../packages
 Compression=lzma
