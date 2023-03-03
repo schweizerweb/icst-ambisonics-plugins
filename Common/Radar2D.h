@@ -34,10 +34,10 @@ public:
     enum SpecialHandlingMode { None, Stretch, RotateAroundGroupPoint, RotateInAedSpace };
     enum AnchorX { X_Left, X_Center, X_Right };
     enum AnchorY { Y_Top, Y_Center, Y_Bottom };
-	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, ZoomSettings* pZoomSettings, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
+	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar2D();
 
-	Point<double> getProjectedPoint(Point3D<double>* point3_d) const;
+	Point<double> getProjectedPoint(Vector3D<double>* point3_d) const;
 	Point<float> getAbsoluteScreenPoint(Point<float> point) const;
 	void paint (Graphics&) override;
 	
@@ -70,18 +70,20 @@ private:
 	Point<float> getValuePointFromAbsoluteScreenPoint(Point<float> absoluteScreenPoint) const;
 	float getValueToScreenRatio() const;
 	float getSelectedPointSize(float scaler) const;
+    float getSelectedGroupPointSize(float scaler) const;
 	Point<float> getSpecialIconPositionForCenter(Point<float> centerPt, SpecialHandlingMode mode) const;
-    void drawSquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
-	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Point3D<double>* pt, float pointSize) const;
+    void drawSquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
+	void drawEmptySquare(Graphics* g, Point<float>* screenPt, Vector3D<double>* pt, float pointSize) const;
     void drawStar(Graphics* g, Point<float>* screenPt, float pointSize) const;
     void drawStrechIcon(Graphics* g, Point<float> screenPt, float pointSize) const;
     void drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize, bool centerPoint) const;
-	void paintPoint(Graphics* g, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false) const;
-	void paintConnection(Graphics* g, AmbiGroup* group, AmbiPoint* point) const;
+	void paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false, bool groupFlag = false) const;
+	void paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const;
 
-	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
+    float getGroupPointSize(float scaler) const;
 	float getFontSize() const;
 	void drawRadar(Graphics* g) const;
 	void drawInfoLabel(Graphics* g) const;
@@ -91,7 +93,7 @@ private:
 	void updateInfoLabel(String info);
 	void timerCallback() override;
     bool checkMouseActionMode(const ModifierKeys modifiers, MouseActionMode mode);
-    void calculateRotationAroundReference(Point<int> currentMousePosition, Point3D<double> &referencePoint, double* rotationY, double* rotationZ);
+    void calculateRotationAroundReference(Point<int> currentMousePosition, Vector3D<double> &referencePoint, double* rotationY, double* rotationZ);
     bool containsIncludingBoder(const Rectangle<int>* rect, Point<int> point) const;
     
     
@@ -103,7 +105,7 @@ private:
 	Image radarBackground;
 	Image infoImage;
 	Rectangle<int> radarViewport;
-	ZoomSettings* pZoomSettings;
+    Rectangle<int> radarViewportWithBorder;
 	RadarMode radarMode;
 	PointSelection* pPointSelection;
 	RadarColors radarColors;
@@ -121,6 +123,7 @@ private:
     float lastCartesianLimit;
     AnchorX anchorX;
     AnchorY anchorY;
+    float border;
 
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (Radar2D)
 };

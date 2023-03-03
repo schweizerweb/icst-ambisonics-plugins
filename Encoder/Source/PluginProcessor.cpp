@@ -10,14 +10,13 @@
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
-#include "AudioParameterFloatAmbi.h"
-#include "AudioParameterBoolAmbi.h"
 #include "../../Common/TrackColors.h"
-#include "EncoderConstants.h"
+#include "../../Common/EncoderConstants.h"
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
 #define XML_TAG_ENCODER_ANIMATOR "Animator"
+#define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -33,13 +32,14 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #endif
 {
     sources.reset(new AmbiSourceSet(getScalingInfo()));
-	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings.distanceEncodingParams, &encoderSettings.customOscInput, getScalingInfo());
+	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
 
 	initializeOsc();
     initializeAudioParameter();
     
+    zoomSettings.reset(new ZoomSettings(getScalingInfo()));
     presetHelper.reset(new EncoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder"), this, getScalingInfo()));
     presetHelper->initialize();
 	distanceEncodingPresetHelper.reset(new DistanceEncodingPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiEncoder/DistanceEncoding"), this));
@@ -59,7 +59,7 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
         sources->addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
-    if(!presetHelper->loadDefaultPreset(&audioParams, sources.get(), &encoderSettings))
+    if(!presetHelper->loadDefaultPreset(&audioParams, sources.get()))
     {
 		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
@@ -76,45 +76,10 @@ AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
 void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
 {
 #if MULTI_ENCODER_MODE
-    encoderSettings.initialize(this);
+    sources->initialize(this);
 #endif
 	encoderSettings.distanceEncodingParams.initialize(this);
-    // points (X, Y, Z, Gain)
-     for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
-     {
-        String indexStr = String(i + 1);
-         
-        AudioParameterSet set;
-        set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("X" + indexStr, 1, "X " + indexStr, "Point " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::X);
-        set.pY = new AudioParameterFloatAmbi("Y" + indexStr, 1, "Y " + indexStr, "Point " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Y);
-        set.pZ = new AudioParameterFloatAmbi("Z" + indexStr, 1, "Z " + indexStr, "Point " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Z);
-        set.pGain = new AudioParameterFloatAmbi("Gain" + indexStr, 1, "Gain" + indexStr, "Point " + indexStr + ": Gain", AudioProcessorParameter::genericParameter, NormalisableRange<float>((float)Constants::GainDbMin, (float)Constants::GainDbMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::Gain);
-        set.pMute = new AudioParameterBoolAmbi("Mute" + indexStr, 1, "Mute" + indexStr, "Point " + indexStr + ": Mute", false, sources.get(), i, AudioParameterBoolAmbi::Mute);
-         
-        audioParams.sourceParams.add(set);
-        addParameter(set.pX);
-        addParameter(set.pY);
-        addParameter(set.pZ);
-        addParameter(set.pGain);
-        addParameter(set.pMute);
-    }
-    
-    for (int i = 0; i < MAXIMUM_NUMBER_OF_GROUPS; i++)
-    {
-        String indexStr = String(i + 1);
-        
-        AudioParameterSet set;
-        set.pScaling = getScalingInfo();
-        set.pX = new AudioParameterFloatAmbi("GX" + indexStr, 1, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GX);
-        set.pY = new AudioParameterFloatAmbi("GY" + indexStr, 1, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GY);
-        set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, 1, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, sources.get(), i, AudioParameterFloatAmbi::GZ);
-        
-        audioParams.groupParams.add(set);
-        addParameter(set.pX);
-        addParameter(set.pY);
-        addParameter(set.pZ);
-    }
+    audioParams.initialize(this, getScalingInfo(), sources.get(), MAXIMUM_NUMBER_OF_GROUPS);
 }
 
 //==============================================================================
@@ -227,7 +192,7 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
 	// Audio handling
-    const float masterGainFactor = float(Decibels::decibelsToGain(encoderSettings.getMasterGain()));
+    const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
@@ -270,10 +235,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
             || (soloOnly && !source->getSolo()))
 			continue;
 
-		Point3D<double>* pSourcePoint = source->getPoint();
-
+        Vector3D<double> sourceVector = sources->getAbsSourcePoint(iSource);
+        Point3D<double> sourcePoint(sourceVector.x, sourceVector.y, sourceVector.z);
+        double sourcePointDistance = sourcePoint.getDistance();
+        
 		// air absorbtion filter
-		if (encoderSettings.distanceEncodingFlag && airAbsorbtionFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, pSourcePoint->getDistance(), &iirFilterSpec))
+		if (encoderSettings.distanceEncodingFlag && airAbsorbtionFilters[iSource].checkFilter(&encoderSettings.distanceEncodingParams, sourcePointDistance, &iirFilterSpec))
 		{
             float* writePointer = inputBuffer.getWritePointer(iSource);
             AirAbsorbtionFilter* filter = &airAbsorbtionFilters[iSource];
@@ -287,15 +254,15 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-		pSourcePoint->getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
-		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, pSourcePoint->getDistance());
+		sourcePoint.getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
+		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, sourcePointDistance);
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
 			delayBuffers[iSource].check(int(DelayHelper::getDelaySamples(scalingInfo.GetScaler() * MathConstants<float>::sqrt2, getSampleRate())));
             localBuffer.copyFrom(0, 0, inputBuffer, iSource, 0, inputBuffer.getNumSamples());
 			// check doppler delay buffers
-			float currentDelayInSamples = DelayHelper::getDelaySamples(pSourcePoint->getDistance(), getSampleRate());
+			float currentDelayInSamples = DelayHelper::getDelaySamples(sourcePointDistance, getSampleRate());
 			delayBuffers[iSource].process(currentDelayInSamples, localBuffer.getReadPointer(0), inputBuffer.getWritePointer(iSource), inputBuffer.getNumSamples());
 		}
 
@@ -332,10 +299,12 @@ AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
 	XmlElement* xml = new XmlElement(XML_ROOT_TAG);
-
+    xml->setAttribute(XML_ATTRIBUTE_VERSION, ProjectInfo::versionNumber);
+    
 	// save general encoder settings
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
+    zoomSettings->writeToXmlElement(xml);
     xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
@@ -350,12 +319,21 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		// make sure that it's actually our type of XML object..
 		if (xmlState->hasTagName(XML_ROOT_TAG))
 		{
+            int versionNumber = xmlState->getIntAttribute(XML_ATTRIBUTE_VERSION, 0);
+            
+            if(versionNumber > ProjectInfo::versionNumber)
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "Outdated AmbiEncoder version", "The state to be loaded has been saved with a newer version of the AmbiEncoder plugin");
+            }
+            // future implementation of backward compatibility
+            
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
-            scalingInfo.SetScaler(encoderSettings.getDistanceScaler());
+            scalingInfo.SetScaler(sources->getDistanceScaler());
 			// load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();
+            zoomSettings->loadFromXml(xmlState.get());
             animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
 		}
 	}
@@ -408,24 +386,29 @@ ScalingInfo* AmbisonicEncoderAudioProcessor::getScalingInfo()
     return &scalingInfo;
 }
 
+ZoomSettings* AmbisonicEncoderAudioProcessor::getZoomSettingsPointer()
+{
+    return zoomSettings.get();
+}
+
 AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
 {
     return &animatorDataset;
 }
 
-#if (!MULTI_ENCODER_MODE)
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
 {
 	dawParameter.updateTrackPropertiesWorking = true;
 	dawParameter.lastTrackProperties = properties;
 
+#if (!MULTI_ENCODER_MODE)
 	if (sources->size() > 0)
 	{
 		sources->get(0)->setName(properties.name);
 		sources->get(0)->setColor(properties.colour);
 	}
-}
 #endif
+}
 
 EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 {
@@ -473,7 +456,7 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
     if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
     {
         File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
-        presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get(), &encoderSettings);
+        presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get());
         presetHelper->notifyPresetChanged();
     }
 }

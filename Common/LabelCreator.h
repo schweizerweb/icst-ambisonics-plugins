@@ -15,4 +15,6 @@ class LabelCreator
 {
 public:
 	static Image createNewLabel(String label, Colour newColor, float fontSize);
+    static DrawableImage* createIcon(String str, Colour fillColor, Colour textColor, Colour borderColor, bool strikeThrough);
+    static DrawableImage* createColorField(Colour color);
 };

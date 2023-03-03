@@ -1,10 +1,10 @@
 ICST Ambisonics Plugins - Readme
 --------------------------------
 
-Developped at the Institute for Comuputer Music and Sound Technology ICST in Zurich, Switzerland
-by Christian Schweizer / Martin Neukom / Johannes Schuett
+Developed at the Institute for Computer Music and Sound Technology ICST in Zurich, Switzerland
+by Christian Schweizer / Martin Neukom / Johannes Schütt
 
-Further information and help can be found here:
+More information and help can be found here:
 - Download
   https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/downloads/
 - Technical Documentation
@@ -14,4 +14,7 @@ Further information and help can be found here:
 - Guide, Tutorials, Blog
   https://ambisonics.ch/page/icst-ambisonics-plugins
 
-Note: Some Reaper-Templates distributed with this package require 3rd-party plugins. More information including download links can be found here: https://ambisonics.ch/post/icst-ambisonics-plugins-templates
+Note: Some Reaper templates distributed with this package require third-party plugins. More information, including download links, can be found here: https://ambisonics.ch/post/icst-ambiplugins-templates
+
+Note: If you have a previous version of ICST AmbiPlugin installed, you should manually clean up the Reaper template folders before installing this version over it.
+

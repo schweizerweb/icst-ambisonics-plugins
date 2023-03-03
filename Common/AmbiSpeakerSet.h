@@ -12,6 +12,7 @@
 #include "AmbiDataSet.h"
 #include "AmbiSpeaker.h"
 
+#define XML_TAG_PRESET_POINTS "Points"
 #define XML_TAG_PRESET_POINT "Point"
 
 class AmbiSpeakerSet : public AmbiDataSet

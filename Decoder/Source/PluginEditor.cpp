@@ -40,11 +40,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pFilterSpecification = ownerProc.getFilterSpecification();
 	pOscHandler = new OSCHandlerDecoder(pMovingPoints);
 	initializeOscHandler();
-	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = false;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
 	radarOptions.editablePointsAsSquare = true;
     radarOptions.scalingInfo = ownerProc.getScalingInfo();
+    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));
@@ -92,7 +92,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
+	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + (Constants::isNonVisibleVersionPrerelease() ? "" : (" " + String(ProjectInfo::versionString))), dontSendNotification);
 	updateRadarOptions();
     //[/Constructor]
 }
@@ -153,7 +153,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, radarComponent->getZoomSettingsPointer()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]

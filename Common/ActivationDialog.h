@@ -79,7 +79,7 @@ private:
         AmbiPoint* p = pData->get(combo->getSelectedId() - 1);
         p->setEnabled(true);
         p->setName(text->getText());
-        p->getPoint()->setXYZ(newPosition.getX(), xyRadar ? newPosition.getY() : 0.0, xyRadar ? 0.0 : newPosition.getY());
+        p->getRawPoint()->setXYZ(newPosition.getX(), xyRadar ? newPosition.getY() : 0.0, xyRadar ? 0.0 : newPosition.getY());
         findParentComponentOfClass<CallOutBox>()->exitModalState(0);
     }
 
@@ -91,6 +91,7 @@ private:
     std::unique_ptr<TextEditor> text;
 
     std::unique_ptr<TextButton> btn;
+    
     AmbiDataSet* pData;
     Point<float> newPosition;
     bool xyRadar;

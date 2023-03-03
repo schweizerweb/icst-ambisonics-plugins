@@ -79,7 +79,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O1_8CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o1_8ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -107,7 +107,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O1_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o1_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -125,7 +125,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O2_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o2_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -143,7 +143,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O3_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o3_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -161,7 +161,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O4_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o4_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -179,7 +179,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O5_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o5_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -197,7 +197,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O6_64CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o6_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -215,35 +215,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_O7_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>BUNDLE_POSTINSTALL_PATH</key>
-															<dict>
-																<key>PATH_TYPE</key>
-																<integer>0</integer>
-															</dict>
-															<key>BUNDLE_PREINSTALL_PATH</key>
-															<dict>
-																<key>PATH_TYPE</key>
-																<integer>0</integer>
-															</dict>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O1_1CH.vst3</string>
+															<string>../bin/VST3/AmbiDecoder_o7_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -271,223 +243,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O1_8CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O1_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O2_1CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O2_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O3_1CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O3_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O4_1CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O4_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O5_1CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O5_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O6_1CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O6_64CH.vst3</string>
-															<key>PATH_TYPE</key>
-															<integer>1</integer>
-															<key>PERMISSIONS</key>
-															<integer>493</integer>
-															<key>TYPE</key>
-															<integer>3</integer>
-															<key>UID</key>
-															<integer>0</integer>
-														</dict>
-														<dict>
-															<key>BUNDLE_CAN_DOWNGRADE</key>
-															<false/>
-															<key>CHILDREN</key>
-															<array/>
-															<key>GID</key>
-															<integer>0</integer>
-															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O7_1CH.vst3</string>
+															<string>../bin/VST3/AmbiEncoder_o1_1ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -515,7 +271,251 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_O7_64CH.vst3</string>
+															<string>../bin/VST3/AmbiEncoder_o1_8ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o1_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o2_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o2_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o3_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o3_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o4_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o4_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o5_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o5_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o6_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o6_64ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o7_1ch.vst3</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>493</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>BUNDLE_CAN_DOWNGRADE</key>
+															<false/>
+															<key>BUNDLE_POSTINSTALL_PATH</key>
+															<dict>
+																<key>PATH_TYPE</key>
+																<integer>0</integer>
+															</dict>
+															<key>BUNDLE_PREINSTALL_PATH</key>
+															<dict>
+																<key>PATH_TYPE</key>
+																<integer>0</integer>
+															</dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>../bin/VST3/AmbiEncoder_o7_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1058,7 +1058,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1077,7 +1077,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/MacOS/AmbiDecoder_O1_8CH</string>
+																					<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/MacOS/AmbiDecoder_o1_8ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1093,7 +1093,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1109,7 +1109,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1128,7 +1128,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/Resources/AmbiDecoder_O1_8CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/Resources/AmbiDecoder_o1_8ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1144,7 +1144,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1160,7 +1160,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1176,7 +1176,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O1_8CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o1_8ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1192,7 +1192,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O1_8CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o1_8ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1226,7 +1226,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1245,7 +1245,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/MacOS/AmbiDecoder_O1_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/MacOS/AmbiDecoder_o1_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1261,7 +1261,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1277,7 +1277,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1296,7 +1296,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/Resources/AmbiDecoder_O1_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/Resources/AmbiDecoder_o1_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1312,7 +1312,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1328,7 +1328,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1344,7 +1344,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O1_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o1_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1360,7 +1360,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O1_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o1_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1384,7 +1384,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1403,7 +1403,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/MacOS/AmbiDecoder_O2_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/MacOS/AmbiDecoder_o2_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1419,7 +1419,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1435,7 +1435,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1454,7 +1454,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/Resources/AmbiDecoder_O2_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/Resources/AmbiDecoder_o2_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1470,7 +1470,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1486,7 +1486,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1502,7 +1502,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O2_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o2_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1518,7 +1518,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O2_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o2_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1542,7 +1542,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1561,7 +1561,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/MacOS/AmbiDecoder_O3_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/MacOS/AmbiDecoder_o3_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1577,7 +1577,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1593,7 +1593,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1612,7 +1612,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/Resources/AmbiDecoder_O3_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/Resources/AmbiDecoder_o3_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1628,7 +1628,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1644,7 +1644,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1660,7 +1660,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O3_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o3_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1676,7 +1676,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O3_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o3_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1700,7 +1700,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1719,7 +1719,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/MacOS/AmbiDecoder_O4_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/MacOS/AmbiDecoder_o4_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1735,7 +1735,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1751,7 +1751,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1770,7 +1770,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/Resources/AmbiDecoder_O4_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/Resources/AmbiDecoder_o4_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1786,7 +1786,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1802,7 +1802,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1818,7 +1818,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O4_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o4_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1834,7 +1834,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O4_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o4_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -1858,7 +1858,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1877,7 +1877,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/MacOS/AmbiDecoder_O5_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/MacOS/AmbiDecoder_o5_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1893,7 +1893,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1909,7 +1909,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1928,7 +1928,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/Resources/AmbiDecoder_O5_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/Resources/AmbiDecoder_o5_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1944,7 +1944,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -1960,7 +1960,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -1976,7 +1976,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O5_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o5_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -1992,7 +1992,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O5_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o5_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2016,7 +2016,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2035,7 +2035,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/MacOS/AmbiDecoder_O6_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/MacOS/AmbiDecoder_o6_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2051,7 +2051,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2067,7 +2067,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2086,7 +2086,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/Resources/AmbiDecoder_O6_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/Resources/AmbiDecoder_o6_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2102,7 +2102,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2118,7 +2118,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2134,7 +2134,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O6_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o6_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2150,7 +2150,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O6_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o6_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2174,7 +2174,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2193,7 +2193,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/MacOS/AmbiDecoder_O7_64CH</string>
+																					<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/MacOS/AmbiDecoder_o7_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2209,7 +2209,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2225,7 +2225,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2244,7 +2244,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/Resources/AmbiDecoder_O7_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/Resources/AmbiDecoder_o7_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2260,7 +2260,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2276,7 +2276,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2292,7 +2292,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiDecoder_O7_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiDecoder_o7_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2308,7 +2308,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiDecoder_O7_64CH.component</string>
+															<string>../bin/AU/AmbiDecoder_o7_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2332,7 +2332,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2351,7 +2351,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/MacOS/AmbiEncoder_O1_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/MacOS/AmbiEncoder_o1_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2367,7 +2367,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2383,7 +2383,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2402,7 +2402,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/Resources/AmbiEncoder_O1_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/Resources/AmbiEncoder_o1_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2418,7 +2418,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2434,7 +2434,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2450,7 +2450,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O1_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o1_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2466,7 +2466,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O1_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o1_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2500,7 +2500,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2519,7 +2519,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/MacOS/AmbiEncoder_O1_8CH</string>
+																					<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/MacOS/AmbiEncoder_o1_8ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2535,7 +2535,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2551,7 +2551,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2570,7 +2570,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/Resources/AmbiEncoder_O1_8CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/Resources/AmbiEncoder_o1_8ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2586,7 +2586,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2602,7 +2602,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2618,7 +2618,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O1_8CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o1_8ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2634,7 +2634,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O1_8CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o1_8ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2658,7 +2658,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2677,7 +2677,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/MacOS/AmbiEncoder_O1_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/MacOS/AmbiEncoder_o1_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2693,7 +2693,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2709,7 +2709,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2728,7 +2728,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/Resources/AmbiEncoder_O1_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/Resources/AmbiEncoder_o1_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2744,7 +2744,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2760,7 +2760,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2776,7 +2776,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O1_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o1_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2792,7 +2792,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O1_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o1_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2816,7 +2816,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2835,7 +2835,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/MacOS/AmbiEncoder_O2_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/MacOS/AmbiEncoder_o2_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2851,7 +2851,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2867,7 +2867,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2886,7 +2886,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/Resources/AmbiEncoder_O2_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/Resources/AmbiEncoder_o2_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2902,7 +2902,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -2918,7 +2918,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2934,7 +2934,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O2_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o2_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -2950,7 +2950,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O2_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o2_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2974,7 +2974,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -2993,7 +2993,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/MacOS/AmbiEncoder_O2_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/MacOS/AmbiEncoder_o2_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3009,7 +3009,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3025,7 +3025,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3044,7 +3044,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/Resources/AmbiEncoder_O2_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/Resources/AmbiEncoder_o2_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3060,7 +3060,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3076,7 +3076,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3092,7 +3092,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O2_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o2_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3108,7 +3108,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O2_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o2_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3132,7 +3132,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3151,7 +3151,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/MacOS/AmbiEncoder_O3_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/MacOS/AmbiEncoder_o3_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3167,7 +3167,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3183,7 +3183,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3202,7 +3202,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/Resources/AmbiEncoder_O3_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/Resources/AmbiEncoder_o3_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3218,7 +3218,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3234,7 +3234,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3250,7 +3250,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O3_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o3_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3266,7 +3266,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O3_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o3_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3290,7 +3290,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3309,7 +3309,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/MacOS/AmbiEncoder_O3_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/MacOS/AmbiEncoder_o3_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3325,7 +3325,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3341,7 +3341,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3360,7 +3360,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/Resources/AmbiEncoder_O3_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/Resources/AmbiEncoder_o3_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3376,7 +3376,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3392,7 +3392,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3408,7 +3408,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O3_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o3_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3424,7 +3424,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O3_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o3_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3448,7 +3448,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3467,7 +3467,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/MacOS/AmbiEncoder_O4_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/MacOS/AmbiEncoder_o4_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3483,7 +3483,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3499,7 +3499,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3518,7 +3518,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/Resources/AmbiEncoder_O4_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/Resources/AmbiEncoder_o4_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3534,7 +3534,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3550,7 +3550,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3566,7 +3566,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O4_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o4_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3582,7 +3582,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O4_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o4_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3606,7 +3606,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3625,7 +3625,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/MacOS/AmbiEncoder_O4_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/MacOS/AmbiEncoder_o4_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3641,7 +3641,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3657,7 +3657,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3676,7 +3676,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/Resources/AmbiEncoder_O4_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/Resources/AmbiEncoder_o4_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3692,7 +3692,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3708,7 +3708,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3724,7 +3724,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O4_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o4_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3740,7 +3740,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O4_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o4_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3764,7 +3764,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3783,7 +3783,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/MacOS/AmbiEncoder_O5_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/MacOS/AmbiEncoder_o5_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3799,7 +3799,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3815,7 +3815,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3834,7 +3834,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/Resources/AmbiEncoder_O5_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/Resources/AmbiEncoder_o5_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3850,7 +3850,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3866,7 +3866,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3882,7 +3882,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O5_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o5_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -3898,7 +3898,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O5_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o5_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3922,7 +3922,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3941,7 +3941,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/MacOS/AmbiEncoder_O5_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/MacOS/AmbiEncoder_o5_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -3957,7 +3957,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3973,7 +3973,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -3992,7 +3992,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/Resources/AmbiEncoder_O5_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/Resources/AmbiEncoder_o5_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4008,7 +4008,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4024,7 +4024,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4040,7 +4040,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O5_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o5_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -4056,7 +4056,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O5_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o5_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -4080,7 +4080,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4099,7 +4099,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/MacOS/AmbiEncoder_O6_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/MacOS/AmbiEncoder_o6_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4115,7 +4115,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4131,7 +4131,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4150,7 +4150,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/Resources/AmbiEncoder_O6_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/Resources/AmbiEncoder_o6_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4166,7 +4166,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4182,7 +4182,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4198,7 +4198,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O6_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o6_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -4214,7 +4214,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O6_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o6_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -4238,7 +4238,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4257,7 +4257,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/MacOS/AmbiEncoder_O6_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/MacOS/AmbiEncoder_o6_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4273,7 +4273,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4289,7 +4289,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4308,7 +4308,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/Resources/AmbiEncoder_O6_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/Resources/AmbiEncoder_o6_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4324,7 +4324,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4340,7 +4340,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4356,7 +4356,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O6_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o6_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -4372,7 +4372,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O6_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o6_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -4396,7 +4396,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4415,7 +4415,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/MacOS/AmbiEncoder_O7_1CH</string>
+																					<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/MacOS/AmbiEncoder_o7_1ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4431,7 +4431,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4447,7 +4447,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4466,7 +4466,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/Resources/AmbiEncoder_O7_1CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/Resources/AmbiEncoder_o7_1ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4482,7 +4482,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4498,7 +4498,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4514,7 +4514,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O7_1CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o7_1ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -4530,7 +4530,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O7_1CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o7_1ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -4554,7 +4554,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/Info.plist</string>
+																			<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/Info.plist</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4573,7 +4573,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/MacOS/AmbiEncoder_O7_64CH</string>
+																					<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/MacOS/AmbiEncoder_o7_64ch</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4589,7 +4589,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/MacOS</string>
+																			<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/MacOS</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4605,7 +4605,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/PkgInfo</string>
+																			<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/PkgInfo</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4624,7 +4624,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/Resources/AmbiEncoder_O7_64CH.rsrc</string>
+																					<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/Resources/AmbiEncoder_o7_64ch.rsrc</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4640,7 +4640,7 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
+																					<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
 																					<key>PERMISSIONS</key>
@@ -4656,7 +4656,7 @@
 																			<key>GID</key>
 																			<integer>0</integer>
 																			<key>PATH</key>
-																			<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents/Resources</string>
+																			<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents/Resources</string>
 																			<key>PATH_TYPE</key>
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
@@ -4672,7 +4672,7 @@
 																	<key>GID</key>
 																	<integer>0</integer>
 																	<key>PATH</key>
-																	<string>../bin/AU/AmbiEncoder_O7_64CH.component/Contents</string>
+																	<string>../bin/AU/AmbiEncoder_o7_64ch.component/Contents</string>
 																	<key>PATH_TYPE</key>
 																	<integer>1</integer>
 																	<key>PERMISSIONS</key>
@@ -4688,7 +4688,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/AU/AmbiEncoder_O7_64CH.component</string>
+															<string>../bin/AU/AmbiEncoder_o7_64ch.component</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -5726,7 +5726,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST Mono Ambisonics.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o1.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5742,7 +5742,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_Ambi_OSC_DEMO.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o3.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5758,7 +5758,7 @@
 													<key>GID</key>
 													<integer>80</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O1.RPP</string>
+													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Mono_o5.RPP</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
@@ -5772,11 +5772,11 @@
 													<key>CHILDREN</key>
 													<array/>
 													<key>GID</key>
-													<integer>80</integer>
+													<integer>0</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O3.RPP</string>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o1.RPP</string>
 													<key>PATH_TYPE</key>
-													<integer>1</integer>
+													<integer>0</integer>
 													<key>PERMISSIONS</key>
 													<integer>420</integer>
 													<key>TYPE</key>
@@ -5788,11 +5788,27 @@
 													<key>CHILDREN</key>
 													<array/>
 													<key>GID</key>
-													<integer>80</integer>
+													<integer>0</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_O5.RPP</string>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o3.RPP</string>
 													<key>PATH_TYPE</key>
-													<integer>1</integer>
+													<integer>0</integer>
+													<key>PERMISSIONS</key>
+													<integer>420</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+												<dict>
+													<key>CHILDREN</key>
+													<array/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
+													<string>/Users/cschweizer/Code/ambisonics-plugin/Setup/ICST_AmbisonicsTemplates/ICST_AmbiPlugins_Multi_o5.RPP</string>
+													<key>PATH_TYPE</key>
+													<integer>0</integer>
 													<key>PERMISSIONS</key>
 													<integer>420</integer>
 													<key>TYPE</key>
@@ -6400,7 +6416,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/dearVR_Binaural_Ambi_Micro.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6416,7 +6432,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6432,7 +6448,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/BF_Player_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6448,7 +6464,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6464,7 +6480,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6480,7 +6496,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Bformat-Master_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6496,7 +6512,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6512,7 +6528,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_4x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6528,7 +6544,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_8x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_DECODER_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6544,7 +6560,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_16x_mono_sources.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6560,7 +6576,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6576,7 +6592,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6592,7 +6608,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Multi_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Mono_AmbiEncoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6608,7 +6624,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6624,7 +6640,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6640,7 +6656,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Encoder-Solo_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6656,7 +6672,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O1.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6672,7 +6688,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O3.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6688,7 +6704,23 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/IEM_Binaural_Decoder_O5.RTrackTemplate</string>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ICST_Multi_AmbiEncoder_o5.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>80</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins/ZHdK_IA-Space_Decoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -6709,6 +6741,169 @@
 													<integer>509</integer>
 													<key>TYPE</key>
 													<integer>2</integer>
+													<key>UID</key>
+													<integer>0</integer>
+												</dict>
+												<dict>
+													<key>CHILDREN</key>
+													<array>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/AMBEO A-to-B.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/DearVR_BINAURAL.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/FX_Bformat_o3(IEM).RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_BFormat_Manipulator_o3.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o1.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o3.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/IEM_Binaural_Decoder_o5.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/RODE_Soundfield.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+														<dict>
+															<key>CHILDREN</key>
+															<array/>
+															<key>GID</key>
+															<integer>0</integer>
+															<key>PATH</key>
+															<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party/ZYLIA_to_Bformat.RTrackTemplate</string>
+															<key>PATH_TYPE</key>
+															<integer>1</integer>
+															<key>PERMISSIONS</key>
+															<integer>420</integer>
+															<key>TYPE</key>
+															<integer>3</integer>
+															<key>UID</key>
+															<integer>0</integer>
+														</dict>
+													</array>
+													<key>EXPANDED</key>
+													<true/>
+													<key>GID</key>
+													<integer>0</integer>
+													<key>PATH</key>
+													<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party</string>
+													<key>PATH_TYPE</key>
+													<integer>1</integer>
+													<key>PERMISSIONS</key>
+													<integer>493</integer>
+													<key>TYPE</key>
+													<integer>3</integer>
 													<key>UID</key>
 													<integer>0</integer>
 												</dict>

@@ -115,6 +115,7 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
         // address path elements
         jsContext->jsPathElements.clear();
         jsContext->jsArguments.clear();
+        jsContext->errorMsg = "";
         String address = pMessage->getAddressPattern().toString();
         StringArray tokens;
         tokens.addTokens (address, "/", "\"");
@@ -145,9 +146,12 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
             errorMessage = message;
             return false;
         }
-        else
+        else if(!jsContext->errorMsg.isEmpty())
         {
-            // success
+            // user defined function failed
+            String message = jsContext->errorMsg;
+            errorMessage = message;
+            return false;
         }
         return true;
     }
@@ -290,11 +294,11 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     if(xyzMode)
     {
         if(x == invalidDbl)
-            x = pt->getPoint()->getX();
+            x = pt->getRawPoint()->getX();
         if(y == invalidDbl)
-            y = pt->getPoint()->getY();
+            y = pt->getRawPoint()->getY();
         if(z == invalidDbl)
-            z = pt->getPoint()->getZ();
+            z = pt->getRawPoint()->getZ();
         
         pSources->setChannelXYZ(index, x, y, z);
     }
@@ -302,11 +306,11 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     {
         // otherwise use aed
         if(a == invalidDbl)
-            a = pt->getPoint()->getAzimuth();
+            a = pt->getRawPoint()->getAzimuth();
         if(e == invalidDbl)
-            e = pt->getPoint()->getElevation();
+            e = pt->getRawPoint()->getElevation();
         if(d == invalidDbl)
-            d = pt->getPoint()->getDistance();
+            d = pt->getRawPoint()->getDistance();
         
         pSources->setChannelAED(index, a, e, d);
     }

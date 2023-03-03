@@ -16,12 +16,10 @@
 #include "../../Common/StatusMessageHandler.h"
 #include "../../Common/ScalingInfo.h"
 
-#define COMPARISON_DELTA 0.00001
-
 class PointHistoryEntry
 {
 public:
-	bool update(AmbiPoint* pAmbiPoint)
+	bool update(Vector3D<double> absPos, AmbiPoint* pAmbiPoint)
 	{
 		bool changed = false;
 
@@ -30,9 +28,9 @@ public:
 			name = pAmbiPoint->getName();
 			changed = true;
 		}
-		if(!pAmbiPoint->getPoint()->equals(point, COMPARISON_DELTA))
+		if(!(absPos - point).lengthIsBelowEpsilon())
 		{
-			point = *pAmbiPoint->getPoint();
+			point = absPos;
 			changed = true;
 		}
 		if(pAmbiPoint->getGain() != gain)
@@ -49,7 +47,7 @@ public:
 	}
 
 	String name; 
-	Point3D<double> point;
+	Vector3D<double> point;
 	Colour color;
 	double gain;
 };

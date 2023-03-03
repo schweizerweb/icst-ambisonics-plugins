@@ -106,6 +106,24 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     btnManagePresets->setButtonText (TRANS("presets..."));
     btnManagePresets->addListener (this);
 
+    toggleReceiveStandardOsc.reset (new juce::ToggleButton ("toggleReceiveStandardOsc"));
+    addAndMakeVisible (toggleReceiveStandardOsc.get());
+    toggleReceiveStandardOsc->setButtonText (TRANS("Listen for Standard OSC"));
+    toggleReceiveStandardOsc->addListener (this);
+
+    toggleReceiveStandardOsc->setBounds (280, 10, 184, 24);
+
+    btnInfoStandardOsc.reset (new juce::ImageButton ("btnInfo"));
+    addAndMakeVisible (btnInfoStandardOsc.get());
+    btnInfoStandardOsc->setButtonText (TRANS("new button"));
+    btnInfoStandardOsc->addListener (this);
+
+    btnInfoStandardOsc->setImages (false, true, true,
+                                   juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
+                                   juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                   juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    btnInfoStandardOsc->setBounds (464, 9, 23, 24);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -116,6 +134,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener,
     //[Constructor] You can add your own custom stuff here..
     toggleReceiveOsc->setToggleState(pSettings->oscReceiveFlag, dontSendNotification);
     sliderReceiveOscPort->setValue(pSettings->oscReceivePort, dontSendNotification);
+    toggleReceiveStandardOsc->setToggleState(pSettings->oscHandleStandardFormatFlag, dontSendNotification);
     customOscTableModel->initTable(customOscList.get());
     toggleHideWarnings->setToggleState(pSettings->hideWarnings, dontSendNotification);
     controlDimming();
@@ -139,6 +158,8 @@ OSCRxSettingsComponent::~OSCRxSettingsComponent()
     buttonShowOscLog = nullptr;
     toggleHideWarnings = nullptr;
     btnManagePresets = nullptr;
+    toggleReceiveStandardOsc = nullptr;
+    btnInfoStandardOsc = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -232,6 +253,24 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         //[UserButtonCode_btnManagePresets] -- add your button handler code here..
         presetManagerDialog.show(this, pCustomOscRxPresetHelper);
         //[/UserButtonCode_btnManagePresets]
+    }
+    else if (buttonThatWasClicked == toggleReceiveStandardOsc.get())
+    {
+        //[UserButtonCode_toggleReceiveStandardOsc] -- add your button handler code here..
+        pSettings->oscHandleStandardFormatFlag = toggleReceiveStandardOsc->getToggleState();
+        sendChangeMessage();
+        //[/UserButtonCode_toggleReceiveStandardOsc]
+    }
+    else if (buttonThatWasClicked == btnInfoStandardOsc.get())
+    {
+        //[UserButtonCode_btnInfoStandardOsc] -- add your button handler code here..
+        auto textEditor = std::make_unique<TextEditor>("");
+        textEditor->setReadOnly(true);
+        textEditor->setMultiLine(true);
+        textEditor->setText("If activated, the Plugin listens to the standard OSC patterns, otherwise, the standard patterns are ignored and only user defined patterns are evaluated.\n\nStandard patterns (details can be found in the main help section):\n /icst/ambi/source/aed\n /icst/ambi/source/xyz\n /icst/ambi/source/gain\n /icst/ambi/group/aed\n /icst/ambi/group/xyz\n /icst/ambi/sourceindex/aed\n /icst/ambi/sourceindex/xyz\n /icst/ambi/sourceindex/gain\n /icst/ambi/group/rotate\n /icst/ambi/group/rotateorigin\n /icst/ambi/group/stretch\n /icst/ambi/distanceencoding/mode\n /icst/ambi/distanceencoding/unitcircle\n /icst/ambi/distanceencoding/dbunit\n /icst/ambi/distanceencoding/distanceattenuation\n /icst/ambi/distanceencoding/centercurve\n /icst/ambi/distanceencoding/advancedfactor\n /icst/ambi/distanceencoding/advancedexponent\n /icst/ambi/distanceencoding/standard\n /icst/ambi/distanceencoding/advanced\n /icst/ambi/distanceencoding/exponential\n /icst/ambi/distanceencoding/inverseproportional");
+        textEditor->setSize(330, 250);
+        CallOutBox::launchAsynchronously(std::move(textEditor), btnInfoStandardOsc->getBounds(), this);
+        //[/UserButtonCode_btnInfoStandardOsc]
     }
 
     //[UserbuttonClicked_Post]
@@ -382,6 +421,16 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="134r 10Rr 86 24" posRelativeX="5ccced30e0050e9"
               posRelativeY="5ccced30e0050e9" buttonText="presets..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
+  <TOGGLEBUTTON name="toggleReceiveStandardOsc" id="c6b5fff39ee7a27b" memberName="toggleReceiveStandardOsc"
+                virtualName="" explicitFocusOrder="0" pos="280 10 184 24" posRelativeX="64cdd18a28c39177"
+                posRelativeY="64cdd18a28c39177" buttonText="Listen for Standard OSC"
+                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+  <IMAGEBUTTON name="btnInfo" id="9b390d63268c4528" memberName="btnInfoStandardOsc"
+               virtualName="" explicitFocusOrder="0" pos="464 9 23 24" buttonText="new button"
+               connectedEdges="0" needsCallback="1" radioGroupId="0" keepProportions="1"
+               resourceNormal="help_png" opacityNormal="1.0" colourNormal="0"
+               resourceOver="help_png" opacityOver="0.4000000059604645" colourOver="6eee1010"
+               resourceDown="help_png" opacityDown="1.0" colourDown="c0ee1010"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

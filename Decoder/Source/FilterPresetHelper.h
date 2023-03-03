@@ -35,21 +35,29 @@ public:
     
     void restoreDefaultsInternal() override
     {
-        FilterBankInfo filterInfo;
+        buildDefaultPreset("LowPass 50 Hz",
+R"(<?xml version="1.0" encoding="UTF-8"?>
+
+<FilterPreset>
+  <Settings FilterType="1" FilterFrequency="50.0" FilterQ="1.0" GainFactor="1.0"
+            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
+            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
+            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"/>
+</FilterPreset>
+)"
+            );
         
-        File file = getPathForPresetName("LowPass 50 Hz");
-        filterInfo.get(0)->filterType = FilterInfo::LowPass;
-        filterInfo.get(0)->cutOffFrequencyHz = 50;
-        
-        writeToXmlFile(file, &filterInfo);
-        presetFiles.addIfNotAlreadyThere(file);
-        
-        File fileHighPass = getPathForPresetName("HighPass 120 Hz");
-        filterInfo.get(0)->filterType = FilterInfo::HighPass;
-        filterInfo.get(0)->cutOffFrequencyHz = 120;
-        
-        writeToXmlFile(fileHighPass, &filterInfo);
-        presetFiles.addIfNotAlreadyThere(fileHighPass);
+        buildDefaultPreset("HighPass 120Hz",
+R"(<?xml version="1.0" encoding="UTF-8"?>
+
+<FilterPreset>
+  <Settings FilterType="3" FilterFrequency="120.0" FilterQ="1.0" GainFactor="1.0"
+            FilterType1="0" FilterFrequency1="200.0" FilterQ1="1.0" GainFactor1="1.0"
+            FilterType2="0" FilterFrequency2="200.0" FilterQ2="1.0" GainFactor2="1.0"
+            FilterType3="0" FilterFrequency3="200.0" FilterQ3="1.0" GainFactor3="1.0"/>
+</FilterPreset>
+)"
+            );
     }
     
     bool loadFromXmlFile(const File file, FilterBankInfo* pFilterInfo)

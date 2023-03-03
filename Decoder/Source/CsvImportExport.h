@@ -94,11 +94,11 @@ public:
         {
             AmbiSpeaker* s = pSpeakerSet->get(i);
             stream.writeText(
-                String(Constants::RadToGrad(s->getPoint()->getAzimuth()))
+                String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
                 + SEPARATOR
-                + String(Constants::RadToGrad(s->getPoint()->getElevation()))
+                + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
                 + SEPARATOR
-                + String(s->getPoint()->getDistance())
+                + String(s->getRawPoint()->getDistance())
                 + SEPARATOR
                 + s->getName()
                 + SEPARATOR

@@ -13,6 +13,7 @@
 #include "AudioParams.h"
 #include "DawParameter.h"
 #include "ScalingInfo.h"
+#include "ZoomSettings.h"
 
 class RadarOptions
 {
@@ -21,15 +22,16 @@ public:
 	AudioParameterSet getAudioParamForIndex(int index, bool isGroup) const;
 
 public:
-	bool nameFieldEditable;
 	int maxNumberEditablePoints;
 	bool editablePointsAsSquare;
 	int displayTimeout;
 	bool showEditablePoints;
 	bool showDisplayOnlyPoints;
 	bool setTrackColorAccordingToName;
-
+    bool checkNameFieldEditable;
+    
     AudioParams* audioParams;
 	DawParameter* dawParameter;
     ScalingInfo* scalingInfo;
+    ZoomSettings* zoomSettings;
 };

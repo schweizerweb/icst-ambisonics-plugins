@@ -9,6 +9,7 @@
 */
 
 #include "AmbiSourceSet.h"
+#include "EncoderConstants.h"
 
 AmbiSource* AmbiSourceSet::get(int index) const
 {
@@ -42,7 +43,7 @@ void AmbiSourceSet::remove(int index)
 	// rearrange audio parameter
 	for (int i = elements.size() - 1; i > index; i--)
 	{
-		elements[i]->getPoint()->setAudioParameterSet(elements[i-1]->getPoint()->getAudioParameterSet());
+		elements[i]->getRawPoint()->setAudioParameterSet(elements[i-1]->getRawPoint()->getAudioParameterSet());
 	}
 	
 	AmbiSource* removedPt = elements.removeAndReturn(index);
@@ -58,8 +59,8 @@ void AmbiSourceSet::swap(int a, int b)
 	if (elements.size() > a && elements.size() > b)
 	{
 		// keep audio parameter for index
-		Point3D<double>* pointA = elements.getUnchecked(a)->getPoint();
-		Point3D<double>* pointB = elements.getUnchecked(b)->getPoint();
+		Point3D<double>* pointA = elements.getUnchecked(a)->getRawPoint();
+		Point3D<double>* pointB = elements.getUnchecked(b)->getRawPoint();
 		
 		AudioParameterSet setA = pointA->getAudioParameterSet();
 		pointA->setAudioParameterSet(pointB->getAudioParameterSet());
@@ -117,7 +118,7 @@ void AmbiSourceSet::setChannelXYZExt(String id, String name, double x, double y,
 	}
 
 	matchingPt->setName(name);
-	matchingPt->getPoint()->setXYZ(x, y, z);
+	matchingPt->getRawPoint()->setXYZ(x, y, z);
 	matchingPt->setRms(rms);
 	matchingPt->setColor(color);
 	matchingPt->setAlive(Time::currentTimeMillis());
@@ -139,8 +140,26 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 
 void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams)
 {
-	XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
-	clear();
+    XmlElement* groupMode = xmlElement->getChildByName(XML_TAG_GROUP_MODE);
+    if(groupMode != nullptr)
+    {
+        groupModeFlag = groupMode->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_GROUP_MODE_FLAG);
+    }
+    
+    XmlElement* distanceScalerXml = xmlElement->getChildByName(XML_TAG_DISTANCE_SCALER);
+    if (distanceScalerXml != nullptr)
+    {
+        setDistanceScaler(float(distanceScalerXml->getDoubleAttribute(XML_ATTRIBUTE_FACTOR, DEFAULT_DISTANCE_SCALER)));
+    }
+    
+    XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
+    if (masterGainElement != nullptr)
+    {
+        setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
+    }
+    
+    clear();
+    XmlElement* sourcesElement = xmlElement->getChildByName(XML_TAG_SOURCES);
 	if (sourcesElement != nullptr)
 	{
 		int index = 0;
@@ -167,28 +186,56 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 	}
 
 	// groups
-	XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
-	groups.clear();
+    groups.clear();
+    XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
 	if(groupsElement != nullptr)
 	{
 		int index = 0;
 		XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
+        // create base type pointer array
+        Array<AmbiPoint*> ambiPointPointers;
+        for(int i = 0; i < elements.size(); i++)
+            ambiPointPointers.add(elements[i]);
 		while (xmlGroup != nullptr)
 		{
             if(pAudioParams != nullptr && pAudioParams->groupParams.size() > index)
-                groups.add(new AmbiGroup(xmlGroup, &elements, pAudioParams->groupParams.getUnchecked(index), pScalingInfo));
+                groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, pAudioParams->groupParams.getUnchecked(index), pScalingInfo));
             else
-                groups.add(new AmbiGroup(xmlGroup, &elements, AudioParameterSet(), pScalingInfo));
+                groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, AudioParameterSet(), pScalingInfo));
             
 			xmlGroup = xmlGroup->getNextElement();
 			index++;
 		}
+        if(pAudioParams != nullptr)
+        {
+            while (groups.size() < pAudioParams->groupParams.size())
+            {
+                String indexString = String(index + 1);
+                AmbiGroup* g = new AmbiGroup(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, pAudioParams->groupParams.getUnchecked(index)), "G"+indexString, Colours::orangered, pScalingInfo);
+                g->setEnabled(false);
+                groups.add(g);
+                index++;
+            }
+        }
 	}
 }
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 {
-	// load sources
+    // group mode flag
+    XmlElement* groupMode = new XmlElement(XML_TAG_GROUP_MODE);
+    groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
+    xml->addChildElement(groupMode);
+    
+    XmlElement* distanceScalerXml = new XmlElement(XML_TAG_DISTANCE_SCALER);
+    distanceScalerXml->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
+    xml->addChildElement(distanceScalerXml);
+    
+    XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
+    masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
+    xml->addChildElement(masterGainElement);
+    
+	// sources
 	XmlElement* sourcesElement = new XmlElement(XML_TAG_SOURCES);
 	for (int i = 0; i < size(); i++)
 	{
@@ -228,4 +275,50 @@ bool AmbiSourceSet::anySolo() const
             return true;
     
     return false;
+}
+
+void AmbiSourceSet::setDistanceScaler(double newDistanceScaler)
+{
+    distanceScaler = newDistanceScaler;
+}
+
+double AmbiSourceSet::getDistanceScaler() const
+{
+    return distanceScaler;
+}
+
+float AmbiSourceSet::getMasterGain() const
+{
+    return masterGain != nullptr ? masterGain->get() : localMasterGain;
+}
+
+bool AmbiSourceSet::setMasterGain(float gainDb)
+{
+    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
+        return false;
+
+    if (masterGain != nullptr)
+        *masterGain = gainDb;
+    else
+        localMasterGain = gainDb;
+
+    return true;
+}
+
+void AmbiSourceSet::initialize(AudioProcessor* pProcessor)
+{
+    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
+
+    pProcessor->addParameter(masterGain);
+
+    masterGain->addListener(this);
+}
+
+void AmbiSourceSet::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
+{
+    sendChangeMessage();
+}
+
+void AmbiSourceSet::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
+{
 }

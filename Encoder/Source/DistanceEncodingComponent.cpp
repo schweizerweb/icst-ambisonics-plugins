@@ -18,7 +18,7 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "EncoderConstants.h"
+#include "../../Common/EncoderConstants.h"
 //[/Headers]
 
 #include "DistanceEncodingComponent.h"
@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling)
-    : pParams(pParams), pPresetHelper(pPresetHelper)
+DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
+    : pParams(pParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -42,7 +42,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
                                                       TRANS("Attenuation")));
     addAndMakeVisible (groupAttenuation.get());
 
-    distanceEncodingGraph.reset (new DistanceEncodingGraph (pParams, pScaling));
+    distanceEncodingGraph.reset (new DistanceEncodingGraph (pParams, pZoomSettings));
     addAndMakeVisible (distanceEncodingGraph.get());
     distanceEncodingGraph->setName ("distanceEncodingGraph");
 
@@ -255,6 +255,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pP
     sliderAirAbsorbtionIntensity->setRange(EncoderConstants::AirAbsorbtionIntensityMin, EncoderConstants::AirAbsorbtionIntensityMax, EncoderConstants::AirAbsorbtionIntensityResolution);
     sliderAirAbsorbtionIntensity->setSkewFactorFromMidPoint(10.0);
     pParams->addChangeListener(this);
+    pZoomSettings->addChangeListener(this);
 
     updatePresetComboBox();
     pPresetHelper->addActionListener(this);
@@ -269,6 +270,7 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     pParams->removeChangeListener(this);
     pPresetHelper->removeActionListener(this);
+    pZoomSettings->removeChangeListener(this);
     //[/Destructor_pre]
 
     groupAirAbsorbtion = nullptr;
@@ -307,7 +309,7 @@ void DistanceEncodingComponent::paint (juce::Graphics& g)
     //[UserPrePaint] Add your own custom painting code here..
     //[/UserPrePaint]
 
-    g.fillAll (juce::Colour (0xff505050));
+    g.fillAll (juce::Colour (0xff323e44));
 
     //[UserPaint] Add your own custom painting code here..
     //[/UserPaint]
@@ -320,7 +322,7 @@ void DistanceEncodingComponent::resized()
 
     groupAirAbsorbtion->setBounds (0, getHeight() - 99, getWidth() - 0, 64);
     groupAttenuation->setBounds (0, 0, getWidth() - 0, getHeight() - 99);
-    distanceEncodingGraph->setBounds (16, 200, proportionOfWidth (0.9674f), getHeight() - 315);
+    distanceEncodingGraph->setBounds (16, 200, getWidth() - 32, getHeight() - 316);
     sliderUnitCircleRadius->setBounds (160, 48, getWidth() - 174, 24);
     comboBoxEncodingMode->setBounds (160, 24, getWidth() - 174, 24);
     sliderDbUnit->setBounds (161, 120, getWidth() - 175, 24);
@@ -512,6 +514,7 @@ void DistanceEncodingComponent::setUiValues(DistanceEncodingParams *pEncodingPar
 void DistanceEncodingComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     setUiValues(pParams);
+    controlDimming();
 }
 //[/MiscUserCode]
 
@@ -527,18 +530,18 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DistanceEncodingComponent"
                  componentName="" parentClasses="public Component, ChangeListener, ActionListener"
-                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ScalingInfo* pScaling"
-                 variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper)"
+                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
+                 variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="500">
-  <BACKGROUND backgroundColour="ff505050"/>
+  <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupAirAbsorbtion" id="9e077e85238f4bfb" memberName="groupAirAbsorbtion"
                   virtualName="" explicitFocusOrder="0" pos="0 99R 0M 64" title="Air Absorbtion"/>
   <GROUPCOMPONENT name="groupAttenuation" id="874eb788ffea8f71" memberName="groupAttenuation"
                   virtualName="" explicitFocusOrder="0" pos="0 0 0M 99M" title="Attenuation"/>
   <GENERICCOMPONENT name="distanceEncodingGraph" id="eaba5f5be7082dad" memberName="distanceEncodingGraph"
-                    virtualName="" explicitFocusOrder="0" pos="16 200 96.742% 315M"
-                    class="DistanceEncodingGraph" params="pParams, pScaling"/>
+                    virtualName="" explicitFocusOrder="0" pos="16 200 32M 316M" class="DistanceEncodingGraph"
+                    params="pParams, pZoomSettings"/>
   <SLIDER name="sliderUnitCircleRadius" id="33a23e1d161c87b2" memberName="sliderUnitCircleRadius"
           virtualName="" explicitFocusOrder="0" pos="160 48 174M 24" min="0.01"
           max="1.0" int="0.01" style="LinearHorizontal" textBoxPos="TextBoxLeft"

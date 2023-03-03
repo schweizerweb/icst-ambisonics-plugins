@@ -11,4 +11,5 @@
 #pragma once
 
 #define COLOR_DEFINITION_SELECTED_ROW           Colours::blueviolet
+#define COLOR_DEFINITION_GROUP_DEFAULT          Colours::orange
 #define COLOR_DEFINITION_ALTERNATE_INTENSITY    0.06f

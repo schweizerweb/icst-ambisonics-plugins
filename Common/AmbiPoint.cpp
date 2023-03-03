@@ -11,7 +11,7 @@
 #include "AmbiPoint.h"
 #include "LabelCreator.h"
 
-AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), audioParams(other->audioParams), enabled(other->enabled)
+AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): audioParams(other->audioParams), id(other->id), point(other->point), color(other->color), name(other->name), gain(other->gain), lastUpdate(other->lastUpdate), enabled(other->enabled), pGroup(other->pGroup)
 {
 	if (copyImage)
 	{
@@ -24,24 +24,26 @@ AmbiPoint::AmbiPoint(AmbiPoint* other, bool copyImage): id(other->id), point(oth
 	}
 }
 
-AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0)
+AmbiPoint::AmbiPoint(): color(Colour()), gain(1.0), pGroup(nullptr)
 {
 }
 
 AmbiPoint::AmbiPoint(String id, Point3D<double> point, String name, Colour color, double gain, bool mute, bool solo):
-	id(id),
+    audioParams(point.getAudioParameterSet()),
+    id(id),
 	point(point),
 	color(color),
 	name(name),
 	gain(gain),
     mute(mute),
     solo(solo),
-    enabled(true)
+    enabled(true),
+    pGroup(nullptr)
 {
 }
 
 AmbiPoint::AmbiPoint(XmlElement* element):
-	id(Uuid().toString()),
+	id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z))),
@@ -50,12 +52,14 @@ AmbiPoint::AmbiPoint(XmlElement* element):
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
     solo(false),
-    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true)),
+    pGroup(nullptr)
 {
 }
 
 AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
-	id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
+    audioParams(audioParams),
+    id(element->getStringAttribute(XML_ATTRIBUTE_POINT_ID, Uuid().toString())),
 	point(Point3D<double>(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_X),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Y),
 	                      element->getDoubleAttribute(XML_ATTRIBUTE_POINT_Z),
@@ -65,20 +69,21 @@ AmbiPoint::AmbiPoint(XmlElement* element, AudioParameterSet audioParams):
 	gain(element->getDoubleAttribute(XML_ATTRIBUTE_POINT_GAIN, 1.0)),
     mute(element->getBoolAttribute(XML_ATTRIBUTE_POINT_MUTE, false)),
     solo(false),
-    audioParams(audioParams),
-    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true))
+    enabled(element->getBoolAttribute(XML_ATTRIBUTE_POINT_ENABLED, true)),
+    pGroup(nullptr)
 {
 }
 
 AmbiPoint::AmbiPoint(AudioParameterSet audioParams) :
+    audioParams(audioParams),
     id(Uuid().toString()),
     point(Point3D<double>(0.0, 0.0, 0.0, audioParams)),
     color(Colours::black),
     gain(1.0),
     mute(false),
     solo(false),
-    audioParams(audioParams),
-    enabled(false)
+    enabled(false),
+    pGroup(nullptr)
 {
 }
 
@@ -90,9 +95,9 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 {
 	XmlElement* element = new XmlElement(tagName);
 	element->setAttribute(XML_ATTRIBUTE_POINT_ID, getId());
-	element->setAttribute(XML_ATTRIBUTE_POINT_X, getPoint()->getX());
-	element->setAttribute(XML_ATTRIBUTE_POINT_Y, getPoint()->getY());
-	element->setAttribute(XML_ATTRIBUTE_POINT_Z, getPoint()->getZ());
+	element->setAttribute(XML_ATTRIBUTE_POINT_X, getRawPoint()->getX());
+	element->setAttribute(XML_ATTRIBUTE_POINT_Y, getRawPoint()->getY());
+	element->setAttribute(XML_ATTRIBUTE_POINT_Z, getRawPoint()->getZ());
 	element->setAttribute(XML_ATTRIBUTE_POINT_NAME, getName());
 	element->setAttribute(XML_ATTRIBUTE_POINT_COLOR_NEW, getColor().toString());
 	element->setAttribute(XML_ATTRIBUTE_POINT_GAIN, getGain());
@@ -101,9 +106,14 @@ XmlElement* AmbiPoint::getBaseXmlElement(String tagName)
 	return element;
 }
 
-Point3D<double>* AmbiPoint::getPoint()
+Point3D<double>* AmbiPoint::getRawPoint()
 {
 	return &point;
+}
+
+Vector3D<double> AmbiPoint::getVector3D()
+{
+    return Vector3D<double>(point.getX(), point.getY(), point.getZ());
 }
 
 Colour AmbiPoint::getColor() const
@@ -240,3 +250,13 @@ Colour AmbiPoint::loadColorAttribute(XmlElement* element)
 
     return Colour(uint32(element->getIntAttribute(XML_ATTRIBUTE_POINT_COLOR_OLD))).withAlpha(1.0f);
 }
+
+void AmbiPoint::setGroup(AmbiGroup* pG) {
+    this->pGroup = pG;
+}
+
+AmbiGroup* AmbiPoint::getGroup() {
+    return pGroup;
+}
+
+

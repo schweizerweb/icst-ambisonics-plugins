@@ -17,6 +17,7 @@ ZoomSettings::ZoomSettings(ScalingInfo* pScaling) :
 	initialRadius(1.0),
 	currentRadius(1.0),
     pointScaler(DEFAULT_POINT_SCALER),
+    groupPointScaler(DEFAULT_POINT_SCALER),
     pScalingInfo(pScaling)
 {
 }
@@ -63,7 +64,16 @@ double ZoomSettings::getPointScaler()
 void ZoomSettings::setPointScaler(double newScaler)
 {
     pointScaler = newScaler;
-    sendChangeMessage();
+}
+
+double ZoomSettings::getGroupPointScaler()
+{
+    return groupPointScaler;
+}
+
+void ZoomSettings::setGroupPointScaler(double newScaler)
+{
+    groupPointScaler = newScaler;
 }
 
 float ZoomSettings::getInitialRadius() const
@@ -148,3 +158,22 @@ ScalingInfo* ZoomSettings::getScalingInfo()
 {
     return pScalingInfo;
 }
+
+void ZoomSettings::loadFromXml(XmlElement* xmlElement)
+{
+    XmlElement* zoomSettingsXml = xmlElement->getChildByName(XML_TAG_ZOOM_SETTINGS);
+    if(zoomSettingsXml != nullptr)
+    {
+        pointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
+        groupPointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, DEFAULT_POINT_SCALER);
+    }
+}
+
+void ZoomSettings::writeToXmlElement(XmlElement* xml) const
+{
+    XmlElement* zoomSettingsXml = new XmlElement(XML_TAG_ZOOM_SETTINGS);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, groupPointScaler);
+    xml->addChildElement(zoomSettingsXml);
+}
+    

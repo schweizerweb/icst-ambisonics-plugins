@@ -47,14 +47,6 @@
             file="Source/AnimatorDialog.h"/>
       <FILE id="iEzhVQ" name="AnimatorDialogManager.h" compile="0" resource="0"
             file="Source/AnimatorDialogManager.h"/>
-      <FILE id="LPis9l" name="AudioParameterBoolAmbi.cpp" compile="1" resource="0"
-            file="Source/AudioParameterBoolAmbi.cpp"/>
-      <FILE id="UO28Oh" name="AudioParameterBoolAmbi.h" compile="0" resource="0"
-            file="Source/AudioParameterBoolAmbi.h"/>
-      <FILE id="StvKVL" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
-            file="Source/AudioParameterFloatAmbi.cpp"/>
-      <FILE id="m81e8Q" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
-            file="Source/AudioParameterFloatAmbi.h"/>
       <FILE id="Wd4DSG" name="ComponentArguments.h" compile="0" resource="0"
             file="Source/ComponentArguments.h"/>
       <FILE id="QtiuD8" name="CustomOscBase.cpp" compile="1" resource="0"
@@ -92,10 +84,6 @@
             file="Source/DistanceEncodingParams.h"/>
       <FILE id="aenO0C" name="DistanceEncodingPresetHelper.h" compile="0"
             resource="0" file="Source/DistanceEncodingPresetHelper.h"/>
-      <FILE id="F7eoPa" name="EncoderConstants.cpp" compile="1" resource="0"
-            file="Source/EncoderConstants.cpp"/>
-      <FILE id="g37xg9" name="EncoderConstants.h" compile="0" resource="0"
-            file="Source/EncoderConstants.h"/>
       <FILE id="zbf72D" name="EncoderPresetHelper.h" compile="0" resource="0"
             file="Source/EncoderPresetHelper.h"/>
       <FILE id="TyYNuU" name="EncoderSettings.cpp" compile="1" resource="0"
@@ -115,8 +103,6 @@
       <FILE id="CXnIL9" name="GroupAnimator.cpp" compile="1" resource="0"
             file="Source/GroupAnimator.cpp"/>
       <FILE id="cLqXqH" name="GroupAnimator.h" compile="0" resource="0" file="Source/GroupAnimator.h"/>
-      <FILE id="wzVHPY" name="GroupPointsSelectionComponent.h" compile="0"
-            resource="0" file="Source/GroupPointsSelectionComponent.h"/>
       <FILE id="qLSobP" name="GroupTableListModel.h" compile="0" resource="0"
             file="Source/GroupTableListModel.h"/>
       <FILE id="DqhhEI" name="OSCHandlerEncoder.cpp" compile="1" resource="0"
@@ -191,10 +177,6 @@
             file="../Common/ActivationDialog.h"/>
       <FILE id="t6mAXi" name="AdditionalWindow.h" compile="0" resource="0"
             file="../Common/AdditionalWindow.h"/>
-      <FILE id="R5Yz8G" name="AmbiBasicSettings.cpp" compile="1" resource="0"
-            file="../Common/AmbiBasicSettings.cpp"/>
-      <FILE id="nLYHF0" name="AmbiBasicSettings.h" compile="0" resource="0"
-            file="../Common/AmbiBasicSettings.h"/>
       <FILE id="RbP61N" name="AmbiDataSet.cpp" compile="1" resource="0" file="../Common/AmbiDataSet.cpp"/>
       <FILE id="qURiRx" name="AmbiDataSet.h" compile="0" resource="0" file="../Common/AmbiDataSet.h"/>
       <FILE id="QjJM5Y" name="AmbiGroup.cpp" compile="1" resource="0" file="../Common/AmbiGroup.cpp"/>
@@ -206,8 +188,16 @@
       <FILE id="NAnUK3" name="AmbiSourceSet.cpp" compile="1" resource="0"
             file="../Common/AmbiSourceSet.cpp"/>
       <FILE id="abzgNg" name="AmbiSourceSet.h" compile="0" resource="0" file="../Common/AmbiSourceSet.h"/>
+      <FILE id="d49etN" name="AudioParameterBoolAmbi.cpp" compile="1" resource="0"
+            file="../Common/AudioParameterBoolAmbi.cpp"/>
+      <FILE id="CjQTkS" name="AudioParameterBoolAmbi.h" compile="0" resource="0"
+            file="../Common/AudioParameterBoolAmbi.h"/>
       <FILE id="idkA47" name="AudioParameterBoolAmbiAbs.h" compile="0" resource="0"
             file="../Common/AudioParameterBoolAmbiAbs.h"/>
+      <FILE id="qGX2H6" name="AudioParameterFloatAmbi.cpp" compile="1" resource="0"
+            file="../Common/AudioParameterFloatAmbi.cpp"/>
+      <FILE id="itQ5Ll" name="AudioParameterFloatAmbi.h" compile="0" resource="0"
+            file="../Common/AudioParameterFloatAmbi.h"/>
       <FILE id="b0ptGs" name="AudioParameterFloatAmbiAbs.h" compile="0" resource="0"
             file="../Common/AudioParameterFloatAmbiAbs.h"/>
       <FILE id="IeOIVL" name="AudioParameterSet.h" compile="0" resource="0"
@@ -230,7 +220,13 @@
             resource="0" file="../Common/EditableCodeCustomComponent.h"/>
       <FILE id="u093fy" name="EditableTextCustomComponent.h" compile="0"
             resource="0" file="../Common/EditableTextCustomComponent.h"/>
+      <FILE id="qVzLdX" name="EncoderConstants.cpp" compile="1" resource="0"
+            file="../Common/EncoderConstants.cpp"/>
+      <FILE id="B0KcF5" name="EncoderConstants.h" compile="0" resource="0"
+            file="../Common/EncoderConstants.h"/>
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
+      <FILE id="VvC9ea" name="GroupPointsSelectionComponent.h" compile="0"
+            resource="0" file="../Common/GroupPointsSelectionComponent.h"/>
       <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
             file="../Common/JsEditorComponent.cpp"/>
       <FILE id="fu4V4a" name="JsEditorComponent.h" compile="0" resource="0"
@@ -238,6 +234,8 @@
       <FILE id="afPvvx" name="LabelCreator.cpp" compile="1" resource="0"
             file="../Common/LabelCreator.cpp"/>
       <FILE id="EhzNNO" name="LabelCreator.h" compile="0" resource="0" file="../Common/LabelCreator.h"/>
+      <FILE id="II5Tak" name="MultiActivationDialog.h" compile="0" resource="0"
+            file="../Common/MultiActivationDialog.h"/>
       <FILE id="lzw3Wj" name="NumericColumnCustomComponent.h" compile="0"
             resource="0" file="../Common/NumericColumnCustomComponent.h"/>
       <FILE id="v8HVwz" name="OSCHandler.cpp" compile="1" resource="0" file="../Common/OSCHandler.cpp"/>

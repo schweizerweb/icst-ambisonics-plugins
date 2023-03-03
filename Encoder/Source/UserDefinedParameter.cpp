@@ -72,7 +72,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, ParameterType 
     }
 }
 
-OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, int index)
+OSCArgument UserDefinedParameter::getOSCArgument(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index)
 {
     switch(type)
     {
@@ -81,7 +81,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
             
         case Name:
         case Color:
-            return OSCArgument(getString(pt, scaler, index));
+            return OSCArgument(getString(absPt, pt, scaler, index));
     
         case A:
         case E:
@@ -100,7 +100,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
         case DualScaledY:
         case DualScaledZ:
         case DualScaledE:
-            return OSCArgument(getValue(pt, scaler));
+            return OSCArgument(getValue(absPt, pt, scaler));
             
         case ConstInt:
             return OSCArgument(constInt);
@@ -117,6 +117,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
         case Expression:
         {
             jsContext->jsAmbiPoint = pt;
+            jsContext->jsAbsPos = absPt;
             jsContext->jsPointIndex = index;
             
             auto ret = jsEngine->evaluate(jsExpression);
@@ -138,7 +139,7 @@ OSCArgument UserDefinedParameter::getOSCArgument(AmbiPoint* pt, double scaler, i
     }
 }
 
-String UserDefinedParameter::getString(AmbiPoint* pt, double scaler, int index)
+String UserDefinedParameter::getString(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index)
 {
     switch(type)
     {
@@ -163,7 +164,7 @@ String UserDefinedParameter::getString(AmbiPoint* pt, double scaler, int index)
         case DualScaledY:
         case DualScaledZ:
         case DualScaledE:
-            return String(getValue(pt, scaler));
+            return String(getValue(absPt, pt, scaler));
             
         case ConstInt: return String(constInt);
         case ConstFloat: return String(constFloat);
@@ -171,6 +172,7 @@ String UserDefinedParameter::getString(AmbiPoint* pt, double scaler, int index)
         case Ignore: return "";
         case Expression:
         {
+            jsContext->jsAbsPos = absPt;
             jsContext->jsAmbiPoint = pt;
             jsContext->jsPointIndex = index;
             
@@ -192,27 +194,27 @@ String UserDefinedParameter::getOriginalString()
     return originalString;
 }
 
-float UserDefinedParameter::getValue(AmbiPoint* pt, double scaler)
+float UserDefinedParameter::getValue(Vector3D<double> absPt, AmbiPoint* pt, double scaler)
 {
     switch(type)
     {
-    case A: return float(Constants::RadToGrad(double(pt->getPoint()->getAzimuth())));
-    case E: return float(Constants::RadToGrad(double(pt->getPoint()->getElevation())));
-    case D: return float(pt->getPoint()->getDistance());
-    case X: return float(pt->getPoint()->getX());
-    case Y: return float(pt->getPoint()->getY());
-    case Z: return float(pt->getPoint()->getZ());
-    case ScaledX: return float(jmap(pt->getPoint()->getX(), -scaler, scaler, loLim, hiLim));
-    case ScaledY: return float(jmap(pt->getPoint()->getY(), -scaler, scaler, loLim, hiLim));
-    case ScaledZ: return float(jmap(pt->getPoint()->getZ(), -scaler, scaler, loLim, hiLim));
-    case ScaledA: return float(jmap(pt->getPoint()->getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), loLim, hiLim));
-    case ScaledE: return float(jmap(pt->getPoint()->getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), loLim, hiLim));
-    case ScaledD: return float(jmap(pt->getPoint()->getDistance(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
+    case A: return float(Constants::RadToGrad(Point3D<double>(absPt.x, absPt.y, absPt.z).getAzimuth()));
+    case E: return float(Constants::RadToGrad(Point3D<double>(absPt.x, absPt.y, absPt.z).getElevation()));
+    case D: return float(absPt.length());
+    case X: return float(absPt.x);
+    case Y: return float(absPt.y);
+    case Z: return float(absPt.z);
+    case ScaledX: return float(jmap(absPt.x, -scaler, scaler, loLim, hiLim));
+    case ScaledY: return float(jmap(absPt.y, -scaler, scaler, loLim, hiLim));
+    case ScaledZ: return float(jmap(absPt.z, -scaler, scaler, loLim, hiLim));
+    case ScaledA: return float(jmap(Point3D<double>(absPt.x, absPt.y, absPt.z).getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), loLim, hiLim));
+    case ScaledE: return float(jmap(Point3D<double>(absPt.x, absPt.y, absPt.z).getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), loLim, hiLim));
+    case ScaledD: return float(jmap(absPt.length(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
     case Gain: return float(pt->getGain());
-    case DualScaledX: return dualMap(pt->getPoint()->getX(), scaler);
-    case DualScaledY: return dualMap(pt->getPoint()->getY(), scaler);
-    case DualScaledZ: return dualMap(pt->getPoint()->getZ(), scaler);
-    case DualScaledE: return dualMap(pt->getPoint()->getElevation(), Constants::ElevationRadMax);
+    case DualScaledX: return dualMap(absPt.x, scaler);
+    case DualScaledY: return dualMap(absPt.y, scaler);
+    case DualScaledZ: return dualMap(absPt.z, scaler);
+    case DualScaledE: return dualMap(Point3D<double>(absPt.x, absPt.y, absPt.z).getElevation(), Constants::ElevationRadMax);
     
     case ConstInt: return float(constInt);
     case ConstFloat: return constFloat;

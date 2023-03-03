@@ -10,14 +10,9 @@
 
 #include "AmbiSettings.h"
 
-AmbiSettings::AmbiSettings(): AmbiSettings(DEFAULT_DISTANCE_SCALER)
+AmbiSettings::AmbiSettings()
 {
-	
-}
-
-AmbiSettings::AmbiSettings(double distanceScaler) : AmbiBasicSettings(distanceScaler)
-{
-	// create mapping table
+    // create mapping table
 	int order = 0;
 	for (int i = 0; i < NB_OF_AMBISONICS_CHANNELS; i++)
 	{

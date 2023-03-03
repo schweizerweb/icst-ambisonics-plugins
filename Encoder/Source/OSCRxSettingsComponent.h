@@ -91,6 +91,8 @@ private:
     std::unique_ptr<juce::TextButton> buttonShowOscLog;
     std::unique_ptr<juce::ToggleButton> toggleHideWarnings;
     std::unique_ptr<juce::TextButton> btnManagePresets;
+    std::unique_ptr<juce::ToggleButton> toggleReceiveStandardOsc;
+    std::unique_ptr<juce::ImageButton> btnInfoStandardOsc;
 
 
     //==============================================================================

@@ -25,6 +25,8 @@
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
 
+class AmbiGroup;
+
 class AmbiPoint
 {
 protected:
@@ -38,7 +40,8 @@ protected:
 	XmlElement* getBaseXmlElement(String tagName);
 
 public:
-	Point3D<double>* getPoint();
+	Point3D<double>* getRawPoint();
+    Vector3D<double> getVector3D();
     
 	Colour getColor() const;
 	void setColor(Colour newColor);
@@ -66,12 +69,18 @@ public:
 	
     Image* getLabelImage();
 	void ensureLabelImage();
+    
+    void setGroup(AmbiGroup* pG);
+    AmbiGroup* getGroup();
 	
     virtual float getDisplayScaler() = 0;
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
     virtual bool allowSolo() const = 0;
     virtual bool allowMute() const = 0;
+    
+protected:
+    AudioParameterSet audioParams;
     
 private:
 	Colour loadColorAttribute(XmlElement* element);
@@ -85,8 +94,8 @@ private:
     bool solo;
 	int64 lastUpdate = 0;
 	Image labelImage;
-    AudioParameterSet audioParams;
     bool enabled = true;
+    AmbiGroup* pGroup;
 };
 
 

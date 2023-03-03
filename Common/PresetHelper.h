@@ -42,6 +42,8 @@ public:
     void notifyPresetListChanged();
     
     int showOverwriteDialog(String filename);
+    
+    void buildDefaultPreset(String name, String fileContent);
 
     Array<File> presetFiles;
     

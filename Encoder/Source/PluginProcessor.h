@@ -28,6 +28,7 @@
 #include "CustomOscRxPresetHelper.h"
 #include "CustomOscTxPresetHelper.h"
 #include "AnimatorDataset.h"
+#include "../../Common/ZoomSettings.h"
 
 //==============================================================================
 /**
@@ -87,10 +88,9 @@ public:
     CustomOscTxPresetHelper* getCustomOscTxPresetHelper();
     ScalingInfo* getScalingInfo();
     AnimatorDataset* getAnimatorDataset();
-
-#if (!MULTI_ENCODER_MODE)
+    ZoomSettings* getZoomSettingsPointer();
+    
 	void updateTrackProperties(const TrackProperties& properties) override;
-#endif
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
@@ -110,6 +110,7 @@ private:
     AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
+    std::unique_ptr<ZoomSettings> zoomSettings;
     double lastScaler;
     AnimatorDataset animatorDataset;
 

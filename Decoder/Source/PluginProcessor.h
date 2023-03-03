@@ -19,6 +19,7 @@
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "DecoderPresetHelper.h"
+#include "../../Common/ZoomSettings.h"
 
 //==============================================================================
 /**
@@ -75,6 +76,7 @@ public:
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
     DecoderPresetHelper* getPresetHelper();
+    ZoomSettings* getZoomSettingsPointer();
 
 private:
     ScalingInfo scalingInfo;
@@ -86,7 +88,8 @@ private:
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
     std::unique_ptr<DecoderPresetHelper> presetHelper;
-
+    std::unique_ptr<ZoomSettings> zoomSettings;
+    
     dsp::IIR::Filter<float> iirFilters[JucePlugin_MaxNumOutputChannels][MAX_FILTER_COUNT];
     FilterBankInfo filterInfo[JucePlugin_MaxNumOutputChannels];
     dsp::ProcessSpec iirFilterSpec;

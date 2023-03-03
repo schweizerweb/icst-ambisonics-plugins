@@ -79,7 +79,7 @@ double AmbiSpeakerSet::getMaxNormalizedDistance() const
 	for (AmbiSpeaker* pt : elements)
 	{
 		if (pt != nullptr)
-			maxDist = jmax(maxDist, pt->getPoint()->getDistance());
+			maxDist = jmax(maxDist, pt->getRawPoint()->getDistance());
 	}
 
 	return maxDist;
@@ -94,18 +94,56 @@ void AmbiSpeakerSet::loadFromXml(XmlElement *xmlElement)
 {
     clear();
     
-    XmlElement* xmlPoint = xmlElement->getChildByName(XML_TAG_PRESET_POINT);
-    while (xmlPoint != nullptr)
+    XmlElement* xmlSources = xmlElement->getChildByName(XML_TAG_PRESET_POINTS);
+    if(xmlSources != nullptr)
     {
-        elements.add(new AmbiSpeaker(xmlPoint));
-        xmlPoint = xmlPoint->getNextElement();
+        XmlElement* xmlPoint = xmlSources->getChildByName(XML_TAG_PRESET_POINT);
+        while (xmlPoint != nullptr)
+        {
+            elements.add(new AmbiSpeaker(xmlPoint));
+            xmlPoint = xmlPoint->getNextElement();
+        }
+    }
+    
+    // groups
+    groups.clear();
+    XmlElement* groupsElement = xmlElement->getChildByName(XML_TAG_GROUPS);
+    if(groupsElement != nullptr)
+    {
+        // create base type pointer array
+        Array<AmbiPoint*> ambiPointPointers;
+        for(int i = 0; i < elements.size(); i++)
+            ambiPointPointers.add(elements[i]);
+        
+        int index = 0;
+        XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
+        while (xmlGroup != nullptr)
+        {
+            groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, AudioParameterSet(), pScalingInfo));
+            
+            xmlGroup = xmlGroup->getNextElement();
+            index++;
+        }
     }
 }
 
 void AmbiSpeakerSet::writeToXmlElement(XmlElement *xml) const
 {
+    XmlElement* xmlSpeakers = new XmlElement(XML_TAG_PRESET_POINTS);
     for (AmbiPoint* pt : elements)
     {
-        xml->addChildElement(pt->getAsXmlElement(XML_TAG_PRESET_POINT));
+        xmlSpeakers->addChildElement(pt->getAsXmlElement(XML_TAG_PRESET_POINT));
     }
+    xml->addChildElement(xmlSpeakers);
+    
+    // groups
+    XmlElement* groupsElement = new XmlElement(XML_TAG_GROUPS);
+    for(int i = 0; i < groupCount(); i++)
+    {
+        AmbiGroup* g = getGroup(i);
+        if (g != nullptr)
+            groupsElement->addChildElement(g->getAsXmlElement(XML_TAG_GROUP));
+    }
+
+    xml->addChildElement(groupsElement);
 }

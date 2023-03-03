@@ -10,7 +10,7 @@
 
 #pragma once
 #include "../../Common/Constants.h"
-#include "EncoderConstants.h"
+#include "../../Common/EncoderConstants.h"
 
 #define DEFAULT_UNIT_CIRCLE_SIZE	    0.1f
 #define DEFAULT_DB_UNIT         	    10.0f

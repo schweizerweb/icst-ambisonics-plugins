@@ -218,3 +218,10 @@ File PresetHelper::getPathForPresetName(String name)
 {
     return File(presetDirectory.getFullPathName() + "/" + name + ".xml");
 }
+
+void PresetHelper::buildDefaultPreset(String name, String fileContent)
+{
+    File file = getPathForPresetName(name);
+    file.replaceWithText(fileContent);
+    presetFiles.addIfNotAlreadyThere(file);
+}

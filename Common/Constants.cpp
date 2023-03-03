@@ -26,6 +26,9 @@ const double Constants::GainDbMax = 12.0;
 const float Constants::CompressedMin = -1.0f;
 const float Constants::CompressedMax = 1.0f;
 
+const float Constants::StretchMin = 0.0;
+const float Constants::StretchMax = 100.0;
+
 double Constants::RadToGrad(double rad)
 {
 	return rad * 180.0 / PI;
@@ -44,4 +47,9 @@ int Constants::NormalizeAzimuthGrad(int grad)
 bool Constants::isDevelopmentVersion()
 {
 	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");
+}
+
+bool Constants::isNonVisibleVersionPrerelease()
+{
+    return String(ProjectInfo::versionString).endsWith("-t");
 }

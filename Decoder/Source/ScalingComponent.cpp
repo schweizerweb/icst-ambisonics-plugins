@@ -170,7 +170,7 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         if(currentRoomSizeX > 0.0)
         {
             for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setX(pSpeakerSet->get(i)->getPoint()->getX() / currentRoomSizeX * sliderRoomSizeX->getValue());
+                pSpeakerSet->get(i)->getRawPoint()->setX(pSpeakerSet->get(i)->getRawPoint()->getX() / currentRoomSizeX * sliderRoomSizeX->getValue());
 
             currentRoomSizeX = sliderRoomSizeX->getValue();
         }
@@ -182,7 +182,7 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         if(currentRoomSizeY > 0.0)
         {
             for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setY(pSpeakerSet->get(i)->getPoint()->getY() / currentRoomSizeY * sliderRoomSizeY->getValue());
+                pSpeakerSet->get(i)->getRawPoint()->setY(pSpeakerSet->get(i)->getRawPoint()->getY() / currentRoomSizeY * sliderRoomSizeY->getValue());
 
             currentRoomSizeY = sliderRoomSizeY->getValue();
         }
@@ -194,7 +194,7 @@ void ScalingComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
         if(currentRoomSizeZ > 0.0)
         {
             for(int i = 0; i < pSpeakerSet->size(); i++)
-                pSpeakerSet->get(i)->getPoint()->setZ(pSpeakerSet->get(i)->getPoint()->getZ() / currentRoomSizeZ * sliderRoomSizeZ->getValue());
+                pSpeakerSet->get(i)->getRawPoint()->setZ(pSpeakerSet->get(i)->getRawPoint()->getZ() / currentRoomSizeZ * sliderRoomSizeZ->getValue());
 
             currentRoomSizeZ = sliderRoomSizeZ->getValue();
         }
@@ -215,9 +215,9 @@ void ScalingComponent::calculateAndDisplayRoomSize()
     double maxX = 0.0, maxY = 0.0, maxZ = 0.0;
     for(int i = 0; i < pSpeakerSet->size(); i++)
     {
-        maxX = jmax(maxX, abs(pSpeakerSet->get(i)->getPoint()->getX()));
-        maxY = jmax(maxY, abs(pSpeakerSet->get(i)->getPoint()->getY()));
-        maxZ = jmax(maxZ, abs(pSpeakerSet->get(i)->getPoint()->getZ()));
+        maxX = jmax(maxX, abs(pSpeakerSet->get(i)->getRawPoint()->getX()));
+        maxY = jmax(maxY, abs(pSpeakerSet->get(i)->getRawPoint()->getY()));
+        maxZ = jmax(maxZ, abs(pSpeakerSet->get(i)->getRawPoint()->getZ()));
     }
 
     currentRoomSizeX = maxX * 2.0;

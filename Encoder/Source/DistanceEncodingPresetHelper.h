@@ -12,7 +12,6 @@
 #include "JuceHeader.h"
 #include "../../Common/PresetHelper.h"
 
-
 class DistanceEncodingPresetHelper : public PresetHelper
 {
 public:
@@ -35,12 +34,38 @@ public:
     
     void restoreDefaultsInternal() override
     {
-        DistanceEncodingParams p;
+        buildDefaultPreset("Default",
+R"(<?xml version="1.0" encoding="UTF-8"?>
+
+<DistanceEncodingPreset>
+  <Settings DistEncMode="1" UnitCircleRadius="0.1000000014901161" DistEncDbUnit="10.0"
+            DistEncDistanceAttenuation="5.0" DistEncCenterCurve="0.01999999955296516"
+            DistEncAdvancedFactor="1.0" DistEncAdvancedExponent="1.0" AirAbsorbtionMode="0"
+            AirAbsorbtionIntensity="1.0"/>
+</DistanceEncodingPreset>)"
+        );
         
-        File file = getPathForPresetName("Default");
+        buildDefaultPreset("Demo Standard",
+R"(<?xml version="1.0" encoding="UTF-8"?>
+
+<DistanceEncodingPreset>
+  <Settings DistEncMode="1" UnitCircleRadius="0.7208999991416931" DistEncDbUnit="10.0"
+            DistEncDistanceAttenuation="5.0" DistEncCenterCurve="0.01999999955296516"
+            DistEncAdvancedFactor="1.0" DistEncAdvancedExponent="1.0" AirAbsorbtionMode="1"
+            AirAbsorbtionIntensity="4.5"/>
+</DistanceEncodingPreset>)"
+        );
         
-        writeToXmlFile(file, &p);
-        presetFiles.addIfNotAlreadyThere(file);
+        buildDefaultPreset("Demo Exponential",
+R"(<?xml version="1.0" encoding="UTF-8"?>
+
+<DistanceEncodingPreset>
+  <Settings DistEncMode="3" UnitCircleRadius="0.09299999475479126" DistEncDbUnit="51.58309936523438"
+            DistEncDistanceAttenuation="5.0" DistEncCenterCurve="0.007400000002235174"
+            DistEncAdvancedFactor="1.0" DistEncAdvancedExponent="1.0" AirAbsorbtionMode="1"
+            AirAbsorbtionIntensity="4.200000286102295"/>
+</DistanceEncodingPreset>)"
+        );
     }
     
     bool loadFromXmlFile(const File file, DistanceEncodingParams* pEncodingParams)

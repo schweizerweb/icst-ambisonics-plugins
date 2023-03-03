@@ -10,12 +10,12 @@
 
 #include "EncoderSettings.h"
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
+#define XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT "HandleStandardFormat"
 #define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
-#define XML_TAG_MASTER_GAIN "MasterGain"
 #define XML_TAG_DISPLAY "Display"
 #define XML_TAG_OSC_SEND_EXT_XYZ "Xyz"
 #define XML_TAG_OSC_SEND_EXT_AED "Aed"
@@ -34,9 +34,9 @@
 #define XML_TAG_CUSTOM_OSC_INPUT "CustomOscInput"
 
 EncoderSettings::EncoderSettings():
-	AmbiBasicSettings(DEFAULT_DISTANCE_SCALER),
-    oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
+	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
 	oscReceivePort(DEFAULT_RECEIVE_PORT),
+    oscHandleStandardFormatFlag(DEFAULT_HANDLE_STANDARD_FORMAT_FLAG),
 	oscSendFlag(DEFAULT_SEND_FLAG),
 	oscSendPort(DEFAULT_SEND_PORT),
 	oscSendTargetHost(DEFAULT_SEND_HOST),
@@ -50,9 +50,7 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-    hideWarnings(DEFAULT_HIDE_WARNINGS),
-    masterGain(nullptr),
-    localMasterGain(DEFAULT_MASTER_GAIN)
+    hideWarnings(DEFAULT_HIDE_WARNINGS)
 {
 }
 
@@ -64,9 +62,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 {
 	XmlElement* element = new XmlElement(tagName);
 
-	XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
+    XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
+    oscReceive->setAttribute(XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT, oscHandleStandardFormatFlag);
 	XmlElement* customInputs = new XmlElement(XML_TAG_CUSTOM_OSC_INPUTS);
     for (auto i : customOscInput)
     {
@@ -106,7 +105,14 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     hideWarningsXml->setAttribute(XML_ATTRIBUTE_ENABLE, hideWarnings);
     element->addChildElement(hideWarningsXml);
 	
-    writeToPresetXmlElement(element);
+    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
+    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
+    distanceEncodingParams.writeToXmlElement(distanceEncoding);
+    element->addChildElement(distanceEncoding);
+
+    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
+    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
+    element->addChildElement(dopplerEncoding);
 	
 	return element;
 }
@@ -119,26 +125,33 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     customOscTargets.clear();
     
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
-	oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
-	oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
-    XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
-    if (customInputs != nullptr)
+    if(oscReceive != nullptr)
     {
-        XmlElement* i = customInputs->getChildByName(XML_TAG_CUSTOM_OSC_INPUT);
-        while (i != nullptr)
+        oscReceiveFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_RECEIVE_FLAG);
+        oscReceivePort = oscReceive->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_RECEIVE_PORT);
+        oscHandleStandardFormatFlag = oscReceive->getBoolAttribute(XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT, DEFAULT_HANDLE_STANDARD_FORMAT_FLAG);
+        XmlElement* customInputs = oscReceive->getChildByName(XML_TAG_CUSTOM_OSC_INPUTS);
+        if (customInputs != nullptr)
         {
-            customOscInput.add(new CustomOscInput(i));
+            XmlElement* i = customInputs->getChildByName(XML_TAG_CUSTOM_OSC_INPUT);
+            while (i != nullptr)
+            {
+                customOscInput.add(new CustomOscInput(i));
 
-            i = i->getNextElement();
+                i = i->getNextElement();
+            }
         }
     }
     
 	XmlElement* oscSend = element->getChildByName(XML_TAG_OSC_SEND);
-	oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
-	oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
-	oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_HOST);
-	oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
-
+    if(oscSend != nullptr)
+    {
+        oscSendFlag = oscSend->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_SEND_FLAG);
+        oscSendPort = oscSend->getIntAttribute(XML_ATTRIBUTE_PORT, DEFAULT_SEND_PORT);
+        oscSendTargetHost = oscSend->getStringAttribute(XML_ATTRIBUTE_HOST, DEFAULT_SEND_HOST);
+        oscSendIntervalMs = oscSend->getIntAttribute(XML_ATTRIBUTE_INTERVAL, DEFAULT_SEND_INTERVAL);
+    }
+    
 	XmlElement* oscSendExt = element->getChildByName(XML_TAG_OSC_SEND_EXT);
 	if (oscSendExt != nullptr)
 	{
@@ -173,83 +186,20 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 
     XmlElement* hideWarningsXml = element->getChildByName(XML_TAG_OSC_HIDE_WARNINGS);
     if(hideWarningsXml != nullptr)
-    hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    {
+        hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    }
     
-    loadFromPresetXml(element);
-}
-
-void EncoderSettings::writeToPresetXmlElement(XmlElement* xmlElement) const
-{
-    XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
-    distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
-    distanceEncodingParams.writeToXmlElement(distanceEncoding);
-    xmlElement->addChildElement(distanceEncoding);
-
-    XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
-    dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
-    dopplerEncoding->setAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, getDistanceScaler());
-    xmlElement->addChildElement(dopplerEncoding);
-    
-    XmlElement* masterGainElement = new XmlElement(XML_TAG_MASTER_GAIN);
-    masterGainElement->setAttribute(XML_ATTRIBUTE_VALUE, getMasterGain());
-    xmlElement->addChildElement(masterGainElement);
-}
-
-void EncoderSettings::loadFromPresetXml(XmlElement* xmlElement)
-{
-    XmlElement* distanceEncoding = xmlElement->getChildByName(XML_TAG_DISTANCE_ENCODING);
+    XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);
     if (distanceEncoding != nullptr)
     {
         distanceEncodingFlag = distanceEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DIST_ENC_FLAG);
-        distanceEncodingParams.loadFromXmlElement(distanceEncoding);     
+        distanceEncodingParams.loadFromXmlElement(distanceEncoding);
     }
 
-    XmlElement* dopplerEncoding = xmlElement->getChildByName(XML_TAG_DOPPLER_ENCODING);
+    XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);
     if (dopplerEncoding != nullptr)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
-        setDistanceScaler(float(dopplerEncoding->getDoubleAttribute(XML_ATTRIBUTE_DISTANCE_SCALER, DEFAULT_DISTANCE_SCALER)));
     }
-    
-    XmlElement* masterGainElement = xmlElement->getChildByName(XML_TAG_MASTER_GAIN);
-    if (masterGainElement != nullptr)
-    {
-        setMasterGain(float(masterGainElement->getDoubleAttribute(XML_ATTRIBUTE_VALUE)));
-    }
-}
-
-float EncoderSettings::getMasterGain() const
-{
-    return masterGain != nullptr ? masterGain->get() : localMasterGain;
-}
-
-bool EncoderSettings::setMasterGain(float gainDb)
-{
-    if (gainDb < EncoderConstants::MasterGainMin || gainDb > EncoderConstants::MasterGainMax)
-        return false;
-
-    if (masterGain != nullptr)
-        *masterGain = gainDb;
-    else
-        localMasterGain = gainDb;
-
-    return true;
-}
-
-void EncoderSettings::initialize(AudioProcessor* pProcessor)
-{
-    masterGain = new AudioParameterFloat("MasterGain", "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, "Master Gain for B-Format output");
-
-    pProcessor->addParameter(masterGain);
-
-    masterGain->addListener(this);
-}
-
-void EncoderSettings::parameterValueChanged(int /*parameterIndex*/, float /*newValue*/)
-{
-    sendChangeMessage();
-}
-
-void EncoderSettings::parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/)
-{
 }
