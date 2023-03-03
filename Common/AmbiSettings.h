@@ -10,7 +10,6 @@
 
 #pragma once
 #include "JuceHeader.h"
-#include "AmbiBasicSettings.h"
 #define MAX_AMBISONICS_ORDER 7
 #define NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
 #define NB_OF_AMBISONICS_CHANNELS (NB_OF_AMBISONICS_GAINS * NB_OF_AMBISONICS_GAINS)
@@ -22,12 +21,11 @@
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
 #define XML_VALUE "Value"
 
-class AmbiSettings: public AmbiBasicSettings
+class AmbiSettings
 {
 public:
 	AmbiSettings();
-	AmbiSettings(double distanceScaler);
-
+	
     enum AmbiWeightMode { BASIC = 1, INPHASE = 2, MANUAL = 3, MAXRE = 4 };
     
 	double getAmbiChannelWeight(int ambiChannel);

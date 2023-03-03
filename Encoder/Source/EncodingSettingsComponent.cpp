@@ -18,7 +18,6 @@
 */
 
 //[Headers] You can add your own extra header files here...
-#include "DistanceEncodingComponent.h"
 #include "EncoderPresetHelper.h"
 //[/Headers]
 
@@ -36,101 +35,30 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     addChangeListener(m_args.pChangeListener);
     //[/Constructor_pre]
 
-    comboBoxPresets.reset (new juce::ComboBox ("comboBoxPresets"));
-    addAndMakeVisible (comboBoxPresets.get());
-    comboBoxPresets->setEditableText (false);
-    comboBoxPresets->setJustificationType (juce::Justification::centredLeft);
-    comboBoxPresets->setTextWhenNothingSelected (TRANS("-"));
-    comboBoxPresets->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxPresets->addListener (this);
-
-    labelPresets.reset (new juce::Label ("labelPresets",
-                                         TRANS("Presets:")));
-    addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelPresets->setJustificationType (juce::Justification::centredLeft);
-    labelPresets->setEditable (false, false, false);
-    labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    buttonSave.reset (new juce::TextButton ("buttonSave"));
-    addAndMakeVisible (buttonSave.get());
-    buttonSave->setButtonText (TRANS("save"));
-    buttonSave->addListener (this);
-
-    sourceDefinition.reset (new SourceDefinitionComponent (args));
-    addAndMakeVisible (sourceDefinition.get());
-    sourceDefinition->setName ("sourceDefinition");
+    groupDistanceEncoding.reset (new juce::GroupComponent ("groupDistanceEncoding",
+                                                           TRANS("Distance Encoding")));
+    addAndMakeVisible (groupDistanceEncoding.get());
 
     toggleDistanceEncoding.reset (new juce::ToggleButton ("toggleDistanceEncoding"));
     addAndMakeVisible (toggleDistanceEncoding.get());
-    toggleDistanceEncoding->setButtonText (TRANS("Enable Distance Encoding"));
+    toggleDistanceEncoding->setButtonText (TRANS("Enable"));
     toggleDistanceEncoding->addListener (this);
-
-    toggleDistanceEncoding->setBounds (14, 19, 199, 24);
 
     toggleDoppler.reset (new juce::ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
     toggleDoppler->setButtonText (TRANS("Enable Doppler"));
     toggleDoppler->addListener (this);
 
-    toggleDoppler->setBounds (14, 49, 199, 24);
-
-    sliderDistanceScaler.reset (new juce::Slider ("sliderDistanceScaler"));
-    addAndMakeVisible (sliderDistanceScaler.get());
-    sliderDistanceScaler->setRange (1, 1000, 0.1);
-    sliderDistanceScaler->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderDistanceScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
-    sliderDistanceScaler->addListener (this);
-
-    labelDistanceScaler.reset (new juce::Label ("labelDistanceScaler",
-                                                TRANS("Distance Scaler:")));
-    addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelDistanceScaler->setJustificationType (juce::Justification::centredLeft);
-    labelDistanceScaler->setEditable (false, false, false);
-    labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelDistanceScaler->setBounds (14, 79, 109, 24);
-
-    btnEditDistanceEncoding.reset (new juce::TextButton ("btnEditDistanceEncoding"));
-    addAndMakeVisible (btnEditDistanceEncoding.get());
-    btnEditDistanceEncoding->setButtonText (TRANS("edit..."));
-    btnEditDistanceEncoding->addListener (this);
-
-    buttonManagePresets.reset (new juce::TextButton ("buttonManagePresets"));
-    addAndMakeVisible (buttonManagePresets.get());
-    buttonManagePresets->setButtonText (TRANS("manage..."));
-    buttonManagePresets->addListener (this);
-
-    toggleInfiniteDistance.reset (new juce::ToggleButton ("toggleInfiniteDistance"));
-    addAndMakeVisible (toggleInfiniteDistance.get());
-    toggleInfiniteDistance->setButtonText (TRANS("Infinite"));
-    toggleInfiniteDistance->addListener (this);
+    toggleDoppler->setBounds (6, 8, 199, 24);
 
     btnManageDistanceEncodingPresets.reset (new juce::TextButton ("btnManageDistanceEncodingPresets"));
     addAndMakeVisible (btnManageDistanceEncodingPresets.get());
-    btnManageDistanceEncodingPresets->setButtonText (TRANS("presets..."));
+    btnManageDistanceEncodingPresets->setButtonText (TRANS("manage presets..."));
     btnManageDistanceEncodingPresets->addListener (this);
 
-    labelMasterGain.reset (new juce::Label ("labelMasterGain",
-                                            TRANS("Master Gain [dB]:")));
-    addAndMakeVisible (labelMasterGain.get());
-    labelMasterGain->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelMasterGain->setJustificationType (juce::Justification::centredLeft);
-    labelMasterGain->setEditable (false, false, false);
-    labelMasterGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelMasterGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    labelMasterGain->setBounds (14, 109, 109, 24);
-
-    sliderMasterGain.reset (new juce::Slider ("sliderMasterGain"));
-    addAndMakeVisible (sliderMasterGain.get());
-    sliderMasterGain->setRange (0, 36, 0.1);
-    sliderMasterGain->setSliderStyle (juce::Slider::LinearHorizontal);
-    sliderMasterGain->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
-    sliderMasterGain->addListener (this);
+    distanceEncodingComponent.reset (new DistanceEncodingComponent (&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings));
+    addAndMakeVisible (distanceEncodingComponent.get());
+    distanceEncodingComponent->setName ("distanceEncodingComponent");
 
 
     //[UserPreSize]
@@ -140,49 +68,20 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
 
 
     //[Constructor] You can add your own custom stuff here..
-    sliderDistanceScaler->setSkewFactorFromMidPoint(50.0);
     updateEncodingUiElements();
-
-    labelPresets->setVisible(MULTI_ENCODER_MODE);
-    comboBoxPresets->setVisible(MULTI_ENCODER_MODE);
-    buttonSave->setVisible(MULTI_ENCODER_MODE);
-    buttonManagePresets->setVisible(MULTI_ENCODER_MODE);
-    labelMasterGain->setVisible(MULTI_ENCODER_MODE);
-    sliderMasterGain->setVisible(MULTI_ENCODER_MODE);
-
-    sliderMasterGain->setRange(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax, EncoderConstants::MasterGainResolution);
-    sliderMasterGain->setNumDecimalPlacesToDisplay(1);
-    sliderMasterGain->setTextValueSuffix(" dB");
-    sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
-    // load stored presets
-    m_args.pPresetHelper->addActionListener(this);
-    m_args.pSettings->addChangeListener(this);
-    initializePresets();
-    controlDimming();
     //[/Constructor]
 }
 
 EncodingSettingsComponent::~EncodingSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    m_args.pSettings->removeChangeListener(this);
-    m_args.pPresetHelper->removeActionListener(this);
     //[/Destructor_pre]
 
-    comboBoxPresets = nullptr;
-    labelPresets = nullptr;
-    buttonSave = nullptr;
-    sourceDefinition = nullptr;
+    groupDistanceEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDoppler = nullptr;
-    sliderDistanceScaler = nullptr;
-    labelDistanceScaler = nullptr;
-    btnEditDistanceEncoding = nullptr;
-    buttonManagePresets = nullptr;
-    toggleInfiniteDistance = nullptr;
     btnManageDistanceEncodingPresets = nullptr;
-    labelMasterGain = nullptr;
-    sliderMasterGain = nullptr;
+    distanceEncodingComponent = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -206,35 +105,12 @@ void EncodingSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 290, 24);
-    labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
-    buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
-    sourceDefinition->setBounds (8, 144, getWidth() - 16, getHeight() - 186);
-    sliderDistanceScaler->setBounds (getWidth() - 90 - (getWidth() - 301), 79, getWidth() - 301, 24);
-    btnEditDistanceEncoding->setBounds (getWidth() - 108 - 86, 19, 86, 24);
-    buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
-    toggleInfiniteDistance->setBounds (getWidth() - 82, 79, 72, 24);
-    btnManageDistanceEncodingPresets->setBounds (getWidth() - 12 - 86, 19, 86, 24);
-    sliderMasterGain->setBounds (getWidth() - 90 - (getWidth() - 301), 109, getWidth() - 301, 24);
+    groupDistanceEncoding->setBounds (8, 40, getWidth() - 14, getHeight() - 46);
+    toggleDistanceEncoding->setBounds (8 + 14, 40 + 24, 199, 24);
+    btnManageDistanceEncodingPresets->setBounds (8 + (getWidth() - 14) - 26 - 142, 40 + 24, 142, 24);
+    distanceEncodingComponent->setBounds (8 + 14, 40 + 56, (getWidth() - 14) - 28, (getHeight() - 46) - 70);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
-}
-
-void EncodingSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == comboBoxPresets.get())
-    {
-        //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
-        m_args.pPresetHelper->selectPresetName(comboBoxPresets->getText());
-        comboBoxPresets->setText("", dontSendNotification);
-        //[/UserComboBoxCode_comboBoxPresets]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
 void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
@@ -242,23 +118,12 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == buttonSave.get())
-    {
-        //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = m_args.pPresetHelper->tryCreateNewPreset();
-        if(newFile == nullptr)
-                return;
-
-        m_args.pPresetHelper->writeToXmlFile(*newFile, m_args.pSourceSet, m_args.pSettings);
-        comboBoxPresets->setText("", dontSendNotification);
-        delete newFile;
-        //[/UserButtonCode_buttonSave]
-    }
-    else if (buttonThatWasClicked == toggleDistanceEncoding.get())
+    if (buttonThatWasClicked == toggleDistanceEncoding.get())
     {
         //[UserButtonCode_toggleDistanceEncoding] -- add your button handler code here..
         m_args.pSettings->distanceEncodingFlag = toggleDistanceEncoding->getToggleState();
         sendChangeMessage();
+        controlDimming();
         //[/UserButtonCode_toggleDistanceEncoding]
     }
     else if (buttonThatWasClicked == toggleDoppler.get())
@@ -268,27 +133,6 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
         sendChangeMessage();
         //[/UserButtonCode_toggleDoppler]
     }
-    else if (buttonThatWasClicked == btnEditDistanceEncoding.get())
-    {
-        //[UserButtonCode_btnEditDistanceEncoding] -- add your button handler code here..
-        CallOutBox::launchAsynchronously(std::make_unique<DistanceEncodingComponent>(&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings->getScalingInfo()), getScreenBounds(), this);
-        //[/UserButtonCode_btnEditDistanceEncoding]
-    }
-    else if (buttonThatWasClicked == buttonManagePresets.get())
-    {
-        //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
-        presetManagerDialog.show(this, m_args.pPresetHelper);
-        //[/UserButtonCode_buttonManagePresets]
-    }
-    else if (buttonThatWasClicked == toggleInfiniteDistance.get())
-    {
-        //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        m_args.pSettings->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? m_args.pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
-        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
-        sourceDefinition->refresh();
-        updateEncodingUiElements();
-        //[/UserButtonCode_toggleInfiniteDistance]
-    }
     else if (buttonThatWasClicked == btnManageDistanceEncodingPresets.get())
     {
         //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
@@ -297,34 +141,7 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
     }
 
     //[UserbuttonClicked_Post]
-    controlDimming();
     //[/UserbuttonClicked_Post]
-}
-
-void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
-{
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
-    if (sliderThatWasMoved == sliderDistanceScaler.get())
-    {
-        //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
-        m_args.pSettings->setDistanceScaler(sliderDistanceScaler->getValue());
-        m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSettings->getDistanceScaler());
-        m_args.pZoomSettings->Reset();
-        sendChangeMessage();
-        sourceDefinition->refresh();
-        //[/UserSliderCode_sliderDistanceScaler]
-    }
-    else if (sliderThatWasMoved == sliderMasterGain.get())
-    {
-        //[UserSliderCode_sliderMasterGain] -- add your slider handling code here..
-        m_args.pSettings->setMasterGain((float)sliderMasterGain->getValue());
-        //[/UserSliderCode_sliderMasterGain]
-    }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 
@@ -335,50 +152,13 @@ void EncodingSettingsComponent::updateEncodingUiElements()
     toggleDistanceEncoding->setToggleState(m_args.pSettings->distanceEncodingFlag, dontSendNotification);
 
     toggleDoppler->setToggleState(m_args.pSettings->dopplerEncodingFlag, dontSendNotification);
-
-    toggleInfiniteDistance->setToggleState(m_args.pSettings->getDistanceScaler() == 0.0, dontSendNotification);
-    labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
-    sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
-    if(!toggleInfiniteDistance->getToggleState())
-        sliderDistanceScaler->setValue(m_args.pSettings->getDistanceScaler());
+    
+    controlDimming();
 }
 
-void EncodingSettingsComponent::controlDimming() const
+void EncodingSettingsComponent::controlDimming()
 {
-    btnEditDistanceEncoding->setEnabled(m_args.pSettings->distanceEncodingFlag);
-}
-
-void EncodingSettingsComponent::initializePresets()
-{
-    comboBoxPresets->clear();
-
-    int id = 1;
-    for(File file : m_args.pPresetHelper->presetFiles)
-    {
-        comboBoxPresets->addItem(file.getFileNameWithoutExtension(), id++);
-    }
-}
-
-void EncodingSettingsComponent::actionListenerCallback(const String &message)
-{
-    if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
-    {
-        initializePresets();
-    }
-
-    if(message == ACTION_MESSAGE_PRESET_CHANGED)
-    {
-        sourceDefinition->refresh();
-        updateEncodingUiElements();
-        m_args.pZoomSettings->Reset();
-        controlDimming();
-        sendChangeMessage();
-    }
-}
-
-void EncodingSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
-{
-    sliderMasterGain->setValue(m_args.pSettings->getMasterGain());
+    distanceEncodingComponent->setEnabled(toggleDistanceEncoding->getToggleState());
 }
 
 //[/MiscUserCode]
@@ -394,74 +174,31 @@ void EncodingSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*sour
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="EncodingSettingsComponent"
-                 componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener"
+                 componentName="" parentClasses="public Component, public ChangeBroadcaster"
                  constructorParams="EncoderSettingsComponentArgs args" variableInitialisers="m_args(args)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
-  <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
-            virtualName="" explicitFocusOrder="0" pos="83 8Rr 290M 24" posRelativeX="450188aa0f332e78"
-            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
-            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
-  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="8 8Rr 64 24" posRelativeY="450188aa0f332e78"
-         edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="110Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <GENERICCOMPONENT name="sourceDefinition" id="789a79909c18391b" memberName="sourceDefinition"
-                    virtualName="" explicitFocusOrder="0" pos="8 144 16M 186M" class="SourceDefinitionComponent"
-                    params="args"/>
+  <GROUPCOMPONENT name="groupDistanceEncoding" id="c7f86e9b07311c49" memberName="groupDistanceEncoding"
+                  virtualName="" explicitFocusOrder="0" pos="8 40 14M 46M" title="Distance Encoding"/>
   <TOGGLEBUTTON name="toggleDistanceEncoding" id="c46d0c7f045490ec" memberName="toggleDistanceEncoding"
-                virtualName="" explicitFocusOrder="0" pos="14 19 199 24" posRelativeX="b72378bdfe4e130"
-                posRelativeY="b72378bdfe4e130" buttonText="Enable Distance Encoding"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
+                virtualName="" explicitFocusOrder="0" pos="14 24 199 24" posRelativeX="c7f86e9b07311c49"
+                posRelativeY="c7f86e9b07311c49" buttonText="Enable" connectedEdges="0"
+                needsCallback="1" radioGroupId="0" state="0"/>
   <TOGGLEBUTTON name="toggleDoppler" id="8a9ea68cd17e7a8c" memberName="toggleDoppler"
-                virtualName="" explicitFocusOrder="0" pos="14 49 199 24" posRelativeX="b72378bdfe4e130"
+                virtualName="" explicitFocusOrder="0" pos="6 8 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
-  <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="90Rr 79 301M 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="14 79 109 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="btnEditDistanceEncoding" id="d37af0003751ec97" memberName="btnEditDistanceEncoding"
-              virtualName="" explicitFocusOrder="0" pos="108Rr 19 86 24" posRelativeX="b72378bdfe4e130"
-              posRelativeY="b72378bdfe4e130" buttonText="edit..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
-                virtualName="" explicitFocusOrder="0" pos="82R 79 72 24" buttonText="Infinite"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="btnManageDistanceEncodingPresets" id="e79fc007bc779712"
               memberName="btnManageDistanceEncodingPresets" virtualName=""
-              explicitFocusOrder="0" pos="12Rr 19 86 24" posRelativeX="b72378bdfe4e130"
-              posRelativeY="b72378bdfe4e130" buttonText="presets..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <LABEL name="labelMasterGain" id="5a6c2906ed7799ee" memberName="labelMasterGain"
-         virtualName="" explicitFocusOrder="0" pos="14 109 109 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Master Gain [dB]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderMasterGain" id="48f17ace33ebcbca" memberName="sliderMasterGain"
-          virtualName="" explicitFocusOrder="0" pos="90Rr 109 301M 24"
-          posRelativeX="b72378bdfe4e130" posRelativeY="b72378bdfe4e130"
-          min="0.0" max="36.0" int="0.1" style="LinearHorizontal" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
+              explicitFocusOrder="0" pos="26Rr 24 142 24" posRelativeX="c7f86e9b07311c49"
+              posRelativeY="c7f86e9b07311c49" buttonText="manage presets..."
+              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
+  <GENERICCOMPONENT name="distanceEncodingComponent" id="1a603f1700c46471" memberName="distanceEncodingComponent"
+                    virtualName="" explicitFocusOrder="0" pos="14 56 28M 70M" posRelativeX="c7f86e9b07311c49"
+                    posRelativeY="c7f86e9b07311c49" posRelativeW="c7f86e9b07311c49"
+                    posRelativeH="c7f86e9b07311c49" class="DistanceEncodingComponent"
+                    params="&amp;m_args.pSettings-&gt;distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

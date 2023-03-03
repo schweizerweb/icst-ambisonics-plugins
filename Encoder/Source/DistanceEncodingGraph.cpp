@@ -10,9 +10,9 @@
 
 #include "DistanceEncodingGraph.h"
 
-DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ScalingInfo* pScaling) : pParams(params), pScalingInfo(pScaling)
+DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings) : pParams(params), pZoomSettings(pZoomSettings)
 {
-	setDisplayRange(Linear, Range<double>(0.0, pScalingInfo->CartesianMax()), Linear, Range<double>(-20, 0));
+	setDisplayRange(Linear, Range<double>(0.0, pZoomSettings->getScalingInfo()->CartesianMax()), Linear, Range<double>(-20, 0));
 	fullGridFlag = true;
 	labelAxisX = "Rel. Distance";
 	labelAxisY = "Attenuation [dB]";
@@ -30,13 +30,14 @@ void DistanceEncodingGraph::paintData(Graphics& g)
 	bool firstOther = true;
 
     double w, o;
-    pParams->calculateAttenuation(pScalingInfo->CartesianMax(), &w, &o);
-    setDisplayRange(Linear, Range<double>(0.0, pScalingInfo->CartesianMax()), Linear, Range<double>(jmin(-20.0, Decibels::gainToDecibels(w), Decibels::gainToDecibels(o)), 0));
+    auto maxValue = pZoomSettings->getScalingInfo()->CartesianMax();
+    pParams->calculateAttenuation(maxValue, &w, &o);
+    setDisplayRange(Linear, Range<double>(0.0, maxValue), Linear, Range<double>(jmin(-20.0, Decibels::gainToDecibels(w), Decibels::gainToDecibels(o)), 0));
 
 	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
-		double distance = 0.00001 + pScalingInfo->CartesianMax() / NB_STEPS * step;
+		double distance = 0.00001 + maxValue / NB_STEPS * step;
 		pParams->calculateAttenuation(distance, &wFactor, &otherFactor);
 
 		Point<float> displayPointW = mapValues(distance, Decibels::gainToDecibels(wFactor)).toFloat();

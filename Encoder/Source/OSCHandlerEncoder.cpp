@@ -10,9 +10,10 @@
 
 #include "OSCHandlerEncoder.h"
 
-OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, DistanceEncodingParams* pDistanceEncodingParams, OwnedArray<CustomOscInput>* pCustomOscInput, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling), pCustomOscInput(pCustomOscInput)
+OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, EncoderSettings* pEncoderSettings, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling), pEncoderSettings(pEncoderSettings)
 {
-    this->pDistanceEncodingParams = pDistanceEncodingParams;
+    pCustomOscInput = &pEncoderSettings->customOscInput;
+    pDistanceEncodingParams = &pEncoderSettings->distanceEncodingParams;
     jsEngine.reset(new JavascriptEngine());
 }
 
@@ -41,111 +42,129 @@ bool OSCHandlerEncoder::initSpecific()
 bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
 {
     OSCAddressPattern pattern = message.getAddressPattern();
-    if (pattern.matches(OSCAddress(OSC_ADDRESS_MUSESCORE_SSMN)))
-    {
-        handleMusescoreSSMNStyle(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED)))
-    {
-        handleOwnExternStyleAed(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ)))
-    {
-        handleOwnExternStyleXyz(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GAIN)))
-    {
-        handleOwnExternStyleGain(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED)))
-    {
-        handleOwnExternStyleGroupAed(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ)))
-    {
-        handleOwnExternStyleGroupXyz(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
-    {
-        handleOwnExternStyleIndexAed(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
-    {
-        handleOwnExternStyleIndexXyz(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN)))
-    {
-        handleOwnExternStyleIndexGain(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE)))
-    {
-        handleOwnExternStyleGroupRotate(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN)))
-    {
-        handleOwnExternStyleGroupRotateOrigin(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH)))
-    {
-        handleOwnExternStyleGroupStretch(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_MODE))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_UNITCIRCLE))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DBUNIT))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DISTANCEATTENUATION))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_CENTERCURVE))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDFACTOR))
-            || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDEXPONENT)))
-    {
-        handleOwnExternStyleDistanceEncoding(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_STANDARD)))
-    {
-        handleOwnExternStyleDistanceEncodingStandard(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCED)))
-    {
-        handleOwnExternStyleDistanceEncodingAdvanced(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL)))
-    {
-        handleOwnExternStyleDistanceEncodingExponential(message);
-    }
-    else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL)))
-    {
-        handleOwnExternStyleDistanceEncodingInverseProportional(message);
-    }
-    else
-    {
-        bool hasMatch = false;
-        if(!pattern.containsWildcards()) {
-            OSCAddress address(pattern.toString());
+    
+    // first check for custom osc pattern match
+    bool hasMatch = false;
+    if(!pattern.containsWildcards()) {
+        OSCAddress address(pattern.toString());
         
-            for(auto& r : customOscReceivers)
+        for(auto& r : customOscReceivers)
+        {
+            if(r->matchesPattern(&address))
             {
-                if(r->matchesPattern(&address))
+                hasMatch = true;
+                if(r->handleMessage(pAmbiPoints, &message))
                 {
-                    hasMatch = true;
-                    if(r->handleMessage(pAmbiPoints, &message))
+                    reportSuccess(&message);
+                }
+                else
+                {
+                    if(!r->getErrorMessage().isEmpty())
                     {
-                        reportSuccess(&message);
-                    }
-                    else
-                    {
-                        if(!r->getErrorMessage().isEmpty())
-                        {
-                            reportError(r->getErrorMessage(), &message);
-                        }
+                        reportError(r->getErrorMessage(), &message);
                     }
                 }
             }
         }
-        
-        return hasMatch;
+        if(hasMatch)
+            return true;
+    }
+    if(pEncoderSettings->oscHandleStandardFormatFlag)
+    {
+        if (pattern.matches(OSCAddress(OSC_ADDRESS_MUSESCORE_SSMN)))
+        {
+            handleMusescoreSSMNStyle(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED)))
+        {
+            handleOwnExternStyleAed(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ)))
+        {
+            handleOwnExternStyleXyz(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GAIN)))
+        {
+            handleOwnExternStyleGain(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED)))
+        {
+            handleOwnExternStyleGroupAed(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ)))
+        {
+            handleOwnExternStyleGroupXyz(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
+        {
+            handleOwnExternStyleIndexAed(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
+        {
+            handleOwnExternStyleIndexXyz(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN)))
+        {
+            handleOwnExternStyleIndexGain(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE)))
+        {
+            handleOwnExternStyleGroupRotate(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN)))
+        {
+            handleOwnExternStyleGroupRotateOrigin(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH)))
+        {
+            handleOwnExternStyleGroupStretch(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_MODE))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_UNITCIRCLE))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DBUNIT))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DISTANCEATTENUATION))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_CENTERCURVE))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDFACTOR))
+                || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDEXPONENT)))
+        {
+            handleOwnExternStyleDistanceEncoding(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_STANDARD)))
+        {
+            handleOwnExternStyleDistanceEncodingStandard(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCED)))
+        {
+            handleOwnExternStyleDistanceEncodingAdvanced(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL)))
+        {
+            handleOwnExternStyleDistanceEncodingExponential(message);
+            return true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL)))
+        {
+            handleOwnExternStyleDistanceEncodingInverseProportional(message);
+            return true;
+        }
     }
     
-    
-    return true;
+    return false;
 }
 
 void OSCHandlerEncoder::handleMusescoreSSMNStyle(const OSCMessage& message) const

@@ -12,6 +12,10 @@
 #include "AmbiPoint.h"
 #include "AmbiGroup.h"
 
+#define DEFAULT_GROUP_MODE_FLAG     false
+#define XML_TAG_GROUPS "Groups"
+#define XML_TAG_GROUP "Group"
+
 class AmbiDataSet
 {
 public:
@@ -33,8 +37,8 @@ public:
 	bool setChannelNameAED(String channelName, double a, double e, double d) const;
 	bool setChannelNameXYZ(String channelName, double x, double y, double z) const;
     bool setChannelNameGain(String channelName, double gain) const;
-	void setChannelXY(int channel, double x, double y) const;
-	void setChannelYZ(int channel, double y, double z) const;
+	bool setChannelXY(int channel, double x, double y) const;
+	bool setChannelYZ(int channel, double y, double z) const;
 	void setChannelName(int channel, String name) const;
 	void setChannelColor(int channel, Colour colour) const;
     void setEnabled(int channel, bool enable) const;
@@ -55,16 +59,20 @@ public:
     float getMaxDistance() const;
     
 	int groupCount() const;
+    int activeGroupCount() const;
 	AmbiGroup* getGroup(int index) const;
-	AmbiGroup* addGroup(String id, Point3D<double> point, String name, Colour color);
+    AmbiGroup* getActiveGroup(int index, int* pRealIndex = nullptr) const;
+	int addGroup(String id, Vector3D<double> point, String name, Colour color);
 	void moveGroupXyz(int groupIndex, double dx, double dy, double dz, bool moveSubElements) const;
 	void removeGroup(int groupIndex);
-	void setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
-	void setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
+    void addPointToGroup(int groupIndex, int pointIndex);
+    void removePointFromGroup(int groupIndex, int pointIndex);
+	bool setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
+	bool setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
 	void setGroupName(int groupIndex, String name) const;
-	void stretchGroup(int groupIndex, double stretchValue);
-    void rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
-    void rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
+	bool stretchGroup(int groupIndex, double stretchValue);
+    bool rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
+    bool rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     
     bool setGroupAed(String groupName, double a, double e, double d, bool moveSubElements);
 	bool setGroupXyz(String groupName, double x, double y, double z, bool moveSubElements) const;
@@ -72,7 +80,18 @@ public:
     bool rotateGroup(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(String groupName, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
     void swapGroup(int a, int b);
-
+    
+    bool setGroupRotation(int groupIndex, Quaternion<double> rotation, bool notify = true);
+    bool setGroupStretch(int groupIndex, double stretchFactor, bool notify = true);
+    bool setGroupRotation(String groupName, Quaternion<double> rotation, bool notify = true);
+    bool setGroupStretch(String groupName, double stretchFactor, bool notify = true);
+    
+    Vector3D<double> getAbsSourcePoint(int index) const;
+    void setAbsSourcePoint(int index, Vector3D<double> absPoint);
+    
+    bool getGroupModeFlag() const;
+    void setGroupModeFlag(bool en);
+    
 private:
 	bool nameExists(String name) const;
 
@@ -80,4 +99,6 @@ protected:
 	CriticalSection cs;
 	OwnedArray<AmbiGroup> groups;
     ScalingInfo* pScalingInfo;
+    
+    bool groupModeFlag;
 };

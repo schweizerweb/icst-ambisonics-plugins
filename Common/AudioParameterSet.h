@@ -12,6 +12,7 @@
 #include "AudioParameterFloatAmbiAbs.h"
 #include "AudioParameterBoolAmbiAbs.h"
 #include "ScalingInfo.h"
+#include "Constants.h"
 
 class AudioParameterSet
 {
@@ -19,6 +20,11 @@ public:
 	AudioParameterFloatAmbiAbs* pX = nullptr;
 	AudioParameterFloatAmbiAbs* pY = nullptr;
 	AudioParameterFloatAmbiAbs* pZ = nullptr;
+    AudioParameterFloat* pQ0 = nullptr;
+    AudioParameterFloat* pQ1 = nullptr;
+    AudioParameterFloat* pQ2 = nullptr;
+    AudioParameterFloat* pQ3 = nullptr;
+    AudioParameterFloat* pStretch = nullptr;
     AudioParameterFloatAmbiAbs* pGain = nullptr;
     AudioParameterBoolAmbiAbs* pMute = nullptr;
     
@@ -71,6 +77,44 @@ public:
         
         return z;
 	}
+    
+    void notifyQ(double q0, double q1, double q2, double q3)
+    {
+        makeValid(&q0, -1.0, 1.0);
+        if(pQ0 != nullptr)
+        {
+            *pQ0 = float(q0);
+        }
+        
+        makeValid(&q1, -1.0, 1.0);
+        if(pQ1 != nullptr)
+        {
+            *pQ1 = float(q1);
+        }
+        
+        makeValid(&q2, -1.0, 1.0);
+        if(pQ2 != nullptr)
+        {
+            *pQ2 = float(q2);
+        }
+        
+        makeValid(&q3, -1.0, 1.0);
+        if(pQ3 != nullptr)
+        {
+            *pQ3 = float(q3);
+        }
+    }
+    
+    double notifyStretch(double stretch)
+    {
+        makeValid(&stretch, Constants::StretchMin, Constants::StretchMax);
+        if(pStretch != nullptr)
+        {
+            *pStretch = float(stretch);
+        }
+        
+        return stretch;
+    }
     
     void notifyGain(double gain)
     {

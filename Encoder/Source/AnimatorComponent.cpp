@@ -163,7 +163,7 @@ void AnimatorComponent::actionListenerCallback(const juce::String &message)
             auto group = pSourceSet->getGroup(groupIndex);
             if(group != nullptr && group->getEnabled())
             {
-                Point3D<double> origin = *(group->getPoint());
+                Point3D<double> origin = *(group->getRawPoint());
                 Point3D<double> target = p.second;
                 calculateStepsTo(origin, target, &groupSteps[groupIndex], pMov->polarFlag, stepCount);
                 currentStep[groupIndex] = 0;
@@ -272,7 +272,7 @@ void AnimatorComponent::setPreset(PositionSet *pSet, int groupIndex)
         Logger::writeToLog(String(pSourceSet->getGroup(i)->getPoint()->getX()) + "; " + String(pSourceSet->getGroup(i)->getPoint()->getY()));
     }
      */
-    pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(groupIndex)->getPoint()));
+    pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(groupIndex)->getRawPoint()));
 }
 //[/MiscUserCode]
 

@@ -21,8 +21,8 @@
         UserDefinedParameter(String originalString, std::string typeString, double lo, double hi, double zero);
         UserDefinedParameter(String originalString, ParameterType t);
         
-        OSCArgument getOSCArgument(AmbiPoint* pt, double scaler, int index);
-        String getString(AmbiPoint* pt, double scaler, int index);
+        OSCArgument getOSCArgument(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index);
+        String getString(Vector3D<double> absPt, AmbiPoint* pt, double scaler, int index);
         String getOriginalString();
         ParameterType getType() {return type;}
         
@@ -46,6 +46,9 @@
                     setMethod ("getName", name);
                     setMethod ("getColor", color);
                     setMethod ("getIndex", i);
+                    setMethod ("getAbsX", absX);
+                    setMethod ("getAbsY", absY);
+                    setMethod ("getAbsZ", absZ);
                 }
         
                 static Identifier getClassName()    { return "p"; }
@@ -53,7 +56,7 @@
                 static var x (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getX();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getX();
         
                     return var::undefined();
                 }
@@ -61,7 +64,7 @@
                 static var y (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getY();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getY();
                 
                     return var::undefined();
                 }
@@ -69,15 +72,39 @@
                 static var z (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getZ();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getZ();
+                
+                    return var::undefined();
+                }
+                
+                static var absX (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.x;
+        
+                    return var::undefined();
+                }
+
+                static var absY (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.y;
                 
                     return var::undefined();
                 }
                    
+                static var absZ (const var::NativeFunctionArgs& args)
+                {
+                    if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
+                        return thisObject->jsAbsPos.z;
+                
+                    return var::undefined();
+                }
+                
                 static var a (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getAzimuth();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getAzimuth();
                 
                     return var::undefined();
                 }
@@ -85,7 +112,7 @@
                 static var e (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getElevation();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getElevation();
                 
                     return var::undefined();
                 }
@@ -93,7 +120,7 @@
                 static var d (const var::NativeFunctionArgs& args)
                 {
                     if (auto* thisObject = dynamic_cast<JsContext*> (args.thisObject.getObject()))
-                        return thisObject->jsAmbiPoint->getPoint()->getDistance();
+                        return thisObject->jsAmbiPoint->getRawPoint()->getDistance();
                 
                     return var::undefined();
                 }
@@ -133,12 +160,13 @@
                 
                 UserDefinedParameter* owner;
                 AmbiPoint* jsAmbiPoint;
+                Vector3D<double> jsAbsPos; // TODO
                 int jsPointIndex;
                 
                 JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (JsContext)
             };
         
-        float getValue(AmbiPoint* pt, double scaler);
+        float getValue(Vector3D<double> absPt, AmbiPoint* pt, double scaler);
         float dualMap(double value, double maxValue);
         float inverseDualMap(double value, double maxValue);
         

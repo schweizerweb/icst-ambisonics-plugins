@@ -34,9 +34,9 @@ $DecoderVersions =
 
 function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
 {
-    $projectId =  'O' + $order + 'CH' + $audioChannelNum.ToString('00')
-    $code = 'O' + $order + '_' + $audioChannelNum + 'CH'
-    $codeBundle = 'O' + $order + $audioChannelNum + 'CH'
+    $projectId =  'o' + $order + 'ch' + $audioChannelNum.ToString('00')
+    $code = 'o' + $order + '_' + $audioChannelNum + 'ch'
+    $codeBundle = 'o' + $order + $audioChannelNum + 'ch'
     $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 

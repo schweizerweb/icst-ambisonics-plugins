@@ -15,7 +15,7 @@
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
-#include "GroupPointsSelectionComponent.h"
+#include "../../Common/GroupPointsSelectionComponent.h"
 #include "../../Common/ScalingInfo.h"
 #include "../../Common/ColorDefinition.h"
 
@@ -27,6 +27,8 @@
 #define	COLUMN_ID_GROUP_A		110
 #define	COLUMN_ID_GROUP_E		111
 #define	COLUMN_ID_GROUP_D		112
+#define COLUMN_ID_GROUP_STRETCH 120
+#define COLUMN_ID_GROUP_ROTATION    121
 #define COLUMN_ID_GROUP_COLOR	113
 #define COLUMN_ID_GROUP_POINTS	114
 
@@ -41,22 +43,32 @@ public:
 	~GroupTableListModel() override {}
 
 	int getNumRows() override {
-		return pSources->groupCount();
+		return pSources->activeGroupCount();
 	}
 
 	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
 	{
-		const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-			.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
-		if (rowIsSelected)
-			g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
-		else if (rowNumber % 2)
-			g.fillAll(alternateColour);
+        if (rowIsSelected)
+        {
+            Colour baseColor = COLOR_DEFINITION_SELECTED_ROW;
+            if (pPointSelection->getMainSelectedPointIndex() == rowNumber)
+                g.fillAll(baseColor);
+            else
+                g.fillAll(baseColor.withAlpha(0.4f));
+        }
+        else if (rowNumber % 2)
+        {
+            const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
+                .interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
+
+            g.fillAll(alternateColour);
+        }
 	}
 
 	void paintCell(Graphics& g, int rowNumber, int columnId, int width, int height, bool /*rowIsSelected*/) override 
 	{
-		AmbiGroup* pt = pSources->getGroup(rowNumber);
+        int grpIndex;
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber, &grpIndex);
 		if (pt == nullptr)
 			return;
 
@@ -64,9 +76,9 @@ public:
 		String text;
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_NB: text = String(rowNumber + 1); break;
+		case COLUMN_ID_GROUP_NB: text = String(grpIndex + 1); break;
 		case COLUMN_ID_GROUP_NAME: text = pt->getName(); break;
-		case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPoints.size()); break;
+        case COLUMN_ID_GROUP_POINTS: text = String(pt->groupPointCount()); break;
 		default: text = "";
 		}
 		g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -88,16 +100,19 @@ public:
 			|| columnId == COLUMN_ID_GROUP_Z
 			|| columnId == COLUMN_ID_GROUP_A
 			|| columnId == COLUMN_ID_GROUP_E
-			|| columnId == COLUMN_ID_GROUP_D)
+			|| columnId == COLUMN_ID_GROUP_D
+            || columnId == COLUMN_ID_GROUP_STRETCH)
 		{
 			NumericColumnCustomComponent* numericBox = static_cast<NumericColumnCustomComponent*> (existingComponentToUpdate);
 			if (numericBox == nullptr)
 				numericBox = new NumericColumnCustomComponent(*this);
 
 			numericBox->setRowAndColumn(rowNumber, columnId);
+            numericBox->setJustificationType(Justification::right);
 			return numericBox;
 		}
-		else if (columnId == COLUMN_ID_GROUP_NAME)
+		else if (columnId == COLUMN_ID_GROUP_NAME
+            || columnId == COLUMN_ID_GROUP_ROTATION)
 		{
 			EditableTextCustomComponent* textLabel = static_cast<EditableTextCustomComponent*> (existingComponentToUpdate);
 			if (textLabel == nullptr)
@@ -121,25 +136,44 @@ public:
 
 	void selectedRowsChanged(int lastRowSelected) override
 	{
-		if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
-			pPointSelection->selectGroup(lastRowSelected, false);
+        pPointSelection->unselectPoint();
+
+        bool first = true;
+        if (lastRowSelected >= 0 && lastRowSelected < pSources->size())
+        {
+            auto set = pTableListBox->getSelectedRows();
+            for (auto r : set.getRanges())
+            {
+                for (int i = r.getStart(); i < r.getEnd(); i++)
+                {
+                    if (i != lastRowSelected)
+                    {
+                        pPointSelection->selectGroup(i, !first);
+                        first = false;
+                    }
+                }
+            }
+
+            pPointSelection->selectGroup(lastRowSelected, !first);
+        }
 	}
 
 	double getValue(int columnId, int rowNumber) override 
 	{
 		// group table handling
-		AmbiGroup* pt = pSources->getGroup(rowNumber);
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber);
 		if (pt == nullptr)
 			return 0.0;
 
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_X: return pt->getPoint()->getX();
-		case COLUMN_ID_GROUP_Y: return pt->getPoint()->getY();
-		case COLUMN_ID_GROUP_Z: return pt->getPoint()->getZ();
-		case COLUMN_ID_GROUP_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-		case COLUMN_ID_GROUP_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-		case COLUMN_ID_GROUP_D: return pt->getPoint()->getDistance();
+		case COLUMN_ID_GROUP_X: return pt->getRawPoint()->getX();
+		case COLUMN_ID_GROUP_Y: return pt->getRawPoint()->getY();
+		case COLUMN_ID_GROUP_Z: return pt->getRawPoint()->getZ();
+		case COLUMN_ID_GROUP_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
+		case COLUMN_ID_GROUP_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
+		case COLUMN_ID_GROUP_D: return pt->getRawPoint()->getDistance();
+        case COLUMN_ID_GROUP_STRETCH: return pt->getStretch();
 		case COLUMN_ID_GROUP_COLOR: return pt->getColor().getARGB();
 		default: return 0.0;
 		}
@@ -154,21 +188,24 @@ public:
 	{
 		switch (columnId)
 		{
-		case COLUMN_ID_GROUP_X: pSources->getGroup(rowNumber)->getPoint()->setX(newValue); break;
-		case COLUMN_ID_GROUP_Y: pSources->getGroup(rowNumber)->getPoint()->setY(newValue); break;
-		case COLUMN_ID_GROUP_Z: pSources->getGroup(rowNumber)->getPoint()->setZ(newValue); break;
-		case COLUMN_ID_GROUP_A: pSources->getGroup(rowNumber)->getPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_E: pSources->getGroup(rowNumber)->getPoint()->setElevation(Constants::GradToRad(newValue)); break;
-		case COLUMN_ID_GROUP_D: pSources->getGroup(rowNumber)->getPoint()->setDistance(newValue); break;
+		case COLUMN_ID_GROUP_X: pSources->getActiveGroup(rowNumber)->getRawPoint()->setX(newValue); break;
+		case COLUMN_ID_GROUP_Y: pSources->getActiveGroup(rowNumber)->getRawPoint()->setY(newValue); break;
+		case COLUMN_ID_GROUP_Z: pSources->getActiveGroup(rowNumber)->getRawPoint()->setZ(newValue); break;
+		case COLUMN_ID_GROUP_A: pSources->getActiveGroup(rowNumber)->getRawPoint()->setAzimuth(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_E: pSources->getActiveGroup(rowNumber)->getRawPoint()->setElevation(Constants::GradToRad(newValue)); break;
+		case COLUMN_ID_GROUP_D: pSources->getActiveGroup(rowNumber)->getRawPoint()->setDistance(newValue); break;
+        case COLUMN_ID_GROUP_STRETCH:
+            pSources->getActiveGroup(rowNumber)->setStretch(newValue);
+            break;
 		case COLUMN_ID_GROUP_COLOR:
             if(newValue < 0) // code for setting children
             {
-                pSources->getGroup(rowNumber)->setChildrenColor();
+                pSources->getActiveGroup(rowNumber)->setChildrenColor();
                 pPointSelection->notifyChange();
             }
             else
             {
-                pSources->getGroup(rowNumber)->setColor(Colour(uint32(newValue)));
+                pSources->getActiveGroup(rowNumber)->setColor(Colour(uint32(newValue)));
             }
             break;
 		default: throw;
@@ -195,6 +232,10 @@ public:
 
 		case COLUMN_ID_GROUP_E:
 			return SliderRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+                
+        case COLUMN_ID_GROUP_STRETCH:
+            return SliderRange(Constants::StretchMin, Constants::StretchMax, 0.01);
+                
 		default: return SliderRange(0.0, 1.0, 0.001);
 		}
 	}
@@ -206,13 +247,21 @@ public:
 
 	String getTableText(const int columnId, const int rowNumber) override
 	{
-		AmbiPoint* pt = pSources->getGroup(rowNumber);
+		AmbiGroup* pt = pSources->getActiveGroup(rowNumber);
 		if (pt == nullptr)
 			return "";
 
 		switch (columnId)
 		{
 		case COLUMN_ID_GROUP_NAME: return pt->getName();
+        case COLUMN_ID_GROUP_ROTATION:
+            {
+                auto rot = pt->getRotation();
+                String text;
+                text << String(rot.vector.x, 2) << "; " << String(rot.vector.y, 2) << "; " << String(rot.vector.z, 2) << "; " << String(rot.scalar, 2);
+                return text;
+            }
+                
 		default: return "";
 		}
 	}
@@ -222,6 +271,21 @@ public:
 		switch (columnId)
 		{
 		case COLUMN_ID_GROUP_NAME: pSources->setGroupName(rowNumber, newText); break;
+        case COLUMN_ID_GROUP_ROTATION:
+            {
+                StringArray tokens;
+                tokens.addTokens (newText, ";");
+
+                if(tokens.size() == 4)
+                {
+                    pSources->setGroupRotation(rowNumber, Quaternion<double>(
+                                                tokens[0].getDoubleValue(),
+                                                tokens[1].getDoubleValue(),
+                                                tokens[2].getDoubleValue(),
+                                                tokens[3].getDoubleValue()));
+                }
+                break;
+            }
 		default: throw;
 		}
 	}
@@ -238,10 +302,13 @@ public:
 		tableListBox->getHeader().addColumn("A", COLUMN_ID_GROUP_A, 50);
 		tableListBox->getHeader().addColumn("E", COLUMN_ID_GROUP_E, 50);
 		tableListBox->getHeader().addColumn("D", COLUMN_ID_GROUP_D, 50);
+        tableListBox->getHeader().addColumn("Stretch", COLUMN_ID_GROUP_STRETCH, 60);
+        tableListBox->getHeader().addColumn("Rotation", COLUMN_ID_GROUP_ROTATION, 120);
 		tableListBox->getHeader().addColumn("# Points", COLUMN_ID_GROUP_POINTS, 60);
 		tableListBox->getHeader().addColumn("Color", COLUMN_ID_GROUP_COLOR, 60);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
+        tableListBox->setMultipleSelectionEnabled(true);
 	}
 
 	void cellClicked(int rowNumber, int columnId, const MouseEvent&) override

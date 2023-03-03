@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -51,12 +51,6 @@
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
 #define COLUMN_ID_FILTER    14
-
-#define ID_APPLY_COLOR      1
-#define ID_APPLY_FILTER     2
-#define ID_APPLY_GAIN       3
-#define ID_APPLY_DEC_GAIN   4
-#define ID_APPLY_INC_GAIN   5
 //[/MiscUserDefs]
 
 //==============================================================================
@@ -210,14 +204,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonManageFilters->setButtonText (TRANS("manage filters..."));
     buttonManageFilters->addListener (this);
 
-    comboBoxApply.reset (new juce::ComboBox ("comboBoxApply"));
-    addAndMakeVisible (comboBoxApply.get());
-    comboBoxApply->setEditableText (false);
-    comboBoxApply->setJustificationType (juce::Justification::centredLeft);
-    comboBoxApply->setTextWhenNothingSelected (TRANS("apply..."));
-    comboBoxApply->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboBoxApply->addListener (this);
-
     buttonCsv.reset (new juce::TextButton ("buttonCsv"));
     addAndMakeVisible (buttonCsv.get());
     buttonCsv->setButtonText (TRANS("csv"));
@@ -250,7 +236,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 
     //[Constructor] You can add your own custom stuff here..
-    labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion());
+    labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion() && !Constants::isNonVisibleVersionPrerelease());
 
     // prepare weighting comboBox
     comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);
@@ -280,6 +266,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	speakerList->getHeader().setStretchToFitActive(true);
 	speakerList->getHeader().resizeAllColumnsToFit(speakerList->getWidth());
     speakerList->setMultipleSelectionEnabled(true);
+    speakerList->addMouseListener(this, true);
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
     updateUI();
@@ -325,7 +312,6 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonManage = nullptr;
     comboBoxChannelWeightingMode = nullptr;
     buttonManageFilters = nullptr;
-    comboBoxApply = nullptr;
     buttonCsv = nullptr;
     buttonScaling = nullptr;
     sliderPort = nullptr;
@@ -370,14 +356,13 @@ void SpeakerSettingsComponent::resized()
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 267)) + 199) + 20, 75, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 267)) + 199) + 20, 96, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4978f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4974f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3979f) / 2), 0, proportionOfWidth (0.3979f), 24);
     buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 128, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
-    comboBoxApply->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + 120 - -8, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 144, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
-    buttonScaling->setBounds ((proportionOfWidth (0.4978f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonCsv->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 267)) + 199) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 267)) + 199) + 20, 170, 24);
     //[UserResized] Add your own custom resize handling here..
@@ -404,67 +389,6 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
         ambiChannelControl->updateValues();
         controlDimming();
         //[/UserComboBoxCode_comboBoxChannelWeightingMode]
-    }
-    else if (comboBoxThatHasChanged == comboBoxApply.get())
-    {
-        //[UserComboBoxCode_comboBoxApply] -- add your combo box handling code here..
-        int mainSelection = pPointSelection->getMainSelectedPointIndex();
-        if (mainSelection >= 0 && mainSelection < pSpeakerSet->size())
-        {
-
-            if (comboBoxApply->getSelectedId() == ID_APPLY_COLOR)
-            {
-                Colour color = pSpeakerSet->get(mainSelection)->getColor();
-                auto selection = pPointSelection->getSelectedIndices();
-                for (int i = 0; i < selection.size(); i++)
-                {
-                    if (selection[i] != mainSelection)
-                    {
-                        pSpeakerSet->get(selection[i])->setColor(color);
-                    }
-                }
-            }
-            else if (comboBoxApply->getSelectedId() == ID_APPLY_FILTER)
-            {
-                FilterBankInfo* info = pSpeakerSet->get(mainSelection)->getFilterInfo();
-                bool bypass = pSpeakerSet->get(mainSelection)->getFilterBypass();
-                auto selection = pPointSelection->getSelectedIndices();
-                for (int i = 0; i < selection.size(); i++)
-                {
-                    if (selection[i] != mainSelection)
-                    {
-                        pSpeakerSet->get(selection[i])->getFilterInfo()->copyFrom(info);
-                        pSpeakerSet->get(selection[i])->setFilterBypass(bypass);
-                    }
-                }
-            }
-            else if (comboBoxApply->getSelectedId() == ID_APPLY_GAIN)
-            {
-                double gainFactor = pSpeakerSet->get(mainSelection)->getGain();
-                auto selection = pPointSelection->getSelectedIndices();
-                for (int i = 0; i < selection.size(); i++)
-                {
-                    if (selection[i] != mainSelection)
-                    {
-                        pSpeakerSet->get(selection[i])->setGain(gainFactor, true);
-                    }
-                }
-            }
-            else if(comboBoxApply->getSelectedId() == ID_APPLY_DEC_GAIN || comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN)
-            {
-                float gainFactor = float(Decibels::decibelsToGain(comboBoxApply->getSelectedId() == ID_APPLY_INC_GAIN ? 0.5 : -0.5));
-                auto selection = pPointSelection->getSelectedIndices();
-                for (auto index : selection)
-                {
-                    pSpeakerSet->get(index)->setGain(pSpeakerSet->get(index)->getGain() * gainFactor, true);
-                }
-            }
-        }
-
-        speakerList->updateContent();
-        speakerList->repaint();
-        comboBoxApply->setSelectedId(0);
-        //[/UserComboBoxCode_comboBoxApply]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -716,9 +640,9 @@ void SpeakerSettingsComponent::paintCell(Graphics& g, int rowNumber, int columnI
 	{
 	case COLUMN_ID_NB: text = String(rowNumber + 1); break;
 	case COLUMN_ID_NAME: text = pt->getName(); break;
-	case COLUMN_ID_DISTANCE: text = String(pt->getPoint()->getDistance(), 2); break;
-	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pt), 2); break;
-	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pSpeakerSet->getMaxNormalizedDistance(), pt), 2); break;
+	case COLUMN_ID_DISTANCE: text = String(pt->getRawPoint()->getDistance(), 2); break;
+	case COLUMN_ID_DELAY: text = String(delayHelper.getTotalDelayMs(pt->getRawPoint()->getDistance()), 2); break;
+	case COLUMN_ID_DELAY_COMPENSATION: text = String(delayHelper.getDelayCompensationMs(pt->getRawPoint()->getDistance(), pSpeakerSet->getMaxNormalizedDistance()), 2); break;
 	default: text = "";
 	}
 	g.drawText(text, 2, 0, width - 4, height, Justification::centredLeft, true);
@@ -740,7 +664,8 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
 			numericBox = new NumericColumnCustomComponent(*this);
 
 		numericBox->setRowAndColumn(rowNumber, columnId);
-		return numericBox;
+        numericBox->setJustificationType(Justification::right);
+        return numericBox;
 	}
 	else if(columnId == COLUMN_ID_GAIN)
 	{
@@ -834,7 +759,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
     case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, newValue == 1); break;
-            
+
         default: return; // do nothing
 	}
 
@@ -851,12 +776,12 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	switch (columnId)
 	{
     case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
-	case COLUMN_ID_X: return pt->getPoint()->getX();
-	case COLUMN_ID_Y: return pt->getPoint()->getY();
-	case COLUMN_ID_Z: return pt->getPoint()->getZ();
-	case COLUMN_ID_A: return Constants::RadToGrad(pt->getPoint()->getAzimuth());
-	case COLUMN_ID_E: return Constants::RadToGrad(pt->getPoint()->getElevation());
-	case COLUMN_ID_DISTANCE: return pt->getPoint()->getDistance();
+	case COLUMN_ID_X: return pt->getRawPoint()->getX();
+	case COLUMN_ID_Y: return pt->getRawPoint()->getY();
+	case COLUMN_ID_Z: return pt->getRawPoint()->getZ();
+	case COLUMN_ID_A: return Constants::RadToGrad(pt->getRawPoint()->getAzimuth());
+	case COLUMN_ID_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
+	case COLUMN_ID_DISTANCE: return pt->getRawPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
         case COLUMN_ID_MUTE: return pt->getMute() ? 1 : 0;
         default: return 0.0;
@@ -870,7 +795,7 @@ void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValu
     case COLUMN_ID_FILTER:
         pSpeakerSet->setFilterBypass(rowNumber, !newValue);
     	break;
-            
+
     default: throw;
     }
 
@@ -1016,6 +941,8 @@ void SpeakerSettingsComponent::controlDimming()
 	labelPresets->setEnabled(en);
 	comboBoxChannelConfig->setEnabled(en);
 	speakerList->setEnabled(en);
+    buttonCsv->setEnabled(en);
+    buttonScaling->setEnabled(en);
 	buttonManage->setEnabled(en);
 	buttonSave->setEnabled(en);
 	buttonAdd->setEnabled(en);
@@ -1025,21 +952,83 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonSpeakerTest->setEnabled(en);
 
     ambiChannelControl->setEnabled(pAmbiSettings->getWeightMode() == AmbiSettings::MANUAL);
+}
 
-    comboBoxApply->setVisible(multiselection);
-    if(multiselection)
+void SpeakerSettingsComponent::mouseUp(const MouseEvent &event)
+{
+    if(event.mods.isCtrlDown() || event.mods.isRightButtonDown())
     {
-        comboBoxApply->clear(dontSendNotification);
+        auto rel = event.getScreenPosition()-speakerList->getScreenPosition();
+        int row = speakerList->getRowContainingPosition(rel.x, rel.y);
 
-        int mainIndex = pPointSelection->getMainSelectedPointIndex();
-        if(mainIndex >= 0 && mainIndex < pSpeakerSet->size())
+        // show menu only if multiple rows are selected and the mouse click has hit a row
+        if(row != -1 && pPointSelection->getSelectedIndices().size() > 1)
         {
-            comboBoxApply->addItem("Color from CH " + String(mainIndex + 1), ID_APPLY_COLOR);
-            comboBoxApply->addItem("Filter from CH " + String(mainIndex + 1), ID_APPLY_FILTER);
-            comboBoxApply->addItem("Gain from CH " + String(mainIndex + 1), ID_APPLY_GAIN);
+            PopupMenu m;
+            m.addItem("Apply Color from CH " + String(row + 1), [this, row](){
+                Colour color = pSpeakerSet->get(row)->getColor();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != row)
+                    {
+                        pSpeakerSet->get(selection[i])->setColor(color);
+                    }
+                }
+                speakerList->updateContent();
+                speakerList->repaint();
+            });
 
-            comboBoxApply->addItem(TRANS("Gain -0.5 dB"), ID_APPLY_DEC_GAIN);
-            comboBoxApply->addItem(TRANS("Gain +0.5 dB"), ID_APPLY_INC_GAIN);
+            m.addItem("Apply Filter from CH " + String(row + 1), [this, row](){
+                FilterBankInfo* info = pSpeakerSet->get(row)->getFilterInfo();
+                bool bypass = pSpeakerSet->get(row)->getFilterBypass();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != row)
+                    {
+                        pSpeakerSet->get(selection[i])->getFilterInfo()->copyFrom(info);
+                        pSpeakerSet->get(selection[i])->setFilterBypass(bypass);
+                    }
+                }
+                speakerList->updateContent();
+                speakerList->repaint();
+            });
+            m.addItem("Apply Gain from CH " + String(row + 1), [this, row](){
+                double gainFactor = pSpeakerSet->get(row)->getGain();
+                auto selection = pPointSelection->getSelectedIndices();
+                for (int i = 0; i < selection.size(); i++)
+                {
+                    if (selection[i] != row)
+                    {
+                        pSpeakerSet->get(selection[i])->setGain(gainFactor, true);
+                    }
+                }
+                speakerList->updateContent();
+                speakerList->repaint();
+            });
+
+            m.addItem(TRANS("Gain -0.5 dB"), [this](){
+                float gainFactor = float(Decibels::decibelsToGain(-0.5));
+                auto selection = pPointSelection->getSelectedIndices();
+                for (auto index : selection)
+                {
+                    pSpeakerSet->get(index)->setGain(pSpeakerSet->get(index)->getGain() * gainFactor, true);
+                }
+                speakerList->updateContent();
+                speakerList->repaint();
+            });
+            m.addItem(TRANS("Gain +0.5 dB"), [this](){
+                float gainFactor = float(Decibels::decibelsToGain(0.5));
+                auto selection = pPointSelection->getSelectedIndices();
+                for (auto index : selection)
+                {
+                    pSpeakerSet->get(index)->setGain(pSpeakerSet->get(index)->getGain() * gainFactor, true);
+                }
+                speakerList->updateContent();
+                speakerList->repaint();
+            });
+            m.show();
         }
     }
 }
@@ -1138,11 +1127,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.784%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.742%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.856% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.793% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1159,10 +1148,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="8Rr 24 120 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage filters..."
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <COMBOBOX name="comboBoxApply" id="30951c9518bbedeb" memberName="comboBoxApply"
-            virtualName="" explicitFocusOrder="0" pos="-8R 0 144 24" posRelativeX="5fad387b688247bf"
-            posRelativeY="5fad387b688247bf" editable="0" layout="33" items=""
-            textWhenNonSelected="apply..." textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
               virtualName="" explicitFocusOrder="0" pos="-8r 0 64 24" posRelativeX="5fad387b688247bf"
               posRelativeY="5fad387b688247bf" buttonText="csv" connectedEdges="0"

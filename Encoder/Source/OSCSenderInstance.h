@@ -22,7 +22,7 @@ public:
 
     bool connect(String host, int port);
 	void disconnect();
-	void sendMessage(AmbiPoint* pt, int index);
+	void sendMessage(Vector3D<double> absPt, AmbiPoint* pt, int index);
 	
 private:
     std::unique_ptr<OSCSender> sender;

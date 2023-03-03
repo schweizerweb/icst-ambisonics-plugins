@@ -36,13 +36,16 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	settingsWindow = nullptr;
     pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
-	radarOptions.nameFieldEditable = true;
 	radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
 	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
 	radarOptions.editablePointsAsSquare = false;
 	radarOptions.audioParams = ownerProc.getAudioParams();
 	radarOptions.dawParameter = ownerProc.getDawParameter();
     radarOptions.scalingInfo = ownerProc.getScalingInfo();
+    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
+#if !MULTI_ENCODER_MODE
+    radarOptions.checkNameFieldEditable = true;
+#endif
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));
@@ -98,9 +101,8 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " + String(ProjectInfo::versionString), dontSendNotification);
+	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + (Constants::isNonVisibleVersionPrerelease() ? "" : (" " +  String(ProjectInfo::versionString))), dontSendNotification);
 	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
-    radarComponent->getZoomSettingsPointer()->Reset();
     //[/Constructor]
 }
 
@@ -165,13 +167,14 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             pSources,
             &pointSelection,
             processor.getAudioParams(),
-            radarComponent->getZoomSettingsPointer(),
+            processor.getZoomSettingsPointer(),
             processor.getStatusMessageHandler(),
             processor.getPresetHelper(),
             processor.getDistanceEncodingPresetHelper(),
             processor.getCustomOscRxPresetHelper(),
             processor.getCustomOscTxPresetHelper(),
-            &oscLogDialogManager
+            &oscLogDialogManager,
+            processor.getDawParameter()
         };
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);

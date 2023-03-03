@@ -12,6 +12,11 @@
 #include "PluginEditor.h"
 #include "../../Common/FFTAnalyzer.h"
 
+#define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
+#define XML_ROOT_TAG "AMBISONICDECODERPLUGINSETTINGS"
+#define XML_TAG_GENERAL "General"
+#define XML_TAG_AMBISONICS_PRESET "AmbisonicsPreset"
+
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
@@ -30,6 +35,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     movingPoints.reset(new AmbiSourceSet(&scalingInfo));
     pTestSoundGenerator = new TestSoundGenerator(speakerSet.get());
     
+    zoomSettings.reset(new ZoomSettings(getScalingInfo()));
+
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
     presetHelper->initialize();
     presetHelper->loadDefaultPreset(speakerSet.get(), &ambiSettings);
@@ -129,7 +136,7 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 		AmbiPoint* pt = speakerSet->get(i);
 		if (pt != nullptr)
 		{
-			int requiredDelay = delayHelper.getDelayCompensationSamples(pt, maxDist, getSampleRate());
+			int requiredDelay = delayHelper.getDelayCompensationSamples(pt->getRawPoint()->getDistance(), maxDist, getSampleRate());
 			delayBuffers.getUnchecked(i)->checkAndAdjustSize(requiredDelay);
 		}
 	}
@@ -175,7 +182,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
                     Logger::writeToLog("Error in Filterbank!");
                     return;
                 }
-                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter))
+                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < JucePlugin_MaxNumOutputChannels)
                 {
                     if (filterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
                     {
@@ -238,7 +245,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
             int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
             int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
             
-			pt->getPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
+			pt->getRawPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
 			
 			// gain of the W-signal depends on the used ambisonic order
             if(currentAmbisonicsOrder > 0)
@@ -302,21 +309,22 @@ AudioProcessorEditor* AmbisonicsDecoderAudioProcessor::createEditor()
 //==============================================================================
 void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
-    XmlElement* xml = new XmlElement("AMBISONICDECODERPLUGINSETTINGS");
-
+    XmlElement* xml = new XmlElement(XML_ROOT_TAG);
+    xml->setAttribute(XML_ATTRIBUTE_VERSION, ProjectInfo::versionNumber);
+    
 	// save general decoder settings
 	decoderSettings.saveToXml(xml);
 	
-    XmlElement* speakerSettings = new XmlElement("Points");
-    speakerSet->writeToXmlElement(speakerSettings);
+    speakerSet->writeToXmlElement(xml);
     
-    XmlElement* ambiSettingsXml = new XmlElement("General");
+    XmlElement* ambiSettingsXml = new XmlElement(XML_TAG_GENERAL);
     ambiSettings.writeToPresetXmlElement(ambiSettingsXml);
     
-    XmlElement* presetSettings = new XmlElement("AmbisonicsPreset");
-    presetSettings->addChildElement(speakerSettings);
+    XmlElement* presetSettings = new XmlElement(XML_TAG_AMBISONICS_PRESET);
     presetSettings->addChildElement(ambiSettingsXml);
     xml->addChildElement(presetSettings);
+    
+    zoomSettings->writeToXmlElement(xml);
 
 	copyXmlToBinary(*xml, destData);
 
@@ -330,26 +338,32 @@ void AmbisonicsDecoderAudioProcessor::setStateInformation (const void* data, int
 	if (xmlState != nullptr)
 	{
 		// make sure that it's actually our type of XML object..
-		if (xmlState->hasTagName("AMBISONICDECODERPLUGINSETTINGS"))
+		if (xmlState->hasTagName(XML_ROOT_TAG))
 		{
+            int versionNumber = xmlState->getIntAttribute(XML_ATTRIBUTE_VERSION, 0);
+            
+            if(versionNumber > ProjectInfo::versionNumber)
+            {
+                AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "Outdated AmbiDecoder version", "The state to be loaded has been saved with a newer version of the AmbiDecoder plugin");
+            }
+            // future implementation of backward compatibility
+            
 			// load general decoder settings
 			decoderSettings.loadFromXml(xmlState.get());
 			
-            XmlElement* presetElement = xmlState->getChildByName("AmbisonicsPreset");
+            XmlElement* presetElement = xmlState->getChildByName(XML_TAG_AMBISONICS_PRESET);
             if (presetElement != nullptr)
             {
-                XmlElement* speakerXml = presetElement->getChildByName("Points");
-                if(speakerXml != nullptr)
-                {
-                    speakerSet->loadFromXml(speakerXml);
-                }
+                speakerSet->loadFromXml(xmlState.get());
                 
-                XmlElement* ambiXml = presetElement->getChildByName("General");
+                XmlElement* ambiXml = presetElement->getChildByName(XML_TAG_GENERAL);
                 if(ambiXml != nullptr)
                 {
                     ambiSettings.loadFromPresetXml(ambiXml);
                 }
             }
+            
+            zoomSettings->loadFromXml(xmlState.get());
 		}
 	}
 }
@@ -392,6 +406,11 @@ DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
 ScalingInfo* AmbisonicsDecoderAudioProcessor::getScalingInfo()
 {
     return &scalingInfo;
+}
+
+ZoomSettings* AmbisonicsDecoderAudioProcessor::getZoomSettingsPointer()
+{
+    return zoomSettings.get();
 }
 
 void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)

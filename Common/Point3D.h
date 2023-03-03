@@ -63,7 +63,9 @@ public:
 
 	inline bool operator== (Point3D other) noexcept{ return getX() == other.getX() && getY() == other.getY() && getZ() == other.getZ(); }
 	inline bool operator!= (Point3D other) noexcept{ return getX() != other.getX() || getY() != other.getY() || getZ() != other.getZ(); }
-
+    Point3D& operator+= (Point3D& other) noexcept{ x = x + other.getX(); y = y + other.getY(); z = z + other.getZ(); return *this; }
+    Point3D& operator-= (Point3D& other) noexcept{ x = x - other.getX(); y = y - other.getY(); z = z - other.getZ(); return *this; }
+    
 		/** Returns true if the Point3D is (0, 0, 0). */
 	bool isOrigin() const noexcept{ return getX() == ValueType() && getY() == ValueType() && getZ() == ValueType(); }
 

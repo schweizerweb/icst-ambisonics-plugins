@@ -16,6 +16,7 @@
 #include "CustomOscRxPresetHelper.h"
 #include "CustomOscTxPresetHelper.h"
 #include "../../Common/OSCLogDialogManager.h"
+#include "../../Common/DawParameter.h"
 
 struct EncoderSettingsComponentArgs
 {
@@ -31,4 +32,5 @@ struct EncoderSettingsComponentArgs
     CustomOscRxPresetHelper* pCustomOscRxPresetHelper;
     CustomOscTxPresetHelper* pCustomOscTxPresetHelper;
     OSCLogDialogManager* pOscLogManager;
+    DawParameter* pDawParams;
 };

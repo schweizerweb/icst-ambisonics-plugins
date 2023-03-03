@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.8
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -51,7 +51,6 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void setPointInfoVisible(bool visible);
     void timerCallback() override;
-    ZoomSettings* getZoomSettingsPointer() {return zoomSettings.get();}
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -61,8 +60,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    std::unique_ptr<ZoomSettings> zoomSettings;
-	bool showPointInfo;
+    bool showPointInfo;
     //[/UserVariables]
 
     //==============================================================================

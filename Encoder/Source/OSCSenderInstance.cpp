@@ -36,7 +36,7 @@ void OSCSenderInstance::disconnect()
     sender->disconnect();
 }
 
-void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
+void OSCSenderInstance::sendMessage(Vector3D<double> absPt, AmbiPoint* pt, int index)
 {
     const ScopedLock lock(cs);
     if (!isConnected)
@@ -48,14 +48,14 @@ void OSCSenderInstance::sendMessage(AmbiPoint* pt, int index)
     for (auto& parameter : parametersInPath)
     {
         auto original = parameter->getOriginalString();
-        auto replace = parameter->getString(pt, scaler, index);
+        auto replace = parameter->getString(absPt, pt, scaler, index);
         path = path.replace(original, replace);
     }
 
     OSCMessage message = OSCMessage(OSCAddressPattern(path));
     for (auto& parameter : realParameters)
     {
-        message.addArgument(parameter->getOSCArgument(pt, scaler, index));
+        message.addArgument(parameter->getOSCArgument(absPt, pt, scaler, index));
     }
 
     sender->send(message);

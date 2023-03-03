@@ -32,7 +32,7 @@ public:
 		owner.setTableText(columnId, row, getText());
 	}
 
-	void setRowAndColumn(const int newRow, const int newColumn, const bool readOnly = false)
+	void setRowAndColumn(const int newRow, const int newColumn)
 	{
 		row = newRow;
 		columnId = newColumn;
@@ -41,7 +41,7 @@ public:
         // if code starts with a comment, show the comment only
         if(text.startsWith("//"))
         {
-            text = text.fromFirstOccurrenceOf("//", false, true).upToFirstOccurrenceOf(NewLine::getDefault(), false, true);
+            text = text.fromFirstOccurrenceOf("//", false, true).upToFirstOccurrenceOf("\n", false, true);
 
             textColour = Colours::lightgreen;
         }
@@ -70,7 +70,7 @@ private:
 		Label::paint(g);
     }
 	
-	void mouseUp(const MouseEvent &event) override
+	void mouseUp(const MouseEvent& /*event*/) override
     {
         localCode = owner.getTableText(columnId, row);
         CallOutBox::launchAsynchronously(std::make_unique<JsEditorComponent>(&localCode, &localCloseFlag, this), getScreenBounds(), nullptr);

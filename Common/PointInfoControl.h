@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.0.1
+  Created with Projucer version: 6.1.6
 
   ------------------------------------------------------------------------------
 
@@ -66,6 +66,12 @@ public:
     static const int group_pngSize;
     static const char* ungroup_png;
     static const int ungroup_pngSize;
+    static const char* groupobjectsicon_png;
+    static const int groupobjectsicon_pngSize;
+    static const char* ungroupobjectsicon_png;
+    static const int ungroupobjectsicon_pngSize;
+    static const char* trashbinicon_png;
+    static const int trashbinicon_pngSize;
 
 
 private:
@@ -76,28 +82,23 @@ private:
     //[/UserVariables]
 
     //==============================================================================
+    std::unique_ptr<juce::Component> helperSlider;
+    std::unique_ptr<juce::Label> labelBackground;
     std::unique_ptr<juce::TextEditor> textName;
     std::unique_ptr<juce::Label> labelName;
-    std::unique_ptr<juce::Label> labelX;
     std::unique_ptr<juce::TextEditor> textX;
-    std::unique_ptr<juce::Label> labelY;
     std::unique_ptr<juce::TextEditor> textY;
-    std::unique_ptr<juce::Label> labelZ;
     std::unique_ptr<juce::TextEditor> textZ;
     std::unique_ptr<juce::Label> labelCartesian;
-    std::unique_ptr<juce::Label> labelA;
     std::unique_ptr<juce::TextEditor> textA;
-    std::unique_ptr<juce::Label> labelE;
     std::unique_ptr<juce::TextEditor> textE;
-    std::unique_ptr<juce::Label> labelD;
     std::unique_ptr<juce::TextEditor> textD;
     std::unique_ptr<juce::Label> labelPolar;
     std::unique_ptr<juce::Label> labelCH;
     std::unique_ptr<juce::TextEditor> textCH;
-    std::unique_ptr<juce::ImageButton> btnGroupBackup;
-    std::unique_ptr<juce::ImageButton> btnUngroupBackup;
-    std::unique_ptr<juce::TextButton> btnGroup;
-    std::unique_ptr<juce::TextButton> btnUngroup;
+    std::unique_ptr<juce::ImageButton> btnUngroup;
+    std::unique_ptr<juce::ImageButton> btnGroup;
+    std::unique_ptr<juce::ImageButton> btnDelete;
 
 
     //==============================================================================

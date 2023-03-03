@@ -11,6 +11,9 @@
 #pragma once
 #define DEFAULT_POINT_SCALER 1.0
 #define MIN_ZOOM_RADIUS 0.001f
+#define XML_TAG_ZOOM_SETTINGS "ZoomSettings"
+#define XML_ATTRIBUTE_POINT_SCALER "PointScaler"
+#define XML_ATTRIBUTE_GROUP_POINT_SCALER "GroupPointScaler"
 
 #include "Point3D.h"
 #include "ScalingInfo.h"
@@ -36,10 +39,16 @@ public:
     void setPointScaler(double newScaler);
     double getPointScaler();
     
+    void setGroupPointScaler(double newScaler);
+    double getGroupPointScaler();
+    
     ScalingInfo* getScalingInfo();
     
     void Reset(AmbiDataSet* pDataSet = nullptr);
-
+    
+    void loadFromXml(XmlElement* xmlElement);
+    void writeToXmlElement(XmlElement* xml) const;
+    
 private:
 	Point3D<float> initialCenterPoint;
 	Point3D<float> currentCenterPoint;
@@ -48,6 +57,7 @@ private:
 	float currentRadius;
     
     double pointScaler;
+    double groupPointScaler;
     
     ScalingInfo* pScalingInfo;
 };
