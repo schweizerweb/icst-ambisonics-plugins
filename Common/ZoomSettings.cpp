@@ -12,9 +12,7 @@
 #include "JuceHeader.h"
 
 ZoomSettings::ZoomSettings(ScalingInfo* pScaling) :
-	initialCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
 	currentCenterPoint(Point3D<float>(0.0, 0.0, 0.0)),
-	initialRadius(1.0),
 	currentRadius(1.0),
     pointScaler(DEFAULT_POINT_SCALER),
     groupPointScaler(DEFAULT_POINT_SCALER),
@@ -32,11 +30,6 @@ Rectangle<float> ZoomSettings::getVisibleArea(bool isXZ, bool isFull)
 	
 	Point<float> projectedPoint(currentCenterPoint.getX(), currentCenterPoint.getY());
 	return Rectangle<float>(projectedPoint.getX() - currentRadius, projectedPoint.getY() - (isFull ? currentRadius : 0), 2 * currentRadius, currentRadius * (isFull ? 2 : 1));
-}
-
-Point3D<float> ZoomSettings::getInitialCenterPoint() const
-{
-	return initialCenterPoint;
 }
 
 Point3D<float> ZoomSettings::getCurrentCenterPoint() const
@@ -74,11 +67,6 @@ double ZoomSettings::getGroupPointScaler()
 void ZoomSettings::setGroupPointScaler(double newScaler)
 {
     groupPointScaler = newScaler;
-}
-
-float ZoomSettings::getInitialRadius() const
-{
-	return initialRadius;
 }
 
 float ZoomSettings::getCurrentRadius() const
@@ -166,6 +154,12 @@ void ZoomSettings::loadFromXml(XmlElement* xmlElement)
     {
         pointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
         groupPointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, DEFAULT_POINT_SCALER);
+        currentRadius = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_RADIUS, DEFAULT_RADIUS);
+        currentCenterPoint.setXYZ(
+            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_X, DEFAULT_CENTER_X),
+            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, DEFAULT_CENTER_Y),
+            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, DEFAULT_CENTER_Z)
+        );
     }
 }
 
@@ -174,6 +168,10 @@ void ZoomSettings::writeToXmlElement(XmlElement* xml) const
     XmlElement* zoomSettingsXml = new XmlElement(XML_TAG_ZOOM_SETTINGS);
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, groupPointScaler);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_X, currentCenterPoint.getX());
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, currentCenterPoint.getY());
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, currentCenterPoint.getZ());
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_RADIUS, currentRadius);
     xml->addChildElement(zoomSettingsXml);
 }
     
