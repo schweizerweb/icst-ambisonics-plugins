@@ -195,6 +195,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalNumOutputChannels = getTotalNumOutputChannels();
+    const int totalUsedOutputChannels = encoderSettings.getAmbiChannelCount();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
 	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
 	int iChannel;
@@ -220,7 +221,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
 
     // prepare write pointers
-	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+	for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
     bool soloOnly = sources->anySolo();
@@ -276,7 +277,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		{
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
-			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+			for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
 				outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
