@@ -31,7 +31,7 @@ public:
 	int lastUIHeight;
 
 	bool editMode;
-
-	void saveToXml(XmlElement* xmlElement) const;
+    
+    void saveToXml(XmlElement* xmlElement) const;
 	void loadFromXml(XmlElement* xmlElement);
 };

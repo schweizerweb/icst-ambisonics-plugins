@@ -176,6 +176,30 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     addAndMakeVisible (dummyHeight.get());
     dummyHeight->setName ("dummyHeight");
 
+    labelAmbiOrder.reset (new juce::Label ("labelAmbiOrder",
+                                           TRANS("Ambisonics order:")));
+    addAndMakeVisible (labelAmbiOrder.get());
+    labelAmbiOrder->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    labelAmbiOrder->setEditable (false, false, false);
+    labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAmbiOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    comboAmbiOrder.reset (new juce::ComboBox ("comboAmbiOrder"));
+    addAndMakeVisible (comboAmbiOrder.get());
+    comboAmbiOrder->setEditableText (false);
+    comboAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    comboAmbiOrder->setTextWhenNothingSelected (juce::String());
+    comboAmbiOrder->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboAmbiOrder->addItem (TRANS("1st (4ch)"), 1);
+    comboAmbiOrder->addItem (TRANS("2nd (9ch)"), 2);
+    comboAmbiOrder->addItem (TRANS("3rd (16ch)"), 3);
+    comboAmbiOrder->addItem (TRANS("4th (25ch)"), 4);
+    comboAmbiOrder->addItem (TRANS("5th (36ch)"), 5);
+    comboAmbiOrder->addItem (TRANS("6th (49ch)"), 6);
+    comboAmbiOrder->addItem (TRANS("7th (64ch)"), 7);
+    comboAmbiOrder->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -219,11 +243,14 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     // load stored presets
     m_args.pPresetHelper->addActionListener(this);
     m_args.pSourceSet->addChangeListener(this);
+
+    comboAmbiOrder->setSelectedId(m_args.pSettings->ambiOrder);
+
     initializePresets();
-    
+
     sourceList->addMouseListener(this, true);
     groupList->addMouseListener(this, true);
-    
+
     controlDimming();
     //[/Constructor]
 }
@@ -259,6 +286,8 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
     buttonSave = nullptr;
     buttonManagePresets = nullptr;
     dummyHeight = nullptr;
+    labelAmbiOrder = nullptr;
+    comboAmbiOrder = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -303,6 +332,8 @@ void SourceDefinitionComponent::resized()
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
     dummyHeight->setBounds (0, 96, 24, getHeight() - 134);
+    labelAmbiOrder->setBounds (getWidth() - 285, 8, 136, 24);
+    comboAmbiOrder->setBounds (getWidth() - 149, 8, 142, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -506,6 +537,12 @@ void SourceDefinitionComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHas
         comboBoxPresets->setText("", dontSendNotification);
         //[/UserComboBoxCode_comboBoxPresets]
     }
+    else if (comboBoxThatHasChanged == comboAmbiOrder.get())
+    {
+        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
+        m_args.pSettings->ambiOrder = comboAmbiOrder->getSelectedId();
+        //[/UserComboBoxCode_comboAmbiOrder]
+    }
 
     //[UsercomboBoxChanged_Post]
     //[/UsercomboBoxChanged_Post]
@@ -620,7 +657,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
             if(row != -1 && m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
             {
                 PopupMenu m;
-                
+
                 // reset stretch
                 m.addItem(PopupMenu::Item("Reset Stretch")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("R", Colours::lightgrey, Colours::red, Colours::black, false)))
@@ -634,7 +671,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         groupList->repaint();
                     })
                 );
-                
+
                 // reset rotation
                 m.addItem(PopupMenu::Item("Reset Rotation")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("R", Colours::lightgrey, Colours::red, Colours::black, false)))
@@ -648,7 +685,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         groupList->repaint();
                     })
                 );
-                
+
                 // apply color to sources
                 m.addItem(PopupMenu::Item("Apply color to sources")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("C", Colours::lightgrey, Colours::red, Colours::black, false)))
@@ -664,7 +701,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         sourceList->repaint();
                     })
                 );
-                
+
                 m.show();
             }
         }
@@ -676,9 +713,9 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
             if(row != -1 && m_args.pPointSelection->getSelectionMode() == PointSelection::Point)
             {
                 bool multirow = m_args.pPointSelection->getSelectionMode() == PointSelection::SelectionMode::Point && m_args.pPointSelection->getSelectedIndices().size() > 1;
-            
+
                 PopupMenu m;
-                
+
                 m.addItem(PopupMenu::Item("Mute")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, false)))
                     .setAction([this](){
@@ -691,7 +728,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         sourceList->repaint();
                     })
                 );
-                
+
                 m.addItem(PopupMenu::Item("Unmute")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("M", Colours::lightgrey, Colours::red, Colours::black, true)))
                     .setAction([this](){
@@ -704,7 +741,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         sourceList->repaint();
                     })
                 );
-                
+
                 m.addSeparator();
                 m.addItem(PopupMenu::Item("Solo On")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, false)))
@@ -718,7 +755,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         sourceList->repaint();
                     })
                 );
-                
+
                 m.addItem(PopupMenu::Item("Solo Off")
                     .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("S", Colours::lightgrey, Colours::blue, Colours::black, true)))
                     .setAction([this](){
@@ -731,7 +768,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         sourceList->repaint();
                     })
                 );
-                
+
                 if(multirow)
                 {
                     // color
@@ -752,7 +789,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                             sourceList->repaint();
                         })
                     );
-                    
+
                     if(m_args.pDawParams->updateTrackPropertiesWorking)
                     {
                         m.addItem(PopupMenu::Item("Apply Track Color")
@@ -804,7 +841,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                             sourceList->repaint();
                         })
                     );
-                    
+
                     m.addItem(PopupMenu::Item("Gain +0.5 dB")
                         .setImage(std::unique_ptr<Drawable>(LabelCreator::createIcon("+", Colours::white, Colours::black, Colours::black, false)))
                         .setAction([this](){
@@ -819,7 +856,7 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                         })
                     );
                 }
-                
+
                 m.show();
             }
         }
@@ -943,6 +980,16 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="dummyHeight" id="862016958b331dfc" memberName="dummyHeight"
                     virtualName="" explicitFocusOrder="0" pos="0 96 24 134M" class="juce::Component"
                     params=""/>
+  <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
+         virtualName="" explicitFocusOrder="0" pos="285R 8 136 24" posRelativeX="b72378bdfe4e130"
+         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
+         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
+            virtualName="" explicitFocusOrder="0" pos="149R 8 142 24" editable="0"
+            layout="33" items="1st (4ch)&#10;2nd (9ch)&#10;3rd (16ch)&#10;4th (25ch)&#10;5th (36ch)&#10;6th (49ch)&#10;7th (64ch)"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

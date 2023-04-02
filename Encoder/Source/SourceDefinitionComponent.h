@@ -108,6 +108,8 @@ private:
     std::unique_ptr<juce::TextButton> buttonSave;
     std::unique_ptr<juce::TextButton> buttonManagePresets;
     std::unique_ptr<juce::Component> dummyHeight;
+    std::unique_ptr<juce::Label> labelAmbiOrder;
+    std::unique_ptr<juce::ComboBox> comboAmbiOrder;
 
 
     //==============================================================================

@@ -147,6 +147,8 @@ private:
     std::unique_ptr<juce::TextButton> buttonScaling;
     std::unique_ptr<juce::Slider> sliderPort;
     std::unique_ptr<juce::Slider> sliderTimeout;
+    std::unique_ptr<juce::Label> labelAmbiOrder;
+    std::unique_ptr<juce::ComboBox> comboAmbiOrder;
 
 
     //==============================================================================

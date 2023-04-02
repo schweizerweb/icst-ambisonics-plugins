@@ -163,11 +163,6 @@ public:
 			&& abs(getZ() - other.z) < delta;
 	}
 
-    //==============================================================================
-		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
-	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;
-
-
 		/** Casts this Point3D to a Point3D<float> object. */
 	Point3D<float> toFloat() const noexcept{ return Point3D<float>(static_cast<float> (getX()), static_cast<float> (getY()), static_cast<float> (getZ())); }
 

@@ -39,6 +39,7 @@ public:
 	~EncoderSettings();
 	XmlElement* getAsXmlElement(String tagName) const;
 	void loadFromXml(XmlElement* xml_element);
+    int getAmbiChannelCount() const;
     
     bool oscReceiveFlag;
 	int oscReceivePort;
@@ -60,6 +61,8 @@ public:
     
 	OwnedArray<CustomOscTarget> customOscTargets;
     OwnedArray<CustomOscInput> customOscInput;
+    
+    int ambiOrder;
     
 	bool distanceEncodingFlag;
 	DistanceEncodingParams distanceEncodingParams;

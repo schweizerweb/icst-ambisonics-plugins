@@ -13,8 +13,6 @@
 #define MAX_AMBISONICS_ORDER 7
 #define NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
 #define NB_OF_AMBISONICS_CHANNELS (NB_OF_AMBISONICS_GAINS * NB_OF_AMBISONICS_GAINS)
-#define CURRENT_AMBISONICS_ORDER_NB_OF_GAINS	int(sqrt(JucePlugin_MaxNumInputChannels))
-#define CURRENT_AMBISONICS_ORDER	(CURRENT_AMBISONICS_ORDER_NB_OF_GAINS - 1)
 
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
@@ -36,6 +34,9 @@ public:
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
     void loadFromPresetXml(XmlElement* xmlElement);
 
+    int getAmbiOrder();
+    void setAmbiOrder(int order);
+    
     bool getWarningFlag();
     
 private:
@@ -51,6 +52,8 @@ private:
     double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
     double maxreWeights[NB_OF_AMBISONICS_GAINS];
     double standardWeights[NB_OF_AMBISONICS_GAINS];
+
+    int ambiOrder;
     
     AmbiWeightMode weightMode;
     bool loadWarningFlag;

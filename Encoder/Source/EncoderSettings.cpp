@@ -50,7 +50,8 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-    hideWarnings(DEFAULT_HIDE_WARNINGS)
+    hideWarnings(DEFAULT_HIDE_WARNINGS),
+    ambiOrder(1)
 {
 }
 
@@ -202,4 +203,9 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
     }
+}
+
+int EncoderSettings::getAmbiChannelCount() const
+{
+    return (ambiOrder + 1) * (ambiOrder + 1);
 }

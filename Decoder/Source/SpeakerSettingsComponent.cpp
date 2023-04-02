@@ -128,7 +128,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
+    ambiChannelControl.reset (new MultiSliderControl (NB_OF_AMBISONICS_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -228,6 +228,30 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     sliderTimeout->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 70, 20);
     sliderTimeout->addListener (this);
 
+    labelAmbiOrder.reset (new juce::Label ("labelAmbiOrder",
+                                           TRANS("Ambisonics order:")));
+    addAndMakeVisible (labelAmbiOrder.get());
+    labelAmbiOrder->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    labelAmbiOrder->setEditable (false, false, false);
+    labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAmbiOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    comboAmbiOrder.reset (new juce::ComboBox ("comboAmbiOrder"));
+    addAndMakeVisible (comboAmbiOrder.get());
+    comboAmbiOrder->setEditableText (false);
+    comboAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    comboAmbiOrder->setTextWhenNothingSelected (juce::String());
+    comboAmbiOrder->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboAmbiOrder->addItem (TRANS("1st (4ch)"), 1);
+    comboAmbiOrder->addItem (TRANS("2nd (9ch)"), 2);
+    comboAmbiOrder->addItem (TRANS("3rd (16ch)"), 3);
+    comboAmbiOrder->addItem (TRANS("4th (25ch)"), 4);
+    comboAmbiOrder->addItem (TRANS("5th (36ch)"), 5);
+    comboAmbiOrder->addItem (TRANS("6th (49ch)"), 6);
+    comboAmbiOrder->addItem (TRANS("7th (64ch)"), 7);
+    comboAmbiOrder->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -272,6 +296,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     updateUI();
 
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
+    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder());
 
 	// OSC
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
@@ -316,6 +341,8 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonScaling = nullptr;
     sliderPort = nullptr;
     sliderTimeout = nullptr;
+    labelAmbiOrder = nullptr;
+    comboAmbiOrder = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -356,15 +383,17 @@ void SpeakerSettingsComponent::resized()
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 267)) + 199) + 20, 75, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 267)) + 199) + 20, 96, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4974f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3979f) / 2), 0, proportionOfWidth (0.3979f), 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4979f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3983f) / 2), 0, proportionOfWidth (0.3983f), 24);
     buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 128, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
-    buttonScaling->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonCsv->setBounds ((proportionOfWidth (0.4979f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4979f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 267)) + 199) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 267)) + 199) + 20, 170, 24);
+    labelAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 293, (0 + (getHeight() - 267)) + 21, 136, 24);
+    comboAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 157, (0 + (getHeight() - 267)) + 21, 142, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -389,6 +418,12 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
         ambiChannelControl->updateValues();
         controlDimming();
         //[/UserComboBoxCode_comboBoxChannelWeightingMode]
+    }
+    else if (comboBoxThatHasChanged == comboAmbiOrder.get())
+    {
+        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
+        pAmbiSettings->setAmbiOrder(comboAmbiOrder->getSelectedId());
+        //[/UserComboBoxCode_comboAmbiOrder]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -1099,7 +1134,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="NB_OF_AMBISONICS_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
          virtualName="" explicitFocusOrder="0" pos="8 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
@@ -1127,11 +1162,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.742%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.786%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.793% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.829% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1166,6 +1201,16 @@ BEGIN_JUCER_METADATA
           posRelativeY="f4cf3a53a6ef0d87" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="70" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
+         virtualName="" explicitFocusOrder="0" pos="293R 21 136 24" posRelativeX="17eb4b418501687a"
+         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
+         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
+            virtualName="" explicitFocusOrder="0" pos="157R 21 142 24" posRelativeX="17eb4b418501687a"
+            posRelativeY="17eb4b418501687a" editable="0" layout="33" items="1st (4ch)&#10;2nd (9ch)&#10;3rd (16ch)&#10;4th (25ch)&#10;5th (36ch)&#10;6th (49ch)&#10;7th (64ch)"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
