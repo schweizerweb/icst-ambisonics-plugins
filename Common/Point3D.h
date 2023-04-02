@@ -73,13 +73,13 @@ public:
 	inline bool isFinite() const noexcept{ return juce_isfinite(getX()) && juce_isfinite(getY()) && juce_isfinite(getZ()); }
 
 		/** Returns the Point3D's x coordinate. */
-	inline ValueType getX() noexcept{ return x; }
+	inline ValueType getX() const noexcept{ return x; }
 
 		/** Returns the Point3D's y coordinate. */
-	inline ValueType getY() noexcept{ return y; }
+	inline ValueType getY() const noexcept{ return y; }
 
 		/** Returns the Point3D's z coordinate. */
-	inline ValueType getZ() noexcept{ return z; }
+	inline ValueType getZ() const noexcept{ return z; }
 
 		/** Returns the Point3D's azimuth. */
     inline ValueType getAzimuth() noexcept{ ValueType azimuth; calculateAed(&azimuth, nullptr, nullptr); return azimuth; }

@@ -329,10 +329,10 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             
 			// load general encoder settings
 			encoderSettings.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_SETTINGS));
-            scalingInfo.SetScaler(sources->getDistanceScaler());
-			// load last source preset
+            // load last source preset
 			sources->loadFromXml(xmlState.get(), &audioParams);
             sources->resetIds();
+            scalingInfo.SetScaler(sources->getDistanceScaler());
             zoomSettings->loadFromXml(xmlState.get());
             animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
 		}
