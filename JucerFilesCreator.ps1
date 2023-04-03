@@ -1,22 +1,21 @@
-$ChannelsPerOrder = @( 1, 4, 9, 16, 25, 36, 49, 64 )
 $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Order = 7; Input = 1; Description = "7th Order Ambisonic, 1 Channel Input"; PluginCode = "AE7S" },
-@{ Order = 7; Input = 64; Description = "7th Order Ambisonic, 64 Channel Input"; PluginCode = "AE7F" }
+@{ Input = 1; Description = "1st-7th Order Ambisonic, 1 Channel Input"; PluginCode = "AEXS" },
+@{ Input = 64; Description = "1st-7th Order Ambisonic, 64 Channel Input"; PluginCode = "AEXF" }
 )
 
 $DecoderVersions =
 @(
-@{ Order = 7; Output = 64; Description = "7th Order Ambisonic, 64 Channel Output"; PluginCode = "AD7F" }
+@{  Output = 64; Description = "1st-7th Order Ambisonic, 64 Channel Output"; PluginCode = "ADXF" }
 )
 
-function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$order, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
+function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$audioChannelNum, [string]$description, [string]$pluginUniqueCode)
 {
-    $projectId =  'o' + $order + 'ch' + $audioChannelNum.ToString('00')
-    $code = 'o' + $order + '_' + $audioChannelNum + 'ch'
-    $codeBundle = 'o' + $order + $audioChannelNum + 'ch'
+    $projectId =  'ch' + $audioChannelNum.ToString('00')
+    $code = $audioChannelNum.ToString() + 'ch'
+    $codeBundle = $audioChannelNum.ToString() + 'ch'
     $target = $sourceFile.Replace('.jucer', "_$($code)_AutoGen.jucer")
     Copy-Item $sourceFile $target
 
@@ -69,16 +68,14 @@ Write-Output "Generating Encoder files"
 $source = '.\Encoder\AmbisonicEncoder.jucer'
 foreach ($element in $EncoderVersions) 
 {
-    $output = $ChannelsPerOrder[$element.Order]
-    createFile $source $element.Input $output $element.Order $element.Input $element.Description $element.PluginCode
+    createFile $source $element.Input 64 $element.Input $element.Description $element.PluginCode
 }
 
 Write-Output "Generating Decoder files"
 $source = '.\Decoder\AmbisonicDecoder.jucer'
 foreach ($element in $DecoderVersions) 
 {
-    $inputCount = $ChannelsPerOrder[$element.Order]
-    createFile $source $inputCount $element.Output $element.Order $element.Output $element.Description $element.PluginCode
+    createFile $source 64 $element.Output $element.Output $element.Description $element.PluginCode
 }
 return 0
 # program end
