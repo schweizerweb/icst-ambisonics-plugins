@@ -738,22 +738,6 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiDecoder_64ch.component/Contents/Resources/AmbiDecoder_64ch.rsrc</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
 																					<string>../bin/AU/AmbiDecoder_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
@@ -896,22 +880,6 @@
 																					<key>GID</key>
 																					<integer>0</integer>
 																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_1ch.component/Contents/Resources/AmbiEncoder_1ch.rsrc</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
 																					<string>../bin/AU/AmbiEncoder_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
 																					<key>PATH_TYPE</key>
 																					<integer>1</integer>
@@ -1048,22 +1016,6 @@
 																		<dict>
 																			<key>CHILDREN</key>
 																			<array>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
-																					<string>../bin/AU/AmbiEncoder_64ch.component/Contents/Resources/AmbiEncoder_64ch.rsrc</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
 																				<dict>
 																					<key>CHILDREN</key>
 																					<array/>
