@@ -172,10 +172,9 @@ public:
             }
         }
         
-		getTable()->updateContent();
-		getTable()->repaint();
-
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 	
 	SliderRange getSliderRange(int columnId) override 
@@ -237,6 +236,8 @@ public:
         }
         
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	void initTable(TableListBox* tableListBox)

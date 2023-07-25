@@ -13,16 +13,42 @@
 
 CustomOscBase::CustomOscBase(ScalingInfo* pScaling) : pScalingInfo(pScaling)
 {
-    
+    channelSelectionMode = ChannelSelectionMode::Undefined;
 }
 
 bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
 {
     int index;
 
+    channelSelectionMode = ChannelSelectionMode::Undefined;
     parametersInPath.clear();
     realParameters.clear();
     oscPath = "";
+    
+    std::regex rFixedChannelIndex("[ ]*[cC][iI][ ]*([0-9]+)[ ]*[:](.*)");
+    std::regex rFixedChannelName("[ ]*[cC][nN][ ]*(.+)[ ]*[:](.*)");
+    std::smatch parameterMatch;
+    
+    std::string pathStr = path.toStdString();
+    if(regex_search(pathStr, parameterMatch, rFixedChannelIndex))
+    {
+        auto chStr = parameterMatch[1].str();
+        path = parameterMatch[2].str();
+        constantChannelIndex = String(chStr).getIntValue();
+        if(constantChannelIndex < 1)
+        {
+            *pErrorMessage = "Invalid channel index " + String(constantChannelIndex);
+            return false;
+        }
+        channelSelectionMode = ChannelSelectionMode::ConstantIndex;
+    }
+    else if(regex_search(pathStr, parameterMatch, rFixedChannelName))
+    {
+        auto chStr = parameterMatch[1].str();
+        path = parameterMatch[2].str();
+        constantChannelName = chStr;
+        channelSelectionMode = ChannelSelectionMode::ConstantName;
+    }
     
     if(!path.startsWith("/"))
     {
@@ -42,6 +68,13 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
             UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
             if(param != nullptr)
             {
+                // check for channel or name
+                if(!checkChannelSelection(param))
+                {
+                    *pErrorMessage = "Redefinition of channel selection at parameter " + param->getOriginalString();
+                    return false;
+                }
+                
                 parametersInPath.add(param);
                 oscPath += param->getOriginalString();
             }
@@ -68,6 +101,13 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
             UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
             if(param != nullptr)
             {
+                // check for channel or name
+                if(!checkChannelSelection(param))
+                {
+                    *pErrorMessage = "Redefinition of channel selection at parameter " + param->getOriginalString();
+                    return false;
+                }
+                
                 realParameters.add(param);
                 index++;
             }
@@ -83,10 +123,22 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
         }
     }
     
-    //std::string oscPathString = oscPath.toStdString();
-    //std::string parameterString = path.substring(oscPath.length()).toStdString();
-    
-    // return analyzeString(oscPathString, &parametersInPath) && analyzeString(parameterString, &realParameters);
+    return true;
+}
+
+bool CustomOscBase::checkChannelSelection(UserDefinedParameter* pParam)
+{
+    if(pParam->getType() == UserDefinedParameter::ParameterType::Index
+    || pParam->getType() == UserDefinedParameter::ParameterType::Name
+    )
+    {
+        if(channelSelectionMode != ChannelSelectionMode::Undefined)
+            return false;
+        else
+        {
+            channelSelectionMode = ChannelSelectionMode::Parameter;
+        }
+    }
     
     return true;
 }
@@ -165,6 +217,8 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
             return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledY);
         else if(commandString == "sz")
             return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledZ);
+        else if(commandString == "")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Ignore);
         else
         {
             *pErrorMessage = "Unknown command: " + commandString;

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.6
+  Created with Projucer version: 7.0.5
 
   ------------------------------------------------------------------------------
 
@@ -24,6 +24,7 @@
 #include "EncoderSettings.h"
 #include "CustomOscInputTableListModel.h"
 #include "CustomOscRxPresetHelper.h"
+#include "OSCHandlerEncoder.h"
 #include "../../Common/StatusMessageHandler.h"
 #include "../../Common/OSCLogDialogManager.h"
 #include "../../Common/PresetManagerDialog.h"
@@ -40,14 +41,13 @@
                                                                     //[/Comments]
 */
 class OSCRxSettingsComponent  : public Component,
-                                public ChangeBroadcaster,
                                 public ActionListener,
                                 public juce::Button::Listener,
                                 public juce::Slider::Listener
 {
 public:
     //==============================================================================
-    OSCRxSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager);
+    OSCRxSettingsComponent (EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager, OSCHandlerEncoder* pOscHandler);
     ~OSCRxSettingsComponent() override;
 
     //==============================================================================
@@ -75,6 +75,7 @@ private:
     StatusMessageHandler* pStatusMessageHandler;
     OSCLogDialogManager* pOscLogManager;
     CustomOscRxPresetHelper* pCustomOscRxPresetHelper;
+    OSCHandlerEncoder* pOscHandler;
     std::unique_ptr<CustomOscInputTableListModel> customOscTableModel;
     PresetManagerDialog presetManagerDialog;
     //[/UserVariables]

@@ -253,6 +253,11 @@ bool UserDefinedParameter::getValueFromOsc(int* pInt, OSCArgument* pArgument)
                 *pInt = pArgument->getInt32();
                 return true;
             }
+            if(pArgument->isFloat32())
+            {
+                *pInt = (int)pArgument->getFloat32();
+                return true;
+            }
             break;
         default:
             break;
@@ -330,14 +335,16 @@ bool UserDefinedParameter::getValueFromOsc(String *pString, OSCArgument *pArgume
     return false;
 }
 
-bool UserDefinedParameter::checkConst(OSCArgument* pArgument)
+bool UserDefinedParameter::checkConst(OSCArgument* pArgument, bool* pDataTypeOk)
 {
+    *pDataTypeOk = false;
+    
     switch (type) {
-        case ConstInt: return pArgument->isInt32() && pArgument->getInt32() == constInt;
-        case ConstFloat: return pArgument->isFloat32() && pArgument->getFloat32() == constFloat;
-        case ConstString: return pArgument->isString() && pArgument->getString() == constString;
+        case ConstInt: return (*pDataTypeOk = pArgument->isInt32()) && pArgument->getInt32() == constInt;
+        case ConstFloat: return (*pDataTypeOk = pArgument->isFloat32()) && pArgument->getFloat32() == constFloat;
+        case ConstString: return (*pDataTypeOk = pArgument->isString()) && pArgument->getString() == constString;
             
         default:
-            return true;
+            return false;
     }
 }

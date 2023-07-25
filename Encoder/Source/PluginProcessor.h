@@ -77,7 +77,7 @@ public:
     
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
-	void initializeOsc();
+	void initializeOscSender();
     void initializeAudioParameter();
 	AudioParams* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
@@ -89,13 +89,14 @@ public:
     ScalingInfo* getScalingInfo();
     AnimatorDataset* getAnimatorDataset();
     ZoomSettings* getZoomSettingsPointer();
+    OSCHandlerEncoder* getOscHandler();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
 	EncoderSettings encoderSettings;
-	OSCHandler* pOscHandler;
+	OSCHandlerEncoder* pOscHandler;
 	AmbiOSCSender* pOscSender;
 	AmbiOSCSenderExt* pOscSenderExt;
 	AudioParams audioParams;

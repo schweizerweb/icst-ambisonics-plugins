@@ -23,14 +23,15 @@ public:
     bool matchesPattern(OSCAddress* pAddress);
     bool handleMessage(AmbiSourceSet* pSources, const OSCMessage* pMessage);
     String getErrorMessage();
+    bool getInitFlag();
+    uint32 getLastRxTimestamp();
     
 private:
     std::unique_ptr<OSCAddressPattern> patternToMatch;
-    bool hasIndex;
-    bool hasName;
     bool xyzMode;
     bool javaScriptMode;
     bool isValid;
+    uint32 lastRxTimestamp;
     
     String errorMessage;
     

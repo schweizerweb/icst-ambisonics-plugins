@@ -12,11 +12,12 @@
 
 CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScaling) : CustomOscBase(pScaling)
 {
-    hasIndex = false;
-    hasName = false;
+    bool hasXyz = false;
+    bool hasAed = false;
     xyzMode = false;
     javaScriptMode = false;
     isValid = false;
+    lastRxTimestamp = 0;
     
     if(!pInput->commandString.isEmpty())
     {
@@ -45,7 +46,13 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     bool ok = setOscPath(pInput->oscString, &errorMessage);
     if(!ok)
     {
-        errorMessage = "Error setting OSC path";
+        errorMessage = "Error setting OSC path" + (errorMessage.isEmpty() ? "" : (": " + errorMessage));
+        return;
+    }
+    
+    if(channelSelectionMode == ChannelSelectionMode::Undefined)
+    {
+        errorMessage = "Invalid channel selection - Either index or name is required in custom input pattern (constant or dynamic)";
         return;
     }
     
@@ -60,34 +67,37 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         return;
     }
     
-    for(auto& p : parametersInPath)
-    {
-        if(p->getType() == UserDefinedParameter::ParameterType::Index)
-            hasIndex = true;
-        else if(p->getType() == UserDefinedParameter::ParameterType::Name)
-            hasName = true;
-    }
-    
     for(auto& p : realParameters)
     {
         UserDefinedParameter::ParameterType t = p->getType();
-        if(t == UserDefinedParameter::ParameterType::Index)
-            hasIndex = true;
-        else if(t == UserDefinedParameter::ParameterType::Name)
-            hasName = true;
-        else if(t == UserDefinedParameter::ParameterType::X
+        if(t == UserDefinedParameter::ParameterType::X
                 || t == UserDefinedParameter::ParameterType::Y
                 || t == UserDefinedParameter::ParameterType::Z)
-            xyzMode = true;
+            hasXyz = true;
+        else if(t == UserDefinedParameter::ParameterType::A
+                || t == UserDefinedParameter::ParameterType::E
+                || t == UserDefinedParameter::ParameterType::D)
+            hasAed = true;
     }
     
-    if(!hasIndex && !hasName)
+    if(hasAed && hasXyz)
     {
-        errorMessage = "Either index or name is required in custom input pattern";
+        errorMessage = "XYZ and AED cannot be mixed";
         return;
     }
+    xyzMode = hasXyz;
     
     isValid = true;
+}
+
+bool CustomOscReceiver::getInitFlag()
+{
+    return isValid;
+}
+
+uint32 CustomOscReceiver::getLastRxTimestamp()
+{
+    return lastRxTimestamp;
 }
 
 String CustomOscReceiver::getErrorMessage()
@@ -153,17 +163,22 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
             errorMessage = message;
             return false;
         }
+        
+        lastRxTimestamp = Time::getMillisecondCounter();
         return true;
     }
     
     // check for enough parameters
     if(pMessage->size() < realParameters.size())
+    {
+        errorMessage = "too many arguments";
         return false;
+    }
     
     const double invalidDbl = std::numeric_limits<double>::max();
     
-    int index = -1;
-    String name = "";
+    int index = channelSelectionMode == ChannelSelectionMode::ConstantIndex ? constantChannelIndex : -1;
+    String name = channelSelectionMode == ChannelSelectionMode::ConstantName ? constantChannelName : "";
     String color = "";
     double x = invalidDbl;
     double y = invalidDbl;
@@ -192,72 +207,82 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     {
         auto oscParam = (*pMessage)[i];
         auto param = realParameters.getUnchecked(i);
+        bool dataTypeError = false;
         switch(param->getType())
         {
             case UserDefinedParameter::ParameterType::Index:
                 if(!param->getValueFromOsc(&index, &oscParam))
-                    return false;
+                    dataTypeError = true;
                 break;
             case UserDefinedParameter::ParameterType::Name:
                 if(!param->getValueFromOsc(&name, &oscParam))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::Color:
                 if(!param->getValueFromOsc(&color, &oscParam))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::X:
             case UserDefinedParameter::ParameterType::ScaledX:
             case UserDefinedParameter::ParameterType::DualScaledX:
                 if(!param->getValueFromOsc(&x, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::Y:
             case UserDefinedParameter::ParameterType::ScaledY:
             case UserDefinedParameter::ParameterType::DualScaledY:
                 if(!param->getValueFromOsc(&y, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::Z:
             case UserDefinedParameter::ParameterType::ScaledZ:
             case UserDefinedParameter::ParameterType::DualScaledZ:
                 if(!param->getValueFromOsc(&z, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::A:
             case UserDefinedParameter::ParameterType::ScaledA:
                 if(!param->getValueFromOsc(&a, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::E:
             case UserDefinedParameter::ParameterType::ScaledE:
             case UserDefinedParameter::ParameterType::DualScaledE:
                 if(!param->getValueFromOsc(&e, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
                 
             case UserDefinedParameter::ParameterType::D:
             case UserDefinedParameter::ParameterType::ScaledD:
                 if(!param->getValueFromOsc(&d, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
          
             case UserDefinedParameter::ParameterType::Gain:
                 if(!param->getValueFromOsc(&gain, &oscParam, pScalingInfo->GetScaler()))
-                    return false;
+                    dataTypeError = true;
                 break;
             
             case UserDefinedParameter::ParameterType::ConstInt:
             case UserDefinedParameter::ParameterType::ConstFloat:
             case UserDefinedParameter::ParameterType::ConstString:
-                if(!param->checkConst(&oscParam))
-                    return false;
+                bool dataTypeOk;
+                if(!param->checkConst(&oscParam, &dataTypeOk))
+                {
+                    if(!dataTypeOk)
+                        dataTypeError = true;
+                    else
+                    {
+                        errorMessage = "";
+                        return false; // simply ignore
+                    }
+                }
                 break;
             
             case UserDefinedParameter::ParameterType::Ignore:
@@ -267,6 +292,11 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
             case UserDefinedParameter::ParameterType::Expression:
                 // this type has no effect
                 break;
+        }
+        if(dataTypeError)
+        {
+            errorMessage = "wrong datatype at parameter " + param->getOriginalString();
+            return false;
         }
     }
     
@@ -325,5 +355,6 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
         pSources->setChannelColor(index, Colour::fromString(color));
     }
     
+    lastRxTimestamp = Time::getMillisecondCounter();
     return true;
 }

@@ -32,6 +32,7 @@
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 #define XML_TAG_CUSTOM_OSC_INPUTS "CustomOscInputs"
 #define XML_TAG_CUSTOM_OSC_INPUT "CustomOscInput"
+#define XML_ATTRIBUTE_AMBIORDER "AmbiOrder"
 
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
@@ -48,10 +49,10 @@ EncoderSettings::EncoderSettings():
     oscSendExtAed(new StandardOscTarget()),
     oscSendExtXyzIndex(new StandardOscTarget()),
     oscSendExtAedIndex(new StandardOscTarget()),
+    ambiOrder(DEFAULT_AMBI_ORDER),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
-    hideWarnings(DEFAULT_HIDE_WARNINGS),
-    ambiOrder(1)
+    hideWarnings(DEFAULT_HIDE_WARNINGS)
 {
 }
 
@@ -62,7 +63,7 @@ EncoderSettings::~EncoderSettings()
 XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 {
 	XmlElement* element = new XmlElement(tagName);
-
+    element->setAttribute(XML_ATTRIBUTE_AMBIORDER, ambiOrder);
     XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
@@ -124,6 +125,8 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		return;
 
     customOscTargets.clear();
+    
+    ambiOrder = element->getIntAttribute(XML_ATTRIBUTE_AMBIORDER, DEFAULT_AMBI_ORDER);
     
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
     if(oscReceive != nullptr)

@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.6
+  Created with Projucer version: 7.0.5
 
   ------------------------------------------------------------------------------
 
@@ -40,7 +40,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs
     tabbedComponent->addTab (TRANS("Sources"), juce::Colours::lightgrey, new SourceDefinitionComponent (args), true);
     tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (args), true);
     tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (args.pChangeListener, args.pZoomSettings), true);
-    tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (args.pChangeListener, args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager), true);
+    tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager, args.pOscHandler), true);
     tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper), true);
     tabbedComponent->setCurrentTabIndex (0);
 
@@ -136,7 +136,7 @@ BEGIN_JUCER_METADATA
          constructorParams="args.pChangeListener, args.pZoomSettings"
          jucerComponentFile=""/>
     <TAB name="OSC In" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCRxSettingsComponent"
-         constructorParams="args.pChangeListener, args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager"
+         constructorParams="args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager, args.pOscHandler"
          jucerComponentFile=""/>
     <TAB name="OSC Out" colour="ffd3d3d3" useJucerComp="0" contentClassName="OSCSettingsComponent"
          constructorParams="args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper"

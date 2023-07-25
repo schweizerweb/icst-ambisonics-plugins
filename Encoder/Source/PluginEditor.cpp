@@ -174,7 +174,8 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             processor.getCustomOscRxPresetHelper(),
             processor.getCustomOscTxPresetHelper(),
             &oscLogDialogManager,
-            processor.getDawParameter()
+            processor.getDawParameter(),
+            processor.getOscHandler()
         };
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
@@ -206,7 +207,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
 
 void AmbisonicEncoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
 {
-	processor.initializeOsc();
+	processor.initializeOscSender();
 }
 
 void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& message)

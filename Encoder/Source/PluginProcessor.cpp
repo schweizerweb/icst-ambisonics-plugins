@@ -36,7 +36,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
 
-	initializeOsc();
+    pOscHandler->initialize();
+	initializeOscSender();
     initializeAudioParameter();
     
     zoomSettings.reset(new ZoomSettings(getScalingInfo()));
@@ -340,7 +341,8 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		}
 	}
 
-	initializeOsc();
+    pOscHandler->initialize();
+	initializeOscSender();
 }
 
 AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
@@ -393,6 +395,11 @@ ZoomSettings* AmbisonicEncoderAudioProcessor::getZoomSettingsPointer()
     return zoomSettings.get();
 }
 
+OSCHandlerEncoder* AmbisonicEncoderAudioProcessor::getOscHandler()
+{
+    return pOscHandler;
+}
+
 AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
 {
     return &animatorDataset;
@@ -417,23 +424,9 @@ EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 	return &encoderSettings;
 }
 
-void AmbisonicEncoderAudioProcessor::initializeOsc()
+void AmbisonicEncoderAudioProcessor::initializeOscSender()
 {
-    pOscHandler->setVerbosity(true, !encoderSettings.hideWarnings);
-	if (encoderSettings.oscReceiveFlag)
-	{
-		if (!pOscHandler->start(encoderSettings.oscReceivePort))
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(encoderSettings.oscReceivePort));
-			encoderSettings.oscReceiveFlag = false;
-		}
-	}
-	else
-	{
-		pOscHandler->stop();
-	}
-
-	if (encoderSettings.oscSendFlag)
+    if (encoderSettings.oscSendFlag)
 	{
 		if (!pOscSender->start(encoderSettings.oscSendTargetHost, encoderSettings.oscSendPort, encoderSettings.oscSendIntervalMs))
 		{

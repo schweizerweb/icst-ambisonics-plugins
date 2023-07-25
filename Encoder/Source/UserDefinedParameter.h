@@ -29,7 +29,7 @@
         bool getValueFromOsc(int* pInt, OSCArgument* pArgument);
         bool getValueFromOsc(String* pString, OSCArgument* pArgument);
         bool getValueFromOsc(double* pDouble, OSCArgument* pArgument, double scaler);
-        bool checkConst(OSCArgument* pArgument);
+        bool checkConst(OSCArgument* pArgument, bool* pDataTypeOk);
         
     private:
         struct JsContext  : public DynamicObject

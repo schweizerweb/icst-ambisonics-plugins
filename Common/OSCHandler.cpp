@@ -46,7 +46,7 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	if(!handleSpecific(message))
 	{
-		reportError("Unknown OSC message received: " + message.getAddressPattern().toString(), &message);
+		reportError("Unknown OSC message received: ", &message);
 	}
 }
 

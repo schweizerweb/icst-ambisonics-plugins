@@ -25,8 +25,15 @@ protected:
     bool analyzeString(std::string parameterString, Array<UserDefinedParameter>* pArray);
     UserDefinedParameter* analyzeEscapedString(String fullPath, int* pIndex, String* pErrorMessage);
     float dualMap(double value, double maxValue, UserDefinedParameter* pParam);
+    bool checkChannelSelection(UserDefinedParameter* pParam);
+    
     String oscPath;
     OwnedArray<UserDefinedParameter> parametersInPath;
     OwnedArray<UserDefinedParameter> realParameters;
+    
+    enum ChannelSelectionMode { Undefined, ConstantIndex, ConstantName, Parameter } channelSelectionMode;
+    int constantChannelIndex;
+    String constantChannelName;
+    
     ScalingInfo* pScalingInfo;
 };

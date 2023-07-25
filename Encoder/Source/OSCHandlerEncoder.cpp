@@ -17,6 +17,48 @@ OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessa
     jsEngine.reset(new JavascriptEngine());
 }
 
+bool OSCHandlerEncoder::initialize()
+{
+    setVerbosity(true, !pEncoderSettings->hideWarnings);
+    if (pEncoderSettings->oscReceiveFlag)
+    {
+        if (!start(pEncoderSettings->oscReceivePort))
+        {
+            AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(pEncoderSettings->oscReceivePort));
+            pEncoderSettings->oscReceiveFlag = false;
+            return false;
+        }
+    }
+    else
+    {
+        stop();
+    }
+    
+    return true;
+}
+
+bool OSCHandlerEncoder::getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, String* errorMessage)
+{
+    *isInit = false;
+    *hasIncomingData = false;
+    
+    int iReceiver = -1;
+    for(int i = 0; i <= rowNumber; i++)
+    {
+        if(pEncoderSettings->customOscInput[i]->enabledFlag)
+            iReceiver++;
+    }
+    
+    if(iReceiver >= 0 && iReceiver < customOscReceivers.size())
+    {
+        *isInit = customOscReceivers[iReceiver]->getInitFlag();
+        *hasIncomingData = customOscReceivers[iReceiver]->getLastRxTimestamp() > Time::getMillisecondCounter() - 1000;
+        *errorMessage = customOscReceivers[iReceiver]->getErrorMessage();
+    }
+    
+    return true;
+}
+
 bool OSCHandlerEncoder::initSpecific()
 {
     customOscReceivers.clear();
@@ -66,70 +108,69 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
                 }
             }
         }
-        if(hasMatch)
-            return true;
     }
-    if(pEncoderSettings->oscHandleStandardFormatFlag)
+    
+    if(!hasMatch && pEncoderSettings->oscHandleStandardFormatFlag)
     {
         if (pattern.matches(OSCAddress(OSC_ADDRESS_MUSESCORE_SSMN)))
         {
             handleMusescoreSSMNStyle(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED)))
         {
             handleOwnExternStyleAed(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ)))
         {
             handleOwnExternStyleXyz(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GAIN)))
         {
             handleOwnExternStyleGain(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED)))
         {
             handleOwnExternStyleGroupAed(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ)))
         {
             handleOwnExternStyleGroupXyz(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED)))
         {
             handleOwnExternStyleIndexAed(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ)))
         {
             handleOwnExternStyleIndexXyz(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN)))
         {
             handleOwnExternStyleIndexGain(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE)))
         {
             handleOwnExternStyleGroupRotate(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN)))
         {
             handleOwnExternStyleGroupRotateOrigin(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH)))
         {
             handleOwnExternStyleGroupStretch(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_MODE))
                 || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_UNITCIRCLE))
@@ -140,31 +181,34 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
                 || pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCEDEXPONENT)))
         {
             handleOwnExternStyleDistanceEncoding(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_STANDARD)))
         {
             handleOwnExternStyleDistanceEncodingStandard(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_ADVANCED)))
         {
             handleOwnExternStyleDistanceEncodingAdvanced(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL)))
         {
             handleOwnExternStyleDistanceEncodingExponential(message);
-            return true;
+            hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL)))
         {
             handleOwnExternStyleDistanceEncodingInverseProportional(message);
-            return true;
+            hasMatch = true;
         }
     }
     
-    return false;
+    if(hasMatch)
+        sendActionMessage(OSC_HANDLER_ACTION_OSC_RECEIVED);
+    
+    return hasMatch;
 }
 
 void OSCHandlerEncoder::handleMusescoreSSMNStyle(const OSCMessage& message) const

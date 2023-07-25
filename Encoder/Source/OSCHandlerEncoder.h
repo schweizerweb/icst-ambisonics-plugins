@@ -17,6 +17,7 @@
 #include "DistanceEncodingParams.h"
 #include "EncoderSettings.h"
 
+#define OSC_HANDLER_ACTION_OSC_RECEIVED "oscrcv"
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED "/icst/ambi/source/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ "/icst/ambi/source/xyz"
@@ -42,12 +43,14 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL "/icst/ambi/distanceencoding/exponential"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL "/icst/ambi/distanceencoding/inverseproportional"
 
-class OSCHandlerEncoder : public OSCHandler
+class OSCHandlerEncoder : public OSCHandler, public ActionBroadcaster
 {
 public:
     OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, EncoderSettings* pEncoderSettings, ScalingInfo* pScaling);
     bool handleSpecific(const juce::OSCMessage &message) override;
     bool initSpecific() override;
+    bool initialize();
+    bool getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, String* errorMessage);
     
 private:
     void handleMusescoreSSMNStyle(const OSCMessage& message) const;

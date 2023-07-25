@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "OSCHandlerEncoder.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/EditableCodeCustomComponent.h"
@@ -25,18 +26,32 @@
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
 
 
-class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
+class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener, ActionListener, Timer
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
+	CustomOscInputTableListModel(EncoderSettings* pSettings, OSCHandlerEncoder* pOscHandler, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pOscHandler(pOscHandler), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
 	{
 		addActionListener(pActionListener);
+        pOscHandler->addActionListener(this);
+        startTimerHz(1);
 	}
 
 	~CustomOscInputTableListModel() override
 	{
+        pOscHandler->removeActionListener(this);
 		removeAllActionListeners();
     }
+    
+    void timerCallback() override {
+        // force periodic ui updates for status display
+        getTable()->repaint();
+    }
+    
+    
+    void actionListenerCallback(const juce::String &message) override { 
+        getTable()->repaint();
+    }
+    
     
     void buttonClicked(juce::Button *b) override {
         int rowIndex = b->getComponentID().getIntValue();
@@ -48,14 +63,43 @@ public:
 		return pSettings->customOscInput.size();
 	}
 
-	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
+	void paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
 	{
-		const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-			.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
-		if (rowIsSelected)
-			g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
-		else if (rowNumber % 2)
-			g.fillAll(alternateColour);
+        const Colour defaultColor = pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId);
+		const Colour alternateColour(defaultColor.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
+        
+        auto fillColor = rowIsSelected ? COLOR_DEFINITION_SELECTED_ROW : (rowNumber % 2 ? alternateColour : defaultColor);
+		g.fillAll(fillColor);
+        
+        if(pSettings->customOscInput[rowNumber]->enabledFlag)
+        {
+            bool isInit;
+            bool hasIncomingData;
+            String errorMessage;
+            pOscHandler->getReceiverStatus(rowNumber, &isInit, &hasIncomingData, &errorMessage);
+            auto gradientColor = Colours::red;
+            if(isInit)
+            {
+                if(!errorMessage.isEmpty())
+                {
+                    gradientColor = Colours::darkorange;
+                }
+                else
+                {
+                    if(hasIncomingData)
+                        gradientColor = Colours::green;
+                    else
+                        gradientColor = Colours::yellow;
+                }
+            }
+            if(!errorMessage.isEmpty())
+            {
+                // Todo: Tooltip
+            }
+            
+            g.setGradientFill(ColourGradient(gradientColor, 0, 0, fillColor, width/2, 0, false));
+            g.fillRect(0, 0, width, height);
+        }
 	}
 
 	void paintCell(Graphics& g, int /*rowNumber*/, int /*columnId*/, int width, int height, bool /*rowIsSelected*/) override 
@@ -116,6 +160,8 @@ public:
 	void selectedRowsChanged(int /*lastRowSelected*/) override
 	{
 		sendActionMessage(ACTION_MESSAGE_SEL_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	double getValue(int columnId, int rowNumber) override 
@@ -139,10 +185,9 @@ public:
             default: ;
         }
         
-		getTable()->updateContent();
-		getTable()->repaint();
-
-		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        pOscHandler->initialize();
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 	
 	SliderRange getSliderRange(int /*columnId*/) override 
@@ -182,7 +227,9 @@ public:
             default: ;
         }
         
-		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        pOscHandler->initialize();
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	void initTable(TableListBox* tableListBox)
@@ -210,6 +257,7 @@ public:
 private:
     
 	EncoderSettings* pSettings;
+    OSCHandlerEncoder* pOscHandler;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
     const char* save_png;
