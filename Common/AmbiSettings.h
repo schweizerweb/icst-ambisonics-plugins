@@ -11,8 +11,8 @@
 #pragma once
 #include "JuceHeader.h"
 #define MAX_AMBISONICS_ORDER 7
-#define NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
-#define NB_OF_AMBISONICS_CHANNELS (NB_OF_AMBISONICS_GAINS * NB_OF_AMBISONICS_GAINS)
+#define MAX_NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
+#define MAX_NB_OF_AMBISONICS_CHANNELS (MAX_NB_OF_AMBISONICS_GAINS * MAX_NB_OF_AMBISONICS_GAINS)
 
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
@@ -34,6 +34,7 @@ public:
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
     void loadFromPresetXml(XmlElement* xmlElement);
 
+    int getGainCount();
     int getAmbiOrder();
     void setAmbiOrder(int order);
     
@@ -41,17 +42,15 @@ public:
     
 private:
 	double fact(int n);
-    void prepareInPhaseWeighting();
-    void prepareMaxreWeighting();
-    void prepareStandardWeighting();
+    void prepareAutoWeightings();
     void prepareManualWeighting();
     
-    int ambiChannelOrder[NB_OF_AMBISONICS_CHANNELS];
-	double manualOrderWeights[NB_OF_AMBISONICS_GAINS];
+    int ambiChannelOrder[MAX_NB_OF_AMBISONICS_CHANNELS];
+	double manualOrderWeights[MAX_NB_OF_AMBISONICS_GAINS];
     
-    double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
-    double maxreWeights[NB_OF_AMBISONICS_GAINS];
-    double standardWeights[NB_OF_AMBISONICS_GAINS];
+    double inPhaseWeights[MAX_NB_OF_AMBISONICS_GAINS];
+    double maxreWeights[MAX_NB_OF_AMBISONICS_GAINS];
+    double standardWeights[MAX_NB_OF_AMBISONICS_GAINS];
 
     int ambiOrder;
     

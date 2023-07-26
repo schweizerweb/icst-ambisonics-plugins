@@ -14,6 +14,9 @@
 //==============================================================================
 MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
 {
+    // initially make all sliders visible
+    visibleSliderCount = numberOfSliders;
+    
 	// create sliders
 	for(int i = 0; i < numberOfSliders; i++)
 	{
@@ -38,6 +41,12 @@ MultiSliderControl::~MultiSliderControl()
 {
 }
 
+void MultiSliderControl::setVisibleSliderCount(int count)
+{
+    visibleSliderCount = jmin(count, sliders.size());
+    resized();
+}
+
 void MultiSliderControl::updateValues() const
 {
 	for(int i = 0; i < sliders.size(); i++)
@@ -55,18 +64,34 @@ void MultiSliderControl::paint (Graphics& g)
 
 void MultiSliderControl::resized()
 {
-    int compWidth = getWidth() / (sliders.size());
+    int compWidth = getWidth() / (visibleSliderCount);
 	int labelHeight = 30;
 	int sliderHeight = getHeight() - labelHeight - 8;
 	
 	for(int i = 0; i < labels.size(); i++)
 	{
-		labels[i]->setBounds(i * compWidth, 0, compWidth, labelHeight);
+        if(i < visibleSliderCount)
+        {
+            labels[i]->setBounds(i * compWidth, 0, compWidth, labelHeight);
+            labels[i]->setVisible(true);
+        }
+        else
+        {
+            labels[i]->setVisible(false);
+        }
 	}
 	
 	for(int i = 0; i < sliders.size(); i++)
 	{
-		sliders[i]->setBounds(i * compWidth, labelHeight, compWidth, sliderHeight);
+        if(i < visibleSliderCount)
+        {
+            sliders[i]->setBounds(i * compWidth, labelHeight, compWidth, sliderHeight);
+            sliders[i]->setVisible(true);
+        }
+        else
+        {
+            sliders[i]->setVisible(false);
+        }
 	}
 }
 

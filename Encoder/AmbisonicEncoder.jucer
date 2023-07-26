@@ -6,7 +6,7 @@
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiEncoder"
               pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
-              pluginCode="AAEC" pluginChannelConfigs="{8,4}" pluginIsSynth="0"
+              pluginCode="AAEC" pluginChannelConfigs="{8,16}" pluginIsSynth="0"
               pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
               pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiEncoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambiencoder" pluginAAXCategory="2"

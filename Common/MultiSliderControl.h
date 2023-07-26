@@ -22,6 +22,7 @@ public:
     ~MultiSliderControl();
 	
 	void updateValues() const;
+    void setVisibleSliderCount(int count);
 
 private:
 	void paint (Graphics&) override;
@@ -32,5 +33,6 @@ private:
 	OwnedArray<Slider>	sliders;
 	OwnedArray<Label>	labels;
 	double* pSliderValueArray;
+    int visibleSliderCount;
 	JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiSliderControl)
 };

@@ -14,7 +14,7 @@ AmbiSettings::AmbiSettings()
 {
     // create mapping table
 	int order = 0;
-	for (int i = 0; i < NB_OF_AMBISONICS_CHANNELS; i++)
+	for (int i = 0; i < MAX_NB_OF_AMBISONICS_CHANNELS; i++)
 	{
 		if (i == (order + 1)*(order + 1))
 			order++;
@@ -22,9 +22,7 @@ AmbiSettings::AmbiSettings()
 	}
     ambiOrder = 1;
     loadWarningFlag = false;
-    prepareInPhaseWeighting();
-    prepareMaxreWeighting();
-    prepareStandardWeighting();
+    prepareAutoWeightings();
     prepareManualWeighting();
 }
 
@@ -85,7 +83,7 @@ void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
     
     if(weightMode == MANUAL)
     {
-        for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+        for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
         {
             xmlAmbiChannelWeight->setAttribute("Order" + String(i), manualOrderWeights[i]);
         }
@@ -96,25 +94,29 @@ void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
 
 void AmbiSettings::prepareManualWeighting()
 {
-    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {
         manualOrderWeights[i] = 1.0;
     }
 }
 
-void AmbiSettings::prepareStandardWeighting()
+void AmbiSettings::prepareAutoWeightings()
 {
-    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {
-        standardWeights[i] = 1.0;
+        if (i < getGainCount())
+        {
+            standardWeights[i] = 1.0;
+        }
+        else
+        {
+            standardWeights[i] = 0.0;
+        }
     }
-}
 
-void AmbiSettings::prepareInPhaseWeighting()
-{
-    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {
-        if (i < ambiOrder + 1)
+        if (i < getGainCount())
         {
             double nom = fact(ambiOrder) * fact(ambiOrder + 1);
             double denom = fact(ambiOrder + i + 1)*fact(ambiOrder - i);
@@ -125,13 +127,10 @@ void AmbiSettings::prepareInPhaseWeighting()
             inPhaseWeights[i] = 0.0;
         }
     }
-}
 
-void AmbiSettings::prepareMaxreWeighting()
-{
-    for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+    for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
     {
-        if (i < ambiOrder + 1)
+        if (i < getGainCount())
         {
             maxreWeights[i] = cos(MathConstants<double>::pi * i / (2 * (ambiOrder + 1)));
         }
@@ -141,7 +140,6 @@ void AmbiSettings::prepareMaxreWeighting()
         }
     }
 }
-
 
 double AmbiSettings::fact(int n)
 {
@@ -170,11 +168,11 @@ void AmbiSettings::setWeightMode(AmbiSettings::AmbiWeightMode mode)
     
     // copy values to the manual value array for display purpose
     if (mode == INPHASE)
-        memcpy(&manualOrderWeights, &inPhaseWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
+        memcpy(&manualOrderWeights, &inPhaseWeights, MAX_NB_OF_AMBISONICS_GAINS * sizeof(double));
     else if (mode == BASIC)
-        memcpy(&manualOrderWeights, &standardWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
+        memcpy(&manualOrderWeights, &standardWeights, MAX_NB_OF_AMBISONICS_GAINS * sizeof(double));
     else if (mode == MAXRE)
-        memcpy(&manualOrderWeights, &maxreWeights, NB_OF_AMBISONICS_GAINS * sizeof(double));
+        memcpy(&manualOrderWeights, &maxreWeights, MAX_NB_OF_AMBISONICS_GAINS * sizeof(double));
 }
 
 int AmbiSettings::getAmbiOrder()
@@ -182,7 +180,14 @@ int AmbiSettings::getAmbiOrder()
     return ambiOrder;
 }
 
+int AmbiSettings::getGainCount()
+{
+    return ambiOrder + 1;
+}
+
 void AmbiSettings::setAmbiOrder(int order)
 {
     ambiOrder = order;
+    prepareAutoWeightings();
+    setWeightMode(weightMode);
 }

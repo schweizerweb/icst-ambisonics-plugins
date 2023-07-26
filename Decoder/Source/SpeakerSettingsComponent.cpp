@@ -59,7 +59,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+	for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
 	this->pTestSoundGenerator = pTestSoundListener;
 
@@ -128,7 +128,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (NB_OF_AMBISONICS_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
+    ambiChannelControl.reset (new MultiSliderControl (MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -293,10 +293,15 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     speakerList->addMouseListener(this, true);
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
-    updateUI();
-
+    
+    for(int i = 1; i <= MAX_AMBISONICS_ORDER; i++)
+        comboAmbiOrder->setItemEnabled(i, JucePlugin_MaxNumInputChannels >= (i+1)*(i+1));
+    
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
-    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder());
+    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder(), dontSendNotification);
+    ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
+
+    updateUI();
 
 	// OSC
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
@@ -423,6 +428,8 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
     {
         //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
         pAmbiSettings->setAmbiOrder(comboAmbiOrder->getSelectedId());
+        ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
+        ambiChannelControl->updateValues();
         //[/UserComboBoxCode_comboAmbiOrder]
     }
 
@@ -1134,7 +1141,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="NB_OF_AMBISONICS_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
          virtualName="" explicitFocusOrder="0" pos="8 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"

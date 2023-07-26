@@ -222,6 +222,9 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
     toggleGroupMode->setVisible(MULTI_ENCODER_MODE);
 
+    for(int i = 1; i <= 7; i++)
+        comboAmbiOrder->setItemEnabled(i, JucePlugin_MaxNumOutputChannels >= (i+1)*(i+1));
+    
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
     m_args.pPointSelection->addChangeListener(this);
