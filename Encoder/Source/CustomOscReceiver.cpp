@@ -18,6 +18,7 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     javaScriptMode = false;
     isValid = false;
     lastRxTimestamp = 0;
+    lastSuccessfulRxTimestamp = 0;
     
     if(!pInput->commandString.isEmpty())
     {
@@ -100,6 +101,11 @@ uint32 CustomOscReceiver::getLastRxTimestamp()
     return lastRxTimestamp;
 }
 
+uint32 CustomOscReceiver::getLastSuccessfulRxTimestamp()
+{
+    return lastSuccessfulRxTimestamp;
+}
+
 String CustomOscReceiver::getErrorMessage()
 {
     return errorMessage;
@@ -112,11 +118,12 @@ bool CustomOscReceiver::matchesPattern(OSCAddress* pAddress)
 
 bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage* pMessage)
 {
-    // reset error message
-    errorMessage = "";
-    
     if(!isValid)
         return false;
+ 
+    // reset error message
+    errorMessage = "";
+    lastRxTimestamp = Time::getMillisecondCounter();
     
     if(javaScriptMode)
     {
@@ -164,7 +171,7 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
             return false;
         }
         
-        lastRxTimestamp = Time::getMillisecondCounter();
+        lastSuccessfulRxTimestamp = Time::getMillisecondCounter();
         return true;
     }
     
@@ -355,6 +362,6 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
         pSources->setChannelColor(index, Colour::fromString(color));
     }
     
-    lastRxTimestamp = Time::getMillisecondCounter();
+    lastSuccessfulRxTimestamp = Time::getMillisecondCounter();
     return true;
 }

@@ -153,27 +153,6 @@
             file="Source/UserDefinedParameter.h"/>
     </GROUP>
     <GROUP id="{863BAB85-4CED-E4A2-A38C-4AD53E5DA41D}" name="Common">
-      <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
-        <FILE id="n75RM5" name="HelpDialogManager.h" compile="0" resource="0"
-              file="../Common/HelpDialogManager.h"/>
-        <FILE id="qWOGcI" name="HelpDialog.h" compile="0" resource="0" file="../Common/HelpDialog.h"/>
-        <FILE id="qwN2tl" name="HelpComponent.cpp" compile="1" resource="0"
-              file="../Common/HelpComponent.cpp"/>
-        <FILE id="UvFr8H" name="HelpComponent.h" compile="0" resource="0" file="../Common/HelpComponent.h"/>
-        <FILE id="fTGTzC" name="HelpOscSyntax.cpp" compile="1" resource="0"
-              file="../Common/HelpOscSyntax.cpp"/>
-        <FILE id="C4HMxt" name="HelpOscSyntax.h" compile="0" resource="0" file="../Common/HelpOscSyntax.h"/>
-        <FILE id="mgNxDd" name="HelpRadarInteraction.cpp" compile="1" resource="0"
-              file="../Common/HelpRadarInteraction.cpp"/>
-        <FILE id="GvlxDH" name="HelpRadarInteraction.h" compile="0" resource="0"
-              file="../Common/HelpRadarInteraction.h"/>
-        <FILE id="YkjIi1" name="TreeViewItemHelp.h" compile="0" resource="0"
-              file="../Common/TreeViewItemHelp.h"/>
-        <FILE id="T8TqZC" name="HelpWebBrowserComponent.cpp" compile="1" resource="0"
-              file="../Common/HelpWebBrowserComponent.cpp"/>
-        <FILE id="T7ZWD0" name="HelpWebBrowserComponent.h" compile="0" resource="0"
-              file="../Common/HelpWebBrowserComponent.h"/>
-      </GROUP>
       <FILE id="MPx4vz" name="ActivationDialog.h" compile="0" resource="0"
             file="../Common/ActivationDialog.h"/>
       <FILE id="t6mAXi" name="AdditionalWindow.h" compile="0" resource="0"
@@ -212,6 +191,9 @@
             file="../Common/ColorEditorCustomComponent.h"/>
       <FILE id="XOuO2j" name="ColorSelectionComponent.h" compile="0" resource="0"
             file="../Common/ColorSelectionComponent.h"/>
+      <FILE id="kk3GFi" name="CommonImages.cpp" compile="1" resource="0"
+            file="../Common/CommonImages.cpp"/>
+      <FILE id="kustQO" name="CommonImages.h" compile="0" resource="0" file="../Common/CommonImages.h"/>
       <FILE id="GoCWjo" name="Constants.cpp" compile="1" resource="0" file="../Common/Constants.cpp"/>
       <FILE id="bfp1AJ" name="Constants.h" compile="0" resource="0" file="../Common/Constants.h"/>
       <FILE id="n9fEOI" name="DawParameter.h" compile="0" resource="0" file="../Common/DawParameter.h"/>
@@ -228,6 +210,27 @@
       <FILE id="TUUt8X" name="FilterInfo.h" compile="0" resource="0" file="../Common/FilterInfo.h"/>
       <FILE id="VvC9ea" name="GroupPointsSelectionComponent.h" compile="0"
             resource="0" file="../Common/GroupPointsSelectionComponent.h"/>
+      <GROUP id="{4F2B940B-0CB2-8199-41EB-867DCA343A64}" name="Help">
+        <FILE id="n75RM5" name="HelpDialogManager.h" compile="0" resource="0"
+              file="../Common/HelpDialogManager.h"/>
+        <FILE id="qWOGcI" name="HelpDialog.h" compile="0" resource="0" file="../Common/HelpDialog.h"/>
+        <FILE id="qwN2tl" name="HelpComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpComponent.cpp"/>
+        <FILE id="UvFr8H" name="HelpComponent.h" compile="0" resource="0" file="../Common/HelpComponent.h"/>
+        <FILE id="fTGTzC" name="HelpOscSyntax.cpp" compile="1" resource="0"
+              file="../Common/HelpOscSyntax.cpp"/>
+        <FILE id="C4HMxt" name="HelpOscSyntax.h" compile="0" resource="0" file="../Common/HelpOscSyntax.h"/>
+        <FILE id="mgNxDd" name="HelpRadarInteraction.cpp" compile="1" resource="0"
+              file="../Common/HelpRadarInteraction.cpp"/>
+        <FILE id="GvlxDH" name="HelpRadarInteraction.h" compile="0" resource="0"
+              file="../Common/HelpRadarInteraction.h"/>
+        <FILE id="YkjIi1" name="TreeViewItemHelp.h" compile="0" resource="0"
+              file="../Common/TreeViewItemHelp.h"/>
+        <FILE id="T8TqZC" name="HelpWebBrowserComponent.cpp" compile="1" resource="0"
+              file="../Common/HelpWebBrowserComponent.cpp"/>
+        <FILE id="T7ZWD0" name="HelpWebBrowserComponent.h" compile="0" resource="0"
+              file="../Common/HelpWebBrowserComponent.h"/>
+      </GROUP>
       <FILE id="XQhoeL" name="JsEditorComponent.cpp" compile="1" resource="0"
             file="../Common/JsEditorComponent.cpp"/>
       <FILE id="fu4V4a" name="JsEditorComponent.h" compile="0" resource="0"

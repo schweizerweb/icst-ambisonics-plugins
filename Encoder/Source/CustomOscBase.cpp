@@ -52,7 +52,7 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
     
     if(!path.startsWith("/"))
     {
-        *pErrorMessage = "Invalid OSC address - missing / at the beginning";
+        *pErrorMessage = "Invalid OSC address - missing '/' or channel selection at the beginning";
         return false;
     }
     

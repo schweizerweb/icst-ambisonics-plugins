@@ -16,6 +16,7 @@
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
 #include "../../Common/PresetHelper.h"
+#include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
 #define COLUMN_ID_HOST			202
@@ -29,7 +30,7 @@
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
+	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -107,9 +108,9 @@ public:
                 if (btn == nullptr) {
                     btn = new ImageButton();
                     btn->setImages (false, true, true,
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
                     btn->setTooltip("Add to presets...");
                     btn->addListener(this);
                 }
@@ -274,6 +275,4 @@ private:
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
     OwnedArray<StandardTarget> standardTargets;
-    const char* save_png;
-    const int save_pngSize;
 };

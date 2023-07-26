@@ -31,7 +31,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     : pSettings(pSettings), pCustomOscTxPresetHelper(pCustomOscTxPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this, save_png, save_pngSize));
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this));
     addChangeListener(pChangeListener);
     pCustomOscTxPresetHelper->addActionListener(this);
     //[/Constructor_pre]

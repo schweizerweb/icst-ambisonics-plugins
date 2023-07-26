@@ -17,19 +17,23 @@
 #include "../../Common/EditableCodeCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
+#include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
+#define COLUMN_ID_INFO        202
 #define	COLUMN_ID_PATH			204
 #define COLUMN_ID_COMMAND       205
 #define COLUMN_ID_SAVE_AS_PRESET    206
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
+#define BUTTON_TYPE_PRESET  "preset"
+#define BUTTON_TYPE_INFO    "info"
 
 
 class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener, ActionListener, Timer
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* pSettings, OSCHandlerEncoder* pOscHandler, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pOscHandler(pOscHandler), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
+	CustomOscInputTableListModel(EncoderSettings* pSettings, OSCHandlerEncoder* pOscHandler, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pOscHandler(pOscHandler), pParentComponent(pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
         pOscHandler->addActionListener(this);
@@ -54,8 +58,57 @@ public:
     
     
     void buttonClicked(juce::Button *b) override {
-        int rowIndex = b->getComponentID().getIntValue();
-        sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+        if(b->getName() == BUTTON_TYPE_PRESET)
+        {
+            int rowIndex = b->getComponentID().getIntValue();
+            sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+        }
+        else if(b->getName() == BUTTON_TYPE_INFO)
+        {
+            int rowIndex = b->getComponentID().getIntValue();
+            bool isInit;
+            bool hasIncomingData;
+            bool hasSuccessfulIncomingData;
+            String errorMessage;
+            String info;
+            if(pSettings->customOscInput[rowIndex]->enabledFlag)
+            {
+                pOscHandler->getReceiverStatus(rowIndex, &isInit, &hasIncomingData, &hasSuccessfulIncomingData, &errorMessage);
+                if(isInit)
+                {
+                    info += "Initialized";
+                    if(hasIncomingData)
+                    {
+                        info += " - Receiving data";
+                    }
+                    else
+                    {
+                        info += " - No incoming data";
+                    }
+                }
+                else
+                {
+                    info += "Error initializing";
+                }
+                
+                if(!errorMessage.isEmpty())
+                {
+                    info += ": " + errorMessage;
+                }
+            }
+            else
+            {
+                info = "Disabled";
+            }
+            
+            std::unique_ptr<Label> label = std::make_unique<Label>();
+            label->setText(info , dontSendNotification);
+            int lineCount = label->getFont().getStringWidth(info) / 180;
+            int lineHeight = label->getFont().getHeight();
+            label->setSize(200, lineHeight * (lineCount+2));
+            label->setJustificationType(Justification::centred);
+            CallOutBox::launchAsynchronously(std::move(label), b->getScreenBounds(), nullptr);
+        }
     }
     
 
@@ -75,8 +128,9 @@ public:
         {
             bool isInit;
             bool hasIncomingData;
+            bool hasSuccessfulIncomingData;
             String errorMessage;
-            pOscHandler->getReceiverStatus(rowNumber, &isInit, &hasIncomingData, &errorMessage);
+            pOscHandler->getReceiverStatus(rowNumber, &isInit, &hasIncomingData, &hasSuccessfulIncomingData, &errorMessage);
             auto gradientColor = Colours::red;
             if(isInit)
             {
@@ -86,7 +140,7 @@ public:
                 }
                 else
                 {
-                    if(hasIncomingData)
+                    if(hasSuccessfulIncomingData)
                         gradientColor = Colours::green;
                     else
                         gradientColor = Colours::yellow;
@@ -143,10 +197,28 @@ public:
             if (btn == nullptr) {
                 btn = new ImageButton();
                 btn->setImages (false, true, true,
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
                 btn->setTooltip("Add to presets...");
+                btn->setName(BUTTON_TYPE_PRESET);
+                btn->addListener(this);
+            }
+            
+            btn->setComponentID(String(rowNumber));
+            return btn;
+        }
+        else if (columnId == COLUMN_ID_INFO)
+        {
+            ImageButton* btn = static_cast<ImageButton*>(existingComponentToUpdate);
+            if(btn == nullptr)
+            {
+                btn = new ImageButton();
+                btn->setImages(false, true, true,
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0x6effffff),
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                btn->setName(BUTTON_TYPE_INFO);
                 btn->addListener(this);
             }
             
@@ -236,10 +308,11 @@ public:
 	{
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
-		tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLE, 20);
+		tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLE, 30, 30, 30);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_INFO, 30, 30, 30);
 		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 300);
         tableListBox->getHeader().addColumn("JS-Code", COLUMN_ID_COMMAND, 270);
-        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 30, 30, 30);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -260,6 +333,4 @@ private:
     OSCHandlerEncoder* pOscHandler;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
-    const char* save_png;
-    const int save_pngSize;
 };

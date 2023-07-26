@@ -50,7 +50,7 @@ public:
     bool handleSpecific(const juce::OSCMessage &message) override;
     bool initSpecific() override;
     bool initialize();
-    bool getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, String* errorMessage);
+    bool getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, bool* hasSuccessfulIncomingData, String* errorMessage);
     
 private:
     void handleMusescoreSSMNStyle(const OSCMessage& message) const;

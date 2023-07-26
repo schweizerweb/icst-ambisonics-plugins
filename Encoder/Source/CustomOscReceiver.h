@@ -25,6 +25,7 @@ public:
     String getErrorMessage();
     bool getInitFlag();
     uint32 getLastRxTimestamp();
+    uint32 getLastSuccessfulRxTimestamp();
     
 private:
     std::unique_ptr<OSCAddressPattern> patternToMatch;
@@ -32,6 +33,7 @@ private:
     bool javaScriptMode;
     bool isValid;
     uint32 lastRxTimestamp;
+    uint32 lastSuccessfulRxTimestamp;
     
     String errorMessage;
     

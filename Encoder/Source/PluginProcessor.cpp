@@ -195,8 +195,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
-	const int totalNumOutputChannels = getTotalNumOutputChannels();
-    const int totalUsedOutputChannels = encoderSettings.getAmbiChannelCount();
+	const int totalUsedOutputChannels = encoderSettings.getAmbiChannelCount();
 	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
 	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
 	int iChannel;

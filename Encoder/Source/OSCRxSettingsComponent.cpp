@@ -32,7 +32,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* pSettings, Stat
     : pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager), pCustomOscRxPresetHelper(pCustomOscRxPresetHelper), pOscHandler(pOscHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this, save_png, save_pngSize));
+    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this));
     pCustomOscRxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
 

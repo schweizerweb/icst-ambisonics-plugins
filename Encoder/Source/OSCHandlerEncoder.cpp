@@ -37,7 +37,7 @@ bool OSCHandlerEncoder::initialize()
     return true;
 }
 
-bool OSCHandlerEncoder::getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, String* errorMessage)
+bool OSCHandlerEncoder::getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, bool* hasSuccessfulIncomingData, String* errorMessage)
 {
     *isInit = false;
     *hasIncomingData = false;
@@ -53,6 +53,7 @@ bool OSCHandlerEncoder::getReceiverStatus(int rowNumber, bool* isInit, bool* has
     {
         *isInit = customOscReceivers[iReceiver]->getInitFlag();
         *hasIncomingData = customOscReceivers[iReceiver]->getLastRxTimestamp() > Time::getMillisecondCounter() - 1000;
+        *hasSuccessfulIncomingData = customOscReceivers[iReceiver]->getLastSuccessfulRxTimestamp() > Time::getMillisecondCounter() - 1000;
         *errorMessage = customOscReceivers[iReceiver]->getErrorMessage();
     }
     
@@ -71,10 +72,9 @@ bool OSCHandlerEncoder::initSpecific()
             {
                 AlertWindow::showMessageBoxAsync(MessageBoxIconType::WarningIcon, "OSC error", "Error initializing custom OSC receiver (" + String(pCustomOscInput->indexOf(c)) + "): " + r->getErrorMessage());
             }
-            else
-            {
-                customOscReceivers.add(r);
-            }
+            
+            // add in any case
+            customOscReceivers.add(r);
         }
     }
     
