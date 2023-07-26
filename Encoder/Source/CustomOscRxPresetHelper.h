@@ -71,6 +71,35 @@ if(ret != true)
         File fileJsPreset = getPathForPresetName("JS-Demo");
         writeToXmlFile(fileJsPreset, &jsPreset);
         presetFiles.addIfNotAlreadyThere(fileJsPreset);
+        
+        // iannix cursor preset
+        CustomOscInput iannixPreset;
+        iannixPreset.oscString = "ci1:/cursor {cf,2} {} {} {} {} {x} {y} {z}";
+        iannixPreset.commandString = "";
+        File fileIannixPreset = getPathForPresetName("Iannix-Cusor-Demo");
+        writeToXmlFile(fileIannixPreset, &iannixPreset);
+        presetFiles.addIfNotAlreadyThere(fileIannixPreset);
+        
+        // iannix cursor preset using JS
+        CustomOscInput iannixPresetJs;
+        iannixPresetJs.oscString = "/cursor";
+        iannixPresetJs.commandString =
+R"(// demo that parses Iannix cursor messages using JS
+
+i = 2;          // hard coded channel index
+c = s.arg(1);   // cursor index from iannix, used for filtering
+
+if(c==2)
+{
+    x = s.arg(6);   // X is taken from the 6th argument
+    y = s.arg(7);   // Y is taken from the 7th argument
+    z = s.arg(8);   // Z is taken from the 8th argument
+    s.setXYZ(i, x, y, z);   // finally set the new position
+}
+)";
+        File fileIannixPresetJs = getPathForPresetName("Iannix-Cusor-Demo-JS");
+        writeToXmlFile(fileIannixPresetJs, &iannixPresetJs);
+        presetFiles.addIfNotAlreadyThere(fileIannixPresetJs);
     }
     
     bool loadFromXmlFile(const File file, CustomOscInput* pOscRx)

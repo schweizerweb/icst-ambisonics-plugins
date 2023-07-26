@@ -71,7 +71,11 @@ public:
             bool hasSuccessfulIncomingData;
             String errorMessage;
             String info;
-            if(pSettings->customOscInput[rowIndex]->enabledFlag)
+            if(!pSettings->oscReceiveFlag)
+            {
+                info += "OSC Receive disabled";
+            }
+            else if(pSettings->customOscInput[rowIndex]->enabledFlag)
             {
                 pOscHandler->getReceiverStatus(rowIndex, &isInit, &hasIncomingData, &hasSuccessfulIncomingData, &errorMessage);
                 if(isInit)
@@ -124,7 +128,7 @@ public:
         auto fillColor = rowIsSelected ? COLOR_DEFINITION_SELECTED_ROW : (rowNumber % 2 ? alternateColour : defaultColor);
 		g.fillAll(fillColor);
         
-        if(pSettings->customOscInput[rowNumber]->enabledFlag)
+        if(pSettings->oscReceiveFlag && pSettings->customOscInput[rowNumber]->enabledFlag)
         {
             bool isInit;
             bool hasIncomingData;
