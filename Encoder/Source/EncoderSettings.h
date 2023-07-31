@@ -30,8 +30,8 @@
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
-#define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
-#define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 8 : 0)
+#define MULTI_ENCODER_MODE          true
+#define MAXIMUM_NUMBER_OF_GROUPS    8
 
 class EncoderSettings
 {

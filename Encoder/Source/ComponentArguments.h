@@ -17,6 +17,7 @@
 #include "CustomOscTxPresetHelper.h"
 #include "../../Common/OSCLogDialogManager.h"
 #include "../../Common/DawParameter.h"
+#include "../../Common/ChannelLayout.h"
 #include "OSCHandlerEncoder.h"
 
 struct EncoderSettingsComponentArgs
@@ -35,4 +36,5 @@ struct EncoderSettingsComponentArgs
     OSCLogDialogManager* pOscLogManager;
     DawParameter* pDawParams;
     OSCHandlerEncoder* pOscHandler;
+    ChannelLayout* pChannelLayout;
 };

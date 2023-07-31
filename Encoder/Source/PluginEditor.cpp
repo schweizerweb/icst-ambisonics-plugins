@@ -36,19 +36,12 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	settingsWindow = nullptr;
     pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
-	radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
-	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumInputChannels;
-	radarOptions.editablePointsAsSquare = false;
-	radarOptions.audioParams = ownerProc.getAudioParams();
-	radarOptions.dawParameter = ownerProc.getDawParameter();
-    radarOptions.scalingInfo = ownerProc.getScalingInfo();
-    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
 #if !MULTI_ENCODER_MODE
     radarOptions.checkNameFieldEditable = true;
 #endif
     //[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, &radarOptions));
+    radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, processor.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -175,7 +168,8 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             processor.getCustomOscTxPresetHelper(),
             &oscLogDialogManager,
             processor.getDawParameter(),
-            processor.getOscHandler()
+            processor.getOscHandler(),
+            processor.getChannelLayout()
         };
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
@@ -240,7 +234,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="5bf6bd31c23a4886" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSources, nullptr, &amp;pointSelection, &amp;radarOptions"/>
+                    params="pSources, nullptr, &amp;pointSelection, &amp;processor.getRadarOptions()"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 4 111 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"

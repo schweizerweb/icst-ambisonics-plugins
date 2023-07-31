@@ -19,6 +19,7 @@
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ScalingInfo.h"
 #include "../../Common/ColorDefinition.h"
+#include "../../Common/ChannelLayout.h"
 
 #define COLUMN_ID_NB        2
 #define COLUMN_ID_NAME        3
@@ -38,7 +39,7 @@
 class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
+    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling, ChannelLayout* pChannelLayout) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling), pChannelLayout(pChannelLayout)
     {
     }
 
@@ -69,7 +70,7 @@ public:
 private:
     int getNumRows() override
     {
-        return pSources->size();
+        return jmin(pSources->size(), pChannelLayout->getNumInputChannels());
     }
 
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -239,7 +240,7 @@ private:
         case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
         case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
         case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1); break;
+        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1 && rowNumber < pChannelLayout->getNumInputChannels()); break;
         default: throw;
         }
 
@@ -310,4 +311,5 @@ private:
     Component* pParentComponent;
     TableListBox* pTableListBox;
     ScalingInfo* pScalingInfo;
+    ChannelLayout* pChannelLayout;
 };

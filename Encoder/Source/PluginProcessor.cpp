@@ -20,17 +20,17 @@
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
      : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+#if MULTI_ENCODER_MODE
+                       .withInput ("Input", AudioChannelSet::discreteChannels(64))
+#else
+                       .withInput  ("Input",  AudioChannelSet::mono(), true)
 #endif
+                       .withOutput ("Output", AudioChannelSet::ambisonic(1), true)
+                       )
 {
+    channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
+    
     sources.reset(new AmbiSourceSet(getScalingInfo()));
 	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
@@ -65,6 +65,14 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
 #endif
+    
+    radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
+    radarOptions.maxNumberEditablePoints = channelLayout.getNumInputChannels();
+    radarOptions.editablePointsAsSquare = false;
+    radarOptions.audioParams = getAudioParams();
+    radarOptions.dawParameter = getDawParameter();
+    radarOptions.scalingInfo = getScalingInfo();
+    radarOptions.zoomSettings = getZoomSettingsPointer();
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -153,29 +161,41 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
     // spare memory, etc.
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
+void AmbisonicEncoderAudioProcessor::numChannelsChanged()
+{
+//    AlertWindow::showMessageBoxAsync(MessageBoxIconType::InfoIcon, "Num channels changed", "New channel count: " + String(getBusesLayout().getMainInputChannels()) + "/" + String(getBusesLayout().getMainOutputChannels()) + " ---- can change layout: ");
+
+    // handle output channels
+    channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
+    
+    int maxAmbiOrder = channelLayout.getMaxAmbiOrder(true);
+    if(encoderSettings.ambiOrder > maxAmbiOrder)
+    {
+        encoderSettings.ambiOrder = maxAmbiOrder;
+    }
+    
+    // handle input channels
+    for(int i = channelLayout.getNumInputChannels(); i < sources->size(); i++)
+        sources->get(i)->setEnabled(false);
+    
+    radarOptions.maxNumberEditablePoints = channelLayout.getNumInputChannels();
+}
+
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    if(layouts.getMainOutputChannels() < 4)
         return false;
 
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+    if(layouts.getMainInputChannels() < 1)
         return false;
-   #endif
-
-    return true;
-  #endif
-}
+    
+#if(!MULTI_ENCODER_MODE)
+    if(layouts.getMainInputChannels() != 1)
+        return false;
 #endif
+    
+    return true;
+}
 
 void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
@@ -196,8 +216,8 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
 	const int totalUsedOutputChannels = encoderSettings.getAmbiChannelCount();
-	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
-	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
+	double currentCoefficients[64];
+	float* outputBufferPointers[64];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
@@ -255,9 +275,9 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-        memset(currentCoefficients, 0, JucePlugin_MaxNumOutputChannels * sizeof(double));
+        memset(currentCoefficients, 0, 64 * sizeof(double));
 		sourcePoint.getAmbisonicsCoefficients(encoderSettings.getAmbiChannelCount(), &currentCoefficients[0], true, true);
-		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, sourcePointDistance);
+		applyDistanceGain(&currentCoefficients[0], 64, sourcePointDistance);
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
@@ -282,7 +302,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		}
 
 		// keep coefficients
-		memcpy(&lastCoefficients[iSource], &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
+		memcpy(&lastCoefficients[iSource], &currentCoefficients, 64 * sizeof(double));
 	}
 }
 
@@ -344,6 +364,11 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 	initializeOscSender();
 }
 
+ChannelLayout* AmbisonicEncoderAudioProcessor::getChannelLayout()
+{
+    return &channelLayout;
+}
+
 AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
 {
 	return sources.get();
@@ -402,6 +427,11 @@ OSCHandlerEncoder* AmbisonicEncoderAudioProcessor::getOscHandler()
 AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
 {
     return &animatorDataset;
+}
+
+RadarOptions* AmbisonicEncoderAudioProcessor::getRadarOptions()
+{
+    return &radarOptions;
 }
 
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)

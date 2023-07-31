@@ -29,6 +29,8 @@
 #include "CustomOscTxPresetHelper.h"
 #include "AnimatorDataset.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/ChannelLayout.h"
+#include "../../Common/RadarOptions.h"
 
 //==============================================================================
 /**
@@ -44,10 +46,11 @@ public:
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
-
+   
+    // channel handling
+    void numChannelsChanged() override;
+    
 	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
     void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
 
@@ -75,6 +78,7 @@ public:
 
     void actionListenerCallback(const juce::String &message) override;
     
+    ChannelLayout* getChannelLayout();
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
 	void initializeOscSender();
@@ -90,6 +94,7 @@ public:
     AnimatorDataset* getAnimatorDataset();
     ZoomSettings* getZoomSettingsPointer();
     OSCHandlerEncoder* getOscHandler();
+    RadarOptions* getRadarOptions();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
 
@@ -106,15 +111,17 @@ private:
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
     std::unique_ptr<CustomOscTxPresetHelper> customOscTxPresetHelper;
     std::unique_ptr<CustomOscRxPresetHelper> customOscRxPresetHelper;
-	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
-	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
-    AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
+	double lastCoefficients[64][64];
+	VarDelayBuffer delayBuffers[64];
+    AirAbsorbtionFilter airAbsorbtionFilters[64];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     std::unique_ptr<ZoomSettings> zoomSettings;
     double lastScaler;
     AnimatorDataset animatorDataset;
-
+    ChannelLayout channelLayout;
+    RadarOptions radarOptions;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

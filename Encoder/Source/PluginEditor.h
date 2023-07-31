@@ -72,7 +72,6 @@ private:
     AmbisonicEncoderAudioProcessor& processor;
 	AmbiSourceSet* pSources;
 	PointSelection pointSelection;
-	RadarOptions radarOptions;
 	EncoderSettings* pEncoderSettings;
 	EncoderSettingsDialog* settingsWindow;
     HelpDialogManager helpDialogManager;

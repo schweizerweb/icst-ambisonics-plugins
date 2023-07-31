@@ -24,7 +24,7 @@ public:
         this->pSourceSet = pSources;
         
         // points (X, Y, Z, Gain)
-         for (int i = 0; i < JucePlugin_MaxNumInputChannels; i++)
+         for (int i = 0; i < 64; i++)
          {
             String indexStr = String(i + 1);
              

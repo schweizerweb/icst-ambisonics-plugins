@@ -38,7 +38,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(m_args.pChangeListener);
     groupModel.reset(new GroupTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo()));
-    sourceModel.reset(new SourceTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo()));
+    sourceModel.reset(new SourceTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo(), m_args.pChannelLayout));
     //[/Constructor_pre]
 
     groupGroups.reset (new juce::GroupComponent ("groupGroups",
@@ -222,9 +222,6 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
     toggleGroupMode->setVisible(MULTI_ENCODER_MODE);
 
-    for(int i = 1; i <= 7; i++)
-        comboAmbiOrder->setItemEnabled(i, JucePlugin_MaxNumOutputChannels >= (i+1)*(i+1));
-    
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
     m_args.pPointSelection->addChangeListener(this);
@@ -247,13 +244,14 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     m_args.pPresetHelper->addActionListener(this);
     m_args.pSourceSet->addChangeListener(this);
 
-    comboAmbiOrder->setSelectedId(m_args.pSettings->ambiOrder);
-
+    handleAmbiOrders();
+    
     initializePresets();
 
     sourceList->addMouseListener(this, true);
     groupList->addMouseListener(this, true);
-
+    m_args.pChannelLayout->addActionListener(this);
+    
     controlDimming();
     //[/Constructor]
 }
@@ -261,6 +259,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
 SourceDefinitionComponent::~SourceDefinitionComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    m_args.pChannelLayout->removeActionListener(this);
     m_args.pPointSelection->removeChangeListener(this);
     m_args.pSourceSet->removeChangeListener(this);
     m_args.pPresetHelper->removeActionListener(this);
@@ -619,6 +618,13 @@ void SourceDefinitionComponent::updateEncodingUiElements()
         sliderDistanceScaler->setValue(m_args.pSourceSet->getDistanceScaler(), dontSendNotification);
 }
 
+void SourceDefinitionComponent::handleAmbiOrders()
+{
+    for(int i = 1; i <= 7; i++)
+        comboAmbiOrder->setItemEnabled(i, i <= m_args.pChannelLayout->getMaxAmbiOrder(true));
+    comboAmbiOrder->setSelectedId(m_args.pSettings->ambiOrder);
+}
+
 void SourceDefinitionComponent::initializePresets()
 {
     comboBoxPresets->clear();
@@ -644,6 +650,11 @@ void SourceDefinitionComponent::actionListenerCallback(const String &message)
         m_args.pZoomSettings->Reset();
         controlDimming();
         sendChangeMessage();
+    }
+    if(message == ACTION_MESSAGE_CHANNEL_LAYOUT_CHANGED)
+    {
+        handleAmbiOrders();
+        refresh();
     }
 }
 

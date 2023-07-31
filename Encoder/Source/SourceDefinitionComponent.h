@@ -80,6 +80,7 @@ private:
 
     void initializePresets();
     void updateEncodingUiElements();
+    void handleAmbiOrders();
     void actionListenerCallback(const String &message) override;
     void mouseUp(const MouseEvent &event) override;
     //[/UserVariables]
