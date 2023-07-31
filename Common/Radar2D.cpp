@@ -1085,7 +1085,7 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	{
         if(e.mods.isShiftDown())
         {
-            CallOutBox::launchAsynchronously(std::make_unique<MultiActivationDialog>(pEditablePoints, valuePoint, pRadarOptions->scalingInfo, radarMode == XY), Rectangle<int>(e.getPosition().translated(3, 3), e.getPosition().translated(3, 3)), this);
+            CallOutBox::launchAsynchronously(std::make_unique<MultiActivationDialog>(pEditablePoints, valuePoint, pRadarOptions, radarMode == XY), Rectangle<int>(e.getPosition().translated(3, 3), e.getPosition().translated(3, 3)), this);
         }
         else {
             // otherwise enable a disabled point

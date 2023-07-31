@@ -21,15 +21,15 @@ enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGL
 class MultiActivationDialog : public Component, ComboBox::Listener, Button::Listener, Slider::Listener, public ChangeListener
 {
 public:
-    MultiActivationDialog(AmbiDataSet* pData, Point<float> newPosition, ScalingInfo* pScaling, bool xyRadar) : pData(pData), newPosition(newPosition), xyRadar(xyRadar)
+    MultiActivationDialog(AmbiDataSet* pData, Point<float> newPosition, RadarOptions* pRadarOptions, bool xyRadar) : pData(pData), newPosition(newPosition), pRadarOptions(pRadarOptions), xyRadar(xyRadar)
     {
         // copy to local data set
         color = COLOR_DEFINITION_GROUP_DEFAULT;
-        defaultRadius = pScaling->CartesianMax() / 5;
+        defaultRadius = pRadarOptions->scalingInfo->CartesianMax() / 5;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
         localDataSet->setGroupModeFlag(true);
         localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
-        for(int i = 0; i < pData->size(); i++)
+        for(int i = 0; i < pData->size() && i < pRadarOptions->maxNumberEditablePoints; i++)
         {
             auto p = pData->get(i)->getRawPoint();
             Point3D<double> np(p->getX(), p->getY(), p->getZ());
@@ -45,7 +45,7 @@ public:
         addAndMakeVisible(labelPointCount.get());
         
         sliderPointCount.reset(new Slider("PointCount"));
-        int max = pData->size() - pData->getEnabledCount();
+        int max = pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
         sliderPointCount->setRange(Range<double>(0, max), 1.0);
         sliderPointCount->setValue(max, sendNotificationAsync);
         sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 40, 24);
@@ -74,7 +74,7 @@ public:
 
         sliderRadius.reset(new Slider("Radius"));
         sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-        sliderRadius->setRange(0.01, pScaling->CartesianMax());
+        sliderRadius->setRange(0.01, pRadarOptions->scalingInfo->CartesianMax());
         sliderRadius->setValue(defaultRadius);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
@@ -102,10 +102,6 @@ public:
         btnColor->setColour(TextButton::ColourIds::buttonColourId, color);
         btnColor->addListener(this);
         addAndMakeVisible(btnColor.get());
-        
-        zoomSettings.reset(new ZoomSettings(&scalingInfo));
-        RadarOptions radarOptions;
-        radarOptions.zoomSettings = zoomSettings.get();
         
         btnApply.reset(new TextButton("btn"));
         btnApply->setButtonText("Activate");
@@ -279,9 +275,10 @@ private:
                 int pointIndex = p->getId().getIntValue();
                 pData->addPointToGroup(newGroupIndex, pointIndex);
                 pData->get(pointIndex)->setEnabled(true);
+                auto ptToCopy = pData->getGroupModeFlag() ? p->getVector3D() : localDataSet->getAbsSourcePoint(i);
                 Vector3D<double> pp = xyRadar
-                    ? Vector3D<double>(p->getRawPoint()->getX(), p->getRawPoint()->getY(), 0)
-                    : Vector3D<double>(p->getRawPoint()->getX(), 0, p->getRawPoint()->getY());
+                    ? Vector3D<double>(ptToCopy.x, ptToCopy.y, 0)
+                    : Vector3D<double>(ptToCopy.x, 0, ptToCopy.y);
                 pData->get(pointIndex)->getRawPoint()->setXYZ(pp.x, pp.y, pp.z);
                 pData->get(pointIndex)->setColor(color);
                 if(toggleApplyName->getToggleState())
@@ -362,8 +359,8 @@ private:
     
     AmbiDataSet* pData;
     Point<float> newPosition;
+    RadarOptions* pRadarOptions;
     bool xyRadar;
-    std::unique_ptr<ZoomSettings> zoomSettings;
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiDataSet> localDataSet;
     double defaultRadius;
