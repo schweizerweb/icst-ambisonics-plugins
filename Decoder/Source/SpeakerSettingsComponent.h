@@ -34,6 +34,7 @@
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/ChannelLayout.h"
 //[/Headers]
 
 
@@ -59,7 +60,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings);
+    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings, ChannelLayout* pChannelLayout);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
@@ -89,6 +90,7 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
 	void updateUI() const;
+    void handleAmbiOrders();
 	FilterBankInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
@@ -118,6 +120,7 @@ private:
     PresetManagerDialog presetManagerDialog;
     std::unique_ptr<FilterPresetHelper> filterPresetHelper;
     ZoomSettings* pZoomSettings;
+    ChannelLayout* pChannelLayout;
     //[/UserVariables]
 
     //==============================================================================

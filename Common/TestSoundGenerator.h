@@ -11,6 +11,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "AmbiDataSet.h"
+#include "AmbiSettings.h"
 
 #define NO_TEST_SOUND	-1
 
@@ -30,7 +31,7 @@ private:
 	void timerCallback() override;
 
 private:
-	bool testSoundChannels[JucePlugin_MaxNumOutputChannels];
+	bool testSoundChannels[MAX_NUM_CHANNELS];
 	Random random;
 	AmbiDataSet* pSpeakerSet;
 	int tempChannel;

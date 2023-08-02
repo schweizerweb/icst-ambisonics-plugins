@@ -592,7 +592,7 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
 
 void SourceDefinitionComponent::controlDimming() const
 {
-    buttonAdd->setEnabled(m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size());
+    buttonAdd->setEnabled(m_args.pSourceSet->size() < pChannelLayout-> m_args.pAudioParams->sourceParams.size());
     buttonRemove->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pSourceSet->size() > 0);
     buttonMoveUp->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getMainSelectedPointIndex() > 0);
     buttonMoveDown->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
@@ -622,7 +622,7 @@ void SourceDefinitionComponent::handleAmbiOrders()
 {
     for(int i = 1; i <= 7; i++)
         comboAmbiOrder->setItemEnabled(i, i <= m_args.pChannelLayout->getMaxAmbiOrder(true));
-    comboAmbiOrder->setSelectedId(m_args.pSettings->ambiOrder);
+    comboAmbiOrder->setSelectedId(m_args.pSettings->ambiOrder, dontSendNotification);
 }
 
 void SourceDefinitionComponent::initializePresets()

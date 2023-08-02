@@ -6,9 +6,8 @@
               buildVST="0" buildVST3="1" buildAU="1" buildAUv3="0" buildRTAS="0"
               buildAAX="0" buildStandalone="0" enableIAA="0" pluginName="AmbiDecoder"
               pluginDesc="Development Version" pluginManufacturer="ICST" pluginManufacturerCode="ICST"
-              pluginCode="AADC" pluginChannelConfigs="{16,8}" pluginIsSynth="0"
-              pluginWantsMidiIn="0" pluginProducesMidiOut="0" pluginIsMidiEffectPlugin="0"
-              pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
+              pluginCode="AADC" pluginIsSynth="0" pluginWantsMidiIn="0" pluginProducesMidiOut="0"
+              pluginIsMidiEffectPlugin="0" pluginEditorRequiresKeys="0" pluginAUExportPrefix="AmbiDecoderAU"
               pluginRTASCategory="" aaxIdentifier="com.icst.ambidecoder" pluginAAXCategory="2"
               companyName="ICST" pluginFormats="buildAU,buildVST3" companyWebsite="https://www.zhdk.ch/forschung/icst"
               jucerFormatVersion="1" defines="JUCE_MODAL_LOOPS_PERMITTED=1">
@@ -112,6 +111,9 @@
       <FILE id="EzUhBa" name="AmbiSpeakerSet.h" compile="0" resource="0"
             file="../Common/AmbiSpeakerSet.h"/>
       <FILE id="rEXoft" name="AudioParams.h" compile="0" resource="0" file="../Common/AudioParams.h"/>
+      <FILE id="AboxkW" name="ChannelLayout.cpp" compile="1" resource="0"
+            file="../Common/ChannelLayout.cpp"/>
+      <FILE id="gtw15U" name="ChannelLayout.h" compile="0" resource="0" file="../Common/ChannelLayout.h"/>
       <FILE id="rRezuX" name="CheckBoxCustomComponent.h" compile="0" resource="0"
             file="../Common/CheckBoxCustomComponent.h"/>
       <FILE id="EcBciD" name="ColorDefinition.h" compile="0" resource="0"

@@ -54,8 +54,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
-    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings, ChannelLayout* pChannelLayout)
+    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings), pChannelLayout(pChannelLayout)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
@@ -65,6 +65,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 
 	addChangeListener(pCallback);
     pPresetHelper->addActionListener(this);
+    pChannelLayout->addActionListener(this);
 
     filterPresetHelper.reset(new FilterPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder/Filters"), this));
     filterPresetHelper->initialize();
@@ -294,15 +295,13 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
     
-    for(int i = 1; i <= MAX_AMBISONICS_ORDER; i++)
-        comboAmbiOrder->setItemEnabled(i, JucePlugin_MaxNumInputChannels >= (i+1)*(i+1));
-    
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
     comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder(), dontSendNotification);
     ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
 
     updateUI();
-
+    handleAmbiOrders();
+    
 	// OSC
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	sliderPort->setValue(pDecoderSettings->oscReceivePort);
@@ -318,6 +317,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     pPresetHelper->removeActionListener(this);
+    pChannelLayout->removeActionListener(this);
     //[/Destructor_pre]
 
     groupOsc = nullptr;
@@ -457,11 +457,14 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		Uuid newId = Uuid();
-		pSpeakerSet->add(new AmbiSpeaker(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
-		pPointSelection->selectPoint(pSpeakerSet->size() - 1);
-		speakerList->updateContent();
-		speakerList->repaint();
+        if(pSpeakerSet->size() < pChannelLayout->getNumOutputChannels())
+        {
+            Uuid newId = Uuid();
+            pSpeakerSet->add(new AmbiSpeaker(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
+            pPointSelection->selectPoint(pSpeakerSet->size() - 1);
+            speakerList->updateContent();
+            speakerList->repaint();
+        }
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove.get())
@@ -926,6 +929,13 @@ void SpeakerSettingsComponent::updateUI() const
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
 
+void SpeakerSettingsComponent::handleAmbiOrders()
+{
+    for(int i = 1; i <= MAX_AMBISONICS_ORDER; i++)
+        comboAmbiOrder->setItemEnabled(i, i <= pChannelLayout->getMaxAmbiOrder(false));
+    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder(), sendNotification);
+}
+
 void SpeakerSettingsComponent::updateComboBox() const
 {
 	comboBoxChannelConfig->clear();
@@ -972,6 +982,13 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
         controlDimming();
         sendChangeMessage();
     }
+    if(message == ACTION_MESSAGE_CHANNEL_LAYOUT_CHANGED)
+    {
+        handleAmbiOrders();
+        speakerList->updateContent();
+        speakerList->repaint();
+        controlDimming();
+    }
 }
 
 void SpeakerSettingsComponent::controlDimming()
@@ -987,7 +1004,7 @@ void SpeakerSettingsComponent::controlDimming()
     buttonScaling->setEnabled(en);
 	buttonManage->setEnabled(en);
 	buttonSave->setEnabled(en);
-	buttonAdd->setEnabled(en);
+	buttonAdd->setEnabled(en && pSpeakerSet->size() < pChannelLayout->getNumOutputChannels());
 	buttonRemove->setEnabled(en);
 	buttonMoveUp->setEnabled(en && !multiselection);
 	buttonMoveDown->setEnabled(en && !multiselection);
@@ -1089,8 +1106,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)"
+                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings, ChannelLayout* pChannelLayout"
+                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings), pChannelLayout(pChannelLayout)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="900" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>

@@ -39,15 +39,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pDecoderSettings = ownerProc.getDecoderSettings();
 	pFilterSpecification = ownerProc.getFilterSpecification();
 	pOscHandler = new OSCHandlerDecoder(pMovingPoints);
+    pRadarOptions = ownerProc.getRadarOptions();
 	initializeOscHandler();
-	radarOptions.setTrackColorAccordingToName = false;
-	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
-	radarOptions.editablePointsAsSquare = true;
-    radarOptions.scalingInfo = ownerProc.getScalingInfo();
-    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
-    //[/Constructor_pre]
+	//[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));
+    radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, ownerProc.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -153,7 +149,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer(), processor.getChannelLayout()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
@@ -182,7 +178,7 @@ void AmbisonicsDecoderAudioProcessorEditor::changeListenerCallback(ChangeBroadca
 void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 {
 	// update timeout
-	radarOptions.displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
+	pRadarOptions->displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
 
 	pOscHandler->stop();
 
@@ -197,8 +193,8 @@ void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 
 void AmbisonicsDecoderAudioProcessorEditor::updateRadarOptions()
 {
-	radarOptions.showEditablePoints = pDecoderSettings->editMode;
-	radarOptions.showDisplayOnlyPoints = !pDecoderSettings->editMode;
+	pRadarOptions->showEditablePoints = pDecoderSettings->editMode;
+	pRadarOptions->showDisplayOnlyPoints = !pDecoderSettings->editMode;
 	if(!pDecoderSettings->editMode)
 		pointSelection.unselectPoint();
 	radarComponent->setPointInfoVisible(pDecoderSettings->editMode);
@@ -234,7 +230,7 @@ BEGIN_JUCER_METADATA
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
+                    params="pSpeakerSet, pMovingPoints, &amp;pointSelection, ownerProc.getRadarOptions()"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 4 111 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"

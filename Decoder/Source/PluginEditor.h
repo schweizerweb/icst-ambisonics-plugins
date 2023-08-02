@@ -79,10 +79,10 @@ private:
 	DecoderPresetHelper* pPresetHelper;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;
-	RadarOptions radarOptions;
 	SpeakerSettingsDialog* settingsWindow;
 	dsp::ProcessSpec* pFilterSpecification;
     HelpDialogManager helpDialogManager;
+    RadarOptions* pRadarOptions;
     //[/UserVariables]
 
     //==============================================================================

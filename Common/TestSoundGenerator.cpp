@@ -56,7 +56,7 @@ void TestSoundGenerator::reset()
 {
 	stopTimer();
 	tempChannel = NO_TEST_SOUND;
-	memset(testSoundChannels, 0, JucePlugin_MaxNumOutputChannels);
+	memset(testSoundChannels, 0, MAX_NUM_CHANNELS);
 }
 
 void TestSoundGenerator::timerCallback()

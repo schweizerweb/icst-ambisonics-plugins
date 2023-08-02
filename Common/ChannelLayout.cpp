@@ -30,7 +30,7 @@ int ChannelLayout::getMaxAmbiOrder(bool isEncoder) const
     int maxAmbiOrder = 0;
     for(int i = 1; i <= 7; i++)
     {
-        if((i+1)*(i+1) <= numOutputChannels)
+        if((i+1)*(i+1) <= (isEncoder ? numOutputChannels : numInputChannels))
             maxAmbiOrder = i;
     }
     return maxAmbiOrder;

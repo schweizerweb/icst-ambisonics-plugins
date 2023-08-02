@@ -20,6 +20,8 @@
 #include "../../Common/AmbiSourceSet.h"
 #include "DecoderPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/ChannelLayout.h"
+#include "../../Common/RadarOptions.h"
 
 //==============================================================================
 /**
@@ -60,7 +62,8 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
-
+    void numChannelsChanged() override;
+    
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
@@ -77,7 +80,9 @@ public:
 	dsp::ProcessSpec* getFilterSpecification();
     DecoderPresetHelper* getPresetHelper();
     ZoomSettings* getZoomSettingsPointer();
-
+    ChannelLayout* getChannelLayout();
+    RadarOptions* getRadarOptions();
+    
 private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
@@ -89,9 +94,11 @@ private:
 	DelayHelper delayHelper;
     std::unique_ptr<DecoderPresetHelper> presetHelper;
     std::unique_ptr<ZoomSettings> zoomSettings;
+    ChannelLayout channelLayout;
+    RadarOptions radarOptions;
     
-    dsp::IIR::Filter<float> iirFilters[JucePlugin_MaxNumOutputChannels][MAX_FILTER_COUNT];
-    FilterBankInfo filterInfo[JucePlugin_MaxNumOutputChannels];
+    dsp::IIR::Filter<float> iirFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
+    FilterBankInfo filterInfo[MAX_NUM_CHANNELS];
     dsp::ProcessSpec iirFilterSpec;
     
 
