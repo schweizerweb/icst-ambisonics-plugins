@@ -2,7 +2,7 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-@{ Input = 1; Description = "1st-7th Order Ambisonic, 1 Channel Input"; PluginCode = "AEXS" },
+#@{ Input = 1; Description = "1st-7th Order Ambisonic, 1 Channel Input"; PluginCode = "AEXS" },
 @{ Input = 64; Description = "1st-7th Order Ambisonic, 64 Channel Input"; PluginCode = "AEXF" }
 )
 
@@ -37,7 +37,6 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     $node.id = $projectId
     $node.pluginName = "$($node.pluginName)_$($code)"
     $node.pluginDesc = $description
-    $node.pluginChannelConfigs = "{$($numInput),$($numOutput)}"
 	$node.pluginCode = $pluginUniqueCode
 	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($codeBundle).ToLower())"
     
