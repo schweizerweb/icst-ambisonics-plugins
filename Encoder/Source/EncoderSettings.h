@@ -30,8 +30,8 @@
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
-#define MULTI_ENCODER_MODE          true
 #define MAXIMUM_NUMBER_OF_GROUPS    8
+#define MULTI_ENCODER_MODE (MAX_NUM_INPUT > 1)
 
 class EncoderSettings
 {

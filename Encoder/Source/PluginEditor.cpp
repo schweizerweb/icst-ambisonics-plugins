@@ -7,7 +7,7 @@
   the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
   and re-saved.
 
-  Created with Projucer version: 6.1.4
+  Created with Projucer version: 7.0.5
 
   ------------------------------------------------------------------------------
 
@@ -36,10 +36,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	settingsWindow = nullptr;
     pSources = ownerProc.getSources();
 	pEncoderSettings = ownerProc.getEncoderSettings();
-#if !MULTI_ENCODER_MODE
-    radarOptions.checkNameFieldEditable = true;
-#endif
-    //[/Constructor_pre]
+   //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, processor.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());

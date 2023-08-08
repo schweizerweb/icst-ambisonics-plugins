@@ -2,8 +2,8 @@ $releaseVersion = [string](Get-Content "./versionInformation.txt")
 
 $EncoderVersions =
 @(
-#@{ Input = 1; Description = "1st-7th Order Ambisonic, 1 Channel Input"; PluginCode = "AEXS" },
-@{ Input = 64; Description = "1st-7th Order Ambisonic, 64 Channel Input"; PluginCode = "AEXF" }
+@{ Input = 1; Description = "1st-7th Order Ambisonic, 1 Channel Input"; PluginCode = "AEXS" },
+@{ Input = 64; Description = "1st-7th Order Ambisonic, 1-64 Channel Input"; PluginCode = "AEXF" }
 )
 
 $DecoderVersions =
@@ -39,6 +39,7 @@ function createFile([string]$sourceFile, [int]$numInput, [int]$numOutput, [int]$
     $node.pluginDesc = $description
 	$node.pluginCode = $pluginUniqueCode
 	$node.bundleIdentifier = "$($node.bundleIdentifier)-$(($codeBundle).ToLower())"
+    $node.defines = "JUCE_MODAL_LOOPS_PERMITTED=1 MAX_NUM_INPUT=$($numInput)"
     
     $exportformats = $xml.JUCERPROJECT.EXPORTFORMATS
     foreach($format in $exportformats.ChildNodes)
