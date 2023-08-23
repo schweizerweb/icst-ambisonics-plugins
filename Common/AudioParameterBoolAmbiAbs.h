@@ -23,5 +23,5 @@ public:
 	}
 
 	virtual void setUnscaledValue(bool value) = 0;
-    virtual void setEnabled(bool enabled) = 0;
+  virtual void setEnabled(bool enabled) = 0;
 };
