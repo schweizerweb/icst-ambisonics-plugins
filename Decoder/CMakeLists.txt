@@ -13,12 +13,13 @@ juce_add_plugin(AmbiDecoder
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
     # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
     PLUGIN_MANUFACTURER_CODE "ICST"               # A four-character manufacturer id with at least one upper-case character
-    PLUGIN_CODE "DCXX"                            # A unique four-character plugin id with exactly one upper-case character
+    PLUGIN_CODE "ADXF"                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
+	PLUGIN_NAME "AmbiDecoder"
 	BUNDLE_ID "com.icst.ambidecoder"
     FORMATS AU VST3 Standalone                 # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     PRODUCT_NAME "ICST Ambisonics Decoder"
-	DESCRIPTION "Development Version"
+	DESCRIPTION "1st-7th Order Ambisonic, 64 Channel Output"
 	AU_MAIN_TYPE kAudioUnitType_Effect
 	AU_EXPORT_PREFIX "AmbiDecoderAU"
 )
@@ -96,7 +97,9 @@ target_compile_definitions(AmbiDecoder
         JUCE_WEB_BROWSER=1  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0
-		JUCE_MODAL_LOOPS_PERMITTED=1)
+		JUCE_MODAL_LOOPS_PERMITTED=1
+		MAX_NUM_INPUT=64
+		)
 
 # If your target needs extra binary assets, you can add them here. The first argument is the name of
 # a new static library target that will include all the binary resources. There is an optional
