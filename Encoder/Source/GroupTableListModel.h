@@ -36,7 +36,7 @@
 class GroupTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-	GroupTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling): pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
+	GroupTableListModel(AmbiSourceSet* _pSources, PointSelection* _pPointSelection, Component* _pParentComponent, ScalingInfo* _pScaling): pSources(_pSources), pPointSelection(_pPointSelection), pParentComponent(_pParentComponent), pTableListBox(nullptr), pScalingInfo(_pScaling)
 	{
 	}
 
@@ -274,7 +274,7 @@ public:
         case COLUMN_ID_GROUP_ROTATION:
             {
                 StringArray tokens;
-                tokens.addTokens (newText, ";");
+                tokens.addTokens (newText, ";", "");
 
                 if(tokens.size() == 4)
                 {

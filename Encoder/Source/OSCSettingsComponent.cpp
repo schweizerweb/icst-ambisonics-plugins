@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
-    : pSettings(pSettings)
+OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
+    : pSettings(_pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -310,8 +310,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCSettingsComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener, public ChangeBroadcaster, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper"
-                 variableInitialisers="pSettings(pSettings)" snapPixels="8" snapActive="1"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper"
+                 variableInitialisers="pSettings(_pSettings)" snapPixels="8" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
                  initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

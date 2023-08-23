@@ -11,7 +11,7 @@
 #include "UserDefinedParameter.h"
 #include <string.h>
 
-UserDefinedParameter::UserDefinedParameter(String originalString, std::string typeString, double lo, double hi) : originalString(originalString), loLim(lo), hiLim(hi)
+UserDefinedParameter::UserDefinedParameter(String _originalString, std::string typeString, double lo, double hi) : originalString(_originalString), loLim(lo), hiLim(hi)
 {
     switch(typeString.substr()[0])
     {
@@ -24,7 +24,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, std::string ty
     }
 }
 
-UserDefinedParameter::UserDefinedParameter(String originalString, std::string typeString, double lo, double hi, double zero) : originalString(originalString), loLim(lo), hiLim(hi), zero(zero)
+UserDefinedParameter::UserDefinedParameter(String _originalString, std::string typeString, double lo, double hi, double _zero) : originalString(_originalString), loLim(lo), hiLim(hi), zero(_zero)
 {
     switch(typeString.substr()[0])
     {
@@ -35,7 +35,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, std::string ty
     }
 }
 
-UserDefinedParameter::UserDefinedParameter(String originalString, ParameterType t): originalString(originalString)
+UserDefinedParameter::UserDefinedParameter(String _originalString, ParameterType t): originalString(_originalString)
 {
     type = t;
     switch(t)
@@ -341,7 +341,7 @@ bool UserDefinedParameter::checkConst(OSCArgument* pArgument, bool* pDataTypeOk)
     
     switch (type) {
         case ConstInt: return (*pDataTypeOk = pArgument->isInt32()) && pArgument->getInt32() == constInt;
-        case ConstFloat: return (*pDataTypeOk = pArgument->isFloat32()) && pArgument->getFloat32() == constFloat;
+        case ConstFloat: return (*pDataTypeOk = pArgument->isFloat32()) && approximatelyEqual(pArgument->getFloat32(), constFloat);
         case ConstString: return (*pDataTypeOk = pArgument->isString()) && pArgument->getString() == constString;
             
         default:

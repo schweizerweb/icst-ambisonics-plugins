@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener, ZoomSettings* pZoomSettings)
-    : pZoomSettings(pZoomSettings)
+RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener, ZoomSettings* _pZoomSettings)
+    : pZoomSettings(_pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -318,8 +318,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="RadarSettingsComponent" componentName=""
                  parentClasses="public Component, public ChangeBroadcaster, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pZoomSettings(pZoomSettings)" snapPixels="8"
+                 constructorParams="ChangeListener* pChangeListener, ZoomSettings* _pZoomSettings"
+                 variableInitialisers="pZoomSettings(_pZoomSettings)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

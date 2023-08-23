@@ -39,7 +39,7 @@
 class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling, ChannelLayout* pChannelLayout) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling), pChannelLayout(pChannelLayout)
+    SourceTableListModel(AmbiSourceSet* _pSources, PointSelection* _pPointSelection, Component* _pParentComponent, ScalingInfo* _pScaling, ChannelLayout* _pChannelLayout) : pSources(_pSources), pPointSelection(_pPointSelection), pParentComponent(_pParentComponent), pTableListBox(nullptr), pScalingInfo(_pScaling), pChannelLayout(_pChannelLayout)
     {
     }
 
@@ -231,8 +231,8 @@ private:
         switch (columnId)
         {
         case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
-        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, newValue == 1); break;
-        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, newValue == 1); break;
+        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, newValue == 1.0); break;
+        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, newValue == 1.0); break;
         case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
         case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
         case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
@@ -240,7 +240,7 @@ private:
         case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
         case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
         case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1 && rowNumber < pChannelLayout->getNumInputChannels()); break;
+        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1.0 && rowNumber < pChannelLayout->getNumInputChannels()); break;
         default: throw;
         }
 

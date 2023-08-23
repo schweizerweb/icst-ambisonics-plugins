@@ -33,7 +33,7 @@
 class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener, ActionListener, Timer
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* pSettings, OSCHandlerEncoder* pOscHandler, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pOscHandler(pOscHandler), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	CustomOscInputTableListModel(EncoderSettings* _pSettings, OSCHandlerEncoder* _pOscHandler, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pOscHandler(_pOscHandler), pParentComponent(_pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
         pOscHandler->addActionListener(this);
@@ -52,7 +52,7 @@ public:
     }
     
     
-    void actionListenerCallback(const juce::String &message) override { 
+    void actionListenerCallback(const juce::String& /*message*/) override { 
         getTable()->repaint();
     }
     
@@ -108,7 +108,7 @@ public:
             std::unique_ptr<Label> label = std::make_unique<Label>();
             label->setText(info , dontSendNotification);
             int lineCount = label->getFont().getStringWidth(info) / 180;
-            int lineHeight = label->getFont().getHeight();
+            int lineHeight = roundToInt(label->getFont().getHeight());
             label->setSize(200, lineHeight * (lineCount+2));
             label->setJustificationType(Justification::centred);
             CallOutBox::launchAsynchronously(std::move(label), b->getScreenBounds(), nullptr);

@@ -20,7 +20,7 @@ public:
         window = nullptr;
     }
     
-    ~AnimatorDialogManager()
+    ~AnimatorDialogManager() override
     {
         if(window != nullptr)
         {

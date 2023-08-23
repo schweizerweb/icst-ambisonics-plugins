@@ -20,7 +20,6 @@ class CustomOscInput
 public:
     CustomOscInput();
     CustomOscInput(XmlElement* xmlElement);
-    ~CustomOscInput();
     
     XmlElement* getAsXmlElement(String tagName);
 

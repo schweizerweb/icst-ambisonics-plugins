@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper)
-    : pSettings(pSettings), pCustomOscTxPresetHelper(pCustomOscTxPresetHelper)
+OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper)
+    : pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this));
@@ -310,8 +310,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCTargetsComponent" componentName=""
                  parentClasses="public juce::Component, public ChangeBroadcaster, public TextEditor::Listener, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper"
-                 variableInitialisers="pSettings(pSettings), pCustomOscTxPresetHelper(pCustomOscTxPresetHelper)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper"
+                 variableInitialisers="pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

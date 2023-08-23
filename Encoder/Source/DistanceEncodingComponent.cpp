@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings)
-    : pParams(pParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)
+DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _pParams, DistanceEncodingPresetHelper* _pPresetHelper, ZoomSettings* _pZoomSettings)
+    : pParams(_pParams), pPresetHelper(_pPresetHelper), pZoomSettings(_pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -530,8 +530,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="DistanceEncodingComponent"
                  componentName="" parentClasses="public Component, ChangeListener, ActionListener"
-                 constructorParams="DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pParams(pParams), pPresetHelper(pPresetHelper), pZoomSettings(pZoomSettings)"
+                 constructorParams="DistanceEncodingParams* _pParams, DistanceEncodingPresetHelper* _pPresetHelper, ZoomSettings* _pZoomSettings"
+                 variableInitialisers="pParams(_pParams), pPresetHelper(_pPresetHelper), pZoomSettings(_pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="500">
   <BACKGROUND backgroundColour="ff323e44"/>

@@ -152,7 +152,7 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     // initialisation that you need..
 
 	iirFilterSpec.numChannels = 1;
-	iirFilterSpec.maximumBlockSize = samplesPerBlock;
+	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
 }
 
@@ -228,7 +228,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     
     // in case of scaling change with doppler enabled, send an empty buffer and reset delay buffers
     double newScaler = scalingInfo.GetScaler();
-    if(encoderSettings.dopplerEncodingFlag && lastScaler != newScaler)
+    if(encoderSettings.dopplerEncodingFlag && !approximatelyEqual(lastScaler, newScaler))
     {
         for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
         {

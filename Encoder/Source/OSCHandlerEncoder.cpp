@@ -10,7 +10,7 @@
 
 #include "OSCHandlerEncoder.h"
 
-OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, EncoderSettings* pEncoderSettings, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, pStatusMessageHandler), pScalingInfo(pScaling), pEncoderSettings(pEncoderSettings)
+OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* _pStatusMessageHandler, EncoderSettings* _pEncoderSettings, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, _pStatusMessageHandler), pScalingInfo(pScaling), pEncoderSettings(_pEncoderSettings)
 {
     pCustomOscInput = &pEncoderSettings->customOscInput;
     pDistanceEncodingParams = &pEncoderSettings->distanceEncodingParams;

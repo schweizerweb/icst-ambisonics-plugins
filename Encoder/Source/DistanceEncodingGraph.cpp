@@ -10,7 +10,7 @@
 
 #include "DistanceEncodingGraph.h"
 
-DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings) : pParams(params), pZoomSettings(pZoomSettings)
+DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* _pZoomSettings) : pParams(params), pZoomSettings(_pZoomSettings)
 {
 	setDisplayRange(Linear, Range<double>(0.0, pZoomSettings->getScalingInfo()->CartesianMax()), Linear, Range<double>(-20, 0));
 	fullGridFlag = true;

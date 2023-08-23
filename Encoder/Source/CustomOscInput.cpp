@@ -24,11 +24,6 @@ CustomOscInput::CustomOscInput(XmlElement* xmlElement)
     commandString = xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_INPUT_COMMAND, "");
 }
 
-CustomOscInput::~CustomOscInput()
-{
-    
-}
-
 XmlElement* CustomOscInput::getAsXmlElement(String tagName)
 {
     XmlElement* e = new XmlElement(tagName);

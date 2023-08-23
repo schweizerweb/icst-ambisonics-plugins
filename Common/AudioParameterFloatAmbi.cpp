@@ -28,7 +28,7 @@ AudioParameterFloatAmbi::~AudioParameterFloatAmbi()
 
 AudioParameterFloatAmbi& AudioParameterFloatAmbi::operator= (float newValue)
 {
-	if (value != newValue)
+	if (!approximatelyEqual(value, newValue))
 	{
 		setValueNotifyingHost(range.convertTo0to1(newValue));
 	}
@@ -53,7 +53,7 @@ float AudioParameterFloatAmbi::getValueForText(const String& text) const
 
 void AudioParameterFloatAmbi::setUnscaledValue(float newValue)
 {
-	if (value != newValue)
+	if (!approximatelyEqual(value, newValue))
 	{
 		setValueNotifyingHost(range.convertTo0to1(newValue));
 	}
@@ -70,7 +70,7 @@ void AudioParameterFloatAmbi::setValue(float newValue)
         return;
     
 	float newValueScaled = range.convertFrom0to1(newValue);
-	if (value != newValueScaled)
+	if (!approximatelyEqual(value, newValueScaled))
 	{
 		value = newValueScaled;
 		if (pAmbiPoints->size() > ambiIndex)

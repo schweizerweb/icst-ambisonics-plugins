@@ -38,7 +38,7 @@ bool AirAbsorbtionFilter::checkFilter(DistanceEncodingParams* pParams, double di
     if (currentMode == EncoderConstants::Off)
         return false;
 
-    if(initRequired || pParams->getAirAbsorbtionIntensity() != currentIntensity || distance != currentDistance || pSpec->sampleRate != currentSampleRate)
+    if(initRequired || !approximatelyEqual(pParams->getAirAbsorbtionIntensity(), currentIntensity) || !approximatelyEqual(distance, currentDistance) || !approximatelyEqual(pSpec->sampleRate, currentSampleRate))
     {
         currentIntensity = pParams->getAirAbsorbtionIntensity();
         currentDistance = distance;

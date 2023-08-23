@@ -117,15 +117,11 @@ Error handling:
 Note: all 'index' parameters are 1-based, except for the 'Local Buffer' methods)";
 
 //==============================================================================
-JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdater* pCallback)
+JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpdater* _pCallback) : pCallback(_pCallback), pCode(_pCode), pCloseFlag(_pCloseFlag)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-    
-    this->pCallback = pCallback;
-    this->pCode = pCode;
-    this->pCloseFlag = pCloseFlag;
-    
+
     codeDocument.replaceAllContent(*pCode);
     
     helpFlag = false;

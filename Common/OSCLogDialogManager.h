@@ -31,7 +31,7 @@ public:
         window = nullptr;
     }
     
-    ~OSCLogDialogManager()
+    ~OSCLogDialogManager() override
     {
         if(window != nullptr)
         {

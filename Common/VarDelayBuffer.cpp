@@ -25,7 +25,7 @@ void VarDelayBuffer::initialize(int bufferSize)
 	if (audioBuffer != nullptr)
 		free(audioBuffer);
 
-	audioBuffer = (float*)calloc(bufferSize, sizeof(float));
+	audioBuffer = (float*)calloc((size_t)bufferSize, sizeof(float));
 	bufferLength = bufferSize;
 	iWrite = 0;
 	lastDelayInSamples = 0.0f;

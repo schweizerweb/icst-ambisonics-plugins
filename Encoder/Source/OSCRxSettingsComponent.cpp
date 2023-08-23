@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager, OSCHandlerEncoder* pOscHandler)
-    : pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager), pCustomOscRxPresetHelper(pCustomOscRxPresetHelper), pOscHandler(pOscHandler)
+OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, StatusMessageHandler* _pStatusMessageHandler, CustomOscRxPresetHelper* _pCustomOscRxPresetHelper, OSCLogDialogManager* _pOscLogManager, OSCHandlerEncoder* _pOscHandler)
+    : pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this));
@@ -369,8 +369,8 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCRxSettingsComponent" componentName=""
-                 parentClasses="public Component, public ActionListener" constructorParams="EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager, OSCHandlerEncoder* pOscHandler"
-                 variableInitialisers="pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager), pCustomOscRxPresetHelper(pCustomOscRxPresetHelper), pOscHandler(pOscHandler)&#10;"
+                 parentClasses="public Component, public ActionListener" constructorParams="EncoderSettings* _pSettings, StatusMessageHandler* _pStatusMessageHandler, CustomOscRxPresetHelper* _pCustomOscRxPresetHelper, OSCLogDialogManager* _pOscLogManager, OSCHandlerEncoder* _pOscHandler"
+                 variableInitialisers="pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCLogComponent::OSCLogComponent (StatusMessageHandler* pStatusHandler)
-    : pStatusHandler(pStatusHandler)
+OSCLogComponent::OSCLogComponent (StatusMessageHandler* _pStatusHandler)
+    : pStatusHandler(_pStatusHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -156,7 +156,7 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCLogComponent" componentName=""
                  parentClasses="public juce::Component, public StatusMessageReceiver"
-                 constructorParams="StatusMessageHandler* pStatusHandler" variableInitialisers="pStatusHandler(pStatusHandler)"
+                 constructorParams="StatusMessageHandler* _pStatusHandler" variableInitialisers="pStatusHandler(_pStatusHandler)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

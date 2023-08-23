@@ -26,10 +26,6 @@ CustomOscTarget::CustomOscTarget(XmlElement* xmlElement)
     oscString = xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_STRING, "");
 }
 
-CustomOscTarget::~CustomOscTarget()
-{
-}
-
 XmlElement* CustomOscTarget::getAsXmlElement(String tagName)
 {
     XmlElement* e = new XmlElement(tagName);

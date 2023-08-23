@@ -30,7 +30,7 @@
 
 //==============================================================================
 AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (AmbisonicEncoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc)
+    : AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	settingsWindow = nullptr;
@@ -38,7 +38,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 	pEncoderSettings = ownerProc.getEncoderSettings();
     //[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, processor.getRadarOptions()));
+    radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, mainProcessor.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -99,7 +99,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-	processor.getStatusMessageHandler()->unregisterLabel();
+	mainProcessor.getStatusMessageHandler()->unregisterLabel();
     //[/Destructor_pre]
 
     radarComponent = nullptr;
@@ -156,17 +156,17 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
             pEncoderSettings,
             pSources,
             &pointSelection,
-            processor.getAudioParams(),
-            processor.getZoomSettingsPointer(),
-            processor.getStatusMessageHandler(),
-            processor.getPresetHelper(),
-            processor.getDistanceEncodingPresetHelper(),
-            processor.getCustomOscRxPresetHelper(),
-            processor.getCustomOscTxPresetHelper(),
+            mainProcessor.getAudioParams(),
+            mainProcessor.getZoomSettingsPointer(),
+            mainProcessor.getStatusMessageHandler(),
+            mainProcessor.getPresetHelper(),
+            mainProcessor.getDistanceEncodingPresetHelper(),
+            mainProcessor.getCustomOscRxPresetHelper(),
+            mainProcessor.getCustomOscTxPresetHelper(),
             &oscLogDialogManager,
-            processor.getDawParameter(),
-            processor.getOscHandler(),
-            processor.getChannelLayout()
+            mainProcessor.getDawParameter(),
+            mainProcessor.getOscHandler(),
+            mainProcessor.getChannelLayout()
         };
 		settingsWindow = new EncoderSettingsDialog(this, new EncoderSettingsComponent(args));
 		settingsWindow->setVisible(true);
@@ -179,7 +179,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
 
         if(ModifierKeys::currentModifiers.isCommandDown() && ModifierKeys::currentModifiers.isCtrlDown() && ModifierKeys::currentModifiers.isAltDown() && ModifierKeys::currentModifiers.isShiftDown())
         {
-            animatorDialogManager.show(pSources, processor.getAnimatorDataset(), this);
+            animatorDialogManager.show(pSources, mainProcessor.getAnimatorDataset(), this);
             return;
         }
 
@@ -198,7 +198,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
 
 void AmbisonicEncoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
 {
-	processor.initializeOscSender();
+	mainProcessor.initializeOscSender();
 }
 
 void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& message)
@@ -225,13 +225,13 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="AmbisonicEncoderAudioProcessorEditor"
                  componentName="" parentClasses="public AudioProcessorEditor, public ChangeListener, public ActionListener"
                  constructorParams="AmbisonicEncoderAudioProcessor&amp; ownerProc"
-                 variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
+                 variableInitialisers="AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="5bf6bd31c23a4886" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSources, nullptr, &amp;pointSelection, processor.getRadarOptions()"/>
+                    params="pSources, nullptr, &amp;pointSelection, mainProcessor.getRadarOptions()"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 4 111 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"

@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset)
-    : pSourceSet(pSourceSet), pAnimatorDataset(pAnimatorDataset)
+AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset)
+    : pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     while(pAnimatorDataset->actions.size() < 2)
@@ -136,7 +136,7 @@ void AnimatorComponent::refreshControls()
     // nothing to do
 }
 
-void AnimatorComponent::actionListenerCallback(const juce::String &message)
+void AnimatorComponent::actionListenerCallback(const juce::String& message)
 {
 #if MULTI_ENCODER_MODE
     AnimatorMovement* pMov = nullptr;
@@ -170,6 +170,8 @@ void AnimatorComponent::actionListenerCallback(const juce::String &message)
             }
         }
     }
+#else
+    ignoreUnused(message);
 #endif
 }
 
@@ -288,8 +290,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AnimatorComponent" componentName=""
                  parentClasses="public juce::Component, public MultiTimer, public ActionListener"
-                 constructorParams="AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset"
-                 variableInitialisers="pSourceSet(pSourceSet), pAnimatorDataset(pAnimatorDataset)"
+                 constructorParams="AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset"
+                 variableInitialisers="pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="700" initialHeight="300">
   <BACKGROUND backgroundColour="ff323e44"/>

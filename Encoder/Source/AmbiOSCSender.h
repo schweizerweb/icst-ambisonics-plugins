@@ -16,7 +16,7 @@ class AmbiOSCSender : public Timer
 {
 public:
 	AmbiOSCSender(AmbiSourceSet* ambiPoints);
-	~AmbiOSCSender();
+	~AmbiOSCSender() override;
 
 	bool start(String targetHost, int port, int intervalMs);
 	void stop();

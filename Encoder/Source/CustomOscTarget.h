@@ -20,7 +20,7 @@ class CustomOscTarget
 public:
     CustomOscTarget();
     CustomOscTarget(XmlElement* xmlElement);
-    ~CustomOscTarget();
+    
     XmlElement* getAsXmlElement(String tagName);
 
     bool enabledFlag;

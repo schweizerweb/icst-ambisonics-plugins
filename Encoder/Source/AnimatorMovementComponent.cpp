@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorMovementComponent::AnimatorMovementComponent (AmbiSourceSet* pSourceSet, AnimatorMovement* pAnimatorMovement, ActionListener* pActionListener)
-    : pSourceSet(pSourceSet), pAnimatorMovement(pAnimatorMovement)
+AnimatorMovementComponent::AnimatorMovementComponent (AmbiSourceSet* _pSourceSet, AnimatorMovement* _pAnimatorMovement, ActionListener* pActionListener)
+    : pSourceSet(_pSourceSet), pAnimatorMovement(_pAnimatorMovement)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addActionListener(pActionListener);

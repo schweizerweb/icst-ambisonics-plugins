@@ -11,7 +11,7 @@
 #include "AmbiOSCSenderExt.h"
 #include "OSCHandlerEncoder.h"
 
-AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler, ScalingInfo* pScaling): pPoints(ambiPoints), pStatusMessageHandler(pStatusMessageHandler), pScalingInfo(pScaling)
+AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* _pStatusMessageHandler, ScalingInfo* _pScalingInfo): pPoints(ambiPoints), pStatusMessageHandler(_pStatusMessageHandler), pScalingInfo(_pScalingInfo)
 {
 }
 

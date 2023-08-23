@@ -19,11 +19,11 @@ class DistanceEncodingGraph : public SimpleGraph
 {
 public:
 	DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings);
-	~DistanceEncodingGraph();
+	~DistanceEncodingGraph() override;
 
 	void paintData(Graphics&) override;
 
 private:
 	DistanceEncodingParams* pParams;
-    ZoomSettings* pZoomSettings;
+  ZoomSettings* pZoomSettings;
 };

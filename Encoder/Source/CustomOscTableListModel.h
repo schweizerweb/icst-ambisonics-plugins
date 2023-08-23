@@ -30,7 +30,7 @@
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr)
+	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -266,7 +266,7 @@ public:
 
 private:
     struct StandardTarget {
-        StandardTarget(String name, StandardOscTarget* pTarget) : name(name), pTarget(pTarget) {};
+        StandardTarget(String _name, StandardOscTarget* _pTarget) : name(_name), pTarget(_pTarget) {}
         String name;
         StandardOscTarget* pTarget;
     };

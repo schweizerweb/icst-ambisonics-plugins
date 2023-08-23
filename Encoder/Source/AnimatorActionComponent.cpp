@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction)
-    : pSourceSet(pSourceSet), pAnimatorAction(pAnimatorAction)
+AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, AnimatorAction* _pAnimatorAction)
+    : pSourceSet(_pSourceSet), pAnimatorAction(_pAnimatorAction)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -410,8 +410,8 @@ void AnimatorActionComponent::refreshControls()
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AnimatorActionComponent"
-                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction"
-                 variableInitialisers="pSourceSet(pSourceSet), pAnimatorAction(pAnimatorAction)"
+                 componentName="" parentClasses="public juce::Component" constructorParams="AmbiSourceSet* _pSourceSet, AnimatorAction* _pAnimatorAction"
+                 variableInitialisers="pSourceSet(_pSourceSet), pAnimatorAction(_pAnimatorAction)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="300" initialHeight="340">
   <BACKGROUND backgroundColour="ff323e44"/>

@@ -33,7 +33,7 @@ public:
 			point = absPos;
 			changed = true;
 		}
-		if(pAmbiPoint->getGain() != gain)
+		if(!approximatelyEqual(pAmbiPoint->getGain(), gain))
 		{
 			gain = pAmbiPoint->getGain();
 			changed = true;
@@ -56,7 +56,7 @@ class AmbiOSCSenderExt : public Timer
 {
 public:
 	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler, ScalingInfo* pScaling);
-    virtual ~AmbiOSCSenderExt();
+    virtual ~AmbiOSCSenderExt() override;
 
     OSCSenderInstance* getOrCreateInstance(int index);
 	bool start(EncoderSettings* pSettings, String* pMessage);

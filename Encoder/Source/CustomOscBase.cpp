@@ -281,7 +281,7 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
                 double lo = std::stod(sm[2]);
                 double zero = std::stod(sm[3]);
                 double hi = std::stod(sm[4]);
-                if(lo == hi && lo == zero)
+                if(approximatelyEqual(lo, hi) && approximatelyEqual(lo, zero))
                 {
                     *pErrorMessage = "Invalid arguments for command " + commandString;
                     return nullptr;
@@ -293,7 +293,7 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
             {
                 double lo = std::stod(sm[2]);
                 double hi = std::stod(sm[3]);
-                if(lo == hi)
+                if(approximatelyEqual(lo, hi))
                 {
                     *pErrorMessage = "Invalid arguments for command " + commandString;
                     return nullptr;
@@ -397,7 +397,7 @@ bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefined
                     double lo = std::stod(sm[2]);
                     double zero = std::stod(sm[3]);
                     double hi = std::stod(sm[4]);
-                    if(lo == hi && lo == zero)
+                    if(approximatelyEqual(lo, hi) && approximatelyEqual(lo, zero))
                         return false;
                             
                     pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi, zero));
@@ -406,7 +406,7 @@ bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefined
                 {
                     double lo = std::stod(sm[2]);
                     double hi = std::stod(sm[3]);
-                    if(lo == hi)
+                    if(approximatelyEqual(lo, hi))
                         return false;
                         
                     pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi));

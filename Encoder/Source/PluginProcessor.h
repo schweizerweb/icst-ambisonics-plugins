@@ -40,7 +40,7 @@ class AmbisonicEncoderAudioProcessor  : public AudioProcessor, ActionListener
 public:
     //==============================================================================
     AmbisonicEncoderAudioProcessor();
-    ~AmbisonicEncoderAudioProcessor();
+    ~AmbisonicEncoderAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;

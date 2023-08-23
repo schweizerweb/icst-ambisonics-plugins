@@ -69,7 +69,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    AmbisonicEncoderAudioProcessor& processor;
+    AmbisonicEncoderAudioProcessor& mainProcessor;
 	AmbiSourceSet* pSources;
 	PointSelection pointSelection;
 	EncoderSettings* pEncoderSettings;
