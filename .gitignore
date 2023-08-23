@@ -4,4 +4,6 @@ Encoder/Builds/
 Encoder/JuceLibraryCode/
 bin/
 packages/
+build/
+JUCE/
 *AutoGen.jucer
