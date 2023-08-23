@@ -76,7 +76,6 @@ private:
 	AmbiSourceSet* pMovingPoints;
 	AmbiSettings* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
-	DecoderPresetHelper* pPresetHelper;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;
 	SpeakerSettingsDialog* settingsWindow;
