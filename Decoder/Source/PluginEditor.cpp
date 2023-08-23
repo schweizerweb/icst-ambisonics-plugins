@@ -29,7 +29,7 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc)
+    : AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	settingsWindow = nullptr;
@@ -149,7 +149,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer(), processor.getChannelLayout()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, mainProcessor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, mainProcessor.getTestSoundGenerator(), this, pFilterSpecification, mainProcessor.getZoomSettingsPointer(), mainProcessor.getChannelLayout()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
@@ -224,7 +224,7 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="AmbisonicsDecoderAudioProcessorEditor"
                  componentName="" parentClasses="public AudioProcessorEditor, public ChangeListener, public ActionListener"
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
-                 variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
+                 variableInitialisers="AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>

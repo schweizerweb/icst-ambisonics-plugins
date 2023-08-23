@@ -12,12 +12,12 @@
 #include "TrackColors.h"
 #include "Constants.h"
 
-OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
+OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* _pStatusMessageHandler)
 {
     reportErrorFlag = true;
     reportSuccessFlag = true;
 	pAmbiPoints = pAmbiPointArr;
-	this->pStatusMessageHandler = pStatusMessageHandler;
+	this->pStatusMessageHandler = _pStatusMessageHandler;
 }
 
 void OSCHandler::setVerbosity(bool reportSuccess, bool reportError)

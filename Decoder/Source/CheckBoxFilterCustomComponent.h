@@ -36,7 +36,7 @@ public:
 
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
         {
-            magnitudes[i] = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
+            magnitudes[i] = static_cast<double*>(calloc((size_t)frequencies.size(), sizeof(double)));
         }
 
         displayRangeX.reset(new Range<double>(log10(20), log10(sampleRate / 2.0)));
@@ -44,7 +44,7 @@ public:
         graphArea.reset(new Rectangle<int>(0, 0, 150, 40));
 	}
 
-    ~CheckBoxFilterCustomComponent()
+    ~CheckBoxFilterCustomComponent() override
 	{
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
         {
@@ -94,7 +94,7 @@ private:
             int activeFilterCount = int(coeffs.size());
             for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
             {
-                coeffs[iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], frequencies.size(), sampleRate);
+                coeffs[(size_t)iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], (size_t)frequencies.size(), sampleRate);
             }
 
             for (int i = 0; i < frequencies.size(); i++)

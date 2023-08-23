@@ -19,7 +19,7 @@ public:
     FFTAnalyzer();
     ~FFTAnalyzer();
 
-    juce_DeclareSingleton(FFTAnalyzer, false);
+    juce_DeclareSingleton(FFTAnalyzer, false)
 
     void setActive(int channel);
     void disable();

@@ -108,7 +108,7 @@ void AmbisonicsDecoderAudioProcessor::prepareToPlay (double sampleRate, int samp
     // initialisation that you need..
     
     iirFilterSpec.numChannels = 1;
-    iirFilterSpec.maximumBlockSize = samplesPerBlock;
+    iirFilterSpec.maximumBlockSize = (uint32)samplesPerBlock;
     iirFilterSpec.sampleRate = sampleRate;
 }
 

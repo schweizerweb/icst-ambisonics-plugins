@@ -123,7 +123,7 @@ public:
     
     void notifyMute(bool mute)
     {
-        if (pMute != nullptr) { pMute->setUnscaledValue((float)mute); }
+        if (pMute != nullptr) { pMute->setUnscaledValue(mute); }
     }
     
     void setEnabled(bool enable)

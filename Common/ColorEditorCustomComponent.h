@@ -15,7 +15,7 @@
 class ColorEditorCustomComponent : public Label, public ChangeListener, public Button::Listener
 {
 public:
-	ColorEditorCustomComponent(TableColumnCallback& td, bool groupFlag = false) : owner(td), row(0), columnId(0), groupFlag(groupFlag)
+	ColorEditorCustomComponent(TableColumnCallback& td, bool _groupFlag = false) : owner(td), row(0), columnId(0), groupFlag(_groupFlag)
 	{
 	}
 

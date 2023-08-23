@@ -21,15 +21,15 @@ enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGL
 class MultiActivationDialog : public Component, ComboBox::Listener, Button::Listener, Slider::Listener, public ChangeListener
 {
 public:
-    MultiActivationDialog(AmbiDataSet* pData, Point<float> newPosition, RadarOptions* pRadarOptions, bool xyRadar) : pData(pData), newPosition(newPosition), pRadarOptions(pRadarOptions), xyRadar(xyRadar)
+    MultiActivationDialog(AmbiDataSet* _pData, Point<float> _newPosition, RadarOptions* _pRadarOptions, bool _xyRadar) : pData(_pData), newPosition(_newPosition), xyRadar(_xyRadar)
     {
         // copy to local data set
         color = COLOR_DEFINITION_GROUP_DEFAULT;
-        defaultRadius = pRadarOptions->scalingInfo->CartesianMax() / 5;
+        defaultRadius = _pRadarOptions->scalingInfo->CartesianMax() / 5;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
         localDataSet->setGroupModeFlag(true);
         localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
-        for(int i = 0; i < pData->size() && i < pRadarOptions->maxNumberEditablePoints; i++)
+        for(int i = 0; i < pData->size() && i < _pRadarOptions->maxNumberEditablePoints; i++)
         {
             auto p = pData->get(i)->getRawPoint();
             Point3D<double> np(p->getX(), p->getY(), p->getZ());
@@ -45,7 +45,7 @@ public:
         addAndMakeVisible(labelPointCount.get());
         
         sliderPointCount.reset(new Slider("PointCount"));
-        int max = pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
+        int max = _pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
         sliderPointCount->setRange(Range<double>(0, max), 1.0);
         sliderPointCount->setValue(max, sendNotificationAsync);
         sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 40, 24);
@@ -74,7 +74,7 @@ public:
 
         sliderRadius.reset(new Slider("Radius"));
         sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-        sliderRadius->setRange(0.01, pRadarOptions->scalingInfo->CartesianMax());
+        sliderRadius->setRange(0.01, _pRadarOptions->scalingInfo->CartesianMax());
         sliderRadius->setValue(defaultRadius);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
@@ -359,7 +359,6 @@ private:
     
     AmbiDataSet* pData;
     Point<float> newPosition;
-    RadarOptions* pRadarOptions;
     bool xyRadar;
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiDataSet> localDataSet;

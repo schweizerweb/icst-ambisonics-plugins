@@ -26,8 +26,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper, bool allowApply)
-    : pPresetHelper(pPresetHelper)
+PresetManagerComponent::PresetManagerComponent (PresetHelper* _pPresetHelper, bool allowApply)
+    : pPresetHelper(_pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 
@@ -297,8 +297,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PresetManagerComponent" componentName=""
                  parentClasses="public Component, public FileDragAndDropTarget, ActionListener"
-                 constructorParams="PresetHelper* pPresetHelper, bool allowApply"
-                 variableInitialisers="pPresetHelper(pPresetHelper)" snapPixels="8"
+                 constructorParams="PresetHelper* _pPresetHelper, bool allowApply"
+                 variableInitialisers="pPresetHelper(_pPresetHelper)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="700" initialHeight="400">
   <METHODS>

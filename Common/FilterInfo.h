@@ -84,7 +84,10 @@ public:
             case LowShelf: return 150.0f;
             case HighShelf: return 3200.0f;
             case Peak: return 2000.0f;
-            default: return 200.0f;
+            
+            case None:
+            default: 
+                return 200.0f;
         }
     }
     
@@ -99,7 +102,12 @@ public:
             case LowShelf: return 1.8f;
             case HighShelf: return 1.8f;
             case Peak: return 10.0f;
-            default: return 1.0f;
+            
+            case None:
+            case FirstOrderLowPass:
+            case FirstOrderHighPass:
+            default: 
+                return 1.0f;
         }
     }
     
@@ -110,7 +118,16 @@ public:
             case LowShelf: return 0.1f;
             case HighShelf: return 0.1f;
             case Peak: return 2.0f;
-            default: return 1.0f;
+
+            case None:
+            case LowPass:
+            case BandPass:
+            case HighPass:
+            case FirstOrderLowPass:
+            case FirstOrderHighPass:
+            case Notch:
+            default: 
+                return 1.0f;
         }
     }
     
@@ -151,9 +168,9 @@ public:
     {
         return info != nullptr
         && info->filterType == filterType
-        && info->cutOffFrequencyHz == cutOffFrequencyHz
-        && info->qValue == qValue
-        && info->gainFactor == gainFactor;
+        && approximatelyEqual(info->cutOffFrequencyHz, cutOffFrequencyHz)
+        && approximatelyEqual(info->qValue, qValue)
+        && approximatelyEqual(info->gainFactor, gainFactor);
     }
 
 	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf, Peak } filterType;

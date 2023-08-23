@@ -25,7 +25,7 @@
 class PresetTableModel : public TableListBoxModel, Button::Listener
 {
 public:
-    PresetTableModel(PresetHelper* pPresetHelper, Component* pParentComponent) : pPresetHelper(pPresetHelper), pParentComponent(pParentComponent)
+    PresetTableModel(PresetHelper* _pPresetHelper, Component* _pParentComponent) : pPresetHelper(_pPresetHelper), pParentComponent(_pParentComponent)
     {
     }
 

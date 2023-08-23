@@ -17,12 +17,12 @@
 #include "LabelCreator.h"
 
 //==============================================================================
-Radar2D::Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions):
-	pEditablePoints(pEditablePoints),
-	pDisplayOnlyPoints(pDisplayOnlyPoints),
+Radar2D::Radar2D(RadarMode mode, AmbiDataSet* _pEditablePoints, AmbiDataSet* _pDisplayOnlyPoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions):
+	pEditablePoints(_pEditablePoints),
+	pDisplayOnlyPoints(_pDisplayOnlyPoints),
 	radarMode(mode),
-	pPointSelection(pPointSelection),
-	pRadarOptions(pRadarOptions),
+	pPointSelection(_pPointSelection),
+	pRadarOptions(_pRadarOptions),
     specialGroupManipulationMode(false),
     border(15)
 {
@@ -244,6 +244,8 @@ Point<float> Radar2D::getSpecialIconPositionForCenter(Point<float> centerPt, Spe
             return centerPt.translated(-0.2f * offset, -offset);
         case RotateInAedSpace:
             return centerPt.translated(-0.2f * offset, offset);
+        
+        case None:
         default:
             return centerPt;
     }
@@ -417,7 +419,7 @@ void Radar2D::renderOpenGL()
 	                                                                                roundToInt(desktopScale * getHeight())));
 	if (glRenderer != nullptr)
 	{
-        if(lastCartesianLimit != pRadarOptions->scalingInfo->CartesianMax())
+        if(!approximatelyEqual(lastCartesianLimit, pRadarOptions->scalingInfo->CartesianMax()))
         {
             updateRadarBackground();
             lastCartesianLimit = pRadarOptions->scalingInfo->CartesianMax();
@@ -747,7 +749,7 @@ double Radar2D::getMaxPointSelectionDist() const
 
 void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetails& wheel)
 {
-    if(wheel.deltaY != 0)
+    if(wheel.deltaY != 0.0f)
     {
         if(specialGroupManipulationMode && pPointSelection->getSelectionMode() == PointSelection::Group)
         {

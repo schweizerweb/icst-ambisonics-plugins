@@ -29,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex)
-    : pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)
+FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* _pPresetHelper, int _channelIndex)
+    : pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -313,8 +313,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener, public Timer"
-                 constructorParams="FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex"
-                 variableInitialisers="pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)"
+                 constructorParams="FilterBankInfo* _pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* _pPresetHelper, int _channelIndex"
+                 variableInitialisers="pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="700" initialHeight="550">
   <BACKGROUND backgroundColour="ff505050"/>

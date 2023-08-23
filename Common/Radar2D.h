@@ -35,7 +35,7 @@ public:
     enum AnchorX { X_Left, X_Center, X_Right };
     enum AnchorY { Y_Top, Y_Center, Y_Bottom };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
-    ~Radar2D();
+    ~Radar2D() override;
 
 	Point<double> getProjectedPoint(Vector3D<double>* point3_d) const;
 	Point<float> getAbsoluteScreenPoint(Point<float> point) const;

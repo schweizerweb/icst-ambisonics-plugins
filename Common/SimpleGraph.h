@@ -21,7 +21,7 @@ public:
 	enum ScalingMode { Linear, Logarithmic, LogarithmicFrequency };
 
     SimpleGraph();
-	virtual ~SimpleGraph();
+	~SimpleGraph() override;
 
 	void paint (Graphics&) override;
 	virtual void paintData(Graphics&) = 0;

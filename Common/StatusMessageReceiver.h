@@ -14,7 +14,7 @@
 class StatusMessageReceiver
 {
 public:
-    virtual ~StatusMessageReceiver() {};
+    virtual ~StatusMessageReceiver() {}
     virtual void notifyOverflow(int discardedCount) = 0;
     virtual void notify(StatusMessage msg) = 0;
 };

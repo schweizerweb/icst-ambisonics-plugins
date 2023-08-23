@@ -10,7 +10,7 @@
 
 #include "PresetHelper.h"
 
-PresetHelper::PresetHelper(File presetDirectory, ActionListener* pActionListener): presetDirectory(presetDirectory)
+PresetHelper::PresetHelper(File _presetDirectory, ActionListener* pActionListener): presetDirectory(_presetDirectory)
 {
     if (!presetDirectory.exists())
         presetDirectory.createDirectory();

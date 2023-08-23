@@ -14,7 +14,7 @@
 class ActivationDialog : public Component, ComboBox::Listener, Button::Listener
 {
 public:
-    ActivationDialog(AmbiDataSet* pData, Point<float> newPosition, bool xyRadar) : pData(pData), newPosition(newPosition), xyRadar(xyRadar)
+    ActivationDialog(AmbiDataSet* _pData, Point<float> _newPosition, bool _xyRadar) : pData(_pData), newPosition(_newPosition), xyRadar(_xyRadar)
     {        
         comboLabel.reset(new Label("channel"));
         comboLabel->setText("Channel:", dontSendNotification);

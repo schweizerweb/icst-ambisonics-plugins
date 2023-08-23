@@ -31,8 +31,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
-    : pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)
+PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions)
+    : pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -572,8 +572,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditor::Listener"
-                 constructorParams="AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
-                 variableInitialisers="pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)"
+                 constructorParams="AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions"
+                 variableInitialisers="pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="390" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>

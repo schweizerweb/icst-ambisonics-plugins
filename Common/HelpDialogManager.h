@@ -20,7 +20,7 @@ public:
         helpWindow = nullptr;
     }
     
-    ~HelpDialogManager()
+    ~HelpDialogManager() override
     {
         if(helpWindow != nullptr)
         {

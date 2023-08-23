@@ -20,7 +20,7 @@
 class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:
-    GroupPointsSelectionComponent(AmbiDataSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources), groupIndex(groupIndex)
+    GroupPointsSelectionComponent(AmbiDataSet* _pSources, int _groupIndex, ChangeListener* pListener): pSources(_pSources), groupIndex(_groupIndex)
     {
 	    // In your constructor, you should add any child components, and
 	    // initialise any special settings that your component needs.
@@ -45,7 +45,7 @@ public:
 		setSize(COMPONENT_WIDTH * columnCount, rowCount * CHECKBOX_HEIGHT);
     }
 
-	~GroupPointsSelectionComponent()
+	~GroupPointsSelectionComponent() override
     {
 		deleteAllChildren();
     }

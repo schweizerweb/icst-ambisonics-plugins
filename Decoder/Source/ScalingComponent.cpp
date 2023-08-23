@@ -27,8 +27,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* pSpeakerSet, ZoomSettings* pZoomSettings)
-    : pSpeakerSet(pSpeakerSet), pZoomSettings(pZoomSettings)
+ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* _pSpeakerSet, ZoomSettings* _pZoomSettings)
+    : pSpeakerSet(_pSpeakerSet), pZoomSettings(_pZoomSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pListener);
@@ -246,8 +246,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="ScalingComponent" componentName=""
                  parentClasses="public juce::Component, public ChangeBroadcaster"
-                 constructorParams="ChangeListener* pListener, AmbiSpeakerSet* pSpeakerSet, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pSpeakerSet(pSpeakerSet), pZoomSettings(pZoomSettings)"
+                 constructorParams="ChangeListener* pListener, AmbiSpeakerSet* _pSpeakerSet, ZoomSettings* _pZoomSettings"
+                 variableInitialisers="pSpeakerSet(_pSpeakerSet), pZoomSettings(_pZoomSettings)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="150" initialHeight="100">
   <BACKGROUND backgroundColour="ff323e44"/>

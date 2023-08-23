@@ -34,7 +34,7 @@ public:
     {
         row = newRow;
         columnId = newColumn;
-        setToggleState(owner.getValue(columnId, row) == 1, dontSendNotification);
+        setToggleState(owner.getValue(columnId, row) == 1.0, dontSendNotification);
         bool enabled = owner.getEnabled(columnId, row);
         setEnabled(enabled);
     }

@@ -20,13 +20,13 @@ public:
 	enum ParamType { Mute };
 
 	AudioParameterBoolAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
-	~AudioParameterBoolAmbi();
+	~AudioParameterBoolAmbi() override;
 
     void setEnabled(bool enabled) override;
 	float getValue() const override;
 	void setValue(float newValue) override;
-	bool get() const noexcept { return getValue(); }
-	operator bool() const noexcept { return getValue(); }
+	bool get() const noexcept { return (bool)getValue(); }
+	operator bool() const noexcept { return (bool)getValue(); }
 	AudioParameterBoolAmbi& operator= (bool newValue);
 
 	float getDefaultValue() const override;

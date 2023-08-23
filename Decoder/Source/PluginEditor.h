@@ -71,7 +71,7 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	AmbisonicsDecoderAudioProcessor& processor;
+	AmbisonicsDecoderAudioProcessor& mainProcessor;
 	AmbiSpeakerSet* pSpeakerSet;
 	AmbiSourceSet* pMovingPoints;
 	AmbiSettings* pAmbiSettings;

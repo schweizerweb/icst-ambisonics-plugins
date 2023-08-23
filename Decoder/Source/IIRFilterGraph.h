@@ -24,7 +24,7 @@ class IIRFilterGraph    : public SimpleGraph
 {
 public:
     IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
-    ~IIRFilterGraph();
+    ~IIRFilterGraph() override;
 
 	void paintData(Graphics&) override;
     void setFFTResult(float* data, int size, int newFftSize);

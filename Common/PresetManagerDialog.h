@@ -42,7 +42,7 @@ public:
         window = nullptr;
     }
     
-    ~PresetManagerDialog()
+    ~PresetManagerDialog() override
     {
         if(window != nullptr)
         {

@@ -28,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
-    : pFilterInfo(pFilterInfo)
+SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
+    : pFilterInfo(_pFilterInfo)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -247,8 +247,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SingleFilterSettingsComponent"
                  componentName="" parentClasses="public juce::Component, public ChangeBroadcaster"
-                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
-                 variableInitialisers="pFilterInfo(pFilterInfo)" snapPixels="8"
+                 constructorParams="FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
+                 variableInitialisers="pFilterInfo(_pFilterInfo)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

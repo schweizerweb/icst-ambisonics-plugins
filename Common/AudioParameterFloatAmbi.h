@@ -20,7 +20,7 @@ public:
 
 	AudioParameterFloatAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
 		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
-	~AudioParameterFloatAmbi();
+	~AudioParameterFloatAmbi() override;
 
     void setEnabled(bool enabled) override;
 	float getValue() const override;

@@ -38,12 +38,12 @@ double ScalingInfo::decompress(double value) const
 
 float ScalingInfo::CartesianMin()
 {
-    return Scaler == Infinite ? -100000 : -(float)Scaler;
+    return approximatelyEqual(Scaler, Infinite) ? -100000.0f : -(float)Scaler;
 }
 
 float ScalingInfo::CartesianMax()
 {
-    return Scaler == Infinite ? 100000 : (float)Scaler;
+    return approximatelyEqual(Scaler, Infinite) ? 100000.0f : (float)Scaler;
 }
 
 float ScalingInfo::DistanceMax()
@@ -53,7 +53,7 @@ float ScalingInfo::DistanceMax()
 
 bool ScalingInfo::IsInfinite() const
 {
-    return Scaler == Infinite;
+    return approximatelyEqual(Scaler, Infinite);
 }
 
 double ScalingInfo::GetScaler()

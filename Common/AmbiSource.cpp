@@ -26,11 +26,11 @@ AmbiSource::AmbiSource(String id, Point3D<double> point, String name, Colour col
 {
 }
 
-AmbiSource::AmbiSource(XmlElement* element, AudioParameterSet audioParams) : AmbiPoint(element, audioParams), rms(0.0f)
+AmbiSource::AmbiSource(XmlElement* _element, AudioParameterSet _audioParams) : AmbiPoint(_element, _audioParams), rms(0.0f)
 {
 }
 
-AmbiSource::AmbiSource(AudioParameterSet audioParams, String name) : AmbiPoint(audioParams), rms(0.0f)
+AmbiSource::AmbiSource(AudioParameterSet _audioParams, String name) : AmbiPoint(_audioParams), rms(0.0f)
 {
     setName(name);
 }

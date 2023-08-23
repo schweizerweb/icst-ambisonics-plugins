@@ -154,11 +154,11 @@ void ZoomSettings::loadFromXml(XmlElement* xmlElement)
     {
         pointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
         groupPointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, DEFAULT_POINT_SCALER);
-        currentRadius = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_RADIUS, DEFAULT_RADIUS);
+        currentRadius = (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_RADIUS, DEFAULT_RADIUS);
         currentCenterPoint.setXYZ(
-            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_X, DEFAULT_CENTER_X),
-            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, DEFAULT_CENTER_Y),
-            zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, DEFAULT_CENTER_Z)
+            (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_X, DEFAULT_CENTER_X),
+            (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, DEFAULT_CENTER_Y),
+            (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, DEFAULT_CENTER_Z)
         );
     }
 }

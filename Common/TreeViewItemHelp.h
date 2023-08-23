@@ -31,7 +31,7 @@ public:
 
     bool mightContainSubItems()
     {
-        return xml.getFirstChildElement() != 0;
+        return xml.getFirstChildElement() != nullptr;
     }
 
     void paintItem (Graphics& g, int width, int height)
@@ -42,7 +42,7 @@ public:
 
         // use a "colour" attribute in the xml tag for this node to set the text colour..
         if(xml.hasAttribute("colour"))
-            g.setColour (Colour (xml.getStringAttribute ("colour", "ffeeeeee").getHexValue32()));
+            g.setColour (Colour ((uint32_t)xml.getStringAttribute ("colour", "ffeeeeee").getHexValue32()));
         else
         {
             if(getUniqueName() == "Syntax" || xml.isTextElement())
@@ -77,7 +77,7 @@ public:
 
                 for (auto* child : xml.getChildIterator())
                 {
-                    jassert (child != 0);
+                    jassert (child != nullptr);
                     addSubItem (new TreeViewItemHelp (*child));
                 }
             }

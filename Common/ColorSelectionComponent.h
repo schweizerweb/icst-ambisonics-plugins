@@ -38,7 +38,7 @@ public:
         setSize(200, groupFlag ? 230 : 200);
     }
 
-    ~ColorSelectionComponent()
+    virtual ~ColorSelectionComponent() override
     {
     }
 

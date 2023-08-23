@@ -25,7 +25,7 @@ class PresetHelper : public ActionBroadcaster
 {
 public:
     PresetHelper(File presetDirectory, ActionListener* pActionListener);
-    virtual ~PresetHelper() {};
+    virtual ~PresetHelper() {}
     virtual bool checkValid(File presetFile) = 0;
     
     void restoreDefaults();

@@ -87,8 +87,8 @@ private:
 
     String id;
 	Point3D<double> point;
-	Colour color;
 	String name;
+	Colour color;
 	double gain;
     bool mute;
     bool solo;
