@@ -11,12 +11,13 @@
 #pragma once
 #pragma once
 #include "JuceHeader.h"
+#include "Constants.h"
 
 class AudioParameterBoolAmbiAbs : public AudioProcessorParameterWithID
 {
 public:
 	AudioParameterBoolAmbiAbs(const String& parameterID, const int /*version*/, const String& _name, const String& _label, Category _category)
-    : AudioProcessorParameterWithID(parameterID, _name, AudioProcessorParameterWithIDAttributes()
+    : AudioProcessorParameterWithID(ParameterID(parameterID, Constants::audioParamVersion), _name, AudioProcessorParameterWithIDAttributes()
                                     .withLabel (_label)
                                     .withCategory (_category))
 	{

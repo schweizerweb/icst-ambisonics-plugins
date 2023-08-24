@@ -54,14 +54,14 @@ public:
             set.pX = new AudioParameterFloatAmbi("GX" + indexStr, 1, "GX " + indexStr, "Group " + indexStr + ": X", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, (AmbiDataSet*)pSourceSet, i, AudioParameterFloatAmbi::GX);
             set.pY = new AudioParameterFloatAmbi("GY" + indexStr, 1, "GY " + indexStr, "Group " + indexStr + ": Y", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, (AmbiDataSet*)pSourceSet, i, AudioParameterFloatAmbi::GY);
             set.pZ = new AudioParameterFloatAmbi("GZ" + indexStr, 1, "GZ " + indexStr, "Group " + indexStr + ": Z", AudioProcessorParameter::genericParameter, NormalisableRange<float>(Constants::CompressedMin, Constants::CompressedMax), 0.0f, (AmbiDataSet*)pSourceSet, i, AudioParameterFloatAmbi::GZ);
-            set.pQ0 = new AudioParameterFloat("G_Q0_" + indexStr, "G_Q0 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 0"));
-            set.pQ1 = new AudioParameterFloat("G_Q1_" + indexStr, "G_Q1 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 1"));
-            set.pQ2 = new AudioParameterFloat("G_Q2_" + indexStr, "G_Q2 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 2"));
-            set.pQ3 = new AudioParameterFloat("G_Q3_" + indexStr, "G_Q3 " + indexStr, NormalisableRange<float>(-1, 1), 1.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 3"));
+            set.pQ0 = new AudioParameterFloat(ParameterID("G_Q0_" + indexStr, Constants::audioParamVersion), "G_Q0 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 0"));
+            set.pQ1 = new AudioParameterFloat(ParameterID("G_Q1_" + indexStr, Constants::audioParamVersion), "G_Q1 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 1"));
+            set.pQ2 = new AudioParameterFloat(ParameterID("G_Q2_" + indexStr, Constants::audioParamVersion), "G_Q2 " + indexStr, NormalisableRange<float>(-1, 1), 0.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 2"));
+            set.pQ3 = new AudioParameterFloat(ParameterID("G_Q3_" + indexStr, Constants::audioParamVersion), "G_Q3 " + indexStr, NormalisableRange<float>(-1, 1), 1.0f, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Rotation Quaternion 3"));
             
             NormalisableRange<float> stretchRange(Constants::StretchMin, Constants::StretchMax);
             stretchRange.setSkewForCentre(1.0);
-            set.pStretch = new AudioParameterFloat("G_Stretch_" + indexStr, "G_Stretch " + indexStr, stretchRange, 1.0, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Stretch Factor"));
+            set.pStretch = new AudioParameterFloat(ParameterID("G_Stretch_" + indexStr, Constants::audioParamVersion), "G_Stretch " + indexStr, stretchRange, 1.0, AudioParameterFloatAttributes().withLabel("Group " + indexStr + ": Stretch Factor"));
             
             groupParams.add(set);
             pProcessor->addParameter(set.pX);

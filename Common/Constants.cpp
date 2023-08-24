@@ -28,6 +28,7 @@ const float Constants::CompressedMax = 1.0f;
 
 const float Constants::StretchMin = 0.0;
 const float Constants::StretchMax = 100.0;
+const int Constants::audioParamVersion = 1;
 
 double Constants::RadToGrad(double rad)
 {
@@ -46,7 +47,7 @@ int Constants::NormalizeAzimuthGrad(int grad)
 
 bool Constants::isDevelopmentVersion()
 {
-	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");
+	return String(ProjectInfo::versionString).startsWith("0") || !String(ProjectInfo::versionString).containsOnly("0123456789.");
 }
 
 bool Constants::isNonVisibleVersionPrerelease()

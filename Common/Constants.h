@@ -34,6 +34,7 @@ public:
     
     const static float StretchMin;
     const static float StretchMax;
+	const static int audioParamVersion;
 
 	static double RadToGrad(double rad);
 	static double GradToRad(double grad);
