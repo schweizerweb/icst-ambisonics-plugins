@@ -21,34 +21,18 @@ target_sources(AmbiEncoderSolo
 
 target_compile_definitions(AmbiEncoderSolo
     PUBLIC
-        # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        JUCE_WEB_BROWSER=1  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
-        JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
-        JUCE_VST3_CAN_REPLACE_VST2=0
-		JUCE_MODAL_LOOPS_PERMITTED=1
-		MAX_NUM_INPUT=1
-		)
-
+    # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
+    JUCE_WEB_BROWSER=1  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` cal
+    JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
+    JUCE_VST3_CAN_REPLACE_VST2=0
+	JUCE_MODAL_LOOPS_PERMITTED=1
+	MAX_NUM_INPUT=1
+	)
 
 target_link_libraries(AmbiEncoderSolo
-    PRIVATE
-        BinaryData
-
-        juce::juce_audio_utils
-        juce::juce_osc
-        juce::juce_opengl
-        juce::juce_gui_extra
-        juce::juce_gui_basics
-        juce::juce_graphics
-        juce::juce_data_structures
-        juce::juce_audio_processors
-        juce::juce_audio_plugin_client
-        juce::juce_audio_basics
-        juce::juce_dsp
-        juce::juce_audio_formats
+    ${COMMON_LINK_LIBRARIES}
+    )
     
-    PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
-	)
+set_target_properties( AmbiEncoderSolo
+    ${COMMON_OUTPUT_DIRECTORY}
+    )

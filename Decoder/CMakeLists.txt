@@ -71,29 +71,10 @@ target_compile_definitions(AmbiDecoder
 		MAX_NUM_INPUT=64
 		)
 
-#juce_add_binary_data(BinaryData SOURCES 
-#	../Resources/speaker.png
-#)
-
 target_link_libraries(AmbiDecoder
-    PRIVATE
-        BinaryData
+    ${COMMON_LINK_LIBRARIES}
+    )
 
-        juce::juce_audio_utils
-        juce::juce_osc
-        juce::juce_opengl
-        juce::juce_gui_extra
-        juce::juce_gui_basics
-        juce::juce_graphics
-        juce::juce_data_structures
-        juce::juce_audio_processors
-        juce::juce_audio_plugin_client
-        juce::juce_audio_basics
-        juce::juce_dsp
-        juce::juce_audio_formats
-    
-    PUBLIC
-        juce::juce_recommended_config_flags
-        juce::juce_recommended_lto_flags
-        juce::juce_recommended_warning_flags
+set_target_properties(AmbiDecoder
+    ${COMMON_OUTPUT_DIRECTORY}
 	)

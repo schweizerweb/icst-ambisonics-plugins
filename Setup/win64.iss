@@ -18,9 +18,9 @@ DefaultDirName={autopf}\Common Files\VST3
 DisableDirPage=no
 DefaultGroupName=ICST_AmbiPlugins
 DisableProgramGroupPage=yes
-InfoBeforeFile=..\readme.txt
+InfoBeforeFile=readme.txt
 OutputBaseFilename=AmbiPluginPackageName
-OutputDir=../packages
+OutputDir=Setup
 Compression=lzma
 SolidCompression=yes
 WizardStyle=modern
@@ -31,10 +31,10 @@ ArchitecturesAllowed=x64
 Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
+Source: ".\Redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "..\bin\VST3\AmbiDecoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
 Source: "..\bin\VST3\AmbiEncoder_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
 Source: "..\bin\VST3\AmbiEncoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: ".\Redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
 Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
 Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
 Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion

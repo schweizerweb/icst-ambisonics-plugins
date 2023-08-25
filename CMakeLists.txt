@@ -6,6 +6,13 @@ project(ICST_AMBISONICS_PLUGINS
     VERSION 0.0.1
 )
 
+set( COMMON_OUTPUT_DIRECTORY
+    PROPERTIES
+    ARCHIVE_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    LIBRARY_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+    RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/bin"
+)
+
 set(COMMON_PLUGIN_SETTINGS
     # ICON_BIG ...                              # ICON_* arguments specify a path to an image file to use as an icon for the Standalone
     # ICON_SMALL ...
@@ -23,6 +30,27 @@ set(COMMON_PLUGIN_SETTINGS
     AU_MAIN_TYPE kAudioUnitType_Effect
 )
 
+set(COMMON_LINK_LIBRARIES
+    PRIVATE
+    BinaryData
+    juce::juce_audio_utils
+    juce::juce_osc
+    juce::juce_opengl
+    juce::juce_gui_extra
+    juce::juce_gui_basics
+    juce::juce_graphics
+    juce::juce_data_structures
+    juce::juce_audio_processors
+    juce::juce_audio_plugin_client
+    juce::juce_audio_basics
+    juce::juce_dsp
+    juce::juce_audio_formats
+
+    PUBLIC
+    juce::juce_recommended_config_flags
+    juce::juce_recommended_lto_flags
+    juce::juce_recommended_warning_flags
+)
 add_subdirectory(JUCE)                    
 
 juce_add_binary_data(BinaryData SOURCES 
