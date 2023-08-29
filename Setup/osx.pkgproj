@@ -79,7 +79,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiDecoder_64ch.vst3</string>
+															<string>../build/bin/VST3/AmbiDecoder_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -107,7 +107,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_1ch.vst3</string>
+															<string>../build/bin/VST3/AmbiEncoder_1ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -125,7 +125,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>../bin/VST3/AmbiEncoder_64ch.vst3</string>
+															<string>../build/bin/VST3/AmbiEncoder_64ch.vst3</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -729,41 +729,6 @@
 																			<key>UID</key>
 																			<integer>0</integer>
 																		</dict>
-																		<dict>
-																			<key>CHILDREN</key>
-																			<array>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
-																					<string>../build/bin/AU/AmbiDecoder_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
-																			</array>
-																			<key>EXPANDED</key>
-																			<true/>
-																			<key>GID</key>
-																			<integer>0</integer>
-																			<key>PATH</key>
-																			<string>../build/bin/AU/AmbiDecoder_64ch.component/Contents/Resources</string>
-																			<key>PATH_TYPE</key>
-																			<integer>1</integer>
-																			<key>PERMISSIONS</key>
-																			<integer>493</integer>
-																			<key>TYPE</key>
-																			<integer>3</integer>
-																			<key>UID</key>
-																			<integer>0</integer>
-																		</dict>
 																	</array>
 																	<key>EXPANDED</key>
 																	<true/>
@@ -871,41 +836,6 @@
 																			<key>UID</key>
 																			<integer>0</integer>
 																		</dict>
-																		<dict>
-																			<key>CHILDREN</key>
-																			<array>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
-																					<string>../build/bin/AU/AmbiEncoder_1ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
-																			</array>
-																			<key>EXPANDED</key>
-																			<true/>
-																			<key>GID</key>
-																			<integer>0</integer>
-																			<key>PATH</key>
-																			<string>../build/bin/AU/AmbiEncoder_1ch.component/Contents/Resources</string>
-																			<key>PATH_TYPE</key>
-																			<integer>1</integer>
-																			<key>PERMISSIONS</key>
-																			<integer>493</integer>
-																			<key>TYPE</key>
-																			<integer>3</integer>
-																			<key>UID</key>
-																			<integer>0</integer>
-																		</dict>
 																	</array>
 																	<key>EXPANDED</key>
 																	<true/>
@@ -1008,41 +938,6 @@
 																			<integer>1</integer>
 																			<key>PERMISSIONS</key>
 																			<integer>420</integer>
-																			<key>TYPE</key>
-																			<integer>3</integer>
-																			<key>UID</key>
-																			<integer>0</integer>
-																		</dict>
-																		<dict>
-																			<key>CHILDREN</key>
-																			<array>
-																				<dict>
-																					<key>CHILDREN</key>
-																					<array/>
-																					<key>GID</key>
-																					<integer>0</integer>
-																					<key>PATH</key>
-																					<string>../build/bin/AU/AmbiEncoder_64ch.component/Contents/Resources/RecentFilesMenuTemplate.nib</string>
-																					<key>PATH_TYPE</key>
-																					<integer>1</integer>
-																					<key>PERMISSIONS</key>
-																					<integer>420</integer>
-																					<key>TYPE</key>
-																					<integer>3</integer>
-																					<key>UID</key>
-																					<integer>0</integer>
-																				</dict>
-																			</array>
-																			<key>EXPANDED</key>
-																			<true/>
-																			<key>GID</key>
-																			<integer>0</integer>
-																			<key>PATH</key>
-																			<string>../build/bin/AU/AmbiEncoder_64ch.component/Contents/Resources</string>
-																			<key>PATH_TYPE</key>
-																			<integer>1</integer>
-																			<key>PERMISSIONS</key>
-																			<integer>493</integer>
 																			<key>TYPE</key>
 																			<integer>3</integer>
 																			<key>UID</key>
@@ -2798,7 +2693,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/BF_Player_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/BF_Player_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2814,7 +2709,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/BF_Player_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/BF_Player_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2830,7 +2725,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/BF_Player_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/BF_Player_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2846,7 +2741,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Bformat-Master_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Bformat-Master_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2862,7 +2757,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Bformat-Master_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Bformat-Master_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2878,7 +2773,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Bformat-Master_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Bformat-Master_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2894,7 +2789,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_DECODER_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_DECODER_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2910,7 +2805,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_DECODER_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_DECODER_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2926,7 +2821,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_DECODER_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_DECODER_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2942,7 +2837,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2958,7 +2853,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Mono_AmbiEncoder_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Mono_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2974,7 +2869,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Mono_AmbiEncoder_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Mono_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -2990,7 +2885,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Mono_AmbiEncoder_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Mono_AmbiEncoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3006,7 +2901,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3022,7 +2917,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3038,7 +2933,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3054,7 +2949,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3070,7 +2965,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3086,7 +2981,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ICST_Multi_AmbiEncoder_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ICST_Multi_AmbiEncoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3102,7 +2997,7 @@
 															<key>GID</key>
 															<integer>80</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins/ZHdK_IA-Space_Decoder_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins/ZHdK_IA-Space_Decoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3135,7 +3030,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/AMBEO A-to-B.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/AMBEO A-to-B.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3151,7 +3046,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/DearVR_BINAURAL.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/DearVR_BINAURAL.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3167,7 +3062,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/FX_Bformat_o3(IEM).RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/FX_Bformat_o3(IEM).RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3183,7 +3078,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/IEM_BFormat_Manipulator_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/IEM_BFormat_Manipulator_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3199,7 +3094,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/IEM_Binaural_Decoder_o1.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/IEM_Binaural_Decoder_o1.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3215,7 +3110,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/IEM_Binaural_Decoder_o3.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/IEM_Binaural_Decoder_o3.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3231,7 +3126,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/IEM_Binaural_Decoder_o5.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/IEM_Binaural_Decoder_o5.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3247,7 +3142,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/RODE_Soundfield.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/RODE_Soundfield.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3263,7 +3158,7 @@
 															<key>GID</key>
 															<integer>0</integer>
 															<key>PATH</key>
-															<string>Templates/TrackTemplates/ICST_Ambi_Plugins_3rdParty/ZYLIA_to_Bformat.RTrackTemplate</string>
+															<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty/ZYLIA_to_Bformat.RTrackTemplate</string>
 															<key>PATH_TYPE</key>
 															<integer>1</integer>
 															<key>PERMISSIONS</key>
@@ -3279,7 +3174,7 @@
 													<key>GID</key>
 													<integer>0</integer>
 													<key>PATH</key>
-													<string>ICST_AmbisonicsTrackTemplates/ICST Ambisonics Plugins 3rd party</string>
+													<string>Templates/TrackTemplates/ICST_AmbiPlugins_3rdParty</string>
 													<key>PATH_TYPE</key>
 													<integer>1</integer>
 													<key>PERMISSIONS</key>
