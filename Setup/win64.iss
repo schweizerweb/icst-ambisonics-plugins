@@ -32,44 +32,44 @@ Name: "english"; MessagesFile: "compiler:Default.isl"
 
 [Files]
 Source: ".\Redist\VC_redist.x64.exe"; DestDir: "{tmp}"; Flags: dontcopy
-Source: "..\bin\VST3\AmbiDecoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "..\bin\VST3\AmbiEncoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Mono_o5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_o1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_o3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTemplates\ICST_AmbiPlugins_Multi_o5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\BF_Player_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\BF_Player_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\BF_Player_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat-Master_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat-Master_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Bformat-Master_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_DECODER_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Mono_AmbiEncoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Mono_AmbiEncoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Mono_AmbiEncoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ICST_Multi_AmbiEncoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins\ZHdK_IA-Space_Decoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\AMBEO A-to-B.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\DearVR_BINAURAL.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\FX_Bformat_o3(IEM).RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\IEM_BFormat_Manipulator_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\IEM_Binaural_Decoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\IEM_Binaural_Decoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\IEM_Binaural_Decoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\RODE_Soundfield.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
-Source: "ICST_AmbisonicsTrackTemplates\ICST Ambisonics Plugins 3rd party\ZYLIA_to_Bformat.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST AmbiPlugins 3rdParty"; Flags: ignoreversion
+Source: "..\build\bin\VST3\AmbiDecoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\build\bin\VST3\AmbiEncoder_1ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "..\build\bin\VST3\AmbiEncoder_64ch.vst3"; DestDir: "{app}"; Flags: ignoreversion; Components: VST3Plugins
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Mono_o1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Mono_o3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Mono_o5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Multi_o1.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Multi_o3.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\ProjectTemplates\ICST_AmbiPlugins_Multi_o5.RPP"; DestDir: "{userappdata}/REAPER/ProjectTemplates"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\BF_Player_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\BF_Player_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\BF_Player_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Bformat-Master_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Bformat-Master_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Bformat-Master_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_DECODER_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_DECODER_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_DECODER_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Kompositionsstudio_Decoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Mono_AmbiEncoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Mono_AmbiEncoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Mono_AmbiEncoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o3_4x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o3_8x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o3_16x_mono_sources.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ICST_Multi_AmbiEncoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins\ZHdK_IA-Space_Decoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\AMBEO A-to-B.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\DearVR_BINAURAL.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\FX_Bformat_o3(IEM).RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_BFormat_Manipulator_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_Binaural_Decoder_o1.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_Binaural_Decoder_o3.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_Binaural_Decoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\RODE_Soundfield.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\ZYLIA_to_Bformat.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Visual C++ Redistributables"; \
