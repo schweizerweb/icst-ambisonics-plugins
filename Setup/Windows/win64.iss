@@ -18,8 +18,8 @@ DefaultDirName={autopf}\Common Files\VST3
 DisableDirPage=no
 DefaultGroupName=ICST_AmbiPlugins
 DisableProgramGroupPage=yes
-InfoBeforeFile=readme.txt
-OutputBaseFilename=AmbiPluginPackageName
+InfoBeforeFile=AmbiPluginReadmePath
+OutputBaseFilename={#MyAppName}
 OutputDir=Setup
 Compression=lzma
 SolidCompression=yes
@@ -70,6 +70,7 @@ Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_Binaural_Decoder
 Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\IEM_Binaural_Decoder_o5.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
 Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\RODE_Soundfield.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
 Source: "Templates\TrackTemplates\ICST_AmbiPlugins_3rdParty\ZYLIA_to_Bformat.RTrackTemplate"; DestDir: "{userappdata}/REAPER\TrackTemplates\ICST_AmbiPlugins_3rdParty"; Flags: ignoreversion
+; __FILE_SECTION__
 
 [Run]
 Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Visual C++ Redistributables"; \
@@ -79,6 +80,7 @@ Filename: "{tmp}\VC_redist.x64.exe"; StatusMsg: "Installing Visual C++ Redistrib
 Name: "VST3Plugins"; Description: "ICST Ambisonics Plugins VST3"; Types: compact custom full
 Name: "ReaperTemplates"; Description: "Reaper Project Templates"; Types: full custom
 Name: "ReaperTrackTemplates"; Description: "Reaper Track Templates"; Types: custom full
+; __COMPONENT_SECTION__
 
 [Dirs]
 Name: "{userappdata}/REAPER\ProjectTemplates"; Components: ReaperTemplates
