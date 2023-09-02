@@ -34,6 +34,7 @@ cp $SOURCE_PATH $OUTPUT_FILE
 
 dirs = ""
 
+: '
 templateDir=${SCRIPT_DIR}/Templates
 find $templateDir -type d -depth 1 -print0 | while IFS= read -d '' subDir
 do
@@ -54,7 +55,7 @@ do
         echo $str
         echo "-----------------------"
     fi
-
-
 done 
+'
+
 

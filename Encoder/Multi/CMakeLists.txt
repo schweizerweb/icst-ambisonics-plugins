@@ -5,7 +5,7 @@ juce_add_plugin(AmbiEncoderMulti
 
 	PLUGIN_CODE "AEXF"                            # A unique four-character plugin id with exactly one upper-case character
                                                 # GarageBand 10.3 requires the first letter to be upper-case, and the remaining letters to be lower-case
-	PLUGIN_NAME "AmbiEncoder"
+	PLUGIN_NAME "AmbiEncoder_64"
 	BUNDLE_ID "com.icst.ambiencoder_multi"
     PRODUCT_NAME "AmbiEncoder_64ch"
 	DESCRIPTION "1st-7th Order Ambisonic, 1-64 Channel Input"
