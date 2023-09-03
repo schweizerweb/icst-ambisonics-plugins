@@ -76,13 +76,14 @@ generate_package_section()
         >&2 echo "Error: No description defined for $packageId"
         exit
     fi
-
-    echo $"Name: \""${packageId}"\"; Description: \""${desc}"\"; Types: custom full \n"
+    
+    extraFlags="$(arrayGet packageExtraFlags $packageId)"
+    echo -e $"Name: \""${packageId}"\"; Description: \""${desc}"\"; Types: custom full "$extraFlags"\r\n"
 }
 
 write_file()
 {
     local content="${1}"
     local filename=${2}
-    echo -e $content > $filename
+    echo "$content" > $filename
 }

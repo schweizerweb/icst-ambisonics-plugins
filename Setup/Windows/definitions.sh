@@ -21,3 +21,5 @@ packageNames_VST3="ICST Ambisonics Plugins VST3"
 packageNames_AU="ICST Ambisonics Plugins AU"
 packageNames_LV2="ICST Ambisonics Plugins LV2"
 packageNames_Standalone=""
+
+packageExtraFlags_VST3="compact"
