@@ -24,9 +24,9 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #if MULTI_ENCODER_MODE
                        .withInput ("Input", AudioChannelSet::discreteChannels(64))
 #else
-                       .withInput  ("Input",  AudioChannelSet::mono(), true)
+                       .withInput  ("Input", AudioChannelSet::mono(), true)
 #endif
-                       .withOutput ("Output", AudioChannelSet::ambisonic(1), true)
+                       .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        )
 {
     channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());

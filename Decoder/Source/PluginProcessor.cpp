@@ -21,8 +21,8 @@
 //==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
      : AudioProcessor (BusesProperties()
-                       .withInput  ("Input",  AudioChannelSet::quadraphonic(), true)
-                       .withOutput ("Output", AudioChannelSet::quadraphonic(), true)
+                       .withInput  ("Input",  ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
+                       .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        )
 {
     speakerSet.reset(new AmbiSpeakerSet(&scalingInfo));
