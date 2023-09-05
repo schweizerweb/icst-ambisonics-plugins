@@ -85,6 +85,16 @@ generate_package_section()
     echo $packageSection
 }
 
+generate_dir_section()
+{
+    echo ""
+}
+
+get_full_path()
+{
+    echo ${1}
+}
+
 write_file()
 {
     local content=${1}

@@ -35,10 +35,11 @@ done
 : ${PACKAGE_NAME:?"Missing option -n (package name) $(exit_with_error)"}
 
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
-README_PATH=$SCRIPT_DIR/readme.txt
 
 source $SCRIPT_DIR/$PLATFORM_FOLDER/definitions.sh
 source $SCRIPT_DIR/$PLATFORM_FOLDER/file_content_generator.sh
+
+README_PATH="\"$(get_full_path "${SCRIPT_DIR}/readme.txt")\""
 
 # load template file and prepare output
 originalTemplateFile=$SCRIPT_DIR/$PLATFORM_FOLDER/$templateFileName
@@ -48,10 +49,11 @@ templateFileContent=$(cat ${originalTemplateFile})
 ###### generate package and files sections
 packageSection=""
 fileSection=""
+dirSection=""
 
 # binaries
 binaryDir=${SCRIPT_DIR}/../build/bin
-binaryFolders=$(find ${binaryDir} -type d -depth 1)
+binaryFolders=$(find ${binaryDir} -maxdepth 1 -mindepth 1 -type d)
 for subDir in $binaryFolders; do
     localPackageSection="$(generate_package_section $(basename $subDir))"
     packageSection+=$localPackageSection
@@ -62,13 +64,16 @@ done
 
 # templates
 templateDir=${SCRIPT_DIR}/Templates
-templateFolders=$(find ${templateDir} -type d -depth 1)
+templateFolders=$(find ${templateDir} -maxdepth 1 -mindepth 1 -type d)
 for subDir in $templateFolders; do
     localPackageSection="$(generate_package_section $(basename $subDir))"
     packageSection+=$localPackageSection
 
     localFileSection="$(generate_file_section $(basename $subDir) ${PACKAGE_VERSION} $subDir 0)"
     fileSection+=$localFileSection
+
+    localDirSection="$(generate_dir_section $(basename $subDir))"
+    dirSection+=$localDirSection
 done
 
 # finally replace template file content and write file
@@ -76,8 +81,10 @@ templateFileContent=${templateFileContent//$readmePathMark/$README_PATH}
 templateFileContent=${templateFileContent//$packageNameMark/$PACKAGE_NAME}
 templateFileContent=${templateFileContent//$installerSectionMark/$packageSection}
 templateFileContent=${templateFileContent//$packageSectionMark/$fileSection}
-templateFileContent=${templateFileContent//$packageVersionMark/$packageVersion}
+templateFileContent=${templateFileContent//$dirSectionMark/$dirSection}
+templateFileContent=${templateFileContent//$packageVersionMark/$PACKAGE_VERSION}
 
+templateFileContent="$(handle_fixed_files "$templateFileContent")"
 write_file "$templateFileContent" "$outputFile"
 echo "----------- build installer done ----------"
 exit 0

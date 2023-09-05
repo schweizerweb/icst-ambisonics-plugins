@@ -1,71 +1,38 @@
 #!/usr/bin/env bash
 
-generate_element() {
-    local fullPath=$1
-    local elementName=$2
-    
-    if [[ $elementName == *"."* ]]; then
-        local fileDefinition="${fileDefinitionTemplate//__ABSOLUTE_FILEPATH__/$fullPath}"
-        echo $fileDefinition
-    else
-        local fileList=""
-        local files=$(find ${fullPath} -depth 1 ! -name ".DS_Store")
-        for file in $files; do
-            local str="$(generate_element $file "$(basename $file)")"
-            fileList+=$str
-        done
-        
-        local folderDefinition=${folderTemplate//__FILESECTION_FOLDERNAME__/$elementName}
-        local folderDefinition=${folderDefinition//$fileListMark/$fileList}
-        echo $folderDefinition
-    fi
+get_full_path()
+{
+    local winPath="$(cygpath -w ${1})"
+    echo ${winPath//\\/\\\\}
 }
 
 generate_file_section()
 {
-    : '
     local packageId=${1}
     local packageVersion=${2}
     local basePath=${3}
     local fileSectionType=${4}
     local fileSection=""
 
-    local packageUuid="$(arrayGet packageUuids $packageId)"
-    local packageName="$(arrayGet packageNames $packageId)"
     local packageFolder="$(arrayGet packageTargetFolders $packageId)"
     packageFolder=${packageFolder:=$packageId} # use packageId as default if not defined otherwise 
     
-    if [[ "$packageUuid" == "" ]]; then
-        >&2 echo "Error: no UUID defined for package $packageId"
+    local packageTargetFolder="$(arrayGet packageTargetBaseFolder $packageId)"
+    if [[ "$packageTargetFolder" == "" ]]; then
+        >&2 echo "Error: No package target folder defined for $packageId"
         exit
     fi
 
-    case "$fileSectionType" in
-     0) fileSection=$fileSectionTemplateTemplates ;;
-     1) fileSection=$fileSectionTemplateBinaries ;;
-    esac   
-														
-    result="${mainFileSectionTemplate//__PACKAGE_NAME__/$packageName}"
-    result="${result//__PACKAGE_UUID__/$packageUuid}"
-    result="${result//__PACKAGE_ID__/$packageId}"
-    result="${result//__FILE_SECTION__/$fileSection}"
+    local fileList=$(find ${basePath} -mindepth 2 -type f)
+    local str=""
+    for f in $fileList; do
+        local localBasePath="$(dirname $f)"
+        local relPath="${packageTargetFolder}/${packageId}${localBasePath#$basePath}"    
+        local fp="$(get_full_path $f)"
+        str+=$"Source: \"${fp}\"; DestDir: \"${relPath}\"; Flags: ignoreversion; Components: ${packageId}\r\n"
+    done
 
-    local fileList="$(generate_element $basePath $packageFolder)"
-
-    result="${result//$fileListMark/$fileList}"
-
-    if [[ "$fileSectionType" == "0" ]]; then
-        newLine='\n'
-        generatedScript=$"#!/bin/bash ${newLine}mv /Users/Shared/AmbiPluginsTemplatesTemp/${packageId}/* ~/Library/Application\ Support/REAPER/${packageId}/ ${newLine}rm -r /Users/Shared/AmbiPluginsTemplatesTemp/${packageId}"
-        scriptFilename="$(pwd)/post_install_script_${packageId}.sh"
-        echo -e $generatedScript > $scriptFilename
-        result="${result//__POSTINSTALL_SCRIPT__/$scriptFilename}"
-    fi
-
-    echo $result
-    '
-
-    echo "file"
+    echo $str
 }
 
 generate_package_section()
@@ -78,12 +45,27 @@ generate_package_section()
     fi
     
     extraFlags="$(arrayGet packageExtraFlags $packageId)"
-    echo -e $"Name: \""${packageId}"\"; Description: \""${desc}"\"; Types: custom full "$extraFlags"\r\n"
+    echo $"Name: \""${packageId}"\"; Description: \""${desc}"\"; Types: custom full $extraFlags\r\n"
+}
+
+generate_dir_section()
+{
+    local packageId=${1}
+    echo $"Name: \""{userappdata}/REAPER/${packageId}"\"; Components: ${packageId}\r\n"
+}
+
+handle_fixed_files()
+{
+    local content=${1}
+    local basePath=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+    local absRedist="\"$(get_full_path "${basePath}/Redist/VC_redist.x64.exe")\""
+    echo "${content//$redistMark/$absRedist}"
 }
 
 write_file()
 {
     local content="${1}"
     local filename=${2}
-    echo "$content" > $filename
+    echo -e "$content" > $filename
 }
