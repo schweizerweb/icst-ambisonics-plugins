@@ -149,7 +149,7 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
     if (numIn < 4 || (numIn > 16 && numIn != 64))
         return false;
 
-    if (numOut < 1 || (numOut > 16 && numOut != 64))
+    if (numOut < 1 || (numOut > 24 && numOut != 64))
         return false;
 
     return true;

@@ -22,7 +22,7 @@
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
      : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
 #if MULTI_ENCODER_MODE
-                       .withInput ("Input", AudioChannelSet::discreteChannels(64))
+                       .withInput ("Input", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
 #else
                        .withInput  ("Input", AudioChannelSet::mono(), true)
 #endif
