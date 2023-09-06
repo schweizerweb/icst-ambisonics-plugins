@@ -39,7 +39,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 source $SCRIPT_DIR/$PLATFORM_FOLDER/definitions.sh
 source $SCRIPT_DIR/$PLATFORM_FOLDER/file_content_generator.sh
 
-README_PATH="\"$(get_full_path "${SCRIPT_DIR}/readme.txt")\""
+README_PATH="$(get_full_path "${SCRIPT_DIR}/readme.txt")"
 
 # load template file and prepare output
 originalTemplateFile=$SCRIPT_DIR/$PLATFORM_FOLDER/$templateFileName

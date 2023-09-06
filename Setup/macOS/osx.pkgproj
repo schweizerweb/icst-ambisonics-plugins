@@ -128,7 +128,7 @@
 							<key>PATH</key>
 							<string>AmbiPluginReadmePath</string>
 							<key>PATH_TYPE</key>
-							<integer>1</integer>
+							<integer>0</integer>
 						</dict>
 					</dict>
 				</array>

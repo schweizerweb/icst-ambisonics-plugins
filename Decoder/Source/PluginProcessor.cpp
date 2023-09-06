@@ -20,7 +20,7 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
-     : AudioProcessor (BusesProperties()
+     : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
                        .withInput  ("Input",  ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        )
@@ -144,12 +144,12 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 
 bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    if (layouts.getMainInputChannels() < 4)
+    int numIn = layouts.getMainInputChannels();
+    int numOut = layouts.getMainOutputChannels();
+    if (numIn < 4 || (numIn > 16 && numIn != 64))
         return false;
 
-    if (layouts.getMainOutputChannels() < 1)
+    if (numOut < 1 || (numOut > 16 && numOut != 64))
         return false;
 
     return true;

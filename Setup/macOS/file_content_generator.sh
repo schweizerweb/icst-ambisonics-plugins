@@ -95,6 +95,11 @@ get_full_path()
     echo ${1}
 }
 
+handle_fixed_files()
+{
+    echo ${1}
+}
+
 write_file()
 {
     local content=${1}
