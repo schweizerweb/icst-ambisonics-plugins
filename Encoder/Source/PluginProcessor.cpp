@@ -26,7 +26,6 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #else
                        .withInput  ("Input", AudioChannelSet::mono(), true)
 #endif
-                       .withOutput ("Output", AudioChannelSet::discreteChannels(64), true)
                        .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        )
 {
