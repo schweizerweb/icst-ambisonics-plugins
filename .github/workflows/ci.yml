@@ -63,7 +63,7 @@ jobs:
       id: juce_dependencies
       run: | 
         sudo apt-get update
-        sudo apt-get install -y g++ libgtk-3-dev libwebkit2gtk-4.0-dev webkit2gtk-4.0 libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
+        sudo apt-get install -y g++ libgtk-3-dev libgtk2.0-dev libwebkit2gtk-4.0-dev webkit2gtk-4.0 libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
         
     - name: Set reusable strings
       # Turn repeated input strings (such as the build output directory) into step outputs. These step outputs can be used throughout the workflow file.
