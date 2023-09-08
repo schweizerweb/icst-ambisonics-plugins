@@ -215,9 +215,9 @@ void ScalingComponent::calculateAndDisplayRoomSize()
     double maxX = 0.0, maxY = 0.0, maxZ = 0.0;
     for(int i = 0; i < pSpeakerSet->size(); i++)
     {
-        maxX = jmax(maxX, abs(pSpeakerSet->get(i)->getRawPoint()->getX()));
-        maxY = jmax(maxY, abs(pSpeakerSet->get(i)->getRawPoint()->getY()));
-        maxZ = jmax(maxZ, abs(pSpeakerSet->get(i)->getRawPoint()->getZ()));
+        maxX = jmax(maxX, fabs(pSpeakerSet->get(i)->getRawPoint()->getX()));
+        maxY = jmax(maxY, fabs(pSpeakerSet->get(i)->getRawPoint()->getY()));
+        maxZ = jmax(maxZ, fabs(pSpeakerSet->get(i)->getRawPoint()->getZ()));
     }
 
     currentRoomSizeX = maxX * 2.0;
