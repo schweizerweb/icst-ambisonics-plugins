@@ -12,10 +12,6 @@ juce_add_plugin(AmbiEncoderSolo
 	AU_EXPORT_PREFIX "AmbiEncoderSoloAU"
 )
 
-juce_add_binary_data(BinaryDataEncoderSolo SOURCES 
-	../../Resources/speaker.png
-)
-
 juce_generate_juce_header(AmbiEncoderSolo)
 
 target_sources(AmbiEncoderSolo
@@ -34,7 +30,6 @@ target_compile_definitions(AmbiEncoderSolo
 
 target_link_libraries(AmbiEncoderSolo
     ${COMMON_LINK_LIBRARIES}
-    BinaryDataEncoderSolo
     )
     
 set_target_properties( AmbiEncoderSolo

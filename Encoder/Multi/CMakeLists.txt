@@ -12,10 +12,6 @@ juce_add_plugin(AmbiEncoderMulti
 	AU_EXPORT_PREFIX "AmbiEncoderMultiAU"
 )
 
-juce_add_binary_data(BinaryDataEncoderMulti SOURCES 
-	../../Resources/speaker.png
-)
-
 juce_generate_juce_header(AmbiEncoderMulti)
 
 target_sources(AmbiEncoderMulti
@@ -34,7 +30,6 @@ target_compile_definitions(AmbiEncoderMulti
 
 target_link_libraries(AmbiEncoderMulti
     ${COMMON_LINK_LIBRARIES}
-    BinaryDataEncoderMulti
     )
 
 set_target_properties( AmbiEncoderMulti

@@ -12,10 +12,6 @@ juce_add_plugin(AmbiDecoder
 	AU_EXPORT_PREFIX "AmbiDecoderAU"
 )
 
-juce_add_binary_data(BinaryDataDecoder SOURCES 
-	../Resources/speaker.png
-)
-
 juce_generate_juce_header(AmbiDecoder)
 
 target_sources(AmbiDecoder
@@ -27,6 +23,7 @@ target_sources(AmbiDecoder
 	Source/SingleFilterSettingsComponent.cpp
 	Source/DecoderSettings.cpp
 	Source/SpeakerSettingsComponent.cpp
+	Source/SpeakerTestCustomComponent.cpp
 	Source/PluginProcessor.cpp
 	Source/PluginEditor.cpp
 
@@ -76,7 +73,6 @@ target_compile_definitions(AmbiDecoder
 
 target_link_libraries(AmbiDecoder
     ${COMMON_LINK_LIBRARIES}
-	BinaryDataDecoder
     )
 
 set_target_properties(AmbiDecoder

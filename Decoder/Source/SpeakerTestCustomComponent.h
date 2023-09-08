@@ -18,7 +18,7 @@ public:
 	SpeakerTestCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(button);
-		button.setImages(false, true, true, ImageCache::getFromMemory(BinaryData::speaker_png, BinaryData::speaker_pngSize), 1.0, Colours::transparentBlack, Image(), 1.0, Colours::blue.withAlpha(0.3f), Image(), 1.0, Colours::red.withAlpha(0.3f));
+		button.setImages(false, true, true, ImageCache::getFromMemory(speaker_png, speaker_pngSize), 1.0, Colours::transparentBlack, Image(), 1.0, Colours::blue.withAlpha(0.3f), Image(), 1.0, Colours::red.withAlpha(0.3f));
 		button.setClickingTogglesState(true);
 		button.addListener(this);
 		button.setWantsKeyboardFocus(false);
@@ -44,4 +44,6 @@ private:
 	SpeakerSettingsComponent& owner;
 	ImageButton button;
 	int row, columnId;
+	const char*   speaker_png;
+    const int     speaker_pngSize = 7186;
 };
