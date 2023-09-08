@@ -12,6 +12,10 @@ juce_add_plugin(AmbiDecoder
 	AU_EXPORT_PREFIX "AmbiDecoderAU"
 )
 
+juce_add_binary_data(BinaryDataDecoder SOURCES 
+	../Resources/speaker.png
+)
+
 juce_generate_juce_header(AmbiDecoder)
 
 target_sources(AmbiDecoder
@@ -64,7 +68,6 @@ target_sources(AmbiDecoder
 target_compile_definitions(AmbiDecoder
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        JUCE_WEB_BROWSER=1  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0
 		JUCE_MODAL_LOOPS_PERMITTED=1
@@ -73,6 +76,7 @@ target_compile_definitions(AmbiDecoder
 
 target_link_libraries(AmbiDecoder
     ${COMMON_LINK_LIBRARIES}
+	BinaryDataDecoder
     )
 
 set_target_properties(AmbiDecoder

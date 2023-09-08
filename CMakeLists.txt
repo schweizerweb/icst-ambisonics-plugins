@@ -32,11 +32,11 @@ set(COMMON_PLUGIN_SETTINGS
     PLUGIN_MANUFACTURER_CODE "ICST"               # A four-character manufacturer id with at least one upper-case character
     FORMATS AU VST3 Standalone LV2                 # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     AU_MAIN_TYPE kAudioUnitType_Effect
+    NEEDS_WEB_BROWSER TRUE
 )
 
 set(COMMON_LINK_LIBRARIES
     PRIVATE
-    BinaryData
     juce::juce_audio_utils
     juce::juce_osc
     juce::juce_opengl
@@ -56,10 +56,6 @@ set(COMMON_LINK_LIBRARIES
     juce::juce_recommended_warning_flags
 )
 add_subdirectory(JUCE)                    
-
-juce_add_binary_data(BinaryData SOURCES 
-	Resources/speaker.png
-)
 
 add_subdirectory(Encoder)
 add_subdirectory(Decoder)

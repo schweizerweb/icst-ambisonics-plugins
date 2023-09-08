@@ -12,6 +12,10 @@ juce_add_plugin(AmbiEncoderMulti
 	AU_EXPORT_PREFIX "AmbiEncoderMultiAU"
 )
 
+juce_add_binary_data(BinaryDataEncoderMulti SOURCES 
+	../../Resources/speaker.png
+)
+
 juce_generate_juce_header(AmbiEncoderMulti)
 
 target_sources(AmbiEncoderMulti
@@ -22,7 +26,6 @@ target_sources(AmbiEncoderMulti
 target_compile_definitions(AmbiEncoderMulti
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
-        JUCE_WEB_BROWSER=1  # If you remove this, add `NEEDS_WEB_BROWSER TRUE` to the `juce_add_plugin` call
         JUCE_USE_CURL=0     # If you remove this, add `NEEDS_CURL TRUE` to the `juce_add_plugin` call
         JUCE_VST3_CAN_REPLACE_VST2=0
 		JUCE_MODAL_LOOPS_PERMITTED=1
@@ -31,6 +34,7 @@ target_compile_definitions(AmbiEncoderMulti
 
 target_link_libraries(AmbiEncoderMulti
     ${COMMON_LINK_LIBRARIES}
+    BinaryDataEncoderMulti
     )
 
 set_target_properties( AmbiEncoderMulti
