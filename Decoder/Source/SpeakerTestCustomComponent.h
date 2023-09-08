@@ -44,6 +44,6 @@ private:
 	SpeakerSettingsComponent& owner;
 	ImageButton button;
 	int row, columnId;
-	const char*   speaker_png;
-    const int     speaker_pngSize = 7186;
+	static const char*   speaker_png;
+    static const int     speaker_pngSize = 7186;
 };
