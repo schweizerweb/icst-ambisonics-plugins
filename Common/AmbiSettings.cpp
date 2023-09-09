@@ -185,6 +185,11 @@ int AmbiSettings::getGainCount()
     return ambiOrder + 1;
 }
 
+int AmbiSettings::getAmbiChannelCount() const
+{
+    return (ambiOrder + 1) * (ambiOrder + 1);
+}
+
 void AmbiSettings::setAmbiOrder(int order)
 {
     ambiOrder = order;

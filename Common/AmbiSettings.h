@@ -38,7 +38,7 @@ public:
     int getGainCount();
     int getAmbiOrder();
     void setAmbiOrder(int order);
-    
+    int getAmbiChannelCount() const;
     bool getWarningFlag();
     
 private:
