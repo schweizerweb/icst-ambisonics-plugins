@@ -215,11 +215,14 @@ void AnimatorMovementComponent::sliderValueChanged (juce::Slider* sliderThatWasM
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void AnimatorMovementComponent::refreshControls()
 {
-    for(auto p : pAnimatorMovement->groupPositions)
+    if(!pAnimatorMovement->groupPositions.empty())
+    //for(auto p : pAnimatorMovement->groupPositions)
     {
         // temp solution because only one group allowed
+        auto p = *pAnimatorMovement->groupPositions.begin();
+    
         sliderGroup->setValue(p.first + 1, dontSendNotification);
-        break;
+        //break;
     }
 
     sliderTime->setValue(pAnimatorMovement->timeSpanSeconds);

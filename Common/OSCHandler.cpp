@@ -31,12 +31,16 @@ bool OSCHandler::start(int portNb)
 	disconnect();
 	bool ok = connect(portNb);
 	if (!ok)
-		return false;
+	{
+    	return false;
+    }
 
     ok = initSpecific();
     if (!ok)
+    {
         return false;
-    
+    }
+
 	addListener(this);
 
 	return true;
@@ -55,9 +59,13 @@ void OSCHandler::oscBundleReceived(const OSCBundle & bundle)
     for(auto & e : bundle)
     {
         if(e.isBundle())
+        {
             oscBundleReceived(e.getBundle());
+        }
         else
+        {
             oscMessageReceived(e.getMessage());
+        }
     }
 }
 

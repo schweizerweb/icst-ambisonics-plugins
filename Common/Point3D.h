@@ -353,9 +353,9 @@ private:
 
 	void setFromAed(ValueType azimuth, ValueType elevation, ValueType distance)
 	{
-		ValueType newX = distance * cos(elevation) * sin(azimuth);
-		ValueType newY = distance * cos(elevation) * cos(azimuth);
-		ValueType newZ = distance * sin(elevation);
+		ValueType newX = distance * (ValueType)cos(elevation) * (ValueType)sin(azimuth);
+		ValueType newY = distance * (ValueType)cos(elevation) * (ValueType)cos(azimuth);
+		ValueType newZ = distance * (ValueType)sin(elevation);
         
 		x = (ValueType)audioParams.notifyX((double)newX);
         y = (ValueType)audioParams.notifyY((double)newY);

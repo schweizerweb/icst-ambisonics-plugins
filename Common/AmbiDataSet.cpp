@@ -198,10 +198,14 @@ void AmbiDataSet::setX(int channel, double x, bool notify) const
 	AmbiPoint* pt = get(channel);
 
     if(!notify)
+    {
         x = pScalingInfo->decompress(x);
-    
+    }
+
 	if (pt != nullptr)
-		pt->getRawPoint()->setX(x, notify);
+	{
+    	pt->getRawPoint()->setX(x, notify);
+    }
 }
 
 void AmbiDataSet::setY(int channel, double y, bool notify) const
@@ -209,10 +213,14 @@ void AmbiDataSet::setY(int channel, double y, bool notify) const
 	AmbiPoint* pt = get(channel);
 
     if(!notify)
+    {
         y = pScalingInfo->decompress(y);
-    
+    }
+
 	if (pt != nullptr)
-		pt->getRawPoint()->setY(y, notify);
+	{
+    	pt->getRawPoint()->setY(y, notify);
+    }
 }
 
 void AmbiDataSet::setZ(int channel, double z, bool notify) const
@@ -220,10 +228,14 @@ void AmbiDataSet::setZ(int channel, double z, bool notify) const
 	AmbiPoint* pt = get(channel);
 
     if(!notify)
+    {
         z = pScalingInfo->decompress(z);
-    
+    }
+
 	if (pt != nullptr)
-		pt->getRawPoint()->setZ(z, notify);
+	{
+    	pt->getRawPoint()->setZ(z, notify);
+    }
 }
 
 void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
@@ -231,10 +243,14 @@ void AmbiDataSet::setGroupX(int channel, double x, bool notify) const
     AmbiPoint* pt = getGroup(channel);
 
     if(!notify)
+    {
         x = pScalingInfo->decompress(x);
-    
+    }
+
     if (pt != nullptr)
+    {
         pt->getRawPoint()->setX(x, notify);
+    }
 }
 
 void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
@@ -242,10 +258,14 @@ void AmbiDataSet::setGroupY(int channel, double y, bool notify) const
     AmbiPoint* pt = getGroup(channel);
 
     if(!notify)
+    {
         y = pScalingInfo->decompress(y);
+    }
     
     if (pt != nullptr)
+    {
         pt->getRawPoint()->setY(y, notify);
+    }
 }
 
 void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
@@ -253,10 +273,14 @@ void AmbiDataSet::setGroupZ(int channel, double z, bool notify) const
     AmbiPoint* pt = getGroup(channel);
 
     if(!notify)
+    {
         z = pScalingInfo->decompress(z);
-    
+    }
+
     if (pt != nullptr)
+    {
         pt->getRawPoint()->setZ(z, notify);
+    }
 }
 
 void AmbiDataSet::setAzimuth(int channel, double azimuth) const
@@ -264,7 +288,9 @@ void AmbiDataSet::setAzimuth(int channel, double azimuth) const
 	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
-		pt->getRawPoint()->setAzimuth(azimuth);
+	{	
+        pt->getRawPoint()->setAzimuth(azimuth);
+    }
 }
 
 void AmbiDataSet::setElevation(int channel, double elevation) const
@@ -272,7 +298,9 @@ void AmbiDataSet::setElevation(int channel, double elevation) const
 	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
+    {
 		pt->getRawPoint()->setElevation(elevation);
+    }
 }
 
 void AmbiDataSet::setDistance(int channel, double distance) const
@@ -280,7 +308,9 @@ void AmbiDataSet::setDistance(int channel, double distance) const
 	AmbiPoint* pt = get(channel);
 
 	if (pt != nullptr)
+    {
 		pt->getRawPoint()->setDistance(distance);
+    }
 }
 
 bool AmbiDataSet::setGain(int channel, double gain, bool notify) const
@@ -342,7 +372,9 @@ int AmbiDataSet::getEnabledCount() const
 	for(int i = 0; i < size(); i++)
 	{
 		if (get(i) != nullptr && get(i)->getEnabled())
+        {
 			count++;
+        }
 	}
 
 	return count;
@@ -359,7 +391,9 @@ int AmbiDataSet::activeGroupCount() const
     for(auto& g : groups)
     {
         if(g->getEnabled())
+        {
             cnt++;
+        }
     }
     
     return cnt;
@@ -379,7 +413,10 @@ AmbiGroup* AmbiDataSet::getActiveGroup(int index, int* pRealIndex) const
             if(index == 0)
             {
                 if(pRealIndex != nullptr)
+                {
                     *pRealIndex = i;
+                }
+
                 return groups[i];
             }
             
@@ -396,7 +433,9 @@ void AmbiDataSet::moveGroupXyz(int groupIndex, double dx, double dy, double dz, 
 
 	AmbiGroup* group = groups[groupIndex];
 	if (group != nullptr)
+    {
 		group->moveXYZ(dx, dy, dz, moveSubElements, groupModeFlag);
+    }
 }
 
 void AmbiDataSet::removeGroup(int groupIndex)
@@ -418,7 +457,9 @@ void AmbiDataSet::removeGroup(int groupIndex)
     groups[groupIndex]->setEnabled(false);
     
     for(auto& p : origPos)
+    {
         setAbsSourcePoint(p.first, p.second);
+    }
 }
 
 void AmbiDataSet::addPointToGroup(int groupIndex, int pointIndex)
@@ -571,7 +612,9 @@ void AmbiDataSet::setGroupName(int groupIndex, String name) const
 
 	AmbiGroup* group = groups[groupIndex];
 	if (group != nullptr)
+    {
 		group->setName(name);
+    }
 }
 
 bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bool moveSubElements)
@@ -640,7 +683,9 @@ bool AmbiDataSet::nameExists(String name) const
 	for (int i = 0; i < size(); i++)
 	{
 		if (get(i)->getName() == name)
+        {
 			return true;
+        }
 	}
 
 	return false;

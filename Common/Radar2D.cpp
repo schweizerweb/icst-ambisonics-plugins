@@ -76,22 +76,22 @@ Point<float> Radar2D::getAbsoluteScreenPoint(Point<float> valuePoint) const
 
 float Radar2D::getEditablePointSize(float scaler) const
 {
-	return radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
+	return (float)radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
 }
 
 float Radar2D::getGroupPointSize(float scaler) const
 {
-    return radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getGroupPointScaler());
+    return (float)radarViewport.getWidth() / 30.0f * scaler * float(pRadarOptions->zoomSettings->getGroupPointScaler());
 }
 
 float Radar2D::getDisplayOnlyPointSize(float scaler) const
 {
-    return radarViewport.getWidth() / 50.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
+    return (float)radarViewport.getWidth() / 50.0f * scaler * float(pRadarOptions->zoomSettings->getPointScaler());
 }
 
 float Radar2D::getFontSize() const
 {
-	return radarViewport.getWidth() / 25.0f;
+	return (float)radarViewport.getWidth() / 25.0f;
 }
 
 void Radar2D::drawRadar(Graphics* g) const
@@ -127,10 +127,10 @@ Image Radar2D::createRadarBackground() const
     int nbRings = 0;
     bool labelUp = centerPoint.getY() >= localBounds.getHeight()/2;
     
-    for(int i = 1; i * ringResolution < pRadarOptions->zoomSettings->getScalingInfo()->DistanceMax(); i++)
+    for(int i = 1; (float)i * ringResolution < pRadarOptions->zoomSettings->getScalingInfo()->DistanceMax(); i++)
     {
-        float absDist = i * dist;
-        float ringValue = i * ringResolution;
+        float absDist = (float)i * dist;
+        float ringValue = (float)i * ringResolution;
 		Rectangle<float> ellipseRect(centerPoint.getX() - absDist, centerPoint.getY() - absDist, 2 * absDist, 2 * absDist);
         
         // check if circle is in visible area
@@ -220,7 +220,7 @@ void Radar2D::timerCallback()
 
 float Radar2D::getValueToScreenRatio() const
 {
-	return radarViewport.getWidth() / (2 * pRadarOptions->zoomSettings->getCurrentRadius());
+	return (float)radarViewport.getWidth() / (2.0f * pRadarOptions->zoomSettings->getCurrentRadius());
 }
 
 float Radar2D::getSelectedPointSize(float scaler) const
@@ -320,13 +320,13 @@ void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screen
     double baseScaler = groupFlag ? pRadarOptions->zoomSettings->getGroupPointScaler() : pRadarOptions->zoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
-    int y = screenPt.getY() > offset + scaledImageHeight
-		? int(screenPt.getY() - offset - scaledImageHeight)
+    int y = screenPt.getY() > offset + (float)scaledImageHeight
+		? int(screenPt.getY() - offset - (float)scaledImageHeight)
 		: int(screenPt.getY() + offset);
-	if(screenPt.getX() > getWidth() / 2
-		&& screenPt.getX() > getWidth() - (offset + scaledImageWidth))
+	if(screenPt.getX() > (float)getWidth() / 2.0f
+		&& screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
 	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
+		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
 	}
 	else
 	{
@@ -344,15 +344,21 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
 	Point<float> screenPt = getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat());
     
     if(!containsIncludingBoder(&radarViewport, screenPt.toInt()))
+    {
         return;
-    
+    }
+
 	if (select)
 	{
 		g->setColour(radarColors.getPointSelectionColor());
 		if (shape == Square)
+        {
 			drawSquare(g, &screenPt, &absPoint, selectionSize);
+        }
 		else if (shape == Star)
+        {
 			drawStar(g, &screenPt, selectionSize);
+        }
 		else
 		{
 			Rectangle<float> rect(selectionSize, selectionSize);
@@ -364,9 +370,13 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
 	g->setColour(c);
 
 	if(shape == Square)
+    {
 		drawSquare(g, &screenPt, &absPoint, pointSize);
+    }
 	else if (shape == Star)
+    {
 		drawStar(g, &screenPt, pointSize);
+    }
 	else
 	{
 		Rectangle<float> rect(pointSize, pointSize);
@@ -415,8 +425,8 @@ void Radar2D::renderOpenGL()
     OpenGLHelpers::clear(radarColors.getRadarBackground());
     
 	std::unique_ptr<LowLevelGraphicsContext> glRenderer(createOpenGLGraphicsContext(openGLContext,
-	                                                                                roundToInt(desktopScale * getWidth()),
-	                                                                                roundToInt(desktopScale * getHeight())));
+	                                                                                roundToInt(desktopScale * (float)getWidth()),
+	                                                                                roundToInt(desktopScale * (float)getHeight())));
 	if (glRenderer != nullptr)
 	{
         if(!approximatelyEqual(lastCartesianLimit, pRadarOptions->scalingInfo->CartesianMax()))
@@ -662,8 +672,8 @@ Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 	Rectangle<float> currentViewValueRect = pRadarOptions->zoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
-		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * radarViewport.getWidth(),
-		radarViewport.getHeight() - float(valuePoint.getY() - currentViewValueRect.getY()) / currentViewValueRect.getHeight() * radarViewport.getHeight());
+		float(valuePoint.getX() - currentViewValueRect.getX()) / currentViewValueRect.getWidth() * (float)radarViewport.getWidth(),
+		(float)radarViewport.getHeight() - float(valuePoint.getY() - currentViewValueRect.getY()) / currentViewValueRect.getHeight() * (float)radarViewport.getHeight());
 	
 	return convertedPoint;
 }
@@ -673,8 +683,8 @@ Point<float> Radar2D::getValuePointFromRelativeScreenPoint(Point<float> relative
 	Rectangle<float> currentViewValueRect = pRadarOptions->zoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
 
 	Point<float> convertedPoint(
-		float(relativeScreenPoint.getX() / radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
-		float((radarViewport.getHeight() - relativeScreenPoint.getY()) / radarViewport.getHeight() * currentViewValueRect.getHeight()) + currentViewValueRect.getY());
+		float(relativeScreenPoint.getX() / (float)radarViewport.getWidth() * currentViewValueRect.getWidth()) + currentViewValueRect.getX(),
+		float(((float)radarViewport.getHeight() - relativeScreenPoint.getY()) / (float)radarViewport.getHeight() * currentViewValueRect.getHeight()) + currentViewValueRect.getY());
 
 	return convertedPoint;
 }
@@ -868,14 +878,16 @@ void Radar2D::calculateRotationAroundReference(Point<int> currentMousePosition, 
 void Radar2D::mouseDrag(const MouseEvent& e)
 {
     if(!e.mouseWasDraggedSinceMouseDown())
+    {
         return;
-    
+    }
+
 	if(checkMouseActionMode(e.mods, RadarMove))
 	{
         Point<float> move = lastRadarMovePoint - e.getPosition().toFloat();
             
-        move.setX(move.getX() / radarViewport.getWidth() * pRadarOptions->zoomSettings->getCurrentRadius() * 2.0f);
-        move.setY(move.getY() / radarViewport.getHeight() * pRadarOptions->zoomSettings->getCurrentRadius() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
+        move.setX(move.getX() / (float)radarViewport.getWidth() * pRadarOptions->zoomSettings->getCurrentRadius() * 2.0f);
+        move.setY(move.getY() / (float)radarViewport.getHeight() * pRadarOptions->zoomSettings->getCurrentRadius() * ((radarMode == XZ_Half) ? 1.0f : 2.0f));
             
         switch (radarMode)
         {
@@ -930,7 +942,7 @@ void Radar2D::mouseDrag(const MouseEvent& e)
 
             if(currentSpecialHandlingMode == Stretch)
             {
-                double stretchFactor = (lastSpecialModePosition.getY() - e.getPosition().getY()) * pRadarOptions->zoomSettings->getCurrentRadius() * 0.01;
+                double stretchFactor = (float)(lastSpecialModePosition.getY() - e.getPosition().getY()) * pRadarOptions->zoomSettings->getCurrentRadius() * 0.01f;
                 for(int i : selection)
                     pEditablePoints->stretchGroup(i, stretchFactor);
                 

@@ -53,7 +53,7 @@ public:
                 g.setColour(Colours::lightgrey);
         }
 
-        g.setFont (height * 0.7f);
+        g.setFont ((float)height * 0.7f);
 
         // draw the xml element's tag name..
         g.drawText (xml.hasAttribute("name") ? xml.getStringAttribute("name") : getUniqueName(), 4, 0, width - 4, height, Justification::centredLeft, true);

@@ -73,7 +73,7 @@ private:
     void resized() override
     {
         toggle.setBounds(0, 0, getHeight(), getHeight());
-        transform = AffineTransform::scale((float(getWidth())-toggle.getWidth()) / float(graphArea->getWidth()), (float)getHeight() / graphArea->getHeight()).followedBy(AffineTransform::translation(float(toggle.getWidth()), 0.0f));
+        transform = AffineTransform::scale((float(getWidth())-(float)toggle.getWidth()) / float(graphArea->getWidth()), (float)getHeight() / (float)graphArea->getHeight()).followedBy(AffineTransform::translation(float(toggle.getWidth()), 0.0f));
     }
     
     void updateFilterPath()
@@ -117,7 +117,7 @@ private:
     {
         g.fillAll(getLookAndFeel().findColour(ListBox::backgroundColourId));
         g.setColour(Colours::lightgrey);
-        g.drawLine(float(toggle.getWidth()), getHeight()/2.0f, float(getWidth()), getHeight()/2.0f);
+        g.drawLine(float(toggle.getWidth()), (float)getHeight()/2.0f, float(getWidth()), (float)getHeight()/2.0f);
         
         g.setColour(owner.getFlag(columnId, row) ? Colours::lightgreen : Colours::red);
         g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);

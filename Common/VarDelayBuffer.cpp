@@ -40,7 +40,7 @@ void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, flo
 		first = false;
 	}
 
-	if(newDelayInSamples > bufferLength)
+	if(newDelayInSamples > (float)bufferLength)
 	{
 		newDelayInSamples = float(bufferLength);
 	}
@@ -50,9 +50,9 @@ void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, flo
 	{
 		audioBuffer[iWrite] = inBuffer[i];		// write input sound into the buffer
 
-		float pRead = iWrite - (lastDelayInSamples + i * slope);			// float Leseposition 
+		float pRead = (float)iWrite - (lastDelayInSamples + (float)i * slope);			// float Leseposition 
 		int iRead = (int)pRead;
-		float fracRead = pRead - iRead;
+		float fracRead = pRead - (float)iRead;
 		if (iRead < 0) {
 			iRead += bufferLength;
 		}

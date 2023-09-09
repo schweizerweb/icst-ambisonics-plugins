@@ -28,7 +28,10 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-
+#if JUCE_GCC || JUCE_CLANG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
 //[/MiscUserDefs]
 
 //==============================================================================

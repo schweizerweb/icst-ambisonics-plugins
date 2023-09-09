@@ -35,8 +35,8 @@ public:
         Rectangle<int> newBounds (pDialogContent->getWidth()  + int(borderSpace * 2),
                                   pDialogContent->getHeight() + int(borderSpace * 2));
     
-        float hw = newBounds.getWidth() / 2.0f;
-        float hh = newBounds.getHeight() / 2.0f;
+        float hw = (float)newBounds.getWidth() / 2.0f;
+        float hh = (float)newBounds.getHeight() / 2.0f;
         float hwReduced = (float) (hw - borderSpace * 2);
         float hhReduced = (float) (hh - borderSpace * 2);
         float arrowIndent = borderSpace - arrowSize;

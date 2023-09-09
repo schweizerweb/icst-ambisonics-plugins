@@ -313,7 +313,7 @@ private:
                 p.addRectangle(-radius, -radius, 2*radius, 2*radius);
                 break;
             case SHAPE_ID_TRIANGLE:
-                p.addTriangle(0.0f, radius, cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius, -cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius);
+                p.addTriangle(0.0f, radius, (float)cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius, (float)-cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius);
                 break;
             case SHAPE_ID_STAR:
                 float innerRadius = float(sliderRadius->getMinValue());
@@ -327,7 +327,7 @@ private:
         {
             if(localDataSet->get(i)->getGroup() == localDataSet->getGroup(0))
             {
-                auto pt = p.getPointAlongPath(totalLength / pointCount * groupPointIndex);
+                auto pt = p.getPointAlongPath(totalLength / (float(pointCount * groupPointIndex)));
                 localDataSet->get(i)->getRawPoint()->setXY(pt.getX(), pt.getY());
                 groupPointIndex++;
             }

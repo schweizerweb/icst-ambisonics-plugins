@@ -155,7 +155,7 @@ public:
                 // Todo: Tooltip
             }
             
-            g.setGradientFill(ColourGradient(gradientColor, 0, 0, fillColor, width/2, 0, false));
+            g.setGradientFill(ColourGradient(gradientColor, 0.0f, 0.0f, fillColor, (float)width/2.0f, 0.0f, false));
             g.fillRect(0, 0, width, height);
         }
 	}

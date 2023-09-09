@@ -67,8 +67,10 @@ float AudioParameterFloatAmbi::getValue() const
 void AudioParameterFloatAmbi::setValue(float newValue)
 {
     if(!enabled)
-        return;
-    
+    {
+	    return;
+	}
+	
 	float newValueScaled = range.convertFrom0to1(newValue);
 	if (!approximatelyEqual(value, newValueScaled))
 	{

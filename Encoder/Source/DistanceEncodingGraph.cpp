@@ -37,7 +37,7 @@ void DistanceEncodingGraph::paintData(Graphics& g)
 	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
-		double distance = 0.00001 + maxValue / NB_STEPS * step;
+		double distance = 0.00001 + (double)maxValue / (double)NB_STEPS * (double)step;
 		pParams->calculateAttenuation(distance, &wFactor, &otherFactor);
 
 		Point<float> displayPointW = mapValues(distance, Decibels::gainToDecibels(wFactor)).toFloat();

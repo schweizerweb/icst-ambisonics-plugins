@@ -10,8 +10,11 @@
 
 #include "UserDefinedParameter.h"
 #include <string.h>
+
+#if JUCE_GCC || JUCE_CLANG
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wswitch-enum"
+#endif
 
 UserDefinedParameter::UserDefinedParameter(String _originalString, std::string typeString, double lo, double hi) : originalString(_originalString), loLim(lo), hiLim(hi)
 {
