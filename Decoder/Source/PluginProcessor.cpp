@@ -191,7 +191,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
     }
 }
 
-void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&)
+void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
     const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.getAmbiChannelCount(), buffer.getNumChannels());
     const int totalNumOutputChannels = getTotalNumOutputChannels();

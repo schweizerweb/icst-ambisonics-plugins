@@ -28,7 +28,7 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
-#if JUCE_GCC || JUCE_CLANG
+#if JUCE_CLANG
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
 #endif
@@ -468,7 +468,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
         //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
-        m_args.pSourceSet->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? m_args.pZoomSettings->getScalingInfo()->Infinite : sliderDistanceScaler->getValue());
+        m_args.pSourceSet->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? ScalingInfo::Infinite : sliderDistanceScaler->getValue());
         m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSourceSet->getDistanceScaler());
         refresh();
         updateEncodingUiElements();
@@ -614,7 +614,7 @@ void SourceDefinitionComponent::refresh() const
 void SourceDefinitionComponent::updateEncodingUiElements()
 {
     toggleGroupMode->setToggleState(m_args.pSourceSet->getGroupModeFlag(), dontSendNotification);
-    toggleInfiniteDistance->setToggleState(m_args.pSourceSet->getDistanceScaler() == 0.0, dontSendNotification);
+    toggleInfiniteDistance->setToggleState(exactlyEqual(m_args.pSourceSet->getDistanceScaler(), ScalingInfo::Infinite), dontSendNotification);
     labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     if(!toggleInfiniteDistance->getToggleState())

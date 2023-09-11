@@ -22,7 +22,7 @@ AmbiSource::AmbiSource(AmbiSource* other, bool copyImage) : AmbiPoint(other, cop
 {
 }
 
-AmbiSource::AmbiSource(String id, Point3D<double> point, String name, Colour color) : AmbiPoint(id, point, name, color), rms(0.0f)
+AmbiSource::AmbiSource(String _id, Point3D<double> _point, String _name, Colour _color) : AmbiPoint(_id, _point, _name, _color), rms(0.0f)
 {
 }
 
@@ -30,9 +30,9 @@ AmbiSource::AmbiSource(XmlElement* _element, AudioParameterSet _audioParams) : A
 {
 }
 
-AmbiSource::AmbiSource(AudioParameterSet _audioParams, String name) : AmbiPoint(_audioParams), rms(0.0f)
+AmbiSource::AmbiSource(AudioParameterSet _audioParams, String _name) : AmbiPoint(_audioParams), rms(0.0f)
 {
-    setName(name);
+    setName(_name);
 }
 
 void AmbiSource::setRms(float newRmsLevel, bool onlyIfGreater)

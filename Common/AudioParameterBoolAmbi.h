@@ -25,8 +25,8 @@ public:
     void setEnabled(bool enabled) override;
 	float getValue() const override;
 	void setValue(float newValue) override;
-	bool get() const noexcept { return (bool)getValue(); }
-	operator bool() const noexcept { return (bool)getValue(); }
+	bool get() const noexcept { return value; }
+	operator bool() const noexcept { return value; }
 	AudioParameterBoolAmbi& operator= (bool newValue);
 
 	float getDefaultValue() const override;

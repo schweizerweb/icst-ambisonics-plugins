@@ -803,7 +803,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, newValue == 1.0); break;
+    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, !exactlyEqual(newValue, 0.0)); break;
 
         default: return; // do nothing
 	}

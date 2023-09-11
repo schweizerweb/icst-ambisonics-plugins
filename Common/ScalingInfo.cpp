@@ -53,7 +53,7 @@ float ScalingInfo::DistanceMax()
 
 bool ScalingInfo::IsInfinite() const
 {
-    return approximatelyEqual(Scaler, Infinite);
+    return exactlyEqual(Scaler, Infinite);
 }
 
 double ScalingInfo::GetScaler()
