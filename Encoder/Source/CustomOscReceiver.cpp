@@ -29,7 +29,7 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         {
             patternToMatch.reset(new OSCAddressPattern(oscPath));
         }
-        catch(OSCException& e)
+        catch(OSCException& /*e*/)
         {
             errorMessage = "Invalid OSC path";
             return;
@@ -63,7 +63,7 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     {
         patternToMatch.reset(new OSCAddressPattern(matchString));
     }
-    catch (OSCException& e)
+    catch (OSCException& /*e*/)
     {
         errorMessage = "Invalid OSC path";
         return;
