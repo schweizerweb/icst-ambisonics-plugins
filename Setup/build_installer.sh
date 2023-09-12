@@ -86,5 +86,6 @@ templateFileContent=${templateFileContent//$packageVersionMark/$PACKAGE_VERSION}
 
 templateFileContent="$(handle_fixed_files "$templateFileContent")"
 write_file "$templateFileContent" "$outputFile"
+build_installer "$outputFile"
 echo "----------- build installer done ----------"
 exit 0

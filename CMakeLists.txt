@@ -3,11 +3,11 @@
 cmake_minimum_required(VERSION 3.15)
 
 if(APPLE)
-    set(CMAKE_OSX_ARCHITECTURES "x86_64")
+    set( CMAKE_OSX_ARCHITECTURES "x86_64;arm64" CACHE STRING "" )
 endif()
 
 project(ICST_AMBISONICS_PLUGINS 
-    VERSION 0.0.1
+    VERSION 0.0.0.1
 )
 
 set( COMMON_OUTPUT_DIRECTORY
