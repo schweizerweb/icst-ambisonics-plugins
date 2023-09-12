@@ -7,7 +7,7 @@ if(APPLE)
 endif()
 
 project(ICST_AMBISONICS_PLUGINS 
-    VERSION 0.0.0.1
+    VERSION 0.0.0.1 #version_replacement_tag#
 )
 
 set( COMMON_OUTPUT_DIRECTORY
