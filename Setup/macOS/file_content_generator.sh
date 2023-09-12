@@ -107,3 +107,8 @@ write_file()
     echo $content > $filename
     xmllint --format $filename --output $filename
 }
+
+build_installer()
+{
+    packagesbuild ${1}
+}

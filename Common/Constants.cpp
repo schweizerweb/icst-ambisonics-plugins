@@ -47,7 +47,7 @@ int Constants::NormalizeAzimuthGrad(int grad)
 
 bool Constants::isDevelopmentVersion()
 {
-	return String(ProjectInfo::versionString).startsWith("0") || !String(ProjectInfo::versionString).containsOnly("0123456789.");
+	return String(ProjectInfo::versionString).startsWith("0") || String(ProjectInfo::versionString).matchesWildcard("*.*.*.*", true);
 }
 
 bool Constants::isNonVisibleVersionPrerelease()

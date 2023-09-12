@@ -69,3 +69,8 @@ write_file()
     local filename=${2}
     echo -e "$content" > $filename
 }
+
+build_installer()
+{
+    iscc ${1}
+}
