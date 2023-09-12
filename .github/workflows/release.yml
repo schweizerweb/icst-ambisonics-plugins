@@ -78,7 +78,7 @@ jobs:
     - name: Set Project Version
       shell: bash
       run: |
-        sed -i.bak "s/.*#version_replacement_tag#.*/VERSION ${{ needs.prepare.outputs.version }}/" CMakeLists.txt"
+        sed -i.bak "s/.*#version_replacement_tag#.*/VERSION ${{ needs.prepare.outputs.version }}/" CMakeLists.txt
 
     - name: Set reusable strings
       id: strings
