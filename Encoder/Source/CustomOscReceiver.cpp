@@ -29,11 +29,12 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
         {
             patternToMatch.reset(new OSCAddressPattern(oscPath));
         }
-        catch(OSCException e)
+        catch(OSCException& e)
         {
             errorMessage = "Invalid OSC path";
             return;
         }
+
         jsExpression = pInput->commandString;
         jsEngine.reset(new JavascriptEngine());
         jsEngine->maximumExecutionTime = RelativeTime::seconds (5);
@@ -62,7 +63,7 @@ CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScali
     {
         patternToMatch.reset(new OSCAddressPattern(matchString));
     }
-    catch (OSCException e)
+    catch (OSCException& e)
     {
         errorMessage = "Invalid OSC path";
         return;

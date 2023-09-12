@@ -257,7 +257,7 @@ public:
 	{
         switch (columnId)
         {
-            case COLUMN_ID_ENABLE: pSettings->customOscInput[rowNumber]->enabledFlag = newValue != 0.0; break;
+            case COLUMN_ID_ENABLE: pSettings->customOscInput[rowNumber]->enabledFlag = !exactlyEqual(newValue, 0.0); break;
             default: ;
         }
         

@@ -15,8 +15,8 @@
 class DistanceEncodingPresetHelper : public PresetHelper
 {
 public:
-    DistanceEncodingPresetHelper(File presetDirectory, ActionListener* pActionListener)
-        : PresetHelper(presetDirectory, pActionListener)
+    DistanceEncodingPresetHelper(File _presetDirectory, ActionListener* _pActionListener)
+        : PresetHelper(_presetDirectory, _pActionListener)
     {
         
     }

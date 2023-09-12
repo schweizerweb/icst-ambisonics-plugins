@@ -21,7 +21,7 @@ public:
 	
 	virtual ~AmbiSpeaker() = default;
 	AmbiSpeaker(AmbiSpeaker* other, bool copyImage = false);
-	AmbiSpeaker(String id, Point3D<double> point, String name, Colour color = Colour(), double gain = 1.0);
+	AmbiSpeaker(String id, Point3D<double> _point, String _name, Colour _color = Colour(), double _gain = 1.0);
 	AmbiSpeaker(XmlElement* element);
 
 	FilterBankInfo* getFilterInfo();

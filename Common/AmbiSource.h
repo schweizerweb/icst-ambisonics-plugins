@@ -17,9 +17,9 @@ public:
 	virtual ~AmbiSource();
 	AmbiSource();
 	AmbiSource(AmbiSource* other, bool copyImage = false);
-	AmbiSource(String id, Point3D<double> point, String name, Colour color);
-	AmbiSource(XmlElement* element, AudioParameterSet audioParams);
-    AmbiSource(AudioParameterSet audioParams, String name);
+	AmbiSource(String _id, Point3D<double> _point, String _name, Colour _color);
+	AmbiSource(XmlElement* _element, AudioParameterSet _audioParams);
+    AmbiSource(AudioParameterSet _audioParams, String _name);
 
 	void setRms(float newRmsLevel, bool onlyIfGreater = false);
 	float getRms() const;

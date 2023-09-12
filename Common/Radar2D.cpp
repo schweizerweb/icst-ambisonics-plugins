@@ -759,7 +759,7 @@ double Radar2D::getMaxPointSelectionDist() const
 
 void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetails& wheel)
 {
-    if(wheel.deltaY != 0.0f)
+    if(!approximatelyEqual(wheel.deltaY, 0.0f))
     {
         if(specialGroupManipulationMode && pPointSelection->getSelectionMode() == PointSelection::Group)
         {

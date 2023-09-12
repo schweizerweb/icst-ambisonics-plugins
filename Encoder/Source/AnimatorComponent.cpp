@@ -201,7 +201,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
     double factor = STEP_TIMER_INTERVAL / 1000.0;
     if(pAction->enabled && pAction->groupIndex >= 0 && pAction->groupIndex < pSourceSet->groupCount())
     {
-        if(pAction->rotationX != 0.0 || pAction->rotationY != 0.0 || pAction->rotationZ != 0.0)
+        if(!exactlyEqual(pAction->rotationX, 0.0) || !exactlyEqual(pAction->rotationY, 0.0) || !exactlyEqual(pAction->rotationZ, 0.0))
         {
             pSourceSet->rotateGroup(
                                     pAction->groupIndex,
@@ -209,7 +209,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
                                     Constants::GradToRad(factor * pAction->rotationY),
                                     Constants::GradToRad(factor * pAction->rotationZ));
         }
-        if(pAction->rotationOriginX != 0.0 || pAction->rotationOriginY != 0.0 || pAction->rotationOriginZ != 0.0)
+        if(!exactlyEqual(pAction->rotationOriginX, 0.0) || !exactlyEqual(pAction->rotationOriginY, 0.0) || !exactlyEqual(pAction->rotationOriginZ, 0.0))
         {
             pSourceSet->rotateGroupAroundOrigin(
                                                 pAction->groupIndex,
@@ -218,7 +218,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
                                                 Constants::GradToRad(factor * pAction->rotationOriginZ),
                                                 true);
         }
-        if(pAction->stretch != 0.0)
+        if(!exactlyEqual(pAction->stretch, 0.0))
         {
             pSourceSet->stretchGroup(pAction->groupIndex, factor * pAction->stretch);
         }

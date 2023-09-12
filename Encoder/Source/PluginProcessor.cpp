@@ -202,7 +202,7 @@ bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& 
 
 void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
-	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.getUnitCircleRadius() == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || approximatelyEqual(encoderSettings.distanceEncodingParams.getUnitCircleRadius(), 0.0f))
 		return;
 
 	double wFactor, otherFactor;

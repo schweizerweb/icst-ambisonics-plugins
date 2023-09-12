@@ -16,8 +16,8 @@
 class FilterPresetHelper : public PresetHelper
 {
 public:
-    FilterPresetHelper(File presetDirectory, ActionListener* pActionListener)
-        : PresetHelper(presetDirectory, pActionListener)
+    FilterPresetHelper(File _presetDirectory, ActionListener* _pActionListener)
+        : PresetHelper(_presetDirectory, _pActionListener)
     {
         
     }

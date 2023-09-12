@@ -15,8 +15,8 @@
 class CustomOscRxPresetHelper : public PresetHelper
 {
 public:
-    CustomOscRxPresetHelper(File presetDirectory, ActionListener* pActionListener)
-        : PresetHelper(presetDirectory, pActionListener)
+    CustomOscRxPresetHelper(File _presetDirectory, ActionListener* _pActionListener)
+        : PresetHelper(_presetDirectory, _pActionListener)
     {
         
     }

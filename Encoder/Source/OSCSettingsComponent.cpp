@@ -281,7 +281,7 @@ void OSCSettingsComponent::controlDimming() const
     labelExternalOscInfo->setColour(Label::textColourId, textColor);
 
     double packetsPerSecond = targetCount / (pSettings->oscSendExtIntervalMs * 0.001) + (pSettings->oscSendFlag ? (1.0 / (pSettings->oscSendIntervalMs * 0.001)) : 0.0);
-    String info = packetsPerSecond == 0.0
+    String info = approximatelyEqual(packetsPerSecond, 0.0)
         ? "no network traffic"
         : ("estimated network traffic: " + String(!pSettings->oscSendExtContinuousFlag ? "max. " : "") + (packetsPerSecond < 1.0
                                             ? "<1/s"

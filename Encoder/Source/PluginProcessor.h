@@ -52,8 +52,9 @@ public:
     void numChannelsChanged() override;
     
 	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
+    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
+    using AudioProcessor::processBlock;
+    
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;

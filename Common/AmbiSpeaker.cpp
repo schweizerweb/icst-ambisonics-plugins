@@ -15,8 +15,8 @@ AmbiSpeaker::AmbiSpeaker(AmbiSpeaker* other, bool copyImage) :
 {
 }
 
-AmbiSpeaker::AmbiSpeaker(String id, Point3D<double> point, String name, Colour color, double gain) : 
-	AmbiPoint(id, point, name, color, gain), filterBypass(DEFAULT_BYPASS_FILTER)
+AmbiSpeaker::AmbiSpeaker(String _id, Point3D<double> _point, String _name, Colour _color, double _gain) : 
+	AmbiPoint(_id, _point, _name, _color, _gain), filterBypass(DEFAULT_BYPASS_FILTER)
 {
 }
 

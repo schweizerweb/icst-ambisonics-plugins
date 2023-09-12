@@ -22,7 +22,7 @@
 class EncoderPresetHelper : public PresetHelper
 {
 public:
-    EncoderPresetHelper(File presetDirectory, ActionListener* pActionListener, ScalingInfo* pScaling) : PresetHelper(presetDirectory, pActionListener), pScalingInfo(pScaling)
+    EncoderPresetHelper(File _presetDirectory, ActionListener* _pActionListener, ScalingInfo* _pScaling) : PresetHelper(_presetDirectory, _pActionListener), pScalingInfo(_pScaling)
     {
     }
     
@@ -32,15 +32,19 @@ public:
         std::unique_ptr<XmlElement> rootElement = doc.getDocumentElementIfTagMatches("EncoderPreset");
 
         if (rootElement == nullptr || rootElement->getTagName() != "EncoderPreset")
+        {
             return false;
+        }
         
         pSourceSet->loadFromXml(rootElement->getChildByName("AmbiSourceSet"), pAudioParams);
         pSourceSet->resetIds();
         
         // apply scaler if audio params attached
         if(pAudioParams != nullptr)
+        {
             pScalingInfo->SetScaler(pSourceSet->getDistanceScaler());
-        
+        }
+
         return pSourceSet->size() > 0;
     }
 

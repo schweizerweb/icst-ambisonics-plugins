@@ -92,7 +92,9 @@ void ZoomSettings::Reset(AmbiDataSet* pDataSet)
         }
     }
     else
+    {    
         radius =(float)pScalingInfo->GetScaler();
+    }
     
     setCurrentRadius(radius);
 }

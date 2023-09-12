@@ -17,7 +17,7 @@
 class DecoderPresetHelper : public PresetHelper
 {
 public:
-    DecoderPresetHelper(File presetDirectory, ActionListener* pActionListener, ScalingInfo* pScaling) : PresetHelper(presetDirectory, pActionListener), pScalingInfo(pScaling)
+    DecoderPresetHelper(File _presetDirectory, ActionListener* _pActionListener, ScalingInfo* _pScaling) : PresetHelper(_presetDirectory, _pActionListener), pScalingInfo(_pScaling)
     {
     }
 

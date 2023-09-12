@@ -158,7 +158,7 @@ public:
             switch (columnId)
             {
                 case COLUMN_ID_PORT: standardTargets[rowNumber]->pTarget->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = newValue != 0.0; break;
+                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = !exactlyEqual(newValue, 0.0); break;
                 default: ;
             }
         }
@@ -168,7 +168,7 @@ public:
             switch (columnId)
             {
                 case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = newValue != 0.0; break;
+                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = !exactlyEqual(newValue, 0.0); break;
                 default: ;
             }
         }

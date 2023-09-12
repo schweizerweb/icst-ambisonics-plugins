@@ -80,7 +80,7 @@ void GroupAnimator::doStep(float seconds)
         float rotationX = animationSets[i].audioParameterGroupRotationX->get();
         float rotationY = animationSets[i].audioParameterGroupRotationY->get();
         float rotationZ = animationSets[i].audioParameterGroupRotationZ->get();
-        if(rotationX != 0.0f || rotationY != 0.0f || rotationZ != 0.0f)
+        if(!exactlyEqual(rotationX, 0.0f) || !exactlyEqual(rotationY, 0.0f) || !exactlyEqual(rotationZ, 0.0f))
         {
             pSourceSet->rotateGroup(i, Constants::GradToRad(rotationX * seconds), Constants::GradToRad(rotationY * seconds), Constants::GradToRad(rotationZ * seconds));
         }
@@ -88,13 +88,13 @@ void GroupAnimator::doStep(float seconds)
         float rotationOriginX = animationSets[i].audioParameterOriginRotationX->get();
         float rotationOriginY = animationSets[i].audioParameterOriginRotationY->get();
         float rotationOriginZ = animationSets[i].audioParameterOriginRotationZ->get();
-        if(rotationOriginX != 0.0f || rotationOriginY != 0.0f || rotationOriginZ != 0.0f)
+        if(!exactlyEqual(rotationOriginX, 0.0f) || !exactlyEqual(rotationOriginY, 0.0f) || !exactlyEqual(rotationOriginZ, 0.0f))
         {
             pSourceSet->rotateGroupAroundOrigin(i, Constants::GradToRad(rotationOriginX * seconds), Constants::GradToRad(rotationOriginY * seconds), Constants::GradToRad(rotationOriginZ * seconds), true);
         }
         
         float stretch = animationSets[i].audioParameterGroupStretch->get();
-        if(stretch != 0.0f)
+        if(!exactlyEqual(stretch, 0.0f))
         {
             pSourceSet->stretchGroup(i, stretch * seconds);
         }

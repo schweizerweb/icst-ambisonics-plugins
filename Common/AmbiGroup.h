@@ -26,8 +26,8 @@
 class AmbiGroup : public AmbiPoint
 {
 public:
-	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
-	AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
+	AmbiGroup(String _id, Point3D<double> _point, String _name, Colour _color, ScalingInfo* _pScaling) : AmbiPoint(_id, _point, _name, _color), pScalingInfo(_pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
+	AmbiGroup(XmlElement* _xmlElement, Array<AmbiPoint*>* _pSources, AudioParameterSet _audioParameterSet, ScalingInfo* _pScaling);
     virtual ~AmbiGroup() = default;
 
 	float getDisplayScaler() override;
