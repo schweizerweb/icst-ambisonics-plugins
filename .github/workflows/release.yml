@@ -119,11 +119,11 @@ jobs:
       contents: write
     runs-on: ubuntu-latest
     steps:
-      - name: Create Release 
-        uses: ncipollo/release-action@v1
-        with:
-          artifacts: "release.tar.gz,foo/*.txt"
-          bodyFile: "body.md"
+      #- name: Create Release 
+      #  uses: ncipollo/release-action@v1
+      #  with:
+      #    artifacts: "release.tar.gz,foo/*.txt"
+      #    bodyFile: "body.md"
       - name: Create Release
         shell: bash
         run: |
