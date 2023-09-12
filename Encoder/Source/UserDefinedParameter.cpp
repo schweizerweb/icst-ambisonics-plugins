@@ -345,9 +345,15 @@ bool UserDefinedParameter::checkConst(OSCArgument* pArgument, bool* pDataTypeOk)
     *pDataTypeOk = false;
     
     switch (type) {
-        case ConstInt: return (*pDataTypeOk = pArgument->isInt32()) && pArgument->getInt32() == constInt;
-        case ConstFloat: return (*pDataTypeOk = pArgument->isFloat32()) && approximatelyEqual(pArgument->getFloat32(), constFloat);
-        case ConstString: return (*pDataTypeOk = pArgument->isString()) && pArgument->getString() == constString;
+        case ConstInt:
+            *pDataTypeOk = pArgument->isInt32(); 
+            return *pDataTypeOk && (pArgument->getInt32() == constInt);
+        case ConstFloat: 
+            *pDataTypeOk = pArgument->isFloat32();
+            return *pDataTypeOk && approximatelyEqual(pArgument->getFloat32(), constFloat);
+        case ConstString:
+            *pDataTypeOk = pArgument->isString(); 
+            return *pDataTypeOk && (pArgument->getString() == constString);
             
         default:
             return false;
