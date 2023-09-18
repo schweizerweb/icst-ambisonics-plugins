@@ -34,7 +34,7 @@ done
 : ${FOLDER:?"Missing option -f (folder) $(exit_with_error)"}
 
 commonHeader=$(<$HEADER_FILE)
-knownCodeStarts=("#pragma" "#include" "//[Headers]")
+knownCodeStarts=("#pragma" "#include" "//\[Headers\]")
 
 if [[ verbose -eq 1 ]]; then
     echo "Replacing all headers by:"
