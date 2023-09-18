@@ -20,7 +20,6 @@
 
 
 #pragma once
-
 #include "AirAbsorbtionFilter.h"
 #include "JuceHeader.h"
 #include "EncoderSettings.h"

@@ -22,6 +22,7 @@
 #pragma once
 #include "SpeakerSettingsComponent.h"
 #include "FilterSettingsComponent.h"
+
 #define MIN_FREQUENCY_THUMBNAIL    20
 #define FREQUENCY_STEP_THUMBNAIL 1.1
 

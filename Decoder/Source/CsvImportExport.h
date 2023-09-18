@@ -22,6 +22,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/Constants.h"
+
 #define SEPARATOR ";"
 
 class CsvImportExport

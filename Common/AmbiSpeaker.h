@@ -23,7 +23,6 @@
 #include "AmbiPoint.h"
 #include "FilterBankInfo.h"
 
-
 #define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"
 
 class AmbiSpeaker : public AmbiPoint

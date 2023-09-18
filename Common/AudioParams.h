@@ -23,7 +23,6 @@
 #include "AudioParameterSet.h"
 #include "AudioParameterFloatAmbi.h"
 #include "AudioParameterBoolAmbi.h"
-//#include "AmbiSourceSet.h"
 
 class AmbiSourceSet;
 

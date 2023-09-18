@@ -23,11 +23,11 @@
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiSourceSet.h"
+
 #define CHECKBOX_HEIGHT 25
 #define COMPONENT_WIDTH 200
-//==============================================================================
-/*
-*/
+
+
 class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:

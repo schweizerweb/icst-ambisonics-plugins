@@ -21,6 +21,7 @@
 
 #pragma once
 #include "JuceHeader.h"
+
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_ENABLE "Enable"
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_HOST "Host"
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_PORT "Port"

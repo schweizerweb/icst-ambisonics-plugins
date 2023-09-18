@@ -20,6 +20,7 @@
 
 
 #include "StandardOscTarget.h"
+
 StandardOscTarget::StandardOscTarget()
 {
     enabledFlag = DEFAULT_SEND_EXT_STANDARD_FLAG;

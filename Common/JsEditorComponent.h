@@ -27,9 +27,8 @@
 #define JS_EDITOR_COMPONENT_WIDTH 400
 #define JS_EDITOR_ADDITIONAL_WIDTH  450
 #define JS_EDITOR_COMPONENT_HEIGHT 400
-//==============================================================================
-/*
-*/
+
+
 class JsEditorComponent  : public juce::Component, TextButton::Listener
 {
 public:

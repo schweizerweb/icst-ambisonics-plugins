@@ -22,6 +22,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AmbiDataSet.h"
+
 #define ANIMATION_SET_COUNT 4
 
 // First version of group animation using automation parameters

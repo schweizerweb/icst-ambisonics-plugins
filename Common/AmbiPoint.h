@@ -20,7 +20,6 @@
 
 
 #pragma once
-
 #include "Point3D.h"
 
 #define XML_ATTRIBUTE_POINT_ID "Uuid"

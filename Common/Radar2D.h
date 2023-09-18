@@ -27,6 +27,7 @@
 #include "RadarColors.h"
 #include "PointSelection.h"
 #include "RadarOptions.h"
+
 #define INFO_FONT_SIZE	15
 #define ACTIVE_REFRESH_RATE 25
 #define INACTIVE_REFRESH_RATE 10

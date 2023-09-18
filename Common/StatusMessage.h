@@ -20,6 +20,7 @@
 
 
 #pragma once
+
 struct StatusMessage
 {
     enum MessageStyle { Error, Success } messageStyle;

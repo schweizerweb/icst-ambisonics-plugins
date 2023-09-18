@@ -21,6 +21,7 @@
 
 #pragma once
 #include "JuceHeader.h"
+
 #define INACTIVE -1
 #define SCOPE_SIZE 2048
 

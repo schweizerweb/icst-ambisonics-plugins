@@ -20,6 +20,7 @@
 
 
 #include "ChannelLayout.h"
+
 ChannelLayout::ChannelLayout()
 {
     numInputChannels = 0;

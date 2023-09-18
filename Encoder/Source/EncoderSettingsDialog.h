@@ -22,6 +22,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AdditionalWindow.h"
+
 #define ACTION_CLOSE_SETTINGS	"CloseSettings"
 
 class EncoderSettingsDialog : public ActionBroadcaster, public AdditionalWindow

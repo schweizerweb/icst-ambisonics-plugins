@@ -20,7 +20,6 @@
 
 
 #pragma once
-
 #include "JuceHeader.h"
 
 class PointSelection : public ChangeBroadcaster

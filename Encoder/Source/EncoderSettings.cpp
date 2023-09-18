@@ -20,6 +20,7 @@
 
 
 #include "EncoderSettings.h"
+
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
 #define XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT "HandleStandardFormat"
 #define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"

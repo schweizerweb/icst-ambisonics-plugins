@@ -20,6 +20,7 @@
 
 
 #include "LabelCreator.h"
+
 Image LabelCreator::createNewLabel(String label, Colour newColor, float fontSize)
 {
 	const MessageManagerLock lock;
