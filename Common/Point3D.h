@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef POINT3D_H_INCLUDED
-#define POINT3D_H_INCLUDED
-
+#pragma once
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
 #include "Constants.h"
@@ -366,6 +364,4 @@ private:
 /** Multiplies the Point3D's coordinates by a scalar value. */
 template <typename ValueType>
 Point3D<ValueType> operator* (ValueType value, Point3D<ValueType> p) noexcept{ return p * value; }
-
-#endif  // POINT3D_H_INCLUDED
 

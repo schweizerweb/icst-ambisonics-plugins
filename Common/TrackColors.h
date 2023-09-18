@@ -8,9 +8,7 @@
   ==============================================================================
 */
 
-#ifndef TRACKCOLORS_H_INCLUDED
-#define TRACKCOLORS_H_INCLUDED
-
+#pragma once
 #include "JuceHeader.h"
 
 class TrackColors
@@ -63,4 +61,3 @@ public:
     static const int numColors = 10;
 };
 
-#endif  // TRACKCOLORS_H_INCLUDED

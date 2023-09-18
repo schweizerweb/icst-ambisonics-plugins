@@ -8,8 +8,7 @@
   ==============================================================================
 */
 
-#ifndef AMBIPOINT_H_INCLUDED
-#define AMBIPOINT_H_INCLUDED
+#pragma once
 
 #include "Point3D.h"
 
@@ -97,7 +96,3 @@ private:
     bool enabled = true;
     AmbiGroup* pGroup;
 };
-
-
-
-#endif  // AMBIPOINT_H_INCLUDED
