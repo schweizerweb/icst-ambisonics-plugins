@@ -61,7 +61,7 @@ for file in $files; do
             if [[ verbose -eq 1 ]]; then 
                 echo "Index of substring in string : $index"
             fi
-            if [[ minIndex -eq 0 || minIndex -gt index ]]; then
+            if [[ found -eq 0 || minIndex -gt index ]]; then
                 minIndex=$index
                 found=1
             fi
