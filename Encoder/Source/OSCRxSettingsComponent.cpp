@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "OSCTargetsComponent.h"
@@ -28,12 +30,11 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCRxSettingsComponent::OSCRxSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager)
-    : pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager), pCustomOscRxPresetHelper(pCustomOscRxPresetHelper)
+OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, StatusMessageHandler* _pStatusMessageHandler, CustomOscRxPresetHelper* _pCustomOscRxPresetHelper, OSCLogDialogManager* _pOscLogManager, OSCHandlerEncoder* _pOscHandler)
+    : pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, this, this, save_png, save_pngSize));
-    addChangeListener(pChangeListener);
+    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this));
     pCustomOscRxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
 
@@ -205,13 +206,14 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     {
         //[UserButtonCode_toggleReceiveOsc] -- add your button handler code here..
         pSettings->oscReceiveFlag = toggleReceiveOsc->getToggleState();
-        sendChangeMessage();
+        pOscHandler->initialize();
         //[/UserButtonCode_toggleReceiveOsc]
     }
     else if (buttonThatWasClicked == btnAdd.get())
     {
         //[UserButtonCode_btnAdd] -- add your button handler code here..
         pSettings->customOscInput.add(new CustomOscInput());
+        pOscHandler->initialize();
         customOscList->updateContent();
         //[/UserButtonCode_btnAdd]
     }
@@ -221,6 +223,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         int row = customOscTableModel->getCustomIndex(customOscList->getSelectedRow());
         if (row >= 0 && row < pSettings->customOscInput.size())
             pSettings->customOscInput.remove(row);
+        pOscHandler->initialize();
         customOscList->updateContent();
         //[/UserButtonCode_btnDelete]
     }
@@ -245,7 +248,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     {
         //[UserButtonCode_toggleHideWarnings] -- add your button handler code here..
         pSettings->hideWarnings = toggleHideWarnings->getToggleState();
-        sendChangeMessage();
+        pOscHandler->initialize();
         //[/UserButtonCode_toggleHideWarnings]
     }
     else if (buttonThatWasClicked == btnManagePresets.get())
@@ -258,7 +261,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     {
         //[UserButtonCode_toggleReceiveStandardOsc] -- add your button handler code here..
         pSettings->oscHandleStandardFormatFlag = toggleReceiveStandardOsc->getToggleState();
-        sendChangeMessage();
+        pOscHandler->initialize();
         //[/UserButtonCode_toggleReceiveStandardOsc]
     }
     else if (buttonThatWasClicked == btnInfoStandardOsc.get())
@@ -274,7 +277,6 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     }
 
     //[UserbuttonClicked_Post]
-    sendChangeMessage();
     controlDimming();
     //[/UserbuttonClicked_Post]
 }
@@ -288,11 +290,11 @@ void OSCRxSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMove
     {
         //[UserSliderCode_sliderReceiveOscPort] -- add your slider handling code here..
         pSettings->oscReceivePort = int(sliderReceiveOscPort->getValue());
+        pOscHandler->initialize();
         //[/UserSliderCode_sliderReceiveOscPort]
     }
 
     //[UsersliderValueChanged_Post]
-    sendChangeMessage();
     //[/UsersliderValueChanged_Post]
 }
 
@@ -308,7 +310,7 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
 {
     controlDimming();
     if (message == ACTION_MESSAGE_DATA_CHANGED)
-        sendChangeMessage();
+        pOscHandler->initialize();
 
     if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
     {
@@ -369,9 +371,8 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
 BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCRxSettingsComponent" componentName=""
-                 parentClasses="public Component, public ChangeBroadcaster, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, StatusMessageHandler* pStatusMessageHandler, CustomOscRxPresetHelper* pCustomOscRxPresetHelper, OSCLogDialogManager* pOscLogManager"
-                 variableInitialisers="pSettings(pSettings), pStatusMessageHandler(pStatusMessageHandler), pOscLogManager(pOscLogManager), pCustomOscRxPresetHelper(pCustomOscRxPresetHelper)"
+                 parentClasses="public Component, public ActionListener" constructorParams="EncoderSettings* _pSettings, StatusMessageHandler* _pStatusMessageHandler, CustomOscRxPresetHelper* _pCustomOscRxPresetHelper, OSCLogDialogManager* _pOscLogManager, OSCHandlerEncoder* _pOscHandler"
+                 variableInitialisers="pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)&#10;"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

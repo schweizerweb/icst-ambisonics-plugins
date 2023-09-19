@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    FilterInfo.h
-    Created: 30 Oct 2019 4:28:04pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -84,7 +95,10 @@ public:
             case LowShelf: return 150.0f;
             case HighShelf: return 3200.0f;
             case Peak: return 2000.0f;
-            default: return 200.0f;
+            
+            case None:
+            default: 
+                return 200.0f;
         }
     }
     
@@ -99,7 +113,12 @@ public:
             case LowShelf: return 1.8f;
             case HighShelf: return 1.8f;
             case Peak: return 10.0f;
-            default: return 1.0f;
+            
+            case None:
+            case FirstOrderLowPass:
+            case FirstOrderHighPass:
+            default: 
+                return 1.0f;
         }
     }
     
@@ -110,7 +129,16 @@ public:
             case LowShelf: return 0.1f;
             case HighShelf: return 0.1f;
             case Peak: return 2.0f;
-            default: return 1.0f;
+
+            case None:
+            case LowPass:
+            case BandPass:
+            case HighPass:
+            case FirstOrderLowPass:
+            case FirstOrderHighPass:
+            case Notch:
+            default: 
+                return 1.0f;
         }
     }
     
@@ -151,9 +179,9 @@ public:
     {
         return info != nullptr
         && info->filterType == filterType
-        && info->cutOffFrequencyHz == cutOffFrequencyHz
-        && info->qValue == qValue
-        && info->gainFactor == gainFactor;
+        && approximatelyEqual(info->cutOffFrequencyHz, cutOffFrequencyHz)
+        && approximatelyEqual(info->qValue, qValue)
+        && approximatelyEqual(info->gainFactor, gainFactor);
     }
 
 	enum FilterType { None, LowPass, BandPass, HighPass, FirstOrderLowPass, FirstOrderHighPass, Notch, LowShelf, HighShelf, Peak } filterType;

@@ -1,32 +1,69 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    CustomOscBase.cpp
-    Created: 18 Jan 2022 9:55:33am
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "CustomOscBase.h"
 #include <regex>
 
 CustomOscBase::CustomOscBase(ScalingInfo* pScaling) : pScalingInfo(pScaling)
 {
-    
+    channelSelectionMode = ChannelSelectionMode::Undefined;
 }
 
 bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
 {
     int index;
 
+    channelSelectionMode = ChannelSelectionMode::Undefined;
     parametersInPath.clear();
     realParameters.clear();
     oscPath = "";
     
+    std::regex rFixedChannelIndex("[ ]*[cC][iI][ ]*([0-9]+)[ ]*[:](.*)");
+    std::regex rFixedChannelName("[ ]*[cC][nN][ ]*(.+)[ ]*[:](.*)");
+    std::smatch parameterMatch;
+    
+    std::string pathStr = path.toStdString();
+    if(regex_search(pathStr, parameterMatch, rFixedChannelIndex))
+    {
+        auto chStr = parameterMatch[1].str();
+        path = parameterMatch[2].str();
+        constantChannelIndex = String(chStr).getIntValue();
+        if(constantChannelIndex < 1)
+        {
+            *pErrorMessage = "Invalid channel index " + String(constantChannelIndex);
+            return false;
+        }
+        channelSelectionMode = ChannelSelectionMode::ConstantIndex;
+    }
+    else if(regex_search(pathStr, parameterMatch, rFixedChannelName))
+    {
+        auto chStr = parameterMatch[1].str();
+        path = parameterMatch[2].str();
+        constantChannelName = chStr;
+        channelSelectionMode = ChannelSelectionMode::ConstantName;
+    }
+    
     if(!path.startsWith("/"))
     {
-        *pErrorMessage = "Invalid OSC address - missing / at the beginning";
+        *pErrorMessage = "Invalid OSC address - missing '/' or channel selection at the beginning";
         return false;
     }
     
@@ -42,6 +79,13 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
             UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
             if(param != nullptr)
             {
+                // check for channel or name
+                if(!checkChannelSelection(param))
+                {
+                    *pErrorMessage = "Redefinition of channel selection at parameter " + param->getOriginalString();
+                    return false;
+                }
+                
                 parametersInPath.add(param);
                 oscPath += param->getOriginalString();
             }
@@ -68,6 +112,13 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
             UserDefinedParameter* param = analyzeEscapedString(path, &index, pErrorMessage);
             if(param != nullptr)
             {
+                // check for channel or name
+                if(!checkChannelSelection(param))
+                {
+                    *pErrorMessage = "Redefinition of channel selection at parameter " + param->getOriginalString();
+                    return false;
+                }
+                
                 realParameters.add(param);
                 index++;
             }
@@ -83,10 +134,22 @@ bool CustomOscBase::setOscPath(String path, String* pErrorMessage)
         }
     }
     
-    //std::string oscPathString = oscPath.toStdString();
-    //std::string parameterString = path.substring(oscPath.length()).toStdString();
-    
-    // return analyzeString(oscPathString, &parametersInPath) && analyzeString(parameterString, &realParameters);
+    return true;
+}
+
+bool CustomOscBase::checkChannelSelection(UserDefinedParameter* pParam)
+{
+    if(pParam->getType() == UserDefinedParameter::ParameterType::Index
+    || pParam->getType() == UserDefinedParameter::ParameterType::Name
+    )
+    {
+        if(channelSelectionMode != ChannelSelectionMode::Undefined)
+            return false;
+        else
+        {
+            channelSelectionMode = ChannelSelectionMode::Parameter;
+        }
+    }
     
     return true;
 }
@@ -165,6 +228,8 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
             return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledY);
         else if(commandString == "sz")
             return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::ScaledZ);
+        else if(commandString == "")
+            return new UserDefinedParameter(fullString, UserDefinedParameter::ParameterType::Ignore);
         else
         {
             *pErrorMessage = "Unknown command: " + commandString;
@@ -227,7 +292,7 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
                 double lo = std::stod(sm[2]);
                 double zero = std::stod(sm[3]);
                 double hi = std::stod(sm[4]);
-                if(lo == hi && lo == zero)
+                if(approximatelyEqual(lo, hi) && approximatelyEqual(lo, zero))
                 {
                     *pErrorMessage = "Invalid arguments for command " + commandString;
                     return nullptr;
@@ -239,7 +304,7 @@ UserDefinedParameter* CustomOscBase::analyzeEscapedString(String fullPath, int* 
             {
                 double lo = std::stod(sm[2]);
                 double hi = std::stod(sm[3]);
-                if(lo == hi)
+                if(approximatelyEqual(lo, hi))
                 {
                     *pErrorMessage = "Invalid arguments for command " + commandString;
                     return nullptr;
@@ -343,7 +408,7 @@ bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefined
                     double lo = std::stod(sm[2]);
                     double zero = std::stod(sm[3]);
                     double hi = std::stod(sm[4]);
-                    if(lo == hi && lo == zero)
+                    if(approximatelyEqual(lo, hi) && approximatelyEqual(lo, zero))
                         return false;
                             
                     pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi, zero));
@@ -352,7 +417,7 @@ bool CustomOscBase::analyzeString(std::string parameterString, Array<UserDefined
                 {
                     double lo = std::stod(sm[2]);
                     double hi = std::stod(sm[3]);
-                    if(lo == hi)
+                    if(approximatelyEqual(lo, hi))
                         return false;
                         
                     pArray->add(UserDefinedParameter(fullString, sm[1].str(), lo, hi));

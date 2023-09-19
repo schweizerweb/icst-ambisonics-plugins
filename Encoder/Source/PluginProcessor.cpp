@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    This file was auto-generated!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    It contains the basic framework code for a JUCE plugin processor.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -20,23 +31,24 @@
 
 //==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
-                       )
+     : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
+#if MULTI_ENCODER_MODE
+                       .withInput ("Input", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
+#else
+                       .withInput  ("Input", AudioChannelSet::mono(), true)
 #endif
+                       .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
+                       )
 {
+    channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
+    
     sources.reset(new AmbiSourceSet(getScalingInfo()));
 	pOscHandler = new OSCHandlerEncoder(sources.get(), &statusMessageHandler, &encoderSettings, getScalingInfo());
 	pOscSender = new AmbiOSCSender(sources.get());
 	pOscSenderExt = new AmbiOSCSenderExt(sources.get(), &statusMessageHandler, getScalingInfo());
 
-	initializeOsc();
+    pOscHandler->initialize();
+	initializeOscSender();
     initializeAudioParameter();
     
     zoomSettings.reset(new ZoomSettings(getScalingInfo()));
@@ -64,6 +76,15 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
 #endif
+    
+    radarOptions.setTrackColorAccordingToName = !MULTI_ENCODER_MODE;
+    radarOptions.maxNumberEditablePoints = channelLayout.getNumInputChannels();
+    radarOptions.editablePointsAsSquare = false;
+    radarOptions.audioParams = getAudioParams();
+    radarOptions.dawParameter = getDawParameter();
+    radarOptions.scalingInfo = getScalingInfo();
+    radarOptions.zoomSettings = getZoomSettingsPointer();
+    radarOptions.checkNameFieldEditable = !MULTI_ENCODER_MODE;
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()
@@ -142,7 +163,7 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     // initialisation that you need..
 
 	iirFilterSpec.numChannels = 1;
-	iirFilterSpec.maximumBlockSize = samplesPerBlock;
+	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
 }
 
@@ -152,33 +173,47 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
     // spare memory, etc.
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
+void AmbisonicEncoderAudioProcessor::numChannelsChanged()
+{
+//    AlertWindow::showMessageBoxAsync(MessageBoxIconType::InfoIcon, "Num channels changed", "New channel count: " + String(getBusesLayout().getMainInputChannels()) + "/" + String(getBusesLayout().getMainOutputChannels()) + " ---- can change layout: ");
+
+    // handle output channels
+    channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
+    
+    int maxAmbiOrder = channelLayout.getMaxAmbiOrder(true);
+    if(encoderSettings.ambiOrder > maxAmbiOrder)
+    {
+        encoderSettings.ambiOrder = maxAmbiOrder;
+    }
+    
+    // handle input channels
+    for(int i = channelLayout.getNumInputChannels(); i < sources->size(); i++)
+        sources->get(i)->setEnabled(false);
+    
+    radarOptions.maxNumberEditablePoints = channelLayout.getNumInputChannels();
+}
+
 bool AmbisonicEncoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    int numOut = layouts.getMainOutputChannels();
+    int numIn = layouts.getMainInputChannels();
+    if(numOut < 4 || (numOut > 16 && numOut != 64))
         return false;
 
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+    if(numIn < 1 || (numIn > 24 && numIn != 64))
         return false;
-   #endif
-
-    return true;
-  #endif
-}
+    
+#if(!MULTI_ENCODER_MODE)
+    if(layouts.getMainInputChannels() != 1)
+        return false;
 #endif
+    
+    return true;
+}
 
 void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const
 {
-	if (!encoderSettings.distanceEncodingFlag || encoderSettings.distanceEncodingParams.getUnitCircleRadius() == 0.0)
+	if (!encoderSettings.distanceEncodingFlag || approximatelyEqual(encoderSettings.distanceEncodingParams.getUnitCircleRadius(), 0.0f))
 		return;
 
 	double wFactor, otherFactor;
@@ -194,9 +229,9 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
-	const int totalNumOutputChannels = getTotalNumOutputChannels();
-	double currentCoefficients[JucePlugin_MaxNumOutputChannels];
-	float* outputBufferPointers[JucePlugin_MaxNumOutputChannels];
+	const int totalUsedOutputChannels = jmin(getTotalNumOutputChannels(), encoderSettings.getAmbiChannelCount(), buffer.getNumChannels());
+	double currentCoefficients[64];
+	float* outputBufferPointers[64];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
@@ -206,7 +241,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     
     // in case of scaling change with doppler enabled, send an empty buffer and reset delay buffers
     double newScaler = scalingInfo.GetScaler();
-    if(encoderSettings.dopplerEncodingFlag && lastScaler != newScaler)
+    if(encoderSettings.dopplerEncodingFlag && !approximatelyEqual(lastScaler, newScaler))
     {
         for (int iSource = 0; iSource < totalNumInputChannels; iSource++)
         {
@@ -220,7 +255,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	AudioSampleBuffer localBuffer(1, inputBuffer.getNumSamples());
 
     // prepare write pointers
-	for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+	for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
 		outputBufferPointers[iChannel] = buffer.getWritePointer(iChannel);
 	
     bool soloOnly = sources->anySolo();
@@ -254,8 +289,9 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 
 		// calculate ambisonics coefficients
-		sourcePoint.getAmbisonicsCoefficients(JucePlugin_MaxNumOutputChannels, &currentCoefficients[0], true, true);
-		applyDistanceGain(&currentCoefficients[0], JucePlugin_MaxNumOutputChannels, sourcePointDistance);
+        memset(currentCoefficients, 0, 64 * sizeof(double));
+		sourcePoint.getAmbisonicsCoefficients(encoderSettings.getAmbiChannelCount(), &currentCoefficients[0], true, true);
+		applyDistanceGain(&currentCoefficients[0], 64, sourcePointDistance);
 		
 		if (encoderSettings.dopplerEncodingFlag)
 		{
@@ -275,12 +311,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		{
 			double fractionNew = 1.0 / numSamples * iSample;
 			double fractionOld = 1.0 - fractionNew;
-			for (iChannel = 0; iChannel < totalNumOutputChannels; iChannel++)
+			for (iChannel = 0; iChannel < totalUsedOutputChannels; iChannel++)
 				outputBufferPointers[iChannel][iSample] += sourceGain * masterGainFactor * float(inputData[iSample] * (fractionNew * currentCoefficients[iChannel] + fractionOld * lastCoefficients[iSource][iChannel]));
 		}
 
 		// keep coefficients
-		memcpy(&lastCoefficients[iSource], &currentCoefficients, JucePlugin_MaxNumOutputChannels * sizeof(double));
+		memcpy(&lastCoefficients[iSource], &currentCoefficients, 64 * sizeof(double));
 	}
 }
 
@@ -338,7 +374,13 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 		}
 	}
 
-	initializeOsc();
+    pOscHandler->initialize();
+	initializeOscSender();
+}
+
+ChannelLayout* AmbisonicEncoderAudioProcessor::getChannelLayout()
+{
+    return &channelLayout;
 }
 
 AmbiSourceSet* AmbisonicEncoderAudioProcessor::getSources()
@@ -391,9 +433,19 @@ ZoomSettings* AmbisonicEncoderAudioProcessor::getZoomSettingsPointer()
     return zoomSettings.get();
 }
 
+OSCHandlerEncoder* AmbisonicEncoderAudioProcessor::getOscHandler()
+{
+    return pOscHandler;
+}
+
 AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
 {
     return &animatorDataset;
+}
+
+RadarOptions* AmbisonicEncoderAudioProcessor::getRadarOptions()
+{
+    return &radarOptions;
 }
 
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
@@ -415,23 +467,9 @@ EncoderSettings* AmbisonicEncoderAudioProcessor::getEncoderSettings()
 	return &encoderSettings;
 }
 
-void AmbisonicEncoderAudioProcessor::initializeOsc()
+void AmbisonicEncoderAudioProcessor::initializeOscSender()
 {
-    pOscHandler->setVerbosity(true, !encoderSettings.hideWarnings);
-	if (encoderSettings.oscReceiveFlag)
-	{
-		if (!pOscHandler->start(encoderSettings.oscReceivePort))
-		{
-			AlertWindow::showMessageBox(AlertWindow::WarningIcon, JucePlugin_Name, "Error starting OSC Receiver on Port " + String(encoderSettings.oscReceivePort));
-			encoderSettings.oscReceiveFlag = false;
-		}
-	}
-	else
-	{
-		pOscHandler->stop();
-	}
-
-	if (encoderSettings.oscSendFlag)
+    if (encoderSettings.oscSendFlag)
 	{
 		if (!pOscSender->start(encoderSettings.oscSendTargetHost, encoderSettings.oscSendPort, encoderSettings.oscSendIntervalMs))
 		{

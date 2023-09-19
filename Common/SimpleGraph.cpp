@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    SimpleGraph.cpp
-    Created: 13 Nov 2019 10:34:34am
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "JuceHeader.h"
 #include "SimpleGraph.h"
@@ -38,7 +49,7 @@ void SimpleGraph::drawYAxis(Graphics& g) const
 		if (currentStep >= displayRangeY->getStart()) {
 			Point<float> xy = mapValues(displayRangeX->getStart(), currentStep).toFloat();
             xy.setX(jmax((float)graphArea->getX(), xy.getX()));
-			g.drawLine(xy.getX() - 3, xy.getY(), fullGridFlag ? graphArea->getRight() : xy.getX() + 3, xy.getY(), 1.0);
+			g.drawLine(xy.getX() - 3.0f, xy.getY(), fullGridFlag ? (float)graphArea->getRight() : xy.getX() + 3.0f, xy.getY(), 1.0f);
 			String buffer = String::formatted(annotationFormat, currentStep);
 			g.drawSingleLineText(buffer, int(xy.getX()) - 4, int(xy.getY()) + 4, Justification::right);
 		}
@@ -63,7 +74,7 @@ void SimpleGraph::drawXAxis(Graphics& g) const
             {
                 double realValue = labelValues[i];
                 Point<float> xy = mapValues(realValue, displayRangeY->getStart()).toFloat();
-                g.drawLine(xy.getX(), xy.getY() + 3, xy.getX(), fullGridFlag ? graphArea->getY() : xy.getY() - 3, 1.0f);
+                g.drawLine(xy.getX(), xy.getY() + 3.0f, xy.getX(), fullGridFlag ? (float)graphArea->getY() : xy.getY() - 3.0f, 1.0f);
                 g.drawSingleLineText(labelStrings[i], int(xy.getX()), int(xy.getY()) + 14, Justification::horizontallyCentred);
             }
         }
@@ -78,7 +89,7 @@ void SimpleGraph::drawXAxis(Graphics& g) const
 		if (currentStep >= displayRangeX->getStart()) {
 			double realValue = scalingModeX == Linear ? currentStep : pow(10.0, currentStep);
 			Point<float> xy = mapValues(realValue, displayRangeY->getStart()).toFloat();
-			g.drawLine(xy.getX(), xy.getY() + 3, xy.getX(), fullGridFlag ? graphArea->getY() : xy.getY() - 3, 1.0f);
+			g.drawLine(xy.getX(), xy.getY() + 3.0f, xy.getX(), fullGridFlag ? (float)graphArea->getY() : xy.getY() - 3.0f, 1.0f);
 			//String buffer = "10^" + String::formatted(annotationFormat, currentStep);
 			String buffer = String::formatted(scalingModeX == Linear ? annotationFormat : "%.0f", realValue);
 			g.drawSingleLineText(buffer, int(xy.getX()), int(xy.getY()) + 14, Justification::horizontallyCentred);

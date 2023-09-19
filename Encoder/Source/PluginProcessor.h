@@ -1,15 +1,25 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    This file was auto-generated!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    It contains the basic framework code for a JUCE plugin processor.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
 
-#pragma once
 
+
+#pragma once
 #include "AirAbsorbtionFilter.h"
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
@@ -29,6 +39,8 @@
 #include "CustomOscTxPresetHelper.h"
 #include "AnimatorDataset.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/ChannelLayout.h"
+#include "../../Common/RadarOptions.h"
 
 //==============================================================================
 /**
@@ -38,19 +50,21 @@ class AmbisonicEncoderAudioProcessor  : public AudioProcessor, ActionListener
 public:
     //==============================================================================
     AmbisonicEncoderAudioProcessor();
-    ~AmbisonicEncoderAudioProcessor();
+    ~AmbisonicEncoderAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
-
+   
+    // channel handling
+    void numChannelsChanged() override;
+    
 	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
+    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
+    using AudioProcessor::processBlock;
+    
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -75,9 +89,10 @@ public:
 
     void actionListenerCallback(const juce::String &message) override;
     
+    ChannelLayout* getChannelLayout();
 	AmbiSourceSet* getSources();
 	EncoderSettings* getEncoderSettings();
-	void initializeOsc();
+	void initializeOscSender();
     void initializeAudioParameter();
 	AudioParams* getAudioParams();
 	StatusMessageHandler* getStatusMessageHandler();
@@ -89,13 +104,15 @@ public:
     ScalingInfo* getScalingInfo();
     AnimatorDataset* getAnimatorDataset();
     ZoomSettings* getZoomSettingsPointer();
+    OSCHandlerEncoder* getOscHandler();
+    RadarOptions* getRadarOptions();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
 	EncoderSettings encoderSettings;
-	OSCHandler* pOscHandler;
+	OSCHandlerEncoder* pOscHandler;
 	AmbiOSCSender* pOscSender;
 	AmbiOSCSenderExt* pOscSenderExt;
 	AudioParams audioParams;
@@ -105,15 +122,17 @@ private:
     std::unique_ptr<DistanceEncodingPresetHelper> distanceEncodingPresetHelper;
     std::unique_ptr<CustomOscTxPresetHelper> customOscTxPresetHelper;
     std::unique_ptr<CustomOscRxPresetHelper> customOscRxPresetHelper;
-	double lastCoefficients[JucePlugin_MaxNumInputChannels][JucePlugin_MaxNumOutputChannels];
-	VarDelayBuffer delayBuffers[JucePlugin_MaxNumInputChannels];
-    AirAbsorbtionFilter airAbsorbtionFilters[JucePlugin_MaxNumInputChannels];
+	double lastCoefficients[64][64];
+	VarDelayBuffer delayBuffers[64];
+    AirAbsorbtionFilter airAbsorbtionFilters[64];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     std::unique_ptr<ZoomSettings> zoomSettings;
     double lastScaler;
     AnimatorDataset animatorDataset;
-
+    ChannelLayout channelLayout;
+    RadarOptions radarOptions;
+    
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };

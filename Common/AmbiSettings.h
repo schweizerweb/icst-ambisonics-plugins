@@ -1,20 +1,31 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    AmbiSettings.h
-    Created: 9 Oct 2017 4:02:43pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
+
 #define MAX_AMBISONICS_ORDER 7
-#define NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
-#define NB_OF_AMBISONICS_CHANNELS (NB_OF_AMBISONICS_GAINS * NB_OF_AMBISONICS_GAINS)
-#define CURRENT_AMBISONICS_ORDER_NB_OF_GAINS	int(sqrt(JucePlugin_MaxNumInputChannels))
-#define CURRENT_AMBISONICS_ORDER	(CURRENT_AMBISONICS_ORDER_NB_OF_GAINS - 1)
+#define MAX_NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
+#define MAX_NB_OF_AMBISONICS_CHANNELS (MAX_NB_OF_AMBISONICS_GAINS * MAX_NB_OF_AMBISONICS_GAINS)
+#define MAX_NUM_CHANNELS    64
 
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
@@ -36,21 +47,25 @@ public:
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
     void loadFromPresetXml(XmlElement* xmlElement);
 
+    int getGainCount();
+    int getAmbiOrder();
+    void setAmbiOrder(int order);
+    int getAmbiChannelCount() const;
     bool getWarningFlag();
     
 private:
 	double fact(int n);
-    void prepareInPhaseWeighting();
-    void prepareMaxreWeighting();
-    void prepareStandardWeighting();
+    void prepareAutoWeightings();
     void prepareManualWeighting();
     
-    int ambiChannelOrder[NB_OF_AMBISONICS_CHANNELS];
-	double manualOrderWeights[NB_OF_AMBISONICS_GAINS];
+    int ambiChannelOrder[MAX_NB_OF_AMBISONICS_CHANNELS];
+	double manualOrderWeights[MAX_NB_OF_AMBISONICS_GAINS];
     
-    double inPhaseWeights[NB_OF_AMBISONICS_GAINS];
-    double maxreWeights[NB_OF_AMBISONICS_GAINS];
-    double standardWeights[NB_OF_AMBISONICS_GAINS];
+    double inPhaseWeights[MAX_NB_OF_AMBISONICS_GAINS];
+    double maxreWeights[MAX_NB_OF_AMBISONICS_GAINS];
+    double standardWeights[MAX_NB_OF_AMBISONICS_GAINS];
+
+    int ambiOrder;
     
     AmbiWeightMode weightMode;
     bool loadWarningFlag;

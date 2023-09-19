@@ -1,12 +1,23 @@
 /*
-  =============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    MultiActivationDialog.
-    Created: 5 Nov 2022 9:26:39a
-    Author:  Christian Schweize
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  =============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -21,15 +32,15 @@ enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGL
 class MultiActivationDialog : public Component, ComboBox::Listener, Button::Listener, Slider::Listener, public ChangeListener
 {
 public:
-    MultiActivationDialog(AmbiDataSet* pData, Point<float> newPosition, ScalingInfo* pScaling, bool xyRadar) : pData(pData), newPosition(newPosition), xyRadar(xyRadar)
+    MultiActivationDialog(AmbiDataSet* _pData, Point<float> _newPosition, RadarOptions* _pRadarOptions, bool _xyRadar) : pData(_pData), newPosition(_newPosition), xyRadar(_xyRadar)
     {
         // copy to local data set
         color = COLOR_DEFINITION_GROUP_DEFAULT;
-        defaultRadius = pScaling->CartesianMax() / 5;
+        defaultRadius = _pRadarOptions->scalingInfo->CartesianMax() / 5;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
         localDataSet->setGroupModeFlag(true);
         localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
-        for(int i = 0; i < pData->size(); i++)
+        for(int i = 0; i < pData->size() && i < _pRadarOptions->maxNumberEditablePoints; i++)
         {
             auto p = pData->get(i)->getRawPoint();
             Point3D<double> np(p->getX(), p->getY(), p->getZ());
@@ -45,7 +56,7 @@ public:
         addAndMakeVisible(labelPointCount.get());
         
         sliderPointCount.reset(new Slider("PointCount"));
-        int max = pData->size() - pData->getEnabledCount();
+        int max = _pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
         sliderPointCount->setRange(Range<double>(0, max), 1.0);
         sliderPointCount->setValue(max, sendNotificationAsync);
         sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 40, 24);
@@ -74,7 +85,7 @@ public:
 
         sliderRadius.reset(new Slider("Radius"));
         sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
-        sliderRadius->setRange(0.01, pScaling->CartesianMax());
+        sliderRadius->setRange(0.01, _pRadarOptions->scalingInfo->CartesianMax());
         sliderRadius->setValue(defaultRadius);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
@@ -102,10 +113,6 @@ public:
         btnColor->setColour(TextButton::ColourIds::buttonColourId, color);
         btnColor->addListener(this);
         addAndMakeVisible(btnColor.get());
-        
-        zoomSettings.reset(new ZoomSettings(&scalingInfo));
-        RadarOptions radarOptions;
-        radarOptions.zoomSettings = zoomSettings.get();
         
         btnApply.reset(new TextButton("btn"));
         btnApply->setButtonText("Activate");
@@ -279,9 +286,10 @@ private:
                 int pointIndex = p->getId().getIntValue();
                 pData->addPointToGroup(newGroupIndex, pointIndex);
                 pData->get(pointIndex)->setEnabled(true);
+                auto ptToCopy = pData->getGroupModeFlag() ? p->getVector3D() : localDataSet->getAbsSourcePoint(i);
                 Vector3D<double> pp = xyRadar
-                    ? Vector3D<double>(p->getRawPoint()->getX(), p->getRawPoint()->getY(), 0)
-                    : Vector3D<double>(p->getRawPoint()->getX(), 0, p->getRawPoint()->getY());
+                    ? Vector3D<double>(ptToCopy.x, ptToCopy.y, 0)
+                    : Vector3D<double>(ptToCopy.x, 0, ptToCopy.y);
                 pData->get(pointIndex)->getRawPoint()->setXYZ(pp.x, pp.y, pp.z);
                 pData->get(pointIndex)->setColor(color);
                 if(toggleApplyName->getToggleState())
@@ -316,7 +324,7 @@ private:
                 p.addRectangle(-radius, -radius, 2*radius, 2*radius);
                 break;
             case SHAPE_ID_TRIANGLE:
-                p.addTriangle(0.0f, radius, cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius, -cos(float(PI)/6)*radius, -sin(float(PI)/6)*radius);
+                p.addTriangle(0.0f, radius, (float)cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius, (float)-cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius);
                 break;
             case SHAPE_ID_STAR:
                 float innerRadius = float(sliderRadius->getMinValue());
@@ -330,7 +338,7 @@ private:
         {
             if(localDataSet->get(i)->getGroup() == localDataSet->getGroup(0))
             {
-                auto pt = p.getPointAlongPath(totalLength / pointCount * groupPointIndex);
+                auto pt = p.getPointAlongPath(totalLength / (float(pointCount * groupPointIndex)));
                 localDataSet->get(i)->getRawPoint()->setXY(pt.getX(), pt.getY());
                 groupPointIndex++;
             }
@@ -363,10 +371,8 @@ private:
     AmbiDataSet* pData;
     Point<float> newPosition;
     bool xyRadar;
-    std::unique_ptr<ZoomSettings> zoomSettings;
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiDataSet> localDataSet;
     double defaultRadius;
     Colour color;
 };
-

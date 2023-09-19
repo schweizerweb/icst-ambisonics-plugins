@@ -1,16 +1,25 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    Point3D.h
-    Created: 28 Jul 2016 8:17:47am
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
 
-#ifndef POINT3D_H_INCLUDED
-#define POINT3D_H_INCLUDED
 
+
+#pragma once
 #include "JuceHeader.h"
 #include "AudioParameterSet.h"
 #include "Constants.h"
@@ -162,11 +171,6 @@ public:
 			&& abs(getY() - other.y) < delta
 			&& abs(getZ() - other.z) < delta;
 	}
-
-    //==============================================================================
-		/** This type will be double if the Point3D's type is double, otherwise it will be float. */
-	typedef typename TypeHelpers::SmallestFloatType<ValueType>::type FloatType;
-
 
 		/** Casts this Point3D to a Point3D<float> object. */
 	Point3D<float> toFloat() const noexcept{ return Point3D<float>(static_cast<float> (getX()), static_cast<float> (getY()), static_cast<float> (getZ())); }
@@ -358,9 +362,9 @@ private:
 
 	void setFromAed(ValueType azimuth, ValueType elevation, ValueType distance)
 	{
-		ValueType newX = distance * cos(elevation) * sin(azimuth);
-		ValueType newY = distance * cos(elevation) * cos(azimuth);
-		ValueType newZ = distance * sin(elevation);
+		ValueType newX = distance * (ValueType)cos(elevation) * (ValueType)sin(azimuth);
+		ValueType newY = distance * (ValueType)cos(elevation) * (ValueType)cos(azimuth);
+		ValueType newZ = distance * (ValueType)sin(elevation);
         
 		x = (ValueType)audioParams.notifyX((double)newX);
         y = (ValueType)audioParams.notifyY((double)newY);
@@ -371,6 +375,3 @@ private:
 /** Multiplies the Point3D's coordinates by a scalar value. */
 template <typename ValueType>
 Point3D<ValueType> operator* (ValueType value, Point3D<ValueType> p) noexcept{ return p * value; }
-
-#endif  // POINT3D_H_INCLUDED
-

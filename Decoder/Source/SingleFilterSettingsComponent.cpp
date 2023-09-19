@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.0.5
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/FilterInfo.h"
@@ -25,11 +27,15 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+#if JUCE_CLANG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
 //[/MiscUserDefs]
 
 //==============================================================================
-SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
-    : pFilterInfo(pFilterInfo)
+SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
+    : pFilterInfo(_pFilterInfo)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -247,8 +253,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SingleFilterSettingsComponent"
                  componentName="" parentClasses="public juce::Component, public ChangeBroadcaster"
-                 constructorParams="FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
-                 variableInitialisers="pFilterInfo(pFilterInfo)" snapPixels="8"
+                 constructorParams="FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
+                 variableInitialisers="pFilterInfo(_pFilterInfo)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -292,4 +298,3 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

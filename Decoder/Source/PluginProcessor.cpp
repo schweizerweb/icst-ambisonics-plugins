@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    This file was auto-generated!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    It contains the basic framework code for a JUCE plugin processor.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
@@ -20,16 +31,10 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
-#ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
-                     #if ! JucePlugin_IsMidiEffect
-                      #if ! JucePlugin_IsSynth
-                       .withInput  ("Input",  AudioChannelSet::stereo(), true)
-                      #endif
-                       .withOutput ("Output", AudioChannelSet::stereo(), true)
-                     #endif
+     : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
+                       .withInput  ("Input",  ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
+                       .withOutput ("Output", ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
                        )
-#endif
 {
     speakerSet.reset(new AmbiSpeakerSet(&scalingInfo));
     movingPoints.reset(new AmbiSourceSet(&scalingInfo));
@@ -40,6 +45,12 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
     presetHelper->initialize();
     presetHelper->loadDefaultPreset(speakerSet.get(), &ambiSettings);
+    
+    radarOptions.setTrackColorAccordingToName = false;
+    radarOptions.maxNumberEditablePoints = getBusesLayout().getMainOutputChannels();
+    radarOptions.editablePointsAsSquare = true;
+    radarOptions.scalingInfo = getScalingInfo();
+    radarOptions.zoomSettings = getZoomSettingsPointer();
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
@@ -108,7 +119,7 @@ void AmbisonicsDecoderAudioProcessor::prepareToPlay (double sampleRate, int samp
     // initialisation that you need..
     
     iirFilterSpec.numChannels = 1;
-    iirFilterSpec.maximumBlockSize = samplesPerBlock;
+    iirFilterSpec.maximumBlockSize = (uint32)samplesPerBlock;
     iirFilterSpec.sampleRate = sampleRate;
 }
 
@@ -142,29 +153,18 @@ void AmbisonicsDecoderAudioProcessor::checkDelayBuffers()
 	}
 }
 
-#ifndef JucePlugin_PreferredChannelConfigurations
 bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout& layouts) const
 {
-  #if JucePlugin_IsMidiEffect
-    ignoreUnused (layouts);
-    return true;
-  #else
-    // This is the place where you check if the layout is supported.
-    // In this template code we only support mono or stereo.
-    if (layouts.getMainOutputChannelSet() != AudioChannelSet::mono()
-     && layouts.getMainOutputChannelSet() != AudioChannelSet::stereo())
+    int numIn = layouts.getMainInputChannels();
+    int numOut = layouts.getMainOutputChannels();
+    if (numIn < 4 || (numIn > 16 && numIn != 64))
         return false;
 
-    // This checks if the input layout matches the output layout
-   #if ! JucePlugin_IsSynth
-    if (layouts.getMainOutputChannelSet() != layouts.getMainInputChannelSet())
+    if (numOut < 1 || (numOut > 24 && numOut != 64))
         return false;
-   #endif
 
     return true;
-  #endif
 }
-#endif
 
 void AmbisonicsDecoderAudioProcessor::checkFilters()
 {
@@ -182,7 +182,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
                     Logger::writeToLog("Error in Filterbank!");
                     return;
                 }
-                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < JucePlugin_MaxNumOutputChannels)
+                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < MAX_NUM_CHANNELS)
                 {
                     if (filterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
                     {
@@ -202,12 +202,12 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
     }
 }
 
-void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer&)
+void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    const int totalNumInputChannels  = getTotalNumInputChannels();
+    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.getAmbiChannelCount(), buffer.getNumChannels());
     const int totalNumOutputChannels = getTotalNumOutputChannels();
-    double currentCoefficients[JucePlugin_MaxNumInputChannels];
-	const float* inputBufferPointers[JucePlugin_MaxNumInputChannels];
+    double currentCoefficients[MAX_NUM_CHANNELS];
+	const float* inputBufferPointers[MAX_NUM_CHANNELS];
 	int iChannel;
 	AudioSampleBuffer inputBuffer;
 
@@ -242,10 +242,10 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, M
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
 			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
-            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : CURRENT_AMBISONICS_ORDER;
-            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : totalNumInputChannels;
+            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.getAmbiOrder();
+            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((ambiSettings.getAmbiOrder() + 1) * (ambiSettings.getAmbiOrder() + 1));
             
-			pt->getRawPoint()->getAmbisonicsCoefficients(JucePlugin_MaxNumInputChannels, &currentCoefficients[0], true, true);
+			pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
 			
 			// gain of the W-signal depends on the used ambisonic order
             if(currentAmbisonicsOrder > 0)
@@ -413,6 +413,16 @@ ZoomSettings* AmbisonicsDecoderAudioProcessor::getZoomSettingsPointer()
     return zoomSettings.get();
 }
 
+ChannelLayout* AmbisonicsDecoderAudioProcessor::getChannelLayout()
+{
+    return &channelLayout;
+}
+
+RadarOptions* AmbisonicsDecoderAudioProcessor::getRadarOptions()
+{
+    return &radarOptions;
+}
+
 void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)
 {
     if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
@@ -421,6 +431,24 @@ void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &messa
         presetHelper->loadFromXmlFile(presetFile, speakerSet.get(), &ambiSettings);
         presetHelper->notifyPresetChanged();
     }
+}
+
+void AmbisonicsDecoderAudioProcessor::numChannelsChanged()
+{
+    // handle output channels
+    channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
+    
+    int maxAmbiOrder = channelLayout.getMaxAmbiOrder(false);
+    if(ambiSettings.getAmbiOrder() > maxAmbiOrder)
+    {
+        ambiSettings.setAmbiOrder(maxAmbiOrder);
+    }
+    
+    // handle output channels
+    while(channelLayout.getNumOutputChannels() < speakerSet->size())
+        speakerSet->remove(speakerSet->size() - 1);
+    
+    radarOptions.maxNumberEditablePoints = channelLayout.getNumOutputChannels();
 }
 
 //==============================================================================

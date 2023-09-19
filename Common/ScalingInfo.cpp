@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    ScalingInfo.cpp
-    Created: 7 Apr 2021 6:03:37pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include <JuceHeader.h>
 #include "ScalingInfo.h"
@@ -38,12 +49,12 @@ double ScalingInfo::decompress(double value) const
 
 float ScalingInfo::CartesianMin()
 {
-    return Scaler == Infinite ? -100000 : -(float)Scaler;
+    return approximatelyEqual(Scaler, Infinite) ? -100000.0f : -(float)Scaler;
 }
 
 float ScalingInfo::CartesianMax()
 {
-    return Scaler == Infinite ? 100000 : (float)Scaler;
+    return approximatelyEqual(Scaler, Infinite) ? 100000.0f : (float)Scaler;
 }
 
 float ScalingInfo::DistanceMax()
@@ -53,7 +64,7 @@ float ScalingInfo::DistanceMax()
 
 bool ScalingInfo::IsInfinite() const
 {
-    return Scaler == Infinite;
+    return exactlyEqual(Scaler, Infinite);
 }
 
 double ScalingInfo::GetScaler()

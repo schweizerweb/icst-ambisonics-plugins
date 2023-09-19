@@ -1,26 +1,37 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    GroupPointsSelectionComponent.h
-    Created: 9 Nov 2019 3:35:35pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "../../Common/AmbiSourceSet.h"
+
 #define CHECKBOX_HEIGHT 25
 #define COMPONENT_WIDTH 200
-//==============================================================================
-/*
-*/
+
+
 class GroupPointsSelectionComponent    : public Component, public ToggleButton::Listener, ChangeBroadcaster
 {
 public:
-    GroupPointsSelectionComponent(AmbiDataSet* pSources, int groupIndex, ChangeListener* pListener): pSources(pSources), groupIndex(groupIndex)
+    GroupPointsSelectionComponent(AmbiDataSet* _pSources, int _groupIndex, ChangeListener* pListener): pSources(_pSources), groupIndex(_groupIndex)
     {
 	    // In your constructor, you should add any child components, and
 	    // initialise any special settings that your component needs.
@@ -45,7 +56,7 @@ public:
 		setSize(COMPONENT_WIDTH * columnCount, rowCount * CHECKBOX_HEIGHT);
     }
 
-	~GroupPointsSelectionComponent()
+	~GroupPointsSelectionComponent() override
     {
 		deleteAllChildren();
     }

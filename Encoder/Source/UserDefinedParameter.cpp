@@ -1,17 +1,33 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    UserDefinedParameter.cpp
-    Created: 17 Jan 2022 10:50:22pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "UserDefinedParameter.h"
 #include <string.h>
 
-UserDefinedParameter::UserDefinedParameter(String originalString, std::string typeString, double lo, double hi) : originalString(originalString), loLim(lo), hiLim(hi)
+#if JUCE_GCC || JUCE_CLANG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wswitch-enum"
+#endif
+
+UserDefinedParameter::UserDefinedParameter(String _originalString, std::string typeString, double lo, double hi) : originalString(_originalString), loLim(lo), hiLim(hi)
 {
     switch(typeString.substr()[0])
     {
@@ -24,7 +40,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, std::string ty
     }
 }
 
-UserDefinedParameter::UserDefinedParameter(String originalString, std::string typeString, double lo, double hi, double zero) : originalString(originalString), loLim(lo), hiLim(hi), zero(zero)
+UserDefinedParameter::UserDefinedParameter(String _originalString, std::string typeString, double lo, double hi, double _zero) : originalString(_originalString), loLim(lo), hiLim(hi), zero(_zero)
 {
     switch(typeString.substr()[0])
     {
@@ -35,7 +51,7 @@ UserDefinedParameter::UserDefinedParameter(String originalString, std::string ty
     }
 }
 
-UserDefinedParameter::UserDefinedParameter(String originalString, ParameterType t): originalString(originalString)
+UserDefinedParameter::UserDefinedParameter(String _originalString, ParameterType t): originalString(_originalString)
 {
     type = t;
     switch(t)
@@ -253,6 +269,11 @@ bool UserDefinedParameter::getValueFromOsc(int* pInt, OSCArgument* pArgument)
                 *pInt = pArgument->getInt32();
                 return true;
             }
+            if(pArgument->isFloat32())
+            {
+                *pInt = (int)pArgument->getFloat32();
+                return true;
+            }
             break;
         default:
             break;
@@ -330,14 +351,22 @@ bool UserDefinedParameter::getValueFromOsc(String *pString, OSCArgument *pArgume
     return false;
 }
 
-bool UserDefinedParameter::checkConst(OSCArgument* pArgument)
+bool UserDefinedParameter::checkConst(OSCArgument* pArgument, bool* pDataTypeOk)
 {
+    *pDataTypeOk = false;
+    
     switch (type) {
-        case ConstInt: return pArgument->isInt32() && pArgument->getInt32() == constInt;
-        case ConstFloat: return pArgument->isFloat32() && pArgument->getFloat32() == constFloat;
-        case ConstString: return pArgument->isString() && pArgument->getString() == constString;
+        case ConstInt:
+            *pDataTypeOk = pArgument->isInt32(); 
+            return *pDataTypeOk && (pArgument->getInt32() == constInt);
+        case ConstFloat: 
+            *pDataTypeOk = pArgument->isFloat32();
+            return *pDataTypeOk && approximatelyEqual(pArgument->getFloat32(), constFloat);
+        case ConstString:
+            *pDataTypeOk = pArgument->isString(); 
+            return *pDataTypeOk && (pArgument->getString() == constString);
             
         default:
-            return true;
+            return false;
     }
 }

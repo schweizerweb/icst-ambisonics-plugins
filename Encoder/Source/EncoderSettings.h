@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    EncoderSettings.h
-    Created: 26 Dec 2017 11:55:01pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -29,8 +40,9 @@
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_HIDE_WARNINGS       false
-#define MULTI_ENCODER_MODE (JucePlugin_MaxNumInputChannels > 1)
-#define MAXIMUM_NUMBER_OF_GROUPS   (JucePlugin_MaxNumInputChannels > 1 ? 8 : 0)
+#define DEFAULT_AMBI_ORDER          1
+#define MAXIMUM_NUMBER_OF_GROUPS    8
+#define MULTI_ENCODER_MODE (MAX_NUM_INPUT > 1)
 
 class EncoderSettings
 {
@@ -39,6 +51,7 @@ public:
 	~EncoderSettings();
 	XmlElement* getAsXmlElement(String tagName) const;
 	void loadFromXml(XmlElement* xml_element);
+    int getAmbiChannelCount() const;
     
     bool oscReceiveFlag;
 	int oscReceivePort;
@@ -60,6 +73,8 @@ public:
     
 	OwnedArray<CustomOscTarget> customOscTargets;
     OwnedArray<CustomOscInput> customOscInput;
+    
+    int ambiOrder;
     
 	bool distanceEncodingFlag;
 	DistanceEncodingParams distanceEncodingParams;

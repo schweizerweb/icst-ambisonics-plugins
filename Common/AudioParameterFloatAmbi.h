@@ -1,12 +1,24 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    AudioParameterFloatAmbi.h
-    Created: 15 Jan 2018 6:21:08am
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
+
 #pragma once
 
 #include "JuceHeader.h"
@@ -20,7 +32,7 @@ public:
 
 	AudioParameterFloatAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, Category categoryToUse, 
 		NormalisableRange<float> r, float def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType);
-	~AudioParameterFloatAmbi();
+	~AudioParameterFloatAmbi() override;
 
     void setEnabled(bool enabled) override;
 	float getValue() const override;

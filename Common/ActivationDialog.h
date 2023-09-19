@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    ActivationDialog.h
-    Created: 8 Feb 2021 7:00:28pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -14,7 +25,7 @@
 class ActivationDialog : public Component, ComboBox::Listener, Button::Listener
 {
 public:
-    ActivationDialog(AmbiDataSet* pData, Point<float> newPosition, bool xyRadar) : pData(pData), newPosition(newPosition), xyRadar(xyRadar)
+    ActivationDialog(AmbiDataSet* _pData, Point<float> _newPosition, bool _xyRadar) : pData(_pData), newPosition(_newPosition), xyRadar(_xyRadar)
     {        
         comboLabel.reset(new Label("channel"));
         comboLabel->setText("Channel:", dontSendNotification);

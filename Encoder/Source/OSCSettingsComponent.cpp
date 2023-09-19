@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 //[/Headers]
@@ -27,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
-    : pSettings(pSettings)
+OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
+    : pSettings(_pSettings)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(pChangeListener);
@@ -281,7 +283,7 @@ void OSCSettingsComponent::controlDimming() const
     labelExternalOscInfo->setColour(Label::textColourId, textColor);
 
     double packetsPerSecond = targetCount / (pSettings->oscSendExtIntervalMs * 0.001) + (pSettings->oscSendFlag ? (1.0 / (pSettings->oscSendIntervalMs * 0.001)) : 0.0);
-    String info = packetsPerSecond == 0.0
+    String info = approximatelyEqual(packetsPerSecond, 0.0)
         ? "no network traffic"
         : ("estimated network traffic: " + String(!pSettings->oscSendExtContinuousFlag ? "max. " : "") + (packetsPerSecond < 1.0
                                             ? "<1/s"
@@ -310,8 +312,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCSettingsComponent" componentName=""
                  parentClasses="public Component, public TextEditor::Listener, public ChangeBroadcaster, public ChangeListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper"
-                 variableInitialisers="pSettings(pSettings)" snapPixels="8" snapActive="1"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper"
+                 variableInitialisers="pSettings(_pSettings)" snapPixels="8" snapActive="1"
                  snapShown="1" overlayOpacity="0.330" fixedSize="0" initialWidth="600"
                  initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>

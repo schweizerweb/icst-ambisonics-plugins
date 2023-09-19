@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "SpeakerSettingsComponent.h"
@@ -29,7 +31,7 @@
 
 //==============================================================================
 AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc)
-    : AudioProcessorEditor(ownerProc), processor(ownerProc)
+    : AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	settingsWindow = nullptr;
@@ -39,15 +41,11 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 	pDecoderSettings = ownerProc.getDecoderSettings();
 	pFilterSpecification = ownerProc.getFilterSpecification();
 	pOscHandler = new OSCHandlerDecoder(pMovingPoints);
+    pRadarOptions = ownerProc.getRadarOptions();
 	initializeOscHandler();
-	radarOptions.setTrackColorAccordingToName = false;
-	radarOptions.maxNumberEditablePoints = JucePlugin_MaxNumOutputChannels;
-	radarOptions.editablePointsAsSquare = true;
-    radarOptions.scalingInfo = ownerProc.getScalingInfo();
-    radarOptions.zoomSettings = ownerProc.getZoomSettingsPointer();
-    //[/Constructor_pre]
+	//[/Constructor_pre]
 
-    radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, &radarOptions));
+    radarComponent.reset (new RadarComponent (pSpeakerSet, pMovingPoints, &pointSelection, ownerProc.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
@@ -153,7 +151,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, processor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, processor.getTestSoundGenerator(), this, pFilterSpecification, processor.getZoomSettingsPointer()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, mainProcessor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, mainProcessor.getTestSoundGenerator(), this, pFilterSpecification, mainProcessor.getZoomSettingsPointer(), mainProcessor.getChannelLayout()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]
@@ -182,7 +180,7 @@ void AmbisonicsDecoderAudioProcessorEditor::changeListenerCallback(ChangeBroadca
 void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 {
 	// update timeout
-	radarOptions.displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
+	pRadarOptions->displayTimeout = pDecoderSettings->oscReceiveTimeoutMs;
 
 	pOscHandler->stop();
 
@@ -197,8 +195,8 @@ void AmbisonicsDecoderAudioProcessorEditor::initializeOscHandler()
 
 void AmbisonicsDecoderAudioProcessorEditor::updateRadarOptions()
 {
-	radarOptions.showEditablePoints = pDecoderSettings->editMode;
-	radarOptions.showDisplayOnlyPoints = !pDecoderSettings->editMode;
+	pRadarOptions->showEditablePoints = pDecoderSettings->editMode;
+	pRadarOptions->showDisplayOnlyPoints = !pDecoderSettings->editMode;
 	if(!pDecoderSettings->editMode)
 		pointSelection.unselectPoint();
 	radarComponent->setPointInfoVisible(pDecoderSettings->editMode);
@@ -228,13 +226,13 @@ BEGIN_JUCER_METADATA
 <JUCER_COMPONENT documentType="Component" className="AmbisonicsDecoderAudioProcessorEditor"
                  componentName="" parentClasses="public AudioProcessorEditor, public ChangeListener, public ActionListener"
                  constructorParams="AmbisonicsDecoderAudioProcessor&amp; ownerProc"
-                 variableInitialisers="AudioProcessorEditor(ownerProc), processor(ownerProc)"
+                 variableInitialisers="AudioProcessorEditor(ownerProc), mainProcessor(ownerProc)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="400" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
   <GENERICCOMPONENT name="radarComponent" id="cb26712c5c52dede" memberName="radarComponent"
                     virtualName="" explicitFocusOrder="0" pos="0 32 0M 32M" class="RadarComponent"
-                    params="pSpeakerSet, pMovingPoints, &amp;pointSelection, &amp;radarOptions"/>
+                    params="pSpeakerSet, pMovingPoints, &amp;pointSelection, ownerProc.getRadarOptions()"/>
   <LABEL name="labelVersion" id="79dc1bc82b90b8df" memberName="labelVersion"
          virtualName="" explicitFocusOrder="0" pos="5Rr 4 111 24" edTextCol="ff000000"
          edBkgCol="0" labelText="Version" editableSingleClick="0" editableDoubleClick="0"
@@ -688,4 +686,3 @@ const int AmbisonicsDecoderAudioProcessorEditor::help_pngSize = 1009;
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

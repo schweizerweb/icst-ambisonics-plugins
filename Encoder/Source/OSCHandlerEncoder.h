@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    OSCHandlerEncoder.h
-    Created: 3 May 2020 10:57:23pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -17,6 +28,7 @@
 #include "DistanceEncodingParams.h"
 #include "EncoderSettings.h"
 
+#define OSC_HANDLER_ACTION_OSC_RECEIVED "oscrcv"
 #define OSC_ADDRESS_MUSESCORE_SSMN "/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED "/icst/ambi/source/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ "/icst/ambi/source/xyz"
@@ -42,12 +54,14 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_EXPONENTIAL "/icst/ambi/distanceencoding/exponential"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_INVERSE_PROPORTIONAL "/icst/ambi/distanceencoding/inverseproportional"
 
-class OSCHandlerEncoder : public OSCHandler
+class OSCHandlerEncoder : public OSCHandler, public ActionBroadcaster
 {
 public:
     OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* pStatusMessageHandler, EncoderSettings* pEncoderSettings, ScalingInfo* pScaling);
     bool handleSpecific(const juce::OSCMessage &message) override;
     bool initSpecific() override;
+    bool initialize();
+    bool getReceiverStatus(int rowNumber, bool* isInit, bool* hasIncomingData, bool* hasSuccessfulIncomingData, String* errorMessage);
     
 private:
     void handleMusescoreSSMNStyle(const OSCMessage& message) const;

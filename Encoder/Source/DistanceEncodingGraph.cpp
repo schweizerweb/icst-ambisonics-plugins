@@ -1,16 +1,27 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    DistanceEncodingGraph.cpp
-    Created: 22 Nov 2019 1:29:47pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "DistanceEncodingGraph.h"
 
-DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings) : pParams(params), pZoomSettings(pZoomSettings)
+DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* _pZoomSettings) : pParams(params), pZoomSettings(_pZoomSettings)
 {
 	setDisplayRange(Linear, Range<double>(0.0, pZoomSettings->getScalingInfo()->CartesianMax()), Linear, Range<double>(-20, 0));
 	fullGridFlag = true;
@@ -37,7 +48,7 @@ void DistanceEncodingGraph::paintData(Graphics& g)
 	for (int step = 0; step <= NB_STEPS; step++)
 	{
 		double wFactor, otherFactor;
-		double distance = 0.00001 + maxValue / NB_STEPS * step;
+		double distance = 0.00001 + (double)maxValue / (double)NB_STEPS * (double)step;
 		pParams->calculateAttenuation(distance, &wFactor, &otherFactor);
 
 		Point<float> displayPointW = mapValues(distance, Decibels::gainToDecibels(wFactor)).toFloat();

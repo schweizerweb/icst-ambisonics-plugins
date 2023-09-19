@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    VarDelayBuffer.cpp
-    Created: 18 Nov 2019 8:57:03am
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "VarDelayBuffer.h"
 
@@ -25,7 +36,7 @@ void VarDelayBuffer::initialize(int bufferSize)
 	if (audioBuffer != nullptr)
 		free(audioBuffer);
 
-	audioBuffer = (float*)calloc(bufferSize, sizeof(float));
+	audioBuffer = (float*)calloc((size_t)bufferSize, sizeof(float));
 	bufferLength = bufferSize;
 	iWrite = 0;
 	lastDelayInSamples = 0.0f;
@@ -40,7 +51,7 @@ void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, flo
 		first = false;
 	}
 
-	if(newDelayInSamples > bufferLength)
+	if(newDelayInSamples > (float)bufferLength)
 	{
 		newDelayInSamples = float(bufferLength);
 	}
@@ -50,9 +61,9 @@ void VarDelayBuffer::process(float newDelayInSamples, const float* inBuffer, flo
 	{
 		audioBuffer[iWrite] = inBuffer[i];		// write input sound into the buffer
 
-		float pRead = iWrite - (lastDelayInSamples + i * slope);			// float Leseposition 
+		float pRead = (float)iWrite - (lastDelayInSamples + (float)i * slope);			// float Leseposition 
 		int iRead = (int)pRead;
-		float fracRead = pRead - iRead;
+		float fracRead = pRead - (float)iRead;
 		if (iRead < 0) {
 			iRead += bufferLength;
 		}

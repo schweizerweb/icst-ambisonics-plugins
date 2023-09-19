@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    GroupTableListModel.h
-    Created: 9 Nov 2019 8:41:04am
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -36,7 +47,7 @@
 class GroupTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-	GroupTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling): pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
+	GroupTableListModel(AmbiSourceSet* _pSources, PointSelection* _pPointSelection, Component* _pParentComponent, ScalingInfo* _pScaling): pSources(_pSources), pPointSelection(_pPointSelection), pParentComponent(_pParentComponent), pTableListBox(nullptr), pScalingInfo(_pScaling)
 	{
 	}
 
@@ -274,7 +285,7 @@ public:
         case COLUMN_ID_GROUP_ROTATION:
             {
                 StringArray tokens;
-                tokens.addTokens (newText, ";");
+                tokens.addTokens (newText, ";", "");
 
                 if(tokens.size() == 4)
                 {

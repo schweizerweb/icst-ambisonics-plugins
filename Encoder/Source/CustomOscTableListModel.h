@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    CustomOscTableListModel.h
-    Created: 24 Jan 2021 9:53:48pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -16,6 +27,7 @@
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
 #include "../../Common/PresetHelper.h"
+#include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
 #define COLUMN_ID_HOST			202
@@ -29,7 +41,7 @@
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
+	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -107,9 +119,9 @@ public:
                 if (btn == nullptr) {
                     btn = new ImageButton();
                     btn->setImages (false, true, true,
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                                    juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                    juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
                     btn->setTooltip("Add to presets...");
                     btn->addListener(this);
                 }
@@ -157,7 +169,7 @@ public:
             switch (columnId)
             {
                 case COLUMN_ID_PORT: standardTargets[rowNumber]->pTarget->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = newValue != 0.0; break;
+                case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = !exactlyEqual(newValue, 0.0); break;
                 default: ;
             }
         }
@@ -167,15 +179,14 @@ public:
             switch (columnId)
             {
                 case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
-                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = newValue != 0.0; break;
+                case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = !exactlyEqual(newValue, 0.0); break;
                 default: ;
             }
         }
         
-		getTable()->updateContent();
-		getTable()->repaint();
-
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 	
 	SliderRange getSliderRange(int columnId) override 
@@ -237,6 +248,8 @@ public:
         }
         
 		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	void initTable(TableListBox* tableListBox)
@@ -264,7 +277,7 @@ public:
 
 private:
     struct StandardTarget {
-        StandardTarget(String name, StandardOscTarget* pTarget) : name(name), pTarget(pTarget) {};
+        StandardTarget(String _name, StandardOscTarget* _pTarget) : name(_name), pTarget(_pTarget) {}
         String name;
         StandardOscTarget* pTarget;
     };
@@ -273,6 +286,4 @@ private:
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
     OwnedArray<StandardTarget> standardTargets;
-    const char* save_png;
-    const int save_pngSize;
 };

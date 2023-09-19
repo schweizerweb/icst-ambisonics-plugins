@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.0.5
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/FilterBankInfo.h"
@@ -29,8 +31,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex)
-    : pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)
+FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* _pPresetHelper, int _channelIndex)
+    : pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -313,8 +315,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="FilterSettingsComponent"
                  componentName="" parentClasses="public Component, public ChangeBroadcaster, public ActionListener, public ChangeListener, public Timer"
-                 constructorParams="FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex"
-                 variableInitialisers="pPresetHelper(pPresetHelper), pFilterBankInfo(pFilterBankInfo), channelIndex(channelIndex)"
+                 constructorParams="FilterBankInfo* _pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* _pPresetHelper, int _channelIndex"
+                 variableInitialisers="pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="700" initialHeight="550">
   <BACKGROUND backgroundColour="ff505050"/>
@@ -369,4 +371,3 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

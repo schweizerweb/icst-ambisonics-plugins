@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "RadarOptions.h"
@@ -28,11 +30,15 @@
 
 
 //[MiscUserDefs] You can add your own user definitions and misc code here...
+#if JUCE_CLANG
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
+#endif
 //[/MiscUserDefs]
 
 //==============================================================================
-PointInfoControl::PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
-    : pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)
+PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions)
+    : pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -572,8 +578,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PointInfoControl" componentName=""
                  parentClasses="public Component, public ChangeListener, public TextEditor::Listener"
-                 constructorParams="AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions"
-                 variableInitialisers="pEditablePoints(pEditablePoints), pPointSelection(pPointSelection), pRadarOptions(pRadarOptions)"
+                 constructorParams="AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions"
+                 variableInitialisers="pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="1" initialWidth="390" initialHeight="100">
   <BACKGROUND backgroundColour="ff505050"/>
@@ -829,4 +835,3 @@ const int PointInfoControl::trashbinicon_pngSize = 3030;
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

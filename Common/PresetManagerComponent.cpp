@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.0.5
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 //[/Headers]
@@ -26,8 +28,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-PresetManagerComponent::PresetManagerComponent (PresetHelper* pPresetHelper, bool allowApply)
-    : pPresetHelper(pPresetHelper)
+PresetManagerComponent::PresetManagerComponent (PresetHelper* _pPresetHelper, bool allowApply)
+    : pPresetHelper(_pPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 
@@ -297,8 +299,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="PresetManagerComponent" componentName=""
                  parentClasses="public Component, public FileDragAndDropTarget, ActionListener"
-                 constructorParams="PresetHelper* pPresetHelper, bool allowApply"
-                 variableInitialisers="pPresetHelper(pPresetHelper)" snapPixels="8"
+                 constructorParams="PresetHelper* _pPresetHelper, bool allowApply"
+                 variableInitialisers="pPresetHelper(_pPresetHelper)" snapPixels="8"
                  snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
                  initialWidth="700" initialHeight="400">
   <METHODS>

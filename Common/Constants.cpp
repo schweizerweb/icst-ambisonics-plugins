@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    Constants.cpp
-    Created: 27 Sep 2018 1:25:28pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "Constants.h"
 #include "JuceHeader.h"
@@ -28,6 +39,7 @@ const float Constants::CompressedMax = 1.0f;
 
 const float Constants::StretchMin = 0.0;
 const float Constants::StretchMax = 100.0;
+const int Constants::audioParamVersion = 1;
 
 double Constants::RadToGrad(double rad)
 {
@@ -46,7 +58,7 @@ int Constants::NormalizeAzimuthGrad(int grad)
 
 bool Constants::isDevelopmentVersion()
 {
-	return String(ProjectInfo::versionString) == "0.0.0" || !String(ProjectInfo::versionString).containsOnly("0123456789.");
+	return String(ProjectInfo::versionString).startsWith("0") || String(ProjectInfo::versionString).matchesWildcard("*.*.*.*", true);
 }
 
 bool Constants::isNonVisibleVersionPrerelease()

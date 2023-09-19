@@ -1,19 +1,30 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    IIRFilterGraph.cpp
-    Created: 12 Nov 2019 4:11:24pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "IIRFilterGraph.h"
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
+IIRFilterGraph::IIRFilterGraph(FilterBankInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(_pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -25,7 +36,7 @@ IIRFilterGraph::IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pF
 
 	for (int i = 0; i < MAX_FILTER_COUNT; i++)
 	{
-		magnitudes[i] = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
+		magnitudes[i] = static_cast<double*>(calloc((size_t)frequencies.size(), sizeof(double)));
 	}
 
 	setDisplayRange(LogarithmicFrequency, Range<double>(20, pFilterSpecification->sampleRate / 2.0), Linear, Range<double>(-50, 50));
@@ -64,7 +75,7 @@ void IIRFilterGraph::paintData(Graphics& g)
 		int activeFilterCount = int(coeffs.size());
 		for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
 		{
-			coeffs[iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], frequencies.size(), sampleRate);
+			coeffs[(size_t)iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], (size_t)frequencies.size(), sampleRate);
 		}
 
 		for (int i = 0; i < frequencies.size(); i++)
@@ -109,13 +120,13 @@ void IIRFilterGraph::setFFTResult(float* data, int size, int newFftSize)
 		if (fftResultData != nullptr)
 			free(fftResultData);
 		
-		fftResultData = static_cast<float*>(calloc(size, sizeof(float)));
+		fftResultData = static_cast<float*>(calloc((size_t)size, sizeof(float)));
 		fftResultDataSize = size;
 	}
 
 	if (fftResultData != nullptr)
 	{
-		memcpy(fftResultData, data, size * sizeof(float));
+		memcpy(fftResultData, data, (size_t)size * sizeof(float));
 		repaint();
 	}
 }

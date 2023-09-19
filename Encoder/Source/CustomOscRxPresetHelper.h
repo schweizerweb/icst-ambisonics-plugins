@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    CustomOscRxPresetHelper.h
-    Created: 4 Aug 2022 10:46:25am
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -15,8 +26,8 @@
 class CustomOscRxPresetHelper : public PresetHelper
 {
 public:
-    CustomOscRxPresetHelper(File presetDirectory, ActionListener* pActionListener)
-        : PresetHelper(presetDirectory, pActionListener)
+    CustomOscRxPresetHelper(File _presetDirectory, ActionListener* _pActionListener)
+        : PresetHelper(_presetDirectory, _pActionListener)
     {
         
     }
@@ -71,6 +82,35 @@ if(ret != true)
         File fileJsPreset = getPathForPresetName("JS-Demo");
         writeToXmlFile(fileJsPreset, &jsPreset);
         presetFiles.addIfNotAlreadyThere(fileJsPreset);
+        
+        // iannix cursor preset
+        CustomOscInput iannixPreset;
+        iannixPreset.oscString = "ci1:/cursor {cf,2} {} {} {} {} {x} {y} {z}";
+        iannixPreset.commandString = "";
+        File fileIannixPreset = getPathForPresetName("Iannix-Cusor-Demo");
+        writeToXmlFile(fileIannixPreset, &iannixPreset);
+        presetFiles.addIfNotAlreadyThere(fileIannixPreset);
+        
+        // iannix cursor preset using JS
+        CustomOscInput iannixPresetJs;
+        iannixPresetJs.oscString = "/cursor";
+        iannixPresetJs.commandString =
+R"(// demo that parses Iannix cursor messages using JS
+
+i = 2;          // hard coded channel index
+c = s.arg(1);   // cursor index from iannix, used for filtering
+
+if(c==2)
+{
+    x = s.arg(6);   // X is taken from the 6th argument
+    y = s.arg(7);   // Y is taken from the 7th argument
+    z = s.arg(8);   // Z is taken from the 8th argument
+    s.setXYZ(i, x, y, z);   // finally set the new position
+}
+)";
+        File fileIannixPresetJs = getPathForPresetName("Iannix-Cusor-Demo-JS");
+        writeToXmlFile(fileIannixPresetJs, &iannixPresetJs);
+        presetFiles.addIfNotAlreadyThere(fileIannixPresetJs);
     }
     
     bool loadFromXmlFile(const File file, CustomOscInput* pOscRx)

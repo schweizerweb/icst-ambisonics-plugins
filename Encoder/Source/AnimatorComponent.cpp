@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 //[/Headers]
@@ -27,8 +29,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-AnimatorComponent::AnimatorComponent (AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset)
-    : pSourceSet(pSourceSet), pAnimatorDataset(pAnimatorDataset)
+AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset)
+    : pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     while(pAnimatorDataset->actions.size() < 2)
@@ -136,7 +138,7 @@ void AnimatorComponent::refreshControls()
     // nothing to do
 }
 
-void AnimatorComponent::actionListenerCallback(const juce::String &message)
+void AnimatorComponent::actionListenerCallback(const juce::String& message)
 {
 #if MULTI_ENCODER_MODE
     AnimatorMovement* pMov = nullptr;
@@ -170,6 +172,8 @@ void AnimatorComponent::actionListenerCallback(const juce::String &message)
             }
         }
     }
+#else
+    ignoreUnused(message);
 #endif
 }
 
@@ -199,7 +203,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
     double factor = STEP_TIMER_INTERVAL / 1000.0;
     if(pAction->enabled && pAction->groupIndex >= 0 && pAction->groupIndex < pSourceSet->groupCount())
     {
-        if(pAction->rotationX != 0.0 || pAction->rotationY != 0.0 || pAction->rotationZ != 0.0)
+        if(!exactlyEqual(pAction->rotationX, 0.0) || !exactlyEqual(pAction->rotationY, 0.0) || !exactlyEqual(pAction->rotationZ, 0.0))
         {
             pSourceSet->rotateGroup(
                                     pAction->groupIndex,
@@ -207,7 +211,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
                                     Constants::GradToRad(factor * pAction->rotationY),
                                     Constants::GradToRad(factor * pAction->rotationZ));
         }
-        if(pAction->rotationOriginX != 0.0 || pAction->rotationOriginY != 0.0 || pAction->rotationOriginZ != 0.0)
+        if(!exactlyEqual(pAction->rotationOriginX, 0.0) || !exactlyEqual(pAction->rotationOriginY, 0.0) || !exactlyEqual(pAction->rotationOriginZ, 0.0))
         {
             pSourceSet->rotateGroupAroundOrigin(
                                                 pAction->groupIndex,
@@ -216,7 +220,7 @@ void AnimatorComponent::performAction(AnimatorAction *pAction)
                                                 Constants::GradToRad(factor * pAction->rotationOriginZ),
                                                 true);
         }
-        if(pAction->stretch != 0.0)
+        if(!exactlyEqual(pAction->stretch, 0.0))
         {
             pSourceSet->stretchGroup(pAction->groupIndex, factor * pAction->stretch);
         }
@@ -288,8 +292,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="AnimatorComponent" componentName=""
                  parentClasses="public juce::Component, public MultiTimer, public ActionListener"
-                 constructorParams="AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset"
-                 variableInitialisers="pSourceSet(pSourceSet), pAnimatorDataset(pAnimatorDataset)"
+                 constructorParams="AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset"
+                 variableInitialisers="pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="700" initialHeight="300">
   <BACKGROUND backgroundColour="ff323e44"/>

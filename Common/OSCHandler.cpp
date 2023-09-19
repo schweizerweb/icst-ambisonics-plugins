@@ -1,23 +1,34 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    OSCHandler.cpp
-    Created: 18 Mar 2017 5:07:47pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "OSCHandler.h"
 #include "TrackColors.h"
 #include "Constants.h"
 
-OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* pStatusMessageHandler)
+OSCHandler::OSCHandler(AmbiSourceSet* pAmbiPointArr, StatusMessageHandler* _pStatusMessageHandler)
 {
     reportErrorFlag = true;
     reportSuccessFlag = true;
 	pAmbiPoints = pAmbiPointArr;
-	this->pStatusMessageHandler = pStatusMessageHandler;
+	this->pStatusMessageHandler = _pStatusMessageHandler;
 }
 
 void OSCHandler::setVerbosity(bool reportSuccess, bool reportError)
@@ -31,12 +42,16 @@ bool OSCHandler::start(int portNb)
 	disconnect();
 	bool ok = connect(portNb);
 	if (!ok)
-		return false;
+	{
+    	return false;
+    }
 
     ok = initSpecific();
     if (!ok)
+    {
         return false;
-    
+    }
+
 	addListener(this);
 
 	return true;
@@ -46,7 +61,7 @@ void OSCHandler::oscMessageReceived(const OSCMessage & message)
 {
 	if(!handleSpecific(message))
 	{
-		reportError("Unknown OSC message received: " + message.getAddressPattern().toString(), &message);
+		reportError("Unknown OSC message received: ", &message);
 	}
 }
 
@@ -55,9 +70,13 @@ void OSCHandler::oscBundleReceived(const OSCBundle & bundle)
     for(auto & e : bundle)
     {
         if(e.isBundle())
+        {
             oscBundleReceived(e.getBundle());
+        }
         else
+        {
             oscMessageReceived(e.getMessage());
+        }
     }
 }
 

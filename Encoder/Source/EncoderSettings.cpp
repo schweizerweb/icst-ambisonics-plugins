@@ -1,14 +1,26 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    EncoderSettings.cpp
-    Created: 26 Dec 2017 11:55:01pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
 
+
+
 #include "EncoderSettings.h"
+
 #define XML_TAG_OSC_RECEIVE	"OscReceive"
 #define XML_ATTRIBUTE_HANDLE_STANDARD_FORMAT "HandleStandardFormat"
 #define XML_TAG_OSC_HIDE_WARNINGS    "HideWarnings"
@@ -32,6 +44,7 @@
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 #define XML_TAG_CUSTOM_OSC_INPUTS "CustomOscInputs"
 #define XML_TAG_CUSTOM_OSC_INPUT "CustomOscInput"
+#define XML_ATTRIBUTE_AMBIORDER "AmbiOrder"
 
 EncoderSettings::EncoderSettings():
 	oscReceiveFlag(DEFAULT_RECEIVE_FLAG),
@@ -48,6 +61,7 @@ EncoderSettings::EncoderSettings():
     oscSendExtAed(new StandardOscTarget()),
     oscSendExtXyzIndex(new StandardOscTarget()),
     oscSendExtAedIndex(new StandardOscTarget()),
+    ambiOrder(DEFAULT_AMBI_ORDER),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
     hideWarnings(DEFAULT_HIDE_WARNINGS)
@@ -61,7 +75,7 @@ EncoderSettings::~EncoderSettings()
 XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
 {
 	XmlElement* element = new XmlElement(tagName);
-
+    element->setAttribute(XML_ATTRIBUTE_AMBIORDER, ambiOrder);
     XmlElement* oscReceive = new XmlElement(XML_TAG_OSC_RECEIVE);
 	oscReceive->setAttribute(XML_ATTRIBUTE_ENABLE, oscReceiveFlag);
 	oscReceive->setAttribute(XML_ATTRIBUTE_PORT, oscReceivePort);
@@ -123,6 +137,8 @@ void EncoderSettings::loadFromXml(XmlElement* element)
 		return;
 
     customOscTargets.clear();
+    
+    ambiOrder = element->getIntAttribute(XML_ATTRIBUTE_AMBIORDER, DEFAULT_AMBI_ORDER);
     
 	XmlElement* oscReceive = element->getChildByName(XML_TAG_OSC_RECEIVE);
     if(oscReceive != nullptr)
@@ -202,4 +218,9 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         dopplerEncodingFlag = dopplerEncoding->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_DOPPLER_ENC_FLAG);
     }
+}
+
+int EncoderSettings::getAmbiChannelCount() const
+{
+    return (ambiOrder + 1) * (ambiOrder + 1);
 }

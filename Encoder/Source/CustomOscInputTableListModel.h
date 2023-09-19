@@ -1,46 +1,129 @@
 /*
-  =============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    CustomOscInputTableListModel.
-    Created: 17 Jan 2022 10:24:05p
-    Author:  Schweizer Christia
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  =============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "OSCHandlerEncoder.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/EditableCodeCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
+#include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
+#define COLUMN_ID_INFO        202
 #define	COLUMN_ID_PATH			204
 #define COLUMN_ID_COMMAND       205
 #define COLUMN_ID_SAVE_AS_PRESET    206
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
+#define BUTTON_TYPE_PRESET  "preset"
+#define BUTTON_TYPE_INFO    "info"
 
 
-class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
+class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener, ActionListener, Timer
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* pSettings, Component* pParentComponent, ActionListener* pActionListener, const char* save_png, const int save_pngSize): pSettings(pSettings), pParentComponent(pParentComponent), pTableListBox(nullptr), save_png(save_png), save_pngSize(save_pngSize)
+	CustomOscInputTableListModel(EncoderSettings* _pSettings, OSCHandlerEncoder* _pOscHandler, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pOscHandler(_pOscHandler), pParentComponent(_pParentComponent), pTableListBox(nullptr)
 	{
 		addActionListener(pActionListener);
+        pOscHandler->addActionListener(this);
+        startTimerHz(1);
 	}
 
 	~CustomOscInputTableListModel() override
 	{
+        pOscHandler->removeActionListener(this);
 		removeAllActionListeners();
     }
     
+    void timerCallback() override {
+        // force periodic ui updates for status display
+        getTable()->repaint();
+    }
+    
+    
+    void actionListenerCallback(const juce::String& /*message*/) override { 
+        getTable()->repaint();
+    }
+    
+    
     void buttonClicked(juce::Button *b) override {
-        int rowIndex = b->getComponentID().getIntValue();
-        sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+        if(b->getName() == BUTTON_TYPE_PRESET)
+        {
+            int rowIndex = b->getComponentID().getIntValue();
+            sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+        }
+        else if(b->getName() == BUTTON_TYPE_INFO)
+        {
+            int rowIndex = b->getComponentID().getIntValue();
+            bool isInit;
+            bool hasIncomingData;
+            bool hasSuccessfulIncomingData;
+            String errorMessage;
+            String info;
+            if(!pSettings->oscReceiveFlag)
+            {
+                info += "OSC Receive disabled";
+            }
+            else if(pSettings->customOscInput[rowIndex]->enabledFlag)
+            {
+                pOscHandler->getReceiverStatus(rowIndex, &isInit, &hasIncomingData, &hasSuccessfulIncomingData, &errorMessage);
+                if(isInit)
+                {
+                    info += "Initialized";
+                    if(hasIncomingData)
+                    {
+                        info += " - Receiving data";
+                    }
+                    else
+                    {
+                        info += " - No incoming data";
+                    }
+                }
+                else
+                {
+                    info += "Error initializing";
+                }
+                
+                if(!errorMessage.isEmpty())
+                {
+                    info += ": " + errorMessage;
+                }
+            }
+            else
+            {
+                info = "Disabled";
+            }
+            
+            std::unique_ptr<Label> label = std::make_unique<Label>();
+            label->setText(info , dontSendNotification);
+            int lineCount = label->getFont().getStringWidth(info) / 180;
+            int lineHeight = roundToInt(label->getFont().getHeight());
+            label->setSize(200, lineHeight * (lineCount+2));
+            label->setJustificationType(Justification::centred);
+            CallOutBox::launchAsynchronously(std::move(label), b->getScreenBounds(), nullptr);
+        }
     }
     
 
@@ -48,14 +131,44 @@ public:
 		return pSettings->customOscInput.size();
 	}
 
-	void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
+	void paintRowBackground(Graphics& g, int rowNumber, int width, int height, bool rowIsSelected) override
 	{
-		const Colour alternateColour(pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId)
-			.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
-		if (rowIsSelected)
-			g.fillAll(COLOR_DEFINITION_SELECTED_ROW);
-		else if (rowNumber % 2)
-			g.fillAll(alternateColour);
+        const Colour defaultColor = pParentComponent->getLookAndFeel().findColour(ListBox::backgroundColourId);
+		const Colour alternateColour(defaultColor.interpolatedWith(pParentComponent->getLookAndFeel().findColour(ListBox::textColourId), COLOR_DEFINITION_ALTERNATE_INTENSITY));
+        
+        auto fillColor = rowIsSelected ? COLOR_DEFINITION_SELECTED_ROW : (rowNumber % 2 ? alternateColour : defaultColor);
+		g.fillAll(fillColor);
+        
+        if(pSettings->oscReceiveFlag && pSettings->customOscInput[rowNumber]->enabledFlag)
+        {
+            bool isInit;
+            bool hasIncomingData;
+            bool hasSuccessfulIncomingData;
+            String errorMessage;
+            pOscHandler->getReceiverStatus(rowNumber, &isInit, &hasIncomingData, &hasSuccessfulIncomingData, &errorMessage);
+            auto gradientColor = Colours::red;
+            if(isInit)
+            {
+                if(!errorMessage.isEmpty())
+                {
+                    gradientColor = Colours::darkorange;
+                }
+                else
+                {
+                    if(hasSuccessfulIncomingData)
+                        gradientColor = Colours::green;
+                    else
+                        gradientColor = Colours::yellow;
+                }
+            }
+            if(!errorMessage.isEmpty())
+            {
+                // Todo: Tooltip
+            }
+            
+            g.setGradientFill(ColourGradient(gradientColor, 0.0f, 0.0f, fillColor, (float)width/2.0f, 0.0f, false));
+            g.fillRect(0, 0, width, height);
+        }
 	}
 
 	void paintCell(Graphics& g, int /*rowNumber*/, int /*columnId*/, int width, int height, bool /*rowIsSelected*/) override 
@@ -99,10 +212,28 @@ public:
             if (btn == nullptr) {
                 btn = new ImageButton();
                 btn->setImages (false, true, true,
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0x6effffff),
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                                juce::ImageCache::getFromMemory (save_png, save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0x6effffff),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
                 btn->setTooltip("Add to presets...");
+                btn->setName(BUTTON_TYPE_PRESET);
+                btn->addListener(this);
+            }
+            
+            btn->setComponentID(String(rowNumber));
+            return btn;
+        }
+        else if (columnId == COLUMN_ID_INFO)
+        {
+            ImageButton* btn = static_cast<ImageButton*>(existingComponentToUpdate);
+            if(btn == nullptr)
+            {
+                btn = new ImageButton();
+                btn->setImages(false, true, true,
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0x6effffff),
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                btn->setName(BUTTON_TYPE_INFO);
                 btn->addListener(this);
             }
             
@@ -116,6 +247,8 @@ public:
 	void selectedRowsChanged(int /*lastRowSelected*/) override
 	{
 		sendActionMessage(ACTION_MESSAGE_SEL_CHANGED);
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	double getValue(int columnId, int rowNumber) override 
@@ -135,14 +268,13 @@ public:
 	{
         switch (columnId)
         {
-            case COLUMN_ID_ENABLE: pSettings->customOscInput[rowNumber]->enabledFlag = newValue != 0.0; break;
+            case COLUMN_ID_ENABLE: pSettings->customOscInput[rowNumber]->enabledFlag = !exactlyEqual(newValue, 0.0); break;
             default: ;
         }
         
-		getTable()->updateContent();
-		getTable()->repaint();
-
-		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        pOscHandler->initialize();
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 	
 	SliderRange getSliderRange(int /*columnId*/) override 
@@ -182,17 +314,20 @@ public:
             default: ;
         }
         
-		sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+        pOscHandler->initialize();
+        getTable()->updateContent();
+        getTable()->repaint();
 	}
 
 	void initTable(TableListBox* tableListBox)
 	{
 		pTableListBox = tableListBox;
 		tableListBox->setModel(this);
-		tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLE, 20);
+		tableListBox->getHeader().addColumn("En", COLUMN_ID_ENABLE, 30, 30, 30);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_INFO, 30, 30, 30);
 		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 300);
         tableListBox->getHeader().addColumn("JS-Code", COLUMN_ID_COMMAND, 270);
-        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 30, 30, 30);
 		tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
 	}
@@ -210,8 +345,7 @@ public:
 private:
     
 	EncoderSettings* pSettings;
+    OSCHandlerEncoder* pOscHandler;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
-    const char* save_png;
-    const int save_pngSize;
 };

@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    AmbiSource.h
-    Created: 30 Oct 2019 11:39:59am
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "AmbiPoint.h"
@@ -17,9 +28,9 @@ public:
 	virtual ~AmbiSource();
 	AmbiSource();
 	AmbiSource(AmbiSource* other, bool copyImage = false);
-	AmbiSource(String id, Point3D<double> point, String name, Colour color);
-	AmbiSource(XmlElement* element, AudioParameterSet audioParams);
-    AmbiSource(AudioParameterSet audioParams, String name);
+	AmbiSource(String _id, Point3D<double> _point, String _name, Colour _color);
+	AmbiSource(XmlElement* _element, AudioParameterSet _audioParams);
+    AmbiSource(AudioParameterSet _audioParams, String _name);
 
 	void setRms(float newRmsLevel, bool onlyIfGreater = false);
 	float getRms() const;

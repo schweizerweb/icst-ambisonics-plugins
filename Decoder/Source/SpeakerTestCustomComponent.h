@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    SpeakerTestCustomComponent.h
-    Created: 9 Oct 2017 2:52:14pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "SpeakerSettingsComponent.h"
@@ -18,7 +29,7 @@ public:
 	SpeakerTestCustomComponent(SpeakerSettingsComponent& td) : owner(td)
 	{
 		addAndMakeVisible(button);
-		button.setImages(false, true, true, ImageCache::getFromMemory(BinaryData::speaker_png, BinaryData::speaker_pngSize), 1.0, Colours::transparentBlack, Image(), 1.0, Colours::blue.withAlpha(0.3f), Image(), 1.0, Colours::red.withAlpha(0.3f));
+		button.setImages(false, true, true, ImageCache::getFromMemory(speaker_png, speaker_pngSize), 1.0, Colours::transparentBlack, Image(), 1.0, Colours::blue.withAlpha(0.3f), Image(), 1.0, Colours::red.withAlpha(0.3f));
 		button.setClickingTogglesState(true);
 		button.addListener(this);
 		button.setWantsKeyboardFocus(false);
@@ -44,4 +55,6 @@ private:
 	SpeakerSettingsComponent& owner;
 	ImageButton button;
 	int row, columnId;
+	static const char*   speaker_png;
+    static const int     speaker_pngSize = 7186;
 };

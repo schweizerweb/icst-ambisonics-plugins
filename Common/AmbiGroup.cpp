@@ -1,18 +1,29 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    AmbiGroup.cpp
-    Created: 5 Nov 2019 6:01:24pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "AmbiGroup.h"
 
-AmbiGroup::AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling) : AmbiPoint(xmlElement, audioParameterSet), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
+AmbiGroup::AmbiGroup(XmlElement* _xmlElement, Array<AmbiPoint*>* _pSources, AudioParameterSet _audioParameterSet, ScalingInfo* _pScaling) : AmbiPoint(_xmlElement, _audioParameterSet), pScalingInfo(_pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)
 {
-    XmlElement* rot = xmlElement->getChildByName(XML_TAG_ROTATION);
+    XmlElement* rot = _xmlElement->getChildByName(XML_TAG_ROTATION);
     if(rot != nullptr)
     {
         double x = rot->getDoubleAttribute(XML_ATTRIBUTE_ROTATION_Q0);
@@ -22,14 +33,14 @@ AmbiGroup::AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioP
         setRotation(Quaternion<double>(x, y, z, w));
     }
     
-    XmlElement* stretch = xmlElement->getChildByName(XML_TAG_STRETCH);
+    XmlElement* stretch = _xmlElement->getChildByName(XML_TAG_STRETCH);
     if(stretch != nullptr)
     {
         double f = stretch->getDoubleAttribute(XML_ATTRIBUTE_FACTOR);
         setStretch(f);
     }
     
-	XmlElement* subPointsElement = xmlElement->getChildByName(XML_TAG_SUBPOINTS);
+	XmlElement* subPointsElement = _xmlElement->getChildByName(XML_TAG_SUBPOINTS);
 	groupPoints.clear();
 	if (subPointsElement != nullptr)
 	{
@@ -37,11 +48,11 @@ AmbiGroup::AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioP
 		while (xmlSubPoint != nullptr)
 		{
 			String idStr = xmlSubPoint->getStringAttribute(XML_ATTRIBUTE_GROUP_ID);
-			for (int i = 0; i < pSources->size(); i++)
+			for (int i = 0; i < _pSources->size(); i++)
 			{
-				if (pSources->getUnchecked(i)->getId() == idStr)
+				if (_pSources->getUnchecked(i)->getId() == idStr)
 				{
-					addPointToGroup(pSources->getUnchecked(i));
+					addPointToGroup(_pSources->getUnchecked(i));
 					break;
 				}
 			}
@@ -287,19 +298,19 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
     {
         rotationMatrix *= Matrix3D<double>::rotation(Vector3D<double>(angleAroundXAxis, angleAroundYAxis, angleAroundZAxis));
         
-        if(angleAroundXAxis != 0.0)
+        if(!exactlyEqual(angleAroundXAxis, 0.0))
         {
             Quaternion<double> xRot = Quaternion<double>::fromAngle(angleAroundXAxis, Vector3D<double>(1, 0, 0));
             rotationQuaternion *= xRot;
         }
         
-        if(angleAroundYAxis != 0.0)
+        if(!exactlyEqual(angleAroundYAxis, 0.0))
         {
             Quaternion<double> yRot = Quaternion<double>::fromAngle(angleAroundYAxis, Vector3D<double>(0, 1, 0));
             rotationQuaternion *= yRot;
         }
         
-        if(angleAroundZAxis != 0.0)
+        if(!exactlyEqual(angleAroundZAxis, 0.0))
         {
             Quaternion<double> zRot = Quaternion<double>::fromAngle(angleAroundZAxis, Vector3D<double>(0, 0, -1));
             rotationQuaternion *= zRot;
@@ -320,7 +331,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
         {
             Point3D<double> center = *getRawPoint();
             
-            if(angleAroundXAxis != 0.0)
+            if(!exactlyEqual(angleAroundXAxis, 0.0))
             {
                 Point3D<double> relativeChild = *(p->getRawPoint())-center;
                 p->getRawPoint()->setYZ(
@@ -328,7 +339,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
                                      center.getZ() + relativeChild.getY() * sx + relativeChild.getZ() * cx);
             }
             
-            if(angleAroundYAxis != 0.0)
+            if(!exactlyEqual(angleAroundYAxis, 0.0))
             {
                 Point3D<double> relativeChild = *(p->getRawPoint())-center;
                 p->getRawPoint()->setXZ(
@@ -336,7 +347,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
                                     center.getZ() + relativeChild.getX() * sy + relativeChild.getZ() * cy);
             }
             
-            if(angleAroundZAxis != 0.0)
+            if(!exactlyEqual(angleAroundZAxis, 0.0))
             {
                 Point3D<double> relativeChild = *(p->getRawPoint())-center;
                 p->getRawPoint()->setXY(
@@ -349,7 +360,7 @@ void AmbiGroup::rotate(double angleAroundXAxis, double angleAroundYAxis, double 
 
 void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements, bool groupModeFlag)
 {
-    if(angleAroundXAxis != 0.0)
+    if(!exactlyEqual(angleAroundXAxis, 0.0))
     {
         double sx = sin(-angleAroundXAxis);
         double cx = cos(-angleAroundXAxis);
@@ -360,7 +371,7 @@ void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYA
                moveSubElements, groupModeFlag);
     }
     
-    if(angleAroundYAxis != 0.0)
+    if(!exactlyEqual(angleAroundYAxis, 0.0))
     {
         double sy = sin(-angleAroundYAxis);
         double cy = cos(-angleAroundYAxis);
@@ -372,7 +383,7 @@ void AmbiGroup::rotateAroundOrigin(double angleAroundXAxis, double angleAroundYA
                moveSubElements, groupModeFlag);
     }
     
-    if(angleAroundZAxis != 0.0)
+    if(!exactlyEqual(angleAroundZAxis, 0.0))
     {
         double sz = sin(-angleAroundZAxis);
         double cz = cos(-angleAroundZAxis);

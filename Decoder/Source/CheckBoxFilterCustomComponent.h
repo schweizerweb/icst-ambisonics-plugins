@@ -1,16 +1,28 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    EditableTextCustomComponent.h
-    Created: 9 Oct 2017 2:04:27pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "SpeakerSettingsComponent.h"
 #include "FilterSettingsComponent.h"
+
 #define MIN_FREQUENCY_THUMBNAIL    20
 #define FREQUENCY_STEP_THUMBNAIL 1.1
 
@@ -36,7 +48,7 @@ public:
 
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
         {
-            magnitudes[i] = static_cast<double*>(calloc(frequencies.size(), sizeof(double)));
+            magnitudes[i] = static_cast<double*>(calloc((size_t)frequencies.size(), sizeof(double)));
         }
 
         displayRangeX.reset(new Range<double>(log10(20), log10(sampleRate / 2.0)));
@@ -44,7 +56,7 @@ public:
         graphArea.reset(new Rectangle<int>(0, 0, 150, 40));
 	}
 
-    ~CheckBoxFilterCustomComponent()
+    ~CheckBoxFilterCustomComponent() override
 	{
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
         {
@@ -73,7 +85,7 @@ private:
     void resized() override
     {
         toggle.setBounds(0, 0, getHeight(), getHeight());
-        transform = AffineTransform::scale((float(getWidth())-toggle.getWidth()) / float(graphArea->getWidth()), (float)getHeight() / graphArea->getHeight()).followedBy(AffineTransform::translation(float(toggle.getWidth()), 0.0f));
+        transform = AffineTransform::scale((float(getWidth())-(float)toggle.getWidth()) / float(graphArea->getWidth()), (float)getHeight() / (float)graphArea->getHeight()).followedBy(AffineTransform::translation(float(toggle.getWidth()), 0.0f));
     }
     
     void updateFilterPath()
@@ -94,7 +106,7 @@ private:
             int activeFilterCount = int(coeffs.size());
             for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
             {
-                coeffs[iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], frequencies.size(), sampleRate);
+                coeffs[(size_t)iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], (size_t)frequencies.size(), sampleRate);
             }
 
             for (int i = 0; i < frequencies.size(); i++)
@@ -117,7 +129,7 @@ private:
     {
         g.fillAll(getLookAndFeel().findColour(ListBox::backgroundColourId));
         g.setColour(Colours::lightgrey);
-        g.drawLine(float(toggle.getWidth()), getHeight()/2.0f, float(getWidth()), getHeight()/2.0f);
+        g.drawLine(float(toggle.getWidth()), (float)getHeight()/2.0f, float(getWidth()), (float)getHeight()/2.0f);
         
         g.setColour(owner.getFlag(columnId, row) ? Colours::lightgreen : Colours::red);
         g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);

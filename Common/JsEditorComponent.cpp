@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    JsEditorComponent.cpp
-    Created: 5 Jul 2022 7:34:00pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include <JuceHeader.h>
 #include "JsEditorComponent.h"
@@ -117,15 +128,11 @@ Error handling:
 Note: all 'index' parameters are 1-based, except for the 'Local Buffer' methods)";
 
 //==============================================================================
-JsEditorComponent::JsEditorComponent(String* pCode, bool* pCloseFlag, AsyncUpdater* pCallback)
+JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpdater* _pCallback) : pCallback(_pCallback), pCode(_pCode), pCloseFlag(_pCloseFlag)
 {
     // In your constructor, you should add any child components, and
     // initialise any special settings that your component needs.
-    
-    this->pCallback = pCallback;
-    this->pCode = pCode;
-    this->pCloseFlag = pCloseFlag;
-    
+
     codeDocument.replaceAllContent(*pCode);
     
     helpFlag = false;

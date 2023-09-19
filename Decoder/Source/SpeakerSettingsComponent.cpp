@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/EditableTextCustomComponent.h"
@@ -54,17 +56,18 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings)
-    : pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettings* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout)
+    : pSpeakerSet(_pSpeakerSet), pPresetHelper(_pPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
-	for (int i = 0; i < NB_OF_AMBISONICS_GAINS; i++)
+	for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
 	this->pTestSoundGenerator = pTestSoundListener;
 
 	addChangeListener(pCallback);
     pPresetHelper->addActionListener(this);
+    pChannelLayout->addActionListener(this);
 
     filterPresetHelper.reset(new FilterPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder/Filters"), this));
     filterPresetHelper->initialize();
@@ -128,7 +131,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     buttonMoveUp->setButtonText (TRANS("up"));
     buttonMoveUp->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
+    ambiChannelControl.reset (new MultiSliderControl (MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
     addAndMakeVisible (ambiChannelControl.get());
     ambiChannelControl->setName ("ambiChannelControl");
 
@@ -228,6 +231,30 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     sliderTimeout->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 70, 20);
     sliderTimeout->addListener (this);
 
+    labelAmbiOrder.reset (new juce::Label ("labelAmbiOrder",
+                                           TRANS("Ambisonics order:")));
+    addAndMakeVisible (labelAmbiOrder.get());
+    labelAmbiOrder->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    labelAmbiOrder->setEditable (false, false, false);
+    labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelAmbiOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    comboAmbiOrder.reset (new juce::ComboBox ("comboAmbiOrder"));
+    addAndMakeVisible (comboAmbiOrder.get());
+    comboAmbiOrder->setEditableText (false);
+    comboAmbiOrder->setJustificationType (juce::Justification::centredLeft);
+    comboAmbiOrder->setTextWhenNothingSelected (juce::String());
+    comboAmbiOrder->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
+    comboAmbiOrder->addItem (TRANS("1st (4ch)"), 1);
+    comboAmbiOrder->addItem (TRANS("2nd (9ch)"), 2);
+    comboAmbiOrder->addItem (TRANS("3rd (16ch)"), 3);
+    comboAmbiOrder->addItem (TRANS("4th (25ch)"), 4);
+    comboAmbiOrder->addItem (TRANS("5th (36ch)"), 5);
+    comboAmbiOrder->addItem (TRANS("6th (49ch)"), 6);
+    comboAmbiOrder->addItem (TRANS("7th (64ch)"), 7);
+    comboAmbiOrder->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -269,10 +296,14 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet,
     speakerList->addMouseListener(this, true);
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
-    updateUI();
-
+    
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
+    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder(), dontSendNotification);
+    ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
 
+    updateUI();
+    handleAmbiOrders();
+    
 	// OSC
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	sliderPort->setValue(pDecoderSettings->oscReceivePort);
@@ -288,6 +319,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     pPresetHelper->removeActionListener(this);
+    pChannelLayout->removeActionListener(this);
     //[/Destructor_pre]
 
     groupOsc = nullptr;
@@ -316,6 +348,8 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonScaling = nullptr;
     sliderPort = nullptr;
     sliderTimeout = nullptr;
+    labelAmbiOrder = nullptr;
+    comboAmbiOrder = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -356,15 +390,17 @@ void SpeakerSettingsComponent::resized()
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 267)) + 199) + 20, 75, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 267)) + 199) + 20, 96, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4974f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3979f) / 2), 0, proportionOfWidth (0.3979f), 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4979f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3983f) / 2), 0, proportionOfWidth (0.3983f), 24);
     buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
     comboBoxChannelWeightingMode->setBounds ((8 + 0) + 128, (0 + (getHeight() - 267)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
-    buttonScaling->setBounds ((proportionOfWidth (0.4974f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonCsv->setBounds ((proportionOfWidth (0.4979f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4979f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 267)) + 199) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 267)) + 199) + 20, 170, 24);
+    labelAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 293, (0 + (getHeight() - 267)) + 21, 136, 24);
+    comboAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 157, (0 + (getHeight() - 267)) + 21, 142, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -389,6 +425,14 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
         ambiChannelControl->updateValues();
         controlDimming();
         //[/UserComboBoxCode_comboBoxChannelWeightingMode]
+    }
+    else if (comboBoxThatHasChanged == comboAmbiOrder.get())
+    {
+        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
+        pAmbiSettings->setAmbiOrder(comboAmbiOrder->getSelectedId());
+        ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
+        ambiChannelControl->updateValues();
+        //[/UserComboBoxCode_comboAmbiOrder]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -415,11 +459,14 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-		Uuid newId = Uuid();
-		pSpeakerSet->add(new AmbiSpeaker(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
-		pPointSelection->selectPoint(pSpeakerSet->size() - 1);
-		speakerList->updateContent();
-		speakerList->repaint();
+        if(pSpeakerSet->size() < pChannelLayout->getNumOutputChannels())
+        {
+            Uuid newId = Uuid();
+            pSpeakerSet->add(new AmbiSpeaker(newId.toString(), Point3D<double>(0.0, 0.0, 0.0), "new", TrackColors::getSpeakerColor()));
+            pPointSelection->selectPoint(pSpeakerSet->size() - 1);
+            speakerList->updateContent();
+            speakerList->repaint();
+        }
         //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove.get())
@@ -758,7 +805,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, newValue == 1); break;
+    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, !exactlyEqual(newValue, 0.0)); break;
 
         default: return; // do nothing
 	}
@@ -884,6 +931,13 @@ void SpeakerSettingsComponent::updateUI() const
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->getWeightMode());
 }
 
+void SpeakerSettingsComponent::handleAmbiOrders()
+{
+    for(int i = 1; i <= MAX_AMBISONICS_ORDER; i++)
+        comboAmbiOrder->setItemEnabled(i, i <= pChannelLayout->getMaxAmbiOrder(false));
+    comboAmbiOrder->setSelectedId(pAmbiSettings->getAmbiOrder(), sendNotification);
+}
+
 void SpeakerSettingsComponent::updateComboBox() const
 {
 	comboBoxChannelConfig->clear();
@@ -930,6 +984,13 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
         controlDimming();
         sendChangeMessage();
     }
+    if(message == ACTION_MESSAGE_CHANNEL_LAYOUT_CHANGED)
+    {
+        handleAmbiOrders();
+        speakerList->updateContent();
+        speakerList->repaint();
+        controlDimming();
+    }
 }
 
 void SpeakerSettingsComponent::controlDimming()
@@ -945,7 +1006,7 @@ void SpeakerSettingsComponent::controlDimming()
     buttonScaling->setEnabled(en);
 	buttonManage->setEnabled(en);
 	buttonSave->setEnabled(en);
-	buttonAdd->setEnabled(en);
+	buttonAdd->setEnabled(en && pSpeakerSet->size() < pChannelLayout->getNumOutputChannels());
 	buttonRemove->setEnabled(en);
 	buttonMoveUp->setEnabled(en && !multiselection);
 	buttonMoveDown->setEnabled(en && !multiselection);
@@ -1047,8 +1108,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings"
-                 variableInitialisers="pSpeakerSet(pSpeakerSet), pPresetHelper(pPresetHelper), pPointSelection(pPointSelection), pAmbiSettings(pAmbiSettings),pDecoderSettings(pDecoderSettings), pFilterSpecification(pFilterSpecification), pZoomSettings(pZoomSettings)"
+                 constructorParams="AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettings* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout"
+                 variableInitialisers="pSpeakerSet(_pSpeakerSet), pPresetHelper(_pPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="900" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
@@ -1099,7 +1160,7 @@ BEGIN_JUCER_METADATA
   <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
                     virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="CURRENT_AMBISONICS_ORDER_NB_OF_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
+                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
   <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
          virtualName="" explicitFocusOrder="0" pos="8 20 112 24" posRelativeX="17eb4b418501687a"
          posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
@@ -1127,11 +1188,11 @@ BEGIN_JUCER_METADATA
                 posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.742%c -8R 120 24"
+              virtualName="" explicitFocusOrder="0" pos="49.786%c -8R 120 24"
               posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.793% 24"
+         virtualName="" explicitFocusOrder="0" pos="50%c 0 39.829% 24"
          bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
@@ -1166,6 +1227,16 @@ BEGIN_JUCER_METADATA
           posRelativeY="f4cf3a53a6ef0d87" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="70" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
+  <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
+         virtualName="" explicitFocusOrder="0" pos="293R 21 136 24" posRelativeX="17eb4b418501687a"
+         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
+         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
+         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
+         kerning="0.0" bold="0" italic="0" justification="33"/>
+  <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
+            virtualName="" explicitFocusOrder="0" pos="157R 21 142 24" posRelativeX="17eb4b418501687a"
+            posRelativeY="17eb4b418501687a" editable="0" layout="33" items="1st (4ch)&#10;2nd (9ch)&#10;3rd (16ch)&#10;4th (25ch)&#10;5th (36ch)&#10;6th (49ch)&#10;7th (64ch)"
+            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -1175,4 +1246,3 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

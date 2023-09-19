@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    AmbiGroup.h
-    Created: 5 Nov 2019 6:01:24pm
-    Author:  chris
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "AmbiPoint.h"
@@ -26,8 +37,8 @@
 class AmbiGroup : public AmbiPoint
 {
 public:
-	AmbiGroup(String id, Point3D<double> point, String name, Colour color, ScalingInfo* pScaling) : AmbiPoint(id, point, name, color), pScalingInfo(pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
-	AmbiGroup(XmlElement* xmlElement, Array<AmbiPoint*>* pSources, AudioParameterSet audioParameterSet, ScalingInfo* pScaling);
+	AmbiGroup(String _id, Point3D<double> _point, String _name, Colour _color, ScalingInfo* _pScaling) : AmbiPoint(_id, _point, _name, _color), pScalingInfo(_pScaling), rotationQuaternion(Quaternion<double>(0,0,0,1)), stretchFactor(1.0) {}
+	AmbiGroup(XmlElement* _xmlElement, Array<AmbiPoint*>* _pSources, AudioParameterSet _audioParameterSet, ScalingInfo* _pScaling);
     virtual ~AmbiGroup() = default;
 
 	float getDisplayScaler() override;

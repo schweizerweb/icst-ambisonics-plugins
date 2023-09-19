@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    SourceTableListModel.h
-    Created: 19 Jan 2020 8:28:59pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -19,6 +30,7 @@
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ScalingInfo.h"
 #include "../../Common/ColorDefinition.h"
+#include "../../Common/ChannelLayout.h"
 
 #define COLUMN_ID_NB        2
 #define COLUMN_ID_NAME        3
@@ -38,7 +50,7 @@
 class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
 {
 public:
-    SourceTableListModel(AmbiSourceSet* pSources, PointSelection* pPointSelection, Component* pParentComponent, ScalingInfo* pScaling) : pSources(pSources), pPointSelection(pPointSelection), pParentComponent(pParentComponent), pTableListBox(nullptr), pScalingInfo(pScaling)
+    SourceTableListModel(AmbiSourceSet* _pSources, PointSelection* _pPointSelection, Component* _pParentComponent, ScalingInfo* _pScaling, ChannelLayout* _pChannelLayout) : pSources(_pSources), pPointSelection(_pPointSelection), pParentComponent(_pParentComponent), pTableListBox(nullptr), pScalingInfo(_pScaling), pChannelLayout(_pChannelLayout)
     {
     }
 
@@ -69,7 +81,7 @@ public:
 private:
     int getNumRows() override
     {
-        return pSources->size();
+        return jmin(pSources->size(), pChannelLayout->getNumInputChannels());
     }
 
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override
@@ -230,8 +242,8 @@ private:
         switch (columnId)
         {
         case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
-        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, newValue == 1); break;
-        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, newValue == 1); break;
+        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, !exactlyEqual(newValue, 0.0)); break;
+        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, !exactlyEqual(newValue, 0.0)); break;
         case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
         case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
         case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;
@@ -239,7 +251,7 @@ private:
         case COLUMN_ID_E: pSources->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
         case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
         case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, newValue == 1); break;
+        case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, !exactlyEqual(newValue, 0.0) && rowNumber < pChannelLayout->getNumInputChannels()); break;
         default: throw;
         }
 
@@ -310,4 +322,5 @@ private:
     Component* pParentComponent;
     TableListBox* pTableListBox;
     ScalingInfo* pScalingInfo;
+    ChannelLayout* pChannelLayout;
 };

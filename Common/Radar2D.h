@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    Radar2D.h
-    Created: 22 Jul 2017 1:43:26pm
-    Author:  Christian Schweizer
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 
@@ -16,6 +27,7 @@
 #include "RadarColors.h"
 #include "PointSelection.h"
 #include "RadarOptions.h"
+
 #define INFO_FONT_SIZE	15
 #define ACTIVE_REFRESH_RATE 25
 #define INACTIVE_REFRESH_RATE 10
@@ -35,7 +47,7 @@ public:
     enum AnchorX { X_Left, X_Center, X_Right };
     enum AnchorY { Y_Top, Y_Center, Y_Bottom };
 	Radar2D(RadarMode mode, AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
-    ~Radar2D();
+    ~Radar2D() override;
 
 	Point<double> getProjectedPoint(Vector3D<double>* point3_d) const;
 	Point<float> getAbsoluteScreenPoint(Point<float> point) const;

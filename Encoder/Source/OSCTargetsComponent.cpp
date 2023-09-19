@@ -1,21 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-  This is an automatically generated GUI class created by the Projucer!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  Be careful when adding custom code to these files, as only the code within
-  the "//[xyz]" and "//[/xyz]" sections will be retained when the file is loaded
-  and re-saved.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  Created with Projucer version: 6.1.6
-
-  ------------------------------------------------------------------------------
-
-  The Projucer is part of the JUCE library.
-  Copyright (c) 2020 - Raw Material Software Limited.
-
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 //[Headers] You can add your own extra header files here...
 //[/Headers]
@@ -27,11 +29,11 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper)
-    : pSettings(pSettings), pCustomOscTxPresetHelper(pCustomOscTxPresetHelper)
+OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper)
+    : pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this, save_png, save_pngSize));
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this));
     addChangeListener(pChangeListener);
     pCustomOscTxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
@@ -310,8 +312,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="OSCTargetsComponent" componentName=""
                  parentClasses="public juce::Component, public ChangeBroadcaster, public TextEditor::Listener, public ActionListener"
-                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper"
-                 variableInitialisers="pSettings(pSettings), pCustomOscTxPresetHelper(pCustomOscTxPresetHelper)"
+                 constructorParams="ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper"
+                 variableInitialisers="pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
@@ -450,4 +452,3 @@ const int OSCTargetsComponent::save_pngSize = 3426;
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
-

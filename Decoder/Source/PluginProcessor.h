@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    This file was auto-generated!
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-    It contains the basic framework code for a JUCE plugin processor.
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
 
-  ==============================================================================
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 
@@ -20,6 +31,8 @@
 #include "../../Common/AmbiSourceSet.h"
 #include "DecoderPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/ChannelLayout.h"
+#include "../../Common/RadarOptions.h"
 
 //==============================================================================
 /**
@@ -29,7 +42,7 @@ class AmbisonicsDecoderAudioProcessor  : public AudioProcessor, ActionListener
 public:
     //==============================================================================
     AmbisonicsDecoderAudioProcessor();
-    ~AmbisonicsDecoderAudioProcessor();
+    ~AmbisonicsDecoderAudioProcessor() override;
 
     //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
@@ -41,8 +54,9 @@ public:
 
 	void checkDelayBuffers();
     void checkFilters();
-    void processBlock (AudioSampleBuffer&, MidiBuffer&) override;
-
+    void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
+    using AudioProcessor::processBlock;
+    
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
@@ -60,7 +74,8 @@ public:
     void setCurrentProgram (int index) override;
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
-
+    void numChannelsChanged() override;
+    
     //==============================================================================
     void getStateInformation (MemoryBlock& destData) override;
     void setStateInformation (const void* data, int sizeInBytes) override;
@@ -77,7 +92,9 @@ public:
 	dsp::ProcessSpec* getFilterSpecification();
     DecoderPresetHelper* getPresetHelper();
     ZoomSettings* getZoomSettingsPointer();
-
+    ChannelLayout* getChannelLayout();
+    RadarOptions* getRadarOptions();
+    
 private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
@@ -89,9 +106,11 @@ private:
 	DelayHelper delayHelper;
     std::unique_ptr<DecoderPresetHelper> presetHelper;
     std::unique_ptr<ZoomSettings> zoomSettings;
+    ChannelLayout channelLayout;
+    RadarOptions radarOptions;
     
-    dsp::IIR::Filter<float> iirFilters[JucePlugin_MaxNumOutputChannels][MAX_FILTER_COUNT];
-    FilterBankInfo filterInfo[JucePlugin_MaxNumOutputChannels];
+    dsp::IIR::Filter<float> iirFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
+    FilterBankInfo filterInfo[MAX_NUM_CHANNELS];
     dsp::ProcessSpec iirFilterSpec;
     
 

@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    HelpValueTreeItem.h
-    Created: 29 Mar 2020 5:11:08pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #pragma once
 #include "JuceHeader.h"
@@ -31,7 +42,7 @@ public:
 
     bool mightContainSubItems()
     {
-        return xml.getFirstChildElement() != 0;
+        return xml.getFirstChildElement() != nullptr;
     }
 
     void paintItem (Graphics& g, int width, int height)
@@ -42,7 +53,7 @@ public:
 
         // use a "colour" attribute in the xml tag for this node to set the text colour..
         if(xml.hasAttribute("colour"))
-            g.setColour (Colour (xml.getStringAttribute ("colour", "ffeeeeee").getHexValue32()));
+            g.setColour (Colour ((uint32_t)xml.getStringAttribute ("colour", "ffeeeeee").getHexValue32()));
         else
         {
             if(getUniqueName() == "Syntax" || xml.isTextElement())
@@ -53,7 +64,7 @@ public:
                 g.setColour(Colours::lightgrey);
         }
 
-        g.setFont (height * 0.7f);
+        g.setFont ((float)height * 0.7f);
 
         // draw the xml element's tag name..
         g.drawText (xml.hasAttribute("name") ? xml.getStringAttribute("name") : getUniqueName(), 4, 0, width - 4, height, Justification::centredLeft, true);
@@ -77,7 +88,7 @@ public:
 
                 for (auto* child : xml.getChildIterator())
                 {
-                    jassert (child != 0);
+                    jassert (child != nullptr);
                     addSubItem (new TreeViewItemHelp (*child));
                 }
             }

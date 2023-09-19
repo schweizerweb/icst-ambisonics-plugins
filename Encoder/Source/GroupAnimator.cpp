@@ -1,12 +1,23 @@
 /*
-  ==============================================================================
+================================================================================
+    This file is part of the ICST AmbiPlugins.
 
-    GroupAnimator.cpp
-    Created: 7 May 2020 10:25:14pm
-    Author:  Schweizer Christian
+    ICST AmbiPlugins are free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
 
-  ==============================================================================
+    ICST AmbiPlugins are distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with the ICSTAmbiPlugins.  If not, see <http://www.gnu.org/licenses/>.
+================================================================================
 */
+
+
 
 #include "GroupAnimator.h"
 
@@ -16,21 +27,21 @@ void GroupAnimator::initialize(AudioProcessor* pAudioProcessor, AmbiDataSet* pDa
     {
         String indexString = "G" + String(i+1) + " ";
         
-        animationSets[i].audioParameterAnimationToggle = new AudioParameterBool(indexString + "Animation Toggle", indexString + "Animation Toggle", false, "Turn On/Off Animation");
+        animationSets[i].audioParameterAnimationToggle = new AudioParameterBool(ParameterID(indexString + "Animation Toggle", Constants::audioParamVersion), indexString + "Animation Toggle", false, AudioParameterBoolAttributes().withLabel("Turn On/Off Animation"));
     
-        animationSets[i].audioParameterGroupRotationX = new AudioParameterFloat(indexString + "Rotation X", indexString + "Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (X-Axis) in Degrees per Second");
+        animationSets[i].audioParameterGroupRotationX = new AudioParameterFloat(ParameterID(indexString + "Rotation X", Constants::audioParamVersion), indexString + "Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (X-Axis) in Degrees per Second"));
         
-        animationSets[i].audioParameterGroupRotationY = new AudioParameterFloat(indexString + "Rotation Y", indexString + "Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Y-Axis) in Degrees per Second");
+        animationSets[i].audioParameterGroupRotationY = new AudioParameterFloat(ParameterID(indexString + "Rotation Y", Constants::audioParamVersion), indexString + "Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (Y-Axis) in Degrees per Second"));
         
-        animationSets[i].audioParameterGroupRotationZ = new AudioParameterFloat(indexString + "Rotation Z", indexString + "Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Group Rotation (Z-Axis) in Degrees per Second");
+        animationSets[i].audioParameterGroupRotationZ = new AudioParameterFloat(ParameterID(indexString + "Rotation Z", Constants::audioParamVersion), indexString + "Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Rotation (Z-Axis) in Degrees per Second"));
     
-        animationSets[i].audioParameterOriginRotationX = new AudioParameterFloat(indexString + "Origin Rotation X", indexString + "Origin Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (X-Axis) in Degrees per Second");
+        animationSets[i].audioParameterOriginRotationX = new AudioParameterFloat(ParameterID(indexString + "Origin Rotation X", Constants::audioParamVersion), indexString + "Origin Rotation X", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (X-Axis) in Degrees per Second"));
         
-        animationSets[i].audioParameterOriginRotationY = new AudioParameterFloat(indexString + "Origin Rotation Y", indexString + "Origin Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Y-Axis) in Degrees per Second");
+        animationSets[i].audioParameterOriginRotationY = new AudioParameterFloat(ParameterID(indexString + "Origin Rotation Y", Constants::audioParamVersion), indexString + "Origin Rotation Y", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (Y-Axis) in Degrees per Second"));
         
-        animationSets[i].audioParameterOriginRotationZ = new AudioParameterFloat(indexString + "Origin Rotation Z", indexString + "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, "Rotation around Origin (Z-Axis) in Degrees per Second");
+        animationSets[i].audioParameterOriginRotationZ = new AudioParameterFloat(ParameterID(indexString + "Origin Rotation Z", Constants::audioParamVersion), indexString + "Origin Rotation Z", NormalisableRange<float>(-360.0f, 360.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Rotation around Origin (Z-Axis) in Degrees per Second"));
     
-        animationSets[i].audioParameterGroupStretch = new AudioParameterFloat(indexString + "Stretch", indexString + "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, "Group Stretch in Units per Second");
+        animationSets[i].audioParameterGroupStretch = new AudioParameterFloat(ParameterID(indexString + "Stretch", Constants::audioParamVersion), indexString + "Group Stretch", NormalisableRange<float>(-1.0f, 1.0f), 0.0f, AudioParameterFloatAttributes().withLabel("Group Stretch in Units per Second"));
     
     
         pAudioProcessor->addParameter(animationSets[i].audioParameterAnimationToggle);
@@ -80,7 +91,7 @@ void GroupAnimator::doStep(float seconds)
         float rotationX = animationSets[i].audioParameterGroupRotationX->get();
         float rotationY = animationSets[i].audioParameterGroupRotationY->get();
         float rotationZ = animationSets[i].audioParameterGroupRotationZ->get();
-        if(rotationX != 0.0f || rotationY != 0.0f || rotationZ != 0.0f)
+        if(!exactlyEqual(rotationX, 0.0f) || !exactlyEqual(rotationY, 0.0f) || !exactlyEqual(rotationZ, 0.0f))
         {
             pSourceSet->rotateGroup(i, Constants::GradToRad(rotationX * seconds), Constants::GradToRad(rotationY * seconds), Constants::GradToRad(rotationZ * seconds));
         }
@@ -88,13 +99,13 @@ void GroupAnimator::doStep(float seconds)
         float rotationOriginX = animationSets[i].audioParameterOriginRotationX->get();
         float rotationOriginY = animationSets[i].audioParameterOriginRotationY->get();
         float rotationOriginZ = animationSets[i].audioParameterOriginRotationZ->get();
-        if(rotationOriginX != 0.0f || rotationOriginY != 0.0f || rotationOriginZ != 0.0f)
+        if(!exactlyEqual(rotationOriginX, 0.0f) || !exactlyEqual(rotationOriginY, 0.0f) || !exactlyEqual(rotationOriginZ, 0.0f))
         {
             pSourceSet->rotateGroupAroundOrigin(i, Constants::GradToRad(rotationOriginX * seconds), Constants::GradToRad(rotationOriginY * seconds), Constants::GradToRad(rotationOriginZ * seconds), true);
         }
         
         float stretch = animationSets[i].audioParameterGroupStretch->get();
-        if(stretch != 0.0f)
+        if(!exactlyEqual(stretch, 0.0f))
         {
             pSourceSet->stretchGroup(i, stretch * seconds);
         }
