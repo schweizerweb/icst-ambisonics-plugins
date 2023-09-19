@@ -2,7 +2,7 @@
 
 get_full_path()
 {
-    local winPath="$(cygpath -w ${1})"
+    local winPath="$(cygpath -m ${1})"
     echo ${winPath//\\/\\\\}
 }
 
