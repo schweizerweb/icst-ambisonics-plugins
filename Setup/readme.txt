@@ -5,12 +5,14 @@ Developed at the Institute for Computer Music and Sound Technology ICST in Zuric
 by Christian Schweizer / Martin Neukom / Johannes Schütt
 
 More information and help can be found here:
-- Download
-  https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/downloads/
+- Binary Download
+  https://github.com/schweizerweb/icst-ambisonics-plugins/releases
+- Source Code
+  https://github.com/schweizerweb/icst-ambisonics-plugins
 - Technical Documentation
-  https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Home
+  https://github.com/schweizerweb/icst-ambisonics-plugins/wiki
 - Issues and Feedback
-  https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/issues?status=new&status=open
+  https://github.com/schweizerweb/icst-ambisonics-plugins/issues
 - Guide, Tutorials, Blog
   https://ambisonics.ch/page/icst-ambisonics-plugins
 
