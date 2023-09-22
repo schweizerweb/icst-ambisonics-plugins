@@ -30,7 +30,7 @@ set(COMMON_PLUGIN_SETTINGS
     # EDITOR_WANTS_KEYBOARD_FOCUS TRUE/FALSE    # Does the editor need keyboard focus?
     # COPY_PLUGIN_AFTER_BUILD TRUE/FALSE        # Should the plugin be installed to a default location after building?
     PLUGIN_MANUFACTURER_CODE "ICST"               # A four-character manufacturer id with at least one upper-case character
-    FORMATS AU VST3 Standalone LV2                 # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
+    FORMATS AU VST3 LV2                 # The formats to build. Other valid formats are: AAX Unity VST AU AUv3
     AU_MAIN_TYPE kAudioUnitType_Effect
     NEEDS_WEB_BROWSER TRUE
 )
