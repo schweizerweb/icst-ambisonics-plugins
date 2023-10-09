@@ -338,7 +338,7 @@ private:
         {
             if(localDataSet->get(i)->getGroup() == localDataSet->getGroup(0))
             {
-                auto pt = p.getPointAlongPath(totalLength / (float(pointCount * groupPointIndex)));
+                auto pt = p.getPointAlongPath(totalLength / float(pointCount) * float(groupPointIndex));
                 localDataSet->get(i)->getRawPoint()->setXY(pt.getX(), pt.getY());
                 groupPointIndex++;
             }
