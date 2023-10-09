@@ -228,7 +228,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 {
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
-	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size());
+	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size(), buffer.getNumChannels());
 	const int totalUsedOutputChannels = jmin(getTotalNumOutputChannels(), encoderSettings.getAmbiChannelCount(), buffer.getNumChannels());
 	double currentCoefficients[64];
 	float* outputBufferPointers[64];
