@@ -59,7 +59,7 @@ public:
         int max = _pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
         sliderPointCount->setRange(Range<double>(0, max), 1.0);
         sliderPointCount->setValue(max, sendNotificationAsync);
-        sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 40, 24);
+        sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, false, 40, 24);
         sliderPointCount->addListener(this);
         addAndMakeVisible(sliderPointCount.get());
         
