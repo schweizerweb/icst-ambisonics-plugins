@@ -32,6 +32,8 @@ RadarOptions::RadarOptions()
 	dawParameter = nullptr;
 	setTrackColorAccordingToName = true;
     checkNameFieldEditable = false;
+    allowGroup = true;
+    allowDelete = true;
 }
 
 AudioParameterSet RadarOptions::getAudioParamForIndex(int index, bool isGroup) const

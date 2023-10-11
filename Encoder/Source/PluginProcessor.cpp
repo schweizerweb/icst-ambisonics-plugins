@@ -85,6 +85,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     radarOptions.scalingInfo = getScalingInfo();
     radarOptions.zoomSettings = getZoomSettingsPointer();
     radarOptions.checkNameFieldEditable = !MULTI_ENCODER_MODE;
+    radarOptions.allowGroup = MULTI_ENCODER_MODE;
+    radarOptions.allowDelete = MULTI_ENCODER_MODE;
 }
 
 AmbisonicEncoderAudioProcessor::~AmbisonicEncoderAudioProcessor()

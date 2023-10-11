@@ -420,10 +420,10 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
 		textD->setText("-");
 	}
 
-    bool enGroup = pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
+    bool enGroup = pRadarOptions->allowGroup && pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
     && ( pRadarOptions->audioParams == nullptr || pEditablePoints->activeGroupCount() < pRadarOptions->audioParams->groupParams.size());
-    bool enUngroup = pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1;
-    bool enDelete = pPointSelection->getSelectedIndices().size() > 0;
+    bool enUngroup = pRadarOptions->allowGroup && pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1;
+    bool enDelete = pRadarOptions->allowDelete && pPointSelection->getSelectedIndices().size() > 0;
 	btnGroup->setEnabled(enGroup);
 	btnUngroup->setEnabled(enUngroup);
     btnDelete->setEnabled(enDelete);

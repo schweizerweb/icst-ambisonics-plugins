@@ -118,7 +118,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelDistanceScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelDistanceScaler->setBounds (6, 39, 109, 24);
+    labelDistanceScaler->setBounds (312, 8, 109, 24);
 
     toggleInfiniteDistance.reset (new juce::ToggleButton ("toggleInfiniteDistance"));
     addAndMakeVisible (toggleInfiniteDistance.get());
@@ -134,7 +134,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelMasterGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelMasterGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    labelMasterGain->setBounds (6, 69, 109, 24);
+    labelMasterGain->setBounds (8, 40, 109, 24);
 
     sliderMasterGain.reset (new juce::Slider ("sliderMasterGain"));
     addAndMakeVisible (sliderMasterGain.get());
@@ -142,13 +142,6 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     sliderMasterGain->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderMasterGain->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderMasterGain->addListener (this);
-
-    toggleGroupMode.reset (new juce::ToggleButton ("toggleGroupMode"));
-    addAndMakeVisible (toggleGroupMode.get());
-    toggleGroupMode->setButtonText (TRANS("Group Mode"));
-    toggleGroupMode->addListener (this);
-
-    toggleGroupMode->setBounds (8, 8, 199, 24);
 
     comboBoxPresets.reset (new juce::ComboBox ("comboBoxPresets"));
     addAndMakeVisible (comboBoxPresets.get());
@@ -190,19 +183,21 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelAmbiOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
+    labelAmbiOrder->setBounds (6, 8, 136, 24);
+
     comboAmbiOrder.reset (new juce::ComboBox ("comboAmbiOrder"));
     addAndMakeVisible (comboAmbiOrder.get());
     comboAmbiOrder->setEditableText (false);
     comboAmbiOrder->setJustificationType (juce::Justification::centredLeft);
     comboAmbiOrder->setTextWhenNothingSelected (juce::String());
     comboAmbiOrder->setTextWhenNoChoicesAvailable (TRANS("(no choices)"));
-    comboAmbiOrder->addItem (TRANS("1st (4ch)"), 1);
-    comboAmbiOrder->addItem (TRANS("2nd (9ch)"), 2);
-    comboAmbiOrder->addItem (TRANS("3rd (16ch)"), 3);
-    comboAmbiOrder->addItem (TRANS("4th (25ch)"), 4);
-    comboAmbiOrder->addItem (TRANS("5th (36ch)"), 5);
-    comboAmbiOrder->addItem (TRANS("6th (49ch)"), 6);
-    comboAmbiOrder->addItem (TRANS("7th (64ch)"), 7);
+    comboAmbiOrder->addItem (TRANS("1st (4 ch)"), 1);
+    comboAmbiOrder->addItem (TRANS("2nd (9 ch)"), 2);
+    comboAmbiOrder->addItem (TRANS("3rd (16 ch)"), 3);
+    comboAmbiOrder->addItem (TRANS("4th (25 ch)"), 4);
+    comboAmbiOrder->addItem (TRANS("5th (36 ch)"), 5);
+    comboAmbiOrder->addItem (TRANS("6th (49 ch)"), 6);
+    comboAmbiOrder->addItem (TRANS("7th (64 ch)"), 7);
     comboAmbiOrder->addListener (this);
 
 
@@ -225,7 +220,6 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
-    toggleGroupMode->setVisible(MULTI_ENCODER_MODE);
 
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
@@ -250,13 +244,13 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     m_args.pSourceSet->addChangeListener(this);
 
     handleAmbiOrders();
-    
+
     initializePresets();
 
     sourceList->addMouseListener(this, true);
     groupList->addMouseListener(this, true);
     m_args.pChannelLayout->addActionListener(this);
-    
+
     controlDimming();
     //[/Constructor]
 }
@@ -287,7 +281,6 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
     toggleInfiniteDistance = nullptr;
     labelMasterGain = nullptr;
     sliderMasterGain = nullptr;
-    toggleGroupMode = nullptr;
     comboBoxPresets = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
@@ -319,28 +312,27 @@ void SourceDefinitionComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupGroups->setBounds (0, 96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f)), getWidth() - 0, juce::roundToInt ((getHeight() - 134) * 0.4343f));
-    groupList->setBounds (0 + 16, (96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f))) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 134) * 0.4343f)) - 67);
-    buttonAddGroup->setBounds (0 + 17, (96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f))) + (juce::roundToInt ((getHeight() - 134) * 0.4343f)) - 40, 64, 24);
-    buttonRemoveGroup->setBounds (0 + 89, (96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f))) + (juce::roundToInt ((getHeight() - 134) * 0.4343f)) - 40, 64, 24);
-    groupSources->setBounds (0, 96 + 0, getWidth() - 0, juce::roundToInt ((getHeight() - 134) * 0.5657f));
-    sourceList->setBounds (0 + 16, (96 + 0) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 134) * 0.5657f)) - 67);
-    buttonAdd->setBounds (0 + 17, (96 + 0) + (juce::roundToInt ((getHeight() - 134) * 0.5657f)) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, (96 + 0) + (juce::roundToInt ((getHeight() - 134) * 0.5657f)) - 40, 64, 24);
-    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, (96 + 0) + (juce::roundToInt ((getHeight() - 134) * 0.5657f)) - 40, 64, 24);
-    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, (96 + 0) + (juce::roundToInt ((getHeight() - 134) * 0.5657f)) - 40, 64, 24);
-    buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f))) + (juce::roundToInt ((getHeight() - 134) * 0.4343f)) - 40, 64, 24);
-    buttonMoveGroupUp->setBounds (0 + (getWidth() - 0) - 152, (96 + (getHeight() - 134) - (juce::roundToInt ((getHeight() - 134) * 0.4343f))) + (juce::roundToInt ((getHeight() - 134) * 0.4343f)) - 40, 64, 24);
-    sliderDistanceScaler->setBounds (getWidth() - 98 - (getWidth() - 301), 39, getWidth() - 301, 24);
-    toggleInfiniteDistance->setBounds (getWidth() - 90, 39, 72, 24);
-    sliderMasterGain->setBounds (getWidth() - 98 - (getWidth() - 301), 69, getWidth() - 301, 24);
+    groupGroups->setBounds (0, 72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f)), getWidth() - 0, juce::roundToInt ((getHeight() - 110) * 0.4349f));
+    groupList->setBounds (0 + 16, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 67);
+    buttonAddGroup->setBounds (0 + 17, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
+    buttonRemoveGroup->setBounds (0 + 89, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
+    groupSources->setBounds (0, 72 + 0, getWidth() - 0, juce::roundToInt ((getHeight() - 110) * 0.5651f));
+    sourceList->setBounds (0 + 16, (72 + 0) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 67);
+    buttonAdd->setBounds (0 + 17, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
+    buttonRemove->setBounds (0 + 89, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
+    buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
+    buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
+    buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
+    buttonMoveGroupUp->setBounds (0 + (getWidth() - 0) - 152, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
+    sliderDistanceScaler->setBounds (getWidth() - 93 - (getWidth() - 525), 8, getWidth() - 525, 24);
+    toggleInfiniteDistance->setBounds (getWidth() - 81, 8, 72, 24);
+    sliderMasterGain->setBounds (getWidth() - 5 - (getWidth() - 141), 40, getWidth() - 141, 24);
     comboBoxPresets->setBounds (83, getHeight() - 8 - 24, getWidth() - 290, 24);
     labelPresets->setBounds (8, getHeight() - 8 - 24, 64, 24);
     buttonSave->setBounds (getWidth() - 110 - 90, getHeight() - 8 - 24, 90, 24);
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
-    dummyHeight->setBounds (0, 96, 24, getHeight() - 134);
-    labelAmbiOrder->setBounds (getWidth() - 285, 8, 136, 24);
-    comboAmbiOrder->setBounds (getWidth() - 149, 8, 142, 24);
+    dummyHeight->setBounds (0, 72, 24, getHeight() - 110);
+    comboAmbiOrder->setBounds (280 - 144, 8, 144, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -476,13 +468,6 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         updateEncodingUiElements();
         //[/UserButtonCode_toggleInfiniteDistance]
     }
-    else if (buttonThatWasClicked == toggleGroupMode.get())
-    {
-        //[UserButtonCode_toggleGroupMode] -- add your button handler code here..
-        m_args.pSourceSet->setGroupModeFlag(toggleGroupMode->getToggleState());
-        refresh();
-        //[/UserButtonCode_toggleGroupMode]
-    }
     else if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
@@ -615,7 +600,6 @@ void SourceDefinitionComponent::refresh() const
 
 void SourceDefinitionComponent::updateEncodingUiElements()
 {
-    toggleGroupMode->setToggleState(m_args.pSourceSet->getGroupModeFlag(), dontSendNotification);
     toggleInfiniteDistance->setToggleState(exactlyEqual(m_args.pSourceSet->getDistanceScaler(), ScalingInfo::Infinite), dontSendNotification);
     labelDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
     sliderDistanceScaler->setEnabled(!toggleInfiniteDistance->getToggleState());
@@ -902,7 +886,7 @@ BEGIN_JUCER_METADATA
                  fixedSize="0" initialWidth="600" initialHeight="400">
   <BACKGROUND backgroundColour="ff323e44"/>
   <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 43.432%"
+                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 43.495%"
                   posRelativeX="73249ab85d6bba3a" posRelativeY="862016958b331dfc"
                   posRelativeW="73249ab85d6bba3a" posRelativeH="862016958b331dfc"
                   title="Groups"/>
@@ -919,7 +903,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 56.568%" posRelativeX="73249ab85d6bba3a"
+                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 56.505%" posRelativeX="73249ab85d6bba3a"
                   posRelativeY="862016958b331dfc" posRelativeW="73249ab85d6bba3a"
                   posRelativeH="862016958b331dfc" title="Sources"/>
   <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
@@ -951,34 +935,30 @@ BEGIN_JUCER_METADATA
               posRelativeY="983b0a3b2c5c945a" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="98Rr 39 301M 24" posRelativeX="b72378bdfe4e130"
+          virtualName="" explicitFocusOrder="0" pos="93Rr 8 525M 24" posRelativeX="b72378bdfe4e130"
           posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
   <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="6 39 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="312 8 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
-                virtualName="" explicitFocusOrder="0" pos="90R 39 72 24" buttonText="Infinite"
+                virtualName="" explicitFocusOrder="0" pos="81R 8 72 24" buttonText="Infinite"
                 connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelMasterGain" id="5a6c2906ed7799ee" memberName="labelMasterGain"
-         virtualName="" explicitFocusOrder="0" pos="6 69 109 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="8 40 109 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Master Gain [dB]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <SLIDER name="sliderMasterGain" id="48f17ace33ebcbca" memberName="sliderMasterGain"
-          virtualName="" explicitFocusOrder="0" pos="98Rr 69 301M 24" posRelativeX="b72378bdfe4e130"
+          virtualName="" explicitFocusOrder="0" pos="5Rr 40 141M 24" posRelativeX="b72378bdfe4e130"
           posRelativeY="b72378bdfe4e130" min="0.0" max="36.0" int="0.1"
           style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
           textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <TOGGLEBUTTON name="toggleGroupMode" id="88b6a5b9193adc18" memberName="toggleGroupMode"
-                virtualName="" explicitFocusOrder="0" pos="8 8 199 24" posRelativeX="b72378bdfe4e130"
-                posRelativeY="b72378bdfe4e130" buttonText="Group Mode" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
   <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
             virtualName="" explicitFocusOrder="0" pos="83 8Rr 290M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
@@ -997,17 +977,17 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="dummyHeight" id="862016958b331dfc" memberName="dummyHeight"
-                    virtualName="" explicitFocusOrder="0" pos="0 96 24 134M" class="juce::Component"
+                    virtualName="" explicitFocusOrder="0" pos="0 72 24 110M" class="juce::Component"
                     params=""/>
   <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
-         virtualName="" explicitFocusOrder="0" pos="285R 8 136 24" posRelativeX="b72378bdfe4e130"
+         virtualName="" explicitFocusOrder="0" pos="6 8 136 24" posRelativeX="b72378bdfe4e130"
          posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
          labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
-            virtualName="" explicitFocusOrder="0" pos="149R 8 142 24" editable="0"
-            layout="33" items="1st (4ch)&#10;2nd (9ch)&#10;3rd (16ch)&#10;4th (25ch)&#10;5th (36ch)&#10;6th (49ch)&#10;7th (64ch)"
+            virtualName="" explicitFocusOrder="0" pos="280r 8 144 24" editable="0"
+            layout="33" items="1st (4 ch)&#10;2nd (9 ch)&#10;3rd (16 ch)&#10;4th (25 ch)&#10;5th (36 ch)&#10;6th (49 ch)&#10;7th (64 ch)"
             textWhenNonSelected="" textWhenNoItems="(no choices)"/>
 </JUCER_COMPONENT>
 

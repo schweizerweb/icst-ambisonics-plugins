@@ -40,6 +40,8 @@ public:
 	bool showDisplayOnlyPoints;
 	bool setTrackColorAccordingToName;
     bool checkNameFieldEditable;
+    bool allowGroup;
+    bool allowDelete;
     
     AudioParams* audioParams;
 	DawParameter* dawParameter;
