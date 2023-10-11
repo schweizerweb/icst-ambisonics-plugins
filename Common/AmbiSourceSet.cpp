@@ -151,12 +151,6 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 
 void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams)
 {
-    XmlElement* groupMode = xmlElement->getChildByName(XML_TAG_GROUP_MODE);
-    if(groupMode != nullptr)
-    {
-        groupModeFlag = groupMode->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_GROUP_MODE_FLAG);
-    }
-    
     XmlElement* distanceScalerXml = xmlElement->getChildByName(XML_TAG_DISTANCE_SCALER);
     if (distanceScalerXml != nullptr)
     {
@@ -233,11 +227,6 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 {
-    // group mode flag
-    XmlElement* groupMode = new XmlElement(XML_TAG_GROUP_MODE);
-    groupMode->setAttribute(XML_ATTRIBUTE_ENABLE, groupModeFlag);
-    xml->addChildElement(groupMode);
-    
     XmlElement* distanceScalerXml = new XmlElement(XML_TAG_DISTANCE_SCALER);
     distanceScalerXml->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
     xml->addChildElement(distanceScalerXml);

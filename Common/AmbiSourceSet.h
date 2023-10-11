@@ -39,7 +39,7 @@
 class AmbiSourceSet : public AmbiDataSet, public AudioProcessorParameter::Listener, public ChangeBroadcaster
 {
 public:
-    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling), distanceScaler(DEFAULT_DISTANCE_SCALER), masterGain(nullptr), localMasterGain(DEFAULT_MASTER_GAIN)
+    AmbiSourceSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling, true), distanceScaler(DEFAULT_DISTANCE_SCALER), masterGain(nullptr), localMasterGain(DEFAULT_MASTER_GAIN)
     {}
     
     void initialize(AudioProcessor* pProcessor);
