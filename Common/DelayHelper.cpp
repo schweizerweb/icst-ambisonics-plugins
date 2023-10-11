@@ -35,9 +35,9 @@ double DelayHelper::getDelayCompensationMs(double distance, double maxNormalized
 
 int DelayHelper::getDelayCompensationSamples(double distance, double maxNormalizedDistance, double samplingRate)
 {
-	return int((maxNormalizedDistance - distance)
+	return jmax(0, int((maxNormalizedDistance - distance)
 		* SOUND_SPEED_S_PER_M
-		* samplingRate);
+		* samplingRate));
 }
 
 float DelayHelper::getDelaySamples(double distance, double samplingRate)
