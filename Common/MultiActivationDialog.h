@@ -36,9 +36,8 @@ public:
     {
         // copy to local data set
         color = COLOR_DEFINITION_GROUP_DEFAULT;
-        defaultRadius = _pRadarOptions->scalingInfo->CartesianMax() / 5;
+        defaultRadius = _pRadarOptions->scalingInfo->IsInfinite() ? 5.0 : _pRadarOptions->scalingInfo->CartesianMax() / 5.0;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
-        localDataSet->setGroupModeFlag(true);
         localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
         for(int i = 0; i < pData->size() && i < _pRadarOptions->maxNumberEditablePoints; i++)
         {
@@ -84,9 +83,10 @@ public:
         addAndMakeVisible(labelRadius.get());
 
         sliderRadius.reset(new Slider("Radius"));
-        sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
+        sliderRadius->setTextBoxStyle (Slider::TextEntryBoxPosition::TextBoxRight, false, 50, 24);
         sliderRadius->setRange(0.01, _pRadarOptions->scalingInfo->CartesianMax());
         sliderRadius->setValue(defaultRadius);
+        sliderRadius->setNumDecimalPlacesToDisplay(2);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
         addAndMakeVisible(sliderRadius.get());
