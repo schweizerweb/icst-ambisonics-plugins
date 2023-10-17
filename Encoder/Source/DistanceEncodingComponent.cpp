@@ -230,6 +230,11 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelIntensity->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelIntensity->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
+    buttonManagePresets.reset (new juce::TextButton ("buttonManagePresets"));
+    addAndMakeVisible (buttonManagePresets.get());
+    buttonManagePresets->setButtonText (TRANS("manage..."));
+    buttonManagePresets->addListener (this);
+
 
     //[UserPreSize]
     //[/UserPreSize]
@@ -299,6 +304,7 @@ DistanceEncodingComponent::~DistanceEncodingComponent()
     comboBoxAirAbsorbtionMode = nullptr;
     sliderAirAbsorbtionIntensity = nullptr;
     labelIntensity = nullptr;
+    buttonManagePresets = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -332,13 +338,14 @@ void DistanceEncodingComponent::resized()
     sliderCenterCurve->setBounds (161, 144, getWidth() - 175, 24);
     sliderAdvancedFactor->setBounds (161, 72, getWidth() - 175, 24);
     sliderAdvancedExponent->setBounds (161, 96, getWidth() - 175, 24);
-    comboBoxDistanceEncodingPreset->setBounds (72, getHeight() - 30, getWidth() - 171, 24);
+    comboBoxDistanceEncodingPreset->setBounds (72, getHeight() - 30, getWidth() - 278, 24);
     labelPresets->setBounds (0, getHeight() - 30, 64, 24);
-    buttonSave->setBounds (getWidth() - 6 - 80, getHeight() - 30, 80, 24);
+    buttonSave->setBounds (getWidth() - 115 - 80, getHeight() - 30, 80, 24);
     labelAirAbsorbtionMode->setBounds (19, getHeight() - 76, 53, 24);
     comboBoxAirAbsorbtionMode->setBounds (80, getHeight() - 75, 192, 24);
     sliderAirAbsorbtionIntensity->setBounds (368, getHeight() - 75, getWidth() - 382, 24);
     labelIntensity->setBounds (288, getHeight() - 76, 72, 24);
+    buttonManagePresets->setBounds (getWidth() - 6 - 96, getHeight() - 30, 96, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -445,6 +452,12 @@ void DistanceEncodingComponent::buttonClicked (juce::Button* buttonThatWasClicke
         comboBoxDistanceEncodingPreset->setText("", dontSendNotification);
         delete newFile;
         //[/UserButtonCode_buttonSave]
+    }
+    else if (buttonThatWasClicked == buttonManagePresets.get())
+    {
+        //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
+        presetManagerDialog.show(this, pPresetHelper, false);
+        //[/UserButtonCode_buttonManagePresets]
     }
 
     //[UserbuttonClicked_Post]
@@ -613,7 +626,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <COMBOBOX name="comboBoxDistanceEncodingPreset" id="4b25adf5b07e9492" memberName="comboBoxDistanceEncodingPreset"
-            virtualName="" explicitFocusOrder="0" pos="72 30R 171M 24" posRelativeX="450188aa0f332e78"
+            virtualName="" explicitFocusOrder="0" pos="72 30R 278M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
             textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
   <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
@@ -622,7 +635,7 @@ BEGIN_JUCER_METADATA
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
   <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="6Rr 30R 80 24" posRelativeX="450188aa0f332e78"
+              virtualName="" explicitFocusOrder="0" pos="115Rr 30R 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <LABEL name="labelAirAbsorbtionMode" id="21b94baa2315f138" memberName="labelAirAbsorbtionMode"
@@ -643,6 +656,10 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Intensity" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
+  <TEXTBUTTON name="buttonManagePresets" id="d2c677691816b1ab" memberName="buttonManagePresets"
+              virtualName="" explicitFocusOrder="0" pos="6Rr 30R 96 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
+              needsCallback="1" radioGroupId="0"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA
@@ -652,3 +669,4 @@ END_JUCER_METADATA
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

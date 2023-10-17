@@ -24,7 +24,6 @@
 //[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "SourceDefinitionComponent.h"
-#include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
 #include "DistanceEncodingPresetHelper.h"
 #include "ComponentArguments.h"
@@ -64,7 +63,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    PresetManagerDialog presetManagerDialog;
     EncoderSettingsComponentArgs m_args;
     
     void controlDimming();
