@@ -60,8 +60,8 @@ HelpComponent::HelpComponent (bool isEncoder)
     }
 
     String documentationUrl = isEncoder
-    ? "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Encoder_specification"
-    : "https://bitbucket.org/christian_schweizer/icst-ambisonics-plugins/wiki/Decoder_specification";
+    ? "https://github.com/schweizerweb/icst-ambisonics-plugins/wiki/ICST-AmbiEncoder"
+    : "https://github.com/schweizerweb/icst-ambisonics-plugins/wiki/ICST-AmbiDecoder";
     tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
     tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/page/icst-ambisonics-plugins"), true);
 
