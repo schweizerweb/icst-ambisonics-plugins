@@ -790,7 +790,10 @@ Vector3D<double> AmbiDataSet::getAbsSourcePoint(int index) const
 
     if(groupModeFlag)
     {
-        Vector3D<double> pt = get(index)->getVector3D();
+        auto p = get(index);
+        if(p==nullptr)
+            return Vector3D<double>();
+        Vector3D<double> pt = p->getVector3D();
         auto grpPoint = get(index)->getGroup();
         if(grpPoint != nullptr)
         {

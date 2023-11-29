@@ -151,6 +151,8 @@ void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour
 
 void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams)
 {
+	const ScopedLock lock(cs);
+
     XmlElement* distanceScalerXml = xmlElement->getChildByName(XML_TAG_DISTANCE_SCALER);
     if (distanceScalerXml != nullptr)
     {
@@ -227,6 +229,8 @@ void AmbiSourceSet::loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParam
 
 void AmbiSourceSet::writeToXmlElement(XmlElement* xml) const
 {
+	const ScopedLock lock(cs);
+	
     XmlElement* distanceScalerXml = new XmlElement(XML_TAG_DISTANCE_SCALER);
     distanceScalerXml->setAttribute(XML_ATTRIBUTE_FACTOR, getDistanceScaler());
     xml->addChildElement(distanceScalerXml);
