@@ -319,11 +319,11 @@ private:
                 return false;
             case SHAPE_ID_CIRCLE:
                 {   
-                    float startAngle = (pointCount % 2 == 0 ? (float)(-PI/pointCount) : 0.0f);
+                    float startAngle = (pointCount % 2 == 0 ? (float)(-PI/(double)pointCount) : 0.0f);
                     p.startNewSubPath(radius*sinf(startAngle), radius*cosf(startAngle));
                     for(int i = 1; i < pointCount+1; i++)
                     {
-                        float angle = startAngle + (float)(i*2.0f*PI/pointCount);
+                        float angle = startAngle + (float)((double)i*2.0*PI/(double)pointCount);
                         p.lineTo(radius*sinf(angle), radius*cosf(angle));
                     }
                 }
