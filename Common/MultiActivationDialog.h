@@ -318,7 +318,15 @@ private:
             case SHAPE_ID_NONE:
                 return false;
             case SHAPE_ID_CIRCLE:
-                p.addEllipse(-radius, -radius, 2*radius, 2*radius);
+                {   
+                    float startAngle = (pointCount % 2 == 0 ? (float)(-PI/pointCount) : 0.0f);
+                    p.startNewSubPath(radius*sinf(startAngle), radius*cosf(startAngle));
+                    for(int i = 1; i < pointCount+1; i++)
+                    {
+                        float angle = startAngle + (float)(i*2.0f*PI/pointCount);
+                        p.lineTo(radius*sinf(angle), radius*cosf(angle));
+                    }
+                }
                 break;
             case SHAPE_ID_SQUARE:
                 p.addRectangle(-radius, -radius, 2*radius, 2*radius);
