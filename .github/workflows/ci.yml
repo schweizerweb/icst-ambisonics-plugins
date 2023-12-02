@@ -80,4 +80,24 @@ jobs:
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
+    
+    - if: ${{ runner.os == 'macOS' }}
+      name: Install packagesbuild
+      shell: bash
+      run: |
+        wget http://s.sudre.free.fr/Software/files/Packages.dmg
+        hdiutil attach Packages.dmg -mountpoint "/Volumes/PackagesTmp"
+        sudo installer -package "/Volumes/PackagesTmp/Install Packages.pkg" -target /
+        hdiutil detach /Volumes/PackagesTmp
+
+    - name: Build Installer
+      shell: bash
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.1" -n "ICST_AmbiPlugins_${{ matrix.name }}_dev"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/packages/*
 
