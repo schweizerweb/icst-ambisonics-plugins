@@ -788,6 +788,7 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
 void Radar2D::mouseDown(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
+    Point<float> screenPoint = (e.getPosition().toFloat());
 
 	if (!pRadarOptions->showEditablePoints)
 		return;
@@ -809,7 +810,10 @@ void Radar2D::mouseDown(const MouseEvent& e)
 			continue;
 		double dist;
         Vector3D<double> absPoint = pEditablePoints->getAbsSourcePoint(i);
-		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
+        dist = screenPoint.getDistanceFrom(getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat()));
+        float scaler = pEditablePoints->get(i)->getDisplayScaler();
+        dist = jmax(0.0, dist - getEditablePointSize(scaler));
+		if (dist < minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -824,7 +828,10 @@ void Radar2D::mouseDown(const MouseEvent& e)
 			continue;
 	    double dist;
         Vector3D<double> absPoint = pt->getVector3D();
-        if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
+        dist = screenPoint.getDistanceFrom(getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat()));
+        float scaler = pEditablePoints->getGroup(i)->getDisplayScaler();
+        dist = jmax(0.0, dist - getGroupPointSize(scaler));
+		if (dist <= minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -841,7 +848,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
             for(int si = 0; si < 3; si++)
             {
                 Point<float> p = getSpecialIconPositionForCenter(groupScreenPoint, specialHandleModes[si]);
-                if((dist = valuePoint.getDistanceFrom(getValuePointFromAbsoluteScreenPoint(p))) < minDist)
+                dist = screenPoint.getDistanceFrom(p);
+                dist = jmax(0.0, dist - getGroupPointSize(scaler));
+                if(dist <= minDist)
                 {
                     minDist = dist;
                     minDistIndex = i;
