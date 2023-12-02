@@ -6,3 +6,4 @@ bin/
 packages/
 build*/
 *AutoGen.jucer
+.vscode/
