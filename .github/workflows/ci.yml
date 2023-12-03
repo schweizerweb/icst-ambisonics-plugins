@@ -65,6 +65,9 @@ jobs:
       shell: bash
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
+        echo "sha_short=$(git rev-parse --short "$GITHUB_SHA")" >> "$GITHUB_OUTPUT"
+        echo "branch=$(echo ${GITHUB_REF#refs/heads/})" >> "$GITHUB_OUTPUT"
+
 
     - name: Configure CMake
       run: >
@@ -93,7 +96,7 @@ jobs:
     - name: Build Installer
       shell: bash
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.1" -n "ICST_AmbiPlugins_${{ matrix.name }}_dev"
+      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.1" -n "ICST_AmbiPlugins_${{ matrix.name }}_${{steps.strings.outputs.branch}}_${{steps.strings.outputs.sha_short}}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
