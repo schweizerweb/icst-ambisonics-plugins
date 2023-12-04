@@ -20,6 +20,7 @@
 
 
 #include "Constants.h"
+#include "BuildInfo.h"
 #include "JuceHeader.h"
 
 const float Constants::AzimuthRadMin = float(0);
@@ -64,4 +65,40 @@ bool Constants::isDevelopmentVersion()
 bool Constants::isNonVisibleVersionPrerelease()
 {
     return String(ProjectInfo::versionString).endsWith("-t");
+}
+
+String Constants::getUiVersionString(bool addLeadingSpace)
+{
+    if(Constants::isNonVisibleVersionPrerelease())
+    {
+        return "";
+    }
+
+    String versionString;
+    if(String(ProjectInfo::versionString).startsWith("0.0.0."))
+    {
+        if(BUILD_NUMBER > 0)
+        {
+            versionString = "Dev" + String(BUILD_NUMBER);
+        }
+        else
+        {
+            versionString = "self-built";
+        }
+    }
+    else
+    {
+        versionString = String(ProjectInfo::versionString);
+    }
+    
+    return addLeadingSpace
+            ? (" " + versionString)
+            : versionString;
+}
+
+String Constants::getBuildInfo()
+{
+    return String(COMMIT_ID) == String("")
+        ? ""
+        : ("Build: " + getUiVersionString(false) + "; Last commit: " + COMMIT_ID);
 }

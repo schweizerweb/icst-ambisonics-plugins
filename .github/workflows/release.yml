@@ -83,6 +83,12 @@ jobs:
       run: |
         sed -i.bak "s/.*#version_replacement_tag#.*/VERSION ${{ needs.prepare.outputs.version }}/" CMakeLists.txt
 
+    - name: Set Build info
+      shell: bash
+      run: |
+        sed -i.bak "s/BUILD_NUMBER 0/BUILD_NUMBER ${{github.run_id}}/" Common/BuildInfo.h
+        sed -i.bak "s/COMMIT_ID \"\"/COMMIT_ID \"${{github.sha}}\"/" Common/BuildInfo.h
+
     - name: Set reusable strings
       id: strings
       shell: bash

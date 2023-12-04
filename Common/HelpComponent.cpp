@@ -23,6 +23,7 @@
 #include "HelpRadarInteraction.h"
 #include "HelpOscSyntax.h"
 #include "HelpWebBrowserComponent.h"
+#include "Constants.h"
 //[/Headers]
 
 #include "HelpComponent.h"
@@ -65,8 +66,8 @@ HelpComponent::HelpComponent (bool isEncoder)
     tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
     tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/page/icst-ambisonics-plugins"), true);
 
-    label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + " " +  String(ProjectInfo::versionString) + " " + String::fromUTF8("\xc2\xa9 2023 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
-
+    label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true) + " " + String::fromUTF8("\xc2\xa9 2023 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
+    label->setTooltip(Constants::getBuildInfo());
     //[/UserPreSize]
 
     setSize (600, 400);
