@@ -99,7 +99,7 @@ jobs:
     - name: Build Installer
       shell: bash
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
-      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.${{github.run_id}}" -n "ICST_AmbiPlugins_dev_${{ matrix.name }}_${{github.run_id}}"
+      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.${{github.run_id}}" -n "ICST_AmbiPlugins_dev_${{ matrix.name }}_cibuild_${{github.run_number}}"
 
     - name: Upload artifact
       uses: actions/upload-artifact@v3
