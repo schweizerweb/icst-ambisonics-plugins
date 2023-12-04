@@ -100,5 +100,5 @@ String Constants::getBuildInfo()
 {
     return String(COMMIT_ID) == String("")
         ? ""
-        : ("Build: " + getUiVersionString(false) + "; Last commit: " + COMMIT_ID);
+        : ("Version: " + getUiVersionString(false) + "; Build#: " + String(BUILD_NUMBER) + "; Last commit: " + COMMIT_ID);
 }

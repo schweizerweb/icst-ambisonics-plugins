@@ -69,7 +69,7 @@ jobs:
     - name: Set Build info
       shell: bash
       run: |
-        sed -i.bak "s/BUILD_NUMBER 0/BUILD_NUMBER ${{github.run_id}}/" Common/BuildInfo.h
+        sed -i.bak "s/BUILD_NUMBER 0/BUILD_NUMBER ${{github.run_number}}/" Common/BuildInfo.h
         sed -i.bak "s/COMMIT_ID \"\"/COMMIT_ID \"${{github.event.pull_request.head.sha}}\"/" Common/BuildInfo.h
 
     - name: Configure CMake
