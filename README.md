@@ -13,7 +13,7 @@ Links to get started:
 OS | Version | VST3 | AU | LV2<sup>1</sup>
 :------------ | :--------------| :-------------| :------------- | :-------------
 macOS         | >= 10.3         | :white_check_mark:  | :white_check_mark: | :white_check_mark:
-Windows<sup>2</sup>       | >= 10           | :x:  | :white_check_mark: | :white_check_mark:
+Windows<sup>2</sup>       | >= 10           | :white_check_mark:  | :x: | :white_check_mark:
 Linux         | experimental    | :white_check_mark:  | :x: | :white_check_mark:
 
 <sup>1</sup> LV2 version does currently NOT support automation parameters
