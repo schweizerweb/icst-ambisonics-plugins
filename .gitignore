@@ -4,5 +4,6 @@ Encoder/Builds/
 Encoder/JuceLibraryCode/
 bin/
 packages/
-build/
+build*/
 *AutoGen.jucer
+.vscode/

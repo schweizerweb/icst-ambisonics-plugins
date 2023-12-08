@@ -21,7 +21,7 @@
 
 #include "AmbiDataSet.h"
 
-AmbiDataSet::AmbiDataSet(ScalingInfo* pScaling) : pScalingInfo(pScaling), groupModeFlag(DEFAULT_GROUP_MODE_FLAG)
+AmbiDataSet::AmbiDataSet(ScalingInfo* pScaling, bool _groupModeFlag) : pScalingInfo(pScaling), groupModeFlag(_groupModeFlag)
 {
 }
 
@@ -784,37 +784,16 @@ bool AmbiDataSet::getGroupModeFlag() const
     return groupModeFlag;
 }
 
-void AmbiDataSet::setGroupModeFlag(bool en)
-{
-    std::map<int, Vector3D<double>> origPos;
-    
-    if(groupModeFlag != en)
-    {
-        // rearrange all source positions
-        for(int i = 0; i < size(); i++)
-        {
-            auto p = get(i);
-            if(p != nullptr)
-            {
-                origPos[i] = getAbsSourcePoint(i);
-            }
-        }
-    }
-    
-    groupModeFlag = en;
-    
-    for(auto& p : origPos)
-        setAbsSourcePoint(p.first, p.second);
-}
-
-
 Vector3D<double> AmbiDataSet::getAbsSourcePoint(int index) const
 {
     const ScopedLock lock(cs);
 
     if(groupModeFlag)
     {
-        Vector3D<double> pt = get(index)->getVector3D();
+        auto p = get(index);
+        if(p==nullptr)
+            return Vector3D<double>();
+        Vector3D<double> pt = p->getVector3D();
         auto grpPoint = get(index)->getGroup();
         if(grpPoint != nullptr)
         {

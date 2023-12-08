@@ -126,14 +126,12 @@ void AmbiSpeakerSet::loadFromXml(XmlElement *xmlElement)
         for(int i = 0; i < elements.size(); i++)
             ambiPointPointers.add(elements[i]);
         
-        int index = 0;
         XmlElement* xmlGroup = groupsElement->getChildByName(XML_TAG_GROUP);
         while (xmlGroup != nullptr)
         {
             groups.add(new AmbiGroup(xmlGroup, &ambiPointPointers, AudioParameterSet(), pScalingInfo));
             
             xmlGroup = xmlGroup->getNextElement();
-            index++;
         }
     }
 }

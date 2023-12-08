@@ -27,6 +27,7 @@
 #include "DistanceEncodingGraph.h"
 #include "DistanceEncodingPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
+#include "../../Common/PresetManagerDialog.h"
 //[/Headers]
 
 
@@ -48,7 +49,7 @@ class DistanceEncodingComponent  : public Component,
 {
 public:
     //==============================================================================
-    DistanceEncodingComponent (DistanceEncodingParams* pParams, DistanceEncodingPresetHelper* pPresetHelper, ZoomSettings* pZoomSettings);
+    DistanceEncodingComponent (DistanceEncodingParams* _pParams, DistanceEncodingPresetHelper* _pPresetHelper, ZoomSettings* _pZoomSettings);
     ~DistanceEncodingComponent() override;
 
     //==============================================================================
@@ -73,6 +74,7 @@ private:
 	DistanceEncodingParams* pParams;
     DistanceEncodingPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;
+    PresetManagerDialog presetManagerDialog;
     //[/UserVariables]
 
     //==============================================================================
@@ -100,6 +102,7 @@ private:
     std::unique_ptr<juce::ComboBox> comboBoxAirAbsorbtionMode;
     std::unique_ptr<juce::Slider> sliderAirAbsorbtionIntensity;
     std::unique_ptr<juce::Label> labelIntensity;
+    std::unique_ptr<juce::TextButton> buttonManagePresets;
 
 
     //==============================================================================
@@ -108,3 +111,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

@@ -796,23 +796,11 @@ void OSCHandlerEncoder::handleOwnExternStyleDistanceEncodingInverseProportional(
 
 bool OSCHandlerEncoder::checkAed(double a, double e, double d, String* errorString) const
 {
-    if(a < Constants::AzimuthRadMin || a > Constants::AzimuthRadMax)
-    {
-        *errorString = "OSC-Message Azimuth out of range: " + String(a);
-        return false;
-    }
-    if(e < Constants::ElevationRadMin || e > Constants::ElevationRadMax)
-    {
-        *errorString = "OSC-Message Elevation out of range: " + String(e);
-        return false;
-    }
-    if (d < Constants::DistanceMin)
-    {
-        *errorString = "OSC-Message Distance out of range: " + String(d);
-        return false;
-    }
+    double x = d * cos(e) * cos(a);
+    double y = d * cos(e) * sin(a);
+    double z = d * sin(e);
 
-    return true;
+    return checkXyz(x, y, z, errorString);
 }
 
 bool OSCHandlerEncoder::checkXyz(double x, double y, double z, String* errorString) const

@@ -36,9 +36,8 @@ public:
     {
         // copy to local data set
         color = COLOR_DEFINITION_GROUP_DEFAULT;
-        defaultRadius = _pRadarOptions->scalingInfo->CartesianMax() / 5;
+        defaultRadius = _pRadarOptions->scalingInfo->IsInfinite() ? 5.0 : _pRadarOptions->scalingInfo->CartesianMax() / 5.0;
         localDataSet.reset(new AmbiSourceSet(&scalingInfo));
-        localDataSet->setGroupModeFlag(true);
         localDataSet->addGroup(Uuid().toString(), Vector3D<double>(newPosition.x, newPosition.y, 0), "Temp", color);
         for(int i = 0; i < pData->size() && i < _pRadarOptions->maxNumberEditablePoints; i++)
         {
@@ -59,7 +58,7 @@ public:
         int max = _pRadarOptions->maxNumberEditablePoints - pData->getEnabledCount();
         sliderPointCount->setRange(Range<double>(0, max), 1.0);
         sliderPointCount->setValue(max, sendNotificationAsync);
-        sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, true, 40, 24);
+        sliderPointCount->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, false, 40, 24);
         sliderPointCount->addListener(this);
         addAndMakeVisible(sliderPointCount.get());
         
@@ -84,9 +83,10 @@ public:
         addAndMakeVisible(labelRadius.get());
 
         sliderRadius.reset(new Slider("Radius"));
-        sliderRadius->setTextBoxStyle (Slider::NoTextBox, false, 0, 0);
+        sliderRadius->setTextBoxStyle (Slider::TextEntryBoxPosition::TextBoxRight, false, 50, 24);
         sliderRadius->setRange(0.01, _pRadarOptions->scalingInfo->CartesianMax());
         sliderRadius->setValue(defaultRadius);
+        sliderRadius->setNumDecimalPlacesToDisplay(2);
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
         addAndMakeVisible(sliderRadius.get());
@@ -318,7 +318,15 @@ private:
             case SHAPE_ID_NONE:
                 return false;
             case SHAPE_ID_CIRCLE:
-                p.addEllipse(-radius, -radius, 2*radius, 2*radius);
+                {   
+                    float startAngle = (pointCount % 2 == 0 ? (float)(-PI/(double)pointCount) : 0.0f);
+                    p.startNewSubPath(radius*sinf(startAngle), radius*cosf(startAngle));
+                    for(int i = 1; i < pointCount+1; i++)
+                    {
+                        float angle = startAngle + (float)((double)i*2.0*PI/(double)pointCount);
+                        p.lineTo(radius*sinf(angle), radius*cosf(angle));
+                    }
+                }
                 break;
             case SHAPE_ID_SQUARE:
                 p.addRectangle(-radius, -radius, 2*radius, 2*radius);
@@ -338,7 +346,7 @@ private:
         {
             if(localDataSet->get(i)->getGroup() == localDataSet->getGroup(0))
             {
-                auto pt = p.getPointAlongPath(totalLength / (float(pointCount * groupPointIndex)));
+                auto pt = p.getPointAlongPath(totalLength / float(pointCount) * float(groupPointIndex));
                 localDataSet->get(i)->getRawPoint()->setXY(pt.getX(), pt.getY());
                 groupPointIndex++;
             }

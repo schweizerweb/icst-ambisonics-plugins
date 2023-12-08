@@ -576,7 +576,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
             for(auto i : selection)
                 pEditablePoints->setSolo(i, anyNotSolo);
         }
-        else if(key.isKeyCode(KeyPress::backspaceKey))
+        else if(pRadarOptions->allowDelete && (key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey)))
         {
             for(auto i : selection)
             {
@@ -788,6 +788,7 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
 void Radar2D::mouseDown(const MouseEvent& e)
 {
 	Point<float> valuePoint = getValuePointFromAbsoluteScreenPoint(e.getPosition().toFloat());
+    Point<float> screenPoint = (e.getPosition().toFloat());
 
 	if (!pRadarOptions->showEditablePoints)
 		return;
@@ -809,7 +810,10 @@ void Radar2D::mouseDown(const MouseEvent& e)
 			continue;
 		double dist;
         Vector3D<double> absPoint = pEditablePoints->getAbsSourcePoint(i);
-		if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
+        dist = screenPoint.getDistanceFrom(getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat()));
+        float scaler = pEditablePoints->get(i)->getDisplayScaler();
+        dist = jmax(0.0, dist - getEditablePointSize(scaler));
+		if (dist < minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -824,7 +828,10 @@ void Radar2D::mouseDown(const MouseEvent& e)
 			continue;
 	    double dist;
         Vector3D<double> absPoint = pt->getVector3D();
-        if ((dist = valuePoint.getDistanceFrom(getProjectedPoint(&absPoint).toFloat())) < minDist)
+        dist = screenPoint.getDistanceFrom(getAbsoluteScreenPoint(getProjectedPoint(&absPoint).toFloat()));
+        float scaler = pEditablePoints->getGroup(i)->getDisplayScaler();
+        dist = jmax(0.0, dist - getGroupPointSize(scaler));
+		if (dist <= minDist)
 		{
 			minDist = dist;
 			minDistIndex = i;
@@ -841,7 +848,9 @@ void Radar2D::mouseDown(const MouseEvent& e)
             for(int si = 0; si < 3; si++)
             {
                 Point<float> p = getSpecialIconPositionForCenter(groupScreenPoint, specialHandleModes[si]);
-                if((dist = valuePoint.getDistanceFrom(getValuePointFromAbsoluteScreenPoint(p))) < minDist)
+                dist = screenPoint.getDistanceFrom(p);
+                dist = jmax(0.0, dist - getGroupPointSize(scaler));
+                if(dist <= minDist)
                 {
                     minDist = dist;
                     minDistIndex = i;
@@ -1088,31 +1097,32 @@ void Radar2D::mouseDoubleClick(const MouseEvent& e)
 	if (pRadarOptions->maxNumberEditablePoints > 0 && pEditablePoints->getEnabledCount() >= pRadarOptions->maxNumberEditablePoints)
 		return;
 
-	if (pEditablePoints->size() < pRadarOptions->maxNumberEditablePoints)
-	{
-		// add new point if capacity allows it
-		Uuid newId = Uuid();
-		int index = pEditablePoints->size();
-		switch (radarMode) {
-		case XY:
-			pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
-			break;
-		case XZ_Half:
-		case XZ_Full:
-			pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
-			break;
-		}
-
-		// select point
-		pPointSelection->selectPoint(pEditablePoints->size() - 1);
-	}
-	else 
-	{
-        if(e.mods.isShiftDown())
+    if(e.mods.isShiftDown() && pRadarOptions->allowGroup)
+    {
+        CallOutBox::launchAsynchronously(std::make_unique<MultiActivationDialog>(pEditablePoints, valuePoint, pRadarOptions, radarMode == XY), Rectangle<int>(e.getPosition().translated(3, 3), e.getPosition().translated(3, 3)), this);
+    }
+    else
+    {
+        if (pEditablePoints->size() < pRadarOptions->maxNumberEditablePoints)
         {
-            CallOutBox::launchAsynchronously(std::make_unique<MultiActivationDialog>(pEditablePoints, valuePoint, pRadarOptions, radarMode == XY), Rectangle<int>(e.getPosition().translated(3, 3), e.getPosition().translated(3, 3)), this);
+            // add new point if capacity allows it
+            Uuid newId = Uuid();
+            int index = pEditablePoints->size();
+            switch (radarMode) {
+            case XY:
+                pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), valuePoint.getY(), 0.0, pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+                break;
+            case XZ_Half:
+            case XZ_Full:
+                pEditablePoints->addNew(newId.toString(), Point3D<double>(valuePoint.getX(), 0.0, valuePoint.getY(), pRadarOptions->getAudioParamForIndex(index, false)), pEditablePoints->getNewUniqueName(), TrackColors::getColor(index + 1));
+                break;
+            }
+
+            // select point
+            pPointSelection->selectPoint(pEditablePoints->size() - 1);
         }
-        else {
+        else
+        {
             // otherwise enable a disabled point
             CallOutBox::launchAsynchronously(std::make_unique<ActivationDialog>(pEditablePoints, valuePoint, radarMode == XY), Rectangle<int>(e.getPosition(), e.getPosition().translated(3, 3)), this);
         }

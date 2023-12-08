@@ -18,7 +18,7 @@
 <SelectMultipleGroups name = "Select Multiple Groups">Shift + Click Multiple Group Points</SelectMultipleGroups>
 <MoveGroup name="Move Group(s)">Drag-Drop Selected Group Point(s)</MoveGroup>
 <MoveGroupPointOnly name="Move Group Point(s) only">Shift + Drag-Drop Selected Group Point(s)</MoveGroupPointOnly>
-<StretchGroupPoints name="Stretch Group">Alt -> Stretchsymbol -> Mouse Up/down to increase/decrease stretch</StretchGroupPoints>
+<StretchGroupPoints name="Stretch Group">Alt -> Mousewheel OR Alt -> Stretchsymbol -> Mouse up/down to inc/dec stretch</StretchGroupPoints>
 <RotateGroupPoints name="Rotate Point(s) around Group Point(s)">Alt -> Drag-Drop Rotate-Around-Group-Symbol</RotateGroupPoints>
 <RotateGroupAroundOrigin name="Rotate Group(s) around Origin">Alt -> Drag-Drop Rotate-Around-Origin-Symbol</RotateGroupAroundOrigin>
 </Group>

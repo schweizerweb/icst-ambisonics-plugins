@@ -105,7 +105,6 @@ private:
     std::unique_ptr<juce::ToggleButton> toggleInfiniteDistance;
     std::unique_ptr<juce::Label> labelMasterGain;
     std::unique_ptr<juce::Slider> sliderMasterGain;
-    std::unique_ptr<juce::ToggleButton> toggleGroupMode;
     std::unique_ptr<juce::ComboBox> comboBoxPresets;
     std::unique_ptr<juce::Label> labelPresets;
     std::unique_ptr<juce::TextButton> buttonSave;

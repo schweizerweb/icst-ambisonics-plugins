@@ -23,14 +23,13 @@
 #include "AmbiPoint.h"
 #include "AmbiGroup.h"
 
-#define DEFAULT_GROUP_MODE_FLAG     false
 #define XML_TAG_GROUPS "Groups"
 #define XML_TAG_GROUP "Group"
 
 class AmbiDataSet
 {
 public:
-	AmbiDataSet(ScalingInfo* pScaling);
+	AmbiDataSet(ScalingInfo* pScaling, bool _groupModeFlag);
 	virtual ~AmbiDataSet();
 
 	virtual int size() const = 0;
@@ -101,7 +100,6 @@ public:
     void setAbsSourcePoint(int index, Vector3D<double> absPoint);
     
     bool getGroupModeFlag() const;
-    void setGroupModeFlag(bool en);
     
 private:
 	bool nameExists(String name) const;

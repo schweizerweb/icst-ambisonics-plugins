@@ -111,6 +111,41 @@ if(c==2)
         File fileIannixPresetJs = getPathForPresetName("Iannix-Cusor-Demo-JS");
         writeToXmlFile(fileIannixPresetJs, &iannixPresetJs);
         presetFiles.addIfNotAlreadyThere(fileIannixPresetJs);
+
+        // preset for absolute quaternion rotation using JS
+        CustomOscInput quatPresetJs;
+        quatPresetJs.oscString = "/absgrouprotation/quaternion";
+        quatPresetJs.commandString =
+R"(// set absolute group rotation using quaterion values
+// syntax: /absgrouprotation/quaternion [groupName] [q1] [q2] [q3] [q4]
+
+groupName = s.arg(1);
+q1 = s.arg(2);
+q2 = s.arg(3);
+q3 = s.arg(4);
+q4 = s.arg(5);
+
+s.setGroupRotationByName (groupName, q1, q2, q3, q4);
+)";
+        File filequatPresetJs = getPathForPresetName("Abs-Quaternion-Rotation-JS");
+        writeToXmlFile(filequatPresetJs, &quatPresetJs);
+        presetFiles.addIfNotAlreadyThere(filequatPresetJs);
+
+        // preset for absolute group stretch using JS
+        CustomOscInput stretchPresetJs;
+        stretchPresetJs.oscString = "/absgroupstretch/factor";
+        stretchPresetJs.commandString =
+R"(// set absolute group stretch factor
+// syntax: /absgroupstretch/factor [groupName] [factor]
+
+groupName = s.arg(1);
+factor = s.arg(2);
+
+s.setGroupStretchByName (groupName, factor);
+)";
+        File fileStretchPresetJs = getPathForPresetName("Abs-Stretch-JS");
+        writeToXmlFile(fileStretchPresetJs, &stretchPresetJs);
+        presetFiles.addIfNotAlreadyThere(fileStretchPresetJs);
     }
     
     bool loadFromXmlFile(const File file, CustomOscInput* pOscRx)

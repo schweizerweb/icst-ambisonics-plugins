@@ -29,7 +29,7 @@
 class AmbiSpeakerSet : public AmbiDataSet
 {
 public:
-    AmbiSpeakerSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling) {}
+    AmbiSpeakerSet(ScalingInfo* pScaling) : AmbiDataSet(pScaling, false) {}
 	AmbiSpeaker* get(int index) const override;
 
 	void add(AmbiSpeaker* pt);

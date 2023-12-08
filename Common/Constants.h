@@ -20,6 +20,7 @@
 
 
 #pragma once
+#include "JuceHeader.h"
 
 #define PI 3.1415926535897932384626433832795
 #define SOUND_SPEED_M_PER_S    343.0
@@ -54,4 +55,6 @@ public:
 
 	static bool isDevelopmentVersion();
     static bool isNonVisibleVersionPrerelease();
+    static String getUiVersionString(bool addBrackets);
+    static String getBuildInfo();
 };

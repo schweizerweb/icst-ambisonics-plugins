@@ -51,6 +51,8 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     radarOptions.editablePointsAsSquare = true;
     radarOptions.scalingInfo = getScalingInfo();
     radarOptions.zoomSettings = getZoomSettingsPointer();
+    radarOptions.allowGroup = false;
+    radarOptions.allowDelete = false;
 }
 
 AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()

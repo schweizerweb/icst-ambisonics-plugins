@@ -53,11 +53,6 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
 
     toggleDoppler->setBounds (6, 8, 199, 24);
 
-    btnManageDistanceEncodingPresets.reset (new juce::TextButton ("btnManageDistanceEncodingPresets"));
-    addAndMakeVisible (btnManageDistanceEncodingPresets.get());
-    btnManageDistanceEncodingPresets->setButtonText (TRANS("manage presets..."));
-    btnManageDistanceEncodingPresets->addListener (this);
-
     distanceEncodingComponent.reset (new DistanceEncodingComponent (&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings));
     addAndMakeVisible (distanceEncodingComponent.get());
     distanceEncodingComponent->setName ("distanceEncodingComponent");
@@ -82,7 +77,6 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     groupDistanceEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDoppler = nullptr;
-    btnManageDistanceEncodingPresets = nullptr;
     distanceEncodingComponent = nullptr;
 
 
@@ -109,7 +103,6 @@ void EncodingSettingsComponent::resized()
 
     groupDistanceEncoding->setBounds (8, 40, getWidth() - 14, getHeight() - 46);
     toggleDistanceEncoding->setBounds (8 + 14, 40 + 24, 199, 24);
-    btnManageDistanceEncodingPresets->setBounds (8 + (getWidth() - 14) - 26 - 142, 40 + 24, 142, 24);
     distanceEncodingComponent->setBounds (8 + 14, 40 + 56, (getWidth() - 14) - 28, (getHeight() - 46) - 70);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
@@ -134,12 +127,6 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
         m_args.pSettings->dopplerEncodingFlag = toggleDoppler->getToggleState();
         sendChangeMessage();
         //[/UserButtonCode_toggleDoppler]
-    }
-    else if (buttonThatWasClicked == btnManageDistanceEncodingPresets.get())
-    {
-        //[UserButtonCode_btnManageDistanceEncodingPresets] -- add your button handler code here..
-        presetManagerDialog.show(this, m_args.pDistanceEncodingPresetHelper, false);
-        //[/UserButtonCode_btnManageDistanceEncodingPresets]
     }
 
     //[UserbuttonClicked_Post]
@@ -191,11 +178,6 @@ BEGIN_JUCER_METADATA
                 virtualName="" explicitFocusOrder="0" pos="6 8 199 24" posRelativeX="b72378bdfe4e130"
                 posRelativeY="b72378bdfe4e130" buttonText="Enable Doppler" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTBUTTON name="btnManageDistanceEncodingPresets" id="e79fc007bc779712"
-              memberName="btnManageDistanceEncodingPresets" virtualName=""
-              explicitFocusOrder="0" pos="26Rr 24 142 24" posRelativeX="c7f86e9b07311c49"
-              posRelativeY="c7f86e9b07311c49" buttonText="manage presets..."
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="distanceEncodingComponent" id="1a603f1700c46471" memberName="distanceEncodingComponent"
                     virtualName="" explicitFocusOrder="0" pos="14 56 28M 70M" posRelativeX="c7f86e9b07311c49"
                     posRelativeY="c7f86e9b07311c49" posRelativeW="c7f86e9b07311c49"

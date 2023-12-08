@@ -69,6 +69,7 @@ target_compile_definitions(AmbiDecoder
         JUCE_VST3_CAN_REPLACE_VST2=0
 		JUCE_MODAL_LOOPS_PERMITTED=1
 		MAX_NUM_INPUT=64
+		JUCE_SILENCE_XCODE_15_LINKER_WARNING=1
 		)
 
 target_link_libraries(AmbiDecoder

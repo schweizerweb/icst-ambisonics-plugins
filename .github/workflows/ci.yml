@@ -66,6 +66,12 @@ jobs:
       run: |
         echo "build-output-dir=${{ github.workspace }}/build" >> "$GITHUB_OUTPUT"
 
+    - name: Set Build info
+      shell: bash
+      run: |
+        sed -i.bak "s/BUILD_NUMBER 0/BUILD_NUMBER ${{github.run_number}}/" Common/BuildInfo.h
+        sed -i.bak "s/COMMIT_ID \"\"/COMMIT_ID \"${{github.event.pull_request.head.sha}}\"/" Common/BuildInfo.h
+
     - name: Configure CMake
       run: >
         cmake -B ${{ steps.strings.outputs.build-output-dir }}
@@ -80,4 +86,24 @@ jobs:
     - name: Test
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ctest --build-config ${{ matrix.build_type }}
+    
+    - if: ${{ runner.os == 'macOS' }}
+      name: Install packagesbuild
+      shell: bash
+      run: |
+        wget http://s.sudre.free.fr/Software/files/Packages.dmg
+        hdiutil attach Packages.dmg -mountpoint "/Volumes/PackagesTmp"
+        sudo installer -package "/Volumes/PackagesTmp/Install Packages.pkg" -target /
+        hdiutil detach /Volumes/PackagesTmp
+
+    - name: Build Installer
+      shell: bash
+      working-directory: ${{ steps.strings.outputs.build-output-dir }}
+      run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.${{github.run_id}}" -n "ICST_AmbiPlugins_dev_${{ matrix.name }}_cibuild_${{github.run_number}}"
+
+    - name: Upload artifact
+      uses: actions/upload-artifact@v3
+      with:
+        name: ${{ matrix.name }}
+        path: ${{ steps.strings.outputs.build-output-dir }}/packages/*
 

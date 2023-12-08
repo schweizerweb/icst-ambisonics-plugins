@@ -212,9 +212,9 @@ public:
             if (btn == nullptr) {
                 btn = new ImageButton();
                 btn->setImages (false, true, true,
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0x6effffff),
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xaeffffff),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0xaeee1010),
+                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xffee1010));
                 btn->setTooltip("Add to presets...");
                 btn->setName(BUTTON_TYPE_PRESET);
                 btn->addListener(this);
