@@ -342,11 +342,11 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     // use only xyz OR aed, xyz has priority
     if(xyzMode)
     {
-        if(approximatelyEqual(x, invalidDbl))
+        if(exactlyEqual(x, invalidDbl))
             x = pt->getRawPoint()->getX();
-        if(approximatelyEqual(y, invalidDbl))
+        if(exactlyEqual(y, invalidDbl))
             y = pt->getRawPoint()->getY();
-        if(approximatelyEqual(z, invalidDbl))
+        if(exactlyEqual(z, invalidDbl))
             z = pt->getRawPoint()->getZ();
         
         pSources->setChannelXYZ(index, x, y, z);
@@ -354,17 +354,17 @@ bool CustomOscReceiver::handleMessage(AmbiSourceSet* pSources, const OSCMessage*
     else
     {
         // otherwise use aed
-        if(approximatelyEqual(a, invalidDbl))
+        if(exactlyEqual(a, invalidDbl))
             a = pt->getRawPoint()->getAzimuth();
-        if(approximatelyEqual(e, invalidDbl))
+        if(exactlyEqual(e, invalidDbl))
             e = pt->getRawPoint()->getElevation();
-        if(approximatelyEqual(d, invalidDbl))
+        if(exactlyEqual(d, invalidDbl))
             d = pt->getRawPoint()->getDistance();
         
         pSources->setChannelAED(index, a, e, d);
     }
     
-    if(approximatelyEqual(gain, invalidDbl))
+    if(!exactlyEqual(gain, invalidDbl))
     {
         pSources->setGain(index, gain);
     }
