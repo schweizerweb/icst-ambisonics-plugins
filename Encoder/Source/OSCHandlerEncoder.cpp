@@ -168,6 +168,11 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
             handleOwnExternStyleIndexGain(message);
             hasMatch = true;
         }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_NAME)))
+        {
+            handleOwnExternStyleIndexName(message);
+            hasMatch = true;
+        }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE)))
         {
             handleOwnExternStyleGroupRotate(message);
@@ -460,6 +465,37 @@ void OSCHandlerEncoder::handleOwnExternStyleIndexGain(const OSCMessage &message)
     }
     
     if(pAmbiPoints->setGain(channel, gain))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + String(channel) + ")", &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleIndexName(const OSCMessage &message) const
+{
+    bool valid =
+        message.size() == 2
+        && message[0].isInt32()
+        && (message[1].isString());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(Name index style)", &message);
+        return;
+    }
+
+    int channel = message[0].getInt32();
+    String name = message[1].getString();
+    String errorMessage;
+    if (!checkName(name, &errorMessage))
+    {
+        reportError(errorMessage, &message);
+        return;
+    }
+    
+    if(pAmbiPoints->setChannelName(channel, name))
     {
         reportSuccess(&message);
     }
@@ -829,6 +865,17 @@ bool OSCHandlerEncoder::checkGain(double gain, String *errorString) const
     if(gain < Constants::GainDbMin || gain > Constants::GainDbMax)
     {
         *errorString = "OSC-Message Gain out of range: " + String(gain);
+        return false;
+    }
+    
+    return true;
+}
+       
+bool OSCHandlerEncoder::checkName(String name, String *errorString) const
+{
+    if(name.length() < 1)
+    {
+        *errorString = "OSC-Message name not specified";
         return false;
     }
     

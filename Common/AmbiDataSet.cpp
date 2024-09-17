@@ -165,12 +165,17 @@ bool AmbiDataSet::setChannelYZ(int channel, double y, double z) const
     return false;
 }
 
-void AmbiDataSet::setChannelName(int channel, String name) const
+bool AmbiDataSet::setChannelName(int channel, String name) const
 {
 	AmbiPoint* pt = get(channel);
 
-	if (pt != nullptr)
-		pt->setName(name);
+    if (pt != nullptr)
+    {
+        pt->setName(name);
+        return true;
+    }
+
+    return false;
 }
 
 void AmbiDataSet::setChannelColor(int channel, Colour colour) const

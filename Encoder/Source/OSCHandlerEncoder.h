@@ -38,6 +38,7 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/sourceindex/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/sourceindex/xyz"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN "/icst/ambi/sourceindex/gain"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_NAME "/icst/ambi/sourceindex/name"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE "/icst/ambi/group/rotate"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN "/icst/ambi/group/rotateorigin"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH "/icst/ambi/group/stretch"
@@ -71,6 +72,7 @@ private:
     void handleOwnExternStyleIndexAed(const OSCMessage& message) const;
     void handleOwnExternStyleIndexXyz(const OSCMessage& message) const;
     void handleOwnExternStyleIndexGain(const OSCMessage& message) const;
+    void handleOwnExternStyleIndexName(const OSCMessage& message) const;
     void handleOwnExternStyleGroupAed(const OSCMessage& message) const;
     void handleOwnExternStyleGroupXyz(const OSCMessage& message) const;
     void handleOwnExternStyleGroupRotate(const OSCMessage& message) const;
@@ -84,6 +86,7 @@ private:
     bool checkAed(double a, double e, double d, String* errorString) const;
     bool checkXyz(double x, double y, double z, String* errorString) const;
     bool checkGain(double gain, String* errorString) const;
+    bool checkName(String name, String* errorString) const;
     
     ScalingInfo* pScalingInfo;
     OwnedArray<CustomOscInput>* pCustomOscInput;
