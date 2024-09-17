@@ -464,7 +464,7 @@ void OSCHandlerEncoder::handleOwnExternStyleIndexGain(const OSCMessage &message)
         return;
     }
     
-    if(pAmbiPoints->setGain(channel, gain))
+    if(pAmbiPoints->setGain(channel-1, gain))
     {
         reportSuccess(&message);
     }
@@ -495,7 +495,7 @@ void OSCHandlerEncoder::handleOwnExternStyleIndexName(const OSCMessage &message)
         return;
     }
     
-    if(pAmbiPoints->setChannelName(channel, name))
+    if(pAmbiPoints->setChannelName(channel-1, name))
     {
         reportSuccess(&message);
     }
