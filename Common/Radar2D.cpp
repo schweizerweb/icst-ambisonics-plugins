@@ -42,6 +42,7 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* _pEditablePoints, AmbiDataSet* _pD
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(false);
+    Component::setTransform(AffineTransform::scale(Desktop::getInstance().getGlobalScaleFactor()));
 
 	setWantsKeyboardFocus(true);
 
