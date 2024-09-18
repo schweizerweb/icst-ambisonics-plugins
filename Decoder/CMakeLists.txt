@@ -26,6 +26,7 @@ target_sources(AmbiDecoder
 	Source/SpeakerTestCustomComponent.cpp
 	Source/PluginProcessor.cpp
 	Source/PluginEditor.cpp
+	Source/MultiDecoderComponent.cpp
 
 	../Common/HelpComponent.cpp
 	../Common/HelpOscSyntax.cpp

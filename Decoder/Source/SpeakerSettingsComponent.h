@@ -32,6 +32,7 @@
 #include "../../Common/TestSoundGenerator.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "FilterSettingsComponent.h"
+#include "MultiDecoderComponent.h"
 #include "DecoderPresetHelper.h"
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
@@ -62,7 +63,7 @@ class SpeakerSettingsComponent  : public Component,
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* pSpeakerSet, DecoderPresetHelper* pPresetHelper, PointSelection* pPointSelection, AmbiSettings* pAmbiSettings, DecoderSettings* pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* pFilterSpecification, ZoomSettings* pZoomSettings, ChannelLayout* pChannelLayout);
+    SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettings* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
@@ -154,6 +155,8 @@ private:
     std::unique_ptr<juce::Slider> sliderTimeout;
     std::unique_ptr<juce::Label> labelAmbiOrder;
     std::unique_ptr<juce::ComboBox> comboAmbiOrder;
+    std::unique_ptr<juce::ToggleButton> toggleMultiDecoder;
+    std::unique_ptr<MultiDecoderComponent> multiDecoderControl;
 
 
     //==============================================================================
@@ -162,3 +165,4 @@ private:
 
 //[EndFile] You can add extra defines here...
 //[/EndFile]
+

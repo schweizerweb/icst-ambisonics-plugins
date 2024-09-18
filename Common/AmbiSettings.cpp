@@ -63,7 +63,8 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
     loadWarningFlag = false;
     // ambisonics settings
     
-    ambiOrder = xmlElement->getIntAttribute("ambiOrder", 1);
+    ambiOrder = xmlElement->getIntAttribute(XML_ATTRIBUTE_AMBI_ORDER, 1);
+    multiDecoderFlag = xmlElement->getBoolAttribute(XML_ATTRIBUTE_MULTI_DECODER, false);
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, AmbiSettings::INPHASE));
     int index = 0;
@@ -87,8 +88,8 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
 
 void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
 {
-    xmlElement->setAttribute("ambiOrder", ambiOrder);
-    
+    xmlElement->setAttribute(XML_ATTRIBUTE_AMBI_ORDER, ambiOrder);
+    xmlElement->setAttribute(XML_ATTRIBUTE_MULTI_DECODER, multiDecoderFlag);
     XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, int(weightMode));
     
@@ -206,4 +207,14 @@ void AmbiSettings::setAmbiOrder(int order)
     ambiOrder = order;
     prepareAutoWeightings();
     setWeightMode(weightMode);
+}
+
+bool AmbiSettings::getMultiDecoderFlag()
+{
+    return multiDecoderFlag;
+}
+
+void AmbiSettings::setMultiDecoderFlag(bool isMulti)
+{
+    multiDecoderFlag = isMulti;
 }

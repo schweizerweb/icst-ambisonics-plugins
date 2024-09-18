@@ -30,6 +30,8 @@
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
+#define XML_ATTRIBUTE_MULTI_DECODER "multiDecoder"
+#define XML_ATTRIBUTE_AMBI_ORDER "ambiOrder"
 #define XML_VALUE "Value"
 
 class AmbiSettings
@@ -52,6 +54,9 @@ public:
     void setAmbiOrder(int order);
     int getAmbiChannelCount() const;
     bool getWarningFlag();
+
+    bool getMultiDecoderFlag();
+    void setMultiDecoderFlag(bool isMulti);
     
 private:
 	double fact(int n);
@@ -69,4 +74,6 @@ private:
     
     AmbiWeightMode weightMode;
     bool loadWarningFlag;
+
+    bool multiDecoderFlag;
 };
