@@ -36,6 +36,7 @@ target_sources(AmbiDecoder
 	../Common/AmbiGroup.cpp
 	../Common/AmbiPoint.cpp
 	../Common/AmbiSettings.cpp
+	../Common/AmbiSettingsCollection.cpp
 	../Common/AmbiSource.cpp
 	../Common/AmbiSourceSet.cpp
 	../Common/AmbiSpeaker.cpp

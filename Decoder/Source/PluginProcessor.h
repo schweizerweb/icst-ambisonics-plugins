@@ -22,7 +22,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiSettings.h"
+#include "../../Common/AmbiSettingsCollection.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
 #include "../../Common/DelayBuffer.h"
@@ -53,7 +53,7 @@ public:
    #endif
 
 	void checkDelayBuffers();
-    void checkFilters();
+    void checkSpeakerFilters();
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
     using AudioProcessor::processBlock;
     
@@ -86,7 +86,7 @@ public:
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();
 	AmbiSourceSet* getMovingPoints();
-	AmbiSettings* getAmbiSettings();
+	AmbiSettingsCollection* getAmbiSettings();
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
@@ -99,7 +99,7 @@ private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
 	std::unique_ptr<AmbiSourceSet> movingPoints;
-	AmbiSettings ambiSettings;
+	AmbiSettingsCollection ambiSettings;
 	DecoderSettings decoderSettings;
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;

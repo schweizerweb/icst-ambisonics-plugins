@@ -76,7 +76,7 @@ private:
 	AmbisonicsDecoderAudioProcessor& mainProcessor;
 	AmbiSpeakerSet* pSpeakerSet;
 	AmbiSourceSet* pMovingPoints;
-	AmbiSettings* pAmbiSettings;
+	AmbiSettingsCollection* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;

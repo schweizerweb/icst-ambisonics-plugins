@@ -168,7 +168,7 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
     return true;
 }
 
-void AmbisonicsDecoderAudioProcessor::checkFilters()
+void AmbisonicsDecoderAudioProcessor::checkSpeakerFilters()
 {
     int size = speakerSet->size();
 
@@ -206,7 +206,7 @@ void AmbisonicsDecoderAudioProcessor::checkFilters()
 
 void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.getAmbiChannelCount(), buffer.getNumChannels());
+    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.singleDecoder->getAmbiChannelCount(), buffer.getNumChannels());
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     double currentCoefficients[MAX_NUM_CHANNELS];
 	const float* inputBufferPointers[MAX_NUM_CHANNELS];
@@ -214,7 +214,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 	AudioSampleBuffer inputBuffer;
 
 	checkDelayBuffers();
-    checkFilters();
+    checkSpeakerFilters();
 
 	// copy input buffer and get read pointers
 	inputBuffer.makeCopyOf(buffer);
@@ -244,8 +244,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 			// calculate ambisonics coefficients
 			double speakerGain = pt->getGain();
 			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
-            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.getAmbiOrder();
-            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((ambiSettings.getAmbiOrder() + 1) * (ambiSettings.getAmbiOrder() + 1));
+            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.singleDecoder->getAmbiOrder();
+            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((ambiSettings.singleDecoder->getAmbiOrder() + 1) * (ambiSettings.singleDecoder->getAmbiOrder() + 1));
             
 			pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
 			
@@ -255,7 +255,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 
 			for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
 			{
-				currentCoefficients[iChannel] *= ambiSettings.getAmbiChannelWeight(iChannel);
+				currentCoefficients[iChannel] *= ambiSettings.singleDecoder->getAmbiChannelWeight(iChannel);
 			}
 			// apply to B-format and create output
 			float* channelData = buffer.getWritePointer(iSpeaker);
@@ -380,7 +380,7 @@ AmbiSourceSet* AmbisonicsDecoderAudioProcessor::getMovingPoints()
 	return movingPoints.get();
 }
 
-AmbiSettings* AmbisonicsDecoderAudioProcessor::getAmbiSettings()
+AmbiSettingsCollection* AmbisonicsDecoderAudioProcessor::getAmbiSettings()
 {
 	return &ambiSettings;
 }
@@ -441,10 +441,7 @@ void AmbisonicsDecoderAudioProcessor::numChannelsChanged()
     channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
     
     int maxAmbiOrder = channelLayout.getMaxAmbiOrder(false);
-    if(ambiSettings.getAmbiOrder() > maxAmbiOrder)
-    {
-        ambiSettings.setAmbiOrder(maxAmbiOrder);
-    }
+    ambiSettings.ensureMaxAmbiOrder(maxAmbiOrder);
     
     // handle output channels
     while(channelLayout.getNumOutputChannels() < speakerSet->size())

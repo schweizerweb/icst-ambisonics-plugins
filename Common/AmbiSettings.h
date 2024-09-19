@@ -30,7 +30,6 @@
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
-#define XML_ATTRIBUTE_MULTI_DECODER "multiDecoder"
 #define XML_ATTRIBUTE_AMBI_ORDER "ambiOrder"
 #define XML_VALUE "Value"
 
@@ -47,16 +46,12 @@ public:
     void setWeightMode(AmbiWeightMode mode);
     
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
-    void loadFromPresetXml(XmlElement* xmlElement);
+    bool loadFromPresetXml(XmlElement* xmlElement);
 
     int getGainCount();
     int getAmbiOrder();
     void setAmbiOrder(int order);
     int getAmbiChannelCount() const;
-    bool getWarningFlag();
-
-    bool getMultiDecoderFlag();
-    void setMultiDecoderFlag(bool isMulti);
     
 private:
 	double fact(int n);
@@ -73,7 +68,4 @@ private:
     int ambiOrder;
     
     AmbiWeightMode weightMode;
-    bool loadWarningFlag;
-
-    bool multiDecoderFlag;
 };
