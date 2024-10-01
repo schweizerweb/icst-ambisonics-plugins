@@ -94,7 +94,6 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
 	void updateUI() const;
-    void handleAmbiOrders();
 	FilterBankInfo* getFilterInfo(int rowNumber) const;
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
@@ -139,8 +138,6 @@ private:
     std::unique_ptr<juce::TextButton> buttonRemove;
     std::unique_ptr<juce::TextButton> buttonMoveDown;
     std::unique_ptr<juce::TextButton> buttonMoveUp;
-    std::unique_ptr<MultiSliderControl> ambiChannelControl;
-    std::unique_ptr<juce::Label> labelChannelWeights;
     std::unique_ptr<juce::ToggleButton> btnEditMode;
     std::unique_ptr<juce::Label> labelOscPort;
     std::unique_ptr<juce::Label> labelTimeout;
@@ -148,14 +145,11 @@ private:
     std::unique_ptr<juce::TextButton> buttonSpeakerTest;
     std::unique_ptr<juce::Label> labelDevelopmentVersion;
     std::unique_ptr<juce::TextButton> buttonManage;
-    std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
     std::unique_ptr<juce::TextButton> buttonManageFilters;
     std::unique_ptr<juce::TextButton> buttonCsv;
     std::unique_ptr<juce::TextButton> buttonScaling;
     std::unique_ptr<juce::Slider> sliderPort;
     std::unique_ptr<juce::Slider> sliderTimeout;
-    std::unique_ptr<juce::Label> labelAmbiOrder;
-    std::unique_ptr<juce::ComboBox> comboAmbiOrder;
     std::unique_ptr<juce::ToggleButton> toggleMultiDecoder;
     std::unique_ptr<MultiDecoderComponent> multiDecoderControl;
     std::unique_ptr<AmbiSettingsComponent> ambiSettingsControl;

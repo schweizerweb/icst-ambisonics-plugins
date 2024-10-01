@@ -131,19 +131,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     buttonMoveUp->setButtonText (TRANS ("up"));
     buttonMoveUp->addListener (this);
 
-    ambiChannelControl.reset (new MultiSliderControl (MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings->singleDecoder->getAmbiOrderWeightPointer(), &ambiChannelNames, 0.0, 1.5, 0.00001));
-    addAndMakeVisible (ambiChannelControl.get());
-    ambiChannelControl->setName ("ambiChannelControl");
-
-    labelChannelWeights.reset (new juce::Label ("labelChannelWeights",
-                                                TRANS ("Channel weights:")));
-    addAndMakeVisible (labelChannelWeights.get());
-    labelChannelWeights->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelChannelWeights->setJustificationType (juce::Justification::centredLeft);
-    labelChannelWeights->setEditable (false, false, false);
-    labelChannelWeights->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelChannelWeights->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
     btnEditMode.reset (new juce::ToggleButton ("btnEditMode"));
     addAndMakeVisible (btnEditMode.get());
     btnEditMode->setButtonText (TRANS ("Edit mode"));
@@ -194,14 +181,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     buttonManage->setButtonText (TRANS ("manage..."));
     buttonManage->addListener (this);
 
-    comboBoxChannelWeightingMode.reset (new juce::ComboBox ("comboBoxChannelWeightingMode"));
-    addAndMakeVisible (comboBoxChannelWeightingMode.get());
-    comboBoxChannelWeightingMode->setEditableText (false);
-    comboBoxChannelWeightingMode->setJustificationType (juce::Justification::centredLeft);
-    comboBoxChannelWeightingMode->setTextWhenNothingSelected (juce::String());
-    comboBoxChannelWeightingMode->setTextWhenNoChoicesAvailable (TRANS ("(no choices)"));
-    comboBoxChannelWeightingMode->addListener (this);
-
     buttonManageFilters.reset (new juce::TextButton ("buttonManageFilters"));
     addAndMakeVisible (buttonManageFilters.get());
     buttonManageFilters->setButtonText (TRANS ("manage filters..."));
@@ -231,30 +210,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     sliderTimeout->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 70, 20);
     sliderTimeout->addListener (this);
 
-    labelAmbiOrder.reset (new juce::Label ("labelAmbiOrder",
-                                           TRANS ("Ambisonics order:")));
-    addAndMakeVisible (labelAmbiOrder.get());
-    labelAmbiOrder->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
-    labelAmbiOrder->setJustificationType (juce::Justification::centredLeft);
-    labelAmbiOrder->setEditable (false, false, false);
-    labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelAmbiOrder->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    comboAmbiOrder.reset (new juce::ComboBox ("comboAmbiOrder"));
-    addAndMakeVisible (comboAmbiOrder.get());
-    comboAmbiOrder->setEditableText (false);
-    comboAmbiOrder->setJustificationType (juce::Justification::centredLeft);
-    comboAmbiOrder->setTextWhenNothingSelected (juce::String());
-    comboAmbiOrder->setTextWhenNoChoicesAvailable (TRANS ("(no choices)"));
-    comboAmbiOrder->addItem (TRANS ("1st (4ch)"), 1);
-    comboAmbiOrder->addItem (TRANS ("2nd (9ch)"), 2);
-    comboAmbiOrder->addItem (TRANS ("3rd (16ch)"), 3);
-    comboAmbiOrder->addItem (TRANS ("4th (25ch)"), 4);
-    comboAmbiOrder->addItem (TRANS ("5th (36ch)"), 5);
-    comboAmbiOrder->addItem (TRANS ("6th (49ch)"), 6);
-    comboAmbiOrder->addItem (TRANS ("7th (64ch)"), 7);
-    comboAmbiOrder->addListener (this);
-
     toggleMultiDecoder.reset (new juce::ToggleButton ("toggleMultiDecoder"));
     addAndMakeVisible (toggleMultiDecoder.get());
     toggleMultiDecoder->setButtonText (TRANS ("Multi-Decoder mode"));
@@ -279,12 +234,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 
     //[Constructor] You can add your own custom stuff here..
     labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion() && !Constants::isNonVisibleVersionPrerelease());
-
-    // prepare weighting comboBox
-    comboBoxChannelWeightingMode->addItem("Basic", AmbiSettings::BASIC);
-    comboBoxChannelWeightingMode->addItem("In-Phase", AmbiSettings::INPHASE);
-    comboBoxChannelWeightingMode->addItem("Max-rE", AmbiSettings::MAXRE);
-    comboBoxChannelWeightingMode->addItem("Manual", AmbiSettings::MANUAL);
 
     // speaker list elements
 	buttonSpeakerTest->setClickingTogglesState(true);
@@ -313,8 +262,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 	pPointSelection->addChangeListener(this);
 
     updateUI();
-    handleAmbiOrders();
-
+    
 	// OSC
 	toggleOsc->setToggleState(pDecoderSettings->oscReceive, dontSendNotification);
 	sliderPort->setValue(pDecoderSettings->oscReceivePort);
@@ -344,8 +292,6 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
-    ambiChannelControl = nullptr;
-    labelChannelWeights = nullptr;
     btnEditMode = nullptr;
     labelOscPort = nullptr;
     labelTimeout = nullptr;
@@ -353,14 +299,11 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     buttonSpeakerTest = nullptr;
     labelDevelopmentVersion = nullptr;
     buttonManage = nullptr;
-    comboBoxChannelWeightingMode = nullptr;
     buttonManageFilters = nullptr;
     buttonCsv = nullptr;
     buttonScaling = nullptr;
     sliderPort = nullptr;
     sliderTimeout = nullptr;
-    labelAmbiOrder = nullptr;
-    comboAmbiOrder = nullptr;
     toggleMultiDecoder = nullptr;
     multiDecoderControl = nullptr;
     ambiSettingsControl = nullptr;
@@ -397,8 +340,6 @@ void SpeakerSettingsComponent::resized()
     buttonRemove->setBounds ((8 + 8) + 72, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 52, ((getWidth() - 16) - 0) - 16, 249 - 60);
-    labelChannelWeights->setBounds ((((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120) + -20 - 112, (0 + (getHeight() - 317)) + 20, 112, 24);
     btnEditMode->setBounds (8 + 8, 0 + 24, 150, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 317)) + 249) + 20, 75, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 317)) + 249) + 20, 96, 24);
@@ -406,14 +347,11 @@ void SpeakerSettingsComponent::resized()
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 317) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
     buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
-    comboBoxChannelWeightingMode->setBounds (((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120, (0 + (getHeight() - 317)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
     buttonCsv->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
     buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 317)) + 249) + 20, 170, 24);
-    labelAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 293, (0 + (getHeight() - 317)) + 21, 136, 24);
-    comboAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 157, (0 + (getHeight() - 317)) + 21, 142, 24);
     toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, 150, 24);
     multiDecoderControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
     ambiSettingsControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
@@ -433,22 +371,6 @@ void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasC
         pPresetHelper->selectPresetName(presetName);
 
         //[/UserComboBoxCode_comboBoxChannelConfig]
-    }
-    else if (comboBoxThatHasChanged == comboBoxChannelWeightingMode.get())
-    {
-        //[UserComboBoxCode_comboBoxChannelWeightingMode] -- add your combo box handling code here..
-        pAmbiSettings->singleDecoder->setWeightMode(AmbiSettings::AmbiWeightMode( comboBoxChannelWeightingMode->getSelectedId()));
-        ambiChannelControl->updateValues();
-        controlDimming();
-        //[/UserComboBoxCode_comboBoxChannelWeightingMode]
-    }
-    else if (comboBoxThatHasChanged == comboAmbiOrder.get())
-    {
-        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
-        pAmbiSettings->singleDecoder->setAmbiOrder(comboAmbiOrder->getSelectedId());
-        ambiChannelControl->setVisibleSliderCount(pAmbiSettings->singleDecoder->getGainCount());
-        ambiChannelControl->updateValues();
-        //[/UserComboBoxCode_comboAmbiOrder]
     }
 
     //[UsercomboBoxChanged_Post]
@@ -950,20 +872,8 @@ void SpeakerSettingsComponent::updateUI() const
 	speakerList->updateContent();
 	speakerList->repaint();
 
-	ambiChannelControl->updateValues();
-    comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->singleDecoder->getWeightMode());
-
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
-    comboAmbiOrder->setSelectedId(pAmbiSettings->singleDecoder->getAmbiOrder(), dontSendNotification);
-    ambiChannelControl->setVisibleSliderCount(pAmbiSettings->singleDecoder->getGainCount());
     toggleMultiDecoder->setToggleState(pAmbiSettings->getMultiDecoderFlag(), dontSendNotification);
-}
-
-void SpeakerSettingsComponent::handleAmbiOrders()
-{
-    for(int i = 1; i <= MAX_AMBISONICS_ORDER; i++)
-        comboAmbiOrder->setItemEnabled(i, i <= pChannelLayout->getMaxAmbiOrder(false));
-    comboAmbiOrder->setSelectedId(pAmbiSettings->singleDecoder->getAmbiOrder(), sendNotification);
 }
 
 void SpeakerSettingsComponent::updateComboBox() const
@@ -1014,7 +924,6 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
     }
     if(message == ACTION_MESSAGE_CHANNEL_LAYOUT_CHANGED)
     {
-        handleAmbiOrders();
         speakerList->updateContent();
         speakerList->repaint();
         controlDimming();
@@ -1040,19 +949,7 @@ void SpeakerSettingsComponent::controlDimming()
 	buttonMoveDown->setEnabled(en && !multiselection);
 	buttonSpeakerTest->setEnabled(en);
 
-    ambiChannelControl->setEnabled(pAmbiSettings->singleDecoder->getWeightMode() == AmbiSettings::MANUAL);
-
     bool isMulti = pAmbiSettings->getMultiDecoderFlag();
-    /*labelAmbiOrder->setVisible(!isMulti);
-    comboAmbiOrder->setVisible(!isMulti);
-    labelChannelWeights->setVisible(!isMulti);
-    comboBoxChannelWeightingMode->setVisible(!isMulti);
-    ambiChannelControl->setVisible(!isMulti);*/
-    labelAmbiOrder->setVisible(false);
-    comboAmbiOrder->setVisible(false);
-    labelChannelWeights->setVisible(false);
-    comboBoxChannelWeightingMode->setVisible(false);
-    ambiChannelControl->setVisible(false);
     multiDecoderControl->setVisible(isMulti);
     ambiSettingsControl->setVisible(!isMulti);
 }
@@ -1199,16 +1096,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <GENERICCOMPONENT name="ambiChannelControl" id="4ec5a32a175ea48d" memberName="ambiChannelControl"
-                    virtualName="" explicitFocusOrder="0" pos="8 52 16M 60M" posRelativeX="17eb4b418501687a"
-                    posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiSliderControl" params="MAX_NB_OF_AMBISONICS_GAINS, pAmbiSettings-&gt;singleDecoder-&gt;getAmbiOrderWeightPointer(), &amp;ambiChannelNames, 0.0, 1.5, 0.00001"/>
-  <LABEL name="labelChannelWeights" id="ce2f83213d847908" memberName="labelChannelWeights"
-         virtualName="" explicitFocusOrder="0" pos="-20r 20 112 24" posRelativeX="e9f5f23a259dd1c0"
-         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
-         labelText="Channel weights:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
   <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
                 virtualName="" explicitFocusOrder="0" pos="8 24 150 24" posRelativeX="450188aa0f332e78"
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
@@ -1243,10 +1130,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="136Rr 24 80 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <COMBOBOX name="comboBoxChannelWeightingMode" id="e9f5f23a259dd1c0" memberName="comboBoxChannelWeightingMode"
-            virtualName="" explicitFocusOrder="0" pos="-20r 20 120 24" posRelativeX="2bcfcb77cb1da104"
-            posRelativeY="17eb4b418501687a" editable="0" layout="33" items=""
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TEXTBUTTON name="buttonManageFilters" id="5b471faa99c7496b" memberName="buttonManageFilters"
               virtualName="" explicitFocusOrder="0" pos="8Rr 24 120 24" posRelativeX="450188aa0f332e78"
               posRelativeY="450188aa0f332e78" buttonText="manage filters..."
@@ -1269,16 +1152,6 @@ BEGIN_JUCER_METADATA
           posRelativeY="f4cf3a53a6ef0d87" min="10.0" max="10000.0" int="1.0"
           style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="70" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
-         virtualName="" explicitFocusOrder="0" pos="293R 21 136 24" posRelativeX="17eb4b418501687a"
-         posRelativeY="17eb4b418501687a" edTextCol="ff000000" edBkgCol="0"
-         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
-            virtualName="" explicitFocusOrder="0" pos="157R 21 142 24" posRelativeX="17eb4b418501687a"
-            posRelativeY="17eb4b418501687a" editable="0" layout="33" items="1st (4ch)&#10;2nd (9ch)&#10;3rd (16ch)&#10;4th (25ch)&#10;5th (36ch)&#10;6th (49ch)&#10;7th (64ch)"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
   <TOGGLEBUTTON name="toggleMultiDecoder" id="d25afde82619da9f" memberName="toggleMultiDecoder"
                 virtualName="" explicitFocusOrder="0" pos="8 20 150 24" posRelativeX="17eb4b418501687a"
                 posRelativeY="17eb4b418501687a" buttonText="Multi-Decoder mode"
