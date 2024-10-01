@@ -24,6 +24,8 @@
 AmbiSettingsCollection::AmbiSettingsCollection()
 {
     loadWarningFlag = false;
+    nbUsedDecoders = 3;
+    multiDecoderFlag = false;
     singleDecoder.reset(new AmbiSettings());
 }
 
@@ -32,15 +34,31 @@ void AmbiSettingsCollection::loadFromPresetXml(XmlElement *xmlElement)
     loadWarningFlag = false;
     // ambisonics settings
     
-    multiDecoderFlag = xmlElement->getBoolAttribute(XML_ATTRIBUTE_MULTI_DECODER, false);
+    multiDecoderFlag = xmlElement->getBoolAttribute(XML_ATTRIBUTE_MULTI_DECODER_FLAG, false);
+    nbUsedDecoders = xmlElement->getIntAttribute(XML_ATTRIBUTE_MULTI_DECODER_SECTION_COUNT, 1);
     loadWarningFlag |= singleDecoder->loadFromPresetXml(xmlElement);
+    for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
+    {
+        XmlElement* xmlSection = xmlElement->getChildByName(XML_TAG_DECODER_SECTION+String(i));
+        if (xmlSection != nullptr)
+        {
+            loadWarningFlag |= multiDecoderSections[i].loadFromPresetXml(xmlSection);
+        }
+    }
 }
 
-void AmbiSettingsCollection::writeToPresetXmlElement(XmlElement *xmlElement) const
+void AmbiSettingsCollection::writeToPresetXmlElement(XmlElement *xmlElement)
 {
-    xmlElement->setAttribute(XML_ATTRIBUTE_MULTI_DECODER, multiDecoderFlag);
+    xmlElement->setAttribute(XML_ATTRIBUTE_MULTI_DECODER_FLAG, multiDecoderFlag);
+    xmlElement->setAttribute(XML_ATTRIBUTE_MULTI_DECODER_SECTION_COUNT, nbUsedDecoders);
     singleDecoder->writeToPresetXmlElement(xmlElement);
-    //xmlElement->addChildElement(xmlAmbiChannelWeight);
+
+    for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
+    {
+        XmlElement* xmlSection = new XmlElement(XML_TAG_DECODER_SECTION+String(i));
+        multiDecoderSections[i].writeToPresetXmlElement(xmlSection);
+        xmlElement->addChildElement(xmlSection);
+    }
 }
 
 
@@ -57,6 +75,15 @@ bool AmbiSettingsCollection::getMultiDecoderFlag()
 void AmbiSettingsCollection::setMultiDecoderFlag(bool isMulti)
 {
     multiDecoderFlag = isMulti;
+}
+
+int AmbiSettingsCollection::getUsedDecoderCount()
+{
+    return nbUsedDecoders;
+}
+void AmbiSettingsCollection::setUsedDecoderCount(int count)
+{
+    nbUsedDecoders = count;
 }
 
 void AmbiSettingsCollection::ensureMaxAmbiOrder(int maxOrder)

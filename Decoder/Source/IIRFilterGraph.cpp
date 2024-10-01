@@ -24,7 +24,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(FilterBankInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification): pFilterInfo(_pFilterInfo), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
+IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors): pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -61,41 +61,57 @@ IIRFilterGraph::~IIRFilterGraph()
 void IIRFilterGraph::paintData(Graphics& g)
 {
 	// draw curve
-	Path path;
+	
+	for (int iFilter = 0; iFilter < pFilterInfo.size(); iFilter++)
+	{
+		FilterBankInfo* pFilter = pFilterInfo[iFilter];
+		Path path;
 
-	if(!pFilterInfo->anyActive())
-	{
-		path.startNewSubPath(mapValues(frequencies.getFirst(), 0.0).toFloat());
-		path.lineTo(mapValues(frequencies.getLast(), 0.0).toFloat());
-	}
-	else
-	{
-		std::vector<dsp::IIR::Coefficients<float>::Ptr> coeffs;
-		pFilterInfo->getCoefficients(sampleRate, &coeffs);
-		int activeFilterCount = int(coeffs.size());
-		for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
+		if (!pFilter->anyActive())
 		{
-			coeffs[(size_t)iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], (size_t)frequencies.size(), sampleRate);
+			path.startNewSubPath(mapValues(frequencies.getFirst(), 0.0).toFloat());
+			path.lineTo(mapValues(frequencies.getLast(), 0.0).toFloat());
+		}
+		else
+		{
+			std::vector<dsp::IIR::Coefficients<float>::Ptr> coeffs;
+			pFilter->getCoefficients(sampleRate, &coeffs);
+			int activeFilterCount = int(coeffs.size());
+			for (int iCoeff = 0; iCoeff < activeFilterCount && iCoeff < MAX_FILTER_COUNT; iCoeff++)
+			{
+				coeffs[(size_t)iCoeff]->getMagnitudeForFrequencyArray(frequencies.getRawDataPointer(), magnitudes[iCoeff], (size_t)frequencies.size(), sampleRate);
+			}
+
+			for (int i = 0; i < frequencies.size(); i++)
+			{
+				double magnitudeSum = 1.0;
+				for (int iMag = 0; iMag < activeFilterCount; iMag++)
+					magnitudeSum *= magnitudes[iMag][i];
+
+				Point<float> displayPoint = mapValues(frequencies[i], Decibels::gainToDecibels(magnitudeSum)).toFloat();
+
+				if (i == 0)
+					path.startNewSubPath(displayPoint);
+				else
+					path.lineTo(displayPoint);
+			}
 		}
 
-		for (int i = 0; i < frequencies.size(); i++)
+		if (pColors.size() > iFilter)
 		{
-			double magnitudeSum = 1.0;
-			for (int iMag = 0; iMag < activeFilterCount; iMag++)
-				magnitudeSum *= magnitudes[iMag][i];
-
-			Point<float> displayPoint = mapValues(frequencies[i], Decibels::gainToDecibels(magnitudeSum)).toFloat();
-			
-			if (i == 0)
-				path.startNewSubPath(displayPoint);
-			else
-				path.lineTo(displayPoint);
+			g.setColour(*(pColors[iFilter]));
 		}
+		else
+		{
+			g.setColour(Colours::lightgreen);
+		}
+
+		g.strokePath(path, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
 	}
 
-	g.setColour(Colours::lightgreen);
-	g.strokePath(path, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
 
+	// FFT
+	
 	if(fftResultDataSize > 0)
 	{
         const double sampleRateVsFFTSize = (sampleRate / fftSize);

@@ -21,47 +21,60 @@
 
 #include <JuceHeader.h>
 #include "IIRFilterGraph.h"
-#include "DecoderSectionControlComponent.h"
+#include "FilterPresetHelper.h"
 #include "../../Common/AmbiSettingsCollection.h"
+#include "../../Common/ColorEditorCustomComponent.h"
+#include "../../Common/AmbiLookAndFeel.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/ChannelLayout.h"
-#include "FilterPresetHelper.h"
 
-class MultiDecoderComponent  : public juce::Component,
+class DecoderSectionControlComponent  : public juce::Component,
                                public juce::Slider::Listener,
                                public juce::ToggleButton::Listener,
+                               public TableColumnCallback,
                                public ChangeListener,
                                public ChangeBroadcaster
 {
 public:
-    MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSettings, AmbiSpeakerSet* pSpeakerSet, FilterPresetHelper* _pPresetHelper, dsp::ProcessSpec* _pFilterSpecification, ChangeListener* pChangeListener, ChannelLayout* _pChannelLayout);
-    ~MultiDecoderComponent() override;
+    DecoderSectionControlComponent(AmbiSettingsSection* pSection, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout);
+    ~DecoderSectionControlComponent() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
     void buttonClicked(Button*) override;
 
-
 private:
     void controlDimming();
+    AmbiLookAndFeel ambiLookAndFeel;
+    std::unique_ptr<juce::Slider> gainSlider;
+    std::unique_ptr<juce::TextButton> muteButton;
+    std::unique_ptr<juce::TextButton> orderButton;
+    std::unique_ptr<juce::TextButton> weightingButton;
+    std::unique_ptr<juce::TextButton> pointsButton;
+    std::unique_ptr<juce::TextButton> filterButton;
+    std::unique_ptr<ColorEditorCustomComponent> colorField;
 
-    std::unique_ptr<IIRFilterGraph> filterCurve;
-    std::unique_ptr<juce::Slider> sliderDecoderCount;
-    std::unique_ptr<juce::Label> labelDecoderCount;
-
-    OwnedArray<DecoderSectionControlComponent> sectionControls;
-    
-    AmbiSettingsCollection* pAmbiSettings;
+    AmbiSettingsSection* pAmbiSettings;
     AmbiSpeakerSet* pSpeakerSet;
     FilterPresetHelper* pFilterPresetHelper;
     dsp::ProcessSpec* pFilterSpecification;
     ChannelLayout* pChannelLayout;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiDecoderComponent)
 
-        // Inherited via ChangeListener
-        void changeListenerCallback(ChangeBroadcaster* source) override;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecoderSectionControlComponent)
+
+        // Inherited via TableColumnCallback
+        double getValue(int columnId, int rowNumber) override;
+    void setValue(int columnId, int rowNumber, double newValue) override;
+    SliderRange getSliderRange(int columnId) override;
+    TableListBox* getTable() override;
+    String getTableText(const int columnId, const int rowNumber) override;
+    void setTableText(const int columnId, const int rowNumber, const String& newText) override;
+    bool getEnabled(const int columnId, const int rowNumber) override;
+
+    // Inherited via ChangeListener
+    void changeListenerCallback(ChangeBroadcaster* source) override;
 };
 
 //[EndFile] You can add extra defines here...

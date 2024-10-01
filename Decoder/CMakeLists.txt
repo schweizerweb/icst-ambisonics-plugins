@@ -27,6 +27,8 @@ target_sources(AmbiDecoder
 	Source/PluginProcessor.cpp
 	Source/PluginEditor.cpp
 	Source/MultiDecoderComponent.cpp
+	Source/AmbiSettingsComponent.cpp
+	Source/DecoderSectionControlComponent.cpp
 
 	../Common/HelpComponent.cpp
 	../Common/HelpOscSyntax.cpp
@@ -34,9 +36,11 @@ target_sources(AmbiDecoder
 	../Common/HelpWebBrowserComponent.cpp
 	../Common/AmbiDataSet.cpp
 	../Common/AmbiGroup.cpp
+	../Common/AmbiLookAndFeel.cpp
 	../Common/AmbiPoint.cpp
 	../Common/AmbiSettings.cpp
 	../Common/AmbiSettingsCollection.cpp
+	../Common/AmbiSettingsSection.cpp
 	../Common/AmbiSource.cpp
 	../Common/AmbiSourceSet.cpp
 	../Common/AmbiSpeaker.cpp

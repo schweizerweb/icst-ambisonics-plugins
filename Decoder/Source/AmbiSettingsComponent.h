@@ -22,48 +22,48 @@
 #include <JuceHeader.h>
 #include "IIRFilterGraph.h"
 #include "DecoderSectionControlComponent.h"
-#include "../../Common/AmbiSettingsCollection.h"
+#include "../../Common/AmbiSettings.h"
 #include "../../Common/AmbiSpeakerSet.h"
+#include "../../Common/MultiSliderControl.h"
 #include "../../Common/ChannelLayout.h"
 #include "FilterPresetHelper.h"
 
-class MultiDecoderComponent  : public juce::Component,
-                               public juce::Slider::Listener,
-                               public juce::ToggleButton::Listener,
+class AmbiSettingsComponent : public juce::Component,
+                               public juce::ComboBox::Listener,
                                public ChangeListener,
-                               public ChangeBroadcaster
+                               public ChangeBroadcaster,
+                               public ActionListener
 {
 public:
-    MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSettings, AmbiSpeakerSet* pSpeakerSet, FilterPresetHelper* _pPresetHelper, dsp::ProcessSpec* _pFilterSpecification, ChangeListener* pChangeListener, ChannelLayout* _pChannelLayout);
-    ~MultiDecoderComponent() override;
+    AmbiSettingsComponent(AmbiSettings* _pAmbiSettings, ChangeListener* pChangeListener, ChannelLayout* _pChannelLayout);
+    ~AmbiSettingsComponent() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
-    void buttonClicked(Button*) override;
-
 
 private:
     void controlDimming();
+    void updateUI() const;
+    void handleAmbiOrders();
 
-    std::unique_ptr<IIRFilterGraph> filterCurve;
-    std::unique_ptr<juce::Slider> sliderDecoderCount;
-    std::unique_ptr<juce::Label> labelDecoderCount;
-
-    OwnedArray<DecoderSectionControlComponent> sectionControls;
-    
-    AmbiSettingsCollection* pAmbiSettings;
-    AmbiSpeakerSet* pSpeakerSet;
-    FilterPresetHelper* pFilterPresetHelper;
-    dsp::ProcessSpec* pFilterSpecification;
+    AmbiSettings* pAmbiSettings;
     ChannelLayout* pChannelLayout;
 
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiDecoderComponent)
+    std::unique_ptr<juce::Label> labelAmbiOrder;
+    std::unique_ptr<juce::ComboBox> comboAmbiOrder;
+
+    std::unique_ptr<juce::ComboBox> comboBoxChannelWeightingMode;
+    std::unique_ptr<MultiSliderControl> ambiChannelControl;
+    std::unique_ptr<juce::Label> labelChannelWeights;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbiSettingsComponent)
 
         // Inherited via ChangeListener
         void changeListenerCallback(ChangeBroadcaster* source) override;
+
+    // Inherited via Listener
+    void comboBoxChanged(ComboBox* comboBoxThatHasChanged) override;
+
+    // Inherited via ActionListener
+    void actionListenerCallback(const String& message) override;
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

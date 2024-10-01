@@ -260,13 +260,18 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     toggleMultiDecoder->setButtonText (TRANS ("Multi-Decoder mode"));
     toggleMultiDecoder->addListener (this);
 
-    multiDecoderControl.reset (new MultiDecoderComponent());
+    multiDecoderControl.reset (new MultiDecoderComponent(pAmbiSettings, pSpeakerSet, getFilterPresetHelper(), pFilterSpecification, this, pChannelLayout));
     addAndMakeVisible (multiDecoderControl.get());
     multiDecoderControl->setName ("multiDecoderControl");
+
+    ambiSettingsControl.reset (new AmbiSettingsComponent(pAmbiSettings->singleDecoder.get(), this, pChannelLayout));
+    addAndMakeVisible (ambiSettingsControl.get());
+    ambiSettingsControl->setName ("ambiSettingsControl");
 
 
     //[UserPreSize]
     multiDecoderControl->toBehind(toggleMultiDecoder.get());
+    ambiSettingsControl->toBehind(toggleMultiDecoder.get());
     //[/UserPreSize]
 
     setSize (900, 700);
@@ -306,11 +311,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     speakerList->addMouseListener(this, true);
 	updateComboBox();
 	pPointSelection->addChangeListener(this);
-
-    btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
-    comboAmbiOrder->setSelectedId(pAmbiSettings->singleDecoder->getAmbiOrder(), dontSendNotification);
-    ambiChannelControl->setVisibleSliderCount(pAmbiSettings->singleDecoder->getGainCount());
-    toggleMultiDecoder->setToggleState(pAmbiSettings->getMultiDecoderFlag(), dontSendNotification);
 
     updateUI();
     handleAmbiOrders();
@@ -363,7 +363,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     comboAmbiOrder = nullptr;
     toggleMultiDecoder = nullptr;
     multiDecoderControl = nullptr;
-
+    ambiSettingsControl = nullptr;
 
     //[Destructor]. You can add your own custom destruction code here..
     //[/Destructor]
@@ -386,36 +386,37 @@ void SpeakerSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 267)) + 199, ((getWidth() - 16) - 0) - 0, 60);
-    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 267), (getWidth() - 16) - 0, 199);
-    groupSpeakers->setBounds (8, 0, getWidth() - 16, getHeight() - 267);
+    groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 317)) + 249, ((getWidth() - 16) - 0) - 0, 60);
+    groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 317), (getWidth() - 16) - 0, 249);
+    groupSpeakers->setBounds (8, 0, getWidth() - 16, getHeight() - 317);
     comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 531, 24);
     labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
     buttonSave->setBounds (8 + (getWidth() - 16) - 224 - 80, 0 + 24, 80, 24);
-    speakerList->setBounds (8 + 8, 0 + 56, (getWidth() - 16) - 16, (getHeight() - 267) - 96);
-    buttonAdd->setBounds ((8 + 8) + 0, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonRemove->setBounds ((8 + 8) + 72, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 267) - 96) - -8, 64, 24);
-    ambiChannelControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 267)) + 52, ((getWidth() - 16) - 0) - 16, 199 - 60);
-    labelChannelWeights->setBounds ((((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120) + -20 - 112, (0 + (getHeight() - 267)) + 20, 112, 24);
+    speakerList->setBounds (8 + 8, 0 + 56, (getWidth() - 16) - 16, (getHeight() - 317) - 96);
+    buttonAdd->setBounds ((8 + 8) + 0, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
+    buttonRemove->setBounds ((8 + 8) + 72, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
+    buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
+    buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
+    ambiChannelControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 52, ((getWidth() - 16) - 0) - 16, 249 - 60);
+    labelChannelWeights->setBounds ((((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120) + -20 - 112, (0 + (getHeight() - 317)) + 20, 112, 24);
     btnEditMode->setBounds (8 + 8, 0 + 24, 150, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 267)) + 199) + 20, 75, 24);
-    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 267)) + 199) + 20, 96, 24);
-    toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 267)) + 199) + 20, 180, 24);
-    buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 267) - 96) - -8, 120, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 317)) + 249) + 20, 75, 24);
+    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 317)) + 249) + 20, 96, 24);
+    toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 317)) + 249) + 20, 180, 24);
+    buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 317) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
     buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
-    comboBoxChannelWeightingMode->setBounds (((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120, (0 + (getHeight() - 267)) + 20, 120, 24);
+    comboBoxChannelWeightingMode->setBounds (((8 + 0) + ((getWidth() - 16) - 0) - 293) + -20 - 120, (0 + (getHeight() - 317)) + 20, 120, 24);
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
-    buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 267) - 96) - -8) + 0, 64, 24);
-    sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 267)) + 199) + 20, 100, 24);
-    sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 267)) + 199) + 20, 170, 24);
-    labelAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 293, (0 + (getHeight() - 267)) + 21, 136, 24);
-    comboAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 157, (0 + (getHeight() - 267)) + 21, 142, 24);
-    toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 267)) + 20, 150, 24);
-    multiDecoderControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 267)) + 20, ((getWidth() - 16) - 0) - 16, 199 - 30);
+    buttonCsv->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -8 - 64, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80 - 64, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
+    sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
+    sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 317)) + 249) + 20, 170, 24);
+    labelAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 293, (0 + (getHeight() - 317)) + 21, 136, 24);
+    comboAmbiOrder->setBounds ((8 + 0) + ((getWidth() - 16) - 0) - 157, (0 + (getHeight() - 317)) + 21, 142, 24);
+    toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, 150, 24);
+    multiDecoderControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
+    ambiSettingsControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -951,6 +952,11 @@ void SpeakerSettingsComponent::updateUI() const
 
 	ambiChannelControl->updateValues();
     comboBoxChannelWeightingMode->setSelectedId(pAmbiSettings->singleDecoder->getWeightMode());
+
+    btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
+    comboAmbiOrder->setSelectedId(pAmbiSettings->singleDecoder->getAmbiOrder(), dontSendNotification);
+    ambiChannelControl->setVisibleSliderCount(pAmbiSettings->singleDecoder->getGainCount());
+    toggleMultiDecoder->setToggleState(pAmbiSettings->getMultiDecoderFlag(), dontSendNotification);
 }
 
 void SpeakerSettingsComponent::handleAmbiOrders()
@@ -1037,12 +1043,18 @@ void SpeakerSettingsComponent::controlDimming()
     ambiChannelControl->setEnabled(pAmbiSettings->singleDecoder->getWeightMode() == AmbiSettings::MANUAL);
 
     bool isMulti = pAmbiSettings->getMultiDecoderFlag();
-    labelAmbiOrder->setVisible(!isMulti);
+    /*labelAmbiOrder->setVisible(!isMulti);
     comboAmbiOrder->setVisible(!isMulti);
     labelChannelWeights->setVisible(!isMulti);
     comboBoxChannelWeightingMode->setVisible(!isMulti);
-    ambiChannelControl->setVisible(!isMulti);
+    ambiChannelControl->setVisible(!isMulti);*/
+    labelAmbiOrder->setVisible(false);
+    comboAmbiOrder->setVisible(false);
+    labelChannelWeights->setVisible(false);
+    comboBoxChannelWeightingMode->setVisible(false);
+    ambiChannelControl->setVisible(false);
     multiDecoderControl->setVisible(isMulti);
+    ambiSettingsControl->setVisible(!isMulti);
 }
 
 void SpeakerSettingsComponent::mouseUp(const MouseEvent &event)
@@ -1148,11 +1160,11 @@ BEGIN_JUCER_METADATA
                   posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                   title="OSC"/>
   <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
-                  virtualName="" explicitFocusOrder="0" pos="0 0R 0M 199" posRelativeX="450188aa0f332e78"
+                  virtualName="" explicitFocusOrder="0" pos="0 0R 0M 249" posRelativeX="450188aa0f332e78"
                   posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
                   title="Ambisonics"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 0 16M 267M" title="Speakers"/>
+                  virtualName="" explicitFocusOrder="0" pos="8 0 16M 317M" title="Speakers"/>
   <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
             virtualName="" explicitFocusOrder="0" pos="192 24 531M 24" posRelativeX="450188aa0f332e78"
             posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
@@ -1275,7 +1287,12 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="8 20 16M 30M" posRelativeX="17eb4b418501687a"
                     posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
                     posRelativeH="17eb4b418501687a" class="MultiDecoderComponent"
-                    params=""/>
+                    params="pAmbiSettings, pSpeakerSet, getFilterPresetHelper(), pFilterSpecification, this, pChannelLayout"/>
+  <GENERICCOMPONENT name="ambiSettingsControl" id="bb0e706735450c14" memberName="ambiSettingsControl"
+                    virtualName="" explicitFocusOrder="0" pos="8 20 16M 30M" posRelativeX="17eb4b418501687a"
+                    posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
+                    posRelativeH="17eb4b418501687a" class="AmbiSettingsComponent"
+                    params="pAmbiSettings->singleDecoder.get(), this, pChannelLayout"/>
 </JUCER_COMPONENT>
 
 END_JUCER_METADATA

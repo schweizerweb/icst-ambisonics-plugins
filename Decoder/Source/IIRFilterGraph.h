@@ -34,7 +34,7 @@
 class IIRFilterGraph    : public SimpleGraph
 {
 public:
-    IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
+    IIRFilterGraph(std::vector<FilterBankInfo*> pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> pColors = std::vector<juce::Colour*>());
     ~IIRFilterGraph() override;
 
 	void paintData(Graphics&) override;
@@ -45,7 +45,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
 
 private:
-	FilterBankInfo* pFilterInfo;
+	std::vector<FilterBankInfo*> pFilterInfo;
+	std::vector<juce::Colour*> pColors;
 	Array<double> frequencies;
 	double sampleRate;
 	double* magnitudes[MAX_FILTER_COUNT];

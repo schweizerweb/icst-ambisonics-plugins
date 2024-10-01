@@ -34,7 +34,12 @@ public:
 	{
         if(isEnabled())
         {
-            owner.getTable()->selectRowsBasedOnModifierKeys(row, event.mods, false);
+            auto tbl = owner.getTable();
+            if (tbl != nullptr)
+            {
+                tbl->selectRowsBasedOnModifierKeys(row, event.mods, false);
+            }
+
             CallOutBox::launchAsynchronously(std::make_unique<ColorSelectionComponent>(color, this, this, groupFlag), getScreenBounds(), nullptr);
         }
 	}

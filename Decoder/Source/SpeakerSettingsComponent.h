@@ -33,6 +33,7 @@
 #include "../../Common/AmbiSpeakerSet.h"
 #include "FilterSettingsComponent.h"
 #include "MultiDecoderComponent.h"
+#include "AmbiSettingsComponent.h"
 #include "DecoderPresetHelper.h"
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
@@ -157,6 +158,7 @@ private:
     std::unique_ptr<juce::ComboBox> comboAmbiOrder;
     std::unique_ptr<juce::ToggleButton> toggleMultiDecoder;
     std::unique_ptr<MultiDecoderComponent> multiDecoderControl;
+    std::unique_ptr<AmbiSettingsComponent> ambiSettingsControl;
 
 
     //==============================================================================

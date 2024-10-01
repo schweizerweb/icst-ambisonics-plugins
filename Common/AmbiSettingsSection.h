@@ -18,42 +18,28 @@
 */
 
 
-
 #pragma once
 #include "JuceHeader.h"
 #include "AmbiSettings.h"
 #include "FilterBankInfo.h"
-#include "AmbiSettingsSection.h"
 
-#define MAX_NB_OF_DECODER_SECTIONS 3
-#define XML_ATTRIBUTE_MULTI_DECODER_FLAG "multiDecoder"
-#define XML_ATTRIBUTE_MULTI_DECODER_SECTION_COUNT "sectionCount"
-#define XML_TAG_DECODER_SECTION "DecoderSection"
+#define XML_ATTRIBUTE_SECTION_MUTE "mute"
+#define XML_ATTRIBUTE_SECTION_GAIN "gain"
+#define XML_ATTRIBUTE_SECTION_COLOR "color"
+#define XML_ATTRIBUTE_SECTION_SPEAKERMASK "speakerMask"
+#define XML_TAG_SECTION_FILTER "Filter"
 
-class AmbiSettingsCollection
+class AmbiSettingsSection
 {
 public:
-    AmbiSettingsCollection();
+    double gain;
+    bool mute;
+    Colour color;
+    AmbiSettings ambiSettings;
+    FilterBankInfo filterInfo;
+    uint64_t speakerMask;
 
-    bool getWarningFlag();
-
-    bool getMultiDecoderFlag();
-    void setMultiDecoderFlag(bool isMulti);
-
-    int getUsedDecoderCount();
-    void setUsedDecoderCount(int count);
-
-    void ensureMaxAmbiOrder(int maxOrder);
-
+    AmbiSettingsSection();
     void writeToPresetXmlElement(XmlElement* xmlElement);
-    void loadFromPresetXml(XmlElement* xmlElement);
-
-    std::unique_ptr<AmbiSettings> singleDecoder;
-    AmbiSettingsSection multiDecoderSections[MAX_NB_OF_DECODER_SECTIONS];
-
-private:
-    bool loadWarningFlag;
-
-    bool multiDecoderFlag;
-    int nbUsedDecoders;
+    bool loadFromPresetXml(XmlElement* xmlElement);
 };

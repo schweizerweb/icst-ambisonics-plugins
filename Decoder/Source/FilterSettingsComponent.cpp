@@ -35,9 +35,11 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     : pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    std::vector<FilterBankInfo*> filterInfo;
+    filterInfo.push_back(pFilterBankInfo);
     //[/Constructor_pre]
 
-    filterGraph.reset (new IIRFilterGraph (pFilterBankInfo, pFilterSpecification));
+    filterGraph.reset (new IIRFilterGraph (filterInfo, pFilterSpecification));
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
 
@@ -116,7 +118,11 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
 	addChangeListener(pChangeListener);
 
     updatePresetComboBox();
-    pPresetHelper->addActionListener(this);
+    if (pPresetHelper != nullptr)
+    {
+        pPresetHelper->addActionListener(this);
+    }
+
     sliderFFTScaler->setValue(INITIAL_FFT_SCALER);
     //[/Constructor]
 }
@@ -124,7 +130,11 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
 FilterSettingsComponent::~FilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    pPresetHelper->removeActionListener(this);
+    if (pPresetHelper != nullptr)
+    {
+        pPresetHelper->removeActionListener(this);
+    }
+
     stopTimer();
     FFTAnalyzer::getInstance()->disable();
     //[/Destructor_pre]
