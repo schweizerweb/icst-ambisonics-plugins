@@ -21,7 +21,7 @@
 
 #include "AmbiSettingsSection.h"
 
-AmbiSettingsSection::AmbiSettingsSection()
+AmbiSettingsSection::AmbiSettingsSection(): gain(0), mute(false), speakerMask(0), color(Colours::red)
 {
 }
 

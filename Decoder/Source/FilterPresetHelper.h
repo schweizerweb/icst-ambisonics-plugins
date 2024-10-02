@@ -79,7 +79,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
         if (rootElement == nullptr || rootElement->getTagName() != "FilterPreset")
             return false;
         
-        bool ok = pFilterInfo->loadFromXmlElement(rootElement->getChildByName("Settings"));
+        bool ok = pFilterInfo->loadFromXmlElement(rootElement->getChildByName("Settings"), true);
     
         return ok;
     }
@@ -89,7 +89,7 @@ R"(<?xml version="1.0" encoding="UTF-8"?>
         XmlElement* rootElement = new XmlElement("FilterPreset");
 
         XmlElement* xmlSettings = new XmlElement("Settings");
-        pFilterInfo->writeToXmlElement(xmlSettings);
+        pFilterInfo->writeToXmlElement(xmlSettings, true);
         rootElement->addChildElement(xmlSettings);
 
         bool success = rootElement->writeTo(file);

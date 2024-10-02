@@ -24,7 +24,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors): pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
+IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors): pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0), usedFilterCount(1)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -43,6 +43,7 @@ IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::P
 	fullGridFlag = true;
 	labelAxisY = "Gain [dB]";
 	labelAxisX = "Frequency [Hz]";
+	usedFilterCount = pFilterInfo.size();
 }
 
 IIRFilterGraph::~IIRFilterGraph()
@@ -62,7 +63,7 @@ void IIRFilterGraph::paintData(Graphics& g)
 {
 	// draw curve
 	
-	for (int iFilter = 0; iFilter < pFilterInfo.size(); iFilter++)
+	for (int iFilter = 0; iFilter < pFilterInfo.size() && iFilter < usedFilterCount; iFilter++)
 	{
 		FilterBankInfo* pFilter = pFilterInfo[iFilter];
 		Path path;
@@ -97,14 +98,22 @@ void IIRFilterGraph::paintData(Graphics& g)
 			}
 		}
 
+		Colour color;
 		if (pColors.size() > iFilter)
 		{
-			g.setColour(*(pColors[iFilter]));
+			color = *(pColors[iFilter]);
 		}
 		else
 		{
-			g.setColour(Colours::lightgreen);
+			color = Colours::lightgreen;
 		}
+
+		if (pFilter->getFilterBypass())
+		{
+			color = color.withAlpha(0.3f);
+		}
+
+		g.setColour(color);
 
 		g.strokePath(path, PathStrokeType(3, PathStrokeType::curved, PathStrokeType::rounded));
 	}
@@ -158,5 +167,11 @@ void IIRFilterGraph::setFFTParams(bool enable, double scaler)
 		fftResultDataSize = 0;
 	}
 
+	repaint();
+}
+
+void IIRFilterGraph::setUsedFiltersCount(int filterCount)
+{
+	usedFilterCount = filterCount;
 	repaint();
 }

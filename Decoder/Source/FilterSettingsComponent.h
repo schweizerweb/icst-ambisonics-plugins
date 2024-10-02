@@ -87,6 +87,7 @@ private:
     std::unique_ptr<SingleFilterSettingsComponent> filter2;
     std::unique_ptr<SingleFilterSettingsComponent> filter3;
     std::unique_ptr<juce::ToggleButton> toggleFFT;
+    std::unique_ptr<juce::ToggleButton> toggleBypass;
     std::unique_ptr<juce::Slider> sliderFFTScaler;
     std::unique_ptr<juce::Label> labelFFTScaler;
 

@@ -123,7 +123,7 @@ void DecoderSectionControlComponent::setValue(int columnId, int rowNumber, doubl
     {
         for (int i = 0; i < pSpeakerSet->size(); i++)
         {
-            if (pAmbiSettings->speakerMask & (1 << (i)))
+            if (pAmbiSettings->speakerMask & (static_cast<unsigned long long>(1) << (i)))
             {
                 AmbiSpeaker* p = pSpeakerSet->get(i);
                 if (p != nullptr)

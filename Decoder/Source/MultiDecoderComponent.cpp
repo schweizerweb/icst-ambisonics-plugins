@@ -32,7 +32,7 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
     filterCurve.reset (new IIRFilterGraph(filterInfo, pFilterSpecification, colorInfo));
     addAndMakeVisible (filterCurve.get());
     filterCurve->setName ("filterCurve");
-
+    filterCurve->setUsedFiltersCount(pAmbiSettings->getUsedDecoderCount());
     //filterCurve->setBounds (8, 40, 150, 24);
 
     sliderDecoderCount.reset (new juce::Slider ("sliderDecoderCount"));
@@ -123,6 +123,7 @@ void MultiDecoderComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved
     if (sliderThatWasMoved == sliderDecoderCount.get())
     {
         pAmbiSettings->setUsedDecoderCount(sliderDecoderCount->getValue());
+        filterCurve->setUsedFiltersCount(pAmbiSettings->getUsedDecoderCount());
         controlDimming();
         resized();
     }

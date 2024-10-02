@@ -157,7 +157,7 @@ public:
         return true;
     }
     
-    bool writeToXmlElement(XmlElement* xmlElement, String indexSuffix)
+    bool writeToXmlElement(XmlElement* xmlElement, String indexSuffix) const
     {
         xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_TYPE + indexSuffix, (int)filterType);
         xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_FREQUENCY + indexSuffix, cutOffFrequencyHz);
@@ -175,7 +175,7 @@ public:
         gainFactor = info->gainFactor;
     }
     
-    bool equals(FilterInfo* info)
+    bool equals(FilterInfo* info) const
     {
         return info != nullptr
         && info->filterType == filterType

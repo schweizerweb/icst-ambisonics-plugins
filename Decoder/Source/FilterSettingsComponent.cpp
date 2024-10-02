@@ -83,6 +83,11 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     addAndMakeVisible (filter3.get());
     filter3->setName ("filter3");
 
+    toggleBypass.reset (new juce::ToggleButton ("toggleBypass"));
+    addAndMakeVisible (toggleBypass.get());
+    toggleBypass->setButtonText (TRANS("Bypass filter"));
+    toggleBypass->addListener (this);
+
     toggleFFT.reset (new juce::ToggleButton ("toggleFFT"));
     addAndMakeVisible (toggleFFT.get());
     toggleFFT->setButtonText (TRANS("FFT"));
@@ -124,6 +129,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     }
 
     sliderFFTScaler->setValue(INITIAL_FFT_SCALER);
+    toggleBypass->setToggleState(pFilterBankInfo->getFilterBypass(), dontSendNotification);
     //[/Constructor]
 }
 
@@ -147,6 +153,7 @@ FilterSettingsComponent::~FilterSettingsComponent()
     filter1 = nullptr;
     filter2 = nullptr;
     filter3 = nullptr;
+    toggleBypass = nullptr;
     toggleFFT = nullptr;
     sliderFFTScaler = nullptr;
     labelFFTScaler = nullptr;
@@ -180,6 +187,7 @@ void FilterSettingsComponent::resized()
     filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
     filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    toggleBypass->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58 - 128, 42, 128, 24);
     toggleFFT->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58, 42, 58, 24);
     sliderFFTScaler->setBounds (getWidth() - 170, 42, 170, 24);
     labelFFTScaler->setBounds ((getWidth() - 170) + 0 - 85, 42, 85, 24);
@@ -222,6 +230,13 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         comboBoxFilterPreset->setText("", dontSendNotification);
         delete newFile;
         //[/UserButtonCode_buttonSave]
+    }
+    else if (buttonThatWasClicked == toggleBypass.get())
+    {
+        //[UserButtonCode_toggleBypass] -- add your button handler code here..
+        pFilterBankInfo->setFilterBypass(toggleBypass->getToggleState());
+        sendChangeMessage();
+        //[/UserButtonCode_toggleBypass]
     }
     else if (buttonThatWasClicked == toggleFFT.get())
     {
@@ -361,6 +376,10 @@ BEGIN_JUCER_METADATA
   <TOGGLEBUTTON name="toggleFFT" id="7049cb4ab444a015" memberName="toggleFFT"
                 virtualName="" explicitFocusOrder="0" pos="0r 42 58 24" posRelativeX="8939080a2743d889"
                 buttonText="FFT" connectedEdges="0" needsCallback="1" radioGroupId="0"
+                state="0"/>
+  <TOGGLEBUTTON name="toggleBypass" id="7049cb4ab444a482" memberName="toggleBypass"
+                virtualName="" explicitFocusOrder="0" pos="0r 42 128 24" posRelativeX="7049cb4ab444a015"
+                buttonText="Bypass filter" connectedEdges="0" needsCallback="1" radioGroupId="0"
                 state="0"/>
   <SLIDER name="sliderFFTScaler" id="8c8b26e83a78b29" memberName="sliderFFTScaler"
           virtualName="" explicitFocusOrder="0" pos="170R 42 170 24" min="0.0"

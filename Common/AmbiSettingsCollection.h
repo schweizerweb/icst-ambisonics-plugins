@@ -37,13 +37,14 @@ public:
 
     bool getWarningFlag();
 
-    bool getMultiDecoderFlag();
+    bool getMultiDecoderFlag() const;
     void setMultiDecoderFlag(bool isMulti);
 
-    int getUsedDecoderCount();
+    int getUsedDecoderCount() const;
     void setUsedDecoderCount(int count);
 
     void ensureMaxAmbiOrder(int maxOrder);
+    int getMaxUsedChannelCount() const;
 
     void writeToPresetXmlElement(XmlElement* xmlElement);
     void loadFromPresetXml(XmlElement* xmlElement);

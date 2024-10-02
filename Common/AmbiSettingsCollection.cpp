@@ -67,7 +67,7 @@ bool AmbiSettingsCollection::getWarningFlag()
     return loadWarningFlag;
 }
 
-bool AmbiSettingsCollection::getMultiDecoderFlag()
+bool AmbiSettingsCollection::getMultiDecoderFlag() const
 {
     return multiDecoderFlag;
 }
@@ -77,7 +77,7 @@ void AmbiSettingsCollection::setMultiDecoderFlag(bool isMulti)
     multiDecoderFlag = isMulti;
 }
 
-int AmbiSettingsCollection::getUsedDecoderCount()
+int AmbiSettingsCollection::getUsedDecoderCount() const
 {
     return nbUsedDecoders;
 }
@@ -95,4 +95,22 @@ void AmbiSettingsCollection::ensureMaxAmbiOrder(int maxOrder)
 
     // TODO: other channels
 
+}
+
+int AmbiSettingsCollection::getMaxUsedChannelCount() const
+{
+    if (getMultiDecoderFlag())
+    {
+        int max = 0;
+        for (int i = 0; i < getUsedDecoderCount(); i++)
+        {
+            max = jmax(max, multiDecoderSections[i].ambiSettings.getAmbiChannelCount());
+        }
+
+        return max;
+    }
+    else
+    {
+        return singleDecoder->getAmbiChannelCount();
+    }
 }
