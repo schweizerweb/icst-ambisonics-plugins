@@ -120,9 +120,13 @@ void AmbisonicsDecoderAudioProcessor::prepareToPlay (double sampleRate, int samp
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
     
-    iirFilterSpec.numChannels = 1;
-    iirFilterSpec.maximumBlockSize = (uint32)samplesPerBlock;
-    iirFilterSpec.sampleRate = sampleRate;
+    speakerIIRFilterSpec.numChannels = 1;
+    speakerIIRFilterSpec.maximumBlockSize = (uint32)samplesPerBlock;
+    speakerIIRFilterSpec.sampleRate = sampleRate;
+
+    bFormatIIRFilterSpec.numChannels = MAX_NB_OF_AMBISONICS_CHANNELS;
+    bFormatIIRFilterSpec.maximumBlockSize = (uint32)samplesPerBlock;
+    bFormatIIRFilterSpec.sampleRate = sampleRate;
 }
 
 void AmbisonicsDecoderAudioProcessor::releaseResources()
@@ -168,6 +172,43 @@ bool AmbisonicsDecoderAudioProcessor::isBusesLayoutSupported (const BusesLayout&
     return true;
 }
 
+void AmbisonicsDecoderAudioProcessor::updateBFormatFilters()
+{
+    for (int iDec = 0; iDec < MAX_NB_OF_DECODER_SECTIONS; iDec++)
+    {
+        if (!speakerSet->get(iDec)->getFilterBypass())
+        {
+            auto filterBankInfo = &(ambiSettings.multiDecoderSections[iDec].filterInfo);
+
+            for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
+            {
+                FilterInfo* pFilter = filterBankInfo->get(iFilter);
+                if (pFilter == nullptr)
+                {
+                    Logger::writeToLog("Error in Filterbank!");
+                    return;
+                }
+                if (!bFormatFilterInfo[iDec].get(iFilter)->equals(pFilter) && iFilter < MAX_FILTER_COUNT)
+                {
+                    if (bFormatFilterInfo[iDec].get(iFilter)->filterType != pFilter->filterType)
+                    {
+                        bFormatFilter[iDec][iFilter].prepare(bFormatIIRFilterSpec);
+                        bFormatFilter[iDec][iFilter].reset();
+                    }
+
+                    bFormatFilterInfo[iDec].get(iFilter)->copyFrom(pFilter);
+                    auto newCoeff = pFilter->getCoefficients(bFormatIIRFilterSpec.sampleRate);
+                    if (newCoeff != nullptr)
+                    {
+                        bFormatFilter[iDec][iFilter].state = newCoeff;
+                    }
+                }
+            }
+        }
+    }
+
+}
+
 void AmbisonicsDecoderAudioProcessor::checkSpeakerFilters()
 {
     int size = speakerSet->size();
@@ -184,19 +225,19 @@ void AmbisonicsDecoderAudioProcessor::checkSpeakerFilters()
                     Logger::writeToLog("Error in Filterbank!");
                     return;
                 }
-                if (!filterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < MAX_NUM_CHANNELS)
+                if (!speakerFilterInfo[iSpeaker].get(iFilter)->equals(pFilter) && iSpeaker < MAX_NUM_CHANNELS)
                 {
-                    if (filterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
+                    if (speakerFilterInfo[iSpeaker].get(iFilter)->filterType != pFilter->filterType)
                     {
-                        iirFilters[iSpeaker][iFilter].prepare(iirFilterSpec);
-                        iirFilters[iSpeaker][iFilter].reset();
+                        speakerIIRFilters[iSpeaker][iFilter].prepare(speakerIIRFilterSpec);
+                        speakerIIRFilters[iSpeaker][iFilter].reset();
                     }
 
-                    filterInfo[iSpeaker].get(iFilter)->copyFrom(pFilter);
-                    auto newCoeff = pFilter->getCoefficients(iirFilterSpec.sampleRate);
+                    speakerFilterInfo[iSpeaker].get(iFilter)->copyFrom(pFilter);
+                    auto newCoeff = pFilter->getCoefficients(speakerIIRFilterSpec.sampleRate);
                     if (newCoeff != nullptr)
                     {
-                        iirFilters[iSpeaker][iFilter].coefficients = newCoeff;
+                        speakerIIRFilters[iSpeaker][iFilter].coefficients = newCoeff;
                     }
                 }
             }
@@ -206,26 +247,66 @@ void AmbisonicsDecoderAudioProcessor::checkSpeakerFilters()
 
 void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.singleDecoder->getAmbiChannelCount(), buffer.getNumChannels());
+    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.getMaxUsedChannelCount(), buffer.getNumChannels());
     const int totalNumOutputChannels = getTotalNumOutputChannels();
+    const bool isMultiDecoderMode = ambiSettings.getMultiDecoderFlag();
     double currentCoefficients[MAX_NUM_CHANNELS];
-	const float* inputBufferPointers[MAX_NUM_CHANNELS];
+	const float* inputBufferPointers[MAX_NB_OF_DECODER_SECTIONS][MAX_NUM_CHANNELS];
 	int iChannel;
-	AudioSampleBuffer inputBuffer;
+
+	std::vector<AudioSampleBuffer> inputBuffers;
+    std::vector<AmbiSettings*> ambiSettingsVector;
+    std::vector<float> decoderGains;
+
+    // clear output buffers if less than #input channels used, the others will be overwritten later
+    for (int i = speakerSet->size(); i < totalNumInputChannels; ++i)
+        buffer.clear(i, 0, buffer.getNumSamples());
 
 	checkDelayBuffers();
     checkSpeakerFilters();
 
-	// copy input buffer and get read pointers
-	inputBuffer.makeCopyOf(buffer);
-	for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-		inputBufferPointers[iChannel] = inputBuffer.getReadPointer(iChannel);
+    if (isMultiDecoderMode)
+    {
+        int nbDec = ambiSettings.getUsedDecoderCount();
+        for (int iDec = 0; iDec < nbDec; iDec++)
+        {
+            if (!ambiSettings.multiDecoderSections[iDec].mute)
+            {
+                AudioSampleBuffer cpy(buffer);
+                dsp::AudioBlock <float> block(cpy); // copy?
+                updateBFormatFilters();
+                for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
+                {
+                    if (bFormatFilterInfo[iDec].isActive(iFilter))
+                    {
+                        bFormatFilter[iDec][iFilter].process(dsp::ProcessContextReplacing<float>(block));
+                    }
+                }
 
-	// clear output buffers if less than #input channels used, the others will be overwritten later
-	for (int i = speakerSet->size(); i < totalNumInputChannels; ++i)
-		buffer.clear(i, 0, buffer.getNumSamples());
+                inputBuffers.push_back(AudioSampleBuffer(cpy));
+                ambiSettingsVector.push_back(&ambiSettings.multiDecoderSections[iDec].ambiSettings);
+                decoderGains.push_back(ambiSettings.multiDecoderSections[iDec].gain);
 
-    int lowPassCount = 0;
+                // get read pointers
+                for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+                    inputBufferPointers[iDec][iChannel] = inputBuffers[iDec].getReadPointer(iChannel);
+            }
+        }
+    }
+    else
+    {
+        // directly copy buffer
+        inputBuffers.push_back(AudioSampleBuffer(buffer));
+        ambiSettingsVector.push_back(ambiSettings.singleDecoder.get());
+        decoderGains.push_back(1.0);
+
+        // get read pointers
+        for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+            inputBufferPointers[0][iChannel] = inputBuffers[0].getReadPointer(iChannel);
+    }
+
+
+	int lowPassCount = 0;
     for (int i = 0; i < speakerSet->size(); i++)
     {
         if(!speakerSet->get(i)->getFilterBypass() && speakerSet->get(i)->getFilterInfo()->isLowPass())
@@ -241,47 +322,63 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 			buffer.clear(iSpeaker, 0, buffer.getNumSamples());
 		else
 		{
-			// calculate ambisonics coefficients
-			double speakerGain = pt->getGain();
-			bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
-            int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : ambiSettings.singleDecoder->getAmbiOrder();
-            int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((ambiSettings.singleDecoder->getAmbiOrder() + 1) * (ambiSettings.singleDecoder->getAmbiOrder() + 1));
-            
-			pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
-			
-			// gain of the W-signal depends on the used ambisonic order
-            if(currentAmbisonicsOrder > 0)
-                currentCoefficients[0] *= (currentAmbisonicsOrder / (2.0 * currentAmbisonicsOrder + 1));
+            float* channelData = buffer.getWritePointer(iSpeaker);
+            AudioSampleBuffer sumBuf(1, buffer.getNumSamples());
+            sumBuf.clear();
 
-			for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
-			{
-				currentCoefficients[iChannel] *= ambiSettings.singleDecoder->getAmbiChannelWeight(iChannel);
-			}
-			// apply to B-format and create output
-			float* channelData = buffer.getWritePointer(iSpeaker);
-			for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
-			{
-				float currentSample = 0.0f;
-				for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
-					currentSample += float(speakerGain * inputBufferPointers[iChannel][iSample] * currentCoefficients[iChannel]);
-				
-				DelayBuffer* buf = delayBuffers[iSpeaker];
-				if(buf != nullptr)
-					channelData[iSample] = buf->processNextSample(currentSample);
-			}
+            float* sumData = sumBuf.getWritePointer(0);
+            for (int iDec = 0; iDec < inputBuffers.size(); iDec++)
+            {
+                AmbiSettings* pAmbi = ambiSettingsVector[iDec];
+
+                // calculate ambisonics coefficients
+                double speakerGain = pt->getGain();
+                bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
+                int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : pAmbi->getAmbiOrder();
+                int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1));
+
+                pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
+
+                // gain of the W-signal depends on the used ambisonic order
+                if (currentAmbisonicsOrder > 0)
+                    currentCoefficients[0] *= (currentAmbisonicsOrder / (2.0 * currentAmbisonicsOrder + 1));
+
+                for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
+                {
+                    currentCoefficients[iChannel] *= pAmbi->getAmbiChannelWeight(iChannel);
+                }
+                // apply to B-format and create output
+                for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+                {
+                    float currentSample = 0.0f;
+                    for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
+                        currentSample += float(speakerGain * inputBufferPointers[iDec][iChannel][iSample] * currentCoefficients[iChannel]);
+                    
+                    sumData[iSample] += decoderGains[iDec] * currentSample;
+                }
+            }
             
+            // apply delay
+            for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+            {
+                DelayBuffer* buf = delayBuffers[iSpeaker];
+                if (buf != nullptr)
+                    channelData[iSample] = buf->processNextSample(sumData[iSample]);
+            }
+
+            // inject test sound
             pTestSoundGenerator->process(channelData, buffer.getNumSamples(), iSpeaker);
 
-            // apply filters
+            // apply speaker filters
             if(!pt->getFilterBypass() && pt->getFilterInfo()->anyActive())
             {
                 for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
                 {
                     for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
                     {
-                        if (filterInfo[iSpeaker].get(iFilter)->filterType != FilterInfo::None)
+                        if (speakerFilterInfo[iSpeaker].get(iFilter)->filterType != FilterInfo::None)
                         {
-                            channelData[iSample] = iirFilters[iSpeaker][iFilter].processSample(channelData[iSample]);
+                            channelData[iSample] = speakerIIRFilters[iSpeaker][iFilter].processSample(channelData[iSample]);
                         }
                     }
                 }
@@ -397,7 +494,7 @@ TestSoundGenerator* AmbisonicsDecoderAudioProcessor::getTestSoundGenerator() con
 
 dsp::ProcessSpec* AmbisonicsDecoderAudioProcessor::getFilterSpecification()
 {
-	return &iirFilterSpec;
+	return &speakerIIRFilterSpec;
 }
 
 DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
@@ -444,10 +541,10 @@ void AmbisonicsDecoderAudioProcessor::numChannelsChanged()
     ambiSettings.ensureMaxAmbiOrder(maxAmbiOrder);
     
     // handle output channels
-    while(channelLayout.getNumOutputChannels() < speakerSet->size())
-        speakerSet->remove(speakerSet->size() - 1);
+    // while(channelLayout.getNumOutputChannels() < speakerSet->size())
+    //     speakerSet->remove(speakerSet->size() - 1);
     
-    radarOptions.maxNumberEditablePoints = channelLayout.getNumOutputChannels();
+    // radarOptions.maxNumberEditablePoints = channelLayout.getNumOutputChannels();
 }
 
 //==============================================================================

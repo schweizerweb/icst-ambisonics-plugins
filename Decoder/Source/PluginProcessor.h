@@ -54,6 +54,7 @@ public:
 
 	void checkDelayBuffers();
     void checkSpeakerFilters();
+    void updateBFormatFilters();
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
     using AudioProcessor::processBlock;
     
@@ -109,9 +110,12 @@ private:
     ChannelLayout channelLayout;
     RadarOptions radarOptions;
     
-    dsp::IIR::Filter<float> iirFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
-    FilterBankInfo filterInfo[MAX_NUM_CHANNELS];
-    dsp::ProcessSpec iirFilterSpec;
+    dsp::IIR::Filter<float> speakerIIRFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
+    dsp::ProcessorDuplicator<dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> bFormatFilter[MAX_NB_OF_DECODER_SECTIONS][MAX_FILTER_COUNT];
+    FilterBankInfo speakerFilterInfo[MAX_NUM_CHANNELS];
+    FilterBankInfo bFormatFilterInfo[MAX_NB_OF_DECODER_SECTIONS];
+    dsp::ProcessSpec speakerIIRFilterSpec;
+    dsp::ProcessSpec bFormatIIRFilterSpec;
     
 
 	//==============================================================================

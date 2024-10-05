@@ -72,6 +72,11 @@ public:
         return false;
     }
 
+    bool isActive(int index) const
+    {
+        return index >= 0 && index < MAX_FILTER_COUNT && filters[index].filterType != FilterInfo::None;
+    }
+
     bool loadFromXmlElement(XmlElement* xmlElement, bool ignoreBypass = false)
     {
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
