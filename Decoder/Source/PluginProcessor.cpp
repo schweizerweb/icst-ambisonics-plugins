@@ -254,7 +254,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 	const float* inputBufferPointers[MAX_NB_OF_DECODER_SECTIONS][MAX_NUM_CHANNELS];
 	int iChannel;
 
-	std::vector<AudioSampleBuffer> inputBuffers;
+	std::vector<AudioSampleBuffer> multiInputBuffers;
+	std::vector<AudioSampleBuffer*> inputBuffers;
     std::vector<AmbiSettings*> ambiSettingsVector;
     std::vector<float> decoderGains;
 
@@ -283,26 +284,27 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                     }
                 }
 
-                inputBuffers.push_back(AudioSampleBuffer(cpy));
+                multiInputBuffers.push_back(AudioSampleBuffer(cpy));
+                inputBuffers.push_back(&multiInputBuffers.back());
                 ambiSettingsVector.push_back(&ambiSettings.multiDecoderSections[iDec].ambiSettings);
                 decoderGains.push_back(ambiSettings.multiDecoderSections[iDec].gain);
 
                 // get read pointers
                 for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-                    inputBufferPointers[iDec][iChannel] = inputBuffers[iDec].getReadPointer(iChannel);
+                    inputBufferPointers[iDec][iChannel] = inputBuffers[iDec]->getReadPointer(iChannel);
             }
         }
     }
     else
     {
         // directly copy buffer
-        inputBuffers.push_back(AudioSampleBuffer(buffer));
+        inputBuffers.push_back(&buffer);
         ambiSettingsVector.push_back(ambiSettings.singleDecoder.get());
         decoderGains.push_back(1.0);
 
         // get read pointers
         for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-            inputBufferPointers[0][iChannel] = inputBuffers[0].getReadPointer(iChannel);
+            inputBufferPointers[0][iChannel] = inputBuffers[0]->getReadPointer(iChannel);
     }
 
 
@@ -359,11 +361,13 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
             }
             
             // apply delay
-            for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+            DelayBuffer* buf = delayBuffers[iSpeaker];
+            if (buf != nullptr)
             {
-                DelayBuffer* buf = delayBuffers[iSpeaker];
-                if (buf != nullptr)
+                for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+                {
                     channelData[iSample] = buf->processNextSample(sumData[iSample]);
+                }
             }
 
             // inject test sound
