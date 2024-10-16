@@ -176,7 +176,7 @@ void AmbisonicsDecoderAudioProcessor::updateBFormatFilters()
 {
     for (int iDec = 0; iDec < MAX_NB_OF_DECODER_SECTIONS; iDec++)
     {
-        if (!speakerSet->get(iDec)->getFilterBypass())
+        if (!ambiSettings.multiDecoderSections[iDec].filterInfo.getFilterBypass())
         {
             auto filterBankInfo = &(ambiSettings.multiDecoderSections[iDec].filterInfo);
 
@@ -188,7 +188,7 @@ void AmbisonicsDecoderAudioProcessor::updateBFormatFilters()
                     Logger::writeToLog("Error in Filterbank!");
                     return;
                 }
-                if (!bFormatFilterInfo[iDec].get(iFilter)->equals(pFilter) && iFilter < MAX_FILTER_COUNT)
+                if (!bFormatFilterInfo[iDec].get(iFilter)->equals(pFilter))
                 {
                     if (bFormatFilterInfo[iDec].get(iFilter)->filterType != pFilter->filterType)
                     {
@@ -198,12 +198,16 @@ void AmbisonicsDecoderAudioProcessor::updateBFormatFilters()
 
                     bFormatFilterInfo[iDec].get(iFilter)->copyFrom(pFilter);
                     auto newCoeff = pFilter->getCoefficients(bFormatIIRFilterSpec.sampleRate);
-                    if (newCoeff != nullptr)
+                    if (newCoeff != nullptr && newCoeff->coefficients != bFormatFilter[iDec][iFilter].state->coefficients)
                     {
-                        bFormatFilter[iDec][iFilter].state = newCoeff;
+                        bFormatFilter[iDec][iFilter].state->coefficients = newCoeff->coefficients;
                     }
-                }
+                } 
             }
+        }
+        else
+        {
+            bFormatFilterInfo[iDec].setFilterBypass(true);
         }
     }
 
@@ -257,7 +261,9 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 	std::vector<AudioSampleBuffer> multiInputBuffers;
 	std::vector<AudioSampleBuffer*> inputBuffers;
     std::vector<AmbiSettings*> ambiSettingsVector;
-    std::vector<float> decoderGains;
+    std::vector<double> decoderGains;
+    std::vector<unsigned long long> speakerMaskVector;
+    auto analyzer = FFTAnalyzer::getInstance();
 
     // clear output buffers if less than #input channels used, the others will be overwritten later
     for (int i = speakerSet->size(); i < totalNumInputChannels; ++i)
@@ -268,39 +274,55 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 
     if (isMultiDecoderMode)
     {
+        updateBFormatFilters();
         int nbDec = ambiSettings.getUsedDecoderCount();
+        int bufferPointerIndex = 0;
         for (int iDec = 0; iDec < nbDec; iDec++)
         {
             if (!ambiSettings.multiDecoderSections[iDec].mute)
             {
-                AudioSampleBuffer cpy(buffer);
-                dsp::AudioBlock <float> block(cpy); // copy?
-                updateBFormatFilters();
+                // make copy of input buffer and add to processing list
+                AudioSampleBuffer inputBuffer;
+                inputBuffer.makeCopyOf(buffer);
+                dsp::AudioBlock <float> block(inputBuffer);
                 for (int iFilter = 0; iFilter < MAX_FILTER_COUNT; iFilter++)
                 {
-                    if (bFormatFilterInfo[iDec].isActive(iFilter))
+                    if (!ambiSettings.multiDecoderSections[iDec].filterInfo.getFilterBypass() && bFormatFilterInfo[iDec].isActive(iFilter))
                     {
                         bFormatFilter[iDec][iFilter].process(dsp::ProcessContextReplacing<float>(block));
                     }
                 }
 
-                multiInputBuffers.push_back(AudioSampleBuffer(cpy));
+                multiInputBuffers.push_back(inputBuffer);
                 inputBuffers.push_back(&multiInputBuffers.back());
                 ambiSettingsVector.push_back(&ambiSettings.multiDecoderSections[iDec].ambiSettings);
                 decoderGains.push_back(ambiSettings.multiDecoderSections[iDec].gain);
+                speakerMaskVector.push_back(ambiSettings.multiDecoderSections[iDec].speakerMask);
 
                 // get read pointers
                 for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
-                    inputBufferPointers[iDec][iChannel] = inputBuffers[iDec]->getReadPointer(iChannel);
+                    inputBufferPointers[bufferPointerIndex][iChannel] = inputBuffers[bufferPointerIndex]->getReadPointer(iChannel);
+
+                if (analyzer->isActive(FFT_INDEX_OFFSET_MULTIDECODER + iDec))
+                {
+                    for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
+                        analyzer->pushNextSampleIntoFifo(inputBufferPointers[bufferPointerIndex][0][iSample]);  // push W-signal to FFT-Analyzer
+                }
+
+                bufferPointerIndex++;
             }
         }
     }
     else
     {
-        // directly copy buffer
-        inputBuffers.push_back(&buffer);
+        // make copy of input buffer and add to processing list
+        AudioSampleBuffer inputBuffer;
+        inputBuffer.makeCopyOf(buffer);
+        multiInputBuffers.push_back(inputBuffer);
+        inputBuffers.push_back(&multiInputBuffers.back());
         ambiSettingsVector.push_back(ambiSettings.singleDecoder.get());
         decoderGains.push_back(1.0);
+        speakerMaskVector.push_back(0xffffffffffffffff);
 
         // get read pointers
         for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
@@ -332,6 +354,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
             for (int iDec = 0; iDec < inputBuffers.size(); iDec++)
             {
                 AmbiSettings* pAmbi = ambiSettingsVector[iDec];
+                if (!(speakerMaskVector[iDec] & (static_cast<unsigned long long>(1) << (iSpeaker))))
+                    continue;
 
                 // calculate ambisonics coefficients
                 double speakerGain = pt->getGain();
@@ -352,11 +376,11 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                 // apply to B-format and create output
                 for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
                 {
-                    float currentSample = 0.0f;
+                    double currentSample = 0.0;
                     for (iChannel = 0; iChannel < usedChannelCount; iChannel++)
-                        currentSample += float(speakerGain * inputBufferPointers[iDec][iChannel][iSample] * currentCoefficients[iChannel]);
+                        currentSample += speakerGain * inputBufferPointers[iDec][iChannel][iSample] * currentCoefficients[iChannel];
                     
-                    sumData[iSample] += decoderGains[iDec] * currentSample;
+                    sumData[iSample] += float(decoderGains[iDec] * currentSample);
                 }
             }
             
@@ -388,7 +412,6 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                 }
             }
 
-            auto analyzer = FFTAnalyzer::getInstance();
             if (analyzer->isActive(iSpeaker))
             {
                 for (int iSample = 0; iSample < buffer.getNumSamples(); iSample++)
