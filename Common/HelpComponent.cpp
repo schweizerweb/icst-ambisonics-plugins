@@ -45,7 +45,7 @@ HelpComponent::HelpComponent (bool isEncoder)
     tabHelp->setCurrentTabIndex (0);
 
     label.reset (new juce::Label ("new label",
-                                  juce::CharPointer_UTF8 ("\xc2\xa9 2023 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST")));
+                                  juce::CharPointer_UTF8 ("\xc2\xa9 2024 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST")));
     addAndMakeVisible (label.get());
     label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
     label->setJustificationType (juce::Justification::centred);
@@ -66,7 +66,7 @@ HelpComponent::HelpComponent (bool isEncoder)
     tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
     tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/page/icst-ambisonics-plugins"), true);
 
-    label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true) + " " + String::fromUTF8("\xc2\xa9 2023 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
+    label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true) + " " + String::fromUTF8("\xc2\xa9 2024 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
     label->setTooltip(Constants::getBuildInfo());
     //[/UserPreSize]
 
@@ -141,7 +141,7 @@ BEGIN_JUCER_METADATA
   </TABBEDCOMPONENT>
   <LABEL name="new label" id="c9e7e52a2e8c0879" memberName="label" virtualName=""
          explicitFocusOrder="0" pos="0 3Rr 0M 16" edTextCol="ff000000"
-         edBkgCol="0" labelText="&#169; 2023 Martin Neukom, Johannes Schuett &amp; Christian Schweizer @ ICST"
+         edBkgCol="0" labelText="&#169; 2024 Martin Neukom, Johannes Schuett &amp; Christian Schweizer @ ICST"
          editableSingleClick="0" editableDoubleClick="0" focusDiscardsChanges="0"
          fontname="Default font" fontsize="15.0" kerning="0.0" bold="0"
          italic="0" justification="36"/>

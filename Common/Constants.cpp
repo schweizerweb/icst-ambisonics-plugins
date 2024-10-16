@@ -96,6 +96,6 @@ String Constants::getUiVersionString(bool addLeadingSpace)
 String Constants::getBuildInfo()
 {
     return String(COMMIT_ID) == String("")
-        ? ""
-        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID + "\r\nBuild Date: " + __DATE__ + " " + __TIME__);
+        ? ("Build Date: " + String(__DATE__) + " " + String(__TIME__))
+        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID + "\r\nBuild Date: " + String(__DATE__) + " " + String(__TIME__));
 }
