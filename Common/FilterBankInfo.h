@@ -72,6 +72,18 @@ public:
         return false;
     }
 
+    int filterCount() const
+    {
+        int count = 0;
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            if (filters[i].filterType != FilterInfo::None)
+                count++;
+        }
+
+        return count;
+    }
+
     bool isActive(int index) const
     {
         return index >= 0 && index < MAX_FILTER_COUNT && filters[index].filterType != FilterInfo::None;

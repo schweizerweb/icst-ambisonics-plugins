@@ -26,8 +26,8 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
 {
     gainSlider.reset(new juce::Slider());
     addAndMakeVisible(gainSlider.get());
-    gainSlider->setRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
-    gainSlider->setSliderStyle(juce::Slider::LinearBarVertical);
+    gainSlider->setRange(-Constants::GainDbMax, Constants::GainDbMax, 0.5);
+    gainSlider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     gainSlider->setTextValueSuffix(" dB");
     gainSlider->addListener(this);
     
@@ -58,6 +58,8 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     filterButton.reset(new juce::TextButton("btnFilter", "F"));
     addAndMakeVisible(filterButton.get());
     filterButton->addListener(this);
+    filterButton->setClickingTogglesState(false);
+    filterButton->setColour(TextButton::ColourIds::buttonOnColourId, Colours::green);
 
     setLookAndFeel(&ambiLookAndFeel);
     
@@ -94,18 +96,21 @@ void DecoderSectionControlComponent::controlDimming()
         }
     }
 
-    pointsButton->setButtonText(String(speakerCount) + " S");
+    pointsButton->setButtonText(String(speakerCount) + " speakers");
     pointsButton->setTooltip(String(speakerCount) + " speakers selected");
 
-    orderButton->setButtonText("O " + String(pAmbiSettings->ambiSettings.getAmbiOrder()));
-    orderButton->setTooltip("Order " + String(pAmbiSettings->ambiSettings.getAmbiOrder()));
+    int order = pAmbiSettings->ambiSettings.getAmbiOrder();
+    String orderString = String(order) + (order == 1 ? "st" : (order == 2 ? "nd" : "th")) + " order";
+    orderButton->setButtonText(orderString);
+    orderButton->setTooltip(orderString + " ambisonics");
 
     auto mode = pAmbiSettings->ambiSettings.getWeightMode();
-    weightingButton->setButtonText(mode == AmbiSettings::BASIC ? "Bas" : (mode == AmbiSettings::INPHASE ? "inP" : (mode == AmbiSettings::MAXRE ? "mRe" : "Man")));
-    weightingButton->setTooltip("Weighting: " + String(mode == AmbiSettings::BASIC ? "Basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "Manual"))));
+    weightingButton->setButtonText(mode == AmbiSettings::BASIC ? "basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "manual")));
+    weightingButton->setTooltip("Weighting: " + String(mode == AmbiSettings::BASIC ? "basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "manual"))));
 
-    filterButton->setButtonText("F");
-    filterButton->setTooltip("Filter");
+    int nbActiveFilters = pAmbiSettings->filterInfo.getFilterBypass() ? 0 : pAmbiSettings->filterInfo.filterCount();
+    filterButton->setButtonText(nbActiveFilters > 0 ? "Filter (" + String(nbActiveFilters) + ")" : "Filter OFF");
+    filterButton->setTooltip(nbActiveFilters > 0 ? "Filter (" + String(nbActiveFilters) + " individual filters active)" : "No filters active");
 }
 
 double DecoderSectionControlComponent::getValue(int /*columnId*/, int /*rowNumber*/)
@@ -151,6 +156,7 @@ void DecoderSectionControlComponent::changeListenerCallback(ChangeBroadcaster* /
 {
     controlDimming();
     sendChangeMessage();
+    updateUI();
 }
 
 
@@ -163,18 +169,22 @@ void DecoderSectionControlComponent::paint (juce::Graphics& g)
 
 void DecoderSectionControlComponent::resized()
 {
+    auto border = 2;
     auto width = getWidth();
     auto height = getHeight();
-    auto secondColumnStart = width / 2;
-    auto secondColumnWidth = width - width / 2 - 2;
+    auto standardWidth = width - 2 * border;
+    auto standardHeight = 20;
+    //auto secondColumnStart = width / 2;
+    //auto secondColumnWidth = width - width / 2 - 2;
     
-    gainSlider->setBounds(2, 2, secondColumnStart - 4, height - 24);
-    pointsButton->setBounds(secondColumnStart, 2, secondColumnWidth, 20);
-    orderButton->setBounds(secondColumnStart, 22, secondColumnWidth, 20);
-    weightingButton->setBounds(secondColumnStart, 42, secondColumnWidth, 20);
-    filterButton->setBounds(secondColumnStart, 62, secondColumnWidth, 20);
-    muteButton->setBounds(2, height - 20, secondColumnStart - 4, 18);
-    colorField->setBounds(secondColumnStart, height - 20, secondColumnWidth, 18);
+    pointsButton->setBounds(border, border, standardWidth, standardHeight);
+    orderButton->setBounds(border, standardHeight + 2 * border, standardWidth, standardHeight);
+    weightingButton->setBounds(border, 2 * standardHeight + 3 * border, standardWidth, standardHeight);
+    filterButton->setBounds(border, 3 * standardHeight + 4 * border, standardWidth, standardHeight);
+    gainSlider->setBounds(border, 4 * standardHeight + 5 * border, standardWidth, height - standardHeight - 4 * standardHeight - 8 * border);
+    gainSlider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, width - 4 * border, standardHeight);
+    muteButton->setBounds(border, height - standardHeight - border, width / 2 - 2 * border, standardHeight);
+    colorField->setBounds(width / 2 + border, height - standardHeight - border, width / 2 - 2 * border, standardHeight);
 }
 
 void DecoderSectionControlComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
@@ -211,6 +221,7 @@ void DecoderSectionControlComponent::updateUI()
 {
     gainSlider->setValue(Decibels::gainToDecibels(pAmbiSettings->gain));
     muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
+    filterButton->setToggleState(!pAmbiSettings->filterInfo.getFilterBypass() && pAmbiSettings->filterInfo.anyActive(), dontSendNotification);
     colorField->setRowAndColumn(0, 0);
     controlDimming();
     resized();
