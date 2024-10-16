@@ -67,7 +67,7 @@ jobs:
             c_compiler: cl
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -76,7 +76,7 @@ jobs:
       id: juce_dependencies
       run: | 
         sudo apt-get update
-        sudo apt-get install -y g++ libgtk-3-dev libgtk2.0-dev libwebkit2gtk-4.0-dev webkit2gtk-4.0 libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
+        sudo apt-get install -y g++ libgtk-3-dev libgtk2.0-dev webkit2gtk-4.0 libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
     
     - name: Set Project Version
       shell: bash
@@ -125,7 +125,7 @@ jobs:
       run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "${{ needs.prepare.outputs.version }}" -n "ICST_AmbiPlugins_${{ matrix.name }}_${{ needs.prepare.outputs.version }}"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}
         path: ${{ steps.strings.outputs.build-output-dir }}/packages/*
@@ -138,7 +138,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artiacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
         
