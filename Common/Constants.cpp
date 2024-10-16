@@ -77,14 +77,11 @@ String Constants::getUiVersionString(bool addLeadingSpace)
     String versionString;
     if(String(ProjectInfo::versionString).startsWith("0.0.0."))
     {
-        if(BUILD_NUMBER > 0)
-        {
-            versionString = "Dev" + String(BUILD_NUMBER);
-        }
-        else
-        {
-            versionString = "self-built";
-        }
+#if BUILD_NUMBER > 0
+        versionString = "Dev" + String(BUILD_NUMBER);
+#else
+        versionString = "self-built";
+#endif
     }
     else
     {
@@ -100,5 +97,5 @@ String Constants::getBuildInfo()
 {
     return String(COMMIT_ID) == String("")
         ? ""
-        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID);
+        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID + "\r\nBuild Date: " + __DATE__ + " " + __TIME__);
 }

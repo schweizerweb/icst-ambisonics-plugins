@@ -39,6 +39,14 @@ public:
 	{
 	}
 
+    void init()
+    {
+        filterType = DEFAULT_FILTER_TYPE;
+        cutOffFrequencyHz = DEFAULT_FREQUENCY;
+        qValue = DEFAULT_Q;
+        gainFactor = DEFAULT_GAIN_FACTOR;
+    }
+
 	dsp::IIR::Coefficients<float>::Ptr getCoefficients(double sampleRate) const
 	{
 		switch (filterType)

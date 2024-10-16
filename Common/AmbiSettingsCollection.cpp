@@ -20,6 +20,7 @@
 
 
 #include "AmbiSettingsCollection.h"
+#include "MultiDecoderColors.h"
 
 AmbiSettingsCollection::AmbiSettingsCollection()
 {
@@ -43,6 +44,16 @@ void AmbiSettingsCollection::loadFromPresetXml(XmlElement *xmlElement)
         if (xmlSection != nullptr)
         {
             loadWarningFlag |= multiDecoderSections[i].loadFromPresetXml(xmlSection);
+        }
+        else
+        {
+            multiDecoderSections[i].ambiSettings.setAmbiOrder(DEAFULT_AMBI_ORDER);
+            multiDecoderSections[i].ambiSettings.setWeightMode(DEFAULT_WEIGHT_MODE);
+            multiDecoderSections[i].color = MultiDecoderColors::getColor(i);
+            multiDecoderSections[i].gain = DEFAULT_GAIN_FACTOR;
+            multiDecoderSections[i].mute = false;
+            multiDecoderSections[i].speakerMask = 0xffffffffffffffff;
+            multiDecoderSections[i].filterInfo.init();
         }
     }
 }

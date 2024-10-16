@@ -29,7 +29,6 @@
 
 class MultiDecoderComponent  : public juce::Component,
                                public juce::Slider::Listener,
-                               public juce::ToggleButton::Listener,
                                public ChangeListener,
                                public ChangeBroadcaster
 {
@@ -40,11 +39,11 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
-    void buttonClicked(Button*) override;
-
+    void refresh();
 
 private:
     void controlDimming();
+    void updateUI();
 
     std::unique_ptr<IIRFilterGraph> filterCurve;
     std::unique_ptr<juce::Slider> sliderDecoderCount;

@@ -48,7 +48,7 @@ public:
 			ToggleButton* b = new ToggleButton(label);
             bool enabled = s->getEnabled();
             b->setEnabled(enabled);
-            b->setToggleState(enabled && ((*pSpeakerMask) & (1<<(i))), dontSendNotification);
+            b->setToggleState(enabled && ((*pSpeakerMask) & (static_cast<unsigned long long>(1) << (i))), dontSendNotification);
             b->addListener(this);
 			toggleButtons.add(b);
 			addAndMakeVisible(b);
@@ -87,17 +87,7 @@ public:
 		
 		if(index >= 0)
 		{
-            *pSpeakerMask = *pSpeakerMask ^ (1 << index);
-            /*
-			if (static_cast<ToggleButton*>(b)->getToggleState())
-            {
-                *pSpeakerMask = (*pSpeakerMask | (1<<(index)));
-            }
-			else
-			{
-                pSources->removePointFromGroup(groupIndex, index);
-			}
-            */
+            *pSpeakerMask = *pSpeakerMask ^ (static_cast<unsigned long long>(1) << index);
 
 			sendChangeMessage();
 		}

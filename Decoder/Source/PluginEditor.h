@@ -58,7 +58,7 @@ public:
 	void updateRadarOptions();
 	void actionListenerCallback(const String& message) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
-    TooltipWindow tooltipWindow{ this }; // instance required for ToolTips to work
+    SharedResourcePointer<TooltipWindow> tooltipWindow;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;

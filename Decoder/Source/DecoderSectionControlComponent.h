@@ -36,13 +36,14 @@ class DecoderSectionControlComponent  : public juce::Component,
                                public ChangeBroadcaster
 {
 public:
-    DecoderSectionControlComponent(AmbiSettingsSection* pSection, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout);
+    DecoderSectionControlComponent(AmbiSettingsSection* pSection, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout, int _decoderIndex);
     ~DecoderSectionControlComponent() override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
     void buttonClicked(Button*) override;
+    void updateUI();
 
 private:
     void controlDimming();
@@ -60,7 +61,7 @@ private:
     FilterPresetHelper* pFilterPresetHelper;
     dsp::ProcessSpec* pFilterSpecification;
     ChannelLayout* pChannelLayout;
-
+    int decoderIndex;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecoderSectionControlComponent)
 

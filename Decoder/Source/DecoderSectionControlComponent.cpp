@@ -22,22 +22,20 @@
 #include "AmbiSettingsComponent.h"
 #include "../../Common/SpeakerSelectionComponent.h"
 
-DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSection* _pAmbiSettings, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* _pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout): pAmbiSettings(_pAmbiSettings), pSpeakerSet(_pSpeakerSet), pFilterPresetHelper(_pFilterPresetHelper), pFilterSpecification(_pFilterSpecification), pChannelLayout(_pChannelLayout)
+DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSection* _pAmbiSettings, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* _pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout, int _decoderIndex): pAmbiSettings(_pAmbiSettings), pSpeakerSet(_pSpeakerSet), pFilterPresetHelper(_pFilterPresetHelper), pFilterSpecification(_pFilterSpecification), pChannelLayout(_pChannelLayout), decoderIndex(_decoderIndex)
 {
     gainSlider.reset(new juce::Slider());
     addAndMakeVisible(gainSlider.get());
-    gainSlider->setRange(-88, 12, 1);
+    gainSlider->setRange(Constants::GainDbMin, Constants::GainDbMax, 0.5);
     gainSlider->setSliderStyle(juce::Slider::LinearBarVertical);
     gainSlider->setTextValueSuffix(" dB");
     gainSlider->addListener(this);
-    gainSlider->setValue(pAmbiSettings->gain);
-
+    
     muteButton.reset(new juce::TextButton("btnMute", "Mute"));
     addAndMakeVisible(muteButton.get());
     muteButton->setClickingTogglesState(true);
     muteButton->setButtonText("M");
     muteButton->setColour(TextButton::ColourIds::buttonOnColourId, Colours::red);
-    muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
     muteButton->addListener(this);
     
     colorField.reset(new ColorEditorCustomComponent(*this, true));
@@ -65,8 +63,7 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     
     addChangeListener(_pChangeListener);
 
-    controlDimming();
-    setSize (600, 400);
+    updateUI();
 }
 
 DecoderSectionControlComponent::~DecoderSectionControlComponent()
@@ -104,20 +101,19 @@ void DecoderSectionControlComponent::controlDimming()
     orderButton->setTooltip("Order " + String(pAmbiSettings->ambiSettings.getAmbiOrder()));
 
     auto mode = pAmbiSettings->ambiSettings.getWeightMode();
-    //weightingButton->setButtonText("W " + String(mode));
-    //weightingButton->setButtonText(mode == AmbiSettings::BASIC ? "Basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "Manual")));
     weightingButton->setButtonText(mode == AmbiSettings::BASIC ? "Bas" : (mode == AmbiSettings::INPHASE ? "inP" : (mode == AmbiSettings::MAXRE ? "mRe" : "Man")));
+    weightingButton->setTooltip("Weighting: " + String(mode == AmbiSettings::BASIC ? "Basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "Manual"))));
 
     filterButton->setButtonText("F");
     filterButton->setTooltip("Filter");
 }
 
-double DecoderSectionControlComponent::getValue(int columnId, int rowNumber)
+double DecoderSectionControlComponent::getValue(int /*columnId*/, int /*rowNumber*/)
 {
     return double(uint32(pAmbiSettings->color.getARGB()));
 }
 
-void DecoderSectionControlComponent::setValue(int columnId, int rowNumber, double newValue)
+void DecoderSectionControlComponent::setValue(int /*columnId*/, int /*rowNumber*/, double newValue)
 {
     if (newValue == -1)
     {
@@ -144,31 +140,14 @@ void DecoderSectionControlComponent::setValue(int columnId, int rowNumber, doubl
     sendChangeMessage();
 }
 
-SliderRange DecoderSectionControlComponent::getSliderRange(int columnId)
-{
-    return SliderRange();
-}
+// unused inherited methods
+SliderRange DecoderSectionControlComponent::getSliderRange(int /*columnId*/) { return SliderRange(); }
+TableListBox* DecoderSectionControlComponent::getTable() { return nullptr; }
+String DecoderSectionControlComponent::getTableText(const int /*columnId*/, const int /*rowNumber*/) { return String(); }
+void DecoderSectionControlComponent::setTableText(const int /*columnId*/, const int /*rowNumber*/, const String& /*newText*/) { }
+bool DecoderSectionControlComponent::getEnabled(const int /*columnId*/, const int /*rowNumber*/) { return true; }
 
-TableListBox* DecoderSectionControlComponent::getTable()
-{
-    return nullptr;
-}
-
-String DecoderSectionControlComponent::getTableText(const int columnId, const int rowNumber)
-{
-    return String();
-}
-
-void DecoderSectionControlComponent::setTableText(const int columnId, const int rowNumber, const String& newText)
-{
-}
-
-bool DecoderSectionControlComponent::getEnabled(const int columnId, const int rowNumber)
-{
-    return true;
-}
-
-void DecoderSectionControlComponent::changeListenerCallback(ChangeBroadcaster* source)
+void DecoderSectionControlComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     controlDimming();
     sendChangeMessage();
@@ -179,7 +158,7 @@ void DecoderSectionControlComponent::paint (juce::Graphics& g)
 {
     g.fillAll (juce::Colour (0xff323e44));
     g.setColour(pAmbiSettings->color);
-    g.drawRoundedRectangle(1, 1, getWidth() - 2, getHeight() - 2, 4, 2);
+    g.drawRoundedRectangle(1.0f, 1.0f, getWidth() - 2.0f, getHeight() - 2.0f, 4.0f, 2.0f);
 }
 
 void DecoderSectionControlComponent::resized()
@@ -202,7 +181,7 @@ void DecoderSectionControlComponent::sliderValueChanged (juce::Slider* sliderTha
 {
     if (sliderThatWasMoved == gainSlider.get())
     {
-        pAmbiSettings->gain = sliderThatWasMoved->getValue();
+        pAmbiSettings->gain = Decibels::decibelsToGain(sliderThatWasMoved->getValue());
     }
 }
 
@@ -222,9 +201,18 @@ void DecoderSectionControlComponent::buttonClicked(Button* btn)
     }
     else if (btn == filterButton.get())
     {
-        CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, 0), getScreenBounds(), nullptr);
+        CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), getScreenBounds(), nullptr);
     }
 
     controlDimming();
+}
+
+void DecoderSectionControlComponent::updateUI()
+{
+    gainSlider->setValue(Decibels::gainToDecibels(pAmbiSettings->gain));
+    muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
+    colorField->setRowAndColumn(0, 0);
+    controlDimming();
+    resized();
 }
 

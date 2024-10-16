@@ -136,6 +136,14 @@ public:
         return true;
     }
 
+    void init()
+    {
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            filters[i].init();
+        }
+    }
+
 private:
     FilterInfo filters[MAX_FILTER_COUNT];
     bool filterBypass;

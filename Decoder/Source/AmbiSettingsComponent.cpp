@@ -121,7 +121,7 @@ void AmbiSettingsComponent::controlDimming()
 
 }
 
-void AmbiSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
+void AmbiSettingsComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     sendChangeMessage();
 }

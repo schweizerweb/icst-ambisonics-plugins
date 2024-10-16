@@ -32,7 +32,6 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
     filterCurve.reset (new IIRFilterGraph(filterInfo, pFilterSpecification, colorInfo));
     addAndMakeVisible (filterCurve.get());
     filterCurve->setName ("filterCurve");
-    filterCurve->setUsedFiltersCount(pAmbiSettings->getUsedDecoderCount());
     //filterCurve->setBounds (8, 40, 150, 24);
 
     sliderDecoderCount.reset (new juce::Slider ("sliderDecoderCount"));
@@ -41,7 +40,6 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
     sliderDecoderCount->setSliderStyle (juce::Slider::IncDecButtons);
     sliderDecoderCount->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderDecoderCount->addListener (this);
-    sliderDecoderCount->setValue(pAmbiSettings->getUsedDecoderCount());
 
     labelDecoderCount.reset (new juce::Label ("labelDecoderCount",
                                               TRANS ("# Decoders:")));
@@ -54,16 +52,14 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
 
     for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
     {
-        auto sectionControl = new DecoderSectionControlComponent(&pAmbiSettings->multiDecoderSections[i], pSpeakerSet, pFilterPresetHelper, pFilterSpecification, this, pChannelLayout);
+        auto sectionControl = new DecoderSectionControlComponent(&pAmbiSettings->multiDecoderSections[i], pSpeakerSet, pFilterPresetHelper, pFilterSpecification, this, pChannelLayout, i);
         sectionControls.add(sectionControl);
         addAndMakeVisible(sectionControl);
     }
 
     addChangeListener(pChangeListener);
 
-    controlDimming();
-    setSize (600, 400);
-
+    updateUI();
 }
 
 MultiDecoderComponent::~MultiDecoderComponent()
@@ -84,7 +80,16 @@ void MultiDecoderComponent::controlDimming()
     }
 }
 
-void MultiDecoderComponent::changeListenerCallback(ChangeBroadcaster* source)
+void MultiDecoderComponent::updateUI()
+{
+    filterCurve->setUsedFiltersCount(pAmbiSettings->getUsedDecoderCount());
+    sliderDecoderCount->setValue(pAmbiSettings->getUsedDecoderCount());
+
+    controlDimming();
+    resized();
+}
+
+void MultiDecoderComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     filterCurve->repaint();
     sendChangeMessage();
@@ -103,10 +108,10 @@ void MultiDecoderComponent::resized()
     int border = 2;
     auto width = getWidth();
     auto height = getHeight();
-    sliderDecoderCount->setBounds (getWidth() - 126, border, 126, 24);
-    labelDecoderCount->setBounds (getWidth() - 147 - 80, border, 88, 24);
+    sliderDecoderCount->setBounds (width - 126, border, 126, 24);
+    labelDecoderCount->setBounds (width - 147 - 80, border, 88, 24);
 
-    int rightEnd = getWidth()-border;
+    int rightEnd = width-border;
     for (int i = pAmbiSettings->getUsedDecoderCount() - 1; i >= 0; i--)
     {
         rightEnd -= decoderSettingsWidth;
@@ -122,15 +127,18 @@ void MultiDecoderComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved
 {
     if (sliderThatWasMoved == sliderDecoderCount.get())
     {
-        pAmbiSettings->setUsedDecoderCount(sliderDecoderCount->getValue());
-        filterCurve->setUsedFiltersCount(pAmbiSettings->getUsedDecoderCount());
-        controlDimming();
-        resized();
+        pAmbiSettings->setUsedDecoderCount((int)sliderDecoderCount->getValue());
+        updateUI();
     }
 }
 
-void MultiDecoderComponent::buttonClicked(Button* btn)
+void MultiDecoderComponent::refresh()
 {
-    
+    updateUI();
+    for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
+    {
+        sectionControls[i]->updateUI();
+    }
 }
+
 

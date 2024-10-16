@@ -34,7 +34,7 @@ void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
     g.fillPath(p);
 }
 
-void AmbiLookAndFeel::drawLinearSlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float minSliderPos, float maxSliderPos, Slider::SliderStyle, Slider&)
+void AmbiLookAndFeel::drawLinearSlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/, Slider::SliderStyle, Slider&)
 {
     // fill
     g.setColour(juce::Colours::grey);

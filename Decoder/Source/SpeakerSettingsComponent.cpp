@@ -871,6 +871,8 @@ void SpeakerSettingsComponent::updateUI() const
 {
 	speakerList->updateContent();
 	speakerList->repaint();
+    multiDecoderControl->repaint();
+    multiDecoderControl->refresh();
 
     btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
     toggleMultiDecoder->setToggleState(pAmbiSettings->getMultiDecoderFlag(), dontSendNotification);

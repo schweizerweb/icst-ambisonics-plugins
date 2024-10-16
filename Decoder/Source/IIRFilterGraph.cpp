@@ -43,7 +43,7 @@ IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::P
 	fullGridFlag = true;
 	labelAxisY = "Gain [dB]";
 	labelAxisX = "Frequency [Hz]";
-	usedFilterCount = pFilterInfo.size();
+	usedFilterCount = (int)pFilterInfo.size();
 }
 
 IIRFilterGraph::~IIRFilterGraph()
