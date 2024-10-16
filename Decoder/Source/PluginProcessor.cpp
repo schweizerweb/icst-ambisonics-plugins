@@ -361,7 +361,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                 double speakerGain = pt->getGain();
                 bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
                 int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : pAmbi->getAmbiOrder();
-                int usedChannelCount = isSubwoofer ? subwooferAmbisonicsChannelCount : ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1));
+                int usedChannelCount = jmin(totalNumInputChannels, isSubwoofer ? subwooferAmbisonicsChannelCount : ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1)));
 
                 pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
 
