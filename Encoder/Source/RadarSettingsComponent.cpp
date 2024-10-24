@@ -55,7 +55,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointX.reset (new juce::Label ("labelCenterPointX",
                                               TRANS("Center X")));
     addAndMakeVisible (labelCenterPointX.get());
-    labelCenterPointX->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointX->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelCenterPointX->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointX->setEditable (false, false, false);
     labelCenterPointX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -71,7 +71,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointY.reset (new juce::Label ("labelCenterPointY",
                                               TRANS("Center Y")));
     addAndMakeVisible (labelCenterPointY.get());
-    labelCenterPointY->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointY->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelCenterPointY->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointY->setEditable (false, false, false);
     labelCenterPointY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -87,7 +87,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointZ.reset (new juce::Label ("labelCenterPointZ",
                                               TRANS("Center Z")));
     addAndMakeVisible (labelCenterPointZ.get());
-    labelCenterPointZ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointZ->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelCenterPointZ->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointZ->setEditable (false, false, false);
     labelCenterPointZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -107,7 +107,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelPointScaler.reset (new juce::Label ("labelPointScaler",
                                              TRANS("Point Scaler:")));
     addAndMakeVisible (labelPointScaler.get());
-    labelPointScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPointScaler->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelPointScaler->setJustificationType (juce::Justification::centredLeft);
     labelPointScaler->setEditable (false, false, false);
     labelPointScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -123,7 +123,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelRadius.reset (new juce::Label ("labelRadius",
                                         TRANS("Radius")));
     addAndMakeVisible (labelRadius.get());
-    labelRadius->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRadius->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelRadius->setJustificationType (juce::Justification::centredLeft);
     labelRadius->setEditable (false, false, false);
     labelRadius->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -144,7 +144,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelGroupPointScaler.reset (new juce::Label ("labelGroupPointScaler",
                                                   TRANS("Group Point Scaler:")));
     addAndMakeVisible (labelGroupPointScaler.get());
-    labelGroupPointScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelGroupPointScaler->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelGroupPointScaler->setJustificationType (juce::Justification::centredLeft);
     labelGroupPointScaler->setEditable (false, false, false);
     labelGroupPointScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);

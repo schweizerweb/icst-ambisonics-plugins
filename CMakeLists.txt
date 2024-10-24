@@ -27,7 +27,7 @@ set(COMMON_PLUGIN_SETTINGS
     # ICON_SMALL ...
     COMPANY_NAME "ICST"                          
 	COMPANY_WEBSITE "https://www.zhdk.ch/forschung/icst"
-	COMPANY_COPYRIGHT "© 2023"
+	COMPANY_COPYRIGHT "© 2024"
     IS_SYNTH FALSE                       # Is this a synth or an effect?
     NEEDS_MIDI_INPUT FALSE               # Does the plugin need midi input?
     NEEDS_MIDI_OUTPUT FALSE              # Does the plugin need midi output?

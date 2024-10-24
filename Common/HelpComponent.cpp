@@ -47,7 +47,7 @@ HelpComponent::HelpComponent (bool isEncoder)
     label.reset (new juce::Label ("new label",
                                   juce::CharPointer_UTF8 ("\xc2\xa9 2024 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST")));
     addAndMakeVisible (label.get());
-    label->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    label->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     label->setJustificationType (juce::Justification::centred);
     label->setEditable (false, false, false);
     label->setColour (juce::TextEditor::textColourId, juce::Colours::black);

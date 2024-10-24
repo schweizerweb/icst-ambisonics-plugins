@@ -128,8 +128,12 @@ Image Radar2D::createRadarBackground() const
 
     Rectangle<float> localBounds = radarViewport.toFloat().withZeroOrigin();
 
-	Image img = Image(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
-	Graphics g(img);
+    Rectangle<float> localBoundsAll = radarViewportWithBorder.toFloat().withZeroOrigin();
+    Image imgAll = Image(Image::ARGB, int(localBoundsAll.getWidth()), int(localBoundsAll.getHeight()), true);
+    Graphics g(imgAll);
+
+    g.saveState();
+    g.addTransform(AffineTransform::translation(border, border));
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
     
@@ -189,21 +193,27 @@ Image Radar2D::createRadarBackground() const
         g.fillRect(x, y, squareSize, squareSize);
     }
     
-    Rectangle<float> localBoundsAll = radarViewportWithBorder.toFloat().withZeroOrigin();
-    Image imgAll = Image(Image::ARGB, int(localBoundsAll.getWidth()), int(localBoundsAll.getHeight()), true);
-    Graphics gAll(imgAll);
-    gAll.drawImage(img, localBounds.withPosition(border, border));
-    
+    g.restoreState();
+
+    // clean up the border area
+    g.saveState();
+    g.setColour(radarColors.getRadarBackground());
+    g.fillRect(0.0f, 0.0f, localBoundsAll.getWidth(), border);
+    g.fillRect(0.0f, 0.0f, border, localBoundsAll.getHeight());
+    g.fillRect(localBoundsAll.getWidth() - border, 0.0f, border, localBoundsAll.getHeight());
+    g.fillRect(0.0f, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border);
+    g.restoreState();
+
     // labels
-    gAll.setFont(border);
-    gAll.drawText(radarMode == XY ? "Front" : "Top", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
-    gAll.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
+    g.setFont(border);
+    g.drawText(radarMode == XY ? "Front" : "Top", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+    g.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
     if(radarMode != XZ_Half)
     {
-        gAll.addTransform(AffineTransform::rotation(float(PI)/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
-        gAll.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
-        gAll.addTransform(AffineTransform::rotation(-float(PI), localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
-        gAll.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+        g.addTransform(AffineTransform::rotation(float(PI)/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        g.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+        g.addTransform(AffineTransform::rotation(-float(PI), localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        g.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
     }
     
 	return imgAll;

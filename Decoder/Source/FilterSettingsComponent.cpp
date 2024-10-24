@@ -54,7 +54,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     labelPresets.reset (new juce::Label ("labelPresets",
                                          TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
     labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -103,7 +103,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     labelFFTScaler.reset (new juce::Label ("labelFFTScaler",
                                            TRANS("Scaler [dB]:")));
     addAndMakeVisible (labelFFTScaler.get());
-    labelFFTScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFFTScaler->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelFFTScaler->setJustificationType (juce::Justification::centredLeft);
     labelFFTScaler->setEditable (false, false, false);
     labelFFTScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);

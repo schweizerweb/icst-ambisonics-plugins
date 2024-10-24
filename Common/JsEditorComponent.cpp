@@ -163,7 +163,7 @@ JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpd
     help->setText(helpText, dontSendNotification);
     help->setReadOnly(true);
     //help->setJustificationType(Justification::topLeft);
-    help->setFont(Font(Font::getDefaultMonospacedFontName(), 12.0f, 0));
+    help->setFont(Font(FontOptions(Font::getDefaultMonospacedFontName(), 12.0f, 0)));
     setSize(JS_EDITOR_COMPONENT_WIDTH, JS_EDITOR_COMPONENT_HEIGHT);
 }
 

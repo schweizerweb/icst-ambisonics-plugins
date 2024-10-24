@@ -47,7 +47,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     labelVersion.reset (new juce::Label ("labelVersion",
                                          TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelVersion->setJustificationType (juce::Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -67,7 +67,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     labelMessage.reset (new juce::Label ("labelMessage",
                                          juce::String()));
     addAndMakeVisible (labelMessage.get());
-    labelMessage->setFont (juce::Font (11.70f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelMessage->setFont (juce::Font (juce::FontOptions("Regular", 11.70f, juce::Font::plain)));
     labelMessage->setJustificationType (juce::Justification::centred);
     labelMessage->setEditable (false, false, false);
     labelMessage->setColour (juce::TextEditor::textColourId, juce::Colours::black);

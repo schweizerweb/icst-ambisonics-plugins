@@ -62,7 +62,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     labelOscSendIp.reset (new juce::Label ("labelOscSendIp",
                                            TRANS("Target Host/Port:")));
     addAndMakeVisible (labelOscSendIp.get());
-    labelOscSendIp->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendIp->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelOscSendIp->setJustificationType (juce::Justification::centredRight);
     labelOscSendIp->setEditable (false, false, false);
     labelOscSendIp->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -71,7 +71,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     labelOscSendInterval.reset (new juce::Label ("labelOscSendInterval",
                                                  TRANS("Interval [ms]:")));
     addAndMakeVisible (labelOscSendInterval.get());
-    labelOscSendInterval->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscSendInterval->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelOscSendInterval->setJustificationType (juce::Justification::centredRight);
     labelOscSendInterval->setEditable (false, false, false);
     labelOscSendInterval->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -85,7 +85,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     labelExternalOscInfo.reset (new juce::Label ("labelExternalOscInfo",
                                                  TRANS("no active targets")));
     addAndMakeVisible (labelExternalOscInfo.get());
-    labelExternalOscInfo->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelExternalOscInfo->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelExternalOscInfo->setJustificationType (juce::Justification::centredRight);
     labelExternalOscInfo->setEditable (false, false, false);
     labelExternalOscInfo->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -112,7 +112,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     labelLoadInfo.reset (new juce::Label ("labelLoadInfo",
                                           TRANS("no network traffic")));
     addAndMakeVisible (labelLoadInfo.get());
-    labelLoadInfo->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelLoadInfo->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
     labelLoadInfo->setJustificationType (juce::Justification::centredLeft);
     labelLoadInfo->setEditable (false, false, false);
     labelLoadInfo->setColour (juce::TextEditor::textColourId, juce::Colours::black);
