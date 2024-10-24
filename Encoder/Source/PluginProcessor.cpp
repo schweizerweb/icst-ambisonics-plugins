@@ -73,7 +73,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
 #else
     if(!presetHelper->loadDefaultPreset(&audioParams, sources.get()))
     {
-		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
+        // do not do anything because it might block the user interface on initialization
+		//AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
 #endif
     
