@@ -11,6 +11,19 @@ if(APPLE)
     endif()
 endif()
 
+if(WIN32)
+    find_program(NUGET_EXE NAMES nuget)
+    if(NOT NUGET_EXE)
+        message("NUGET.EXE not found.")
+        message(FATAL_ERROR "Please install this executable, and run CMake again.")
+    endif()
+    execute_process(COMMAND ${NUGET_EXE} install "Microsoft.Web.WebView2" -OutputDirectory ${CMAKE_BINARY_DIR}/packages)
+    set(WebView2_DIR ${CMAKE_BINARY_DIR}/packages/Microsoft.Web.WebView2)
+    set(JUCE_WEBVIEW2_PACKAGE_LOCATION
+        "${CMAKE_BINARY_DIR}/packages"
+    )
+endif()
+
 project(ICST_AMBISONICS_PLUGINS 
     VERSION 0.0.0.1 #version_replacement_tag#
 )
