@@ -62,7 +62,7 @@ bool AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
     bool loadWarningFlag = false;
     // ambisonics settings
     
-    ambiOrder = xmlElement->getIntAttribute(XML_ATTRIBUTE_AMBI_ORDER, DEAFULT_AMBI_ORDER);
+    setAmbiOrder(xmlElement->getIntAttribute(XML_ATTRIBUTE_AMBI_ORDER, DEAFULT_AMBI_ORDER));
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, DEFAULT_WEIGHT_MODE));
     int index = 0;
