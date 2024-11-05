@@ -41,7 +41,7 @@ private:
     };
 
 public:
-    static int importFromCsv(AmbiDataSet* pDataSet)
+    static int importFromCsv(AmbiDataSet* pDataSet, bool keepExistingData)
     {
         FileChooser chooser("Import from CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToOpen();
@@ -77,15 +77,36 @@ public:
             }
         }
 
-        pDataSet->clear();
-        for (int i = 0; i < points.size(); i++)
+        if (keepExistingData)
         {
-            Point3D<double> p;
-            p.setAed(points[i].a, points[i].e, points[i].d);
-            pDataSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
-            pDataSet->setGain(i, points[i].gain);
+            for (int i = 0; i < pDataSet->size(); i++)
+            {
+                if (points.size() > i)
+                {
+                    auto p = points[i];
+                    pDataSet->setChannelAED(i, p.a, p.e, p.d);
+                    pDataSet->setChannelName(i, p.name);
+                    pDataSet->setChannelColor(i, p.color);
+                    pDataSet->setGain(i, p.gain);
+                    pDataSet->setEnabled(i, true);
+                }
+                else
+                {
+                    pDataSet->setEnabled(i, false);
+                }
+            }
         }
-
+        else
+        {
+            pDataSet->clear();
+            for (int i = 0; i < points.size(); i++)
+            {
+                Point3D<double> p;
+                p.setAed(points[i].a, points[i].e, points[i].d);
+                pDataSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
+                pDataSet->setGain(i, points[i].gain);
+            }
+        }
         return !points.isEmpty() ? CSV_IMPORT_SUCCESS : CSV_IMPORT_FAIL;
     }
 
@@ -107,19 +128,22 @@ public:
         for(int i = 0; i < pDataSet->size(); i++)
         {
             AmbiPoint* s = pDataSet->get(i);
-            stream.writeText(
-                String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
-                + SEPARATOR
-                + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
-                + SEPARATOR
-                + String(s->getRawPoint()->getDistance())
-                + SEPARATOR
-                + s->getName()
-                + SEPARATOR
-                + s->getColor().toString()
-                + SEPARATOR
-                + String(Decibels::gainToDecibels(s->getGain()))
-                + NewLine::getDefault(), false, false, nullptr);
+            if (s->getEnabled())
+            {
+                stream.writeText(
+                    String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
+                    + SEPARATOR
+                    + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
+                    + SEPARATOR
+                    + String(s->getRawPoint()->getDistance())
+                    + SEPARATOR
+                    + s->getName()
+                    + SEPARATOR
+                    + s->getColor().toString()
+                    + SEPARATOR
+                    + String(Decibels::gainToDecibels(s->getGain()))
+                    + NewLine::getDefault(), false, false, nullptr);
+            }
         }
         
         return CSV_IMPORT_SUCCESS;

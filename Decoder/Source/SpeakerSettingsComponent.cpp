@@ -485,7 +485,7 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonCsv.get())
     {
         //[UserButtonCode_buttonCsv] -- add your button handler code here..
-        bool change = ImportExport::importExport(pSpeakerSet, buttonCsv.get());
+        bool change = ImportExport::importExport(pSpeakerSet, buttonCsv.get(), false);
         if (change)
         {
             sendChangeMessage();

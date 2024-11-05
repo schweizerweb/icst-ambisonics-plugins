@@ -31,6 +31,7 @@ class ExternalImportExport
 private:
     struct ExternalDataSet
     {
+        int index;
         double a;
         double e;
         double d;
@@ -38,7 +39,7 @@ private:
     };
 
 public:
-    static int importFromFile(AmbiDataSet* pDataSet)
+    static int importFromFile(AmbiDataSet* pDataSet, bool keepExistingData)
     {
         FileChooser chooser("Import from TXT", File(), "*.txt");
         bool ok = chooser.browseForFileToOpen();
@@ -73,6 +74,7 @@ public:
                     return EXT_IMPORT_FAIL;
 
                 ExternalDataSet set;
+                set.index = indexString.getIntValue();
                 set.a = Constants::GradToRad(arr2[2].getDoubleValue());
                 set.e = Constants::GradToRad(arr2[3].getDoubleValue());
                 set.d = arr2[4].getDoubleValue();
@@ -88,15 +90,44 @@ public:
             }
         }
 
-        pDataSet->clear();
-        for (int i = 0; i < points.size(); i++)
+        if (keepExistingData)
         {
-            Point3D<double> p;
-            p.setAed(points[i].a, points[i].e, points[i].d);
-            pDataSet->addNew(Uuid().toString(), p, points[i].name, TrackColors::getSpeakerColor());
-            pDataSet->setGain(i, 1.0);
-        }
+            for (int i = 0; i < pDataSet->size(); i++)
+            {
+                bool found = false;
 
+                for (int iSet = 0; iSet < points.size(); iSet++)
+                {
+                    if (points[iSet].index == i + 1)
+                    {
+                        auto p = points[iSet];
+                        pDataSet->setChannelAED(i, p.a, p.e, p.d);
+                        pDataSet->setChannelName(i, p.name);
+                        pDataSet->setChannelColor(i, TrackColors::getSpeakerColor());
+                        pDataSet->setGain(i, 1.0);
+                        pDataSet->setEnabled(i, true);
+                        found = true;
+                        break;
+                    }
+                }
+
+                if (!found)
+                {
+                    pDataSet->setEnabled(i, false);
+                }
+            }
+        }
+        else
+        {
+            pDataSet->clear();
+            for (int i = 0; i < points.size(); i++)
+            {
+                Point3D<double> p;
+                p.setAed(points[i].a, points[i].e, points[i].d);
+                pDataSet->addNew(Uuid().toString(), p, points[i].name, TrackColors::getSpeakerColor());
+                pDataSet->setGain(i, 1.0);
+            }
+        }
         return !points.isEmpty() ? EXT_IMPORT_SUCCESS : EXT_IMPORT_FAIL;
     }
 
@@ -114,23 +145,28 @@ public:
             chooser.getResult().deleteFile();
         }
 
+        float maxDist = jmax(pDataSet->getMaxDistance(), 1.0f);
+
         FileOutputStream stream(chooser.getResult());
         for(int i = 0; i < pDataSet->size(); i++)
         {
             AmbiPoint* s = pDataSet->get(i);
-            stream.writeText(
-                String(i+1)
-                + ", aed "
-                + String(i+1)
-                + " "
-                + String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
-                + " "
-                + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
-                + " "
-                + String(s->getRawPoint()->getDistance())
-                + " "
-                + "1;"
-                + NewLine::getDefault(), false, false, nullptr);
+            if (s->getEnabled())
+            {
+                stream.writeText(
+                    String(i + 1)
+                    + ", aed "
+                    + String(i + 1)
+                    + " "
+                    + String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
+                    + " "
+                    + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
+                    + " "
+                    + String(s->getRawPoint()->getDistance() / maxDist)
+                    + " "
+                    + "1;"
+                    + NewLine::getDefault(), false, false, nullptr);
+            }
         }
         
         return EXT_IMPORT_SUCCESS;

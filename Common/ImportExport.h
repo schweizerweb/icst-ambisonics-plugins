@@ -27,7 +27,7 @@
 class ImportExport
 {
 public:
-    static bool importExport(AmbiDataSet* pDataSet, Component* pBtn)
+    static bool importExport(AmbiDataSet* pDataSet, Component* pBtn, bool keepExistingData)
     {
         PopupMenu m;
         m.addItem(1, "Import from CSV");
@@ -40,7 +40,7 @@ public:
         const int result = m.show();
         if (result == 1)
         {
-            auto ret = CsvImportExport::importFromCsv(pDataSet);
+            auto ret = CsvImportExport::importFromCsv(pDataSet, keepExistingData);
             if(ret == CSV_IMPORT_SUCCESS)
             {
                 AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Import", "Data import successful");
@@ -74,7 +74,7 @@ public:
         }
         else if (result == 4)
         {
-            auto ret = ExternalImportExport::importFromFile(pDataSet);
+            auto ret = ExternalImportExport::importFromFile(pDataSet, keepExistingData);
             if(ret == EXT_IMPORT_SUCCESS)
             {
                 AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "AmbiExternal format import", "Data import successful");

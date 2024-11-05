@@ -369,7 +369,7 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonImportExport.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-        bool change = ImportExport::importExport(m_args.pSourceSet, buttonImportExport.get());
+        bool change = ImportExport::importExport(m_args.pSourceSet, buttonImportExport.get(), true);
         if (change)
         {
             sendChangeMessage();
