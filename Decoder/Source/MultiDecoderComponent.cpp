@@ -36,7 +36,7 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
 
     sliderDecoderCount.reset (new juce::Slider ("sliderDecoderCount"));
     addAndMakeVisible (sliderDecoderCount.get());
-    sliderDecoderCount->setRange (1, 3, 1);
+    sliderDecoderCount->setRange (1, MAX_NB_OF_DECODER_SECTIONS, 1);
     sliderDecoderCount->setSliderStyle (juce::Slider::IncDecButtons);
     sliderDecoderCount->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderDecoderCount->addListener (this);

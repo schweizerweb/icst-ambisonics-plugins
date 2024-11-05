@@ -25,7 +25,7 @@
 #include "FilterBankInfo.h"
 #include "AmbiSettingsSection.h"
 
-#define MAX_NB_OF_DECODER_SECTIONS 3
+#define MAX_NB_OF_DECODER_SECTIONS 4
 #define XML_ATTRIBUTE_MULTI_DECODER_FLAG "multiDecoder"
 #define XML_ATTRIBUTE_MULTI_DECODER_SECTION_COUNT "sectionCount"
 #define XML_TAG_DECODER_SECTION "DecoderSection"
