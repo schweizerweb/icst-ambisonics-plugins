@@ -24,6 +24,7 @@
 #include "../../Common/TrackColors.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/LabelCreator.h"
+#include "../../Common/ImportExport.h"
 //[/Headers]
 
 #include "SourceDefinitionComponent.h"
@@ -72,15 +73,10 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     addAndMakeVisible (sourceList.get());
     sourceList->setName ("sourceList");
 
-    buttonAdd.reset (new juce::TextButton ("buttonAdd"));
-    addAndMakeVisible (buttonAdd.get());
-    buttonAdd->setButtonText (TRANS("add"));
-    buttonAdd->addListener (this);
-
-    buttonRemove.reset (new juce::TextButton ("buttonRemove"));
-    addAndMakeVisible (buttonRemove.get());
-    buttonRemove->setButtonText (TRANS("remove"));
-    buttonRemove->addListener (this);
+    buttonImportExport.reset (new juce::TextButton ("buttonImportExport"));
+    addAndMakeVisible (buttonImportExport.get());
+    buttonImportExport->setButtonText (TRANS("import/export"));
+    buttonImportExport->addListener (this);
 
     buttonMoveDown.reset (new juce::TextButton ("buttonMoveDown"));
     addAndMakeVisible (buttonMoveDown.get());
@@ -209,8 +205,6 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
 
     //[Constructor] You can add your own custom stuff here..
     groupSources->setVisible(MULTI_ENCODER_MODE);
-    buttonAdd->setVisible(false);
-    buttonRemove->setVisible(false);
     buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
     sourceList->setVisible(MULTI_ENCODER_MODE);
@@ -220,6 +214,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     buttonRemoveGroup->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveGroupDown->setVisible(MULTI_ENCODER_MODE);
+    buttonImportExport->setVisible(MULTI_ENCODER_MODE);
 
     sourceModel->initTable(sourceList.get());
     groupModel->initTable(groupList.get());
@@ -270,8 +265,7 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
     buttonRemoveGroup = nullptr;
     groupSources = nullptr;
     sourceList = nullptr;
-    buttonAdd = nullptr;
-    buttonRemove = nullptr;
+    buttonImportExport = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
     buttonMoveGroupDown = nullptr;
@@ -318,8 +312,7 @@ void SourceDefinitionComponent::resized()
     buttonRemoveGroup->setBounds (0 + 89, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
     groupSources->setBounds (0, 72 + 0, getWidth() - 0, juce::roundToInt ((getHeight() - 110) * 0.5651f));
     sourceList->setBounds (0 + 16, (72 + 0) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 67);
-    buttonAdd->setBounds (0 + 17, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
-    buttonRemove->setBounds (0 + 89, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
+    buttonImportExport->setBounds (0 + 17, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 104, 24);
     buttonMoveDown->setBounds (0 + (getWidth() - 0) - 80, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
     buttonMoveUp->setBounds (0 + (getWidth() - 0) - 152, (72 + 0) + (juce::roundToInt ((getHeight() - 110) * 0.5651f)) - 40, 64, 24);
     buttonMoveGroupDown->setBounds (0 + (getWidth() - 0) - 80, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
@@ -373,37 +366,18 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
 
         //[/UserButtonCode_buttonRemoveGroup]
     }
-    else if (buttonThatWasClicked == buttonAdd.get())
+    else if (buttonThatWasClicked == buttonImportExport.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-        if (m_args.pAudioParams != nullptr && m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size())
+        bool change = ImportExport::importExport(m_args.pSourceSet, buttonImportExport.get());
+        if (change)
         {
-            Uuid newId = Uuid();
-            m_args.pSourceSet->addNew(newId.toString(), Point3D<double>(0.0, 0.0, 0.0, m_args.pAudioParams->sourceParams.getUnchecked(m_args.pSourceSet->size())), m_args.pSourceSet->getNewUniqueName(), TrackColors::getColor(m_args.pSourceSet->size() + 1));
-            m_args.pPointSelection->selectPoint(m_args.pSourceSet->size() - 1);
+            sendChangeMessage();
+            controlDimming();
             sourceList->updateContent();
             sourceList->repaint();
         }
-        else
-        {
-            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "No more sources allowed!");
-        }
-
         //[/UserButtonCode_buttonAdd]
-    }
-    else if (buttonThatWasClicked == buttonRemove.get())
-    {
-        //[UserButtonCode_buttonRemove] -- add your button handler code here..
-        int selection = m_args.pPointSelection->getMainSelectedPointIndex();
-        if (m_args.pPointSelection->getSelectionMode() == PointSelection::Point && selection >= 0 && selection < m_args.pSourceSet->size())
-        {
-            m_args.pPointSelection->unselectPoint();
-            m_args.pSourceSet->remove(selection);
-            sourceList->updateContent();
-            sourceList->repaint();
-        }
-
-        //[/UserButtonCode_buttonRemove]
     }
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
@@ -582,8 +556,6 @@ void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source
 
 void SourceDefinitionComponent::controlDimming() const
 {
-    buttonAdd->setEnabled(m_args.pSourceSet->size() < m_args.pAudioParams->sourceParams.size());
-    buttonRemove->setEnabled(m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pSourceSet->size() > 0);
     buttonMoveUp->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getMainSelectedPointIndex() > 0);
     buttonMoveDown->setEnabled(!m_args.pSourceSet->getGroupModeFlag() && m_args.pPointSelection->getSelectionMode() == PointSelection::Point && m_args.pPointSelection->getMainSelectedPointIndex() < m_args.pSourceSet->size() - 1);
     buttonAddGroup->setEnabled(true);
@@ -910,13 +882,9 @@ BEGIN_JUCER_METADATA
                     virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="da4e7711e3fff0be"
                     posRelativeY="da4e7711e3fff0be" posRelativeW="da4e7711e3fff0be"
                     posRelativeH="da4e7711e3fff0be" class="TableListBox" params=""/>
-  <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
-              virtualName="" explicitFocusOrder="0" pos="17 40R 64 24" posRelativeX="da4e7711e3fff0be"
-              posRelativeY="da4e7711e3fff0be" buttonText="add" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonRemove" id="49c8de1156e72d8c" memberName="buttonRemove"
-              virtualName="" explicitFocusOrder="0" pos="89 40R 64 24" posRelativeX="da4e7711e3fff0be"
-              posRelativeY="da4e7711e3fff0be" buttonText="remove" connectedEdges="0"
+  <TEXTBUTTON name="buttonImportExport" id="e1290b9a1a32d249" memberName="buttonImportExport"
+              virtualName="" explicitFocusOrder="0" pos="17 40R 104 24" posRelativeX="da4e7711e3fff0be"
+              posRelativeY="da4e7711e3fff0be" buttonText="import/export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonMoveDown" id="7291297cb3544d01" memberName="buttonMoveDown"
               virtualName="" explicitFocusOrder="0" pos="80R 40R 64 24" posRelativeX="da4e7711e3fff0be"

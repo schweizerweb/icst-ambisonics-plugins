@@ -24,6 +24,8 @@
 #include "../../Common/Constants.h"
 
 #define SEPARATOR ";"
+#define CSV_IMPORT_FAIL -1
+#define CSV_IMPORT_SUCCESS 1
 
 class CsvImportExport
 {
@@ -39,13 +41,13 @@ private:
     };
 
 public:
-    static bool importFromCsv(AmbiDataSet* pDataSet)
+    static int importFromCsv(AmbiDataSet* pDataSet)
     {
         FileChooser chooser("Import from CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         FileInputStream stream(chooser.getResult());
@@ -71,7 +73,7 @@ public:
             else if(nbTokens > 0)
             {
                 // fail for rows with less than 3 columns, but ignore empty lines
-                return false;
+                return CSV_IMPORT_FAIL;
             }
         }
 
@@ -84,7 +86,7 @@ public:
             pDataSet->setGain(i, points[i].gain);
         }
 
-        return !points.isEmpty();
+        return !points.isEmpty() ? CSV_IMPORT_SUCCESS : CSV_IMPORT_FAIL;
     }
 
     static bool exportToCsv(AmbiDataSet* pDataSet)
@@ -93,7 +95,7 @@ public:
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         if(chooser.getResult().exists())
@@ -120,6 +122,6 @@ public:
                 + NewLine::getDefault(), false, false, nullptr);
         }
         
-        return true;
+        return CSV_IMPORT_SUCCESS;
     }
 };

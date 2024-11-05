@@ -30,8 +30,7 @@
 #include "../../Common/Constants.h"
 #include "../../Common/ColorDefinition.h"
 #include "FilterSettingsComponent.h"
-#include "CsvImportExport.h"
-#include "ExternalImportExport.h"
+#include "../../Common/ImportExport.h"
 #include "ScalingComponent.h"
 //[/Headers]
 
@@ -486,82 +485,13 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
     else if (buttonThatWasClicked == buttonCsv.get())
     {
         //[UserButtonCode_buttonCsv] -- add your button handler code here..
-        PopupMenu m;
-        m.addItem(1, "Import from CSV");
-        m.addItem(2, "Export to CSV");
-        m.addItem(3, "CSV help");
-        m.addSeparator();
-        m.addItem(4, "Import from AmbiExternal");
-        m.addItem(5, "Export to AmbiExternal");
-        m.addItem(6, "AmbiExternal help");
-        const int result = m.show();
-        if (result == 1)
+        bool change = ImportExport::importExport(pSpeakerSet, buttonCsv.get());
+        if (change)
         {
-            if (CsvImportExport::importFromCsv(pSpeakerSet))
-            {
-                sendChangeMessage();
-                controlDimming();
-                speakerList->updateContent();
-                speakerList->repaint();
-                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Import", "Data import successful");
-            }
-            else
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "CSV Import", "Data import failed, please refer to file specification...");
-            }
-        }
-        else if (result == 2)
-        {
-            if(CsvImportExport::exportToCsv(pSpeakerSet))
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "CSV Export", "Export completed successfully");
-            }
-            else
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "CSV Export", "Export failed!");
-            }
-        }
-        else if (result == 3)
-        {
-            std::unique_ptr<Label> label = std::make_unique<Label>();
-            label->setSize(600, 140);
-            label->setText("Required CSV format:\nAzimuth[Degrees];Elevation[Degrees];Distance[m];{Name};{Color[ARGB Hex]};{Gain[dB]}\nParameters in {} are optional, semicolons can be omitted after last used parameter.\nIf parameter 'Name' is not specified, the channel number will be used as name.\n\nExample:\n315;0;10\n45;0;9.5\n10;-5;4;Subwoofer;ffff0000;-6", dontSendNotification);
-            label->setJustificationType(Justification::left);
-            CallOutBox::launchAsynchronously(std::move(label), buttonCsv->getBounds(), this);
-        }
-        else if (result == 4)
-        {
-            if (ExternalImportExport::importFromFile(pSpeakerSet))
-            {
-                sendChangeMessage();
-                controlDimming();
-                speakerList->updateContent();
-                speakerList->repaint();
-                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "AmbiExternal format import", "Data import successful");
-            }
-            else
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "AmbiExternal format import", "Data import failed, please refer to file specification...");
-            }
-        }
-        else if (result == 5)
-        {
-            if (ExternalImportExport::exportToFile(pSpeakerSet))
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "AmbiExternal format export", "Export completed successfully");
-            }
-            else
-            {
-                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "AmbiExternal format export", "Export failed!");
-            }
-        }
-        else if (result == 6)
-        {
-            std::unique_ptr<Label> label = std::make_unique<Label>();
-            label->setSize(600, 140);
-            label->setText("ICST AmbiExternals (Max MSP) format:\n{index}, aed {index} {azimuth[degrees]} {elevation[degrees]} {distance[m]} {status};\n\nThe {status} parameter is currently not used. It is ignored at import and set to 1 at export.\n\nExample:\n1, aed 1 315 0 1 1;", dontSendNotification);
-            label->setJustificationType(Justification::left);
-            CallOutBox::launchAsynchronously(std::move(label), buttonCsv->getBounds(), this);
+            sendChangeMessage();
+            controlDimming();
+            speakerList->updateContent();
+            speakerList->repaint();
         }
         //[/UserButtonCode_buttonCsv]
     }
@@ -1176,7 +1106,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="450188aa0f332e78" buttonText="manage filters..."
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
-              virtualName="" explicitFocusOrder="0" pos="-8r 0 64 24" posRelativeX="5fad387b688247bf"
+              virtualName="" explicitFocusOrder="0" pos="-8r 0 104 24" posRelativeX="5fad387b688247bf"
               posRelativeY="5fad387b688247bf" buttonText="import/export" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonScaling" id="d872dac34b0e60ef" memberName="buttonScaling"

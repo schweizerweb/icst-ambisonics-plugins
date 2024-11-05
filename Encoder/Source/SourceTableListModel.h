@@ -81,7 +81,7 @@ public:
 private:
     int getNumRows() override
     {
-        return jmin(pSources->size(), pChannelLayout->getNumInputChannels());
+        return pSources->size();
     }
 
     void paintRowBackground(Graphics& g, int rowNumber, int /*width*/, int /*height*/, bool rowIsSelected) override

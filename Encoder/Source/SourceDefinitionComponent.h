@@ -94,8 +94,7 @@ private:
     std::unique_ptr<juce::TextButton> buttonRemoveGroup;
     std::unique_ptr<juce::GroupComponent> groupSources;
     std::unique_ptr<TableListBox> sourceList;
-    std::unique_ptr<juce::TextButton> buttonAdd;
-    std::unique_ptr<juce::TextButton> buttonRemove;
+    std::unique_ptr<juce::TextButton> buttonImportExport;
     std::unique_ptr<juce::TextButton> buttonMoveDown;
     std::unique_ptr<juce::TextButton> buttonMoveUp;
     std::unique_ptr<juce::TextButton> buttonMoveGroupDown;

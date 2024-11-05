@@ -23,6 +23,9 @@
 #include "JuceHeader.h"
 #include "../../Common/Constants.h"
 
+#define EXT_IMPORT_FAIL -1
+#define EXT_IMPORT_SUCCESS 1
+
 class ExternalImportExport
 {
 private:
@@ -35,13 +38,13 @@ private:
     };
 
 public:
-    static bool importFromFile(AmbiDataSet* pDataSet)
+    static int importFromFile(AmbiDataSet* pDataSet)
     {
         FileChooser chooser("Import from TXT", File(), "*.txt");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         FileInputStream stream(chooser.getResult());
@@ -64,10 +67,10 @@ public:
                 auto shouldBeIndex = arr2[1];
 
                 if (shouldBeAed != "aed")
-                    return false;
+                    return EXT_IMPORT_FAIL;
 
                 if (shouldBeIndex != indexString)
-                    return false;
+                    return EXT_IMPORT_FAIL;
 
                 ExternalDataSet set;
                 set.a = Constants::GradToRad(arr2[2].getDoubleValue());
@@ -81,7 +84,7 @@ public:
             else if(nbTokens > 0)
             {
                 // fail for rows with less than 3 columns, but ignore empty lines
-                return false;
+                return EXT_IMPORT_FAIL;
             }
         }
 
@@ -94,7 +97,7 @@ public:
             pDataSet->setGain(i, 1.0);
         }
 
-        return !points.isEmpty();
+        return !points.isEmpty() ? EXT_IMPORT_SUCCESS : EXT_IMPORT_FAIL;
     }
 
     static bool exportToFile(AmbiDataSet* pDataSet)
@@ -103,7 +106,7 @@ public:
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         if(chooser.getResult().exists())
@@ -130,6 +133,6 @@ public:
                 + NewLine::getDefault(), false, false, nullptr);
         }
         
-        return true;
+        return EXT_IMPORT_SUCCESS;
     }
 };
