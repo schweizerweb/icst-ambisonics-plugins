@@ -336,10 +336,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
         if(!speakerSet->get(i)->getFilterBypass() && speakerSet->get(i)->getFilterInfo()->isLowPass())
             lowPassCount++;
     }
-    int subwooferAmbisonicsOrder = lowPassCount >= 4 ? 1 : 0;
-    int subwooferAmbisonicsChannelCount = lowPassCount >= 4 ? 4 : 1;
     
-	for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
+    for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		AmbiSpeaker* pt = speakerSet->get(iSpeaker);
 		if (pt == nullptr || pt->getMute())
@@ -359,9 +357,8 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 
                 // calculate ambisonics coefficients
                 double speakerGain = pt->getGain();
-                bool isSubwoofer = pt->getFilterBypass() && pt->getFilterInfo()->isLowPass();
-                int currentAmbisonicsOrder = isSubwoofer ? subwooferAmbisonicsOrder : pAmbi->getAmbiOrder();
-                int usedChannelCount = jmin(totalNumInputChannels, isSubwoofer ? subwooferAmbisonicsChannelCount : ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1)));
+                int currentAmbisonicsOrder = pAmbi->getAmbiOrder();
+                int usedChannelCount = jmin(totalNumInputChannels, ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1)));
 
                 pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
 
