@@ -23,25 +23,21 @@
 #include "JuceHeader.h"
 #include "../../Common/Constants.h"
 
-#define SEPARATOR ";"
-
-class CsvImportExport
+class ExternalImportExport
 {
 private:
-    struct CsvDataSet
+    struct ExternalDataSet
     {
         double a;
         double e;
         double d;
         String name;
-        Colour color;
-        double gain;
     };
 
 public:
-    static bool importFromCsv(AmbiDataSet* pDataSet)
+    static bool importFromFile(AmbiDataSet* pDataSet)
     {
-        FileChooser chooser("Import from CSV", File(), "*.csv");
+        FileChooser chooser("Import from TXT", File(), "*.txt");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
@@ -49,22 +45,36 @@ public:
         }
 
         FileInputStream stream(chooser.getResult());
-        Array<CsvDataSet> points;
+        Array<ExternalDataSet> points;
         int indexPlus1 = 1;
         while (!stream.isExhausted())
         {
             String line = stream.readNextLine();
-            StringArray arr;
-            int nbTokens = arr.addTokens(line, SEPARATOR, String());
-            if (nbTokens >= 3)
+            StringArray arr1;
+            int nbTokens = arr1.addTokens(line, ",", String());
+            if (nbTokens == 2)
             {
-                CsvDataSet set;
-                set.a = Constants::GradToRad(arr[0].getDoubleValue());
-                set.e = Constants::GradToRad(arr[1].getDoubleValue());
-                set.d = arr[2].getDoubleValue();
-                set.name = arr.size() > 3 && arr[3].isNotEmpty() ? arr[3] : String(indexPlus1);
-                set.color = arr.size() > 4 && arr[4].isNotEmpty() ? Colour::fromString(arr[4]) : TrackColors::getSpeakerColor();
-                set.gain = arr.size() > 5 && arr[5].isNotEmpty() ? Decibels::decibelsToGain(arr[5].getDoubleValue()) : 1.0;
+                auto indexString = arr1[0];
+                
+                StringArray arr2;
+                auto info = arr1[1].trim();
+                nbTokens = arr2.addTokens(info, " ", String());
+
+                auto shouldBeAed = arr2[0];
+                auto shouldBeIndex = arr2[1];
+
+                if (shouldBeAed != "aed")
+                    return false;
+
+                if (shouldBeIndex != indexString)
+                    return false;
+
+                ExternalDataSet set;
+                set.a = Constants::GradToRad(arr2[2].getDoubleValue());
+                set.e = Constants::GradToRad(arr2[3].getDoubleValue());
+                set.d = arr2[4].getDoubleValue();
+                // for now, ignore the last value
+                set.name = String(indexString);
                 points.add(set);
                 indexPlus1++;
             }
@@ -80,16 +90,16 @@ public:
         {
             Point3D<double> p;
             p.setAed(points[i].a, points[i].e, points[i].d);
-            pDataSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
-            pDataSet->setGain(i, points[i].gain);
+            pDataSet->addNew(Uuid().toString(), p, points[i].name, TrackColors::getSpeakerColor());
+            pDataSet->setGain(i, 1.0);
         }
 
         return !points.isEmpty();
     }
 
-    static bool exportToCsv(AmbiDataSet* pDataSet)
+    static bool exportToFile(AmbiDataSet* pDataSet)
     {
-        FileChooser chooser("Export to CSV", File(), "*.csv");
+        FileChooser chooser("Export to file", File(), "*.txt");
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
@@ -106,17 +116,17 @@ public:
         {
             AmbiPoint* s = pDataSet->get(i);
             stream.writeText(
-                String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
-                + SEPARATOR
+                String(i+1)
+                + ", aed "
+                + String(i+1)
+                + " "
+                + String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
+                + " "
                 + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
-                + SEPARATOR
+                + " "
                 + String(s->getRawPoint()->getDistance())
-                + SEPARATOR
-                + s->getName()
-                + SEPARATOR
-                + s->getColor().toString()
-                + SEPARATOR
-                + String(Decibels::gainToDecibels(s->getGain()))
+                + " "
+                + "1;"
                 + NewLine::getDefault(), false, false, nullptr);
         }
         
