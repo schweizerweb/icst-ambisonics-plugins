@@ -118,7 +118,7 @@ public:
             
             std::unique_ptr<Label> label = std::make_unique<Label>();
             label->setText(info , dontSendNotification);
-            int lineCount = (int)(TextLayout::getStringWidth(label->getFont(), info) / 180.0f);
+            int lineCount = info.isEmpty() ? 0 :(int)(TextLayout::getStringWidth(label->getFont(), info) / 180.0f);
             int lineHeight = roundToInt(label->getFont().getHeight());
             label->setSize(200, lineHeight * (lineCount+2));
             label->setJustificationType(Justification::centred);
