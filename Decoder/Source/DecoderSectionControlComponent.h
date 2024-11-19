@@ -31,6 +31,7 @@
 class DecoderSectionControlComponent  : public juce::Component,
                                public juce::Slider::Listener,
                                public juce::ToggleButton::Listener,
+                               public juce::TextEditor::Listener,
                                public TableColumnCallback,
                                public ChangeListener,
                                public ChangeBroadcaster
@@ -49,6 +50,7 @@ private:
     void controlDimming();
     AmbiLookAndFeel ambiLookAndFeel;
     std::unique_ptr<juce::Slider> gainSlider;
+    std::unique_ptr<juce::TextEditor> nameEditor;
     std::unique_ptr<juce::TextButton> muteButton;
     std::unique_ptr<juce::TextButton> orderButton;
     std::unique_ptr<juce::TextButton> weightingButton;
@@ -76,8 +78,5 @@ private:
 
     // Inherited via ChangeListener
     void changeListenerCallback(ChangeBroadcaster* source) override;
+    void textEditorTextChanged(TextEditor& editor) override;
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

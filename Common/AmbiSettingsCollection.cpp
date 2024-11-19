@@ -41,17 +41,18 @@ void AmbiSettingsCollection::loadFromPresetXml(XmlElement *xmlElement)
     for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
     {
         XmlElement* xmlSection = xmlElement->getChildByName(XML_TAG_DECODER_SECTION+String(i));
-        if (xmlSection != nullptr)
+        if (xmlSection != nullptr && i < nbUsedDecoders)
         {
-            loadWarningFlag |= multiDecoderSections[i].loadFromPresetXml(xmlSection);
+            loadWarningFlag |= multiDecoderSections[i].loadFromPresetXml(xmlSection, String(i+1));
         }
         else
         {
             multiDecoderSections[i].ambiSettings.setAmbiOrder(DEAFULT_AMBI_ORDER);
             multiDecoderSections[i].ambiSettings.setWeightMode(DEFAULT_WEIGHT_MODE);
+            multiDecoderSections[i].name = String(i+1);
             multiDecoderSections[i].color = MultiDecoderColors::getColor(i);
             multiDecoderSections[i].gain = DEFAULT_GAIN_FACTOR;
-            multiDecoderSections[i].mute = false;
+            multiDecoderSections[i].mute = i != 0;
             multiDecoderSections[i].speakerMask = 0xffffffffffffffff;
             multiDecoderSections[i].filterInfo.init();
         }
@@ -64,7 +65,7 @@ void AmbiSettingsCollection::writeToPresetXmlElement(XmlElement *xmlElement)
     xmlElement->setAttribute(XML_ATTRIBUTE_MULTI_DECODER_SECTION_COUNT, nbUsedDecoders);
     singleDecoder->writeToPresetXmlElement(xmlElement);
 
-    for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS; i++)
+    for (int i = 0; i < MAX_NB_OF_DECODER_SECTIONS && i < nbUsedDecoders; i++)
     {
         XmlElement* xmlSection = new XmlElement(XML_TAG_DECODER_SECTION+String(i));
         multiDecoderSections[i].writeToPresetXmlElement(xmlSection);

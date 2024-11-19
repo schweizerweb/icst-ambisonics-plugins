@@ -32,6 +32,15 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     gainSlider->addListener(this);
     gainSlider->setDoubleClickReturnValue(true, 0.0);
     
+    nameEditor.reset(new juce::TextEditor("editName"));
+    addAndMakeVisible(nameEditor.get());
+    nameEditor->setJustification(Justification::centredTop);
+    nameEditor->addListener(this);
+
+    colorField.reset(new ColorEditorCustomComponent(*this, true));
+    addAndMakeVisible(colorField.get());
+    colorField->setRowAndColumn(0, 0);
+
     muteButton.reset(new juce::TextButton("btnMute", "Mute"));
     addAndMakeVisible(muteButton.get());
     muteButton->setClickingTogglesState(true);
@@ -39,10 +48,6 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     muteButton->setColour(TextButton::ColourIds::buttonOnColourId, Colours::red);
     muteButton->addListener(this);
     
-    colorField.reset(new ColorEditorCustomComponent(*this, true));
-    addAndMakeVisible(colorField.get());
-    colorField->setRowAndColumn(0, 0);
-
     pointsButton.reset(new juce::TextButton("btnPoints", "P"));
     addAndMakeVisible(pointsButton.get());
     pointsButton->addListener(this);
@@ -73,6 +78,7 @@ DecoderSectionControlComponent::~DecoderSectionControlComponent()
 {
     setLookAndFeel(nullptr);
 
+    nameEditor = nullptr;
     gainSlider = nullptr;
     muteButton = nullptr;
     colorField = nullptr;
@@ -160,6 +166,16 @@ void DecoderSectionControlComponent::changeListenerCallback(ChangeBroadcaster* /
     updateUI();
 }
 
+void DecoderSectionControlComponent::textEditorTextChanged(TextEditor& editor)
+{
+    if (&editor == nameEditor.get())
+    {
+        pAmbiSettings->name = editor.getText();
+    }
+
+    controlDimming();
+}
+
 
 void DecoderSectionControlComponent::paint (juce::Graphics& g)
 {
@@ -178,14 +194,15 @@ void DecoderSectionControlComponent::resized()
     //auto secondColumnStart = width / 2;
     //auto secondColumnWidth = width - width / 2 - 2;
     
-    pointsButton->setBounds(border, border, standardWidth, standardHeight);
-    orderButton->setBounds(border, standardHeight + 2 * border, standardWidth, standardHeight);
-    weightingButton->setBounds(border, 2 * standardHeight + 3 * border, standardWidth, standardHeight);
-    filterButton->setBounds(border, 3 * standardHeight + 4 * border, standardWidth, standardHeight);
-    gainSlider->setBounds(border, 4 * standardHeight + 5 * border, standardWidth, height - standardHeight - 4 * standardHeight - 8 * border);
+    nameEditor->setBounds(border, border, standardWidth, standardHeight + border);
+    pointsButton->setBounds(border, standardHeight + 3 * border, standardWidth, standardHeight);
+    orderButton->setBounds(border, 2 * standardHeight + 4 * border, standardWidth, standardHeight);
+    weightingButton->setBounds(border, 3 * standardHeight + 5 * border, standardWidth, standardHeight);
+    filterButton->setBounds(border, 4 * standardHeight + 6 * border, standardWidth, standardHeight);
+    gainSlider->setBounds(border, 5 * standardHeight + 6 * border, standardWidth, height - standardHeight - 5 * standardHeight - 7 * border);
     gainSlider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, width - 4 * border, standardHeight);
-    muteButton->setBounds(border, height - standardHeight - border, width / 2 - 2 * border, standardHeight);
-    colorField->setBounds(width / 2 + border, height - standardHeight - border, width / 2 - 2 * border, standardHeight);
+    muteButton->setBounds(border, height - standardHeight, width / 2 - 2 * border, standardHeight - border);
+    colorField->setBounds(border, height - standardHeight - border, standardWidth, standardHeight);
 }
 
 void DecoderSectionControlComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
@@ -220,6 +237,7 @@ void DecoderSectionControlComponent::buttonClicked(Button* btn)
 
 void DecoderSectionControlComponent::updateUI()
 {
+    nameEditor->setText(pAmbiSettings->name);
     gainSlider->setValue(Decibels::gainToDecibels(pAmbiSettings->gain));
     muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
     filterButton->setToggleState(!pAmbiSettings->filterInfo.getFilterBypass() && pAmbiSettings->filterInfo.anyActive(), dontSendNotification);

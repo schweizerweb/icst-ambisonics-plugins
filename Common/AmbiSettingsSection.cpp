@@ -25,10 +25,11 @@ AmbiSettingsSection::AmbiSettingsSection(): gain(0), mute(false), speakerMask(0)
 {
 }
 
-bool AmbiSettingsSection::loadFromPresetXml(XmlElement *xmlElement)
+bool AmbiSettingsSection::loadFromPresetXml(XmlElement *xmlElement, String defaultName)
 {
     bool warningFlag = false;
     
+    name = xmlElement->getStringAttribute(XML_ATTRIBUTE_SECTION_NAME, defaultName);
     mute = xmlElement->getBoolAttribute(XML_ATTRIBUTE_SECTION_MUTE, false);
     gain = xmlElement->getDoubleAttribute(XML_ATTRIBUTE_SECTION_GAIN, 1.0);
     color = Colour::fromString(xmlElement->getStringAttribute(XML_ATTRIBUTE_SECTION_COLOR, ""));
@@ -46,6 +47,7 @@ bool AmbiSettingsSection::loadFromPresetXml(XmlElement *xmlElement)
 
 void AmbiSettingsSection::writeToPresetXmlElement(XmlElement *xmlElement)
 {
+    xmlElement->setAttribute(XML_ATTRIBUTE_SECTION_NAME, name);
     xmlElement->setAttribute(XML_ATTRIBUTE_SECTION_MUTE, mute);
     xmlElement->setAttribute(XML_ATTRIBUTE_SECTION_GAIN, gain);
     xmlElement->setAttribute(XML_ATTRIBUTE_SECTION_COLOR, color.toString());

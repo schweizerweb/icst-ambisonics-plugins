@@ -23,6 +23,7 @@
 #include "AmbiSettings.h"
 #include "FilterBankInfo.h"
 
+#define XML_ATTRIBUTE_SECTION_NAME "name"
 #define XML_ATTRIBUTE_SECTION_MUTE "mute"
 #define XML_ATTRIBUTE_SECTION_GAIN "gain"
 #define XML_ATTRIBUTE_SECTION_COLOR "color"
@@ -38,8 +39,9 @@ public:
     AmbiSettings ambiSettings;
     FilterBankInfo filterInfo;
     uint64_t speakerMask;
+    String name;
 
     AmbiSettingsSection();
     void writeToPresetXmlElement(XmlElement* xmlElement);
-    bool loadFromPresetXml(XmlElement* xmlElement);
+    bool loadFromPresetXml(XmlElement* xmlElement, String defaultName = "-");
 };
