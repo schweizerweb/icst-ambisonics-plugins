@@ -131,7 +131,7 @@ public:
         return !points.isEmpty() ? EXT_IMPORT_SUCCESS : EXT_IMPORT_FAIL;
     }
 
-    static bool exportToFile(AmbiDataSet* pDataSet)
+    static int exportToFile(AmbiDataSet* pDataSet)
     {
         FileChooser chooser("Export to file", File(), "*.txt");
         bool ok = chooser.browseForFileToSave(true);

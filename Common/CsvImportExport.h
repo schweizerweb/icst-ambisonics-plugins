@@ -110,7 +110,7 @@ public:
         return !points.isEmpty() ? CSV_IMPORT_SUCCESS : CSV_IMPORT_FAIL;
     }
 
-    static bool exportToCsv(AmbiDataSet* pDataSet)
+    static int exportToCsv(AmbiDataSet* pDataSet)
     {
         FileChooser chooser("Export to CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToSave(true);
