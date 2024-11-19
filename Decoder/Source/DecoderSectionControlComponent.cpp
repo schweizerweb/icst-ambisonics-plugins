@@ -30,6 +30,7 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     gainSlider->setSliderStyle(juce::Slider::RotaryHorizontalVerticalDrag);
     gainSlider->setTextValueSuffix(" dB");
     gainSlider->addListener(this);
+    gainSlider->setDoubleClickReturnValue(true, 0.0);
     
     muteButton.reset(new juce::TextButton("btnMute", "Mute"));
     addAndMakeVisible(muteButton.get());
