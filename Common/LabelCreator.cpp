@@ -27,7 +27,7 @@ Image LabelCreator::createNewLabel(String label, Colour newColor, float fontSize
 	
     FontOptions opt(fontSize);
 	Font labelFont(opt);
-	int width = int(labelFont.getStringWidthFloat(label));
+	int width = (int)ceil(TextLayout::getStringWidth(labelFont, label));
 	if (width <= 0)
 		return Image();
 
