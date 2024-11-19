@@ -20,6 +20,7 @@
 
 
 #include "OSCHandlerEncoder.h"
+#include "../../Common/MathHelper.h"
 
 OSCHandlerEncoder::OSCHandlerEncoder(AmbiSourceSet* pAmbiPointArray, StatusMessageHandler* _pStatusMessageHandler, EncoderSettings* _pEncoderSettings, ScalingInfo* pScaling) : OSCHandler(pAmbiPointArray, _pStatusMessageHandler), pScalingInfo(pScaling), pEncoderSettings(_pEncoderSettings)
 {
@@ -178,6 +179,16 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
             handleOwnExternStyleGroupRotate(message);
             hasMatch = true;
         }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_QUATERNION)))
+        {
+            handleOwnExternStyleGroupSetRotationQuaternion(message);
+            hasMatch = true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_EULER)))
+        {
+            handleOwnExternStyleGroupSetRotationEuler(message);
+            hasMatch = true;
+        }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN)))
         {
             handleOwnExternStyleGroupRotateOrigin(message);
@@ -186,6 +197,11 @@ bool OSCHandlerEncoder::handleSpecific(const OSCMessage &message)
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH)))
         {
             handleOwnExternStyleGroupStretch(message);
+            hasMatch = true;
+        }
+        else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETSTRETCH)))
+        {
+            handleOwnExternStyleGroupSetStretch(message);
             hasMatch = true;
         }
         else if(pattern.matches(OSCAddress(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_MODE))
@@ -608,6 +624,66 @@ void OSCHandlerEncoder::handleOwnExternStyleGroupRotate(const OSCMessage& messag
     }
 }
 
+void OSCHandlerEncoder::handleOwnExternStyleGroupSetRotationEuler(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 4
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32())
+        && (message[3].isInt32() || message[3].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(set group rot. euler)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double x = Constants::GradToRad(GetIntOrFloat(&message[1]));
+    double y = Constants::GradToRad(GetIntOrFloat(&message[2]));
+    double z = Constants::GradToRad(GetIntOrFloat(&message[3]));
+    
+    if (pAmbiPoints->setGroupRotation(groupString, MathHelper::ToQuaternion(x, y, z)))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleGroupSetRotationQuaternion(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 5
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32())
+        && (message[2].isInt32() || message[2].isFloat32())
+        && (message[3].isInt32() || message[3].isFloat32())
+        && (message[4].isInt32() || message[4].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(set group rot. quat)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double q1 = Constants::GradToRad(GetIntOrFloat(&message[1]));
+    double q2 = Constants::GradToRad(GetIntOrFloat(&message[2]));
+    double q3 = Constants::GradToRad(GetIntOrFloat(&message[3]));
+    double q4 = Constants::GradToRad(GetIntOrFloat(&message[4]));
+    
+    if (pAmbiPoints->setGroupRotation(groupString, Quaternion<double>(q1, q2, q3, q4)))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
+}
+
 void OSCHandlerEncoder::handleOwnExternStyleGroupRotateOrigin(const OSCMessage& message) const
 {
     bool valid =
@@ -655,6 +731,31 @@ void OSCHandlerEncoder::handleOwnExternStyleGroupStretch(const OSCMessage& messa
     double x = GetIntOrFloat(&message[1]);
     
     if (pAmbiPoints->stretchGroup(groupString, x))
+    {
+        reportSuccess(&message);
+    }
+    else
+    {
+        reportError(ERROR_STRING_NONEXISTING_TARGET + "(" + groupString + ")", &message);
+    }
+}
+
+void OSCHandlerEncoder::handleOwnExternStyleGroupSetStretch(const OSCMessage& message) const
+{
+    bool valid =
+        message.size() == 2
+        && message[0].isString()
+        && (message[1].isInt32() || message[1].isFloat32());
+    if (!valid)
+    {
+        reportError(ERROR_STRING_MALFORMATTED_OSC + "(set group stretch)", &message);
+        return;
+    }
+
+    String groupString = message[0].getString();
+    double x = GetIntOrFloat(&message[1]);
+    
+    if (pAmbiPoints->setGroupStretch(groupString, x))
     {
         reportSuccess(&message);
     }

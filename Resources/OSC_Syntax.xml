@@ -57,6 +57,14 @@
 <Gain desc="Gain in dB as Int/Float" />
 </Parameter>
 </SetGainIndex>
+<SetNameIndex name="Set Source (Index) Name">
+<Syntax desc="/icst/ambi/sourceindex/name [ChannelIndex] [Name]" />
+<Example desc="/icst/ambi/sourceindex/name 2 'flute'" />
+<Parameter>
+<ChannelIndex desc="Channel Index as Int (1-based)" />
+<Name desc="New name as String" />
+</Parameter>
+</SetNameIndex>
 </PointManipulation>
 
 <GroupManipulation name="Group Manipulation">
@@ -90,6 +98,14 @@
 <Distance desc="Distance to stretch/shrink Distance of attached Sources to Group Point as Int/Float" /> 
 </Parameter>
 </StretchGroup>
+<SetStretchGroup name="Set Group Stretch">
+<Syntax desc="/icst/ambi/group/setstretch [GroupName] [Stretch]">Placement of points reaching area limits may be adjusted!</Syntax>
+<Example desc="/icst/ambi/group/setstretch 'G3' 1.5" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Stretch desc="Absolute stretch factor used to stretch/shrink distances of attached sources to Group Point as Int/Float" /> 
+</Parameter>
+</SetStretchGroup>
 <Rotate name="Rotate around Group Point">
 <Syntax desc="/icst/ambi/group/rotate [GroupName] [X] [Y] [Z]">Placement of points reaching area limits may be adjusted!</Syntax>
 <Example desc="/icst/ambi/group/rotate 'G4' 0 0.01 0.1" />
@@ -100,6 +116,27 @@
 <Z desc="Rotation angle around the Z-Axis in Grad as Int/Float" />
 </Parameter>
 </Rotate>
+<SetRotationEuler name="Set absolute rotation in Euler angles around Group Point">
+<Syntax desc="/icst/ambi/group/setrotation/euler [GroupName] [X] [Y] [Z]" />
+<Example desc="/icst/ambi/group/setrotation/euler 'G4' 0.0 10.0 90.0" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<X desc="Absolute rotation around the X-Axis in Degrees as Int/Float" />
+<Y desc="Absolute rotation around the Y-Axis in Degrees as Int/Float" />
+<Z desc="Absolute rotation around the Z-Axis in Degrees as Int/Float" />
+</Parameter>
+</SetRotationEuler>
+<SetRotationQuaternion name="Set absolute rotation as quaternion around Group Point">
+<Syntax desc="/icst/ambi/group/setrotation/quaternion [GroupName] [Q1] [Q2] [Q3] {Q4}" />
+<Example desc="/icst/ambi/group/setrotation/quaternion 'G4' 0.1 0.01 0.2 0.04" />
+<Parameter>
+<GroupName desc="Group Name as String" />
+<Q1 desc="Quaternion value 1 as Int/Float" />
+<Q2 desc="Quaternion value 2 as Int/Float" />
+<Q3 desc="Quaternion value 3 as Int/Float" />
+<Q4 desc="Quaternion value 4 as Int/Float" />
+</Parameter>
+</SetRotationQuaternion>
 <RotateAroundOrigin name="Rotate around Origin (0,0,0)">
 <Syntax desc="/icst/ambi/group/rotateorigin [GroupName] [X] [Y] [Z] [Mode]">Placement of points reaching area limits may be adjusted!</Syntax>
 <Example desc="/icst/ambi/group/rotateorigin 'G5' 0 0 0.05 1" />

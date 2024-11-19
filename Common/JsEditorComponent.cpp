@@ -97,9 +97,12 @@ Group manipulations:
 Additional methods for group mode (absolute rotation and stretch):
   s.setGroupRotation([index], [x], [y], [z], [w]);
     Sets the absolute rotation of the group to the specified quaternion.
+  s.setGroupRotationEuler([index], [x], [y], [z]);
+    Sets the absolute rotation of the group to the specified axis rotations.
   s.setGroupStretch([index], [stretchFactor]);
     Sets the absolute stretch factor.
   s.setGroupRotationByName([name], [x], [y], [z], [w]);
+  s.setGroupRotationEulerByName([name], [x], [y], [z], [w]);
   s.setGroupStretchByName([name], [stretchFactor]);
     Same with identification of the group by name.
 

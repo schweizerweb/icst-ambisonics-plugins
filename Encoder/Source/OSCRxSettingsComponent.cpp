@@ -270,7 +270,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         auto textEditor = std::make_unique<TextEditor>("");
         textEditor->setReadOnly(true);
         textEditor->setMultiLine(true);
-        textEditor->setText("If activated, the Plugin listens to the standard OSC patterns, otherwise, the standard patterns are ignored and only user defined patterns are evaluated.\n\nStandard patterns (details can be found in the main help section):\n /icst/ambi/source/aed\n /icst/ambi/source/xyz\n /icst/ambi/source/gain\n /icst/ambi/group/aed\n /icst/ambi/group/xyz\n /icst/ambi/sourceindex/aed\n /icst/ambi/sourceindex/xyz\n /icst/ambi/sourceindex/gain\n /icst/ambi/group/rotate\n /icst/ambi/group/rotateorigin\n /icst/ambi/group/stretch\n /icst/ambi/distanceencoding/mode\n /icst/ambi/distanceencoding/unitcircle\n /icst/ambi/distanceencoding/dbunit\n /icst/ambi/distanceencoding/distanceattenuation\n /icst/ambi/distanceencoding/centercurve\n /icst/ambi/distanceencoding/advancedfactor\n /icst/ambi/distanceencoding/advancedexponent\n /icst/ambi/distanceencoding/standard\n /icst/ambi/distanceencoding/advanced\n /icst/ambi/distanceencoding/exponential\n /icst/ambi/distanceencoding/inverseproportional");
+        textEditor->setText("If activated, the Plugin listens to the standard OSC patterns, otherwise, the standard patterns are ignored and only user defined patterns are evaluated.\n\nInformation about standard patterns can be found in the main help section.\n");
         textEditor->setSize(330, 250);
         CallOutBox::launchAsynchronously(std::move(textEditor), btnInfoStandardOsc->getBounds(), this);
         //[/UserButtonCode_btnInfoStandardOsc]
