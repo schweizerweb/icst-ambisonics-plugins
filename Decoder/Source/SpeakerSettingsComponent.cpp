@@ -341,8 +341,8 @@ void SpeakerSettingsComponent::resized()
     buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     btnEditMode->setBounds (8 + 8, 0 + 24, 150, 24);
-    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 398 - 75, ((0 + (getHeight() - 317)) + 249) + 20, 75, 24);
-    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 96, ((0 + (getHeight() - 317)) + 249) + 20, 96, 24);
+    labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 408 - 85, ((0 + (getHeight() - 317)) + 249) + 20, 85, 24);
+    labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 105, ((0 + (getHeight() - 317)) + 249) + 20, 105, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 317)) + 249) + 20, 180, 24);
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 317) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
@@ -350,7 +350,7 @@ void SpeakerSettingsComponent::resized()
     buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
     buttonCsv->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -8 - 104, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 104, 24);
     buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80 - 104, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
-    sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 290 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
+    sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 300 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 317)) + 249) + 20, 170, 24);
     toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, 150, 24);
     multiDecoderControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
@@ -1072,13 +1072,13 @@ BEGIN_JUCER_METADATA
                 posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
                 needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="398Rr 20 75 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="408Rr 20 85 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
          kerning="0.0" bold="0" italic="0" justification="33"/>
   <LABEL name="labelTimeout" id="628a0500d66bc466" memberName="labelTimeout"
-         virtualName="" explicitFocusOrder="0" pos="186Rr 20 96 24" posRelativeX="f4cf3a53a6ef0d87"
+         virtualName="" explicitFocusOrder="0" pos="186Rr 20 105 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
          labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
          focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
@@ -1114,7 +1114,7 @@ BEGIN_JUCER_METADATA
               posRelativeY="5fad387b688247bf" buttonText="scaling" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
   <SLIDER name="sliderPort" id="32291ecaacc9e3c0" memberName="sliderPort"
-          virtualName="" explicitFocusOrder="0" pos="290Rr 20 100 24" posRelativeX="f4cf3a53a6ef0d87"
+          virtualName="" explicitFocusOrder="0" pos="300Rr 20 100 24" posRelativeX="f4cf3a53a6ef0d87"
           posRelativeY="f4cf3a53a6ef0d87" min="0.0" max="65535.0" int="1.0"
           style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
           textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
