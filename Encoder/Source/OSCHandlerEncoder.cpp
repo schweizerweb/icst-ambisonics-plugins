@@ -643,7 +643,7 @@ void OSCHandlerEncoder::handleOwnExternStyleGroupSetRotationEuler(const OSCMessa
     double y = Constants::GradToRad(GetIntOrFloat(&message[2]));
     double z = Constants::GradToRad(GetIntOrFloat(&message[3]));
     
-    if (pAmbiPoints->setGroupRotation(groupString, MathHelper::ToQuaternion(x, y, z)))
+    if (pAmbiPoints->setGroupRotation(groupString, MathHelper::EulerToQuaternion(x, y, z)))
     {
         reportSuccess(&message);
     }

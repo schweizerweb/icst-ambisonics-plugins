@@ -903,7 +903,7 @@ private:
                     double y = (double)args.arguments[2] / 180.0 * PI;
                     double z = (double)args.arguments[3] / 180.0 * PI;
                     
-                    if(thisObject->jsAmbiSourceSet->setGroupRotation(index - 1, MathHelper::ToQuaternion(x, y, z))) // make index 0-based
+                    if(thisObject->jsAmbiSourceSet->setGroupRotation(index - 1, MathHelper::EulerToQuaternion(x, y, z))) // make index 0-based
                     {
                         return true;
                     }
@@ -925,7 +925,7 @@ private:
                     double y = (double)args.arguments[2] / 180.0 * PI;
                     double z = (double)args.arguments[3] / 180.0 * PI;
                     
-                    if(thisObject->jsAmbiSourceSet->setGroupRotation(name, MathHelper::ToQuaternion(x, y, z)))
+                    if(thisObject->jsAmbiSourceSet->setGroupRotation(name, MathHelper::EulerToQuaternion(x, y, z)))
                     {
                         return true;
                     }

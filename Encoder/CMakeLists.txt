@@ -45,6 +45,7 @@ SET(SRC_FILES
 ../../Common/HelpWebBrowserComponent.cpp
 ../../Common/JsEditorComponent.cpp
 ../../Common/LabelCreator.cpp
+../../Common/MathHelper.cpp
 ../../Common/OSCHandler.cpp
 ../../Common/OSCLogComponent.cpp
 ../../Common/PointInfoControl.cpp

@@ -52,6 +52,7 @@ target_sources(AmbiDecoder
 	../Common/EncoderConstants.cpp
 	../Common/FFTAnalyzer.cpp
 	../Common/LabelCreator.cpp
+	../Common/MathHelper.cpp
 	../Common/MultiSliderControl.cpp
 	../Common/OSCHandler.cpp
 	../Common/PointInfoControl.cpp
