@@ -29,7 +29,8 @@
 #include "../../Common/DelayHelper.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/AmbiSourceSet.h"
-#include "DecoderPresetHelper.h"
+#include "SpeakerPresetHelper.h"
+#include "DecodingPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
@@ -91,7 +92,8 @@ public:
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
-    DecoderPresetHelper* getPresetHelper();
+    SpeakerPresetHelper* getSpeakerPresetHelper();
+    DecodingPresetHelper* getDecodingPresetHelper();
     ZoomSettings* getZoomSettingsPointer();
     ChannelLayout* getChannelLayout();
     RadarOptions* getRadarOptions();
@@ -105,7 +107,8 @@ private:
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
-    std::unique_ptr<DecoderPresetHelper> presetHelper;
+    std::unique_ptr<SpeakerPresetHelper> speakerPresetHelper;
+    std::unique_ptr<DecodingPresetHelper> decodingPresetHelper;
     std::unique_ptr<ZoomSettings> zoomSettings;
     ChannelLayout channelLayout;
     RadarOptions radarOptions;

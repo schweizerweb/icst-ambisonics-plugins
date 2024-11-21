@@ -99,3 +99,8 @@ String Constants::getBuildInfo()
         ? ("Build Date: " + String(__DATE__) + " " + String(__TIME__))
         : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID + "\r\nBuild Date: " + String(__DATE__) + " " + String(__TIME__));
 }
+
+String Constants::getBasePresetsDirectory()
+{
+    return File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder";
+}

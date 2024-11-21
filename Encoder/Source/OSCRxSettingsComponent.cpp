@@ -34,7 +34,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, Sta
     : pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this));
+    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this, pCustomOscRxPresetHelper));
     pCustomOscRxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
 
@@ -321,10 +321,10 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
     {
         // for now, nothing to do
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SELECT_PRESET)))
+    if(message.startsWith(pCustomOscRxPresetHelper->UniqueActionMessageSelectPreset()))
     {
         CustomOscInput* t = new CustomOscInput();
-        String file = message.fromFirstOccurrenceOf(String(ACTION_MESSAGE_SELECT_PRESET), false, true);
+        String file = message.fromFirstOccurrenceOf(pCustomOscRxPresetHelper->UniqueActionMessageSelectPreset(), false, true);
         pCustomOscRxPresetHelper->loadFromXmlFile(file, t);
 
         // add to list if not yet existing
@@ -344,18 +344,19 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
             customOscList->updateContent();
         }
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SAVE_PRESET)))
+    if(message.startsWith(pCustomOscRxPresetHelper->UniqueActionMessageSavePreset()))
     {
         int index = message.getTrailingIntValue();
 
         if(index < 0 || index >= pSettings->customOscInput.size())
             return;
 
-        File* f = pCustomOscRxPresetHelper->tryCreateNewPreset();
-        if(f != nullptr)
-        {
-            pCustomOscRxPresetHelper->writeToXmlFile(*f, pSettings->customOscInput[index]);
-        }
+        pCustomOscRxPresetHelper->tryCreateNewPreset([&](File* f){
+            if(f != nullptr)
+            {
+                pCustomOscRxPresetHelper->writeToXmlFile(*f, pSettings->customOscInput[index]);
+            }
+        });
     }
 }
 //[/MiscUserCode]

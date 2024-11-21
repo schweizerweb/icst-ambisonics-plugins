@@ -42,10 +42,14 @@ AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
     
     zoomSettings.reset(new ZoomSettings(getScalingInfo()));
 
-    presetHelper.reset(new DecoderPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder"), this, &scalingInfo));
-    presetHelper->initialize();
-    presetHelper->loadDefaultPreset(speakerSet.get(), &ambiSettings);
-    
+    speakerPresetHelper.reset(new SpeakerPresetHelper(File(Constants::getBasePresetsDirectory()), this, &scalingInfo));
+    speakerPresetHelper->initialize();
+    speakerPresetHelper->loadDefaultPreset(speakerSet.get());
+
+    decodingPresetHelper.reset(new DecodingPresetHelper(File(Constants::getBasePresetsDirectory() + "/Decoding"), this));
+    decodingPresetHelper->initialize();
+    decodingPresetHelper->loadDefaultPreset(&ambiSettings);
+
     radarOptions.setTrackColorAccordingToName = false;
     radarOptions.maxNumberEditablePoints = getBusesLayout().getMainOutputChannels();
     radarOptions.editablePointsAsSquare = true;
@@ -521,9 +525,14 @@ dsp::ProcessSpec* AmbisonicsDecoderAudioProcessor::getFilterSpecification()
 	return &speakerIIRFilterSpec;
 }
 
-DecoderPresetHelper* AmbisonicsDecoderAudioProcessor::getPresetHelper()
+SpeakerPresetHelper* AmbisonicsDecoderAudioProcessor::getSpeakerPresetHelper()
 {
-    return presetHelper.get();
+    return speakerPresetHelper.get();
+}
+
+DecodingPresetHelper* AmbisonicsDecoderAudioProcessor::getDecodingPresetHelper()
+{
+    return decodingPresetHelper.get();
 }
 
 ScalingInfo* AmbisonicsDecoderAudioProcessor::getScalingInfo()
@@ -548,11 +557,17 @@ RadarOptions* AmbisonicsDecoderAudioProcessor::getRadarOptions()
 
 void AmbisonicsDecoderAudioProcessor::actionListenerCallback(const String &message)
 {
-    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    if(message.startsWith(speakerPresetHelper->UniqueActionMessageSelectPreset()))
     {
-        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
-        presetHelper->loadFromXmlFile(presetFile, speakerSet.get(), &ambiSettings);
-        presetHelper->notifyPresetChanged();
+        File presetFile(message.substring(speakerPresetHelper->UniqueActionMessageSelectPreset().length()));
+        speakerPresetHelper->loadFromXmlFile(presetFile, speakerSet.get());
+        speakerPresetHelper->notifyPresetChanged();
+    }
+    else if(message.startsWith(decodingPresetHelper->UniqueActionMessageSelectPreset()))
+    {
+        File presetFile(message.substring(decodingPresetHelper->UniqueActionMessageSelectPreset().length()));
+        decodingPresetHelper->loadFromXmlFile(presetFile, &ambiSettings);
+        decodingPresetHelper->notifyPresetChanged();
     }
 }
 

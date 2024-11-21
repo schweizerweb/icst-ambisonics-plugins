@@ -33,6 +33,9 @@ public:
         
     }
     
+    String UniqueActionMessageSelectPreset() override { return "SelectFilterPreset"; }
+    String UniqueActionMessageSavePreset() override { return "SaveFilterPreset"; }
+
     bool checkValid(File presetFile) override
     {
         FilterBankInfo testInfo;

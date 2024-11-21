@@ -34,7 +34,8 @@
 #include "FilterSettingsComponent.h"
 #include "MultiDecoderComponent.h"
 #include "AmbiSettingsComponent.h"
-#include "DecoderPresetHelper.h"
+#include "SpeakerPresetHelper.h"
+#include "DecodingPresetHelper.h"
 #include "FilterPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
@@ -58,13 +59,14 @@ class SpeakerSettingsComponent  : public Component,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
                                   ActionListener,
-                                  public juce::ComboBox::Listener,
                                   public juce::Button::Listener,
-                                  public juce::Slider::Listener
+                                  public juce::Slider::Listener,
+                                  public ApplicationCommandTarget,
+                                  public MenuBarModel
 {
 public:
     //==============================================================================
-    SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout);
+    SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout);
     ~SpeakerSettingsComponent() override;
 
     //==============================================================================
@@ -90,7 +92,6 @@ public:
     bool getEnabled(const int columnId, const int rowNumber) override;
 
 
-	void updateComboBox() const;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
 	void updateUI() const;
@@ -98,13 +99,22 @@ public:
 	dsp::ProcessSpec* getFilterSpecification() const;
 	void controlDimming();
     FilterPresetHelper* getFilterPresetHelper() const;
-
     void mouseUp(const MouseEvent &event) override;
+
+    // menu
+    StringArray getMenuBarNames() override;
+    PopupMenu getMenuForIndex(int menuIndex, const String& /*menuName*/) override;
+    void menuItemSelected(int /*menuItemID*/, int /*topLevelMenuIndex*/) override;
+    ApplicationCommandTarget* getNextCommandTarget() override;
+    void getAllCommands(Array<CommandID>& c) override;
+    void getCommandInfo(CommandID commandID, ApplicationCommandInfo& result) override;
+    bool perform(const InvocationInfo& info) override;
+    bool doBackupAllPresets();
+    bool doRestoreAllPresets();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
-    void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
@@ -112,8 +122,11 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
+    std::unique_ptr<MenuBarComponent> menuBar;
+    ApplicationCommandManager commandManager;
 	AmbiSpeakerSet* pSpeakerSet;
-	DecoderPresetHelper* pPresetHelper;
+	SpeakerPresetHelper* pSpeakerPresetHelper;
+	DecodingPresetHelper* pDecodingPresetHelper;
 	PointSelection* pPointSelection;
 	AmbiSettingsCollection* pAmbiSettings;
 	DecoderSettings* pDecoderSettings;
@@ -124,29 +137,37 @@ private:
     std::unique_ptr<FilterPresetHelper> filterPresetHelper;
     ZoomSettings* pZoomSettings;
     ChannelLayout* pChannelLayout;
+
+    enum CommandIDs
+    {
+        speakerEditMode = 1,
+        speakerSavePreset,
+        speakerManagePresets,
+        decodingSavePreset,
+        decodingManagePresets,
+        filterManagePresets,
+        backupAllPresets,
+        restoreAllPresets,
+        about
+    };
+
+
     //[/UserVariables]
 
     //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupOsc;
     std::unique_ptr<juce::GroupComponent> groupAmbisonics;
     std::unique_ptr<juce::GroupComponent> groupSpeakers;
-    std::unique_ptr<juce::ComboBox> comboBoxChannelConfig;
-    std::unique_ptr<juce::Label> labelPresets;
-    std::unique_ptr<juce::TextButton> buttonSave;
     std::unique_ptr<TableListBox> speakerList;
     std::unique_ptr<juce::TextButton> buttonAdd;
     std::unique_ptr<juce::TextButton> buttonRemove;
     std::unique_ptr<juce::TextButton> buttonMoveDown;
     std::unique_ptr<juce::TextButton> buttonMoveUp;
-    std::unique_ptr<juce::ToggleButton> btnEditMode;
     std::unique_ptr<juce::Label> labelOscPort;
     std::unique_ptr<juce::Label> labelTimeout;
     std::unique_ptr<juce::ToggleButton> toggleOsc;
     std::unique_ptr<juce::TextButton> buttonSpeakerTest;
     std::unique_ptr<juce::Label> labelDevelopmentVersion;
-    std::unique_ptr<juce::TextButton> buttonManage;
-    std::unique_ptr<juce::TextButton> buttonManageFilters;
-    std::unique_ptr<juce::TextButton> buttonCsv;
     std::unique_ptr<juce::TextButton> buttonScaling;
     std::unique_ptr<juce::Slider> sliderPort;
     std::unique_ptr<juce::Slider> sliderTimeout;

@@ -88,6 +88,7 @@ PresetManagerComponent::~PresetManagerComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
     pPresetHelper->removeActionListener(this);
+    presetTable->setModel(nullptr);
     //[/Destructor_pre]
 
     presetTable = nullptr;

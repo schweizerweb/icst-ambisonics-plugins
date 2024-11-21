@@ -31,6 +31,7 @@ PresetHelper::PresetHelper(File _presetDirectory, ActionListener* pActionListene
 
 void PresetHelper::initialize()
 {
+    presetFiles.clear();
     bool hasPresets = false;
     RangedDirectoryIterator iterator(presetDirectory, false, "*.xml");
     for(DirectoryEntry entry : iterator)
@@ -78,54 +79,60 @@ void PresetHelper::notifyPresetListChanged()
     sendActionMessage(ACTION_MESSAGE_PRESET_LIST_CHANGED);
 }
 
-File* PresetHelper::tryCreateNewPreset()
+void PresetHelper::tryCreateNewPreset(std::function<void(File*)> callback)
 {
-    AlertWindow alert("Save Preset", "", AlertWindow::NoIcon);
+    alertWindow.reset(new AlertWindow("Save Preset", "", AlertWindow::NoIcon));
     Array<String> existingPresets;
     existingPresets.add("");
     for (File file : presetFiles)
         existingPresets.add(file.getFileNameWithoutExtension());
 
-    alert.addComboBox("existing", existingPresets, "Overwrite existing");
-    alert.addTextEditor("text", "", "Or enter new name", false);
-    alert.addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-    alert.addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
-    alert.setAlwaysOnTop(true);
-
-    int returnValue = alert.runModalLoop();
-    if(returnValue == 1)
-    {
-        String presetName = alert.getTextEditorContents("text");
-        if(presetName.isEmpty())
-            presetName = alert.getComboBoxComponent("existing")->getText();
-
-        if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
+    alertWindow->addComboBox("existing", existingPresets, "Overwrite existing");
+    alertWindow->addTextEditor("text", "", "Or enter new name", false);
+    alertWindow->addButton("Cancel", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+    alertWindow->addButton("OK", 1, KeyPress(KeyPress::returnKey, 0, 0));
+    
+    alertWindow->enterModalState(true, ModalCallbackFunction::create([&, callback](int returnValue) {
+        if (returnValue == 1)
         {
-            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
-            return nullptr;
-        }
+            String presetName = alertWindow->getTextEditorContents("text");
+            if (presetName.isEmpty())
+                presetName = alertWindow->getComboBoxComponent("existing")->getText();
 
-        File newFile = getPathForPresetName(presetName);
-        if (newFile.existsAsFile())
-        {
-            AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
-            confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
-            confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
-            if (confirm.runModalLoop() == 0)
+            alertWindow = nullptr;
+
+            if (presetName.isEmpty() || File::createLegalFileName(presetName) != presetName)
             {
-                return nullptr;
+                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "Invalid preset name: " + presetName);
+                return;
             }
+
+            File newFile = getPathForPresetName(presetName);
+            if (newFile.existsAsFile())
+            {
+                AlertWindow confirm("Overwrite?", "Are you sure to overwrite preset \"" + presetName + "\"?", AlertWindow::QuestionIcon);
+                confirm.addButton("No", 0, KeyPress(KeyPress::escapeKey, 0, 0));
+                confirm.addButton("Yes", 1, KeyPress(KeyPress::returnKey, 0, 0));
+                if (confirm.runModalLoop() == 0)
+                {
+                    return;
+                }
+            }
+
+            presetFiles.addIfNotAlreadyThere(newFile);
+            notifyPresetListChanged();
+            callback(&newFile);
         }
+        else
+        {
+            alertWindow = nullptr;
+        }
+        }));
     
-        presetFiles.addIfNotAlreadyThere(newFile);
-        notifyPresetListChanged();
-        return new File(newFile);
-    }
-    
-    return nullptr;
+    return;
 }
 
-void PresetHelper::tryDeletePresets(Array<String> presetNames)
+bool PresetHelper::tryDeletePresets(Array<String> presetNames)
 {
     String message = "Following Presets will be deleted and cannot be restored:\r\n\r\n";
     for(String name : presetNames)
@@ -151,15 +158,18 @@ void PresetHelper::tryDeletePresets(Array<String> presetNames)
         }
 
         notifyPresetListChanged();
+        return true;
     }
+
+    return false;
 }
 
-void PresetHelper::tryDeleteAll()
+bool PresetHelper::tryDeleteAll()
 {
     Array<String> allNames;
     for(File f : presetFiles)
         allNames.add(f.getFileNameWithoutExtension());
-    tryDeletePresets(allNames);
+    return tryDeletePresets(allNames);
 }
 
 void PresetHelper::tryImportFiles(Array<File> files)
@@ -222,7 +232,7 @@ int PresetHelper::showOverwriteDialog(String filename)
 
 void PresetHelper::selectPreset(File file)
 {
-    sendActionMessage(String(ACTION_MESSAGE_SELECT_PRESET) + file.getFullPathName());
+    sendActionMessage(String(UniqueActionMessageSelectPreset()) + file.getFullPathName());
 }
 
 File PresetHelper::getPathForPresetName(String name)

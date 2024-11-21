@@ -33,7 +33,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     : pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this));
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this, pCustomOscTxPresetHelper));
     addChangeListener(pChangeListener);
     pCustomOscTxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
@@ -255,10 +255,10 @@ void OSCTargetsComponent::actionListenerCallback(const String& message)
     {
         // for now, nothing to do
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SELECT_PRESET)))
+    if(message.startsWith(pCustomOscTxPresetHelper->UniqueActionMessageSelectPreset()))
     {
         CustomOscTarget* t = new CustomOscTarget();
-        String file = message.fromFirstOccurrenceOf(String(ACTION_MESSAGE_SELECT_PRESET), false, true);
+        String file = message.fromFirstOccurrenceOf(pCustomOscTxPresetHelper->UniqueActionMessageSelectPreset(), false, true);
         pCustomOscTxPresetHelper->loadFromXmlFile(file, t);
 
         // add to list if not yet existing
@@ -278,18 +278,14 @@ void OSCTargetsComponent::actionListenerCallback(const String& message)
             targetList->updateContent();
         }
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SAVE_PRESET)))
+    if(message.startsWith(pCustomOscTxPresetHelper->UniqueActionMessageSavePreset()))
     {
         int index = message.getTrailingIntValue();
 
         if(index < 0 || index >= pSettings->customOscTargets.size())
             return;
 
-        File* f = pCustomOscTxPresetHelper->tryCreateNewPreset();
-        if(f != nullptr)
-        {
-            pCustomOscTxPresetHelper->writeToXmlFile(*f, pSettings->customOscTargets[index]);
-        }
+        pCustomOscTxPresetHelper->tryCreateNewPreset([&](File* f) { pCustomOscTxPresetHelper->writeToXmlFile(*f, pSettings->customOscTargets[index]); });
     }
 }
 

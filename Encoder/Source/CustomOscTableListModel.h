@@ -22,11 +22,11 @@
 #pragma once
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
+#include "CustomOscTxPresetHelper.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
-#include "../../Common/PresetHelper.h"
 #include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
@@ -41,7 +41,7 @@
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr)
+	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener, CustomOscTxPresetHelper* _pPresetHelper): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr), pPresetHelper(_pPresetHelper)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -57,7 +57,7 @@ public:
 
     void buttonClicked(juce::Button *b) override {
         int rowIndex = b->getComponentID().getIntValue();
-        sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+        sendActionMessage(pPresetHelper->UniqueActionMessageSavePreset() + " " + String(rowIndex));
     }
     
 	int getNumRows() override {
@@ -285,5 +285,6 @@ private:
 	EncoderSettings* pSettings;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
+    CustomOscTxPresetHelper* pPresetHelper;
     OwnedArray<StandardTarget> standardTargets;
 };

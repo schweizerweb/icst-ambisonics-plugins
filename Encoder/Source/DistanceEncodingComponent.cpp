@@ -444,13 +444,14 @@ void DistanceEncodingComponent::buttonClicked (juce::Button* buttonThatWasClicke
     if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = pPresetHelper->tryCreateNewPreset();
-        if(newFile == nullptr)
-                return;
-
-        pPresetHelper->writeToXmlFile(*newFile, pParams);
-        comboBoxDistanceEncodingPreset->setText("", dontSendNotification);
-        delete newFile;
+        pPresetHelper->tryCreateNewPreset([&](File* newFile){
+            if (newFile != nullptr)
+            {
+                pPresetHelper->writeToXmlFile(*newFile, pParams);
+                comboBoxDistanceEncodingPreset->setText("", dontSendNotification);
+                delete newFile;
+            }
+        });
         //[/UserButtonCode_buttonSave]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
@@ -482,9 +483,9 @@ void DistanceEncodingComponent::actionListenerCallback(const String &message)
     {
         updatePresetComboBox();
     }
-    else if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    else if(message.startsWith(pPresetHelper->UniqueActionMessageSelectPreset()))
     {
-        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        File presetFile(message.substring(pPresetHelper->UniqueActionMessageSelectPreset().length()));
         pPresetHelper->loadFromXmlFile(presetFile, pParams);
         pPresetHelper->notifyPresetChanged();
         setUiValues(pParams);

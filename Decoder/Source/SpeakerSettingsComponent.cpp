@@ -53,11 +53,13 @@
 #define COLUMN_ID_GAIN		5
 #define	COLUMN_ID_TEST		6
 #define COLUMN_ID_FILTER    14
+
+#define MENU_CMD_IMPORTEXPORT_OFFSET 100
 //[/MiscUserDefs]
 
 //==============================================================================
-SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout)
-    : pSpeakerSet(_pSpeakerSet), pPresetHelper(_pPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)
+SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout)
+    : pSpeakerSet(_pSpeakerSet), pSpeakerPresetHelper(_pSpeakerPresetHelper), pDecodingPresetHelper(_pDecodingPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
@@ -66,11 +68,19 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 	this->pTestSoundGenerator = pTestSoundListener;
 
 	addChangeListener(pCallback);
-    pPresetHelper->addActionListener(this);
+    pSpeakerPresetHelper->addActionListener(this);
+    pDecodingPresetHelper->addActionListener(this);
     pChannelLayout->addActionListener(this);
 
-    filterPresetHelper.reset(new FilterPresetHelper(File(File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder/Filters"), this));
+    filterPresetHelper.reset(new FilterPresetHelper(File(Constants::getBasePresetsDirectory() + "/Filters"), this));
     filterPresetHelper->initialize();
+
+    // menu
+    menuBar.reset(new MenuBarComponent(this));
+    addAndMakeVisible(menuBar.get());
+    setApplicationCommandManagerToWatch(&commandManager);
+    commandManager.registerAllCommandsForTarget(this);
+    addKeyListener(commandManager.getKeyMappings());
     //[/Constructor_pre]
 
     groupOsc.reset (new juce::GroupComponent ("groupOsc",
@@ -84,28 +94,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     groupSpeakers.reset (new juce::GroupComponent ("groupSpeakers",
                                                    TRANS ("Speakers")));
     addAndMakeVisible (groupSpeakers.get());
-
-    comboBoxChannelConfig.reset (new juce::ComboBox ("channelConfig"));
-    addAndMakeVisible (comboBoxChannelConfig.get());
-    comboBoxChannelConfig->setEditableText (false);
-    comboBoxChannelConfig->setJustificationType (juce::Justification::centredLeft);
-    comboBoxChannelConfig->setTextWhenNothingSelected (TRANS ("-"));
-    comboBoxChannelConfig->setTextWhenNoChoicesAvailable (TRANS ("(no choices)"));
-    comboBoxChannelConfig->addListener (this);
-
-    labelPresets.reset (new juce::Label ("labelPresets",
-                                         TRANS ("Presets:")));
-    addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
-    labelPresets->setJustificationType (juce::Justification::centredLeft);
-    labelPresets->setEditable (false, false, false);
-    labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelPresets->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    buttonSave.reset (new juce::TextButton ("buttonSave"));
-    addAndMakeVisible (buttonSave.get());
-    buttonSave->setButtonText (TRANS ("save"));
-    buttonSave->addListener (this);
 
     speakerList.reset (new TableListBox());
     addAndMakeVisible (speakerList.get());
@@ -130,11 +118,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     addAndMakeVisible (buttonMoveUp.get());
     buttonMoveUp->setButtonText (TRANS ("up"));
     buttonMoveUp->addListener (this);
-
-    btnEditMode.reset (new juce::ToggleButton ("btnEditMode"));
-    addAndMakeVisible (btnEditMode.get());
-    btnEditMode->setButtonText (TRANS ("Edit mode"));
-    btnEditMode->addListener (this);
 
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS ("OSC-Port:\n")));
@@ -175,21 +158,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     labelDevelopmentVersion->setColour (juce::Label::outlineColourId, juce::Colours::yellow);
     labelDevelopmentVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelDevelopmentVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    buttonManage.reset (new juce::TextButton ("buttonManage"));
-    addAndMakeVisible (buttonManage.get());
-    buttonManage->setButtonText (TRANS ("manage..."));
-    buttonManage->addListener (this);
-
-    buttonManageFilters.reset (new juce::TextButton ("buttonManageFilters"));
-    addAndMakeVisible (buttonManageFilters.get());
-    buttonManageFilters->setButtonText (TRANS ("manage filters..."));
-    buttonManageFilters->addListener (this);
-
-    buttonCsv.reset (new juce::TextButton ("buttonCsv"));
-    addAndMakeVisible (buttonCsv.get());
-    buttonCsv->setButtonText (TRANS ("import/export"));
-    buttonCsv->addListener (this);
 
     buttonScaling.reset (new juce::TextButton ("buttonScaling"));
     addAndMakeVisible (buttonScaling.get());
@@ -258,7 +226,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 	speakerList->getHeader().resizeAllColumnsToFit(speakerList->getWidth());
     speakerList->setMultipleSelectionEnabled(true);
     speakerList->addMouseListener(this, true);
-	updateComboBox();
 	pPointSelection->addChangeListener(this);
 
     updateUI();
@@ -277,30 +244,25 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     //[Destructor_pre]. You can add your own custom destruction code here..
     pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
-    pPresetHelper->removeActionListener(this);
+    pSpeakerPresetHelper->removeActionListener(this);
+    pDecodingPresetHelper->removeActionListener(this);
     pChannelLayout->removeActionListener(this);
+    commandManager.setFirstCommandTarget(nullptr);
     //[/Destructor_pre]
 
     groupOsc = nullptr;
     groupAmbisonics = nullptr;
     groupSpeakers = nullptr;
-    comboBoxChannelConfig = nullptr;
-    labelPresets = nullptr;
-    buttonSave = nullptr;
     speakerList = nullptr;
     buttonAdd = nullptr;
     buttonRemove = nullptr;
     buttonMoveDown = nullptr;
     buttonMoveUp = nullptr;
-    btnEditMode = nullptr;
     labelOscPort = nullptr;
     labelTimeout = nullptr;
     toggleOsc = nullptr;
     buttonSpeakerTest = nullptr;
     labelDevelopmentVersion = nullptr;
-    buttonManage = nullptr;
-    buttonManageFilters = nullptr;
-    buttonCsv = nullptr;
     buttonScaling = nullptr;
     sliderPort = nullptr;
     sliderTimeout = nullptr;
@@ -327,29 +289,26 @@ void SpeakerSettingsComponent::paint (juce::Graphics& g)
 void SpeakerSettingsComponent::resized()
 {
     //[UserPreResize] Add your own custom resize code here..
+    auto b = getLocalBounds();
+
+    menuBar->setBounds(b.removeFromTop(LookAndFeel::getDefaultLookAndFeel()
+            .getDefaultMenuBarHeight()));
     //[/UserPreResize]
 
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 317)) + 249, ((getWidth() - 16) - 0) - 0, 60);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 317), (getWidth() - 16) - 0, 249);
-    groupSpeakers->setBounds (8, 0, getWidth() - 16, getHeight() - 317);
-    comboBoxChannelConfig->setBounds (8 + 192, 0 + 24, getWidth() - 531, 24);
-    labelPresets->setBounds ((8 + 192) + -8 - 64, 0 + 24, 64, 24);
-    buttonSave->setBounds (8 + (getWidth() - 16) - 224 - 80, 0 + 24, 80, 24);
-    speakerList->setBounds (8 + 8, 0 + 56, (getWidth() - 16) - 16, (getHeight() - 317) - 96);
+    groupSpeakers->setBounds (8, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight() + 8, getWidth() - 16, getHeight() - 317 - LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight() - 8);
+    speakerList->setBounds (8 + 8, LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight() + 8 + 16, (getWidth() - 16) - 16, (getHeight() - 317 - LookAndFeel::getDefaultLookAndFeel().getDefaultMenuBarHeight() - 8 - 16 - 8 - 24 - 8));
     buttonAdd->setBounds ((8 + 8) + 0, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonRemove->setBounds ((8 + 8) + 72, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonMoveDown->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 64, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
     buttonMoveUp->setBounds ((8 + 8) + ((getWidth() - 16) - 16) - 136, (0 + 56) + ((getHeight() - 317) - 96) - -8, 64, 24);
-    btnEditMode->setBounds (8 + 8, 0 + 24, 150, 24);
     labelOscPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 408 - 85, ((0 + (getHeight() - 317)) + 249) + 20, 85, 24);
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 105, ((0 + (getHeight() - 317)) + 249) + 20, 105, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 317)) + 249) + 20, 180, 24);
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 317) - 96) - -8, 120, 24);
     labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
-    buttonManage->setBounds (8 + (getWidth() - 16) - 136 - 80, 0 + 24, 80, 24);
-    buttonManageFilters->setBounds (8 + (getWidth() - 16) - 8 - 120, 0 + 24, 120, 24);
-    buttonCsv->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -8 - 104, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 104, 24);
-    buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80 - 104, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
+    buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 300 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 317)) + 249) + 20, 170, 24);
     toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, 150, 24);
@@ -359,42 +318,12 @@ void SpeakerSettingsComponent::resized()
     //[/UserResized]
 }
 
-void SpeakerSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
-{
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
-    if (comboBoxThatHasChanged == comboBoxChannelConfig.get())
-    {
-        //[UserComboBoxCode_comboBoxChannelConfig] -- add your combo box handling code here..
-		String presetName = comboBoxChannelConfig->getText();
-        pPresetHelper->selectPresetName(presetName);
-
-        //[/UserComboBoxCode_comboBoxChannelConfig]
-    }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
-}
-
 void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
     //[UserbuttonClicked_Pre]
     //[/UserbuttonClicked_Pre]
 
-    if (buttonThatWasClicked == buttonSave.get())
-    {
-        //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = pPresetHelper->tryCreateNewPreset();
-        if(newFile == nullptr)
-                return;
-
-        pPresetHelper->writeToXmlFile(*newFile, pSpeakerSet, pAmbiSettings);
-        comboBoxChannelConfig->setText("", dontSendNotification);
-        delete newFile;
-        //[/UserButtonCode_buttonSave]
-    }
-    else if (buttonThatWasClicked == buttonAdd.get())
+    if (buttonThatWasClicked == buttonAdd.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
         if(pSpeakerSet->size() < pChannelLayout->getNumOutputChannels())
@@ -449,14 +378,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
 		}
         //[/UserButtonCode_buttonMoveUp]
     }
-    else if (buttonThatWasClicked == btnEditMode.get())
-    {
-        //[UserButtonCode_btnEditMode] -- add your button handler code here..
-		pDecoderSettings->editMode = btnEditMode->getToggleState();
-		controlDimming();
-		sendChangeMessage();
-        //[/UserButtonCode_btnEditMode]
-    }
     else if (buttonThatWasClicked == toggleOsc.get())
     {
         //[UserButtonCode_toggleOsc] -- add your button handler code here..
@@ -469,31 +390,6 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
         //[UserButtonCode_buttonSpeakerTest] -- add your button handler code here..
 		pTestSoundGenerator->toggleAutoTest();
         //[/UserButtonCode_buttonSpeakerTest]
-    }
-    else if (buttonThatWasClicked == buttonManage.get())
-    {
-        //[UserButtonCode_buttonManage] -- add your button handler code here..
-        presetManagerDialog.show(this, pPresetHelper);
-        //[/UserButtonCode_buttonManage]
-    }
-    else if (buttonThatWasClicked == buttonManageFilters.get())
-    {
-        //[UserButtonCode_buttonManageFilters] -- add your button handler code here..
-        presetManagerDialog.show(this, filterPresetHelper.get(), false);
-        //[/UserButtonCode_buttonManageFilters]
-    }
-    else if (buttonThatWasClicked == buttonCsv.get())
-    {
-        //[UserButtonCode_buttonCsv] -- add your button handler code here..
-        bool change = ImportExport::importExport(pSpeakerSet, buttonCsv.get(), false);
-        if (change)
-        {
-            sendChangeMessage();
-            controlDimming();
-            speakerList->updateContent();
-            speakerList->repaint();
-        }
-        //[/UserButtonCode_buttonCsv]
     }
     else if (buttonThatWasClicked == buttonScaling.get())
     {
@@ -843,18 +739,7 @@ void SpeakerSettingsComponent::updateUI() const
     multiDecoderControl->repaint();
     multiDecoderControl->refresh();
 
-    btnEditMode->setToggleState(pDecoderSettings->editMode, dontSendNotification);
     toggleMultiDecoder->setToggleState(pAmbiSettings->getMultiDecoderFlag(), dontSendNotification);
-}
-
-void SpeakerSettingsComponent::updateComboBox() const
-{
-	comboBoxChannelConfig->clear();
-	int i = 1;
-	for (File file : pPresetHelper->presetFiles)
-	{
-		comboBoxChannelConfig->addItem(file.getFileNameWithoutExtension(), i++);
-	}
 }
 
 void SpeakerSettingsComponent::changeListenerCallback(ChangeBroadcaster* source)
@@ -879,7 +764,6 @@ void SpeakerSettingsComponent::actionListenerCallback(const String &message)
 {
     if(message == ACTION_MESSAGE_PRESET_LIST_CHANGED)
     {
-        updateComboBox();
     }
     else if(message == ACTION_MESSAGE_PRESET_CHANGED)
     {
@@ -907,13 +791,8 @@ void SpeakerSettingsComponent::controlDimming()
     bool multiselection = pPointSelection->getSelectedIndices().size() > 1;
 
 	groupSpeakers->setEnabled(en);
-	labelPresets->setEnabled(en);
-	comboBoxChannelConfig->setEnabled(en);
 	speakerList->setEnabled(en);
-    buttonCsv->setEnabled(en);
     buttonScaling->setEnabled(en);
-	buttonManage->setEnabled(en);
-	buttonSave->setEnabled(en);
 	buttonAdd->setEnabled(en && pSpeakerSet->size() < pChannelLayout->getNumOutputChannels());
 	buttonRemove->setEnabled(en);
 	buttonMoveUp->setEnabled(en && !multiselection);
@@ -1004,6 +883,298 @@ void SpeakerSettingsComponent::mouseUp(const MouseEvent &event)
     }
 }
 
+//==============================================================================
+StringArray SpeakerSettingsComponent::getMenuBarNames()
+{
+    return { "Speaker", "Decoding", "Filter", "?"};
+}
+
+PopupMenu SpeakerSettingsComponent::getMenuForIndex(int menuIndex, const String& /*menuName*/)
+{
+    PopupMenu menu;
+
+    if (menuIndex == 0)
+    {
+        menu.addCommandItem(&commandManager, CommandIDs::speakerEditMode);
+        menu.addSeparator();
+        menu.addCommandItem(&commandManager, CommandIDs::speakerSavePreset);
+        
+        // load speaker preset
+        PopupMenu loadPresetMenu;
+        for (File file : pSpeakerPresetHelper->presetFiles)
+        {
+            String name = file.getFileNameWithoutExtension();
+            loadPresetMenu.addItem(name, [&, name] { pSpeakerPresetHelper->selectPresetName(name); });
+        }
+        menu.addSubMenu("Load preset", loadPresetMenu);
+
+        menu.addCommandItem(&commandManager, CommandIDs::speakerManagePresets);
+        menu.addSeparator();
+        
+        // import export
+        PopupMenu m;
+        ImportExport::appendSubMenu(&m, MENU_CMD_IMPORTEXPORT_OFFSET);
+        menu.addSubMenu("Import/Export", m);
+    }
+    else if (menuIndex == 1)
+    {
+        menu.addCommandItem(&commandManager, CommandIDs::decodingSavePreset);
+
+        // load speaker preset
+        PopupMenu loadPresetMenu;
+        for (File file : pDecodingPresetHelper->presetFiles)
+        {
+            String name = file.getFileNameWithoutExtension();
+            loadPresetMenu.addItem(name, [&, name] { pDecodingPresetHelper->selectPresetName(name); });
+        }
+        menu.addSubMenu("Load preset", loadPresetMenu);
+
+        menu.addCommandItem(&commandManager, CommandIDs::decodingManagePresets);
+    }
+    else if (menuIndex == 2)
+    {
+        menu.addCommandItem(&commandManager, CommandIDs::filterManagePresets);
+    }
+    else if (menuIndex == 3)
+    {
+        menu.addCommandItem(&commandManager, CommandIDs::backupAllPresets);
+        menu.addCommandItem(&commandManager, CommandIDs::restoreAllPresets);
+        menu.addSeparator();
+        menu.addCommandItem(&commandManager, CommandIDs::about);
+    }
+    return menu;
+}
+
+void SpeakerSettingsComponent::menuItemSelected(int menuItemID, int /*topLevelMenuIndex*/) 
+{
+    if (menuItemID >= MENU_CMD_IMPORTEXPORT_OFFSET && menuItemID <= MENU_CMD_IMPORTEXPORT_OFFSET + ImportExport::idCount())
+    {
+        bool change = ImportExport::handleImportExport(menuItemID, MENU_CMD_IMPORTEXPORT_OFFSET, pSpeakerSet, this, false);
+        if (change)
+        {
+            sendChangeMessage();
+            controlDimming();
+            speakerList->updateContent();
+            speakerList->repaint();
+        }
+    }
+}
+
+//==============================================================================
+// The following methods implement the ApplicationCommandTarget interface, allowing
+// this window to publish a set of actions it can perform, and which can be mapped
+// onto menus, keypresses, etc.
+
+ApplicationCommandTarget* SpeakerSettingsComponent::getNextCommandTarget()
+{
+    return nullptr;// &outerCommandTarget;
+}
+
+void SpeakerSettingsComponent::getAllCommands(Array<CommandID>& c)
+{
+    Array<CommandID> commands{ CommandIDs::speakerEditMode,
+                                CommandIDs::speakerSavePreset,
+                                CommandIDs::speakerManagePresets,
+                                CommandIDs::decodingSavePreset,
+                                CommandIDs::decodingManagePresets,
+                                CommandIDs::filterManagePresets,
+                                CommandIDs::backupAllPresets,
+                                CommandIDs::restoreAllPresets,
+                                CommandIDs::about};
+    c.addArray(commands);
+}
+
+void SpeakerSettingsComponent::getCommandInfo(CommandID commandID, ApplicationCommandInfo& result)
+{
+    switch (commandID)
+    {
+    case CommandIDs::speakerEditMode:
+        result.setInfo("Edit mode", "Toggles edit/presentation mode", "Speaker", 0);
+        result.setTicked(pDecoderSettings->editMode);
+        result.addDefaultKeypress('e', ModifierKeys::ctrlModifier);
+        break;
+    case CommandIDs::speakerSavePreset:
+        result.setInfo("Save preset", "Saves the current speaker arrangement as preset", "Speaker", 0);
+        result.setTicked(false);
+        result.addDefaultKeypress('s', ModifierKeys::ctrlModifier);
+        break;
+    case CommandIDs::speakerManagePresets:
+        result.setInfo("Manage presets...", "Opens the speaker preset manager window", "Speaker", 0);
+        result.setTicked(false);
+        result.addDefaultKeypress('m', ModifierKeys::ctrlModifier);
+        break;
+    case CommandIDs::decodingSavePreset:
+        result.setInfo("Save preset", "Saves the current decoding settings as preset", "Decoding", 0);
+        result.setTicked(false);
+        result.addDefaultKeypress('s', ModifierKeys::altModifier);
+        break;
+    case CommandIDs::decodingManagePresets:
+        result.setInfo("Manage preset...", "Opens the decoding preset manager window", "Decoding", 0);
+        result.setTicked(false);
+        result.addDefaultKeypress('m', ModifierKeys::altModifier);
+        break;
+    case CommandIDs::filterManagePresets:
+        result.setInfo("Manage preset...", "Opens the filter preset manager window", "Filter", 0);
+        result.setTicked(false);
+        result.addDefaultKeypress('f', ModifierKeys::ctrlModifier);
+        break;
+    case CommandIDs::backupAllPresets:
+        result.setInfo("Backup all presets", "Stores all preset files in a ZIP-file", "?", 0);
+        result.setTicked(false);
+        break;
+    case CommandIDs::restoreAllPresets:
+        result.setInfo("Restore all presets", "Restores all presets from a ZIP-file", "?", 0);
+        result.setTicked(false);
+        break;
+    case CommandIDs::about:
+        result.setInfo("About...", "Information about the plugin", "?", 0);
+        result.setTicked(false);
+        break;
+    default:
+        break;
+    }
+}
+
+bool SpeakerSettingsComponent::perform(const InvocationInfo& info)
+{
+    switch (info.commandID)
+    {
+    case CommandIDs::speakerEditMode:
+        pDecoderSettings->editMode = !pDecoderSettings->editMode;
+        controlDimming();
+        sendChangeMessage();
+        break;
+    case CommandIDs::speakerSavePreset:
+        {
+            pSpeakerPresetHelper->tryCreateNewPreset([&](File* newFile) {
+            if (newFile != nullptr)
+            {
+                pSpeakerPresetHelper->writeToXmlFile(*newFile, pSpeakerSet);
+            }
+        });
+        
+        }
+        break;
+    case CommandIDs::speakerManagePresets:
+        presetManagerDialog.show(this, pSpeakerPresetHelper);
+        break;
+    case CommandIDs::decodingSavePreset:
+        {
+        pDecodingPresetHelper->tryCreateNewPreset([&](File* newFile) {
+            if (newFile != nullptr)
+            {
+                pDecodingPresetHelper->writeToXmlFile(*newFile, pAmbiSettings);
+            }
+            });
+        }
+        break;
+    case CommandIDs::decodingManagePresets:
+        presetManagerDialog.show(this, pDecodingPresetHelper);
+        break;
+    case CommandIDs::filterManagePresets:
+        presetManagerDialog.show(this, filterPresetHelper.get(), false);
+        break;
+    case CommandIDs::backupAllPresets:
+        {
+            bool ret = doBackupAllPresets();
+            if (ret == true)
+            {
+                AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "Success", "Backup successful");
+            }
+            else
+            {
+                AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "Backup failed");
+            }
+        }
+        break;
+    case CommandIDs::restoreAllPresets:
+    {
+        bool ret = doRestoreAllPresets();
+        if (ret == true)
+        {
+            AlertWindow::showMessageBoxAsync(AlertWindow::InfoIcon, "Success", "Restore successful");
+        }
+        else
+        {
+            AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "Restore failed");
+        }
+    }
+        break;
+    case CommandIDs::about:
+        break;
+    default:
+        return false;
+    }
+
+    return true;
+}
+
+bool SpeakerSettingsComponent::doBackupAllPresets()
+{
+    FileChooser chooser("Backup to ZIP", File(), "*.zip");
+    bool ok = chooser.browseForFileToSave(true);
+    if (!ok)
+    {
+        return false;
+    }
+
+    if (chooser.getResult().exists())
+    {
+        chooser.getResult().deleteFile();
+    }
+
+    ZipFile::Builder builder;
+    RangedDirectoryIterator it(Constants::getBasePresetsDirectory(), true, "*.xml", File::TypesOfFileToFind::findFiles);
+    for (auto entry : it)
+    {
+        auto f = entry.getFile();
+        builder.addFile(f, 9, f.getRelativePathFrom(Constants::getBasePresetsDirectory()));
+    }
+
+    FileOutputStream stream(chooser.getResult());
+    double progress;
+    return builder.writeToStream(stream, &progress);
+}
+
+bool SpeakerSettingsComponent::doRestoreAllPresets()
+{
+    FileChooser chooser("Restore from ZIP", File(), "*.zip");
+    bool ok = chooser.browseForFileToOpen();
+    if (!ok)
+    {
+        return false;
+    }
+
+    if (!chooser.getResult().exists())
+    {
+        return false;
+    }
+
+    int ret = AlertWindow::showYesNoCancelBox(MessageBoxIconType::QuestionIcon, "Existing presets?", "Import presets and:", "Delete all existing", "Overwrite existing", "Keep existing");
+    // ret 0: keep existing; 1: delete all; 2: overwrite existing
+    if (ret == 1)
+    {
+        // delete all
+        File dir;
+        RangedDirectoryIterator it(File((Constants::getBasePresetsDirectory())), true, "*.xml", File::TypesOfFileToFind::findFiles);
+        for (auto f : it)
+        {
+            f.getFile().deleteFile();
+        }
+    }
+
+    ZipFile zip(chooser.getResult());
+    auto result = zip.uncompressTo(Constants::getBasePresetsDirectory(), ret == 2);
+    if (result.wasOk())
+    {
+        pSpeakerPresetHelper->initialize();
+        pDecodingPresetHelper->initialize();
+        filterPresetHelper->initialize();
+        return true;
+    }
+
+    return false;
+}
 //[/MiscUserCode]
 
 
@@ -1018,8 +1189,8 @@ BEGIN_JUCER_METADATA
 
 <JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
                  componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* _pSpeakerSet, DecoderPresetHelper* _pPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout"
-                 variableInitialisers="pSpeakerSet(_pSpeakerSet), pPresetHelper(_pPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)"
+                 constructorParams="AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout"
+                 variableInitialisers="pSpeakerSet(_pSpeakerSet), pSpeakerPresetHelper(_pSpeakerPresetHelper), pDecodingPresetHelper(_pDecodingPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)"
                  snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
                  fixedSize="0" initialWidth="900" initialHeight="700">
   <BACKGROUND backgroundColour="ff505050"/>
@@ -1033,20 +1204,6 @@ BEGIN_JUCER_METADATA
                   title="Ambisonics"/>
   <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
                   virtualName="" explicitFocusOrder="0" pos="8 0 16M 317M" title="Speakers"/>
-  <COMBOBOX name="channelConfig" id="4b25adf5b07e9492" memberName="comboBoxChannelConfig"
-            virtualName="" explicitFocusOrder="0" pos="192 24 531M 24" posRelativeX="450188aa0f332e78"
-            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
-            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
-  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="-8r 24 64 24" posRelativeX="4b25adf5b07e9492"
-         posRelativeY="450188aa0f332e78" edTextCol="ff000000" edBkgCol="0"
-         labelText="Presets:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="224Rr 24 80 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
   <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
                     virtualName="" explicitFocusOrder="0" pos="8 56 16M 96M" posRelativeX="450188aa0f332e78"
                     posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
@@ -1067,10 +1224,6 @@ BEGIN_JUCER_METADATA
               virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
               posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
               needsCallback="1" radioGroupId="0"/>
-  <TOGGLEBUTTON name="btnEditMode" id="c11c14f07c9141ac" memberName="btnEditMode"
-                virtualName="" explicitFocusOrder="0" pos="8 24 150 24" posRelativeX="450188aa0f332e78"
-                posRelativeY="450188aa0f332e78" buttonText="Edit mode" connectedEdges="0"
-                needsCallback="1" radioGroupId="0" state="0"/>
   <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
          virtualName="" explicitFocusOrder="0" pos="408Rr 20 85 24" posRelativeX="f4cf3a53a6ef0d87"
          posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
@@ -1097,18 +1250,10 @@ BEGIN_JUCER_METADATA
          edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
          editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
          fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
-  <TEXTBUTTON name="buttonManage" id="a4621bea805565b3" memberName="buttonManage"
-              virtualName="" explicitFocusOrder="0" pos="136Rr 24 80 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonManageFilters" id="5b471faa99c7496b" memberName="buttonManageFilters"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 24 120 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="manage filters..."
+  <TEXTBUTTON name="buttonMenu" id="5b471faa99c7496b" memberName="buttonMenu"
+              virtualName="" explicitFocusOrder="0" pos="8Rr 24 40 24" posRelativeX="450188aa0f332e78"
+              posRelativeY="450188aa0f332e78" buttonText="..."
               connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonCsv" id="d9c286724f47cdb0" memberName="buttonCsv"
-              virtualName="" explicitFocusOrder="0" pos="-8r 0 104 24" posRelativeX="5fad387b688247bf"
-              posRelativeY="5fad387b688247bf" buttonText="import/export" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
   <TEXTBUTTON name="buttonScaling" id="d872dac34b0e60ef" memberName="buttonScaling"
               virtualName="" explicitFocusOrder="0" pos="-80r 0 64 24" posRelativeX="5fad387b688247bf"
               posRelativeY="5fad387b688247bf" buttonText="scaling" connectedEdges="0"

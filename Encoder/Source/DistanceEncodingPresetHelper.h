@@ -32,6 +32,9 @@ public:
         
     }
     
+    String UniqueActionMessageSelectPreset() override { return "SelectDistanceEncodingPreset"; }
+    String UniqueActionMessageSavePreset() override { return "SaveDistanceEncodingPreset"; }
+
     bool checkValid(File presetFile) override
     {
         DistanceEncodingParams testInfo;

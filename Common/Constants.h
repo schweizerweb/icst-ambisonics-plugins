@@ -57,4 +57,5 @@ public:
     static bool isNonVisibleVersionPrerelease();
     static String getUiVersionString(bool addBrackets);
     static String getBuildInfo();
+    static String getBasePresetsDirectory();
 };

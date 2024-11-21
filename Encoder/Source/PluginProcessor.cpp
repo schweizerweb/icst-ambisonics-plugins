@@ -494,9 +494,9 @@ void AmbisonicEncoderAudioProcessor::initializeOscSender()
 
 void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &message)
 {
-    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    if(message.startsWith(presetHelper->UniqueActionMessageSelectPreset()))
     {
-        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        File presetFile(message.substring(presetHelper->UniqueActionMessageSelectPreset().length()));
         presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get());
         presetHelper->notifyPresetChanged();
     }

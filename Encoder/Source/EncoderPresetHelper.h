@@ -37,6 +37,9 @@ public:
     {
     }
     
+    String UniqueActionMessageSelectPreset() override { return "SelectEncoderPreset"; }
+    String UniqueActionMessageSavePreset() override { return "SaveEncoderPreset"; }
+
     bool loadFromXmlFile(const File file, AudioParams* pAudioParams, AmbiSourceSet* pSourceSet)
     {
         XmlDocument doc(file);

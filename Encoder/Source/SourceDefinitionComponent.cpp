@@ -369,7 +369,10 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonImportExport.get())
     {
         //[UserButtonCode_buttonAdd] -- add your button handler code here..
-        bool change = ImportExport::importExport(m_args.pSourceSet, buttonImportExport.get(), true);
+        PopupMenu m;
+        ImportExport::appendSubMenu(&m);
+        int ret = m.show();
+        bool change = ImportExport::handleImportExport(ret, 0, m_args.pSourceSet, buttonImportExport.get(), true);
         if (change)
         {
             sendChangeMessage();
@@ -445,13 +448,14 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
     else if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = m_args.pPresetHelper->tryCreateNewPreset();
-        if(newFile == nullptr)
-            return;
-
-        m_args.pPresetHelper->writeToXmlFile(*newFile, m_args.pSourceSet);
-        comboBoxPresets->setText("", dontSendNotification);
-        delete newFile;
+        m_args.pPresetHelper->tryCreateNewPreset([&](File* newFile){
+            if (newFile != nullptr)
+            {
+                m_args.pPresetHelper->writeToXmlFile(*newFile, m_args.pSourceSet);
+                comboBoxPresets->setText("", dontSendNotification);
+                delete newFile;
+            }
+        });
         //[/UserButtonCode_buttonSave]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
