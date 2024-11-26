@@ -399,6 +399,11 @@ void AnimatorActionComponent::refreshControls()
     comboBoxGroup->setSelectedId(pAnimatorAction->groupIndex + 1, dontSendNotification);
     toggleEnable->setToggleState(pAnimatorAction->enabled, dontSendNotification);
 }
+void AnimatorActionComponent::setData(AnimatorAction* pAction)
+{
+    this->pAnimatorAction = pAction;
+    refreshControls();
+}
 //[/MiscUserCode]
 
 

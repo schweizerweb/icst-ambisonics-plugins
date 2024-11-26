@@ -58,10 +58,10 @@ public:
         return element;
     }
     
-    void loadFromXml(XmlElement* element)
+    bool loadFromXml(XmlElement* element)
     {
         if (element == nullptr)
-            return;
+            return false;
 
         actions.clear();
         movements.clear();
@@ -91,5 +91,7 @@ public:
                 }
             }
         }
+
+        return true;
     }
 };

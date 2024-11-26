@@ -229,7 +229,15 @@ void AnimatorMovementComponent::refreshControls()
 
     sliderTime->setValue(pAnimatorMovement->timeSpanSeconds);
     togglePolar->setToggleState(pAnimatorMovement->polarFlag, dontSendNotification);
+    controlDimming();
 }
+
+void AnimatorMovementComponent::setData(AnimatorMovement* pMovement)
+{
+    pAnimatorMovement = pMovement;
+    refreshControls();
+}
+
 void AnimatorMovementComponent::controlDimming()
 {
     bool en = pAnimatorMovement->groupPositions.size() > 0;
