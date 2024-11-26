@@ -44,4 +44,5 @@ public:
     AmbiSettingsSection();
     void writeToPresetXmlElement(XmlElement* xmlElement);
     bool loadFromPresetXml(XmlElement* xmlElement, String defaultName = "-");
+    void setDefault(int index);
 };

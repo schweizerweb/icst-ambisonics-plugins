@@ -20,6 +20,7 @@
 
 
 #include "AmbiSettingsSection.h"
+#include "MultiDecoderColors.h"
 
 AmbiSettingsSection::AmbiSettingsSection(): gain(0), mute(false), speakerMask(0), color(Colours::red)
 {
@@ -43,6 +44,18 @@ bool AmbiSettingsSection::loadFromPresetXml(XmlElement *xmlElement, String defau
     warningFlag = ambiSettings.loadFromPresetXml(xmlElement);
 
     return warningFlag;
+}
+
+void AmbiSettingsSection::setDefault(int index)
+{
+    ambiSettings.setAmbiOrder(DEAFULT_AMBI_ORDER);
+    ambiSettings.setWeightMode(DEFAULT_WEIGHT_MODE);
+    name = String(index + 1);
+    color = MultiDecoderColors::getColor(index);
+    gain = DEFAULT_GAIN_FACTOR;
+    mute = index != 0;
+    speakerMask = 0xffffffffffffffff;
+    filterInfo.init();
 }
 
 void AmbiSettingsSection::writeToPresetXmlElement(XmlElement *xmlElement)

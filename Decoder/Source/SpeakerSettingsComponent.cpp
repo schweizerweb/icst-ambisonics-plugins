@@ -307,7 +307,7 @@ void SpeakerSettingsComponent::resized()
     labelTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 186 - 105, ((0 + (getHeight() - 317)) + 249) + 20, 105, 24);
     toggleOsc->setBounds (((8 + 0) + 0) + 8, ((0 + (getHeight() - 317)) + 249) + 20, 180, 24);
     buttonSpeakerTest->setBounds (proportionOfWidth (0.4982f) - (120 / 2), (0 + 56) + ((getHeight() - 317) - 96) - -8, 120, 24);
-    labelDevelopmentVersion->setBounds (proportionOfWidth (0.5000f) - (proportionOfWidth (0.3986f) / 2), 0, proportionOfWidth (0.3986f), 24);
+    labelDevelopmentVersion->setBounds (getWidth() - 8 - proportionOfWidth(0.3986f), 0, proportionOfWidth (0.3986f), 24);
     buttonScaling->setBounds ((proportionOfWidth (0.4982f) - (120 / 2)) + -80, ((0 + 56) + ((getHeight() - 317) - 96) - -8) + 0, 64, 24);
     sliderPort->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 300 - 100, ((0 + (getHeight() - 317)) + 249) + 20, 100, 24);
     sliderTimeout->setBounds (((8 + 0) + 0) + (((getWidth() - 16) - 0) - 0) - 8 - 170, ((0 + (getHeight() - 317)) + 249) + 20, 170, 24);
@@ -886,7 +886,7 @@ void SpeakerSettingsComponent::mouseUp(const MouseEvent &event)
 //==============================================================================
 StringArray SpeakerSettingsComponent::getMenuBarNames()
 {
-    return { "Speaker", "Decoding", "Filter", "?"};
+    return { "Speaker", "Decoding", "Filter", "Options", "?"};
 }
 
 PopupMenu SpeakerSettingsComponent::getMenuForIndex(int menuIndex, const String& /*menuName*/)
@@ -939,7 +939,9 @@ PopupMenu SpeakerSettingsComponent::getMenuForIndex(int menuIndex, const String&
     {
         menu.addCommandItem(&commandManager, CommandIDs::backupAllPresets);
         menu.addCommandItem(&commandManager, CommandIDs::restoreAllPresets);
-        menu.addSeparator();
+    }
+    else if (menuIndex == 4)
+    {
         menu.addCommandItem(&commandManager, CommandIDs::about);
     }
     return menu;

@@ -127,8 +127,14 @@ void MultiDecoderComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved
 {
     if (sliderThatWasMoved == sliderDecoderCount.get())
     {
+        int oldCount = pAmbiSettings->getUsedDecoderCount();
+        for (int i = oldCount; i < sliderDecoderCount->getValue(); i++)
+        {
+            pAmbiSettings->multiDecoderSections[i].setDefault(i);
+        }
+
         pAmbiSettings->setUsedDecoderCount((int)sliderDecoderCount->getValue());
-        updateUI();
+        refresh();
     }
 }
 
