@@ -66,7 +66,7 @@ AnimatorMovementComponent::AnimatorMovementComponent (AmbiSourceSet* _pSourceSet
     labelG.reset (new juce::Label ("new label",
                                    TRANS("G:")));
     addAndMakeVisible (labelG.get());
-    labelG->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelG->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelG->setJustificationType (juce::Justification::centredLeft);
     labelG->setEditable (false, false, false);
     labelG->setColour (juce::TextEditor::textColourId, juce::Colours::black);

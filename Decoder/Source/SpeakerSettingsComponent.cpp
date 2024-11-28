@@ -122,7 +122,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS ("OSC-Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelOscPort->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelOscPort->setJustificationType (juce::Justification::centredLeft);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -131,7 +131,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     labelTimeout.reset (new juce::Label ("labelTimeout",
                                          TRANS ("Timeout [ms]:")));
     addAndMakeVisible (labelTimeout.get());
-    labelTimeout->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelTimeout->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelTimeout->setJustificationType (juce::Justification::centredLeft);
     labelTimeout->setEditable (false, false, false);
     labelTimeout->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -150,7 +150,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
                                                     TRANS ("Unofficial Pre-Release")));
     addAndMakeVisible (labelDevelopmentVersion.get());
-    labelDevelopmentVersion->setFont (juce::Font (juce::FontOptions("Regular", 25.00f, juce::Font::plain)));
+    labelDevelopmentVersion->setFont (juce::Font (juce::FontOptions(25.00f, juce::Font::plain)));
     labelDevelopmentVersion->setJustificationType (juce::Justification::centred);
     labelDevelopmentVersion->setEditable (false, false, false);
     labelDevelopmentVersion->setColour (juce::Label::backgroundColourId, juce::Colour (0xbded0d0d));

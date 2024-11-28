@@ -56,7 +56,7 @@ OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, Encod
     labelInterval.reset (new juce::Label ("labelInterval",
                                           TRANS("Interval [ms]:")));
     addAndMakeVisible (labelInterval.get());
-    labelInterval->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelInterval->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelInterval->setJustificationType (juce::Justification::centredRight);
     labelInterval->setEditable (false, false, false);
     labelInterval->setColour (juce::TextEditor::textColourId, juce::Colours::black);

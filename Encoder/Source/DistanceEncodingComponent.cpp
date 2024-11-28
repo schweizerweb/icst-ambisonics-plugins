@@ -58,7 +58,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelUnitCircleRadius.reset (new juce::Label ("labelUnitCircleRadius",
                                                   TRANS("Unit Circle Radius")));
     addAndMakeVisible (labelUnitCircleRadius.get());
-    labelUnitCircleRadius->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelUnitCircleRadius->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelUnitCircleRadius->setJustificationType (juce::Justification::centredLeft);
     labelUnitCircleRadius->setEditable (false, false, false);
     labelUnitCircleRadius->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -69,7 +69,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelEncodingMode.reset (new juce::Label ("labelEncodingMode",
                                               TRANS("Encoding Mode")));
     addAndMakeVisible (labelEncodingMode.get());
-    labelEncodingMode->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelEncodingMode->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelEncodingMode->setJustificationType (juce::Justification::centredLeft);
     labelEncodingMode->setEditable (false, false, false);
     labelEncodingMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -95,7 +95,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelDbUnit.reset (new juce::Label ("labelDbUnit",
                                         TRANS("dB Unit")));
     addAndMakeVisible (labelDbUnit.get());
-    labelDbUnit->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelDbUnit->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelDbUnit->setJustificationType (juce::Justification::centredLeft);
     labelDbUnit->setEditable (false, false, false);
     labelDbUnit->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -113,7 +113,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelDistanceAttenuation.reset (new juce::Label ("labelDistanceAttenuation",
                                                      TRANS("Distance Attenuation")));
     addAndMakeVisible (labelDistanceAttenuation.get());
-    labelDistanceAttenuation->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelDistanceAttenuation->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelDistanceAttenuation->setJustificationType (juce::Justification::centredLeft);
     labelDistanceAttenuation->setEditable (false, false, false);
     labelDistanceAttenuation->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -131,7 +131,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelCenterCurve.reset (new juce::Label ("labelCenterCurve",
                                              TRANS("Center Curve")));
     addAndMakeVisible (labelCenterCurve.get());
-    labelCenterCurve->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelCenterCurve->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCenterCurve->setJustificationType (juce::Justification::centredLeft);
     labelCenterCurve->setEditable (false, false, false);
     labelCenterCurve->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -149,7 +149,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelAdvancedFact.reset (new juce::Label ("labelAdvancedFact",
                                               TRANS("Advanced Factor")));
     addAndMakeVisible (labelAdvancedFact.get());
-    labelAdvancedFact->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelAdvancedFact->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelAdvancedFact->setJustificationType (juce::Justification::centredLeft);
     labelAdvancedFact->setEditable (false, false, false);
     labelAdvancedFact->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -167,7 +167,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelAdvancedExponent.reset (new juce::Label ("labelAdvancedExponent",
                                                   TRANS("Advanced Exponent")));
     addAndMakeVisible (labelAdvancedExponent.get());
-    labelAdvancedExponent->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelAdvancedExponent->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelAdvancedExponent->setJustificationType (juce::Justification::centredLeft);
     labelAdvancedExponent->setEditable (false, false, false);
     labelAdvancedExponent->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -186,7 +186,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelPresets.reset (new juce::Label ("labelPresets",
                                          TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelPresets->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
     labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -200,7 +200,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelAirAbsorbtionMode.reset (new juce::Label ("labelAirAbsorbtionMode",
                                                    TRANS("Mode")));
     addAndMakeVisible (labelAirAbsorbtionMode.get());
-    labelAirAbsorbtionMode->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelAirAbsorbtionMode->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelAirAbsorbtionMode->setJustificationType (juce::Justification::centredLeft);
     labelAirAbsorbtionMode->setEditable (false, false, false);
     labelAirAbsorbtionMode->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -224,7 +224,7 @@ DistanceEncodingComponent::DistanceEncodingComponent (DistanceEncodingParams* _p
     labelIntensity.reset (new juce::Label ("labelIntensity",
                                            TRANS("Intensity")));
     addAndMakeVisible (labelIntensity.get());
-    labelIntensity->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelIntensity->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelIntensity->setJustificationType (juce::Justification::centredLeft);
     labelIntensity->setEditable (false, false, false);
     labelIntensity->setColour (juce::TextEditor::textColourId, juce::Colours::black);

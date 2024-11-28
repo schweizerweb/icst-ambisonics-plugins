@@ -76,7 +76,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     labelQ.reset (new juce::Label ("labelQ",
                                    TRANS("Q")));
     addAndMakeVisible (labelQ.get());
-    labelQ->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelQ->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelQ->setJustificationType (juce::Justification::centred);
     labelQ->setEditable (false, false, false);
     labelQ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -85,7 +85,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     labelGain.reset (new juce::Label ("labelGain",
                                       TRANS("Gain")));
     addAndMakeVisible (labelGain.get());
-    labelGain->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelGain->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelGain->setJustificationType (juce::Justification::centred);
     labelGain->setEditable (false, false, false);
     labelGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);

@@ -52,7 +52,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     labelVersion.reset (new juce::Label ("labelVersion",
                                          TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelVersion->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelVersion->setJustificationType (juce::Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);

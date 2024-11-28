@@ -108,7 +108,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelDistanceScaler.reset (new juce::Label ("labelDistanceScaler",
                                                 TRANS("Distance Scaler:")));
     addAndMakeVisible (labelDistanceScaler.get());
-    labelDistanceScaler->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelDistanceScaler->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelDistanceScaler->setJustificationType (juce::Justification::centredLeft);
     labelDistanceScaler->setEditable (false, false, false);
     labelDistanceScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -124,7 +124,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelMasterGain.reset (new juce::Label ("labelMasterGain",
                                             TRANS("Master Gain [dB]:")));
     addAndMakeVisible (labelMasterGain.get());
-    labelMasterGain->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelMasterGain->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelMasterGain->setJustificationType (juce::Justification::centredLeft);
     labelMasterGain->setEditable (false, false, false);
     labelMasterGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -150,7 +150,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelPresets.reset (new juce::Label ("labelPresets",
                                          TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelPresets->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
     labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -173,7 +173,7 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     labelAmbiOrder.reset (new juce::Label ("labelAmbiOrder",
                                            TRANS("Ambisonics order:")));
     addAndMakeVisible (labelAmbiOrder.get());
-    labelAmbiOrder->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelAmbiOrder->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelAmbiOrder->setJustificationType (juce::Justification::centredLeft);
     labelAmbiOrder->setEditable (false, false, false);
     labelAmbiOrder->setColour (juce::TextEditor::textColourId, juce::Colours::black);

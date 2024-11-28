@@ -48,7 +48,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, Sta
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS("Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelOscPort->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelOscPort->setJustificationType (juce::Justification::centredRight);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);

@@ -44,7 +44,7 @@ MultiDecoderComponent::MultiDecoderComponent (AmbiSettingsCollection* _pAmbiSett
     labelDecoderCount.reset (new juce::Label ("labelDecoderCount",
                                               TRANS ("# Decoders:")));
     addAndMakeVisible (labelDecoderCount.get());
-    labelDecoderCount->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelDecoderCount->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelDecoderCount->setJustificationType (juce::Justification::centredLeft);
     labelDecoderCount->setEditable (false, false, false);
     labelDecoderCount->setColour (juce::TextEditor::textColourId, juce::Colours::black);

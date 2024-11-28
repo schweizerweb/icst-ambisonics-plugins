@@ -34,7 +34,7 @@ AmbiSettingsComponent::AmbiSettingsComponent(AmbiSettings* _pAmbiSettings, Chang
     labelChannelWeights.reset(new juce::Label("labelChannelWeights",
         TRANS("Channel weights:")));
     addAndMakeVisible(labelChannelWeights.get());
-    labelChannelWeights->setFont(juce::Font(juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelChannelWeights->setFont(juce::Font(juce::FontOptions(15.00f, juce::Font::plain)));
     labelChannelWeights->setJustificationType(juce::Justification::centredLeft);
     labelChannelWeights->setEditable(false, false, false);
     labelChannelWeights->setColour(juce::TextEditor::textColourId, juce::Colours::black);
@@ -51,7 +51,7 @@ AmbiSettingsComponent::AmbiSettingsComponent(AmbiSettings* _pAmbiSettings, Chang
     labelAmbiOrder.reset(new juce::Label("labelAmbiOrder",
         TRANS("Ambisonics order:")));
     addAndMakeVisible(labelAmbiOrder.get());
-    labelAmbiOrder->setFont(juce::Font(juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelAmbiOrder->setFont(juce::Font(juce::FontOptions(15.00f, juce::Font::plain)));
     labelAmbiOrder->setJustificationType(juce::Justification::centredLeft);
     labelAmbiOrder->setEditable(false, false, false);
     labelAmbiOrder->setColour(juce::TextEditor::textColourId, juce::Colours::black);

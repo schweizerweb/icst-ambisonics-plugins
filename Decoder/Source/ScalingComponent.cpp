@@ -39,7 +39,7 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* _
     labelRoomSize.reset (new juce::Label ("new label",
                                           TRANS("Room size")));
     addAndMakeVisible (labelRoomSize.get());
-    labelRoomSize->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelRoomSize->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRoomSize->setJustificationType (juce::Justification::centredLeft);
     labelRoomSize->setEditable (false, false, false);
     labelRoomSize->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -68,7 +68,7 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* _
     labelX.reset (new juce::Label ("new label",
                                    TRANS("X:")));
     addAndMakeVisible (labelX.get());
-    labelX->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelX->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelX->setJustificationType (juce::Justification::centredLeft);
     labelX->setEditable (false, false, false);
     labelX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -79,7 +79,7 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* _
     labelY.reset (new juce::Label ("new label",
                                    TRANS("Y:")));
     addAndMakeVisible (labelY.get());
-    labelY->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelY->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelY->setJustificationType (juce::Justification::centredLeft);
     labelY->setEditable (false, false, false);
     labelY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -99,7 +99,7 @@ ScalingComponent::ScalingComponent (ChangeListener* pListener, AmbiSpeakerSet* _
     labelZ.reset (new juce::Label ("new label",
                                    TRANS("Z:")));
     addAndMakeVisible (labelZ.get());
-    labelZ->setFont (juce::Font (juce::FontOptions("Regular", 15.00f, juce::Font::plain)));
+    labelZ->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelZ->setJustificationType (juce::Justification::centredLeft);
     labelZ->setEditable (false, false, false);
     labelZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
