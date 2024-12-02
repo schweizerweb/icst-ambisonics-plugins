@@ -453,7 +453,6 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
             {
                 m_args.pPresetHelper->writeToXmlFile(*newFile, m_args.pSourceSet);
                 comboBoxPresets->setText("", dontSendNotification);
-                delete newFile;
             }
         });
         //[/UserButtonCode_buttonSave]

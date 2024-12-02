@@ -449,7 +449,6 @@ void DistanceEncodingComponent::buttonClicked (juce::Button* buttonThatWasClicke
             {
                 pPresetHelper->writeToXmlFile(*newFile, pParams);
                 comboBoxDistanceEncodingPreset->setText("", dontSendNotification);
-                delete newFile;
             }
         });
         //[/UserButtonCode_buttonSave]

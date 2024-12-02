@@ -227,7 +227,6 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
             {
                 pPresetHelper->writeToXmlFile(*newFile, pFilterBankInfo);
                 comboBoxFilterPreset->setText("", dontSendNotification);
-                delete newFile;
             }
         });
         
