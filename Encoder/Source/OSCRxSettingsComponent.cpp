@@ -351,7 +351,7 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
         if(index < 0 || index >= pSettings->customOscInput.size())
             return;
 
-        pCustomOscRxPresetHelper->tryCreateNewPreset([&](File* f){
+        pCustomOscRxPresetHelper->tryCreateNewPreset([&,index](File* f){
             if(f != nullptr)
             {
                 pCustomOscRxPresetHelper->writeToXmlFile(*f, pSettings->customOscInput[index]);

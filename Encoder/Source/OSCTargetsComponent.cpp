@@ -285,7 +285,7 @@ void OSCTargetsComponent::actionListenerCallback(const String& message)
         if(index < 0 || index >= pSettings->customOscTargets.size())
             return;
 
-        pCustomOscTxPresetHelper->tryCreateNewPreset([&](File* f) { pCustomOscTxPresetHelper->writeToXmlFile(*f, pSettings->customOscTargets[index]); });
+        pCustomOscTxPresetHelper->tryCreateNewPreset([&,index](File* f) { pCustomOscTxPresetHelper->writeToXmlFile(*f, pSettings->customOscTargets[index]); });
     }
 }
 
