@@ -993,32 +993,32 @@ void SpeakerSettingsComponent::getCommandInfo(CommandID commandID, ApplicationCo
     case CommandIDs::speakerEditMode:
         result.setInfo("Edit mode", "Toggles edit/presentation mode", "Speaker", 0);
         result.setTicked(pDecoderSettings->editMode);
-        result.addDefaultKeypress('e', ModifierKeys::ctrlModifier);
+        //result.addDefaultKeypress('e', ModifierKeys::ctrlModifier);
         break;
     case CommandIDs::speakerSavePreset:
         result.setInfo("Save preset", "Saves the current speaker arrangement as preset", "Speaker", 0);
         result.setTicked(false);
-        result.addDefaultKeypress('s', ModifierKeys::ctrlModifier);
+        //result.addDefaultKeypress('s', ModifierKeys::ctrlModifier);
         break;
     case CommandIDs::speakerManagePresets:
         result.setInfo("Manage presets...", "Opens the speaker preset manager window", "Speaker", 0);
         result.setTicked(false);
-        result.addDefaultKeypress('m', ModifierKeys::ctrlModifier);
+        //result.addDefaultKeypress('m', ModifierKeys::ctrlModifier);
         break;
     case CommandIDs::decodingSavePreset:
         result.setInfo("Save preset", "Saves the current decoding settings as preset", "Decoding", 0);
         result.setTicked(false);
-        result.addDefaultKeypress('s', ModifierKeys::altModifier);
+        //result.addDefaultKeypress('s', ModifierKeys::altModifier);
         break;
     case CommandIDs::decodingManagePresets:
         result.setInfo("Manage preset...", "Opens the decoding preset manager window", "Decoding", 0);
         result.setTicked(false);
-        result.addDefaultKeypress('m', ModifierKeys::altModifier);
+        //result.addDefaultKeypress('m', ModifierKeys::altModifier);
         break;
     case CommandIDs::filterManagePresets:
         result.setInfo("Manage preset...", "Opens the filter preset manager window", "Filter", 0);
         result.setTicked(false);
-        result.addDefaultKeypress('f', ModifierKeys::ctrlModifier);
+        //result.addDefaultKeypress('f', ModifierKeys::ctrlModifier);
         break;
     case CommandIDs::backupAllPresets:
         result.setInfo("Backup all presets", "Stores all preset files in a ZIP-file", "?", 0);
