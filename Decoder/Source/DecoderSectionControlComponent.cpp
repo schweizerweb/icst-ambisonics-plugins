@@ -229,7 +229,9 @@ void DecoderSectionControlComponent::buttonClicked(Button* btn)
     }
     else if (btn == filterButton.get())
     {
-        CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), getScreenBounds(), nullptr);
+        auto topComponent = getParentComponent()->getParentComponent();
+        auto relPos = topComponent->getScreenPosition();
+        CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), this->getScreenBounds().translated(-relPos.getX(), -relPos.getY()), topComponent);
     }
 
     controlDimming();
