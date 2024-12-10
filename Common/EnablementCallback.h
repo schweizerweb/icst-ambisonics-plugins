@@ -20,13 +20,9 @@
 
 
 #pragma once
-#include "EnablementCallback.h"
 
-class SoloMuteCallback : public EnablementCallback
+class EnablementCallback
 {
 public:
-	virtual bool getMute(int rowNumber) = 0;
-	virtual void setMute(int rowNumber, bool newValue) = 0;
-	virtual bool getSolo(int rowNumber) = 0;
-	virtual void setSolo(int rowNumber, bool newValue) = 0;
+    virtual bool getEnabled(const int columnId, const int rowNumber) = 0;
 };

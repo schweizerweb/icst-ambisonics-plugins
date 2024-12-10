@@ -588,7 +588,7 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
         if(checkBox == nullptr)
             checkBox = new SoloMuteCustomComponent(*this);
 
-        checkBox->setRow(rowNumber);
+        checkBox->setRowAndColumn(rowNumber, columnId);
         return checkBox;
     }
     else if(columnId == COLUMN_ID_COLOR)

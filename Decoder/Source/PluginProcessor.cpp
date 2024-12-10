@@ -333,12 +333,12 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
             inputBufferPointers[0][iChannel] = inputBuffers[0]->getReadPointer(iChannel);
     }
 
-    bool anySolo = speakerSet->anySolo();
+    bool soloOnly = speakerSet->anySolo();
 
     for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		AmbiSpeaker* pt = speakerSet->get(iSpeaker);
-        if (pt == nullptr || pt->getMute() || (anySolo && !pt->getSolo()))
+        if (pt == nullptr || ((pt->getMute() || soloOnly) && !pt->getSolo()))
         {
             buffer.clear(iSpeaker, 0, buffer.getNumSamples());
             if (analyzer->isActive(iSpeaker))

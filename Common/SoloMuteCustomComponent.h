@@ -63,13 +63,14 @@ public:
         }
     }
 
-    void setRow(const int newRow)
+    void setRowAndColumn(const int newRow, const int newColumn)
     {
         row = newRow;
+        columnId = newColumn;
         btnMute.setToggleState(owner.getMute(row), dontSendNotification);
         btnSolo.setToggleState(owner.getSolo(row), dontSendNotification);
-        //bool enabled = owner.getEnabled(columnId, row);
-        //setEnabled(enabled);
+        bool enabled = owner.getEnabled(columnId, row);
+        setEnabled(enabled);
     }
 
 private:
@@ -84,7 +85,7 @@ private:
     TextButton btnMute;
     TextButton btnSolo;
     SoloMuteCallback& owner;
-    int row;
+    int row, columnId;
     Colour textColour;
 };
 

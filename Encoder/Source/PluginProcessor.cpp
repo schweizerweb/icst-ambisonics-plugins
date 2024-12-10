@@ -269,8 +269,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		AmbiSource* source = sources->get(iSource);
 		if (source == nullptr
             || !source->getEnabled()
-            || source->getMute()
-            || (soloOnly && !source->getSolo()))
+            || ((source->getMute() || soloOnly) && !source->getSolo()))
 			continue;
 
         Vector3D<double> sourceVector = sources->getAbsSourcePoint(iSource);

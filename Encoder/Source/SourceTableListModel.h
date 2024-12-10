@@ -26,11 +26,13 @@
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/ColorEditorCustomComponent.h"
+#include "../../Common/SoloMuteCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ScalingInfo.h"
 #include "../../Common/ColorDefinition.h"
 #include "../../Common/ChannelLayout.h"
+#include "../../Common/SoloMuteCallback.h"
 
 #define COLUMN_ID_NB        2
 #define COLUMN_ID_NAME        3
@@ -47,7 +49,7 @@
 #define COLUMN_ID_ENABLED       1
 
 
-class SourceTableListModel : public TableListBoxModel, public TableColumnCallback, public ChangeListener
+class SourceTableListModel : public TableListBoxModel, public SoloMuteCallback, public TableColumnCallback, public ChangeListener
 {
 public:
     SourceTableListModel(AmbiSourceSet* _pSources, PointSelection* _pPointSelection, Component* _pParentComponent, ScalingInfo* _pScaling, ChannelLayout* _pChannelLayout) : pSources(_pSources), pPointSelection(_pPointSelection), pParentComponent(_pParentComponent), pTableListBox(nullptr), pScalingInfo(_pScaling), pChannelLayout(_pChannelLayout)
@@ -69,7 +71,7 @@ public:
         tableListBox->getHeader().addColumn("A", COLUMN_ID_A, 50);
         tableListBox->getHeader().addColumn("E", COLUMN_ID_E, 50);
         tableListBox->getHeader().addColumn("D", COLUMN_ID_D, 50);
-        tableListBox->getHeader().addColumn("Mute", COLUMN_ID_MUTE, 40);
+        tableListBox->getHeader().addColumn("M & S", COLUMN_ID_MUTE, 50);
         tableListBox->getHeader().addColumn("Solo", COLUMN_ID_SOLO, 40);
         tableListBox->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
         tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
@@ -190,9 +192,7 @@ private:
             colorBox->setRowAndColumn(rowNumber, columnId);
             return colorBox;
         }
-        else if (columnId == COLUMN_ID_ENABLED
-                 || columnId == COLUMN_ID_MUTE
-                 || columnId == COLUMN_ID_SOLO)
+        else if (columnId == COLUMN_ID_ENABLED)
         {
             CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*>(existingComponentToUpdate);
             if(checkBox == nullptr)
@@ -201,7 +201,16 @@ private:
             checkBox->setRowAndColumn(rowNumber, columnId);
             return checkBox;
         }
-        
+        else if (columnId == COLUMN_ID_MUTE)
+        {
+            SoloMuteCustomComponent* checkBox = static_cast<SoloMuteCustomComponent*>(existingComponentToUpdate);
+            if (checkBox == nullptr)
+                checkBox = new SoloMuteCustomComponent(*this);
+
+            checkBox->setRowAndColumn(rowNumber, columnId);
+            return checkBox;
+        }
+
         return nullptr;
     }
 
@@ -214,8 +223,6 @@ private:
         switch (columnId)
         {
         case COLUMN_ID_GAIN: return Decibels::gainToDecibels(pt->getGain());
-        case COLUMN_ID_MUTE: return pt->getMute();
-        case COLUMN_ID_SOLO: return pt->getSolo();
         case COLUMN_ID_X: return pt->getRawPoint()->getX();
         case COLUMN_ID_Y: return pt->getRawPoint()->getY();
         case COLUMN_ID_Z: return pt->getRawPoint()->getZ();
@@ -237,13 +244,40 @@ private:
         return (pt != nullptr && pt->getEnabled());
     }
 
+    // Inherited via SoloMuteCallback
+    bool SourceTableListModel::getMute(int rowNumber)
+    {
+        AmbiPoint* pt = pSources->get(rowNumber);
+        if (pt == nullptr)
+            return false;
+
+        return pt->getMute();
+    }
+
+    void SourceTableListModel::setMute(int rowNumber, bool newValue)
+    {
+        pSources->setMute(rowNumber, newValue);
+    }
+
+    bool SourceTableListModel::getSolo(int rowNumber)
+    {
+        AmbiPoint* pt = pSources->get(rowNumber);
+        if (pt == nullptr)
+            return false;
+
+        return pt->getSolo();
+    }
+
+    void SourceTableListModel::setSolo(int rowNumber, bool newValue)
+    {
+        pSources->setSolo(rowNumber, newValue);
+    }
+
     void setValue(int columnId, int rowNumber, double newValue) override
     {
         switch (columnId)
         {
         case COLUMN_ID_GAIN: pSources->setGain(rowNumber, Decibels::decibelsToGain(newValue)); break;
-        case COLUMN_ID_MUTE: pSources->setMute(rowNumber, !exactlyEqual(newValue, 0.0)); break;
-        case COLUMN_ID_SOLO: pSources->setSolo(rowNumber, !exactlyEqual(newValue, 0.0)); break;
         case COLUMN_ID_X: pSources->setX(rowNumber, newValue); break;
         case COLUMN_ID_Y: pSources->setY(rowNumber, newValue); break;
         case COLUMN_ID_Z: pSources->setZ(rowNumber, newValue); break;

@@ -199,7 +199,7 @@ void DecoderSectionControlComponent::showFilterEditor(int /*rowNumber*/, Rectang
 {
     auto topComponent = getParentComponent()->getParentComponent();
     auto relPos = topComponent->getScreenPosition();
-    CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), this->getScreenBounds().translated(-relPos.getX(), -relPos.getY()), topComponent);
+    CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), screenBounds.translated(-relPos.getX(), -relPos.getY()), topComponent);
 }
 
 

@@ -33,7 +33,7 @@
 #define XML_ATTRIBUTE_POINT_MUTE "Mute"
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
-#define MUTE_ALPHA 0.5f
+#define MUTE_ALPHA 0.7f
 #define LABEL_COLOR Colours::black
 
 class AmbiGroup;
@@ -79,9 +79,7 @@ public:
 	void setAlive(int64 currentTimeMillis);
 	
     Image* getLabelImage();
-    Image* getLabelImage(Colour col);
-	void ensureLabelImage();
-	void ensureLabelImage(Colour col);
+	void ensureLabelImage(bool force = false);
     
     void setGroup(AmbiGroup* pG);
     AmbiGroup* getGroup();

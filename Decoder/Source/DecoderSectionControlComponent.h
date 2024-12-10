@@ -70,8 +70,8 @@ private:
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DecoderSectionControlComponent)
 
-        // Inherited via TableColumnCallback
-        double getValue(int columnId, int rowNumber) override;
+    // Inherited via TableColumnCallback
+    double getValue(int columnId, int rowNumber) override;
     void setValue(int columnId, int rowNumber, double newValue) override;
     SliderRange getSliderRange(int columnId) override;
     TableListBox* getTable() override;

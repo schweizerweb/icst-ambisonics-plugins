@@ -21,9 +21,10 @@
 
 #pragma once
 #include "SliderRange.h"
+#include "EnablementCallback.h"
 #include "JuceHeader.h"
 
-class TableColumnCallback
+class TableColumnCallback : public EnablementCallback
 {
 public:
 	virtual ~TableColumnCallback() = default;
@@ -33,6 +34,4 @@ public:
 	virtual TableListBox* getTable() = 0;
 	virtual String getTableText(const int columnId, const int rowNumber) = 0;
 	virtual void setTableText(const int columnId, const int rowNumber, const String& newText) = 0;
-    virtual bool getEnabled(const int columnId, const int rowNumber) = 0;
-
 };
