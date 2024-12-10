@@ -20,28 +20,16 @@
 
 
 #pragma once
-#include "AmbiPoint.h"
 #include "FilterBankInfo.h"
+#include "JuceHeader.h"
 
-class AmbiSpeaker : public AmbiPoint
+class FilterControlCallback
 {
 public:
-	
-	virtual ~AmbiSpeaker() = default;
-	AmbiSpeaker(AmbiSpeaker* other, bool copyImage = false);
-	AmbiSpeaker(String id, Point3D<double> _point, String _name, Colour _color = Colour(), double _gain = 1.0);
-	AmbiSpeaker(XmlElement* element);
-
-	FilterBankInfo* getFilterInfo();
-    bool getFilterBypass() const;
-    void setFilterBypass(bool byPass);
-    
-	float getDisplayScaler() override;
-	XmlElement* getAsXmlElement(String tagName) override;
-
-    bool allowMute() const override { return true; }
-    bool allowSolo() const override { return true; }
-    
-private:
-	FilterBankInfo filterInfo;
+    virtual bool getBypass(int rowNumber) = 0;
+    virtual void setBypass(int rowNumber, bool newValue) = 0;
+    virtual FilterBankInfo* getFilterInfo(int rowNumber) = 0;
+    virtual dsp::ProcessSpec* getFilterSpecification() = 0;
+    virtual void showFilterEditor(int rowNumber, Rectangle<int> screenBounds) = 0;
 };
+

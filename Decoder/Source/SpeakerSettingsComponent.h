@@ -40,6 +40,7 @@
 #include "../../Common/PresetManagerDialog.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
+#include "../../Common/FilterControlCallback.h"
 //[/Headers]
 
 
@@ -52,12 +53,14 @@
     Describe your class and how it works here!
                                                                     //[/Comments]
 */
+
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
                                   public ChangeListener,
                                   public ActionBroadcaster,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
+                                  public FilterControlCallback,
                                   ActionListener,
                                   public juce::Button::Listener,
                                   public juce::Slider::Listener,
@@ -84,8 +87,8 @@ public:
 	void setTableText(const int columnId, const int rowNumber, const String& newText) override;
 	void setValue(int columnId, int rowNumber, double newValue) override;
 	double getValue(int columnId, int rowNumber) override;
-    void setFlag(int columnId, int rowNumber, bool newValue) const;
-    bool getFlag(int columnId, int rowNumber) const;
+    void setBypass(int rowNumber, bool newValue) override;
+    bool getBypass(int rowNumber) override;
 	void speakerTest(int rowNumber) const;
 	TableListBox* getTable() override;
     SliderRange getSliderRange(int columnId) override;
@@ -95,8 +98,9 @@ public:
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
 	void updateUI() const;
-	FilterBankInfo* getFilterInfo(int rowNumber) const;
-	dsp::ProcessSpec* getFilterSpecification() const;
+	FilterBankInfo* getFilterInfo(int rowNumber) override;
+	dsp::ProcessSpec* getFilterSpecification() override;
+    void showFilterEditor(int rowNumber, Rectangle<int> screenBounds) override;
 	void controlDimming();
     FilterPresetHelper* getFilterPresetHelper() const;
     void mouseUp(const MouseEvent &event) override;

@@ -61,11 +61,8 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     weightingButton->setButtonText("W");
     weightingButton->addListener(this);
 
-    filterButton.reset(new juce::TextButton("btnFilter", "F"));
-    addAndMakeVisible(filterButton.get());
-    filterButton->addListener(this);
-    filterButton->setClickingTogglesState(false);
-    filterButton->setColour(TextButton::ColourIds::buttonOnColourId, Colours::green);
+    filterComponent.reset(new CheckBoxFilterCustomComponent(*this));
+    addAndMakeVisible(filterComponent.get());
 
     setLookAndFeel(&ambiLookAndFeel);
     
@@ -86,7 +83,7 @@ DecoderSectionControlComponent::~DecoderSectionControlComponent()
     pointsButton = nullptr;
     orderButton = nullptr;
     weightingButton = nullptr;
-    filterButton = nullptr;
+    filterComponent = nullptr;
 }
 
 void DecoderSectionControlComponent::controlDimming()
@@ -115,9 +112,8 @@ void DecoderSectionControlComponent::controlDimming()
     weightingButton->setButtonText(mode == AmbiSettings::BASIC ? "basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "manual")));
     weightingButton->setTooltip("Weighting: " + String(mode == AmbiSettings::BASIC ? "basic" : (mode == AmbiSettings::INPHASE ? "inPhase" : (mode == AmbiSettings::MAXRE ? "maxRe" : "manual"))));
 
-    int nbActiveFilters = pAmbiSettings->filterInfo.getFilterBypass() ? 0 : pAmbiSettings->filterInfo.filterCount();
-    filterButton->setButtonText(nbActiveFilters > 0 ? "Filter (" + String(nbActiveFilters) + ")" : "Filter OFF");
-    filterButton->setTooltip(nbActiveFilters > 0 ? "Filter (" + String(nbActiveFilters) + " individual filters active)" : "No filters active");
+    //int nbActiveFilters = pAmbiSettings->filterInfo.getFilterBypass() ? 0 : pAmbiSettings->filterInfo.filterCount();
+    //filterButton->setTooltip(nbActiveFilters > 0 ? "Filter (" + String(nbActiveFilters) + " individual filters active)" : "No filters active");
 }
 
 double DecoderSectionControlComponent::getValue(int /*columnId*/, int /*rowNumber*/)
@@ -145,6 +141,7 @@ void DecoderSectionControlComponent::setValue(int /*columnId*/, int /*rowNumber*
     {
         pAmbiSettings->color = Colour(uint32(newValue));
         colorField->setRowAndColumn(0, 0);
+        filterComponent->setRow(0, pAmbiSettings->color);
         controlDimming();
         repaint();
     }
@@ -176,6 +173,35 @@ void DecoderSectionControlComponent::textEditorTextChanged(TextEditor& editor)
     controlDimming();
 }
 
+bool DecoderSectionControlComponent::getBypass(int /*rowNumber*/)
+{
+    return pAmbiSettings->filterInfo.getFilterBypass();
+}
+
+void DecoderSectionControlComponent::setBypass(int /*rowNumber*/, bool newValue)
+{
+    pAmbiSettings->filterInfo.setFilterBypass(newValue);
+    updateUI();
+    sendChangeMessage();
+}
+
+FilterBankInfo* DecoderSectionControlComponent::getFilterInfo(int /*rowNumber*/)
+{
+    return &pAmbiSettings->filterInfo;
+}
+
+dsp::ProcessSpec* DecoderSectionControlComponent::getFilterSpecification()
+{
+    return pFilterSpecification;
+}
+
+void DecoderSectionControlComponent::showFilterEditor(int /*rowNumber*/, Rectangle<int> screenBounds)
+{
+    auto topComponent = getParentComponent()->getParentComponent();
+    auto relPos = topComponent->getScreenPosition();
+    CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), this->getScreenBounds().translated(-relPos.getX(), -relPos.getY()), topComponent);
+}
+
 
 void DecoderSectionControlComponent::paint (juce::Graphics& g)
 {
@@ -198,8 +224,8 @@ void DecoderSectionControlComponent::resized()
     pointsButton->setBounds(border, standardHeight + 3 * border, standardWidth, standardHeight);
     orderButton->setBounds(border, 2 * standardHeight + 4 * border, standardWidth, standardHeight);
     weightingButton->setBounds(border, 3 * standardHeight + 5 * border, standardWidth, standardHeight);
-    filterButton->setBounds(border, 4 * standardHeight + 6 * border, standardWidth, standardHeight);
-    gainSlider->setBounds(border, 5 * standardHeight + 6 * border, standardWidth, height - standardHeight - 5 * standardHeight - 7 * border);
+    filterComponent->setBounds(border, 4 * standardHeight + 6 * border, standardWidth, standardHeight + border);
+    gainSlider->setBounds(border, 5 * standardHeight + 7 * border, standardWidth, height - standardHeight - 5 * standardHeight - 8 * border);
     gainSlider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, width - 4 * border, standardHeight);
     muteButton->setBounds(border, height - standardHeight, width / 2 - 2 * border, standardHeight - border);
     colorField->setBounds(border, height - standardHeight - border, standardWidth, standardHeight);
@@ -227,13 +253,7 @@ void DecoderSectionControlComponent::buttonClicked(Button* btn)
     {
         CallOutBox::launchAsynchronously(std::make_unique<AmbiSettingsComponent>(&(pAmbiSettings->ambiSettings), this, pChannelLayout), getScreenBounds(), nullptr);
     }
-    else if (btn == filterButton.get())
-    {
-        auto topComponent = getParentComponent()->getParentComponent();
-        auto relPos = topComponent->getScreenPosition();
-        CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(&(pAmbiSettings->filterInfo), pFilterSpecification, this, pFilterPresetHelper, FFT_INDEX_OFFSET_MULTIDECODER + decoderIndex), this->getScreenBounds().translated(-relPos.getX(), -relPos.getY()), topComponent);
-    }
-
+    
     controlDimming();
 }
 
@@ -242,7 +262,7 @@ void DecoderSectionControlComponent::updateUI()
     nameEditor->setText(pAmbiSettings->name);
     gainSlider->setValue(Decibels::gainToDecibels(pAmbiSettings->gain));
     muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
-    filterButton->setToggleState(!pAmbiSettings->filterInfo.getFilterBypass() && pAmbiSettings->filterInfo.anyActive(), dontSendNotification);
+    filterComponent->setRow(0, pAmbiSettings->color);
     colorField->setRowAndColumn(0, 0);
     controlDimming();
     resized();

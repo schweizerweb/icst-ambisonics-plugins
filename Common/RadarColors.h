@@ -39,12 +39,14 @@ public:
     Colour getValidRangeColor() const { return radarValidRangeColor[colorScheme]; }
     Colour getExtendedHandleColor() const { return extendedHandleColor[colorScheme]; }
     Colour getExtendedHandleSelectionColor() const { return extendedHandleSelectionColor[colorScheme]; }
+    Colour getPointLabelColor() const { return pointLabelColor[colorScheme]; }
 	void setColorScheme(int scheme) { colorScheme = jmin(scheme, NUMBER_OF_SCHEMES - 1); }
 
 private:
 	Colour radarBackground[NUMBER_OF_SCHEMES] { Colours::lightgrey, Colours::lightgoldenrodyellow };
 	Colour radarLineColor[NUMBER_OF_SCHEMES] { Colours::darkgrey, Colours::darkorange };
 	Colour infoTextColor[NUMBER_OF_SCHEMES] { Colours::darkgrey, Colours::olivedrab };
+	Colour pointLabelColor[NUMBER_OF_SCHEMES] { Colours::black, Colours::darkmagenta };
 	Colour pointSelectionColor[NUMBER_OF_SCHEMES] { Colours::white, Colours::yellow };
     Colour radarAxisColor[NUMBER_OF_SCHEMES] { Colours::darkgreen, Colours::darkblue };
     Colour radarValidRangeColor[NUMBER_OF_SCHEMES] { Colours::lightgreen.withAlpha(0.2f), Colours::lightpink.withAlpha(0.2f) };

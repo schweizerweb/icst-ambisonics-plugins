@@ -83,6 +83,17 @@ float AmbiDataSet::getMaxDistance() const
     return maxDistance;
 }
 
+bool AmbiDataSet::anySolo() const
+{
+    for (int i = 0; i < size(); i++)
+    {
+        if (get(i)->getSolo())
+            return true;
+    }
+
+    return false;
+}
+
 AmbiPoint* AmbiDataSet::getPointByName(String channelName) const
 {
 	AmbiPoint* ambiPt = nullptr;

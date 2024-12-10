@@ -77,7 +77,9 @@ public:
 	void setAlive(int64 currentTimeMillis);
 	
     Image* getLabelImage();
+    Image* getLabelImage(Colour col);
 	void ensureLabelImage();
+	void ensureLabelImage(Colour col);
     
     void setGroup(AmbiGroup* pG);
     AmbiGroup* getGroup();

@@ -423,7 +423,7 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
         drawRotateIcon(g, getSpecialIconPositionForCenter(screenPt, RotateInAedSpace), pointSize, false);
     }
 	
-	Image* img = point->getLabelImage();
+	Image* img = point->getLabelImage(radarColors.getPointLabelColor());
 	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
 }
 

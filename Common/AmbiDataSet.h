@@ -67,7 +67,8 @@ public:
     String getNewUniqueName() const;
 	int getEnabledCount() const;
     float getMaxDistance() const;
-    
+    bool anySolo() const;
+
 	int groupCount() const;
     int activeGroupCount() const;
 	AmbiGroup* getGroup(int index) const;

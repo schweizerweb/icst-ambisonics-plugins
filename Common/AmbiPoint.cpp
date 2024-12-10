@@ -235,11 +235,22 @@ Image* AmbiPoint::getLabelImage()
 	return &labelImage;
 }
 
+Image* AmbiPoint::getLabelImage(Colour col)
+{
+	ensureLabelImage(col);
+	return &labelImage;
+}
+
 void AmbiPoint::ensureLabelImage()
+{
+	ensureLabelImage(color);
+}
+
+void AmbiPoint::ensureLabelImage(Colour col)
 {
 	if (labelImage == Image())
 	{
-		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
+		labelImage = LabelCreator::createNewLabel(name, col, FONT_SIZE);
 		labelImage.duplicateIfShared();
 	}
 }

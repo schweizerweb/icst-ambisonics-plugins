@@ -20,8 +20,8 @@
 
 
 #pragma once
-#include "SpeakerSettingsComponent.h"
 #include "FilterSettingsComponent.h"
+#include "../../Common/FilterControlCallback.h"
 
 #define MIN_FREQUENCY_THUMBNAIL    20
 #define FREQUENCY_STEP_THUMBNAIL 1.1
@@ -29,7 +29,7 @@
 class CheckBoxFilterCustomComponent : public Component, private  ToggleButton::Listener
 {
 public:
-	CheckBoxFilterCustomComponent(SpeakerSettingsComponent& td) : owner(td)
+	CheckBoxFilterCustomComponent(FilterControlCallback& _owner) : owner(_owner)
 	{
         addAndMakeVisible(toggle);
         toggle.addListener(this);
@@ -64,11 +64,11 @@ public:
         }
 	}
 
-	void setRowAndColumn(const int newRow, const int newColumn)
+	void setRow(const int newRow, const Colour color = Colours::lightgreen)
 	{
 		row = newRow;
-		columnId = newColumn;
-		toggle.setToggleState(owner.getFlag(columnId, row), dontSendNotification);
+        activeColor = color;
+		toggle.setToggleState(!owner.getBypass(row), dontSendNotification);
         
         FilterBankInfo* newFilterInfo = owner.getFilterInfo(newRow);
         if(firstUpdate || !filterInfo.equals(newFilterInfo))
@@ -131,20 +131,20 @@ private:
         g.setColour(Colours::lightgrey);
         g.drawLine(float(toggle.getWidth()), (float)getHeight()/2.0f, float(getWidth()), (float)getHeight()/2.0f);
         
-        g.setColour(owner.getFlag(columnId, row) ? Colours::lightgreen : Colours::red);
+        g.setColour(owner.getBypass(row) ? Colours::red : activeColor);
         g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);
     }
     
     void buttonClicked(Button* b) override
     {
-        owner.setFlag(columnId, row, b->getToggleState());
+        owner.setBypass(row, !b->getToggleState());
     }
    
     void mouseUp(const MouseEvent &event) override
     {
         if(!toggle.contains(event.getPosition()))
         {
-            CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(owner.getFilterInfo(row), owner.getFilterSpecification(), &owner, owner.getFilterPresetHelper(), row), getScreenBounds().translated(-owner.getScreenX(), -owner.getScreenY()), &owner);
+            owner.showFilterEditor(row, getScreenBounds());
         }
     }
     
@@ -159,12 +159,13 @@ private:
     }
     
 private:
-	SpeakerSettingsComponent& owner;
-	int row, columnId;
+	FilterControlCallback& owner;
+	int row;
     ToggleButton toggle;
     Path thumbnailFilterPath;
     std::unique_ptr<PathStrokeType> strokeType;
-    
+    Colour activeColor;
+
     FilterBankInfo filterInfo;
     Array<double> frequencies;
     double sampleRate;

@@ -557,7 +557,7 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
         if(checkBox == nullptr)
             checkBox = new CheckBoxFilterCustomComponent(*this);
 
-        checkBox->setRowAndColumn(rowNumber, columnId);
+        checkBox->setRow(rowNumber);
         return checkBox;
     }
     else if(columnId == COLUMN_ID_MUTE)
@@ -645,32 +645,20 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	}
 }
 
-void SpeakerSettingsComponent::setFlag(int columnId, int rowNumber, bool newValue) const
+void SpeakerSettingsComponent::setBypass(int rowNumber, bool newValue)
 {
-    switch (columnId)
-    {
-    case COLUMN_ID_FILTER:
-        pSpeakerSet->setFilterBypass(rowNumber, !newValue);
-    	break;
-
-    default: throw;
-    }
-
+    pSpeakerSet->setFilterBypass(rowNumber, newValue);
     speakerList->updateContent();
     speakerList->repaint();
 }
 
-bool SpeakerSettingsComponent::getFlag(int columnId, int rowNumber) const
+bool SpeakerSettingsComponent::getBypass(int rowNumber)
 {
     AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
     if (pt == nullptr)
         return false;
 
-    switch (columnId)
-    {
-    case COLUMN_ID_FILTER: return !pt->getFilterBypass();
-    default: return false;
-    }
+    return pt->getFilterBypass();
 }
 
 void SpeakerSettingsComponent::speakerTest(int rowNumber) const
@@ -713,7 +701,7 @@ bool SpeakerSettingsComponent::getEnabled(const int /*columnId*/, const int /*ro
     return true;
 }
 
-FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
+FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber)
 {
 	AmbiSpeaker* pt = pSpeakerSet->get(rowNumber);
 	if (pt == nullptr)
@@ -722,9 +710,14 @@ FilterBankInfo* SpeakerSettingsComponent::getFilterInfo(int rowNumber) const
 	return pt->getFilterInfo();
 }
 
-dsp::ProcessSpec* SpeakerSettingsComponent::getFilterSpecification() const
+dsp::ProcessSpec* SpeakerSettingsComponent::getFilterSpecification()
 {
 	return pFilterSpecification;
+}
+
+void SpeakerSettingsComponent::showFilterEditor(int rowNumber, Rectangle<int> screenBounds)
+{
+    CallOutBox::launchAsynchronously(std::make_unique<FilterSettingsComponent>(getFilterInfo(rowNumber), getFilterSpecification(), this, getFilterPresetHelper(), rowNumber), screenBounds.translated(-getScreenX(), -getScreenY()), this);
 }
 
 FilterPresetHelper* SpeakerSettingsComponent::getFilterPresetHelper() const

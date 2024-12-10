@@ -24,9 +24,11 @@
 #include "FilterPresetHelper.h"
 #include "../../Common/AmbiSettingsCollection.h"
 #include "../../Common/ColorEditorCustomComponent.h"
+#include "CheckBoxFilterCustomComponent.h"
 #include "../../Common/AmbiLookAndFeel.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/ChannelLayout.h"
+#include "../../Common/FilterControlCallback.h"
 
 class DecoderSectionControlComponent  : public juce::Component,
                                public juce::Slider::Listener,
@@ -34,7 +36,8 @@ class DecoderSectionControlComponent  : public juce::Component,
                                public juce::TextEditor::Listener,
                                public TableColumnCallback,
                                public ChangeListener,
-                               public ChangeBroadcaster
+                               public ChangeBroadcaster,
+                               public FilterControlCallback
 {
 public:
     DecoderSectionControlComponent(AmbiSettingsSection* pSection, AmbiSpeakerSet* _pSpeakerSet, FilterPresetHelper* _pFilterPresetHelper, dsp::ProcessSpec* pFilterSpecification, ChangeListener* _pChangeListener, ChannelLayout* _pChannelLayout, int _decoderIndex);
@@ -55,7 +58,7 @@ private:
     std::unique_ptr<juce::TextButton> orderButton;
     std::unique_ptr<juce::TextButton> weightingButton;
     std::unique_ptr<juce::TextButton> pointsButton;
-    std::unique_ptr<juce::TextButton> filterButton;
+    std::unique_ptr<CheckBoxFilterCustomComponent> filterComponent;
     std::unique_ptr<ColorEditorCustomComponent> colorField;
 
     AmbiSettingsSection* pAmbiSettings;
@@ -79,4 +82,11 @@ private:
     // Inherited via ChangeListener
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void textEditorTextChanged(TextEditor& editor) override;
+
+    // Inherited via FilterControlCallback
+    bool getBypass(int rowNumber) override;
+    void setBypass(int rowNumber, bool newValue) override;
+    FilterBankInfo* getFilterInfo(int rowNumber) override;
+    dsp::ProcessSpec* getFilterSpecification() override;
+    void showFilterEditor(int rowNumber, Rectangle<int> screenBounds) override;
 };
