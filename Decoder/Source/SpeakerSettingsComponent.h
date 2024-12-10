@@ -28,6 +28,7 @@
 #include "DecoderSettings.h"
 #include "../../Common/MultiSliderControl.h"
 #include "../../Common/TableColumnCallback.h"
+#include "../../Common/SoloMuteCallback.h"
 #include "../../Common/DelayHelper.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "../../Common/AmbiSpeakerSet.h"
@@ -61,6 +62,7 @@ class SpeakerSettingsComponent  : public Component,
                                   public ChangeBroadcaster,
                                   public TableColumnCallback,
                                   public FilterControlCallback,
+                                  public SoloMuteCallback,
                                   ActionListener,
                                   public juce::Button::Listener,
                                   public juce::Slider::Listener,
@@ -115,6 +117,13 @@ public:
     bool perform(const InvocationInfo& info) override;
     bool doBackupAllPresets();
     bool doRestoreAllPresets();
+
+    // Inherited via SoloMuteCallback
+    bool getMute(int rowNumber) override;
+    void setMute(int rowNumber, bool newValue) override;
+    bool getSolo(int rowNumber) override;
+    void setSolo(int rowNumber, bool newValue) override;
+
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;

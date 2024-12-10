@@ -141,7 +141,7 @@ void AmbiPoint::setName(String newName)
 {
 	if (name != newName)
 	{
-		labelImage = LabelCreator::createNewLabel(newName, color, FONT_SIZE);
+		labelImage = LabelCreator::createNewLabel(newName, getMute() ? labelColor.withAlpha(MUTE_ALPHA) : labelColor, FONT_SIZE);
 	}
 
 	name = newName;
@@ -170,6 +170,11 @@ void AmbiPoint::setMute(bool newMute, bool notify)
     if(!allowMute())
         return;
     
+	if (mute != newMute)
+	{
+		labelImage = LabelCreator::createNewLabel(name, newMute ? labelColor.withAlpha(MUTE_ALPHA) : labelColor, FONT_SIZE);
+	}
+
     mute = newMute;
     if(newMute && solo)
         setSolo(false);
@@ -211,10 +216,6 @@ void AmbiPoint::resetId()
 void AmbiPoint::setColor(Colour newColor)
 {
 	newColor = newColor.withAlpha(1.0f);
-	if (color != newColor)
-	{
-		labelImage = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
-	}
 
 	color = newColor;
 }
@@ -235,22 +236,11 @@ Image* AmbiPoint::getLabelImage()
 	return &labelImage;
 }
 
-Image* AmbiPoint::getLabelImage(Colour col)
-{
-	ensureLabelImage(col);
-	return &labelImage;
-}
-
 void AmbiPoint::ensureLabelImage()
-{
-	ensureLabelImage(color);
-}
-
-void AmbiPoint::ensureLabelImage(Colour col)
 {
 	if (labelImage == Image())
 	{
-		labelImage = LabelCreator::createNewLabel(name, col, FONT_SIZE);
+		labelImage = LabelCreator::createNewLabel(name, getMute() ? labelColor.withAlpha(MUTE_ALPHA) : labelColor, FONT_SIZE);
 		labelImage.duplicateIfShared();
 	}
 }

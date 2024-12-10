@@ -22,6 +22,7 @@
 //[Headers] You can add your own extra header files here...
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
+#include "../../Common/SoloMuteCustomComponent.h"
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "CheckBoxFilterCustomComponent.h"
@@ -218,7 +219,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 	speakerList->getHeader().addColumn("Delay [ms]", COLUMN_ID_DELAY, 80);
 	speakerList->getHeader().addColumn("Delay comp. [ms]", COLUMN_ID_DELAY_COMPENSATION, 100);
 	speakerList->getHeader().addColumn("Color", COLUMN_ID_COLOR, 30);
-    speakerList->getHeader().addColumn("Mute", COLUMN_ID_MUTE, 30);
+    speakerList->getHeader().addColumn("M & S", COLUMN_ID_MUTE, 50);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
     speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
@@ -248,6 +249,7 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     pDecodingPresetHelper->removeActionListener(this);
     pChannelLayout->removeActionListener(this);
     commandManager.setFirstCommandTarget(nullptr);
+    speakerList->setModel(nullptr);
     //[/Destructor_pre]
 
     groupOsc = nullptr;
@@ -433,6 +435,26 @@ void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMo
     //[/UsersliderValueChanged_Post]
 }
 
+bool SpeakerSettingsComponent::getMute(int rowNumber)
+{
+    return pSpeakerSet->get(rowNumber)->getMute();
+}
+
+void SpeakerSettingsComponent::setMute(int rowNumber, bool newValue)
+{
+    pSpeakerSet->setMute(rowNumber, newValue);
+}
+
+bool SpeakerSettingsComponent::getSolo(int rowNumber)
+{
+    return pSpeakerSet->get(rowNumber)->getSolo();
+}
+
+void SpeakerSettingsComponent::setSolo(int rowNumber, bool newValue)
+{
+    pSpeakerSet->setSolo(rowNumber, newValue);
+}
+
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -562,11 +584,11 @@ Component* SpeakerSettingsComponent::refreshComponentForCell(int rowNumber, int 
     }
     else if(columnId == COLUMN_ID_MUTE)
     {
-        CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*> (existingComponentToUpdate);
+        SoloMuteCustomComponent* checkBox = static_cast<SoloMuteCustomComponent*> (existingComponentToUpdate);
         if(checkBox == nullptr)
-            checkBox = new CheckBoxCustomComponent(*this);
+            checkBox = new SoloMuteCustomComponent(*this);
 
-        checkBox->setRowAndColumn(rowNumber, columnId);
+        checkBox->setRow(rowNumber);
         return checkBox;
     }
     else if(columnId == COLUMN_ID_COLOR)
@@ -615,8 +637,7 @@ void SpeakerSettingsComponent::setValue(int columnId, int rowNumber, double newV
 	case COLUMN_ID_E: pSpeakerSet->setElevation(rowNumber, Constants::GradToRad(newValue)); break;
 	case COLUMN_ID_DISTANCE: pSpeakerSet->setDistance(rowNumber, newValue); break;
     case COLUMN_ID_COLOR: pSpeakerSet->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
-    case COLUMN_ID_MUTE: pSpeakerSet->setMute(rowNumber, !exactlyEqual(newValue, 0.0)); break;
-
+    
         default: return; // do nothing
 	}
 
@@ -640,8 +661,7 @@ double SpeakerSettingsComponent::getValue(int columnId, int rowNumber)
 	case COLUMN_ID_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
 	case COLUMN_ID_DISTANCE: return pt->getRawPoint()->getDistance();
     case COLUMN_ID_COLOR: return pt->getColor().getARGB();
-        case COLUMN_ID_MUTE: return pt->getMute() ? 1 : 0;
-        default: return 0.0;
+    default: return 0.0;
 	}
 }
 

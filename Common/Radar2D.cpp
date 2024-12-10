@@ -388,7 +388,8 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
 		}
 	}
 
-    Colour c = point->getMute() ? point->getColor().withAlpha(0.2f) : point->getColor();
+    Colour c = point->getMute() ? point->getColor().withAlpha(0.3f) : point->getColor();
+    
 	g->setColour(c);
 
 	if(shape == Square)
@@ -423,8 +424,8 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
         drawRotateIcon(g, getSpecialIconPositionForCenter(screenPt, RotateInAedSpace), pointSize, false);
     }
 	
-	Image* img = point->getLabelImage(radarColors.getPointLabelColor());
-	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
+    Image* img = point->getLabelImage();
+    paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
 }
 
 void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const

@@ -33,6 +33,8 @@
 #define XML_ATTRIBUTE_POINT_MUTE "Mute"
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
+#define MUTE_ALPHA 0.5f
+#define LABEL_COLOR Colours::black
 
 class AmbiGroup;
 
@@ -100,6 +102,7 @@ private:
 	Point3D<double> point;
 	String name;
 	Colour color;
+    Colour labelColor = LABEL_COLOR;
 	double gain;
     bool mute;
     bool solo;
