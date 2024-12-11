@@ -245,7 +245,7 @@ private:
     }
 
     // Inherited via SoloMuteCallback
-    bool SourceTableListModel::getMute(int rowNumber)
+    bool getMute(int rowNumber) override
     {
         AmbiPoint* pt = pSources->get(rowNumber);
         if (pt == nullptr)
@@ -254,12 +254,12 @@ private:
         return pt->getMute();
     }
 
-    void SourceTableListModel::setMute(int rowNumber, bool newValue)
+    void setMute(int rowNumber, bool newValue) override
     {
         pSources->setMute(rowNumber, newValue);
     }
 
-    bool SourceTableListModel::getSolo(int rowNumber)
+    bool getSolo(int rowNumber) override
     {
         AmbiPoint* pt = pSources->get(rowNumber);
         if (pt == nullptr)
@@ -268,7 +268,7 @@ private:
         return pt->getSolo();
     }
 
-    void SourceTableListModel::setSolo(int rowNumber, bool newValue)
+    void setSolo(int rowNumber, bool newValue) override
     {
         pSources->setSolo(rowNumber, newValue);
     }

@@ -170,9 +170,11 @@ bool AmbiPoint::getMute() const
 
 void AmbiPoint::setMute(bool newMute, bool notify)
 {
-    if(!allowMute())
-        return;
-    
+	if (!allowMute())
+	{
+		return;
+	}
+
 	if (mute != newMute)
 	{
 		mute = newMute;
