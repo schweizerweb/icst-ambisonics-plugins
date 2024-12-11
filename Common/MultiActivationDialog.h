@@ -385,8 +385,8 @@ private:
                 break;
             case SHAPE_ID_ARC:
                 {
-                    float startAngle = Constants::GradToRad(sliderAngle->getMinValue());
-                    float totalAngle = Constants::GradToRad(sliderAngle->getMaxValue() - sliderAngle->getMinValue());
+                    float startAngle = (float)Constants::GradToRad(sliderAngle->getMinValue());
+                    float totalAngle = (float)Constants::GradToRad(sliderAngle->getMaxValue() - sliderAngle->getMinValue());
                     p.startNewSubPath(radius * sinf(startAngle), radius * cosf(startAngle));
                     for (int i = 1; i < pointCount + 1; i++)
                     {
