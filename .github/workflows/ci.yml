@@ -96,7 +96,14 @@ jobs:
         sudo installer -package "/Volumes/PackagesTmp/Install Packages.pkg" -target /
         hdiutil detach /Volumes/PackagesTmp
 
-    - name: Build Installer
+    - if: ${{ runner.os == 'Linux' }}
+      name: Build Debian Package
+      shell: bash
+      run: |
+        ./Setup/Linux/build-deb.sh "icst-ambiplugins-dev-${{github.run_number}}" "0.0.0.${{github.run_id}}" "${{ steps.strings.outputs.build-output-dir }}/packages"
+        
+    - if: ${{ runner.os != 'Linux' }}
+      name: Build Installer
       shell: bash
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.${{github.run_id}}" -n "ICST_AmbiPlugins_dev_${{ matrix.name }}_cibuild_${{github.run_number}}"
