@@ -601,7 +601,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
     if(pPointSelection->getSelectionMode() == PointSelection::Group
        && key.getModifiers().isCtrlDown()
        && key.getModifiers().isShiftDown()
-       && key.isKeyCode(KeyPress::backspaceKey))
+       && (key.isKeyCode(KeyPress::backspaceKey) || (key.isKeyCode(KeyPress::deleteKey))))
     {
         {
             pPointSelection->unselectPoint();
@@ -786,7 +786,11 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
     {
         if(specialGroupManipulationMode && pPointSelection->getSelectionMode() == PointSelection::Group)
         {
-            pEditablePoints->stretchGroup(pPointSelection->getMainSelectedPointIndex(), pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
+            auto selectedGroups = pPointSelection->getSelectedIndices();
+            for (int i = 0; i < selectedGroups.size(); i++)
+            {
+                pEditablePoints->stretchGroup(selectedGroups[i], pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
+            }
         }
         else
         {

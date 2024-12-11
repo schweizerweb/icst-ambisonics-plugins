@@ -27,7 +27,7 @@
 #include "ColorSelectionComponent.h"
 #include "ColorDefinition.h"
 
-enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGLE, SHAPE_ID_STAR };
+enum ShapeId { SHAPE_ID_NONE, SHAPE_ID_CIRCLE, SHAPE_ID_SQUARE, SHAPE_ID_TRIANGLE, SHAPE_ID_STAR, SHAPE_ID_LINE, SHAPE_ID_ARC };
 
 class MultiActivationDialog : public Component, ComboBox::Listener, Button::Listener, Slider::Listener, public ChangeListener
 {
@@ -75,6 +75,8 @@ public:
         comboShape->addItem("Square", SHAPE_ID_SQUARE);
         comboShape->addItem("Triangle", SHAPE_ID_TRIANGLE);
         comboShape->addItem("Star", SHAPE_ID_STAR);
+        comboShape->addItem("Line", SHAPE_ID_LINE);
+        comboShape->addItem("Arc", SHAPE_ID_ARC);
         comboShape->addListener(this);
         addAndMakeVisible(comboShape.get());
         
@@ -90,6 +92,21 @@ public:
         sliderRadius->setPopupDisplayEnabled (true, false, this);
         sliderRadius->addListener(this);
         addAndMakeVisible(sliderRadius.get());
+        
+        labelAngle.reset(new Label("Angle"));
+        labelAngle->setText("Angle:", dontSendNotification);
+        addAndMakeVisible(labelAngle.get());
+
+        sliderAngle.reset(new Slider("Angle"));
+        sliderAngle->setTextBoxStyle (Slider::TextEntryBoxPosition::NoTextBox, false, 50, 24);
+        sliderAngle->setRange(-360.0, 360.0);
+        sliderAngle->setSliderStyle(Slider::TwoValueHorizontal); 
+        sliderAngle->setMinValue(-90);
+        sliderAngle->setMaxValue(90);
+        sliderAngle->setNumDecimalPlacesToDisplay(0);
+        sliderAngle->setPopupDisplayEnabled (true, false, this);
+        sliderAngle->addListener(this);
+        addAndMakeVisible(sliderAngle.get());
         
         labelGroupName.reset(new Label("GroupName"));
         labelGroupName->setText("Group Name", dontSendNotification);
@@ -121,7 +138,7 @@ public:
 
         comboShape->setSelectedItemIndex(0);
 
-        setSize(350, 210);
+        setSize(350, 250);
     }
 
     ~MultiActivationDialog() override
@@ -133,6 +150,8 @@ public:
         comboShape = nullptr;
         labelRadius = nullptr;
         sliderRadius = nullptr;
+        labelAngle = nullptr;
+        sliderAngle = nullptr;
         labelGroupName = nullptr;
         textGroupName = nullptr;
         toggleApplyName = nullptr;
@@ -145,25 +164,35 @@ private:
     void resized() override
     {
         int controlHeight = 24;
-        labelPointCount->setBounds(0, 0, getWidth() / 3, controlHeight);
+        int y = 0;
+        int border = 6;
+
+        labelPointCount->setBounds(0, y, getWidth() / 3, controlHeight);
         sliderPointCount->setBounds(labelPointCount->getRight(), labelPointCount->getY(), getWidth() - labelPointCount->getRight() - 70, controlHeight);
         btnSelectPoints->setBounds(getWidth()-70, labelPointCount->getY(), 70, controlHeight);
+        y += controlHeight + border;
 
-        labelShape->setBounds(0, 30, getWidth() / 3, controlHeight);
+        labelShape->setBounds(0, y, getWidth() / 3, controlHeight);
         comboShape->setBounds(labelShape->getRight(), labelShape->getY(), getWidth() - labelShape->getRight(), controlHeight);
+        y += controlHeight + border;
 
-        labelRadius->setBounds(0, 60, getWidth() / 3, controlHeight);
+        labelRadius->setBounds(0, y, getWidth() / 3, controlHeight);
         sliderRadius->setBounds(labelRadius->getRight(), labelRadius->getY(), getWidth() - labelRadius->getRight(), controlHeight);
+        y += controlHeight + border;
+
+        labelAngle->setBounds(0, y, getWidth() / 3, controlHeight);
+        sliderAngle->setBounds(labelAngle->getRight(), labelAngle->getY(), getWidth() - labelAngle->getRight(), controlHeight);
+        y += controlHeight + border;
+
+        labelGroupName->setBounds(0, y, getWidth() / 3, controlHeight);
+        textGroupName->setBounds(labelGroupName->getRight(), labelGroupName->getY(), getWidth() - labelGroupName->getRight(), controlHeight);
+        toggleApplyName->setBounds(labelGroupName->getRight(), labelGroupName->getY()+controlHeight, getWidth() - labelGroupName->getRight(), controlHeight);
+        y += 2 * controlHeight + border;
+
+        labelColor->setBounds(0, y, getWidth() / 3, controlHeight);
+        btnColor->setBounds(labelColor->getRight(), labelColor->getY(), getWidth() - labelColor->getRight(), jmin(controlHeight, getHeight() - (y + controlHeight + border)));
         
-        labelGroupName->setBounds(0, 90, getWidth() / 3, controlHeight);
-        textGroupName->setBounds(labelGroupName->getRight(), 90, getWidth() - labelGroupName->getRight(), controlHeight);
-        
-        toggleApplyName->setBounds(labelGroupName->getRight(), 120, getWidth() - labelGroupName->getRight(), controlHeight);
-        
-        labelColor->setBounds(0, 150, getWidth() / 3, controlHeight);
-        btnColor->setBounds(labelColor->getRight(), labelColor->getY(), getWidth() - labelColor->getRight(), jmin(controlHeight, getHeight() - 180));
-        
-        btnApply->setBounds(0, getHeight()-30, getWidth(), controlHeight);
+        btnApply->setBounds(0, getHeight()-controlHeight-border, getWidth(), controlHeight);
     }
 
     void comboBoxChanged(ComboBox*) override
@@ -250,6 +279,7 @@ private:
         {
             defaultRadius = sliderRadius->getValue();
             sliderRadius->setSliderStyle(Slider::TwoValueHorizontal);
+            sliderRadius->setTextBoxStyle(Slider::TextEntryBoxPosition::NoTextBox, false, 50, 24);
             sliderRadius->setMaxValue(defaultRadius, dontSendNotification);
             sliderRadius->setMinValue(defaultRadius * 0.6, dontSendNotification);
         }
@@ -257,8 +287,11 @@ private:
         {
             defaultRadius = sliderRadius->getMaxValue();
             sliderRadius->setSliderStyle(Slider::LinearHorizontal);
+            sliderRadius->setTextBoxStyle(Slider::TextEntryBoxPosition::TextBoxRight, false, 50, 24);
             sliderRadius->setValue(defaultRadius);
         }
+
+        sliderAngle->setEnabled(comboShape->getSelectedId() == SHAPE_ID_ARC);
     }
     
 private:
@@ -309,7 +342,13 @@ private:
     {
         float radius = float(sliderRadius->getSliderStyle() == Slider::TwoValueHorizontal ? sliderRadius->getMaxValue() : sliderRadius->getValue());
         ShapeId shapeId = (ShapeId)comboShape->getSelectedId();
+        bool isClosed = true;
         int pointCount = localDataSet->getGroup(0)->groupPointCount();
+        if (pointCount < 1)
+        {
+            return false;
+        }
+
         
         Path p;
         switch(shapeId)
@@ -335,8 +374,27 @@ private:
                 p.addTriangle(0.0f, radius, (float)cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius, (float)-cos(PI/6.0)*radius, (float)-sin(PI/6.0)*radius);
                 break;
             case SHAPE_ID_STAR:
-                float innerRadius = float(sliderRadius->getMinValue());
-                p.addStar(Point<float>(0.0f, 0.0f), pointCount/2, innerRadius, radius);
+                p.addStar(Point<float>(0.0f, 0.0f), pointCount/2, float(sliderRadius->getMinValue()), radius);
+                break;
+            case SHAPE_ID_LINE:
+                {
+                    p.startNewSubPath(-radius, 0.0f);
+                    p.lineTo(radius, 0.0f);
+                    isClosed = false;
+                }
+                break;
+            case SHAPE_ID_ARC:
+                {
+                    float startAngle = Constants::GradToRad(sliderAngle->getMinValue());
+                    float totalAngle = Constants::GradToRad(sliderAngle->getMaxValue() - sliderAngle->getMinValue());
+                    p.startNewSubPath(radius * sinf(startAngle), radius * cosf(startAngle));
+                    for (int i = 1; i < pointCount + 1; i++)
+                    {
+                        float angle = startAngle + (float)((double)i * totalAngle / (double)pointCount);
+                        p.lineTo(radius * sinf(angle), radius * cosf(angle));
+                    }
+                    isClosed = false;
+                }
                 break;
         }
         
@@ -346,7 +404,7 @@ private:
         {
             if(localDataSet->get(i)->getGroup() == localDataSet->getGroup(0))
             {
-                auto pt = p.getPointAlongPath(totalLength / float(pointCount) * float(groupPointIndex));
+                auto pt = p.getPointAlongPath(totalLength / float(isClosed ? pointCount : pointCount - 1) * float(groupPointIndex));
                 localDataSet->get(i)->getRawPoint()->setXY(pt.getX(), pt.getY());
                 groupPointIndex++;
             }
@@ -365,6 +423,9 @@ private:
 
     std::unique_ptr<Label> labelRadius;
     std::unique_ptr<Slider> sliderRadius;
+    
+    std::unique_ptr<Label> labelAngle;
+    std::unique_ptr<Slider> sliderAngle;
     
     std::unique_ptr<Label> labelGroupName;
     std::unique_ptr<TextEditor> textGroupName;
