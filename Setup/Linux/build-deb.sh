@@ -26,6 +26,8 @@ Section: base
 Priority: optional
 Architecture: all
 Maintainer: ICST <christian.schweizer@zhdk.ch>
+Homepage: http://www.ambisonics.ch
+License: GPL-3.0
 Description: $DESCRIPTION
 EOF
 

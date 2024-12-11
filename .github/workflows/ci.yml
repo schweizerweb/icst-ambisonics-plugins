@@ -99,6 +99,7 @@ jobs:
     - if: ${{ runner.os == 'Linux' }}
       name: Build Debian Package
       shell: bash
+      working-directory: ${{ github.workspace }}
       run: |
         ./Setup/Linux/build-deb.sh "icst-ambiplugins-dev-${{github.run_number}}" "0.0.0.${{github.run_id}}" "${{ steps.strings.outputs.build-output-dir }}/packages"
         
