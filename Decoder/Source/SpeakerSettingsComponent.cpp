@@ -222,7 +222,7 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     speakerList->getHeader().addColumn("M & S", COLUMN_ID_MUTE, 50);
 	speakerList->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
 	speakerList->getHeader().addColumn("Test", COLUMN_ID_TEST, 30);
-    speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 40);
+    speakerList->getHeader().addColumn("Filter", COLUMN_ID_FILTER, 50);
 	speakerList->getHeader().setStretchToFitActive(true);
 	speakerList->getHeader().resizeAllColumnsToFit(speakerList->getWidth());
     speakerList->setMultipleSelectionEnabled(true);

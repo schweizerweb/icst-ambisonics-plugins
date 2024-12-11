@@ -31,7 +31,7 @@ DecoderSectionControlComponent::DecoderSectionControlComponent(AmbiSettingsSecti
     gainSlider->setTextValueSuffix(" dB");
     gainSlider->addListener(this);
     gainSlider->setDoubleClickReturnValue(true, 0.0);
-    
+
     nameEditor.reset(new juce::TextEditor("editName"));
     addAndMakeVisible(nameEditor.get());
     nameEditor->setJustification(Justification::centredTop);
@@ -88,9 +88,6 @@ DecoderSectionControlComponent::~DecoderSectionControlComponent()
 
 void DecoderSectionControlComponent::controlDimming()
 {
-    gainSlider->setColour(juce::Slider::ColourIds::thumbColourId, pAmbiSettings->color);
-    gainSlider->repaint();
-
     auto speakerCount = 0;
     for (int i = 0; i < pSpeakerSet->size(); i++)
     {
@@ -140,10 +137,7 @@ void DecoderSectionControlComponent::setValue(int /*columnId*/, int /*rowNumber*
     else
     {
         pAmbiSettings->color = Colour(uint32(newValue));
-        colorField->setRowAndColumn(0, 0);
-        filterComponent->setRow(0, pAmbiSettings->color);
-        controlDimming();
-        repaint();
+        updateUI();
     }
 
     sendChangeMessage();
@@ -158,7 +152,6 @@ bool DecoderSectionControlComponent::getEnabled(const int /*columnId*/, const in
 
 void DecoderSectionControlComponent::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
-    controlDimming();
     sendChangeMessage();
     updateUI();
 }
@@ -226,7 +219,7 @@ void DecoderSectionControlComponent::resized()
     weightingButton->setBounds(border, 3 * standardHeight + 5 * border, standardWidth, standardHeight);
     filterComponent->setBounds(border, 4 * standardHeight + 6 * border, standardWidth, standardHeight + border);
     gainSlider->setBounds(border, 5 * standardHeight + 7 * border, standardWidth, height - standardHeight - 5 * standardHeight - 8 * border);
-    gainSlider->setTextBoxStyle(juce::Slider::TextBoxBelow, false, width - 4 * border, standardHeight);
+    gainSlider->setTextBoxStyle(juce::Slider::NoTextBox, false, width - 4 * border, standardHeight);
     muteButton->setBounds(border, height - standardHeight, width / 2 - 2 * border, standardHeight - border);
     colorField->setBounds(border, height - standardHeight - border, standardWidth, standardHeight);
 }
@@ -261,10 +254,13 @@ void DecoderSectionControlComponent::updateUI()
 {
     nameEditor->setText(pAmbiSettings->name);
     gainSlider->setValue(Decibels::gainToDecibels(pAmbiSettings->gain));
+    gainSlider->setColour(juce::Slider::rotarySliderFillColourId, pAmbiSettings->color);
+    gainSlider->repaint();
     muteButton->setToggleState(pAmbiSettings->mute, dontSendNotification);
     filterComponent->setRow(0, pAmbiSettings->color);
     colorField->setRowAndColumn(0, 0);
     controlDimming();
     resized();
+    repaint();
 }
 

@@ -29,7 +29,7 @@
 class CheckBoxFilterCustomComponent : public Component, private  ToggleButton::Listener
 {
 public:
-	CheckBoxFilterCustomComponent(FilterControlCallback& _owner) : owner(_owner)
+	CheckBoxFilterCustomComponent(FilterControlCallback& _owner) : owner(_owner), row(0)
 	{
         addAndMakeVisible(toggle);
         toggle.addListener(this);
@@ -131,8 +131,11 @@ private:
         g.setColour(Colours::lightgrey);
         g.drawLine(float(toggle.getWidth()), (float)getHeight()/2.0f, float(getWidth()), (float)getHeight()/2.0f);
         
-        g.setColour(owner.getBypass(row) ? Colours::red : activeColor);
-        g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);
+        if (!owner.getBypass(row))
+        {
+            g.setColour(activeColor);
+            g.strokePath(thumbnailFilterPath, *strokeType.get(), transform);
+        }
     }
     
     void buttonClicked(Button* b) override

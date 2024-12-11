@@ -5,7 +5,7 @@ AmbiLookAndFeel::AmbiLookAndFeel()
     //setColour(juce::Slider::thumbColourId, juce::Colours::red);
 }
 
-void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider&)
+void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int width, int height, float sliderPos, const float rotaryStartAngle, const float rotaryEndAngle, juce::Slider& slider)
 {
     auto radius = (float)juce::jmin(width / 2, height / 2) - 4.0f;
     auto centreX = (float)x + (float)width * 0.5f;
@@ -16,12 +16,13 @@ void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
     auto angle = rotaryStartAngle + sliderPos * (rotaryEndAngle - rotaryStartAngle);
 
     // fill
-    g.setColour(juce::Colours::orange);
+    Colour c = slider.findColour(juce::Slider::ColourIds::rotarySliderFillColourId);
+    g.setColour(c);
     g.fillEllipse(rx, ry, rw, rw);
 
     // outline
-    g.setColour(juce::Colours::red);
-    g.drawEllipse(rx, ry, rw, rw, 1.0f);
+    g.setColour(juce::Colours::darkgrey);
+    g.drawEllipse(rx, ry, rw, rw, 2.0f);
 
     juce::Path p;
     auto pointerLength = radius * 0.33f;
@@ -30,8 +31,18 @@ void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
     p.applyTransform(juce::AffineTransform::rotation(angle).translated(centreX, centreY));
 
     // pointer
-    g.setColour(juce::Colours::yellow);
+    Colour invColor = c.contrasting(); // c.contrasting(Colours::yellow, 0.3f);
+    
+    g.setColour(invColor);
     g.fillPath(p);
+
+    auto rxt = centreX - radius * 0.6f;
+    auto ryt = centreY - radius * 0.6f;
+    auto rwt = radius * 1.2f;
+    auto value = slider.getValue();
+    auto valueString = value > 0 ? ("+" + String(value, 1)) : String(value, 1);
+    g.drawFittedText(valueString, rxt, ryt, rwt, rwt/2, Justification::centred, 1);
+    g.drawFittedText(slider.getTextValueSuffix(), rxt, ryt + rwt / 2, rwt, rwt / 2, Justification::centred, 1);
 }
 
 void AmbiLookAndFeel::drawLinearSlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/, Slider::SliderStyle, Slider&)
