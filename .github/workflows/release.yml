@@ -44,7 +44,6 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
-        c_compiler: [clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
@@ -63,13 +62,6 @@ jobs:
             c_compiler: clang
             cpp_compiler: clang++
             name: macOS
-        exclude:
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
-          - os: macos-latest
-            c_compiler: cl
 
     steps:
     - uses: actions/checkout@v4
