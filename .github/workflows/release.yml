@@ -50,9 +50,14 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
             name: Windows
+        #  currently clang is not working with github runner (Ubuntu 24.04)
+        #  - os: ubuntu-latest
+        #    c_compiler: clang
+        #    cpp_compiler: clang++
+        #    name: Linux
           - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+            c_compiler: gcc
+            cpp_compiler: g++
             name: Linux
           - os: macos-latest
             c_compiler: clang
