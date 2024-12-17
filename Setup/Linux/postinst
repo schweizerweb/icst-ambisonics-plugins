@@ -3,8 +3,8 @@ mkdir -p $USER_HOME_DIR/.vst3
 mkdir -p $USER_HOME_DIR/.lv2
 mkdir -p $USER_HOME_DIR/.config/REAPER/ProjectTemplates
 mkdir -p $USER_HOME_DIR/.config/REAPER/TrackTemplates
-cp -r /tmp/icst.tmp/vst3/* $USER_HOME_DIR/.vst3/ || exit 1
-cp -r /tmp/icst.tmp/lv2/* $USER_HOME_DIR/.lv2/ || exit 1
-cp -r /tmp/icst.tmp/templates/ProjectTemplates/* $USER_HOME_DIR/.config/REAPER/ProjectTemplates || exit 1
-cp -r /tmp/icst.tmp/templates/TrackTemplates/* $USER_HOME_DIR/.config/REAPER/TrackTemplates || exit 1
+ln -sf /usr/lib/vst3/Ambi* $USER_HOME_DIR/.vst3/ || exit 1
+ln -sf /usr/lib/lv2/Ambi* $USER_HOME_DIR/.lv2/ || exit 1
+cp -f /usr/lib/icst.templates/ProjectTemplates/* $USER_HOME_DIR/.config/REAPER/ProjectTemplates || exit 1
+ln -sf /usr/lib/icst.templates/TrackTemplates/* $USER_HOME_DIR/.config/REAPER/TrackTemplates || exit 1
 echo "install complete"
