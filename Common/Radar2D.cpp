@@ -570,8 +570,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
                 }
             }
             
-            for(auto i : selection)
+            for (auto i : selection)
+            {
                 pEditablePoints->setMute(i, anyNotMuted);
+            }
+
+            pPointSelection->notifyChange();
         }
         else if(key.isKeyCode(83)) // 's'
         {
@@ -585,8 +589,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
                 }
             }
             
-            for(auto i : selection)
+            for (auto i : selection)
+            {
                 pEditablePoints->setSolo(i, anyNotSolo);
+            }
+
+            pPointSelection->notifyChange();
         }
         else if(pRadarOptions->allowDelete && (key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey)))
         {
@@ -594,6 +602,8 @@ bool Radar2D::keyPressed(const KeyPress& key)
             {
                 pEditablePoints->setEnabled(i, false);
             }
+
+            pPointSelection->notifyChange();
         }
         
         return true;
