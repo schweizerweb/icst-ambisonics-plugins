@@ -58,7 +58,6 @@ public:
 	void mouseEnter(const MouseEvent& e) override;
 	double getMaxPointSelectionDist() const;
 	void mouseDown(const MouseEvent& e) override;
-    std::unique_ptr<Point3D<double> > extracted(Point3D<double> &referencePoint, const Point<float> &valuePoint);
     
     void mouseDrag(const MouseEvent& e) override;
 	void setCenterPoint(Point<float> valuePoint) const;
@@ -92,7 +91,7 @@ private:
 	void paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* point, float pointSize, Shape shape, bool select = false, float selectionSize = 0.0, bool extendedHandles = false, bool groupFlag = false) const;
 	void paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const;
 
-	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const;
+	void paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float pointSize, float offsetFactor, bool groupFlag) const;
 	float getEditablePointSize(float scaler) const;
 	float getDisplayOnlyPointSize(float scaler) const;
     float getGroupPointSize(float scaler) const;

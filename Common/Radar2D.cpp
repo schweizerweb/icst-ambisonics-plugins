@@ -337,23 +337,37 @@ void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize
     }
 }
 
-void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float pointSize, float offsetFactor, bool groupFlag) const
 {
     double baseScaler = groupFlag ? pRadarOptions->zoomSettings->getGroupPointScaler() : pRadarOptions->zoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
-    int y = screenPt.getY() > offset + (float)scaledImageHeight
-		? int(screenPt.getY() - offset - (float)scaledImageHeight)
-		: int(screenPt.getY() + offset);
-	if(screenPt.getX() > (float)getWidth() / 2.0f
-		&& screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
-	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-	}
-	else
-	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-	}
+
+    if (pRadarOptions->zoomSettings->getLabelInPointFlag())
+    {
+        float imgSize = pointSize * 0.8f;
+        int referenceSize = jmax(labelImage.getHeight(), labelImage.getWidth());
+        int w = (int)(imgSize / referenceSize * labelImage.getWidth());
+        int h = (int)(imgSize / referenceSize * labelImage.getHeight());
+
+        g->drawImage(labelImage, int(screenPt.getX() - w / 2.0), int(screenPt.getY() - h / 2.0), w, h, 0, 0, labelImage.getWidth(), labelImage.getHeight());
+    }
+    else
+    {
+        float offset = pointSize * offsetFactor;
+        int y = screenPt.getY() > offset + (float)scaledImageHeight
+            ? int(screenPt.getY() - offset - (float)scaledImageHeight)
+            : int(screenPt.getY() + offset);
+        if (screenPt.getX() > (float)getWidth() / 2.0f
+            && screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
+        {
+            g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
+        }
+        else
+        {
+            g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
+        }
+    }
 }
 
 bool Radar2D::containsIncludingBoder(const Rectangle<int> *rect, Point<int> point) const
@@ -425,7 +439,7 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
     }
 	
     Image* img = point->getLabelImage();
-    paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
+    paintPointLabel(g, *img, screenPt, pointSize, (shape == Square ? 0.7f : 0.5f), groupFlag);
 }
 
 void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const

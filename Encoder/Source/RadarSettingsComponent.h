@@ -76,6 +76,7 @@ private:
     std::unique_ptr<juce::GroupComponent> groupDisplay;
     std::unique_ptr<juce::Slider> sliderPointScaler;
     std::unique_ptr<juce::Label> labelPointScaler;
+    std::unique_ptr<juce::ToggleButton> toggleLabelInPoint;
     std::unique_ptr<juce::Slider> sliderRadius;
     std::unique_ptr<juce::Label> labelRadius;
     std::unique_ptr<juce::TextButton> btnReset;
