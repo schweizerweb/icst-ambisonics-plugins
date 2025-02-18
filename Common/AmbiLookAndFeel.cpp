@@ -45,20 +45,20 @@ void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
     g.drawFittedText(slider.getTextValueSuffix(), rxt, ryt + rwt / 2, rwt, rwt / 2, Justification::centred, 1);
 }
 
-void AmbiLookAndFeel::drawLinearSlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/, Slider::SliderStyle, Slider&)
-{
-    // fill
-    g.setColour(juce::Colours::grey);
-    g.fillRect(x, y, width, height);
-
-    // outline
-    g.setColour(findColour(juce::Slider::ColourIds::thumbColourId));
-    g.fillRect(Rectangle<float>((float)x + 0.5f, sliderPos, (float)width - 1.0f, (float)y + ((float)height - sliderPos)));
-
-    //Graphics::ScopedSaveState state(g);
-    //g.addTransform(AffineTransform::rotation(-MathConstants<float>::halfPi,
-    //    width * 0.5f,
-    //    height * 0.5f));
-    //g.setColour(juce::Colours::white);
-    //g.drawText(String(sliderPos, 2, false), x, height-20, width, height, Justification::bottom);
-}
+//void AmbiLookAndFeel::drawLinearSlider(Graphics &g, int x, int y, int width, int height, float sliderPos, float /*minSliderPos*/, float /*maxSliderPos*/, Slider::SliderStyle, Slider&)
+//{
+//    // fill
+//    g.setColour(juce::Colours::grey);
+//    g.fillRect(x, y, width, height);
+//
+//    // outline
+//    g.setColour(findColour(juce::Slider::ColourIds::thumbColourId));
+//    g.fillRect(Rectangle<float>((float)x + 0.5f, sliderPos, (float)width - 1.0f, (float)y + ((float)height - sliderPos)));
+//
+//    //Graphics::ScopedSaveState state(g);
+//    //g.addTransform(AffineTransform::rotation(-MathConstants<float>::halfPi,
+//    //    width * 0.5f,
+//    //    height * 0.5f));
+//    //g.setColour(juce::Colours::white);
+//    //g.drawText(String(sliderPos, 2, false), x, height-20, width, height, Justification::bottom);
+//}

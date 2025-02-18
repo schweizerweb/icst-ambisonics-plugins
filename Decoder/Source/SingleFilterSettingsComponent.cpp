@@ -21,6 +21,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "../../Common/FilterInfo.h"
+#include "../../Common/Constants.h"
 //[/Headers]
 
 #include "SingleFilterSettingsComponent.h"
@@ -46,17 +47,27 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
 
     sliderGain.reset (new juce::Slider ("sliderGain"));
     addAndMakeVisible (sliderGain.get());
-    sliderGain->setRange (0.001, 20, 0.001);
-    sliderGain->setSliderStyle (juce::Slider::Rotary);
+    sliderGain->setRange (Constants::GainDbMin, Constants::GainDbMax, 0.1);
+    sliderGain->setSliderStyle(juce::Slider::LinearBar);
     sliderGain->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
     sliderGain->addListener (this);
+    sliderGain->setNumDecimalPlacesToDisplay(1);
+    sliderGain->setTextValueSuffix(" dB");
+    sliderGain->setDoubleClickReturnValue(true, 0.0);
+    sliderGain->setTooltip("Gain [dB]");
+    //sliderGain->setColour(juce::Slider::rotarySliderFillColourId, Colours::darkgreen);
 
     sliderQ.reset (new juce::Slider ("sliderQ"));
     addAndMakeVisible (sliderQ.get());
     sliderQ->setRange (0.001, 100, 0);
-    sliderQ->setSliderStyle (juce::Slider::Rotary);
+    sliderQ->setSliderStyle(juce::Slider::LinearBar);
     sliderQ->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
     sliderQ->addListener (this);
+    sliderQ->setDoubleClickReturnValue(true, 0.0);
+    sliderQ->setTextValueSuffix(" (Q)");
+    sliderQ->setTooltip("Q value");
+    //sliderQ->setColour(juce::Slider::rotarySliderFillColourId, Colours::darkorange);
+    sliderQ->setNumDecimalPlacesToDisplay(3);
 
     comboBoxType.reset (new juce::ComboBox ("comboBoxType"));
     addAndMakeVisible (comboBoxType.get());
@@ -72,6 +83,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     sliderFrequency->setSliderStyle (juce::Slider::LinearBar);
     sliderFrequency->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderFrequency->addListener (this);
+    sliderFrequency->setTooltip("Cutoff frequency [Hz]");
 
     labelQ.reset (new juce::Label ("labelQ",
                                    TRANS("Q")));
@@ -80,7 +92,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     labelQ->setJustificationType (juce::Justification::centred);
     labelQ->setEditable (false, false, false);
     labelQ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelQ->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    labelQ->setColour (juce::TextEditor::backgroundColourId, Colours::darkorange);
 
     labelGain.reset (new juce::Label ("labelGain",
                                       TRANS("Gain")));
@@ -89,11 +101,11 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     labelGain->setJustificationType (juce::Justification::centred);
     labelGain->setEditable (false, false, false);
     labelGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelGain->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
+    labelGain->setColour (juce::TextEditor::backgroundColourId, Colours::darkgreen);
+    
 
     //[UserPreSize]
-    sliderFrequency->setTextValueSuffix(" [Hz]");
+    sliderFrequency->setTextValueSuffix(" Hz");
     //[/UserPreSize]
 
     setSize (600, 400);
@@ -115,10 +127,8 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     sliderFrequency->setSkewFactorFromMidPoint(500);
     sliderFrequency->setRange(20, jmin(int(pFilterSpecification->sampleRate / 2.0), 22000));
     sliderFrequency->setNumDecimalPlacesToDisplay(0);
-    sliderQ->setNumDecimalPlacesToDisplay(3);
-    sliderQ->setSkewFactorFromMidPoint(1.0);
-    sliderGain->setNumDecimalPlacesToDisplay(3);
-    sliderGain->setSkewFactorFromMidPoint(1.0);
+    
+    setLookAndFeel(&ambiLookAndFeel);
 
     updateUi();
 
@@ -129,6 +139,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
 SingleFilterSettingsComponent::~SingleFilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
+    setLookAndFeel(nullptr);
     removeAllChangeListeners();
     //[/Destructor_pre]
 
@@ -162,13 +173,20 @@ void SingleFilterSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupMain->setBounds (0, 0, getWidth() - 0, getHeight() - 0);
-    sliderGain->setBounds (getWidth() - proportionOfWidth (0.5000f), 88, proportionOfWidth (0.5000f), getHeight() - 96);
-    sliderQ->setBounds (0, 88, proportionOfWidth (0.5000f), getHeight() - 96);
-    comboBoxType->setBounds (16, 24, getWidth() - 32, 24);
-    sliderFrequency->setBounds (16, 56, getWidth() - 32, 24);
-    labelQ->setBounds (0 + juce::roundToInt (proportionOfWidth (0.5000f) * 0.5017f) - (24 / 2), 88 + juce::roundToInt ((getHeight() - 96) * 0.5021f) - (24 / 2), 24, 24);
-    labelGain->setBounds ((getWidth() - proportionOfWidth (0.5000f)) + juce::roundToInt (proportionOfWidth (0.5000f) * 0.4983f) - (48 / 2), 88 + juce::roundToInt ((getHeight() - 96) * 0.5021f) - (24 / 2), 48, 24);
+    int horizBorder = 4;
+    int vertBorder = 0;
+    int offset = 10;
+    int height = int((getHeight() - offset - 4 - 8*vertBorder) / 4.0);
+    groupMain->setBounds (0, 0, getWidth() - 0, getHeight());
+    comboBoxType->setBounds(horizBorder, offset + vertBorder, getWidth() - 2 * horizBorder, height);
+    sliderFrequency->setBounds(horizBorder, offset + height + 3*vertBorder, getWidth() - 2 * horizBorder, height);
+    sliderGain->setBounds(horizBorder, offset + 2*height + 5*vertBorder, getWidth() - 2 * horizBorder, height);
+    sliderQ->setBounds(horizBorder, offset + 3*height + 7*vertBorder, getWidth() - 2*horizBorder, getHeight() - (4 + offset+ 3*height + 7*vertBorder));
+
+    /*sliderGain->setBounds (proportionOfWidth (0.5000f) + 2, 88, proportionOfWidth (0.5000f) - 2, getHeight() - 70);
+    sliderQ->setBounds (2, 88, proportionOfWidth (0.5000f) - 2, getHeight() - 70);*/
+    //labelQ->setBounds (2, getHeight() - 24, proportionOfWidth(0.5f) - 4, 22);
+    //labelGain->setBounds (proportionOfWidth (0.5000f) +2, getHeight() - 24, proportionOfWidth(0.5) - 4, 22);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -181,7 +199,7 @@ void SingleFilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThat
     if (sliderThatWasMoved == sliderGain.get())
     {
         //[UserSliderCode_sliderGain] -- add your slider handling code here..
-        pFilterInfo->gainFactor = float(sliderGain->getValue());
+        pFilterInfo->gainFactor = Decibels::decibelsToGain(float(sliderGain->getValue()));
         //[/UserSliderCode_sliderGain]
     }
     else if (sliderThatWasMoved == sliderQ.get())
@@ -232,7 +250,7 @@ void SingleFilterSettingsComponent::updateUi()
     comboBoxType->setSelectedId(1 + pFilterInfo->filterType, dontSendNotification);
     sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
     sliderQ->setValue(pFilterInfo->qValue);
-    sliderGain->setValue(pFilterInfo->gainFactor);
+    sliderGain->setValue(Decibels::gainToDecibels(pFilterInfo->gainFactor));
 
     sliderFrequency->setEnabled(pFilterInfo->frequencyRequired());
     sliderQ->setEnabled(pFilterInfo->qRequired());

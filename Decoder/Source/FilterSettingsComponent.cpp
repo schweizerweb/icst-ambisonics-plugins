@@ -67,21 +67,13 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
-    filter0.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(0), pFilterSpecification, this));
-    addAndMakeVisible (filter0.get());
-    filter0->setName ("filter0");
-
-    filter1.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(1), pFilterSpecification, this));
-    addAndMakeVisible (filter1.get());
-    filter1->setName ("filter1");
-
-    filter2.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(2), pFilterSpecification, this));
-    addAndMakeVisible (filter2.get());
-    filter2->setName ("filter2");
-
-    filter3.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(3), pFilterSpecification, this));
-    addAndMakeVisible (filter3.get());
-    filter3->setName ("filter3");
+    for (int i = 0; i < MAX_FILTER_COUNT; i++)
+    {
+        auto filterControl = new SingleFilterSettingsComponent(pFilterBankInfo->get(i), pFilterSpecification, this);
+        filterControls.add(filterControl);
+        filterControl->setName("filter" + String(i));
+        addAndMakeVisible(filterControl);
+    }
 
     toggleBypass.reset (new juce::ToggleButton ("toggleBypass"));
     addAndMakeVisible (toggleBypass.get());
@@ -113,7 +105,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (700, 550);
+    setSize (800, 500);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -149,10 +141,7 @@ FilterSettingsComponent::~FilterSettingsComponent()
     comboBoxFilterPreset = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
-    filter0 = nullptr;
-    filter1 = nullptr;
-    filter2 = nullptr;
-    filter3 = nullptr;
+    filterControls.clear();
     toggleBypass = nullptr;
     toggleFFT = nullptr;
     sliderFFTScaler = nullptr;
@@ -180,13 +169,14 @@ void FilterSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    filterGraph->setBounds (0, 40, getWidth() - 0, getHeight() - 240);
+    filterGraph->setBounds (0, 40, getWidth() - 0, getHeight() - 180);
     comboBoxFilterPreset->setBounds (72, 8, getWidth() - 167, 24);
     buttonSave->setBounds (getWidth() - 7 - 80, 8, 80, 24);
-    filter0->setBounds (0, getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    for (int i = 0; i < filterControls.size(); i++)
+    {
+        filterControls[i]->setBounds(proportionOfWidth(1.0/filterControls.size()*i), getHeight() - 140, proportionOfWidth(1.0/filterControls.size()), 140);
+    }
+
     toggleBypass->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58 - 128, 42, 128, 24);
     toggleFFT->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58, 42, 58, 24);
     sliderFFTScaler->setBounds (getWidth() - 170, 42, 170, 24);
@@ -304,10 +294,11 @@ void FilterSettingsComponent::actionListenerCallback(const String &message)
         File presetFile(message.substring(pPresetHelper->UniqueActionMessageSelectPreset().length()));
         pPresetHelper->loadFromXmlFile(presetFile, pFilterBankInfo);
         pPresetHelper->notifyPresetChanged();
-        filter0->updateUi();
-        filter1->updateUi();
-        filter2->updateUi();
-        filter3->updateUi();
+        
+        for (int i = 0; i < filterControls.size(); i++)
+        {
+            filterControls[i]->updateUi();
+        }
     }
 }
 

@@ -82,10 +82,7 @@ private:
     std::unique_ptr<juce::ComboBox> comboBoxFilterPreset;
     std::unique_ptr<juce::Label> labelPresets;
     std::unique_ptr<juce::TextButton> buttonSave;
-    std::unique_ptr<SingleFilterSettingsComponent> filter0;
-    std::unique_ptr<SingleFilterSettingsComponent> filter1;
-    std::unique_ptr<SingleFilterSettingsComponent> filter2;
-    std::unique_ptr<SingleFilterSettingsComponent> filter3;
+    OwnedArray<SingleFilterSettingsComponent> filterControls;
     std::unique_ptr<juce::ToggleButton> toggleFFT;
     std::unique_ptr<juce::ToggleButton> toggleBypass;
     std::unique_ptr<juce::Slider> sliderFFTScaler;
