@@ -36,9 +36,9 @@ void AmbiLookAndFeel::drawRotarySlider(juce::Graphics& g, int x, int y, int widt
     g.setColour(invColor);
     g.fillPath(p);
 
-    auto rxt = centreX - radius * 0.6f;
-    auto ryt = centreY - radius * 0.6f;
-    auto rwt = radius * 1.2f;
+    int rxt = int(centreX - radius * 0.6f);
+    int ryt = int(centreY - radius * 0.6f);
+    int rwt = int(radius * 1.2f);
     auto value = slider.getValue();
     auto valueString = value > 0 ? ("+" + String(value, 1)) : String(value, 1);
     g.drawFittedText(valueString, rxt, ryt, rwt, rwt/2, Justification::centred, 1);

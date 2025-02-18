@@ -771,9 +771,9 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
                     if(m_args.pDawParams->updateTrackPropertiesWorking)
                     {
                         m.addItem(PopupMenu::Item("Apply Track Color")
-                            .setImage(std::unique_ptr<Drawable>(LabelCreator::createColorField(m_args.pDawParams->lastTrackProperties.colour)))
+                            .setImage(std::unique_ptr<Drawable>(LabelCreator::createColorField(m_args.pDawParams->lastTrackProperties.colour.value_or(Colours::black))))
                             .setAction([this, row](){
-                                Colour color = m_args.pDawParams->lastTrackProperties.colour;
+                                Colour color = m_args.pDawParams->lastTrackProperties.colour.value_or(Colours::black);
                                 auto selection = m_args.pPointSelection->getSelectedIndices();
                                 for (int i = 0; i < selection.size(); i++)
                                 {

@@ -66,8 +66,8 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     if (sources->size() == 0)
     {
 		scalingInfo.SetScaler(1.0);
-        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
-        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
+        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name.value_or("1") : "1";
+        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour.value_or(TrackColors::getColor(0)) : TrackColors::getColor(0);
         sources->addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
@@ -458,8 +458,8 @@ void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties
 #if (!MULTI_ENCODER_MODE)
 	if (sources->size() > 0)
 	{
-		sources->get(0)->setName(properties.name);
-		sources->get(0)->setColor(properties.colour);
+		sources->get(0)->setName(properties.name.value_or("1"));
+		sources->get(0)->setColor(properties.colour.value_or(TrackColors::getColor(0)));
 	}
 #endif
 }

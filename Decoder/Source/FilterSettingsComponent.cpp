@@ -174,7 +174,7 @@ void FilterSettingsComponent::resized()
     buttonSave->setBounds (getWidth() - 7 - 80, 8, 80, 24);
     for (int i = 0; i < filterControls.size(); i++)
     {
-        filterControls[i]->setBounds(proportionOfWidth(1.0/filterControls.size()*i), getHeight() - 140, proportionOfWidth(1.0/filterControls.size()), 140);
+        filterControls[i]->setBounds(proportionOfWidth(1.0f/filterControls.size()*i), getHeight() - 140, proportionOfWidth(1.0f/filterControls.size()), 140);
     }
 
     toggleBypass->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58 - 128, 42, 128, 24);
