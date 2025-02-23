@@ -272,15 +272,6 @@ void AmbiSourceSet::resetIds()
 }
 
 
-bool AmbiSourceSet::anySolo() const
-{
-    for(auto& p : elements)
-        if(p->getSolo())
-            return true;
-    
-    return false;
-}
-
 void AmbiSourceSet::setDistanceScaler(double newDistanceScaler)
 {
     distanceScaler = newDistanceScaler;

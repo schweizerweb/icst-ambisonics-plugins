@@ -58,6 +58,7 @@ public:
 	void updateRadarOptions();
 	void actionListenerCallback(const String& message) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+    SharedResourcePointer<TooltipWindow> tooltipWindow;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -76,7 +77,7 @@ private:
 	AmbisonicsDecoderAudioProcessor& mainProcessor;
 	AmbiSpeakerSet* pSpeakerSet;
 	AmbiSourceSet* pMovingPoints;
-	AmbiSettings* pAmbiSettings;
+	AmbiSettingsCollection* pAmbiSettings;
 	DecoderSettings *pDecoderSettings;
 	OSCHandler* pOscHandler;
 	PointSelection pointSelection;

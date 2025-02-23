@@ -24,10 +24,12 @@
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "../../Common/AmbiSourceSet.h"
+#include "../../Common/PresetManagerDialog.h"
 #include "AnimatorActionComponent.h"
 #include "AnimatorMovementComponent.h"
 #include "EncoderSettings.h"
 #include "AnimatorDataset.h"
+#include "AnimatorPresetHelper.h"
 
 #define STEP_TIMER_ID       1
 #define STEP_TIMER_INTERVAL 50
@@ -45,7 +47,8 @@
 */
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
-                           public ActionListener
+                           public ActionListener,
+                           public TextButton::Listener
 {
 public:
     //==============================================================================
@@ -70,10 +73,12 @@ private:
     void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
     void setPreset(PositionSet* pSet, int groupIndex);
     void performAction(AnimatorAction* pAction);
-    void refreshControls();
+    void setData();
     
     AmbiSourceSet* pSourceSet;
     AnimatorDataset* pAnimatorDataset;
+    std::unique_ptr<AnimatorPresetHelper> animatorPresetHelper;
+    PresetManagerDialog presetManagerDialog;
 
 #if MULTI_ENCODER_MODE
     OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
@@ -88,10 +93,14 @@ private:
     std::unique_ptr<AnimatorMovementComponent> preset2;
     std::unique_ptr<AnimatorMovementComponent> preset3;
     std::unique_ptr<AnimatorMovementComponent> preset4;
+    std::unique_ptr<TextButton> btnPresets;
 
 
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnimatorComponent)
+
+        // Inherited via Listener
+        void buttonClicked(Button*) override;
 };
 
 //[EndFile] You can add extra defines here...

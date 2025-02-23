@@ -26,11 +26,16 @@
 #define MAX_NB_OF_AMBISONICS_GAINS (MAX_AMBISONICS_ORDER + 1)
 #define MAX_NB_OF_AMBISONICS_CHANNELS (MAX_NB_OF_AMBISONICS_GAINS * MAX_NB_OF_AMBISONICS_GAINS)
 #define MAX_NUM_CHANNELS    64
+#define FFT_INDEX_OFFSET_MULTIDECODER 100
 
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT "AmbiChannelWeight"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE "AmbiChannelWeightMode"
 #define XML_TAG_PRESET_AMBICHANNELWEIGHT_PLUGIN_ORDER "AmbiPluginOrder"
+#define XML_ATTRIBUTE_AMBI_ORDER "ambiOrder"
 #define XML_VALUE "Value"
+
+#define DEAFULT_AMBI_ORDER 1
+#define DEFAULT_WEIGHT_MODE (AmbiSettings::INPHASE)
 
 class AmbiSettings
 {
@@ -45,13 +50,12 @@ public:
     void setWeightMode(AmbiWeightMode mode);
     
     void writeToPresetXmlElement(XmlElement* xmlElement) const;
-    void loadFromPresetXml(XmlElement* xmlElement);
+    bool loadFromPresetXml(XmlElement* xmlElement);
 
     int getGainCount();
     int getAmbiOrder();
     void setAmbiOrder(int order);
     int getAmbiChannelCount() const;
-    bool getWarningFlag();
     
 private:
 	double fact(int n);
@@ -68,5 +72,4 @@ private:
     int ambiOrder;
     
     AmbiWeightMode weightMode;
-    bool loadWarningFlag;
 };

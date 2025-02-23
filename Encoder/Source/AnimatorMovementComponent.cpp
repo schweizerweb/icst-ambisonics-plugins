@@ -66,7 +66,7 @@ AnimatorMovementComponent::AnimatorMovementComponent (AmbiSourceSet* _pSourceSet
     labelG.reset (new juce::Label ("new label",
                                    TRANS("G:")));
     addAndMakeVisible (labelG.get());
-    labelG->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelG->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelG->setJustificationType (juce::Justification::centredLeft);
     labelG->setEditable (false, false, false);
     labelG->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -229,7 +229,15 @@ void AnimatorMovementComponent::refreshControls()
 
     sliderTime->setValue(pAnimatorMovement->timeSpanSeconds);
     togglePolar->setToggleState(pAnimatorMovement->polarFlag, dontSendNotification);
+    controlDimming();
 }
+
+void AnimatorMovementComponent::setData(AnimatorMovement* pMovement)
+{
+    pAnimatorMovement = pMovement;
+    refreshControls();
+}
+
 void AnimatorMovementComponent::controlDimming()
 {
     bool en = pAnimatorMovement->groupPositions.size() > 0;

@@ -42,6 +42,7 @@ Radar2D::Radar2D(RadarMode mode, AmbiDataSet* _pEditablePoints, AmbiDataSet* _pD
 	openGLContext.setRenderer(this);
 	openGLContext.attachTo(*this);
 	openGLContext.setContinuousRepainting(false);
+    Component::setTransform(AffineTransform::scale(Desktop::getInstance().getGlobalScaleFactor()));
 
 	setWantsKeyboardFocus(true);
 
@@ -127,8 +128,12 @@ Image Radar2D::createRadarBackground() const
 
     Rectangle<float> localBounds = radarViewport.toFloat().withZeroOrigin();
 
-	Image img = Image(Image::ARGB, int(localBounds.getWidth()), int(localBounds.getHeight()), true);
-	Graphics g(img);
+    Rectangle<float> localBoundsAll = radarViewportWithBorder.toFloat().withZeroOrigin();
+    Image imgAll = Image(Image::ARGB, int(localBoundsAll.getWidth()), int(localBoundsAll.getHeight()), true);
+    Graphics g(imgAll);
+
+    g.saveState();
+    g.addTransform(AffineTransform::translation(border, border));
 	g.setColour(radarColors.getRadarLineColor());
 	g.setFont(getFontSize());
     
@@ -188,21 +193,27 @@ Image Radar2D::createRadarBackground() const
         g.fillRect(x, y, squareSize, squareSize);
     }
     
-    Rectangle<float> localBoundsAll = radarViewportWithBorder.toFloat().withZeroOrigin();
-    Image imgAll = Image(Image::ARGB, int(localBoundsAll.getWidth()), int(localBoundsAll.getHeight()), true);
-    Graphics gAll(imgAll);
-    gAll.drawImage(img, localBounds.withPosition(border, border));
-    
+    g.restoreState();
+
+    // clean up the border area
+    g.saveState();
+    g.setColour(radarColors.getRadarBackground());
+    g.fillRect(0.0f, 0.0f, localBoundsAll.getWidth(), border);
+    g.fillRect(0.0f, 0.0f, border, localBoundsAll.getHeight());
+    g.fillRect(localBoundsAll.getWidth() - border, 0.0f, border, localBoundsAll.getHeight());
+    g.fillRect(0.0f, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border);
+    g.restoreState();
+
     // labels
-    gAll.setFont(border);
-    gAll.drawText(radarMode == XY ? "Front" : "Top", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
-    gAll.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
+    g.setFont(border);
+    g.drawText(radarMode == XY ? "Front" : "Top", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+    g.drawText(radarMode == XY ? "Back" : "Bottom", Rectangle<float>(0, localBoundsAll.getHeight() - border, localBoundsAll.getWidth(), border), Justification::centred);
     if(radarMode != XZ_Half)
     {
-        gAll.addTransform(AffineTransform::rotation(float(PI)/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
-        gAll.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
-        gAll.addTransform(AffineTransform::rotation(-float(PI), localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
-        gAll.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+        g.addTransform(AffineTransform::rotation(float(PI)/2, localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        g.drawText("Right", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
+        g.addTransform(AffineTransform::rotation(-float(PI), localBoundsAll.getWidth()/2, localBoundsAll.getWidth()/2));
+        g.drawText("Left", Rectangle<float>(0, 0, localBoundsAll.getWidth(), border), Justification::centred);
     }
     
 	return imgAll;
@@ -326,23 +337,37 @@ void Radar2D::drawRotateIcon(Graphics* g, Point<float> screenPt, float pointSize
     }
 }
 
-void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float offset, bool groupFlag) const
+void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screenPt, float pointSize, float offsetFactor, bool groupFlag) const
 {
     double baseScaler = groupFlag ? pRadarOptions->zoomSettings->getGroupPointScaler() : pRadarOptions->zoomSettings->getPointScaler();
     int scaledImageWidth = int(labelImage.getWidth() * baseScaler);
     int scaledImageHeight = int(labelImage.getHeight() * baseScaler);
-    int y = screenPt.getY() > offset + (float)scaledImageHeight
-		? int(screenPt.getY() - offset - (float)scaledImageHeight)
-		: int(screenPt.getY() + offset);
-	if(screenPt.getX() > (float)getWidth() / 2.0f
-		&& screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
-	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-	}
-	else
-	{
-		g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-	}
+
+    if (pRadarOptions->zoomSettings->getLabelInPointFlag())
+    {
+        float imgSize = pointSize * 0.8f;
+        int referenceSize = jmax(labelImage.getHeight(), labelImage.getWidth());
+        int w = (int)(imgSize / referenceSize * labelImage.getWidth());
+        int h = (int)(imgSize / referenceSize * labelImage.getHeight());
+
+        g->drawImage(labelImage, int(screenPt.getX() - w / 2.0), int(screenPt.getY() - h / 2.0), w, h, 0, 0, labelImage.getWidth(), labelImage.getHeight());
+    }
+    else
+    {
+        float offset = pointSize * offsetFactor;
+        int y = screenPt.getY() > offset + (float)scaledImageHeight
+            ? int(screenPt.getY() - offset - (float)scaledImageHeight)
+            : int(screenPt.getY() + offset);
+        if (screenPt.getX() > (float)getWidth() / 2.0f
+            && screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
+        {
+            g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
+        }
+        else
+        {
+            g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
+        }
+    }
 }
 
 bool Radar2D::containsIncludingBoder(const Rectangle<int> *rect, Point<int> point) const
@@ -377,7 +402,8 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
 		}
 	}
 
-    Colour c = point->getMute() ? point->getColor().withAlpha(0.2f) : point->getColor();
+    Colour c = point->getMute() ? point->getColor().withAlpha(0.3f) : point->getColor();
+    
 	g->setColour(c);
 
 	if(shape == Square)
@@ -412,8 +438,8 @@ void Radar2D::paintPoint(Graphics* g, Vector3D<double> absPoint, AmbiPoint* poin
         drawRotateIcon(g, getSpecialIconPositionForCenter(screenPt, RotateInAedSpace), pointSize, false);
     }
 	
-	Image* img = point->getLabelImage();
-	paintPointLabel(g, *img, screenPt, pointSize * (shape == Square ? 0.7f : 0.5f), groupFlag);
+    Image* img = point->getLabelImage();
+    paintPointLabel(g, *img, screenPt, pointSize, (shape == Square ? 0.7f : 0.5f), groupFlag);
 }
 
 void Radar2D::paintConnection(Graphics* g, AmbiGroup* group, Vector3D<double> absSourcePoint) const
@@ -558,8 +584,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
                 }
             }
             
-            for(auto i : selection)
+            for (auto i : selection)
+            {
                 pEditablePoints->setMute(i, anyNotMuted);
+            }
+
+            pPointSelection->notifyChange();
         }
         else if(key.isKeyCode(83)) // 's'
         {
@@ -573,8 +603,12 @@ bool Radar2D::keyPressed(const KeyPress& key)
                 }
             }
             
-            for(auto i : selection)
+            for (auto i : selection)
+            {
                 pEditablePoints->setSolo(i, anyNotSolo);
+            }
+
+            pPointSelection->notifyChange();
         }
         else if(pRadarOptions->allowDelete && (key.isKeyCode(KeyPress::deleteKey) || key.isKeyCode(KeyPress::backspaceKey)))
         {
@@ -582,6 +616,8 @@ bool Radar2D::keyPressed(const KeyPress& key)
             {
                 pEditablePoints->setEnabled(i, false);
             }
+
+            pPointSelection->notifyChange();
         }
         
         return true;
@@ -589,7 +625,7 @@ bool Radar2D::keyPressed(const KeyPress& key)
     if(pPointSelection->getSelectionMode() == PointSelection::Group
        && key.getModifiers().isCtrlDown()
        && key.getModifiers().isShiftDown()
-       && key.isKeyCode(KeyPress::backspaceKey))
+       && (key.isKeyCode(KeyPress::backspaceKey) || (key.isKeyCode(KeyPress::deleteKey))))
     {
         {
             pPointSelection->unselectPoint();
@@ -774,7 +810,11 @@ void Radar2D::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetail
     {
         if(specialGroupManipulationMode && pPointSelection->getSelectionMode() == PointSelection::Group)
         {
-            pEditablePoints->stretchGroup(pPointSelection->getMainSelectedPointIndex(), pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
+            auto selectedGroups = pPointSelection->getSelectedIndices();
+            for (int i = 0; i < selectedGroups.size(); i++)
+            {
+                pEditablePoints->stretchGroup(selectedGroups[i], pRadarOptions->zoomSettings->getCurrentRadius() * wheel.deltaY);
+            }
         }
         else
         {

@@ -35,9 +35,11 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     : pPresetHelper(_pPresetHelper), pFilterBankInfo(_pFilterBankInfo), channelIndex(_channelIndex)
 {
     //[Constructor_pre] You can add your own custom stuff here..
+    std::vector<FilterBankInfo*> filterInfo;
+    filterInfo.push_back(pFilterBankInfo);
     //[/Constructor_pre]
 
-    filterGraph.reset (new IIRFilterGraph (pFilterBankInfo, pFilterSpecification));
+    filterGraph.reset (new IIRFilterGraph (filterInfo, pFilterSpecification));
     addAndMakeVisible (filterGraph.get());
     filterGraph->setName ("filterGraph");
 
@@ -52,7 +54,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     labelPresets.reset (new juce::Label ("labelPresets",
                                          TRANS("Presets:")));
     addAndMakeVisible (labelPresets.get());
-    labelPresets->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPresets->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelPresets->setJustificationType (juce::Justification::centredLeft);
     labelPresets->setEditable (false, false, false);
     labelPresets->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -65,21 +67,18 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     buttonSave->setButtonText (TRANS("save"));
     buttonSave->addListener (this);
 
-    filter0.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(0), pFilterSpecification, this));
-    addAndMakeVisible (filter0.get());
-    filter0->setName ("filter0");
+    for (int i = 0; i < MAX_FILTER_COUNT; i++)
+    {
+        auto filterControl = new SingleFilterSettingsComponent(pFilterBankInfo->get(i), pFilterSpecification, this);
+        filterControls.add(filterControl);
+        filterControl->setName("filter" + String(i));
+        addAndMakeVisible(filterControl);
+    }
 
-    filter1.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(1), pFilterSpecification, this));
-    addAndMakeVisible (filter1.get());
-    filter1->setName ("filter1");
-
-    filter2.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(2), pFilterSpecification, this));
-    addAndMakeVisible (filter2.get());
-    filter2->setName ("filter2");
-
-    filter3.reset (new SingleFilterSettingsComponent (pFilterBankInfo->get(3), pFilterSpecification, this));
-    addAndMakeVisible (filter3.get());
-    filter3->setName ("filter3");
+    toggleBypass.reset (new juce::ToggleButton ("toggleBypass"));
+    addAndMakeVisible (toggleBypass.get());
+    toggleBypass->setButtonText (TRANS("Bypass filter"));
+    toggleBypass->addListener (this);
 
     toggleFFT.reset (new juce::ToggleButton ("toggleFFT"));
     addAndMakeVisible (toggleFFT.get());
@@ -96,7 +95,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     labelFFTScaler.reset (new juce::Label ("labelFFTScaler",
                                            TRANS("Scaler [dB]:")));
     addAndMakeVisible (labelFFTScaler.get());
-    labelFFTScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelFFTScaler->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelFFTScaler->setJustificationType (juce::Justification::centredLeft);
     labelFFTScaler->setEditable (false, false, false);
     labelFFTScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -106,7 +105,7 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
     //[UserPreSize]
     //[/UserPreSize]
 
-    setSize (700, 550);
+    setSize (800, 500);
 
 
     //[Constructor] You can add your own custom stuff here..
@@ -116,15 +115,24 @@ FilterSettingsComponent::FilterSettingsComponent (FilterBankInfo* _pFilterBankIn
 	addChangeListener(pChangeListener);
 
     updatePresetComboBox();
-    pPresetHelper->addActionListener(this);
+    if (pPresetHelper != nullptr)
+    {
+        pPresetHelper->addActionListener(this);
+    }
+
     sliderFFTScaler->setValue(INITIAL_FFT_SCALER);
+    toggleBypass->setToggleState(pFilterBankInfo->getFilterBypass(), dontSendNotification);
     //[/Constructor]
 }
 
 FilterSettingsComponent::~FilterSettingsComponent()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
-    pPresetHelper->removeActionListener(this);
+    if (pPresetHelper != nullptr)
+    {
+        pPresetHelper->removeActionListener(this);
+    }
+
     stopTimer();
     FFTAnalyzer::getInstance()->disable();
     //[/Destructor_pre]
@@ -133,10 +141,8 @@ FilterSettingsComponent::~FilterSettingsComponent()
     comboBoxFilterPreset = nullptr;
     labelPresets = nullptr;
     buttonSave = nullptr;
-    filter0 = nullptr;
-    filter1 = nullptr;
-    filter2 = nullptr;
-    filter3 = nullptr;
+    filterControls.clear();
+    toggleBypass = nullptr;
     toggleFFT = nullptr;
     sliderFFTScaler = nullptr;
     labelFFTScaler = nullptr;
@@ -163,13 +169,15 @@ void FilterSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    filterGraph->setBounds (0, 40, getWidth() - 0, getHeight() - 240);
+    filterGraph->setBounds (0, 40, getWidth() - 0, getHeight() - 180);
     comboBoxFilterPreset->setBounds (72, 8, getWidth() - 167, 24);
     buttonSave->setBounds (getWidth() - 7 - 80, 8, 80, 24);
-    filter0->setBounds (0, getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter1->setBounds (proportionOfWidth (0.2491f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter2->setBounds (proportionOfWidth (0.4983f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
-    filter3->setBounds (proportionOfWidth (0.7509f), getHeight() - 200, proportionOfWidth (0.2491f), 200);
+    for (int i = 0; i < filterControls.size(); i++)
+    {
+        filterControls[i]->setBounds(proportionOfWidth(1.0f/filterControls.size()*i), getHeight() - 140, proportionOfWidth(1.0f/filterControls.size()), 140);
+    }
+
+    toggleBypass->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58 - 128, 42, 128, 24);
     toggleFFT->setBounds (((getWidth() - 170) + 0 - 85) + 0 - 58, 42, 58, 24);
     sliderFFTScaler->setBounds (getWidth() - 170, 42, 170, 24);
     labelFFTScaler->setBounds ((getWidth() - 170) + 0 - 85, 42, 85, 24);
@@ -204,14 +212,22 @@ void FilterSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == buttonSave.get())
     {
         //[UserButtonCode_buttonSave] -- add your button handler code here..
-        File* newFile = pPresetHelper->tryCreateNewPreset();
-        if(newFile == nullptr)
-                return;
-
-        pPresetHelper->writeToXmlFile(*newFile, pFilterBankInfo);
-        comboBoxFilterPreset->setText("", dontSendNotification);
-        delete newFile;
+        pPresetHelper->tryCreateNewPreset([&](File* newFile) {
+            if (newFile != nullptr)
+            {
+                pPresetHelper->writeToXmlFile(*newFile, pFilterBankInfo);
+                comboBoxFilterPreset->setText("", dontSendNotification);
+            }
+        });
+        
         //[/UserButtonCode_buttonSave]
+    }
+    else if (buttonThatWasClicked == toggleBypass.get())
+    {
+        //[UserButtonCode_toggleBypass] -- add your button handler code here..
+        pFilterBankInfo->setFilterBypass(toggleBypass->getToggleState());
+        sendChangeMessage();
+        //[/UserButtonCode_toggleBypass]
     }
     else if (buttonThatWasClicked == toggleFFT.get())
     {
@@ -273,15 +289,16 @@ void FilterSettingsComponent::actionListenerCallback(const String &message)
     {
         updatePresetComboBox();
     }
-    else if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    else if(message.startsWith(pPresetHelper->UniqueActionMessageSelectPreset()))
     {
-        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        File presetFile(message.substring(pPresetHelper->UniqueActionMessageSelectPreset().length()));
         pPresetHelper->loadFromXmlFile(presetFile, pFilterBankInfo);
         pPresetHelper->notifyPresetChanged();
-        filter0->updateUi();
-        filter1->updateUi();
-        filter2->updateUi();
-        filter3->updateUi();
+        
+        for (int i = 0; i < filterControls.size(); i++)
+        {
+            filterControls[i]->updateUi();
+        }
     }
 }
 
@@ -351,6 +368,10 @@ BEGIN_JUCER_METADATA
   <TOGGLEBUTTON name="toggleFFT" id="7049cb4ab444a015" memberName="toggleFFT"
                 virtualName="" explicitFocusOrder="0" pos="0r 42 58 24" posRelativeX="8939080a2743d889"
                 buttonText="FFT" connectedEdges="0" needsCallback="1" radioGroupId="0"
+                state="0"/>
+  <TOGGLEBUTTON name="toggleBypass" id="7049cb4ab444a482" memberName="toggleBypass"
+                virtualName="" explicitFocusOrder="0" pos="0r 42 128 24" posRelativeX="7049cb4ab444a015"
+                buttonText="Bypass filter" connectedEdges="0" needsCallback="1" radioGroupId="0"
                 state="0"/>
   <SLIDER name="sliderFFTScaler" id="8c8b26e83a78b29" memberName="sliderFFTScaler"
           virtualName="" explicitFocusOrder="0" pos="170R 42 170 24" min="0.0"

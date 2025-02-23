@@ -51,7 +51,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelGroup.reset (new juce::Label ("new label",
                                        TRANS("Group:")));
     addAndMakeVisible (labelGroup.get());
-    labelGroup->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelGroup->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelGroup->setJustificationType (juce::Justification::centredLeft);
     labelGroup->setEditable (false, false, false);
     labelGroup->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -69,7 +69,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationX.reset (new juce::Label ("new label",
                                            TRANS("X-Axis")));
     addAndMakeVisible (labelRotationX.get());
-    labelRotationX->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationX->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationX->setJustificationType (juce::Justification::centredLeft);
     labelRotationX->setEditable (false, false, false);
     labelRotationX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -85,7 +85,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationY.reset (new juce::Label ("new label",
                                            TRANS("Y-Axis")));
     addAndMakeVisible (labelRotationY.get());
-    labelRotationY->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationY->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationY->setJustificationType (juce::Justification::centredLeft);
     labelRotationY->setEditable (false, false, false);
     labelRotationY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -101,7 +101,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationZ.reset (new juce::Label ("new label",
                                            TRANS("Z-Axis")));
     addAndMakeVisible (labelRotationZ.get());
-    labelRotationZ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationZ->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationZ->setJustificationType (juce::Justification::centredLeft);
     labelRotationZ->setEditable (false, false, false);
     labelRotationZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -121,7 +121,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationOriginX.reset (new juce::Label ("new label",
                                                  TRANS("X-Axis")));
     addAndMakeVisible (labelRotationOriginX.get());
-    labelRotationOriginX->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationOriginX->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationOriginX->setJustificationType (juce::Justification::centredLeft);
     labelRotationOriginX->setEditable (false, false, false);
     labelRotationOriginX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -137,7 +137,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationOriginY.reset (new juce::Label ("new label",
                                                  TRANS("Y-Axis")));
     addAndMakeVisible (labelRotationOriginY.get());
-    labelRotationOriginY->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationOriginY->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationOriginY->setJustificationType (juce::Justification::centredLeft);
     labelRotationOriginY->setEditable (false, false, false);
     labelRotationOriginY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -153,7 +153,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelRotationOriginZ.reset (new juce::Label ("new label",
                                                  TRANS("Z-Axis")));
     addAndMakeVisible (labelRotationOriginZ.get());
-    labelRotationOriginZ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRotationOriginZ->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRotationOriginZ->setJustificationType (juce::Justification::centredLeft);
     labelRotationOriginZ->setEditable (false, false, false);
     labelRotationOriginZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -173,7 +173,7 @@ AnimatorActionComponent::AnimatorActionComponent (AmbiSourceSet* _pSourceSet, An
     labelStretchSimple.reset (new juce::Label ("new label",
                                                TRANS("Simple")));
     addAndMakeVisible (labelStretchSimple.get());
-    labelStretchSimple->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelStretchSimple->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelStretchSimple->setJustificationType (juce::Justification::centredLeft);
     labelStretchSimple->setEditable (false, false, false);
     labelStretchSimple->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -398,6 +398,11 @@ void AnimatorActionComponent::refreshControls()
     sliderStretchSimple->setValue(pAnimatorAction->stretch, dontSendNotification);
     comboBoxGroup->setSelectedId(pAnimatorAction->groupIndex + 1, dontSendNotification);
     toggleEnable->setToggleState(pAnimatorAction->enabled, dontSendNotification);
+}
+void AnimatorActionComponent::setData(AnimatorAction* pAction)
+{
+    this->pAnimatorAction = pAction;
+    refreshControls();
 }
 //[/MiscUserCode]
 

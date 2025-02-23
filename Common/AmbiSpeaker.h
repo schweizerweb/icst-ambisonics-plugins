@@ -23,8 +23,6 @@
 #include "AmbiPoint.h"
 #include "FilterBankInfo.h"
 
-#define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"
-
 class AmbiSpeaker : public AmbiPoint
 {
 public:
@@ -35,16 +33,15 @@ public:
 	AmbiSpeaker(XmlElement* element);
 
 	FilterBankInfo* getFilterInfo();
-    bool getFilterBypass();
+    bool getFilterBypass() const;
     void setFilterBypass(bool byPass);
     
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
 
     bool allowMute() const override { return true; }
-    bool allowSolo() const override { return false; }
+    bool allowSolo() const override { return true; }
     
 private:
 	FilterBankInfo filterInfo;
-    bool filterBypass;
 };

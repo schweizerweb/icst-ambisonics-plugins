@@ -49,7 +49,7 @@ public:
     bool setChannelNameGain(String channelName, double gain) const;
 	bool setChannelXY(int channel, double x, double y) const;
 	bool setChannelYZ(int channel, double y, double z) const;
-	void setChannelName(int channel, String name) const;
+	bool setChannelName(int channel, String name) const;
 	void setChannelColor(int channel, Colour colour) const;
     void setEnabled(int channel, bool enable) const;
 	void setX(int channel, double x, bool notify = true) const;
@@ -67,7 +67,8 @@ public:
     String getNewUniqueName() const;
 	int getEnabledCount() const;
     float getMaxDistance() const;
-    
+    bool anySolo() const;
+
 	int groupCount() const;
     int activeGroupCount() const;
 	AmbiGroup* getGroup(int index) const;

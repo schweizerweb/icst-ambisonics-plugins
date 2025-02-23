@@ -1,0 +1,1 @@
+Get-ChildItem -Path "../Common" -File | ForEach-Object { "`t$((Resolve-Path $_.FullName -Relative | Out-String).Trim() -replace '\\', '/')" } | Set-Clipboard

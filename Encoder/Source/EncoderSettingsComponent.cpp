@@ -49,7 +49,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",
                                                     TRANS("Unofficial Pre-Release")));
     addAndMakeVisible (labelDevelopmentVersion.get());
-    labelDevelopmentVersion->setFont (juce::Font (25.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelDevelopmentVersion->setFont (juce::Font (juce::FontOptions(25.00f, juce::Font::plain)));
     labelDevelopmentVersion->setJustificationType (juce::Justification::centred);
     labelDevelopmentVersion->setEditable (false, false, false);
     labelDevelopmentVersion->setColour (juce::Label::backgroundColourId, juce::Colour (0xbded0d0d));

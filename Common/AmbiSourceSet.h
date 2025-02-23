@@ -63,8 +63,6 @@ public:
 	void writeToXmlElement(XmlElement* xml) const;
     void resetIds();
     
-    bool anySolo() const;
-    
     double getDistanceScaler() const;
     void setDistanceScaler(double newDistanceScaler);
     

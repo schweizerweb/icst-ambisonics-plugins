@@ -50,7 +50,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     labelBackground.reset (new juce::Label ("labelBackground",
                                             juce::String()));
     addAndMakeVisible (labelBackground.get());
-    labelBackground->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelBackground->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelBackground->setJustificationType (juce::Justification::centredLeft);
     labelBackground->setEditable (false, false, false);
     labelBackground->setColour (juce::Label::backgroundColourId, juce::Colour (0xabf0ffff));
@@ -72,7 +72,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     labelName.reset (new juce::Label ("labelName",
                                       TRANS("Name:")));
     addAndMakeVisible (labelName.get());
-    labelName->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelName->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelName->setJustificationType (juce::Justification::centredRight);
     labelName->setEditable (false, false, false);
     labelName->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -113,7 +113,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     labelCartesian.reset (new juce::Label ("labelCartesian",
                                            TRANS("Cartesian XYZ:")));
     addAndMakeVisible (labelCartesian.get());
-    labelCartesian->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCartesian->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCartesian->setJustificationType (juce::Justification::centredLeft);
     labelCartesian->setEditable (false, false, false);
     labelCartesian->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -154,7 +154,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     labelPolar.reset (new juce::Label ("labelPolar",
                                        TRANS("Polar AED:")));
     addAndMakeVisible (labelPolar.get());
-    labelPolar->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPolar->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelPolar->setJustificationType (juce::Justification::centredLeft);
     labelPolar->setEditable (false, false, false);
     labelPolar->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -165,7 +165,7 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     labelCH.reset (new juce::Label ("labelCH",
                                     TRANS("CH:")));
     addAndMakeVisible (labelCH.get());
-    labelCH->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCH->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCH->setJustificationType (juce::Justification::centredLeft);
     labelCH->setEditable (false, false, false);
     labelCH->setColour (juce::TextEditor::textColourId, juce::Colours::black);

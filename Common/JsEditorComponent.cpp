@@ -97,9 +97,12 @@ Group manipulations:
 Additional methods for group mode (absolute rotation and stretch):
   s.setGroupRotation([index], [x], [y], [z], [w]);
     Sets the absolute rotation of the group to the specified quaternion.
+  s.setGroupRotationEuler([index], [x], [y], [z]);
+    Sets the absolute rotation of the group to the specified axis rotations.
   s.setGroupStretch([index], [stretchFactor]);
     Sets the absolute stretch factor.
   s.setGroupRotationByName([name], [x], [y], [z], [w]);
+  s.setGroupRotationEulerByName([name], [x], [y], [z], [w]);
   s.setGroupStretchByName([name], [stretchFactor]);
     Same with identification of the group by name.
 
@@ -163,7 +166,7 @@ JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpd
     help->setText(helpText, dontSendNotification);
     help->setReadOnly(true);
     //help->setJustificationType(Justification::topLeft);
-    help->setFont(Font(Font::getDefaultMonospacedFontName(), 12.0f, 0));
+    help->setFont(Font(FontOptions(Font::getDefaultMonospacedFontName(), 12.0f, 0)));
     setSize(JS_EDITOR_COMPONENT_WIDTH, JS_EDITOR_COMPONENT_HEIGHT);
 }
 

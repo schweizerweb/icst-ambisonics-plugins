@@ -22,14 +22,15 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "../../Common/AmbiSettings.h"
+#include "../../Common/AmbiSettingsCollection.h"
 #include "../../Common/TestSoundGenerator.h"
 #include "DecoderSettings.h"
 #include "../../Common/DelayBuffer.h"
 #include "../../Common/DelayHelper.h"
 #include "../../Common/AmbiSpeakerSet.h"
 #include "../../Common/AmbiSourceSet.h"
-#include "DecoderPresetHelper.h"
+#include "SpeakerPresetHelper.h"
+#include "DecodingPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
@@ -53,7 +54,8 @@ public:
    #endif
 
 	void checkDelayBuffers();
-    void checkFilters();
+    void checkSpeakerFilters();
+    void updateBFormatFilters();
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
     using AudioProcessor::processBlock;
     
@@ -86,11 +88,12 @@ public:
 	// ambsonic specific
 	AmbiSpeakerSet* getSpeakerSet();
 	AmbiSourceSet* getMovingPoints();
-	AmbiSettings* getAmbiSettings();
+	AmbiSettingsCollection* getAmbiSettings();
 	DecoderSettings* getDecoderSettings();
 	TestSoundGenerator* getTestSoundGenerator() const;
 	dsp::ProcessSpec* getFilterSpecification();
-    DecoderPresetHelper* getPresetHelper();
+    SpeakerPresetHelper* getSpeakerPresetHelper();
+    DecodingPresetHelper* getDecodingPresetHelper();
     ZoomSettings* getZoomSettingsPointer();
     ChannelLayout* getChannelLayout();
     RadarOptions* getRadarOptions();
@@ -99,19 +102,23 @@ private:
     ScalingInfo scalingInfo;
     std::unique_ptr<AmbiSpeakerSet> speakerSet;
 	std::unique_ptr<AmbiSourceSet> movingPoints;
-	AmbiSettings ambiSettings;
+	AmbiSettingsCollection ambiSettings;
 	DecoderSettings decoderSettings;
 	TestSoundGenerator* pTestSoundGenerator;
 	OwnedArray<DelayBuffer> delayBuffers;
 	DelayHelper delayHelper;
-    std::unique_ptr<DecoderPresetHelper> presetHelper;
+    std::unique_ptr<SpeakerPresetHelper> speakerPresetHelper;
+    std::unique_ptr<DecodingPresetHelper> decodingPresetHelper;
     std::unique_ptr<ZoomSettings> zoomSettings;
     ChannelLayout channelLayout;
     RadarOptions radarOptions;
     
-    dsp::IIR::Filter<float> iirFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
-    FilterBankInfo filterInfo[MAX_NUM_CHANNELS];
-    dsp::ProcessSpec iirFilterSpec;
+    dsp::IIR::Filter<float> speakerIIRFilters[MAX_NUM_CHANNELS][MAX_FILTER_COUNT];
+    dsp::ProcessorDuplicator<dsp::IIR::Filter<float>, juce::dsp::IIR::Coefficients<float>> bFormatFilter[MAX_NB_OF_DECODER_SECTIONS][MAX_FILTER_COUNT];
+    FilterBankInfo speakerFilterInfo[MAX_NUM_CHANNELS];
+    FilterBankInfo bFormatFilterInfo[MAX_NB_OF_DECODER_SECTIONS];
+    dsp::ProcessSpec speakerIIRFilterSpec;
+    dsp::ProcessSpec bFormatIIRFilterSpec;
     
 
 	//==============================================================================

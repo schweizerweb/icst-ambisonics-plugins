@@ -23,6 +23,7 @@
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
 #include "OSCHandlerEncoder.h"
+#include "CustomOscRxPresetHelper.h"
 #include "../../Common/SliderColumnCustomComponent.h"
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/EditableCodeCustomComponent.h"
@@ -44,7 +45,7 @@
 class CustomOscInputTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener, ActionListener, Timer
 {
 public:
-	CustomOscInputTableListModel(EncoderSettings* _pSettings, OSCHandlerEncoder* _pOscHandler, Component* _pParentComponent, ActionListener* pActionListener): pSettings(_pSettings), pOscHandler(_pOscHandler), pParentComponent(_pParentComponent), pTableListBox(nullptr)
+	CustomOscInputTableListModel(EncoderSettings* _pSettings, OSCHandlerEncoder* _pOscHandler, Component* _pParentComponent, ActionListener* pActionListener, CustomOscRxPresetHelper* _pPresetHelper): pSettings(_pSettings), pOscHandler(_pOscHandler), pParentComponent(_pParentComponent), pTableListBox(nullptr), pPresetHelper(_pPresetHelper)
 	{
 		addActionListener(pActionListener);
         pOscHandler->addActionListener(this);
@@ -72,7 +73,7 @@ public:
         if(b->getName() == BUTTON_TYPE_PRESET)
         {
             int rowIndex = b->getComponentID().getIntValue();
-            sendActionMessage(String(ACTION_MESSAGE_SAVE_PRESET) + " " + String(rowIndex));
+            sendActionMessage(pPresetHelper->UniqueActionMessageSavePreset() + " " + String(rowIndex));
         }
         else if(b->getName() == BUTTON_TYPE_INFO)
         {
@@ -118,7 +119,7 @@ public:
             
             std::unique_ptr<Label> label = std::make_unique<Label>();
             label->setText(info , dontSendNotification);
-            int lineCount = label->getFont().getStringWidth(info) / 180;
+            int lineCount = info.isEmpty() ? 0 :(int)(TextLayout::getStringWidth(label->getFont(), info) / 180.0f);
             int lineHeight = roundToInt(label->getFont().getHeight());
             label->setSize(200, lineHeight * (lineCount+2));
             label->setJustificationType(Justification::centred);
@@ -348,4 +349,5 @@ private:
     OSCHandlerEncoder* pOscHandler;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
+    CustomOscRxPresetHelper* pPresetHelper;
 };

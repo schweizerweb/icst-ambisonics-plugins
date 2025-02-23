@@ -54,6 +54,8 @@ public:
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void controlDimming();
+    void refreshControls();
+    void setData(AnimatorMovement* pMovement);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -65,7 +67,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    void refreshControls();
 
     AmbiSourceSet* pSourceSet;
     AnimatorMovement* pAnimatorMovement;

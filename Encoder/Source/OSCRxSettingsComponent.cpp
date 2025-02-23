@@ -34,7 +34,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, Sta
     : pSettings(_pSettings), pStatusMessageHandler(_pStatusMessageHandler), pOscLogManager(_pOscLogManager), pCustomOscRxPresetHelper(_pCustomOscRxPresetHelper), pOscHandler(_pOscHandler)
 {
     //[Constructor_pre] You can add your own custom stuff here..
-    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this));
+    customOscTableModel.reset(new CustomOscInputTableListModel(pSettings, pOscHandler, this, this, pCustomOscRxPresetHelper));
     pCustomOscRxPresetHelper->addActionListener(this);
     //[/Constructor_pre]
 
@@ -48,7 +48,7 @@ OSCRxSettingsComponent::OSCRxSettingsComponent (EncoderSettings* _pSettings, Sta
     labelOscPort.reset (new juce::Label ("labelOscPort",
                                          TRANS("Port:\n")));
     addAndMakeVisible (labelOscPort.get());
-    labelOscPort->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelOscPort->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelOscPort->setJustificationType (juce::Justification::centredRight);
     labelOscPort->setEditable (false, false, false);
     labelOscPort->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -270,7 +270,7 @@ void OSCRxSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         auto textEditor = std::make_unique<TextEditor>("");
         textEditor->setReadOnly(true);
         textEditor->setMultiLine(true);
-        textEditor->setText("If activated, the Plugin listens to the standard OSC patterns, otherwise, the standard patterns are ignored and only user defined patterns are evaluated.\n\nStandard patterns (details can be found in the main help section):\n /icst/ambi/source/aed\n /icst/ambi/source/xyz\n /icst/ambi/source/gain\n /icst/ambi/group/aed\n /icst/ambi/group/xyz\n /icst/ambi/sourceindex/aed\n /icst/ambi/sourceindex/xyz\n /icst/ambi/sourceindex/gain\n /icst/ambi/group/rotate\n /icst/ambi/group/rotateorigin\n /icst/ambi/group/stretch\n /icst/ambi/distanceencoding/mode\n /icst/ambi/distanceencoding/unitcircle\n /icst/ambi/distanceencoding/dbunit\n /icst/ambi/distanceencoding/distanceattenuation\n /icst/ambi/distanceencoding/centercurve\n /icst/ambi/distanceencoding/advancedfactor\n /icst/ambi/distanceencoding/advancedexponent\n /icst/ambi/distanceencoding/standard\n /icst/ambi/distanceencoding/advanced\n /icst/ambi/distanceencoding/exponential\n /icst/ambi/distanceencoding/inverseproportional");
+        textEditor->setText("If activated, the Plugin listens to the standard OSC patterns, otherwise, the standard patterns are ignored and only user defined patterns are evaluated.\n\nInformation about standard patterns can be found in the main help section.\n");
         textEditor->setSize(330, 250);
         CallOutBox::launchAsynchronously(std::move(textEditor), btnInfoStandardOsc->getBounds(), this);
         //[/UserButtonCode_btnInfoStandardOsc]
@@ -321,10 +321,10 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
     {
         // for now, nothing to do
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SELECT_PRESET)))
+    if(message.startsWith(pCustomOscRxPresetHelper->UniqueActionMessageSelectPreset()))
     {
         CustomOscInput* t = new CustomOscInput();
-        String file = message.fromFirstOccurrenceOf(String(ACTION_MESSAGE_SELECT_PRESET), false, true);
+        String file = message.fromFirstOccurrenceOf(pCustomOscRxPresetHelper->UniqueActionMessageSelectPreset(), false, true);
         pCustomOscRxPresetHelper->loadFromXmlFile(file, t);
 
         // add to list if not yet existing
@@ -344,18 +344,19 @@ void OSCRxSettingsComponent::actionListenerCallback(const String& message)
             customOscList->updateContent();
         }
     }
-    if(message.startsWith(String(ACTION_MESSAGE_SAVE_PRESET)))
+    if(message.startsWith(pCustomOscRxPresetHelper->UniqueActionMessageSavePreset()))
     {
         int index = message.getTrailingIntValue();
 
         if(index < 0 || index >= pSettings->customOscInput.size())
             return;
 
-        File* f = pCustomOscRxPresetHelper->tryCreateNewPreset();
-        if(f != nullptr)
-        {
-            pCustomOscRxPresetHelper->writeToXmlFile(*f, pSettings->customOscInput[index]);
-        }
+        pCustomOscRxPresetHelper->tryCreateNewPreset([&,index](File* f){
+            if(f != nullptr)
+            {
+                pCustomOscRxPresetHelper->writeToXmlFile(*f, pSettings->customOscInput[index]);
+            }
+        });
     }
 }
 //[/MiscUserCode]

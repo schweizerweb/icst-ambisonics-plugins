@@ -24,6 +24,8 @@
 #include "../../Common/Constants.h"
 
 #define SEPARATOR ";"
+#define CSV_IMPORT_FAIL -1
+#define CSV_IMPORT_SUCCESS 1
 
 class CsvImportExport
 {
@@ -39,13 +41,13 @@ private:
     };
 
 public:
-    static bool importFromCsv(AmbiSpeakerSet* pSpeakerSet)
+    static int importFromCsv(AmbiDataSet* pDataSet, bool keepExistingData)
     {
         FileChooser chooser("Import from CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         FileInputStream stream(chooser.getResult());
@@ -71,29 +73,50 @@ public:
             else if(nbTokens > 0)
             {
                 // fail for rows with less than 3 columns, but ignore empty lines
-                return false;
+                return CSV_IMPORT_FAIL;
             }
         }
 
-        pSpeakerSet->clear();
-        for (int i = 0; i < points.size(); i++)
+        if (keepExistingData)
         {
-            Point3D<double> p;
-            p.setAed(points[i].a, points[i].e, points[i].d);
-            pSpeakerSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
-            pSpeakerSet->setGain(i, points[i].gain);
+            for (int i = 0; i < pDataSet->size(); i++)
+            {
+                if (points.size() > i)
+                {
+                    auto p = points[i];
+                    pDataSet->setChannelAED(i, p.a, p.e, p.d);
+                    pDataSet->setChannelName(i, p.name);
+                    pDataSet->setChannelColor(i, p.color);
+                    pDataSet->setGain(i, p.gain);
+                    pDataSet->setEnabled(i, true);
+                }
+                else
+                {
+                    pDataSet->setEnabled(i, false);
+                }
+            }
         }
-
-        return !points.isEmpty();
+        else
+        {
+            pDataSet->clear();
+            for (int i = 0; i < points.size(); i++)
+            {
+                Point3D<double> p;
+                p.setAed(points[i].a, points[i].e, points[i].d);
+                pDataSet->addNew(Uuid().toString(), p, points[i].name, points[i].color);
+                pDataSet->setGain(i, points[i].gain);
+            }
+        }
+        return !points.isEmpty() ? CSV_IMPORT_SUCCESS : CSV_IMPORT_FAIL;
     }
 
-    static bool exportToCsv(AmbiSpeakerSet* pSpeakerSet)
+    static int exportToCsv(AmbiDataSet* pDataSet)
     {
-        FileChooser chooser("Import from CSV", File(), "*.csv");
+        FileChooser chooser("Export to CSV", File(), "*.csv");
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
-            return false;
+            return 0;
         }
 
         if(chooser.getResult().exists())
@@ -102,24 +125,27 @@ public:
         }
 
         FileOutputStream stream(chooser.getResult());
-        for(int i = 0; i < pSpeakerSet->size(); i++)
+        for(int i = 0; i < pDataSet->size(); i++)
         {
-            AmbiSpeaker* s = pSpeakerSet->get(i);
-            stream.writeText(
-                String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
-                + SEPARATOR
-                + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
-                + SEPARATOR
-                + String(s->getRawPoint()->getDistance())
-                + SEPARATOR
-                + s->getName()
-                + SEPARATOR
-                + s->getColor().toString()
-                + SEPARATOR
-                + String(Decibels::gainToDecibels(s->getGain()))
-                + NewLine::getDefault(), false, false, nullptr);
+            AmbiPoint* s = pDataSet->get(i);
+            if (s->getEnabled())
+            {
+                stream.writeText(
+                    String(Constants::RadToGrad(s->getRawPoint()->getAzimuth()))
+                    + SEPARATOR
+                    + String(Constants::RadToGrad(s->getRawPoint()->getElevation()))
+                    + SEPARATOR
+                    + String(s->getRawPoint()->getDistance())
+                    + SEPARATOR
+                    + s->getName()
+                    + SEPARATOR
+                    + s->getColor().toString()
+                    + SEPARATOR
+                    + String(Decibels::gainToDecibels(s->getGain()))
+                    + NewLine::getDefault(), false, false, nullptr);
+            }
         }
         
-        return true;
+        return CSV_IMPORT_SUCCESS;
     }
 };

@@ -51,7 +51,7 @@ public:
     void setAED(double newA, double newE, double newD, bool moveSubElements, bool groupModeFlag);
     void setChildrenColor();
     void stretch(double stretchValue, bool groupModeFlag);
-    void extracted(Point3D<double> &center, double cx, AmbiPoint *p, double sx);
+    //void extracted(Point3D<double> &center, double cx, AmbiPoint *p, double sx);
     
     void rotate(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool groupModeFlag);
     void rotateAroundOrigin(double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements, bool groupModeFlag);

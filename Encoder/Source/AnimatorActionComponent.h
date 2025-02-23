@@ -48,6 +48,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    void refreshControls();
+    void setData(AnimatorAction* pAction);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -60,7 +62,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-    void refreshControls();
     
     AmbiSourceSet* pSourceSet;
     AnimatorAction* pAnimatorAction;

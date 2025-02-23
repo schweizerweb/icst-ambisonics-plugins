@@ -79,6 +79,7 @@ private:
     HelpDialogManager helpDialogManager;
     OSCLogDialogManager oscLogDialogManager;
     AnimatorDialogManager animatorDialogManager;
+    SharedResourcePointer<TooltipWindow> tooltipWindow;
     //[/UserVariables]
 
     //==============================================================================

@@ -24,8 +24,6 @@
 
 #define ACTION_MESSAGE_PRESET_CHANGED "PresetChanged"
 #define ACTION_MESSAGE_PRESET_LIST_CHANGED "PresetListChanged"
-#define ACTION_MESSAGE_SELECT_PRESET "SelectPreset "
-#define ACTION_MESSAGE_SAVE_PRESET "SavePreset"
 
 #define RETURN_TYPE_NO          1
 #define RETURN_TYPE_YES         2
@@ -38,15 +36,16 @@ public:
     PresetHelper(File presetDirectory, ActionListener* pActionListener);
     virtual ~PresetHelper() {}
     virtual bool checkValid(File presetFile) = 0;
+    virtual String UniqueActionMessageSelectPreset() = 0;
+    virtual String UniqueActionMessageSavePreset() = 0;
     
     void restoreDefaults();
     void initialize();
     
     void selectPresetName(String name);
-    
-    File* tryCreateNewPreset();
-    void tryDeletePresets(Array<String> presetNames);
-    void tryDeleteAll();
+    void tryCreateNewPreset(std::function<void(File*)> callback);
+    bool tryDeletePresets(Array<String> presetNames);
+    bool tryDeleteAll();
     void tryImportFiles(Array<File> files);
 
     void notifyPresetChanged();
@@ -64,7 +63,8 @@ protected:
 private:
     void selectPreset(File file);
     virtual void restoreDefaultsInternal() = 0;
-    
+    std::unique_ptr<AlertWindow> alertWindow;
+
 private:
     File presetDirectory;
 };

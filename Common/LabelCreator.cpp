@@ -25,8 +25,9 @@ Image LabelCreator::createNewLabel(String label, Colour newColor, float fontSize
 {
 	const MessageManagerLock lock;
 	
-	Font labelFont(fontSize);
-	int width = labelFont.getStringWidth(label);
+    FontOptions opt(fontSize);
+	Font labelFont(opt);
+	int width = label.isEmpty() ? 0 : (int)ceil(TextLayout::getStringWidth(labelFont, label));
 	if (width <= 0)
 		return Image();
 

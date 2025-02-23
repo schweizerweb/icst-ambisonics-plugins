@@ -23,6 +23,7 @@
 
 //[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
+#include "../../Common/AmbiLookAndFeel.h"
 //[/Headers]
 
 
@@ -60,6 +61,7 @@ public:
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     FilterInfo* pFilterInfo;
+    AmbiLookAndFeel ambiLookAndFeel;
     //[/UserVariables]
 
     //==============================================================================

@@ -45,6 +45,10 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDatase
         a->name = "Movement " + String(pAnimatorDataset->movements.size() + 1);
         pAnimatorDataset->movements.add(a);
     }
+
+    animatorPresetHelper.reset(new AnimatorPresetHelper(File(Constants::getBasePresetsDirectory() + "/AnimationDemo"), this));
+    animatorPresetHelper->initialize();
+
     //[/Constructor_pre]
 
     action1.reset (new AnimatorActionComponent (pSourceSet, pAnimatorDataset->actions[0]));
@@ -71,15 +75,18 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDatase
     addAndMakeVisible (preset4.get());
     preset4->setName ("preset4");
 
-
     //[UserPreSize]
+    btnPresets.reset(new TextButton("btnPreset"));
+    addAndMakeVisible(btnPresets.get());
+    btnPresets->setButtonText("Presets");
+    btnPresets->addListener(this);
     //[/UserPreSize]
 
     setSize (700, 300);
 
 
     //[Constructor] You can add your own custom stuff here..
-    refreshControls();
+    setData();
     startTimer(STEP_TIMER_ID, STEP_TIMER_INTERVAL);
     //[/Constructor]
 }
@@ -99,6 +106,7 @@ AnimatorComponent::~AnimatorComponent()
 
 
     //[Destructor]. You can add your own custom destruction code here..
+    btnPresets = nullptr;
     //[/Destructor]
 }
 
@@ -126,6 +134,7 @@ void AnimatorComponent::resized()
     preset3->setBounds (0, 96, getWidth() - 0, 48);
     preset4->setBounds (0, 144, getWidth() - 0, 48);
     //[UserResized] Add your own custom resize handling here..
+    btnPresets->setBounds(0, 540, getWidth(), 24);
     //[/UserResized]
 }
 
@@ -133,13 +142,51 @@ void AnimatorComponent::resized()
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
-void AnimatorComponent::refreshControls()
+void AnimatorComponent::setData()
 {
-    // nothing to do
+    action1->setData(pAnimatorDataset->actions[0]);
+    action2->setData(pAnimatorDataset->actions[1]);
+    preset1->setData(pAnimatorDataset->movements[0]);
+    preset2->setData(pAnimatorDataset->movements[1]);
+    preset3->setData(pAnimatorDataset->movements[2]);
+    preset4->setData(pAnimatorDataset->movements[3]);
+}
+
+void AnimatorComponent::buttonClicked(Button* b)
+{
+    if (b == btnPresets.get())
+    {
+        PopupMenu menu;
+
+        menu.addItem("Save preset", [&] {animatorPresetHelper->tryCreateNewPreset([&](File* newFile) {
+            if (newFile != nullptr)
+            {
+                animatorPresetHelper->writeToXmlFile(*newFile, pAnimatorDataset);
+            }}); });
+
+        PopupMenu loadPresetMenu;
+        for (File file : animatorPresetHelper->presetFiles)
+        {
+            String name = file.getFileNameWithoutExtension();
+            loadPresetMenu.addItem(name, [&, name] { animatorPresetHelper->selectPresetName(name); });
+        }
+        menu.addSubMenu("Load preset", loadPresetMenu);
+        menu.addItem("Manage presets...", [&] {presetManagerDialog.show(this, animatorPresetHelper.get());});
+        menu.show();
+    }
 }
 
 void AnimatorComponent::actionListenerCallback(const juce::String& message)
 {
+    if (message.startsWith(animatorPresetHelper->UniqueActionMessageSelectPreset()))
+    {
+        File presetFile(message.substring(animatorPresetHelper->UniqueActionMessageSelectPreset().length()));
+        animatorPresetHelper->loadFromXmlFile(presetFile, pAnimatorDataset);
+        animatorPresetHelper->notifyPresetChanged();
+        setData();
+        return;
+    }
+
 #if MULTI_ENCODER_MODE
     AnimatorMovement* pMov = nullptr;
     for(auto& m : pAnimatorDataset->movements)

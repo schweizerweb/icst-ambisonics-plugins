@@ -33,6 +33,9 @@ public:
         
     }
     
+    String UniqueActionMessageSelectPreset() override { return "SelectCustomOscTxPreset"; }
+    String UniqueActionMessageSavePreset() override { return "SaveCustomOscTxPreset"; }
+
     bool checkValid(File presetFile) override
     {
         CustomOscTarget testInfo;

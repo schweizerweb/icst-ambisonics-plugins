@@ -32,6 +32,9 @@ public:
         
     }
     
+    String UniqueActionMessageSelectPreset() override { return "SelectCustomOscRxPreset"; }
+    String UniqueActionMessageSavePreset() override { return "SaveCustomOscRxPreset"; }
+
     bool checkValid(File presetFile) override
     {
         CustomOscInput testInfo;

@@ -22,12 +22,12 @@
 #include "AmbiSpeaker.h"
 
 AmbiSpeaker::AmbiSpeaker(AmbiSpeaker* other, bool copyImage) : 
-	AmbiPoint(other, copyImage), filterInfo(other->filterInfo), filterBypass(other->filterBypass)
+	AmbiPoint(other, copyImage), filterInfo(other->filterInfo)
 {
 }
 
 AmbiSpeaker::AmbiSpeaker(String _id, Point3D<double> _point, String _name, Colour _color, double _gain) : 
-	AmbiPoint(_id, _point, _name, _color, _gain), filterBypass(DEFAULT_BYPASS_FILTER)
+	AmbiPoint(_id, _point, _name, _color, _gain)
 {
 }
 
@@ -35,7 +35,6 @@ AmbiSpeaker::AmbiSpeaker(XmlElement* element) :
 	AmbiPoint(element)
 {
 	filterInfo.loadFromXmlElement(element);
-	filterBypass = bool(element->getBoolAttribute(XML_ATTRIBUTE_POINT_FILTER_BYPASS, DEFAULT_BYPASS_FILTER));
 }
 
 FilterBankInfo* AmbiSpeaker::getFilterInfo()
@@ -43,14 +42,14 @@ FilterBankInfo* AmbiSpeaker::getFilterInfo()
 	return &filterInfo;
 }
 
-bool AmbiSpeaker::getFilterBypass()
+bool AmbiSpeaker::getFilterBypass() const
 {
-    return filterBypass;
+    return filterInfo.getFilterBypass();
 }
 
 void AmbiSpeaker::setFilterBypass(bool byPass)
 {
-    filterBypass = byPass;
+    filterInfo.setFilterBypass(byPass);
 }
 
 float AmbiSpeaker::getDisplayScaler()
@@ -62,6 +61,5 @@ XmlElement* AmbiSpeaker::getAsXmlElement(String tagName)
 {
 	XmlElement* element = getBaseXmlElement(tagName);
 	filterInfo.writeToXmlElement(element);
-	element->setAttribute(XML_ATTRIBUTE_POINT_FILTER_BYPASS, filterBypass);
 	return element;
 }

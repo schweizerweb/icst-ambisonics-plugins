@@ -141,10 +141,13 @@ void AmbiPoint::setName(String newName)
 {
 	if (name != newName)
 	{
-		labelImage = LabelCreator::createNewLabel(newName, color, FONT_SIZE);
+		name = newName;
+		ensureLabelImage(true);
 	}
-
-	name = newName;
+	else
+	{
+		name = newName;
+	}
 }
 
 double AmbiPoint::getGain() const
@@ -167,13 +170,21 @@ bool AmbiPoint::getMute() const
 
 void AmbiPoint::setMute(bool newMute, bool notify)
 {
-    if(!allowMute())
-        return;
-    
-    mute = newMute;
-    if(newMute && solo)
-        setSolo(false);
-    
+	if (!allowMute())
+	{
+		return;
+	}
+
+	if (mute != newMute)
+	{
+		mute = newMute;
+		ensureLabelImage(true);
+	}
+	else
+	{
+		mute = newMute;
+	}
+
     if(notify)
         audioParams.notifyMute(mute);
 }
@@ -189,8 +200,6 @@ void AmbiPoint::setSolo(bool newSolo)
         return;
     
     solo = newSolo;
-    if(newSolo && mute)
-        setMute(false, true);
 }
 
 String AmbiPoint::getId()
@@ -211,10 +220,6 @@ void AmbiPoint::resetId()
 void AmbiPoint::setColor(Colour newColor)
 {
 	newColor = newColor.withAlpha(1.0f);
-	if (color != newColor)
-	{
-		labelImage = LabelCreator::createNewLabel(name, newColor, FONT_SIZE);
-	}
 
 	color = newColor;
 }
@@ -235,11 +240,11 @@ Image* AmbiPoint::getLabelImage()
 	return &labelImage;
 }
 
-void AmbiPoint::ensureLabelImage()
+void AmbiPoint::ensureLabelImage(bool force)
 {
-	if (labelImage == Image())
+	if (labelImage == Image() || force)
 	{
-		labelImage = LabelCreator::createNewLabel(name, color, FONT_SIZE);
+		labelImage = LabelCreator::createNewLabel(name, (getMute() && !getSolo()) ? labelColor.withAlpha(MUTE_ALPHA) : labelColor, FONT_SIZE);
 		labelImage.duplicateIfShared();
 	}
 }

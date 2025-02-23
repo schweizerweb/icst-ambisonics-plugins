@@ -75,6 +75,16 @@ double ZoomSettings::getGroupPointScaler()
     return groupPointScaler;
 }
 
+void ZoomSettings::setLabelInPointFlag(bool flag)
+{
+    labelInPointFlag = flag;
+}
+
+bool ZoomSettings::getLabelInPointFlag() const
+{
+    return labelInPointFlag;
+}
+
 void ZoomSettings::setGroupPointScaler(double newScaler)
 {
     groupPointScaler = newScaler;
@@ -167,6 +177,7 @@ void ZoomSettings::loadFromXml(XmlElement* xmlElement)
     {
         pointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_POINT_SCALER, DEFAULT_POINT_SCALER);
         groupPointScaler = zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, DEFAULT_POINT_SCALER);
+        labelInPointFlag = zoomSettingsXml->getBoolAttribute(XML_ATTRIBUTE_LABEL_IN_POINT, DEFAULT_LABEL_IN_POINT_FLAG);
         currentRadius = (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_RADIUS, DEFAULT_RADIUS);
         currentCenterPoint.setXYZ(
             (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_X, DEFAULT_CENTER_X),
@@ -181,6 +192,7 @@ void ZoomSettings::writeToXmlElement(XmlElement* xml) const
     XmlElement* zoomSettingsXml = new XmlElement(XML_TAG_ZOOM_SETTINGS);
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_POINT_SCALER, pointScaler);
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_GROUP_POINT_SCALER, groupPointScaler);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_LABEL_IN_POINT, labelInPointFlag);
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_X, currentCenterPoint.getX());
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, currentCenterPoint.getY());
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, currentCenterPoint.getZ());

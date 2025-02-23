@@ -39,7 +39,7 @@ public:
     Colour getValidRangeColor() const { return radarValidRangeColor[colorScheme]; }
     Colour getExtendedHandleColor() const { return extendedHandleColor[colorScheme]; }
     Colour getExtendedHandleSelectionColor() const { return extendedHandleSelectionColor[colorScheme]; }
-	void setColorScheme(int scheme) { colorScheme = jmin(scheme, NUMBER_OF_SCHEMES - 1); }
+    void setColorScheme(int scheme) { colorScheme = jmin(scheme, NUMBER_OF_SCHEMES - 1); }
 
 private:
 	Colour radarBackground[NUMBER_OF_SCHEMES] { Colours::lightgrey, Colours::lightgoldenrodyellow };

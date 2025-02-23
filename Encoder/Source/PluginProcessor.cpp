@@ -66,14 +66,15 @@ AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
     if (sources->size() == 0)
     {
 		scalingInfo.SetScaler(1.0);
-        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name : "1";
-        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour : TrackColors::getColor(0);
+        String name = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.name.value_or("1") : "1";
+        Colour color = dawParameter.updateTrackPropertiesWorking ? dawParameter.lastTrackProperties.colour.value_or(TrackColors::getColor(0)) : TrackColors::getColor(0);
         sources->addNew(Uuid().toString(), Point3D<double>(0.0, 0.0, 0.0, audioParams.sourceParams[0]), name, color);
     }
 #else
     if(!presetHelper->loadDefaultPreset(&audioParams, sources.get()))
     {
-		AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
+        // do not do anything because it might block the user interface on initialization
+		//AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Default preset", "Default preset not found, please restore presets using the Preset Manager!");
     }
 #endif
     
@@ -268,8 +269,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 		AmbiSource* source = sources->get(iSource);
 		if (source == nullptr
             || !source->getEnabled()
-            || source->getMute()
-            || (soloOnly && !source->getSolo()))
+            || ((source->getMute() || soloOnly) && !source->getSolo()))
 			continue;
 
         Vector3D<double> sourceVector = sources->getAbsSourcePoint(iSource);
@@ -458,8 +458,8 @@ void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties
 #if (!MULTI_ENCODER_MODE)
 	if (sources->size() > 0)
 	{
-		sources->get(0)->setName(properties.name);
-		sources->get(0)->setColor(properties.colour);
+		sources->get(0)->setName(properties.name.value_or("1"));
+		sources->get(0)->setColor(properties.colour.value_or(TrackColors::getColor(0)));
 	}
 #endif
 }
@@ -493,9 +493,9 @@ void AmbisonicEncoderAudioProcessor::initializeOscSender()
 
 void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &message)
 {
-    if(message.startsWith(ACTION_MESSAGE_SELECT_PRESET))
+    if(message.startsWith(presetHelper->UniqueActionMessageSelectPreset()))
     {
-        File presetFile(message.substring(String(ACTION_MESSAGE_SELECT_PRESET).length()));
+        File presetFile(message.substring(presetHelper->UniqueActionMessageSelectPreset().length()));
         presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get());
         presetHelper->notifyPresetChanged();
     }

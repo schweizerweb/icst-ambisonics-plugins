@@ -44,30 +44,27 @@ jobs:
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
-        c_compiler: [clang, cl]
         include:
           - os: windows-latest
             c_compiler: cl
             cpp_compiler: cl
             name: Windows
+        #  currently clang is not working with github runner (Ubuntu 24.04)
+        #  - os: ubuntu-latest
+        #    c_compiler: clang
+        #    cpp_compiler: clang++
+        #    name: Linux
           - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
+            c_compiler: gcc
+            cpp_compiler: g++
             name: Linux
           - os: macos-latest
             c_compiler: clang
             cpp_compiler: clang++
             name: macOS
-        exclude:
-          - os: windows-latest
-            c_compiler: clang
-          - os: ubuntu-latest
-            c_compiler: cl
-          - os: macos-latest
-            c_compiler: cl
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
       with:
         submodules: recursive
 
@@ -76,8 +73,8 @@ jobs:
       id: juce_dependencies
       run: | 
         sudo apt-get update
-        sudo apt-get install -y g++ libgtk-3-dev libgtk2.0-dev libwebkit2gtk-4.0-dev webkit2gtk-4.0 libfreetype6-dev libx11-dev libxinerama-dev libxrandr-dev libxcursor-dev mesa-common-dev libasound2-dev freeglut3-dev libxcomposite-dev libcurl4-openssl-dev
-    
+        sudo apt install -y g++ libasound2-dev libjack-jackd2-dev ladspa-sdk libcurl4-openssl-dev libfreetype-dev libfontconfig1-dev libx11-dev libxcomposite-dev libxcursor-dev libxext-dev libxinerama-dev libxrandr-dev libxrender-dev libwebkit2gtk-4.1-dev libglu1-mesa-dev mesa-common-dev
+        
     - name: Set Project Version
       shell: bash
       run: |
@@ -119,13 +116,21 @@ jobs:
         sudo installer -package "/Volumes/PackagesTmp/Install Packages.pkg" -target /
         hdiutil detach /Volumes/PackagesTmp
 
-    - name: Build Installer
+    - if: ${{ runner.os == 'Linux' }}
+      name: Build Debian Package
+      shell: bash
+      working-directory: ${{ github.workspace }}
+      run: |
+        ./Setup/Linux/build-deb.sh "icst-ambiplugins" "${{ needs.prepare.outputs.version }}" "${{ steps.strings.outputs.build-output-dir }}/packages"
+        
+    - if: ${{ runner.os != 'Linux' }}
+      name: Build Installer
       shell: bash
       working-directory: ${{ steps.strings.outputs.build-output-dir }}
       run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "${{ needs.prepare.outputs.version }}" -n "ICST_AmbiPlugins_${{ matrix.name }}_${{ needs.prepare.outputs.version }}"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: ${{ matrix.name }}
         path: ${{ steps.strings.outputs.build-output-dir }}/packages/*
@@ -138,7 +143,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Download artiacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@v4
         with:
           path: artifacts
         

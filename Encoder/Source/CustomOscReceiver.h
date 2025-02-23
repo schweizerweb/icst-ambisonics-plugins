@@ -24,6 +24,7 @@
 #include "CustomOscInput.h"
 #include "CustomOscBase.h"
 #include "../../Common/AmbiSourceSet.h"
+#include "../../Common/MathHelper.h"
 
 class CustomOscReceiver : CustomOscBase
 {
@@ -98,6 +99,8 @@ private:
                 
                 setMethod ("setGroupRotation", setGroupRotation);
                 setMethod ("setGroupRotationByName", setGroupRotationByName);
+                setMethod ("setGroupRotationEuler", setGroupRotationEuler);
+                setMethod ("setGroupRotationEulerByName", setGroupRotationEulerByName);
                 setMethod ("setGroupStretch", setGroupStretch);
                 setMethod ("setGroupStretchByName", setGroupStretchByName);
                 
@@ -885,6 +888,50 @@ private:
                     else
                     {
                         thisObject->fail("setGroupRotationByName: group '" + name + "' not found");
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
+            static var setGroupRotationEuler (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("setGroupRotationEuler", args, 4))
+                {
+                    int index = args.arguments[0];
+                    double x = (double)args.arguments[1] / 180.0 * PI;
+                    double y = (double)args.arguments[2] / 180.0 * PI;
+                    double z = (double)args.arguments[3] / 180.0 * PI;
+                    
+                    if(thisObject->jsAmbiSourceSet->setGroupRotation(index - 1, MathHelper::EulerToQuaternion(x, y, z))) // make index 0-based
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisObject->fail("setGroupRotationEuler: invalid group index " + String(index));
+                    }
+                }
+                
+                return var::undefined();
+            }
+                        
+            static var setGroupRotationEulerByName (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("setGroupRotationEulerByName", args, 4))
+                {
+                    String name = args.arguments[0];
+                    double x = (double)args.arguments[1] / 180.0 * PI;
+                    double y = (double)args.arguments[2] / 180.0 * PI;
+                    double z = (double)args.arguments[3] / 180.0 * PI;
+                    
+                    if(thisObject->jsAmbiSourceSet->setGroupRotation(name, MathHelper::EulerToQuaternion(x, y, z)))
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisObject->fail("setGroupRotationEulerByName: group '" + name + "' not found");
                     }
                 }
                 

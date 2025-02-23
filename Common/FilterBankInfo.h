@@ -20,7 +20,8 @@
 
 
 #pragma once
-#define MAX_FILTER_COUNT 4
+#define MAX_FILTER_COUNT 8
+#define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"
 
 #include "FilterInfo.h"
 #include "JuceHeader.h"
@@ -28,6 +29,8 @@
 class FilterBankInfo
 {
 public:
+    FilterBankInfo(): filterBypass(DEFAULT_BYPASS_FILTER) {}
+
     FilterInfo* get(int index)
     {
         if (index >= 0 && index < MAX_FILTER_COUNT)
@@ -69,20 +72,57 @@ public:
         return false;
     }
 
-    bool loadFromXmlElement(XmlElement* xmlElement)
+    int filterCount() const
+    {
+        int count = 0;
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            if (filters[i].filterType != FilterInfo::None)
+                count++;
+        }
+
+        return count;
+    }
+
+    bool isActive(int index) const
+    {
+        return index >= 0 && index < MAX_FILTER_COUNT && filters[index].filterType != FilterInfo::None;
+    }
+
+    bool loadFromXmlElement(XmlElement* xmlElement, bool ignoreBypass = false)
     {
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
             filters[i].loadFromXmlElement(xmlElement, i == 0 ? "" : String(i));
 
+        if (!ignoreBypass)
+        {
+            filterBypass = bool(xmlElement->getBoolAttribute(XML_ATTRIBUTE_POINT_FILTER_BYPASS, DEFAULT_BYPASS_FILTER));
+        }
+
         return true;
     }
 
-    bool writeToXmlElement(XmlElement* xmlElement)
+    bool writeToXmlElement(XmlElement* xmlElement, bool ignoreBypass = false)
     {
         for (int i = 0; i < MAX_FILTER_COUNT; i++)
             filters[i].writeToXmlElement(xmlElement, i == 0 ? "" : String(i));
 
+        if (!ignoreBypass)
+        {
+            xmlElement->setAttribute(XML_ATTRIBUTE_POINT_FILTER_BYPASS, filterBypass);
+        }
+
         return true;
+    }
+
+    bool getFilterBypass() const
+    {
+        return filterBypass;
+    }
+
+    void setFilterBypass(bool byPass)
+    {
+        filterBypass = byPass;
     }
 
     void copyFrom(FilterBankInfo* info)
@@ -108,6 +148,15 @@ public:
         return true;
     }
 
+    void init()
+    {
+        for (int i = 0; i < MAX_FILTER_COUNT; i++)
+        {
+            filters[i].init();
+        }
+    }
+
 private:
     FilterInfo filters[MAX_FILTER_COUNT];
+    bool filterBypass;
 };

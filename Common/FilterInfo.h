@@ -39,6 +39,14 @@ public:
 	{
 	}
 
+    void init()
+    {
+        filterType = DEFAULT_FILTER_TYPE;
+        cutOffFrequencyHz = DEFAULT_FREQUENCY;
+        qValue = DEFAULT_Q;
+        gainFactor = DEFAULT_GAIN_FACTOR;
+    }
+
 	dsp::IIR::Coefficients<float>::Ptr getCoefficients(double sampleRate) const
 	{
 		switch (filterType)
@@ -157,7 +165,7 @@ public:
         return true;
     }
     
-    bool writeToXmlElement(XmlElement* xmlElement, String indexSuffix)
+    bool writeToXmlElement(XmlElement* xmlElement, String indexSuffix) const
     {
         xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_TYPE + indexSuffix, (int)filterType);
         xmlElement->setAttribute(XML_ATTRIBUTE_FILTER_FREQUENCY + indexSuffix, cutOffFrequencyHz);
@@ -175,7 +183,7 @@ public:
         gainFactor = info->gainFactor;
     }
     
-    bool equals(FilterInfo* info)
+    bool equals(FilterInfo* info) const
     {
         return info != nullptr
         && info->filterType == filterType

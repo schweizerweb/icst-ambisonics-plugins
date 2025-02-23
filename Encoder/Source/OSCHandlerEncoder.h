@@ -38,9 +38,13 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED "/icst/ambi/sourceindex/aed"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/sourceindex/xyz"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN "/icst/ambi/sourceindex/gain"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_NAME "/icst/ambi/sourceindex/name"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE "/icst/ambi/group/rotate"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_QUATERNION "/icst/ambi/group/setrotation/quaternion"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_EULER "/icst/ambi/group/setrotation/euler"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE_ORIGIN "/icst/ambi/group/rotateorigin"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_STRETCH "/icst/ambi/group/stretch"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETSTRETCH "/icst/ambi/group/setstretch"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_MODE "/icst/ambi/distanceencoding/mode"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_UNITCIRCLE "/icst/ambi/distanceencoding/unitcircle"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_DISTANCEENCODING_DBUNIT "/icst/ambi/distanceencoding/dbunit"
@@ -71,11 +75,15 @@ private:
     void handleOwnExternStyleIndexAed(const OSCMessage& message) const;
     void handleOwnExternStyleIndexXyz(const OSCMessage& message) const;
     void handleOwnExternStyleIndexGain(const OSCMessage& message) const;
+    void handleOwnExternStyleIndexName(const OSCMessage& message) const;
     void handleOwnExternStyleGroupAed(const OSCMessage& message) const;
     void handleOwnExternStyleGroupXyz(const OSCMessage& message) const;
     void handleOwnExternStyleGroupRotate(const OSCMessage& message) const;
+    void handleOwnExternStyleGroupSetRotationQuaternion(const OSCMessage& message) const;
+    void handleOwnExternStyleGroupSetRotationEuler(const OSCMessage& message) const;
     void handleOwnExternStyleGroupRotateOrigin(const OSCMessage& message) const;
     void handleOwnExternStyleGroupStretch(const OSCMessage& message) const;
+    void handleOwnExternStyleGroupSetStretch(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncoding(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncodingStandard(const OSCMessage& message) const;
     void handleOwnExternStyleDistanceEncodingAdvanced(const OSCMessage& message) const;
@@ -84,6 +92,7 @@ private:
     bool checkAed(double a, double e, double d, String* errorString) const;
     bool checkXyz(double x, double y, double z, String* errorString) const;
     bool checkGain(double gain, String* errorString) const;
+    bool checkName(String name, String* errorString) const;
     
     ScalingInfo* pScalingInfo;
     OwnedArray<CustomOscInput>* pCustomOscInput;

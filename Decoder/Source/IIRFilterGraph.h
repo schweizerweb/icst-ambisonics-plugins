@@ -34,18 +34,21 @@
 class IIRFilterGraph    : public SimpleGraph
 {
 public:
-    IIRFilterGraph(FilterBankInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification);
+    IIRFilterGraph(std::vector<FilterBankInfo*> pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> pColors = std::vector<juce::Colour*>());
     ~IIRFilterGraph() override;
 
 	void paintData(Graphics&) override;
     void setFFTResult(float* data, int size, int newFftSize);
     void setFFTParams(bool enable, double scaler = 0);
+    void setUsedFiltersCount(int filterCount);
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
 
 private:
-	FilterBankInfo* pFilterInfo;
+    int usedFilterCount;
+	std::vector<FilterBankInfo*> pFilterInfo;
+	std::vector<juce::Colour*> pColors;
 	Array<double> frequencies;
 	double sampleRate;
 	double* magnitudes[MAX_FILTER_COUNT];

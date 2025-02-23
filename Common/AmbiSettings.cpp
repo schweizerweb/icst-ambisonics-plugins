@@ -32,7 +32,6 @@ AmbiSettings::AmbiSettings()
 		ambiChannelOrder[i] = order;
 	}
     ambiOrder = 1;
-    loadWarningFlag = false;
     prepareAutoWeightings();
     prepareManualWeighting();
 }
@@ -58,14 +57,14 @@ double* AmbiSettings::getAmbiOrderWeightPointer()
 	return manualOrderWeights;
 }
 
-void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
+bool AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
 {
-    loadWarningFlag = false;
+    bool loadWarningFlag = false;
     // ambisonics settings
     
-    ambiOrder = xmlElement->getIntAttribute("ambiOrder", 1);
+    setAmbiOrder(xmlElement->getIntAttribute(XML_ATTRIBUTE_AMBI_ORDER, DEAFULT_AMBI_ORDER));
     XmlElement* xmlAmbiChannelWeight = xmlElement->getChildByName(XML_TAG_PRESET_AMBICHANNELWEIGHT);
-    weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, AmbiSettings::INPHASE));
+    weightMode = AmbiWeightMode(xmlAmbiChannelWeight->getIntAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, DEFAULT_WEIGHT_MODE));
     int index = 0;
     if (xmlAmbiChannelWeight != nullptr && weightMode == MANUAL)
     {
@@ -83,12 +82,13 @@ void AmbiSettings::loadFromPresetXml(XmlElement *xmlElement)
     {
         setWeightMode(weightMode);
     }
+
+    return loadWarningFlag;
 }
 
 void AmbiSettings::writeToPresetXmlElement(XmlElement *xmlElement) const
 {
-    xmlElement->setAttribute("ambiOrder", ambiOrder);
-    
+    xmlElement->setAttribute(XML_ATTRIBUTE_AMBI_ORDER, ambiOrder);
     XmlElement* xmlAmbiChannelWeight = new XmlElement(XML_TAG_PRESET_AMBICHANNELWEIGHT);
     xmlAmbiChannelWeight->setAttribute(XML_TAG_PRESET_AMBICHANNELWEIGHT_MODE, int(weightMode));
     
@@ -166,11 +166,6 @@ double AmbiSettings::fact(int n)
 AmbiSettings::AmbiWeightMode AmbiSettings::getWeightMode()
 {
     return weightMode;
-}
-
-bool AmbiSettings::getWarningFlag()
-{
-    return loadWarningFlag;
 }
 
 void AmbiSettings::setWeightMode(AmbiSettings::AmbiWeightMode mode)

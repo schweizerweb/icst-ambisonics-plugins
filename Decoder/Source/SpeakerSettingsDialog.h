@@ -31,7 +31,7 @@ public:
 	SpeakerSettingsDialog(ActionListener* actionListener, Component* pComponent)
 		: AdditionalWindow("Speaker settings", pComponent)
 	{
-		setAlwaysOnTop(true);
+		setAlwaysOnTop(false);
 		setContentOwned(pComponent, true);
 		addActionListener(actionListener);
 		setResizable(true, true);

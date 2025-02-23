@@ -29,6 +29,7 @@
 #define XML_ATTRIBUTE_MOVEMENT_POS_X "X"
 #define XML_ATTRIBUTE_MOVEMENT_POS_Y "Y"
 #define XML_ATTRIBUTE_MOVEMENT_POS_Z "Z"
+#include "../../Common/Point3D.h"
 
 class AnimatorMovement
 {

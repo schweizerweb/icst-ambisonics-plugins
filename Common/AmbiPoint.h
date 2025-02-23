@@ -33,6 +33,8 @@
 #define XML_ATTRIBUTE_POINT_MUTE "Mute"
 #define XML_ATTRIBUTE_POINT_ENABLED "Enabled"
 #define FONT_SIZE	20
+#define MUTE_ALPHA 0.7f
+#define LABEL_COLOR Colours::black
 
 class AmbiGroup;
 
@@ -77,7 +79,7 @@ public:
 	void setAlive(int64 currentTimeMillis);
 	
     Image* getLabelImage();
-	void ensureLabelImage();
+	void ensureLabelImage(bool force = false);
     
     void setGroup(AmbiGroup* pG);
     AmbiGroup* getGroup();
@@ -98,6 +100,7 @@ private:
 	Point3D<double> point;
 	String name;
 	Colour color;
+    Colour labelColor = LABEL_COLOR;
 	double gain;
     bool mute;
     bool solo;

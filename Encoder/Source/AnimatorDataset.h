@@ -58,10 +58,10 @@ public:
         return element;
     }
     
-    void loadFromXml(XmlElement* element)
+    bool loadFromXml(XmlElement* element)
     {
         if (element == nullptr)
-            return;
+            return false;
 
         actions.clear();
         movements.clear();
@@ -69,25 +69,29 @@ public:
         XmlElement* xmlActions = element->getChildByName(XML_TAG_ACTIONS);
         if (xmlActions != nullptr)
         {
-            XmlElement* i = xmlActions->getChildByName(XML_TAG_ACTION);
-            while (i != nullptr)
+            auto it = xmlActions->getChildIterator();
+            for (auto i : it)
             {
-                actions.add(new AnimatorAction(i));
-
-                i = i->getNextElement();
+                if (i->getTagName() == XML_TAG_ACTION)
+                {
+                    actions.add(new AnimatorAction(i));
+                }
             }
         }
         
         XmlElement* xmlMovements = element->getChildByName(XML_TAG_MOVEMENTS);
         if (xmlMovements != nullptr)
         {
-            XmlElement* i = xmlMovements->getChildByName(XML_TAG_MOVEMENT);
-            while (i != nullptr)
+            auto it = xmlMovements->getChildIterator();
+            for (auto i : it)
             {
-                movements.add(new AnimatorMovement(i));
-
-                i = i->getNextElement();
+                if (i->getTagName() == XML_TAG_MOVEMENT)
+                {
+                    movements.add(new AnimatorMovement(i));
+                }
             }
         }
+
+        return true;
     }
 };

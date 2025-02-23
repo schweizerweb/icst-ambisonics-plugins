@@ -52,7 +52,7 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     labelVersion.reset (new juce::Label ("labelVersion",
                                          TRANS("Version")));
     addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelVersion->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelVersion->setJustificationType (juce::Justification::centredRight);
     labelVersion->setEditable (false, false, false);
     labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -151,7 +151,7 @@ void AmbisonicsDecoderAudioProcessorEditor::buttonClicked (juce::Button* buttonT
         //[UserButtonCode_btnSettings] -- add your button handler code here..
 		if (settingsWindow)
 			delete settingsWindow;
-		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, mainProcessor.getPresetHelper(), &pointSelection, pAmbiSettings, pDecoderSettings, mainProcessor.getTestSoundGenerator(), this, pFilterSpecification, mainProcessor.getZoomSettingsPointer(), mainProcessor.getChannelLayout()));
+		settingsWindow = new SpeakerSettingsDialog(this, new SpeakerSettingsComponent(pSpeakerSet, mainProcessor.getSpeakerPresetHelper(), mainProcessor.getDecodingPresetHelper(), & pointSelection, pAmbiSettings, pDecoderSettings, mainProcessor.getTestSoundGenerator(), this, pFilterSpecification, mainProcessor.getZoomSettingsPointer(), mainProcessor.getChannelLayout()));
 		settingsWindow->setVisible(true);
 		settingsWindow->updatePosition(getScreenBounds());
         //[/UserButtonCode_btnSettings]

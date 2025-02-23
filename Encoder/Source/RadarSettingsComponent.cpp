@@ -55,7 +55,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointX.reset (new juce::Label ("labelCenterPointX",
                                               TRANS("Center X")));
     addAndMakeVisible (labelCenterPointX.get());
-    labelCenterPointX->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointX->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCenterPointX->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointX->setEditable (false, false, false);
     labelCenterPointX->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -71,7 +71,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointY.reset (new juce::Label ("labelCenterPointY",
                                               TRANS("Center Y")));
     addAndMakeVisible (labelCenterPointY.get());
-    labelCenterPointY->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointY->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCenterPointY->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointY->setEditable (false, false, false);
     labelCenterPointY->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -87,7 +87,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelCenterPointZ.reset (new juce::Label ("labelCenterPointZ",
                                               TRANS("Center Z")));
     addAndMakeVisible (labelCenterPointZ.get());
-    labelCenterPointZ->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelCenterPointZ->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelCenterPointZ->setJustificationType (juce::Justification::centredLeft);
     labelCenterPointZ->setEditable (false, false, false);
     labelCenterPointZ->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -99,7 +99,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
 
     sliderPointScaler.reset (new juce::Slider ("sliderPointScaler"));
     addAndMakeVisible (sliderPointScaler.get());
-    sliderPointScaler->setRange (0.2, 2, 0.01);
+    sliderPointScaler->setRange (0.2, 4, 0.01);
     sliderPointScaler->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderPointScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderPointScaler->addListener (this);
@@ -107,11 +107,18 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelPointScaler.reset (new juce::Label ("labelPointScaler",
                                              TRANS("Point Scaler:")));
     addAndMakeVisible (labelPointScaler.get());
-    labelPointScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelPointScaler->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelPointScaler->setJustificationType (juce::Justification::centredLeft);
     labelPointScaler->setEditable (false, false, false);
     labelPointScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelPointScaler->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+
+    toggleLabelInPoint.reset(new juce::ToggleButton("toggleLabelInPoint"));
+    addAndMakeVisible(toggleLabelInPoint.get());
+    toggleLabelInPoint->setButtonText(TRANS("Label in Point"));
+    toggleLabelInPoint->addListener(this);
+
+    toggleLabelInPoint->setBounds(8, 10, 150, 24);
 
     sliderRadius.reset (new juce::Slider ("sliderRadius"));
     addAndMakeVisible (sliderRadius.get());
@@ -123,7 +130,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelRadius.reset (new juce::Label ("labelRadius",
                                         TRANS("Radius")));
     addAndMakeVisible (labelRadius.get());
-    labelRadius->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelRadius->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelRadius->setJustificationType (juce::Justification::centredLeft);
     labelRadius->setEditable (false, false, false);
     labelRadius->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -136,7 +143,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
 
     sliderGroupPointScaler.reset (new juce::Slider ("sliderGroupPointScaler"));
     addAndMakeVisible (sliderGroupPointScaler.get());
-    sliderGroupPointScaler->setRange (0.2, 2, 0.01);
+    sliderGroupPointScaler->setRange (0.2, 4, 0.01);
     sliderGroupPointScaler->setSliderStyle (juce::Slider::LinearHorizontal);
     sliderGroupPointScaler->setTextBoxStyle (juce::Slider::TextBoxRight, false, 80, 20);
     sliderGroupPointScaler->addListener (this);
@@ -144,7 +151,7 @@ RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener,
     labelGroupPointScaler.reset (new juce::Label ("labelGroupPointScaler",
                                                   TRANS("Group Point Scaler:")));
     addAndMakeVisible (labelGroupPointScaler.get());
-    labelGroupPointScaler->setFont (juce::Font (15.00f, juce::Font::plain).withTypefaceStyle ("Regular"));
+    labelGroupPointScaler->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelGroupPointScaler->setJustificationType (juce::Justification::centredLeft);
     labelGroupPointScaler->setEditable (false, false, false);
     labelGroupPointScaler->setColour (juce::TextEditor::textColourId, juce::Colours::black);
@@ -186,6 +193,7 @@ RadarSettingsComponent::~RadarSettingsComponent()
     btnReset = nullptr;
     sliderGroupPointScaler = nullptr;
     labelGroupPointScaler = nullptr;
+    toggleLabelInPoint = nullptr;
 
 
     //[Destructor]. You can add your own custom destruction code here..
@@ -209,21 +217,22 @@ void RadarSettingsComponent::resized()
     //[UserPreResize] Add your own custom resize code here..
     //[/UserPreResize]
 
-    groupZoom->setBounds (8, 105, getWidth() - 16, 192);
-    sliderCenterPointX->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 105 + 24, (getWidth() - 16) - 152, 24);
-    labelCenterPointX->setBounds (8 + 16, 105 + 24, 128, 24);
-    sliderCenterPointY->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 105 + 56, (getWidth() - 16) - 152, 24);
-    labelCenterPointY->setBounds (8 + 16, 105 + 56, 128, 24);
-    sliderCenterPointZ->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 105 + 88, (getWidth() - 16) - 152, 24);
-    labelCenterPointZ->setBounds (8 + 16, 105 + 88, 128, 24);
-    groupDisplay->setBounds (8, 8, getWidth() - 16, 91);
+    groupZoom->setBounds (8, 129, getWidth() - 16, 192);
+    sliderCenterPointX->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 129 + 24, (getWidth() - 16) - 152, 24);
+    labelCenterPointX->setBounds (8 + 16, 129 + 24, 128, 24);
+    sliderCenterPointY->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 129 + 56, (getWidth() - 16) - 152, 24);
+    labelCenterPointY->setBounds (8 + 16, 129 + 56, 128, 24);
+    sliderCenterPointZ->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 129 + 88, (getWidth() - 16) - 152, 24);
+    labelCenterPointZ->setBounds (8 + 16, 129 + 88, 128, 24);
+    groupDisplay->setBounds (8, 8, getWidth() - 16, 115);
     sliderPointScaler->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 8 + 24, (getWidth() - 16) - 152, 24);
     labelPointScaler->setBounds (8 + 8, 8 + 24, 128, 24);
-    sliderRadius->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 105 + 120, (getWidth() - 16) - 152, 24);
-    labelRadius->setBounds (8 + 16, 105 + 120, 128, 24);
-    btnReset->setBounds (8 + juce::roundToInt ((getWidth() - 16) * 0.5000f) - (150 / 2), 105 + 152, 150, 24);
+    sliderRadius->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 129 + 120, (getWidth() - 16) - 152, 24);
+    labelRadius->setBounds (8 + 16, 129 + 120, 128, 24);
+    btnReset->setBounds (8 + juce::roundToInt ((getWidth() - 16) * 0.5000f) - (150 / 2), 129 + 152, 150, 24);
     sliderGroupPointScaler->setBounds (8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 8 + 56, (getWidth() - 16) - 152, 24);
     labelGroupPointScaler->setBounds (8 + 8, 8 + 56, 128, 24);
+    toggleLabelInPoint->setBounds(8 + (getWidth() - 16) - 8 - ((getWidth() - 16) - 152), 8 + 80, (getWidth() - 16) - 152, 24);
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -285,7 +294,11 @@ void RadarSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
         pZoomSettings->Reset();
         //[/UserButtonCode_btnReset]
     }
-
+    else if (buttonThatWasClicked == toggleLabelInPoint.get())
+    {
+        pZoomSettings->setLabelInPointFlag(buttonThatWasClicked->getToggleState());
+    }
+    
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
 }
@@ -297,6 +310,7 @@ void RadarSettingsComponent::displaySettings()
 {
     sliderPointScaler->setValue(pZoomSettings->getPointScaler(), dontSendNotification);
     sliderGroupPointScaler->setValue(pZoomSettings->getGroupPointScaler(), dontSendNotification);
+    toggleLabelInPoint->setToggleState(pZoomSettings->getLabelInPointFlag(), dontSendNotification);
     sliderCenterPointX->setValue(pZoomSettings->getCurrentCenterPoint().getX(), dontSendNotification);
     sliderCenterPointY->setValue(pZoomSettings->getCurrentCenterPoint().getY(), dontSendNotification);
     sliderCenterPointZ->setValue(pZoomSettings->getCurrentCenterPoint().getZ(), dontSendNotification);

@@ -77,14 +77,11 @@ String Constants::getUiVersionString(bool addLeadingSpace)
     String versionString;
     if(String(ProjectInfo::versionString).startsWith("0.0.0."))
     {
-        if(BUILD_NUMBER > 0)
-        {
-            versionString = "Dev" + String(BUILD_NUMBER);
-        }
-        else
-        {
-            versionString = "self-built";
-        }
+#if BUILD_NUMBER > 0
+        versionString = "Dev" + String(BUILD_NUMBER);
+#else
+        versionString = "self-built";
+#endif
     }
     else
     {
@@ -99,6 +96,11 @@ String Constants::getUiVersionString(bool addLeadingSpace)
 String Constants::getBuildInfo()
 {
     return String(COMMIT_ID) == String("")
-        ? ""
-        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID);
+        ? ("Build Date: " + String(__DATE__) + " " + String(__TIME__))
+        : ("Version: " + getUiVersionString(false) + "\r\nBuild#: " + String(BUILD_NUMBER) + "\r\nLast commit: " + COMMIT_ID + "\r\nBuild Date: " + String(__DATE__) + " " + String(__TIME__));
+}
+
+String Constants::getBasePresetsDirectory()
+{
+    return File::getSpecialLocation(File::userApplicationDataDirectory).getFullPathName() + "/ICST AmbiDecoder";
 }
