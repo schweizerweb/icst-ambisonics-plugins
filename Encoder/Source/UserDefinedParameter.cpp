@@ -225,7 +225,7 @@ float UserDefinedParameter::getValue(Vector3D<double> absPt, AmbiPoint* pt, doub
     case ScaledZ: return float(jmap(absPt.z, -scaler, scaler, loLim, hiLim));
     case ScaledA: return float(jmap(Point3D<double>(absPt.x, absPt.y, absPt.z).getAzimuth(), double(Constants::AzimuthRadMin), double(Constants::AzimuthRadMax), loLim, hiLim));
     case ScaledE: return float(jmap(Point3D<double>(absPt.x, absPt.y, absPt.z).getElevation(), double(Constants::ElevationRadMin), double(Constants::ElevationRadMin), loLim, hiLim));
-    case ScaledD: return float(jmap(absPt.length(), -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
+    case ScaledD: return float(jmap(absPt.length(), 0.0, MathConstants<double>::sqrt2 * scaler, loLim, hiLim));
     case Gain: return float(pt->getGain());
     case DualScaledX: return dualMap(absPt.x, scaler);
     case DualScaledY: return dualMap(absPt.y, scaler);
@@ -316,7 +316,7 @@ bool UserDefinedParameter::getValueFromOsc(double* pDouble, OSCArgument* pArgume
             return true;
             
         case ScaledD:
-            *pDouble = jmap(value, loLim, hiLim, -MathConstants<double>::sqrt2 * scaler, MathConstants<double>::sqrt2 * scaler);
+            *pDouble = jmap(value, loLim, hiLim, 0.0, MathConstants<double>::sqrt2 * scaler);
             return true;
             
         case DualScaledX:
