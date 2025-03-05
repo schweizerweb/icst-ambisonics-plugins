@@ -15,7 +15,7 @@ jobs:
         with:
           fetch-depth: 0
 
-      - uses: pixta-dev/repository-mirroring-action@v1
+      - uses: fscarmen/repository-mirroring-action@v1
         with:
           target_repo_url:
             git@${{ env.MIRRORING_BASE_URL }}:${{ env.MIRRORING_ORG_NAME }}/${{ env.MIRRORING_REPO_NAME }}.git
