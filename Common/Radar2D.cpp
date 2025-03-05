@@ -783,9 +783,9 @@ void Radar2D::resized()
             break;
     }
     
-    radarViewport = Rectangle<double>(x, y, w, h).toNearestInt();
     radarViewportWithBorder = Rectangle<double>(x-border, y-border, w+2*border, h+2*border).toNearestInt();
-	updateRadarBackground();
+    radarViewport = radarViewportWithBorder.reduced(border);
+    updateRadarBackground();
 }
 
 void Radar2D::mouseExit(const MouseEvent&)
