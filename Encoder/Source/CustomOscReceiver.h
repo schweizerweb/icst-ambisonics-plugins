@@ -65,7 +65,9 @@ private:
                 setMethod ("setXYZbyName", setXYZbyName);
                 setMethod ("setAED", setAED);
                 setMethod ("setAEDbyName", setAEDbyName);
-                
+                setMethod ("setGain", setGain);
+                setMethod ("setName", setName);
+
                 // getter
                 setMethod ("getX", getX);
                 setMethod ("getY", getY);
@@ -73,6 +75,7 @@ private:
                 setMethod ("getA", getA);
                 setMethod ("getE", getE);
                 setMethod ("getD", getD);
+                setMethod ("getGain", getGain);
                 setMethod ("getName", getName);
                 setMethod ("getAbsX", getAbsX);
                 setMethod ("getAbsY", getAbsY);
@@ -96,6 +99,7 @@ private:
                 setMethod ("setGroupXYZbyName", setGroupXYZbyName);
                 setMethod ("setGroupAED", setGroupAED);
                 setMethod ("setGroupAEDbyName", setGroupAEDbyName);
+                setMethod ("setGroupName", setGroupName);
                 
                 setMethod ("setGroupRotation", setGroupRotation);
                 setMethod ("setGroupRotationByName", setGroupRotationByName);
@@ -576,6 +580,25 @@ private:
                 return var::undefined();
             }
             
+            static var getGain (const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("getGain", args, 1))
+                {
+                    int index = args.arguments[0];
+                    auto p = thisObject->jsAmbiSourceSet->get(index - 1); // make 0-based
+                    if(p != nullptr)
+                    {
+                        return p->getGain();
+                    }
+                    else
+                    {
+                        thisObject->fail("getGain: invalid source index " + String(index));
+                    }
+                }
+                
+                return var::undefined();
+            }
+            
             static var getGroupX (const var::NativeFunctionArgs& args)
             {
                 if (auto* thisObject = basicCheck("getGroupX", args, 1))
@@ -978,6 +1001,66 @@ private:
                 return var::undefined();
             }
             
+            static var setGain(const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("setGain", args, 2))
+                {
+                    int index = args.arguments[0];
+                    double gain = args.arguments[1];
+
+                    if (thisObject->jsAmbiSourceSet->setGain(index - 1, gain)) // make index 0-based
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisObject->fail("setGain: invalid index " + String(index));
+                    }
+                }
+
+                return var::undefined();
+            }
+
+            static var setName(const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("setName", args, 2))
+                {
+                    int index = args.arguments[0];
+                    String name = args.arguments[1];
+
+                    if (thisObject->jsAmbiSourceSet->setChannelName(index - 1, name)) // make index 0-based
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisObject->fail("setName: invalid index " + String(index));
+                    }
+                }
+
+                return var::undefined();
+            }
+
+            static var setGroupName(const var::NativeFunctionArgs& args)
+            {
+                if (auto* thisObject = basicCheck("setGroupName", args, 2))
+                {
+                    int index = args.arguments[0];
+                    String name = args.arguments[1];
+
+                    if (thisObject->jsAmbiSourceSet->setGroupName(index - 1, name)) // make index 0-based
+                    {
+                        return true;
+                    }
+                    else
+                    {
+                        thisObject->fail("setGroupName: invalid index " + String(index));
+                    }
+                }
+
+                return var::undefined();
+            }
+
             static var reportError(const var::NativeFunctionArgs& args)
             {
                 if (auto* thisObject = basicCheck("reportError", args, 1))

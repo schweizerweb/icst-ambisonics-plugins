@@ -80,7 +80,7 @@ public:
     void removePointFromGroup(int groupIndex, int pointIndex);
 	bool setGroupXyz(int groupIndex, double newX, double newY, double newZ, bool moveSubElements) const;
 	bool setGroupAed(int groupIndex, double a, double e, double d, bool moveSubElements) const;
-	void setGroupName(int groupIndex, String name) const;
+	bool setGroupName(int groupIndex, String name) const;
 	bool stretchGroup(int groupIndex, double stretchValue);
     bool rotateGroup(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis);
     bool rotateGroupAroundOrigin(int groupIndex, double angleAroundXAxis, double angleAroundYAxis, double angleAroundZAxis, bool moveSubElements);
