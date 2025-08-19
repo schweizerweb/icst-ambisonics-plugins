@@ -1,23 +1,28 @@
-name: GitLab Auto-Mirror
+name: Mirror to GitLab
+on:
+  push:
+    branches: ['**']
+    tags: ['*']
+  delete:
+    branches: ['**']
+    tags: ['*']
+  workflow_dispatch:
 
-on: [push, delete]
-
-env:
-  MIRRORING_BASE_URL: gitlab.zhdk.ch
-  MIRRORING_ORG_NAME: icst-github-mirror
-  MIRRORING_REPO_NAME: ${{ github.event.repository.name }}
-  
 jobs:
-  mirror_to_gitlab:
+  mirror:
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
     steps:
-      - uses: actions/checkout@v4
+      - name: Checkout private action from zhdk-icst
+        uses: actions/checkout@v4
         with:
-          fetch-depth: 0
+          repository: zhdk-icst/mirror-to-gitlab
+          ref: v1                                 
+          path: .github/actions/mirror-to-gitlab
+          token: ${{ secrets.ACTIONS_READ_TOKEN }}
 
-      - uses: fscarmen/repository-mirroring-action@v1
-        with:
-          target_repo_url:
-            git@${{ env.MIRRORING_BASE_URL }}:${{ env.MIRRORING_ORG_NAME }}/${{ env.MIRRORING_REPO_NAME }}.git
-          ssh_private_key:
-            ${{ secrets.GITLAB_MIRROR_SSH_PRIVATE_KEY }}
+      - name: Run mirror action (local path)
+        uses: ./.github/actions/mirror-to-gitlab
+        env:
+          GITLAB_TOKEN: ${{ secrets.GITLAB_TOKEN }}
