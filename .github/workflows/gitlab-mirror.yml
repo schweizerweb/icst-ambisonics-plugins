@@ -18,7 +18,7 @@ jobs:
         uses: actions/checkout@v4
         with:
           repository: zhdk-icst/mirror-to-gitlab
-          ref: v1.2                                 
+          ref: v1.5                                 
           path: .github/actions/mirror-to-gitlab
           token: ${{ secrets.ACTIONS_READ_TOKEN }}
 
