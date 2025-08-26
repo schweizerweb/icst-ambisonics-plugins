@@ -22,6 +22,7 @@
 //[Headers] You can add your own extra header files here...
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsComponent.h"
+#include "TimelineComponent.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -83,6 +84,18 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
                         juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
                         juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     btnHelp->setBounds (32, 4, 24, 24);
+
+
+    btnAnimator.reset (new juce::ImageButton ("btnAnimator"));
+    addAndMakeVisible (btnAnimator.get());
+    btnAnimator->setButtonText (TRANS("new button"));
+    btnAnimator->addListener (this);
+
+    btnAnimator->setImages (false, true, true,
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    btnAnimator->setBounds (64, 4, 24, 24);
 
 
     //[UserPreSize]
@@ -186,6 +199,15 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         }
 
         helpDialogManager.show(true, this);
+        //[/UserButtonCode_btnHelp]
+    }
+
+    else if (buttonThatWasClicked == btnAnimator.get())
+    {
+        //[UserButtonCode_btnHelp] -- add your button handler code here..
+
+        // CallOutBox zeigt ein neues TimelineWidgetMS
+        timelineDialogManager.show(this);
         //[/UserButtonCode_btnHelp]
     }
 

@@ -30,6 +30,7 @@
 #include "../../Common/HelpDialogManager.h"
 #include "../../Common/OSCLogDialogManager.h"
 #include "AnimatorDialogManager.h"
+#include "TimelineDialog.h"
 //[/Headers]
 
 
@@ -67,6 +68,8 @@ public:
     static const int settings_pngSize;
     static const char* help_png;
     static const int help_pngSize;
+    static const char* animator_png;
+    static const int animator_pngSize;
 
 
 private:
@@ -80,6 +83,7 @@ private:
     OSCLogDialogManager oscLogDialogManager;
     AnimatorDialogManager animatorDialogManager;
     SharedResourcePointer<TooltipWindow> tooltipWindow;
+    TimelineDialogManager timelineDialogManager;
     //[/UserVariables]
 
     //==============================================================================
@@ -88,6 +92,7 @@ private:
     std::unique_ptr<juce::ImageButton> btnSettings;
     std::unique_ptr<juce::Label> labelMessage;
     std::unique_ptr<juce::ImageButton> btnHelp;
+    std::unique_ptr<juce::ImageButton> btnAnimator;
 
 
     //==============================================================================
