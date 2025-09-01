@@ -4,6 +4,7 @@
 #include <juce_core/juce_core.h>
 #include <algorithm>
 #include <vector>
+#include <unordered_map>
 #include <cmath>
 
 // ============================= Design Tokens ==============================
@@ -73,7 +74,7 @@ struct TimeTransform
     double pixelsPerMs = 0.12;   // 120 px / s
     double timeOffset = 0.0;    // linke sichtbare Kante in ms (double für Präzision)
 
-    // Nur noch für Logik/Hit-Tests (Canvas zeichnet in Weltkoordinaten!)
+    // Nur Logik/Hit-Tests – Canvas zeichnet in Weltkoordinaten!
     float  toX(ms_t t)     const { return float(((double)t - timeOffset) * pixelsPerMs); }
     ms_t   toTime(float x) const { return (ms_t)std::llround(timeOffset + (double)x / pixelsPerMs); }
 };
@@ -213,7 +214,11 @@ private:
 class TimelineCanvas : public juce::Component
 {
 public:
-    struct ClipState { int layer; int index; ms_t start; ms_t length; };
+    struct ClipState
+    {
+        int layer; int index; ms_t start; ms_t length;
+        ms_t end() const { return start + length; }
+    };
     struct MoveResizeAction; // fwd
 
     TimelineModel* model = nullptr;
@@ -222,6 +227,7 @@ public:
     float rowHeight = 40.0f;
     float rowGap = 5.0f;
     ms_t  snap = 10; // 10 ms Snap
+    static constexpr ms_t kMinLen = 10;
 
     // echte Viewport-X-Position (Pixel) für Hit-Test & Zoom
     double viewX = 0.0;
@@ -328,6 +334,12 @@ public:
             else selection.addUnique(li, ci);
         }
 
+        // Drag-Anchor (Zeit an der Maus bei mouseDown)
+        dragAnchorTime = timeAtLocalX(e.position.x);
+
+        // Originalzustände der aktuell selektierten Clips sichern (Map wird Quelle der Wahrheit)
+        storeOriginals();
+
         const auto& clip = model->layers[li].clips[ci];
         const auto r = clipBounds(li, clip);
 
@@ -336,7 +348,6 @@ public:
         else if (std::abs(e.x - r.getRight()) < edge) dragMode = DragMode::ResizeRight;
         else                                           dragMode = DragMode::Move;
 
-        storeOriginals();
         repaint();
     }
 
@@ -351,8 +362,9 @@ public:
 
         if (selection.empty() || !tx || !model) return;
 
-        const float dx = e.position.x - dragStartMouse.x;
-        const ms_t dT = (ms_t)std::llround(dx / tx->pixelsPerMs);
+        // robust: dT aus Maus-Zeit, nicht aus dx
+        const ms_t mouseT = timeAtLocalX(e.position.x);
+        const ms_t dT = mouseT - dragAnchorTime;
         dragAccum = dT;
 
         if (dragMode == DragMode::Move)        applyMove(dT, e.mods.isAltDown());
@@ -369,12 +381,13 @@ public:
 
         if (dragMode != DragMode::None && dragAccum != 0)
         {
-            const auto before = originals;
-            const auto after = captureCurrent(selection);
+            const auto before = captureFromMap();          // Snapshots vor Drag
+            const auto after = captureCurrent(selection); // nach Drag
             undo.perform(new MoveResizeAction(*model, selection, before, after));
         }
         dragMode = DragMode::None;
         dragAccum = 0;
+        originals.clear();
     }
 
     void mouseWheelMove(const juce::MouseEvent& e, const juce::MouseWheelDetails& wheel) override
@@ -411,14 +424,21 @@ public:
             {
                 storeOriginals();
                 applyMove(delta, false);
-                const auto before = originals;
+                const auto before = captureFromMap();
                 const auto after = captureCurrent(selection);
                 undo.perform(new MoveResizeAction(*model, selection, before, after));
+                originals.clear();
                 repaint();
             };
 
         if (key == juce::KeyPress(juce::KeyPress::leftKey)) { nudge(-snap); return true; }
         if (key == juce::KeyPress(juce::KeyPress::rightKey)) { nudge(+snap); return true; }
+
+        if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier, 0)) { undo.undo(); repaint(); return true; }
+        if (key == juce::KeyPress('y', juce::ModifierKeys::commandModifier, 0)
+            || key == juce::KeyPress('Z', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::commandModifier, 0)) {
+            undo.redo(); repaint(); return true;
+        }
 
         if (key == juce::KeyPress(juce::KeyPress::deleteKey))
         {
@@ -433,12 +453,6 @@ public:
             selection.clear();
             repaint();
             return true;
-        }
-
-        if (key == juce::KeyPress('z', juce::ModifierKeys::commandModifier, 0)) { undo.undo(); repaint(); return true; }
-        if (key == juce::KeyPress('y', juce::ModifierKeys::commandModifier, 0)
-            || key == juce::KeyPress('Z', juce::ModifierKeys::shiftModifier | juce::ModifierKeys::commandModifier, 0)) {
-            undo.redo(); repaint(); return true;
         }
 
         return false;
@@ -510,6 +524,7 @@ private:
     DragMode dragMode = DragMode::None;
     juce::Point<float> dragStartMouse{};
     ms_t dragAccum = 0;
+    ms_t dragAnchorTime = 0; // Zeit an der Maus bei mouseDown
 
     int selectedLayer = -1;
     int selectedClip = -1;
@@ -517,7 +532,13 @@ private:
     bool marqueeActive = false;
     juce::Rectangle<float> marquee;
 
-    juce::Array<ClipState> originals;
+    // Originalwerte der selektierten Clips (Key = (layer<<32)|clip)
+    std::unordered_map<uint64_t, ClipState> originals;
+
+    static inline uint64_t keyOf(int layer, int clip)
+    {
+        return ((uint64_t)(uint32_t)layer << 32) | (uint64_t)(uint32_t)clip;
+    }
 
     // ---- Helpers ----
     inline ms_t timeAtLocalX(float px) const
@@ -604,13 +625,24 @@ private:
 
     static ms_t snapTo(ms_t v, ms_t step) { if (step <= 1) return v; return step * ((v + step / 2) / step); }
 
+    inline ClipState getOriginal(int layer, int clip) const
+    {
+        auto it = originals.find(keyOf(layer, clip));
+        jassert(it != originals.end()); // MUSS existieren – setzten wir in storeOriginals()
+        return it->second;
+    }
+
     void applyMove(ms_t dT, bool noSnap)
     {
         for (auto s : selection.items)
         {
             auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            ms_t target = origVal(s).start + dT;
-            c.start = (ms_t)juce::jmax(0.0, (double)(noSnap ? target : snapTo(target, snap)));
+            const auto o = getOriginal(s.layer, s.clip);
+
+            ms_t target = o.start + dT;
+            if (!noSnap) target = snapTo(target, snap);
+            c.start = juce::jmax<ms_t>(0, target);
+            c.length = juce::jmax<ms_t>(kMinLen, o.length); // Länge bleibt, Safety
         }
     }
 
@@ -619,11 +651,14 @@ private:
         for (auto s : selection.items)
         {
             auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            const auto o = origVal(s);
-            ms_t newStart = (ms_t)juce::jlimit(0.0, (double)(o.end() - 10),
-                (double)(noSnap ? (o.start + dT) : snapTo(o.start + dT, snap)));
-            c.length = o.end() - newStart;
+            const auto o = getOriginal(s.layer, s.clip);
+
+            ms_t newStart = o.start + dT;
+            if (!noSnap) newStart = snapTo(newStart, snap);
+            newStart = juce::jlimit<ms_t>(0, o.end() - kMinLen, newStart);
+
             c.start = newStart;
+            c.length = juce::jmax<ms_t>(kMinLen, o.end() - newStart);
         }
     }
 
@@ -632,10 +667,14 @@ private:
         for (auto s : selection.items)
         {
             auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            const auto o = origVal(s);
-            ms_t newEnd = (ms_t)juce::jmax<double>((double)(o.start + 10),
-                (double)(noSnap ? (o.end() + dT) : snapTo(o.end() + dT, snap)));
-            c.length = newEnd - c.start;
+            const auto o = getOriginal(s.layer, s.clip);
+
+            ms_t newEnd = o.end() + dT;
+            if (!noSnap) newEnd = snapTo(newEnd, snap);
+            newEnd = juce::jmax<ms_t>(o.start + kMinLen, newEnd);
+
+            c.start = o.start;                    // Start fix wie im Original
+            c.length = juce::jmax<ms_t>(kMinLen, newEnd - o.start);
         }
     }
 
@@ -645,15 +684,16 @@ private:
         for (auto s : selection.items)
         {
             const auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            originals.add({ s.layer, s.clip, c.start, c.length });
+            originals.emplace(keyOf(s.layer, s.clip), ClipState{ s.layer, s.clip, c.start, c.length });
         }
     }
 
-    Clip origVal(const Selection::Ref& r) const
+    juce::Array<ClipState> captureFromMap() const
     {
-        for (auto& o : originals) if (o.layer == r.layer && o.index == r.clip) return Clip{ "", o.start, o.length, {} };
-        const auto& c = model->layers[r.layer].clips.getReference(r.clip);
-        return c;
+        juce::Array<ClipState> out;
+        out.ensureStorageAllocated((int)originals.size());
+        for (const auto& kv : originals) out.add(kv.second);
+        return out;
     }
 
     void updateMarqueeSelection()
@@ -751,7 +791,7 @@ public:
         addAndMakeVisible(viewport);
 
         viewport.setScrollBarsShown(true, true);
-        viewport.setScrollOnDragMode(juce::Viewport::ScrollOnDragMode::never);
+        viewport.setScrollOnDragEnabled(false); // WICHTIG: Canvas-Drag nicht vom Viewport abfangen lassen!
 
         // Zoom aus Canvas → Viewport positionieren (pixelgenau)
         canvas.onViewportChange = [this](int newViewX)
