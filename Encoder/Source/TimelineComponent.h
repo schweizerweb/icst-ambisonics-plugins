@@ -1,4 +1,4 @@
-﻿#pragma once
+#pragma once
 #include <juce_gui_basics/juce_gui_basics.h>
 #include <juce_graphics/juce_graphics.h>
 #include <juce_core/juce_core.h>
@@ -246,6 +246,9 @@ public:
         setWantsKeyboardFocus(true);
     }
 
+    TimelineCanvas(TimelineCanvas&&) = delete;
+    TimelineCanvas& operator=(TimelineCanvas&&) = delete;
+
     int getContentHeight() const
     {
         if (!model) return 0;
@@ -362,17 +365,21 @@ public:
 
         if (selection.empty() || !tx || !model) return;
 
-        // robust: dT aus Maus-Zeit, nicht aus dx
+        // --- NEU: Safety gegen "Drag ohne mouseDown/storeOriginals" ---
+        if (originals.empty())
+            storeOriginals();
+
         const ms_t mouseT = timeAtLocalX(e.position.x);
         const ms_t dT = mouseT - dragAnchorTime;
         dragAccum = dT;
 
-        if (dragMode == DragMode::Move)        applyMove(dT, e.mods.isAltDown());
+        if (dragMode == DragMode::Move)             applyMove(dT, e.mods.isAltDown());
         else if (dragMode == DragMode::ResizeLeft)  applyResizeLeft(dT, e.mods.isAltDown());
         else if (dragMode == DragMode::ResizeRight) applyResizeRight(dT, e.mods.isAltDown());
 
         repaint();
     }
+
 
     void mouseUp(const juce::MouseEvent&) override
     {
@@ -625,68 +632,241 @@ private:
 
     static ms_t snapTo(ms_t v, ms_t step) { if (step <= 1) return v; return step * ((v + step / 2) / step); }
 
+    // Liefert nur echte Originalwerte aus 'originals'. Kein Stub!
+    inline bool getOriginalStrict (int layer, int clip, ClipState& out) const
+    {
+        const auto it = originals.find(keyOf(layer, clip));
+        if (it == originals.end())
+            return false;
+        out = it->second;
+        return true;
+    }
+
+
     inline ClipState getOriginal(int layer, int clip) const
     {
         auto it = originals.find(keyOf(layer, clip));
-        jassert(it != originals.end()); // MUSS existieren – setzten wir in storeOriginals()
-        return it->second;
+        if (it != originals.end())
+            return it->second;
+
+        // Fallback: aktuellen Zustand nehmen (defensiv)
+        jassert (model != nullptr);
+        if (model != nullptr
+            && juce::isPositiveAndBelow(layer, model->layers.size())
+            && juce::isPositiveAndBelow(clip,  model->layers[layer].clips.size()))
+        {
+            const auto& c = model->layers[layer].clips.getReference(clip);
+            return { layer, clip, c.start, c.length };
+        }
+
+        // Worst case: neutraler Stub, damit es nicht crasht
+        return { layer, clip, 0, kMinLen };
     }
+
 
     void applyMove(ms_t dT, bool noSnap)
     {
+        if (!model || selection.empty())
+            return;
+
+        // --- Anchor aus ORIGINALEN bestimmen: bevorzugt der aktiv gezogene Clip
+        ms_t anchor = std::numeric_limits<ms_t>::max();
+        bool haveAnchor = false;
+
+        if (selection.contains(selectedLayer, selectedClip))
+        {
+            ClipState oSel;
+            if (getOriginalStrict(selectedLayer, selectedClip, oSel))
+            {
+                anchor = oSel.start;
+                haveAnchor = true;
+            }
+        }
+
+        if (!haveAnchor)
+        {
+            for (auto s : selection.items)
+            {
+                ClipState o;
+                if (getOriginalStrict(s.layer, s.clip, o))
+                {
+                    anchor = std::min(anchor, o.start);
+                    haveAnchor = true;
+                }
+            }
+        }
+
+        ms_t delta = dT;
+        if (!noSnap && haveAnchor && snap > 1)
+        {
+            const ms_t snapped = snapTo(anchor + dT, snap);
+            delta = snapped - anchor;
+        }
+
+        // --- Anwenden NUR auf gültige Clips (aus ORIGINALEN), Länge nicht ändern
         for (auto s : selection.items)
         {
-            auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            const auto o = getOriginal(s.layer, s.clip);
+            if (!juce::isPositiveAndBelow(s.layer, model->layers.size())) continue;
+            auto& layer = model->layers.getReference(s.layer);
+            if (!juce::isPositiveAndBelow(s.clip, layer.clips.size()))     continue;
 
-            ms_t target = o.start + dT;
-            if (!noSnap) target = snapTo(target, snap);
-            c.start = juce::jmax<ms_t>(0, target);
-            c.length = juce::jmax<ms_t>(kMinLen, o.length); // Länge bleibt, Safety
+            ClipState o;
+            if (!getOriginalStrict(s.layer, s.clip, o))
+                continue; // niemals Stub-Werte erfinden
+
+            auto& c = layer.clips.getReference(s.clip);
+
+            const ms_t newStart = std::max<ms_t>(0, o.start + delta);
+            c.start  = newStart;
+            // Länge exakt beibehalten; nur nach oben clampen, falls Original kaputt war
+            c.length = (o.length >= kMinLen ? o.length : kMinLen);
         }
     }
+
+
 
     void applyResizeLeft(ms_t dT, bool noSnap)
     {
+        if (!model || selection.empty())
+            return;
+
+        // Anchor = linke Kante des gezogenen Clips, sonst kleinstes ORIGINAL-Start
+        ms_t anchorStart = std::numeric_limits<ms_t>::max();
+        bool haveAnchor = false;
+
+        if (selection.contains(selectedLayer, selectedClip))
+        {
+            ClipState oSel;
+            if (getOriginalStrict(selectedLayer, selectedClip, oSel))
+            {
+                anchorStart = oSel.start;
+                haveAnchor = true;
+            }
+        }
+
+        if (!haveAnchor)
+        {
+            for (auto s : selection.items)
+            {
+                ClipState o;
+                if (getOriginalStrict(s.layer, s.clip, o))
+                {
+                    anchorStart = std::min(anchorStart, o.start);
+                    haveAnchor = true;
+                }
+            }
+        }
+
+        ms_t delta = dT;
+        if (!noSnap && haveAnchor && snap > 1)
+        {
+            const ms_t snapped = snapTo(anchorStart + dT, snap);
+            delta = snapped - anchorStart;
+        }
+
         for (auto s : selection.items)
         {
-            auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            const auto o = getOriginal(s.layer, s.clip);
+            if (!juce::isPositiveAndBelow(s.layer, model->layers.size())) continue;
+            auto& layer = model->layers.getReference(s.layer);
+            if (!juce::isPositiveAndBelow(s.clip, layer.clips.size()))     continue;
 
-            ms_t newStart = o.start + dT;
-            if (!noSnap) newStart = snapTo(newStart, snap);
+            ClipState o;
+            if (!getOriginalStrict(s.layer, s.clip, o))
+                continue;
+
+            auto& c = layer.clips.getReference(s.clip);
+
+            ms_t newStart = o.start + delta;
             newStart = juce::jlimit<ms_t>(0, o.end() - kMinLen, newStart);
 
-            c.start = newStart;
-            c.length = juce::jmax<ms_t>(kMinLen, o.end() - newStart);
+            c.start  = newStart;
+            c.length = std::max<ms_t>(kMinLen, o.end() - newStart);
         }
     }
 
+
     void applyResizeRight(ms_t dT, bool noSnap)
     {
+        if (!model || selection.empty())
+            return;
+
+        // --- Anker bestimmen: bevorzugt der aktiv gezogene Clip, sonst rechtester Endpunkt
+        ms_t anchorEnd = std::numeric_limits<ms_t>::min();
+        bool haveAnchor = false;
+
+        const bool selectedIsValid =
+            juce::isPositiveAndBelow(selectedLayer, model->layers.size()) &&
+            juce::isPositiveAndBelow(selectedClip,  model->layers[selectedLayer].clips.size()) &&
+            selection.contains(selectedLayer, selectedClip);
+
+        if (selectedIsValid)
+        {
+            anchorEnd = getOriginal(selectedLayer, selectedClip).end();
+            haveAnchor = true;
+        }
+        else
+        {
+            for (auto s : selection.items)
+            {
+                if (!juce::isPositiveAndBelow(s.layer, model->layers.size())) continue;
+                const auto& layer = model->layers.getReference(s.layer);
+                if (!juce::isPositiveAndBelow(s.clip, layer.clips.size()))   continue;
+
+                const auto o = getOriginal(s.layer, s.clip);
+                anchorEnd = std::max(anchorEnd, o.end());
+                haveAnchor = true;
+            }
+        }
+
+        if (!haveAnchor)
+            return;
+
+        // --- gemeinsames Delta (gesnapped an den Anker)
+        ms_t delta = dT;
+        if (!noSnap && snap > 1)
+        {
+            const ms_t snapped = snapTo(anchorEnd + dT, snap);
+            delta = snapped - anchorEnd;
+        }
+
+        // --- anwenden (pro Clip clampen)
         for (auto s : selection.items)
         {
-            auto& c = model->layers[s.layer].clips.getReference(s.clip);
+            if (!juce::isPositiveAndBelow(s.layer, model->layers.size())) continue;
+            auto& layer = model->layers.getReference(s.layer);
+            if (!juce::isPositiveAndBelow(s.clip, layer.clips.size()))     continue;
+
+            auto& c = layer.clips.getReference(s.clip);
             const auto o = getOriginal(s.layer, s.clip);
 
-            ms_t newEnd = o.end() + dT;
-            if (!noSnap) newEnd = snapTo(newEnd, snap);
+            ms_t newEnd = o.end() + delta;
             newEnd = juce::jmax<ms_t>(o.start + kMinLen, newEnd);
 
-            c.start = o.start;                    // Start fix wie im Original
+            c.start  = o.start; // Start bleibt wie im Original
             c.length = juce::jmax<ms_t>(kMinLen, newEnd - o.start);
         }
     }
 
-    void storeOriginals()
+
+    void storeOriginals()  // nur am Drag-Beginn aufrufen!
     {
         originals.clear();
+        if (!model) return;
+
         for (auto s : selection.items)
         {
-            const auto& c = model->layers[s.layer].clips.getReference(s.clip);
-            originals.emplace(keyOf(s.layer, s.clip), ClipState{ s.layer, s.clip, c.start, c.length });
+            if (!juce::isPositiveAndBelow(s.layer, model->layers.size())) continue;
+            auto& layer = model->layers.getReference(s.layer);   // L-Value!
+            if (!juce::isPositiveAndBelow(s.clip, layer.clips.size()))     continue;
+
+            const Clip& c = layer.clips.getReference(s.clip);    // L-Value!
+            const ms_t lenSafe = juce::jmax<ms_t>(kMinLen, c.length);
+
+            originals.emplace(keyOf(s.layer, s.clip),
+                              ClipState{ s.layer, s.clip, c.start, lenSafe });
         }
     }
+
 
     juce::Array<ClipState> captureFromMap() const
     {
@@ -722,6 +902,7 @@ private:
         return out;
     }
 
+public:
     struct MoveResizeAction : public juce::UndoableAction
     {
         TimelineModel& model;
@@ -766,14 +947,16 @@ private:
 class TimelineWidgetMS : public juce::Component
 {
 public:
+    TimelineWidgetMS(TimelineWidgetMS&&) = delete;
+    TimelineWidgetMS& operator=(TimelineWidgetMS&&) = delete;
+
     TimelineWidgetMS()
     {
         // Demo-Daten
-        model.layers.add({ "Drums", { Clip{ "Kick",   0,    120, juce::Colours::orange },
-                                      Clip{ "Snare",  400,  100, juce::Colours::orangered },
-                                      Clip{ "Hat",    200,   50, juce::Colours::goldenrod } } });
-        model.layers.add({ "Bass",  { Clip{ "Bass A", 250,  800, juce::Colours::mediumseagreen } } });
-        model.layers.add({ "Pads",  { Clip{ "Pad",   1200, 1500, juce::Colours::slateblue } } });
+        model.layers.add({ "Choreography", { Clip{ "Rotation",   1000,    400, juce::Colours::orange },
+                                      Clip{ "Jitter",  1400,  200, juce::Colours::orangered },
+                                      Clip{ "Spiral",    1700,   800, juce::Colours::goldenrod } } });
+        model.layers.add({ "Movement",  { Clip{ "Move to top right",   1200, 2000, juce::Colours::slateblue } } });
 
         header.tx = &tx;
         header.gutterWidth = gutterWidth;
