@@ -1,7 +1,5 @@
 #pragma once
-#include <juce_gui_basics/juce_gui_basics.h>
-#include <juce_graphics/juce_graphics.h>
-#include <juce_core/juce_core.h>
+#include "JuceHeader.h"
 #include <algorithm>
 #include <vector>
 #include <unordered_map>
@@ -221,6 +219,19 @@ public:
     };
     struct MoveResizeAction; // fwd
 
+    ms_t playheadMs = -1; // <0 = aus
+    bool  loopEnabled = false;
+    ms_t  loopStartMs = -1, loopEndMs = -1;
+    
+    void setPlayheadMs(ms_t t) { playheadMs = t; repaint(); }
+    void setLoopRegion (bool enabled, ms_t startMs, ms_t endMs)
+    {
+        loopEnabled = enabled;
+        loopStartMs = startMs;
+        loopEndMs   = endMs;
+        repaint();
+    }
+    
     TimelineModel* model = nullptr;
     TimeTransform* tx = nullptr;
 
@@ -248,7 +259,7 @@ public:
 
     TimelineCanvas(TimelineCanvas&&) = delete;
     TimelineCanvas& operator=(TimelineCanvas&&) = delete;
-
+    
     int getContentHeight() const
     {
         if (!model) return 0;
@@ -279,6 +290,32 @@ public:
             g.fillRect(marquee.getSmallestIntegerContainer());
             g.setColour(TLTheme::marqueeEdge());
             g.drawRect(marquee.getSmallestIntegerContainer(), 1);
+        }
+        
+        if (loopEnabled && loopStartMs >= 0 && loopEndMs > loopStartMs && tx)
+        {
+            const double p = tx->pixelsPerMs;
+            const float x0 = (float)((double)loopStartMs * p);
+            const float x1 = (float)((double)loopEndMs   * p);
+            const float w  = x1 - x0;
+
+            // halbtransparentes Band
+            g.setColour(juce::Colours::yellow.withAlpha(0.12f));
+            g.fillRect(juce::Rectangle<float>(x0, 0.0f, w, (float)getHeight()));
+
+            // Kanten hervorheben
+            g.setColour(juce::Colours::yellow.withAlpha(0.85f));
+            g.drawLine(x0, 0.0f, x0, (float)getHeight(), 1.5f);
+            g.drawLine(x1, 0.0f, x1, (float)getHeight(), 1.5f);
+        }
+        
+        if (playheadMs >= 0 && tx)
+        {
+            const float x = (float)((double)playheadMs * tx->pixelsPerMs); // Weltkoordinate
+            g.setColour(juce::Colours::red.withAlpha(0.9f));
+            g.drawLine(x, 0.0f, x, (float)getHeight(), 2.0f);
+            juce::Path tri; tri.addTriangle(x - 5.f, 0.f, x + 5.f, 0.f, x, 8.f);
+            g.fillPath(tri);
         }
     }
 
@@ -574,10 +611,24 @@ private:
         g.setColour(sel ? TLTheme::selection() : juce::Colours::black.withAlpha(0.6f));
         g.drawRoundedRectangle(clipBounds(layerIndex, c), 5.0f, sel ? 2.0f : 1.0f);
 
-        juce::String label = c.id + "  " + fmtTime(c.start) + " - " + fmtTime(c.end());
+        juce::Rectangle<int> bounds = clipBounds(layerIndex, c).reduced(8, 2).toNearestInt();
+
+        // Zwei Zeilen vorbereiten
+        juce::String line1 = c.id;                                 // Erste Zeile
+        juce::String line2 = fmtTime(c.start) + " - " + fmtTime(c.end()); // Zweite Zeile
+
         g.setColour(juce::Colours::white);
-        g.drawFittedText(label, clipBounds(layerIndex, c).reduced(8).toNearestInt(),
-            juce::Justification::centredLeft, 1);
+
+        // Höhe für jede Zeile aufteilen
+        int halfHeight = bounds.getHeight() / 2;
+        auto topBounds = bounds.removeFromTop(halfHeight);
+        auto bottomBounds = bounds; // Rest
+
+        // Erste Zeile oben, fitted
+        g.drawFittedText(line1, topBounds, juce::Justification::topLeft, 1);
+
+        // Zweite Zeile unten, fitted
+        g.drawFittedText(line2, bottomBounds, juce::Justification::bottomLeft, 1);
     }
 
     void paintGrid(juce::Graphics& g)
@@ -947,6 +998,25 @@ private:
 class TimelineWidgetMS : public juce::Component
 {
 public:
+    struct PlayheadSnapshot
+    {
+        bool   valid   = false;
+        bool   playing = false;
+        ms_t   timeMs  = -1;   // <0 => nicht zeichnen
+        double bpm     = 120.0;
+        
+        bool   looping = false;
+        ms_t   loopStartMs = -1;
+        ms_t   loopEndMs   = -1;
+    };
+
+    using PlayheadProvider = std::function<PlayheadSnapshot()>;
+
+    void setPlayheadProvider(PlayheadProvider p) { playheadProvider = std::move(p); }
+
+    // Optional: Auto-Follow (Cursor im Viewport halten)
+    void setAutoFollow(bool shouldFollow) { autoFollow = shouldFollow; }
+
     TimelineWidgetMS(TimelineWidgetMS&&) = delete;
     TimelineWidgetMS& operator=(TimelineWidgetMS&&) = delete;
 
@@ -1055,5 +1125,81 @@ private:
             for (const auto& c : L.clips)
                 m = std::max(m, c.end());
         return m;
+    }
+    
+    PlayheadProvider playheadProvider;
+    bool autoFollow = true;
+
+    // ---- Timer integrieren:
+    class PlayheadTimer : private juce::Timer
+    {
+    public:
+        PlayheadTimer(TimelineWidgetMS& ownerRef) : owner(ownerRef) { startTimerHz(60); }
+        void setEnabled(bool on) { on ? startTimerHz(60) : stopTimer(); }
+
+    private:
+        TimelineWidgetMS& owner;
+        void timerCallback() override { owner.tickPlayhead(); }
+    } playheadTimer { *this };
+
+    // ---- Tick: Provider abfragen, Canvas updaten, optional folgen
+    void tickPlayhead()
+    {
+        if (!playheadProvider) return;
+
+            const auto s = playheadProvider();
+
+            // Canvas informieren
+            canvas.setPlayheadMs (s.valid ? s.timeMs : -1);
+            canvas.setLoopRegion (s.looping && s.loopEndMs > s.loopStartMs,
+                                  s.loopStartMs, s.loopEndMs);
+
+            if (autoFollow && s.valid && s.timeMs >= 0)
+                keepPlayheadVisible (s.timeMs, s.looping ? std::make_optional(std::pair<ms_t,ms_t>{s.loopStartMs, s.loopEndMs})
+                                                         : std::nullopt);
+    }
+
+    void keepPlayheadVisible (ms_t tMs, std::optional<std::pair<ms_t,ms_t>> loop)
+    {
+        const double p = tx.pixelsPerMs;
+        const int xWorld = (int) std::llround((double)tMs * p);
+
+        auto vis = viewport.getViewArea(); // Weltkoordinaten im Canvas
+        const int margin = 40;
+
+        // Wenn Loop vorhanden und komplett außerhalb sichtbar, zeig’ die ganze Loop
+        if (loop && loop->second > loop->first)
+        {
+            const int loopX0 = (int) std::llround((double)loop->first  * p);
+            const int loopX1 = (int) std::llround((double)loop->second * p);
+            const int loopW  = loopX1 - loopX0;
+
+            // Falls Loop deutlich größer als View: bleib bei Playhead-Follow
+            if (loopW <= vis.getWidth())
+            {
+                const int wantX = juce::jlimit(0, juce::jmax(0, canvas.getWidth() - vis.getWidth()),
+                                               loopX0 - margin);
+                if (loopX0 < vis.getX() + margin || loopX1 > vis.getRight() - margin)
+                {
+                    viewport.setViewPosition(wantX, vis.getY());
+                }
+            }
+        }
+
+        // Standard-Follow: Playhead im Sichtbereich halten
+        vis = viewport.getViewArea(); // evtl. aktualisiert
+        if (xWorld < vis.getX() + margin || xWorld > vis.getRight() - margin)
+        {
+            const int newX = juce::jlimit(0, juce::jmax(0, canvas.getWidth() - vis.getWidth()),
+                                          xWorld - vis.getWidth() / 2);
+            viewport.setViewPosition(newX, vis.getY());
+        }
+
+        // Header/Canvas state syncen
+        header.scrollX = (double)viewport.getViewPositionX();
+        canvas.viewX   = (double)viewport.getViewPositionX();
+        tx.timeOffset  = std::max(0.0, header.scrollX / tx.pixelsPerMs);
+        header.repaint();
+        canvas.repaint();
     }
 };

@@ -109,6 +109,25 @@ public:
     
 	void updateTrackProperties(const TrackProperties& properties) override;
 
+    struct SharedPlayheadState
+    {
+        std::atomic<bool>   valid { false };
+        std::atomic<bool>   playing { false };
+
+        std::atomic<double> timeSeconds { 0.0 };    // absolute Projektzeit
+        std::atomic<double> sampleRate  { 44100.0 };
+        std::atomic<int64_t> timeSamples { 0 };
+
+        std::atomic<double> bpm { 120.0 };
+        std::atomic<double> editOriginSeconds { 0.0 }; // falls Host das liefert
+        
+        std::atomic<bool>   looping { false };
+            std::atomic<double> loopStartSeconds { 0.0 };
+            std::atomic<double> loopEndSeconds   { 0.0 };
+    };
+
+    SharedPlayheadState playheadState;
+
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
 	EncoderSettings encoderSettings;

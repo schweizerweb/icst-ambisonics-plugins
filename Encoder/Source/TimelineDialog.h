@@ -83,13 +83,42 @@ public:
     }
 
     // Dialog öffnen; pParent bestimmt Referenz-Position
-    void show(juce::Component* pParent)
+    void show(juce::Component* pParent, AmbisonicEncoderAudioProcessor* pProcessor)
     {
         if (window != nullptr)
             delete window;
 
-        // Inhalt: dein TimelineWidgetMS
         auto* timeline = new TimelineWidgetMS();
+        timeline->setPlayheadProvider([pProcessor]() -> TimelineWidgetMS::PlayheadSnapshot {
+            TimelineWidgetMS::PlayheadSnapshot s;
+                const auto& st = pProcessor->playheadState;
+
+                s.valid   = st.valid.load(std::memory_order_acquire);
+                if (!s.valid) return s;
+
+                const double secs = st.timeSeconds.load(std::memory_order_relaxed);
+                if (!std::isfinite(secs)) return s;
+
+                s.timeMs  = (ms_t) std::llround(secs * 1000.0);
+                s.playing = st.playing.load(std::memory_order_relaxed);
+                s.bpm     = st.bpm.load(std::memory_order_relaxed);
+
+                s.looping = st.looping.load(std::memory_order_relaxed);
+                if (s.looping)
+                {
+                    const double ls = st.loopStartSeconds.load(std::memory_order_relaxed);
+                    const double le = st.loopEndSeconds.load(std::memory_order_relaxed);
+                    if (std::isfinite(ls) && std::isfinite(le) && le > ls)
+                    {
+                        s.loopStartMs = (ms_t) std::llround(ls * 1000.0);
+                        s.loopEndMs   = (ms_t) std::llround(le * 1000.0);
+                    }
+                    else s.looping = false;
+                }
+                return s;
+        });
+
+        timeline->setAutoFollow(true);
 
         // Dialog erzeugen; Manager (this) als Listener registrieren
         window = new TimelineDialog(this, timeline);

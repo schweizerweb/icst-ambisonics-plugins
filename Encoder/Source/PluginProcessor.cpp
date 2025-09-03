@@ -229,6 +229,56 @@ void AmbisonicEncoderAudioProcessor::applyDistanceGain(double* pCoefficientArray
 
 void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, MidiBuffer& /*midiMessages*/)
 {
+    // playhead handling
+    playheadState.sampleRate.store (getSampleRate(), std::memory_order_relaxed);
+
+    if (auto* ph = getPlayHead())
+    {
+        if (auto pos = ph->getPosition())
+        {
+            if (pos->getTimeInSeconds().hasValue())
+                playheadState.timeSeconds.store (*pos->getTimeInSeconds());
+
+            if (pos->getBpm().hasValue())
+                playheadState.bpm.store (*pos->getBpm());
+                
+            playheadState.playing.store (pos->getIsPlaying());
+            
+            playheadState.looping.store (pos->getIsLooping(), std::memory_order_relaxed);
+
+                if (playheadState.looping.load(std::memory_order_relaxed))
+                {
+                    if (auto lp = pos->getLoopPoints())
+                    {
+                        // lp->ppqStart / lp->ppqEnd sind *PPQ* (quarter-notes)
+                        double bpm = 120.0;
+                        if (auto b = pos->getBpm()) bpm = *b;
+
+                        const double qps = bpm / 60.0; // quarters per second
+
+                        const double ppqStart = lp->ppqStart;
+                        const double ppqEnd   = lp->ppqEnd;
+
+                        if (qps > 0.0 && std::isfinite(ppqStart) && std::isfinite(ppqEnd) && ppqEnd > ppqStart)
+                        {
+                            playheadState.loopStartSeconds.store (ppqStart / qps, std::memory_order_relaxed);
+                            playheadState.loopEndSeconds.store   (ppqEnd   / qps, std::memory_order_relaxed);
+                        }
+                    }
+                }
+
+            playheadState.valid.store (true, std::memory_order_release);
+        }
+        else
+        {
+            playheadState.valid.store (false, std::memory_order_release);
+        }
+    }
+    else
+    {
+        playheadState.valid.store (false, std::memory_order_release);
+    }
+    
 	// Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size(), buffer.getNumChannels());
