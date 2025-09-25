@@ -89,6 +89,7 @@ public:
             delete window;
 
         auto* timeline = new TimelineWidgetMS();
+        timeline->setModels(pProcessor->getTimelines());
         timeline->setPlayheadProvider([pProcessor]() -> TimelineWidgetMS::PlayheadSnapshot {
             TimelineWidgetMS::PlayheadSnapshot s;
                 const auto& st = pProcessor->playheadState;

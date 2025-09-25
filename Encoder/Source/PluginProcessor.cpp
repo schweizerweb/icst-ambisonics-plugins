@@ -394,6 +394,11 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	sources->writeToXmlElement(xml);
     zoomSettings->writeToXmlElement(xml);
     xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
+    
+    auto* xTimelines = xml->createNewChildElement("Timelines");
+    for (auto* tm : timelines)
+        xTimelines->addChildElement (tm->toXml().release());
+
 	copyXmlToBinary(*xml, destData);
 	xml->deleteAllChildElements();
 	delete xml;
@@ -423,11 +428,90 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             scalingInfo.SetScaler(sources->getDistanceScaler());
             zoomSettings->loadFromXml(xmlState.get());
             animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
+            if (auto* xTimelines = xmlState->getChildByName("Timelines"))
+            {
+                timelines.clear(true);
+                forEachXmlChildElementWithTagName (*xTimelines, xTimeline, "Timeline")
+                {
+                    auto* tm = new TimelineModel();
+                    tm->fromXml (*xTimeline); // <-- Model liest sich selbst
+                    timelines.add (tm);
+                }
+                //listeners.call (&Listener::timelineListChanged);
+            }
+            
+            if (timelines.isEmpty())
+            {
+                populateDefaultTimelineModels();
+            }
 		}
 	}
 
     pOscHandler->initialize();
 	initializeOscSender();
+}
+
+static inline Clip makeClip (juce::String id, ms_t start, ms_t length, juce::Colour col)
+{
+    Clip c; c.id = std::move(id); c.start = start; c.length = length; c.colour = col; return c;
+}
+
+static inline Layer makeLayer (juce::String name, std::initializer_list<Clip> clips)
+{
+    Layer L; L.name = std::move(name);
+    for (const auto& c : clips) L.clips.add(c);
+    return L;
+}
+
+void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
+{
+    timelines.clear(true);
+
+    // Timeline 1: Choreography
+    {
+        auto* t = new TimelineModel();
+        t->layers.add (makeLayer ("Choreography", {
+            makeClip ("Rotation",  1000,  400, juce::Colours::orange),
+            makeClip ("Jitter",    1600,  220, juce::Colours::orangered),
+            makeClip ("Spiral",    1900,  800, juce::Colours::goldenrod),
+        }));
+        t->layers.add (makeLayer ("Movement A", {
+            makeClip ("Move to top right", 1200, 2000, juce::Colours::slateblue),
+        }));
+        timelines.add(t);
+    }
+
+    // Timeline 2: Movement
+    {
+        auto* t = new TimelineModel();
+        t->layers.add (makeLayer ("Path", {
+            makeClip ("EaseIn",     0,    800, juce::Colours::cornflowerblue),
+            makeClip ("Hold",       800,  400, juce::Colours::lightsteelblue),
+            makeClip ("EaseOut",    1200, 700, juce::Colours::royalblue),
+        }));
+        t->layers.add (makeLayer ("Offsets", {
+            makeClip ("X Offset",  300,   900, juce::Colours::mediumseagreen),
+            makeClip ("Y Offset",  900,   600, juce::Colours::seagreen),
+        }));
+        timelines.add(t);
+    }
+
+    // Timeline 3: FX
+    {
+        auto* t = new TimelineModel();
+        t->layers.add (makeLayer ("Lights", {
+            makeClip ("Flash",       500,  120, juce::Colours::yellow),
+            makeClip ("Strobe",     1500,  300, juce::Colours::gold),
+            makeClip ("Dim",        2200,  700, juce::Colours::darkkhaki),
+        }));
+        t->layers.add (makeLayer ("Post", {
+            makeClip ("Vignette",   1000, 1200, juce::Colours::darkslategrey),
+            makeClip ("Bloom",      1800,  600, juce::Colours::plum),
+        }));
+        timelines.add(t);
+    }
+
+    //listeners.call (&Listener::timelineListChanged);
 }
 
 ChannelLayout* AmbisonicEncoderAudioProcessor::getChannelLayout()
@@ -499,6 +583,8 @@ RadarOptions* AmbisonicEncoderAudioProcessor::getRadarOptions()
 {
     return &radarOptions;
 }
+
+juce::OwnedArray<TimelineModel>& AmbisonicEncoderAudioProcessor::getTimelines() { return timelines; }
 
 void AmbisonicEncoderAudioProcessor::updateTrackProperties(const TrackProperties& properties)
 {

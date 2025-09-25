@@ -4,6 +4,7 @@
 #include <vector>
 #include <unordered_map>
 #include <cmath>
+#include "../../Common/Point3d.h"
 
 // ============================= Design Tokens ==============================
 struct TLTheme
@@ -31,8 +32,63 @@ struct Clip
     ms_t start = 0;      // ms
     ms_t length = 250;    // ms
     juce::Colour colour = juce::Colours::cornflowerblue;
-
+    
     ms_t end() const { return start + length; }
+};
+
+struct MovementClip : public Clip
+{
+    Point3D<double> startPointGroup;
+    Point3D<double> endPointGroup;
+    bool useStartPoint;
+    Array<Point3D<double>> startPointsRel;
+    Array<Point3D<double>> endPointsRel;
+};
+
+struct MovementLayer
+{
+    Array<MovementClip> clips;
+};
+
+enum class ActionType
+{
+    None,
+    RotationX,
+    RotationY,
+    RotationZ,
+    Stretch
+};
+
+enum class TimingType
+{
+    None,
+    AbsoluteTarget,
+    RelativeDuringClip,
+    AbsolutePerSecond
+};
+
+struct ActionDefinition
+{
+    ActionType action;
+    TimingType timing;
+    double value;
+};
+
+struct ActionClip : public Clip
+{
+    Array<ActionDefinition> actions;
+};
+
+struct ActionLayer
+{
+    String name;
+    Array<ActionClip> clips;
+};
+
+struct TimeLineModel2
+{
+    MovementLayer movement;
+    Array<ActionLayer> actions;
 };
 
 struct Layer
@@ -54,6 +110,73 @@ struct TimelineModel
                 return i;
         return -1;
     }
+    
+    // Im TimelineModel
+    std::unique_ptr<juce::XmlElement> toXml() const
+    {
+        auto xml = std::make_unique<juce::XmlElement>("Timeline");
+
+        for (const auto& L : layers)
+        {
+            auto* xLayer = new juce::XmlElement("Layer");
+            xLayer->setAttribute("name", L.name);
+
+            for (const auto& c : L.clips)
+            {
+                auto* xClip = new juce::XmlElement("Clip");
+                xClip->setAttribute("id",     c.id);
+                xClip->setAttribute("start",  juce::String((juce::int64)c.start));
+                xClip->setAttribute("length", juce::String((juce::int64)c.length));
+                xClip->setAttribute("colour",
+                    juce::String::toHexString((juce::uint32) c.colour.getARGB()).paddedLeft('0', 8));
+                xLayer->addChildElement(xClip);
+            }
+
+            xml->addChildElement(xLayer);
+        }
+
+        return xml;
+    }
+
+    bool fromXml (const juce::XmlElement& xml)
+    {
+        if (!xml.hasTagName("Timeline"))
+            return false;
+
+        layers.clearQuick();
+
+        for (auto* xLayer = xml.getFirstChildElement(); xLayer != nullptr; xLayer = xLayer->getNextElement())
+        {
+            if (!xLayer->hasTagName("Layer"))
+                continue;
+
+            Layer L;
+            L.name = xLayer->getStringAttribute("name");
+
+            for (auto* xClip = xLayer->getFirstChildElement(); xClip != nullptr; xClip = xClip->getNextElement())
+            {
+                if (!xClip->hasTagName("Clip"))
+                    continue;
+
+                Clip c;
+                c.id     = xClip->getStringAttribute("id");
+                c.start  = (ms_t) xClip->getStringAttribute("start").getLargeIntValue();
+                c.length = (ms_t) xClip->getStringAttribute("length").getLargeIntValue();
+
+                const auto colourHex = xClip->getStringAttribute("colour");
+                c.colour = colourHex.isNotEmpty()
+                         ? juce::Colour((juce::uint32) colourHex.getHexValue32())
+                         : juce::Colours::cornflowerblue;
+
+                L.clips.add(c);
+            }
+
+            layers.add(L);
+        }
+
+        return true;
+    }
+
 };
 
 // ============================= Helpers ====================================
@@ -994,6 +1117,112 @@ private:
     }
 };
 
+// -------------------- Horizontaler Scroll-Sync --------------------
+struct ViewSyncHub
+{
+    void registerViewport (juce::Viewport* vp)
+    {
+        if (vp != nullptr) viewports.addIfNotAlreadyThere(vp);
+    }
+
+    void broadcastX (int x, juce::Viewport* source)
+    {
+        if (isBroadcasting) return;
+        isBroadcasting = true;
+        for (auto* vp : viewports)
+            if (vp != source)
+                vp->setViewPosition (x, vp->getViewPositionY());
+        isBroadcasting = false;
+    }
+
+private:
+    juce::Array<juce::Viewport*> viewports;
+    bool isBroadcasting = false;
+};
+
+// ============================= TimelineRow ================================
+class TimelineRow : public juce::Component
+{
+public:
+    TimelineRow (TimelineModel& modelRef, TimeTransform& sharedTx, ViewSyncHub& hubRef, int gutterW)
+        : tx (sharedTx), hub (hubRef), gutterWidth (gutterW)
+    {
+        // Gutter & Canvas verdrahten
+        gutter.model    = &modelRef;
+        gutter.rowHeight = canvas.rowHeight;
+        gutter.rowGap    = canvas.rowGap;
+
+        canvas.model = &modelRef;
+        canvas.tx    = &tx;
+
+        vp.setViewedComponent (&canvas, false);
+        vp.setScrollBarsShown(false /*vertical*/, false /*horizontal*/);
+        vp.setScrollOnDragEnabled(false); // Drag-Gesten gehören der Canvas
+
+        // Horizontal-Scroll → Header & andere Rows syncen
+        vp.onVisibleAreaChanged = [this](const juce::Rectangle<int>& vis)
+        {
+            const int x = vis.getX();
+            headerScrollX = x;
+
+            // tx.timeOffset global halten
+            const double newOffsetMs = (double) x / tx.pixelsPerMs;
+            if (newOffsetMs != tx.timeOffset)
+                tx.timeOffset = std::max(0.0, newOffsetMs);
+
+            gutter.setScrollY (vis.getY());
+            hub.broadcastX (x, &vp);
+            repaint();
+        };
+
+        hub.registerViewport (&vp);
+
+        addAndMakeVisible (gutter);
+        addAndMakeVisible (vp);
+    }
+
+    void resized() override
+    {
+        auto r = getLocalBounds();
+        auto gutterArea = r.removeFromLeft (gutterWidth);
+        gutter.setBounds (gutterArea);
+
+        vp.setBounds (r);
+
+        const int contentWidth = (int) std::ceil ((computeMaxEndMs() + 1000) * tx.pixelsPerMs);
+        canvas.setSize (juce::jmax (r.getWidth(), contentWidth), canvas.getContentHeight());
+    }
+
+    // Weiterreichen für globale Aktionen (Playhead/Loop etc.)
+    TimelineCanvas& getCanvas() { return canvas; }
+    int             getGutterWidth() const { return gutterWidth; }
+    int             getContentHeight() const { return canvas.getContentHeight(); }
+    int             getHeaderScrollX() const { return headerScrollX; } // nützlich für Header
+    juce::Viewport& getViewport()             { return vp; }
+    const juce::Viewport& getViewport() const { return vp; }
+
+private:
+    ms_t computeMaxEndMs() const
+    {
+        ms_t m = 0;
+        if (!canvas.model) return 0;
+        for (const auto& L : canvas.model->layers)
+            for (const auto& c : L.clips)
+                m = std::max (m, c.end());
+        return m;
+    }
+
+    TimeTransform&   tx;
+    ViewSyncHub&     hub;
+    const int        gutterWidth;
+
+    TimelineGutter   gutter;
+    TimelineCanvas   canvas;
+    SyncViewport     vp;
+
+    int headerScrollX = 0;
+};
+
 // ============================= Container ==================================
 class TimelineWidgetMS : public juce::Component
 {
@@ -1019,111 +1248,133 @@ public:
 
     TimelineWidgetMS(TimelineWidgetMS&&) = delete;
     TimelineWidgetMS& operator=(TimelineWidgetMS&&) = delete;
-
+    
     TimelineWidgetMS()
     {
-        // Demo-Daten
-        model.layers.add({ "Choreography", { Clip{ "Rotation",   1000,    400, juce::Colours::orange },
-                                      Clip{ "Jitter",  1400,  200, juce::Colours::orangered },
-                                      Clip{ "Spiral",    1700,   800, juce::Colours::goldenrod } } });
-        model.layers.add({ "Movement",  { Clip{ "Move to top right",   1200, 2000, juce::Colours::slateblue } } });
-
+        // Header konfigurieren (geteilt für alle Canvas)
         header.tx = &tx;
-        header.gutterWidth = gutterWidth;
-
-        gutter.model = &model;
-        gutter.rowHeight = canvas.rowHeight;
-        gutter.rowGap = canvas.rowGap;
-
-        canvas.model = &model;
-        canvas.tx = &tx;
-
+        header.gutterWidth = gutterWidth; // optische Ausrichtung mit Guttern
         addAndMakeVisible(header);
-        addAndMakeVisible(gutter);
-        viewport.setViewedComponent(&canvas, false);
-        addAndMakeVisible(viewport);
-
-        viewport.setScrollBarsShown(true, true);
-        viewport.setScrollOnDragEnabled(false); // WICHTIG: Canvas-Drag nicht vom Viewport abfangen lassen!
-
-        // Zoom aus Canvas → Viewport positionieren (pixelgenau)
-        canvas.onViewportChange = [this](int newViewX)
-            {
-                viewport.setViewPosition(newViewX, viewport.getViewPositionY());
-                // Falls Position unverändert bleibt, trotzdem frisch zeichnen:
-                header.scrollX = (double)viewport.getViewPositionX();
-                header.repaint();
-                canvas.repaint();
-            };
-
-        // bei Scale-Änderung (Ctrl+Wheel) ohne Positionsänderung -> Repaint forcieren
-        canvas.onScaleChanged = [this]
-            {
-                header.scrollX = (double)viewport.getViewPositionX();
-                header.repaint();
-                canvas.repaint();
-            };
-
-        // Scrollbar/Trackpad → Header pixelgenau, Canvas.viewX und tx.timeOffset ableiten
-        viewport.onVisibleAreaChanged = [this](const juce::Rectangle<int>& vis)
-            {
-                const int x = vis.getX();
-                const int y = vis.getY();
-
-                header.scrollX = (double)x;
-                canvas.viewX = (double)x;
-
-                const double newOffsetMs = (double)x / tx.pixelsPerMs; // präzise, ohne Rundung
-                if (newOffsetMs != tx.timeOffset)
-                    tx.timeOffset = std::max(0.0, newOffsetMs);
-
-                gutter.setScrollY(y);
-                header.repaint();
-                canvas.repaint();
-            };
-
-        setSize(1000, 480);
+    
+        // Vertikal-Viewport für die Rows (falls viele Timelines)
+        rowsViewport.setViewedComponent (&rowsContainer, false);
+        rowsViewport.setScrollBarsShown (false, true); // nur vertikal sichtbar
+        addAndMakeVisible (rowsViewport);
+        setSize (1000, 600);
     }
 
     void resized() override
     {
         auto r = getLocalBounds();
-
-        auto headerArea = r.removeFromTop(headerHeight);
-        header.setBounds(headerArea);
-
-        auto gutterArea = r.removeFromLeft(gutterWidth);
-        gutter.setBounds(gutterArea);
-
-        viewport.setBounds(r);
-
-        const ms_t maxEnd = computeMaxEndMs();
-        const int contentWidth = juce::jmax(r.getWidth(),
-            (int)std::ceil((maxEnd + 1000) * tx.pixelsPerMs));
-        canvas.setSize(contentWidth, canvas.getContentHeight());
+        header.setBounds (r.removeFromTop (headerHeight));
+        rowsViewport.setBounds (r);
+        
+        layoutRowsContainer();
     }
 
-    TimelineModel& getModel() { return model; }
-    TimelineCanvas& getCanvas() { return canvas; }
     TimeTransform& getTx() { return tx; }
 
+    void setModels (juce::OwnedArray<TimelineModel>& modelsRef)
+    {
+        models = &modelsRef;   // nur Referenz speichern
+        rebuildRows();
+    }
+    
+    void rebuildRows()
+    {
+        rows.clear(true);
+        if (!models) return;
+
+        for (auto* tm : *models)
+        {
+            auto row = std::make_unique<TimelineRow>(*tm, tx, syncHub, gutterWidth);
+            row->getCanvas().onViewportChange = [this](int newViewX)
+            {
+                // irgendeine Row hat gescrollt (per Canvas-Zoom): Header nachziehen
+                header.scrollX = (double) newViewX;
+                header.repaint();
+            };
+            row->getCanvas().onScaleChanged = [this]
+            {
+                // bei Scale-Änderung ohne Positionsänderung -> Header neu
+                header.repaint();
+                repaint();
+            };
+
+            rowsContainer.addAndMakeVisible(row.get());
+            rows.add(row.release());
+        }
+
+        layoutRowsContainer();
+        repaint();
+    }
+    
 private:
-    TimelineModel  model;
     TimeTransform  tx;
     TimelineHeader header;
-    TimelineGutter gutter;
-    TimelineCanvas canvas;
-    SyncViewport   viewport;
-
+    ViewSyncHub    syncHub;
+    juce::OwnedArray<TimelineModel>* models = nullptr;
+    
+    class RowsContainer : public juce::Component
+    {
+    public:
+        juce::OwnedArray<TimelineRow> rows;
+        int interRowGap = 8;
+        void resized() override
+        {
+            auto r = getLocalBounds();
+            int y = 0;
+            for (auto* row : rows)
+            {
+                const int h = row->getContentHeight();
+                row->setBounds (r.getX(), y, r.getWidth(), h);
+                y += h + interRowGap;
+            }
+        }
+        int computeTotalHeight() const
+        {
+            int total = 0;
+            for (auto* row : rows) total += row->getContentHeight() + interRowGap;
+            return juce::jmax (0, total - interRowGap);
+        }
+    } rowsContainer;
+    juce::Viewport rowsViewport;
+    
+    juce::OwnedArray<TimelineRow>& rows { rowsContainer.rows };
+    
     const int headerHeight = 28;
     const int gutterWidth = 160;
 
-    ms_t computeMaxEndMs() const
+    void layoutRowsContainer()
+    {
+        // Breite: Viewport-Innenbreite, Höhe: Summe aller Row-Höhen
+        const auto viewArea = rowsViewport.getLocalBounds();
+        const int totalH = rowsContainer.computeTotalHeight();
+
+        // Content-Breite abhängig vom maximalen Clip-Ende aller Models
+        const ms_t maxEnd = computeGlobalMaxEndMs();
+        const int contentW = juce::jmax (viewArea.getWidth(),
+                                            (int) std::ceil ((maxEnd + 1000) * tx.pixelsPerMs));
+        rowsContainer.setSize (contentW, juce::jmax (totalH, viewArea.getHeight()));
+        rowsContainer.resized(); // jetzt die Rows positionieren
+
+        // Header-ScrollX an eine (erste) Row koppeln:
+        if (rows.size() > 0)
+            header.scrollX = (double) rows[0]->getHeaderScrollX();
+        header.repaint();
+    }
+
+    ms_t computeGlobalMaxEndMs() const
     {
         ms_t m = 0;
-        for (const auto& L : model.layers)
-            for (const auto& c : L.clips)
-                m = std::max(m, c.end());
+        for (auto* row : rows)
+        {
+            const auto& canvas = row->getCanvas();
+            if (!canvas.model) continue;
+            for (const auto& L : canvas.model->layers)
+                for (const auto& c : L.clips)
+                    m = std::max (m, c.end());
+        }
         return m;
     }
     
@@ -1147,59 +1398,65 @@ private:
     {
         if (!playheadProvider) return;
 
-            const auto s = playheadProvider();
+        const auto s = playheadProvider();
 
-            // Canvas informieren
-            canvas.setPlayheadMs (s.valid ? s.timeMs : -1);
-            canvas.setLoopRegion (s.looping && s.loopEndMs > s.loopStartMs,
-                                  s.loopStartMs, s.loopEndMs);
+        // Alle Canvas updaten
+        for (auto* row : rows)
+        {
+            auto& cv = row->getCanvas();
+            cv.setPlayheadMs (s.valid ? s.timeMs : -1);
+            cv.setLoopRegion (s.looping && s.loopEndMs > s.loopStartMs,
+                                s.loopStartMs, s.loopEndMs);
+        }
 
-            if (autoFollow && s.valid && s.timeMs >= 0)
-                keepPlayheadVisible (s.timeMs, s.looping ? std::make_optional(std::pair<ms_t,ms_t>{s.loopStartMs, s.loopEndMs})
-                                                         : std::nullopt);
+        if (autoFollow && s.valid && s.timeMs >= 0)
+            keepPlayheadVisible (s.timeMs,
+                                    s.looping ? std::make_optional(std::pair<ms_t,ms_t>{s.loopStartMs, s.loopEndMs})
+                                            : std::nullopt);
+        
     }
 
     void keepPlayheadVisible (ms_t tMs, std::optional<std::pair<ms_t,ms_t>> loop)
     {
         const double p = tx.pixelsPerMs;
-        const int xWorld = (int) std::llround((double)tMs * p);
+        const int xWorld = (int) std::llround((double) tMs * p);
 
-        auto vis = viewport.getViewArea(); // Weltkoordinaten im Canvas
-        const int margin = 40;
+        if (rows.size() == 0) return;
 
-        // Wenn Loop vorhanden und komplett außerhalb sichtbar, zeig’ die ganze Loop
+        // use the first row as reference
+        auto& refRow = *rows[0];
+        auto& refVP  = refRow.getViewport();
+        auto  vis    = refVP.getViewArea();
+        const int margin  = 40;
+        const int canvasW = refRow.getCanvas().getWidth();
+
         if (loop && loop->second > loop->first)
         {
-            const int loopX0 = (int) std::llround((double)loop->first  * p);
-            const int loopX1 = (int) std::llround((double)loop->second * p);
+            const int loopX0 = (int) std::llround((double) loop->first  * p);
+            const int loopX1 = (int) std::llround((double) loop->second * p);
             const int loopW  = loopX1 - loopX0;
 
-            // Falls Loop deutlich größer als View: bleib bei Playhead-Follow
             if (loopW <= vis.getWidth())
             {
-                const int wantX = juce::jlimit(0, juce::jmax(0, canvas.getWidth() - vis.getWidth()),
+                const int wantX = juce::jlimit(0, std::max(0, canvasW - vis.getWidth()),
                                                loopX0 - margin);
                 if (loopX0 < vis.getX() + margin || loopX1 > vis.getRight() - margin)
-                {
-                    viewport.setViewPosition(wantX, vis.getY());
-                }
+                    refVP.setViewPosition(wantX, vis.getY());
             }
         }
 
-        // Standard-Follow: Playhead im Sichtbereich halten
-        vis = viewport.getViewArea(); // evtl. aktualisiert
+        // standard follow
+        vis = refVP.getViewArea();
         if (xWorld < vis.getX() + margin || xWorld > vis.getRight() - margin)
         {
-            const int newX = juce::jlimit(0, juce::jmax(0, canvas.getWidth() - vis.getWidth()),
+            const int newX = juce::jlimit(0, std::max(0, canvasW - vis.getWidth()),
                                           xWorld - vis.getWidth() / 2);
-            viewport.setViewPosition(newX, vis.getY());
+            refVP.setViewPosition(newX, vis.getY());
         }
 
-        // Header/Canvas state syncen
-        header.scrollX = (double)viewport.getViewPositionX();
-        canvas.viewX   = (double)viewport.getViewPositionX();
+        // sync header/timeOffset
+        header.scrollX = (double) refVP.getViewPositionX();
         tx.timeOffset  = std::max(0.0, header.scrollX / tx.pixelsPerMs);
         header.repaint();
-        canvas.repaint();
     }
 };

@@ -41,6 +41,7 @@
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
+#include "TimelineComponent.h"
 
 //==============================================================================
 /**
@@ -106,6 +107,8 @@ public:
     ZoomSettings* getZoomSettingsPointer();
     OSCHandlerEncoder* getOscHandler();
     RadarOptions* getRadarOptions();
+    juce::OwnedArray<TimelineModel>& getTimelines();
+    void populateDefaultTimelineModels();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
 
@@ -122,14 +125,15 @@ public:
         std::atomic<double> editOriginSeconds { 0.0 }; // falls Host das liefert
         
         std::atomic<bool>   looping { false };
-            std::atomic<double> loopStartSeconds { 0.0 };
-            std::atomic<double> loopEndSeconds   { 0.0 };
+        std::atomic<double> loopStartSeconds { 0.0 };
+        std::atomic<double> loopEndSeconds   { 0.0 };
     };
 
     SharedPlayheadState playheadState;
 
 private:
 	std::unique_ptr<AmbiSourceSet> sources;
+    juce::OwnedArray<TimelineModel> timelines;
 	EncoderSettings encoderSettings;
 	OSCHandlerEncoder* pOscHandler;
 	AmbiOSCSender* pOscSender;
