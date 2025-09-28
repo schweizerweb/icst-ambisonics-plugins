@@ -8,6 +8,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "TimelineComponent.h"
+#include "TimelineWidgetMS.h"
 
 // Action-String analog zu ACTION_CLOSE_ANIMATOR
 static const juce::String ACTION_CLOSE_TIMELINE = "ACTION_CLOSE_TIMELINE";
@@ -90,8 +91,8 @@ public:
 
         auto* timeline = new TimelineWidgetMS();
         timeline->setModels(pProcessor->getTimelines());
-        timeline->setPlayheadProvider([pProcessor]() -> TimelineWidgetMS::PlayheadSnapshot {
-            TimelineWidgetMS::PlayheadSnapshot s;
+        timeline->setPlayheadProvider([pProcessor]() -> PlayheadSnapshot {
+            PlayheadSnapshot s;
                 const auto& st = pProcessor->playheadState;
 
                 s.valid   = st.valid.load(std::memory_order_acquire);
@@ -119,7 +120,7 @@ public:
                 return s;
         });
 
-        timeline->setAutoFollow(true);
+        timeline->setAutoFollow(false);
 
         // Dialog erzeugen; Manager (this) als Listener registrieren
         window = new TimelineDialog(this, timeline);

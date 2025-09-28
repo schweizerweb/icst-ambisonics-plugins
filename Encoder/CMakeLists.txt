@@ -68,7 +68,11 @@ SET(SRC_FILES
 	../Source/SourceTableListModel.h
 	../Source/StandardOscTarget.cpp
 	../Source/StandardOscTarget.h
+	../Source/TimelineModel.h
 	../Source/TimelineComponent.h
+	../Source/TimelineComponent.cpp
+	../Source/TimelineWidgetMS.h
+	../Source/TimelineWidgetMS.cpp
 	../Source/UserDefinedParameter.cpp
 	../Source/UserDefinedParameter.h
     

@@ -107,7 +107,7 @@ public:
     ZoomSettings* getZoomSettingsPointer();
     OSCHandlerEncoder* getOscHandler();
     RadarOptions* getRadarOptions();
-    juce::OwnedArray<TimelineModel>& getTimelines();
+    juce::OwnedArray<TimelineModel>* getTimelines();
     void populateDefaultTimelineModels();
     
 	void updateTrackProperties(const TrackProperties& properties) override;
