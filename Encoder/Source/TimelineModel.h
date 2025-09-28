@@ -1,7 +1,7 @@
 #pragma once
 #include "../../Common/Point3D.h"
 
-typedef uint ms_t;
+typedef int ms_t;
 
 struct Clip
 {
@@ -65,22 +65,22 @@ struct ActionLayer
 struct TimelineModel
 {
     MovementLayer movement;
-    Array<ActionLayer> actions;
+    ActionLayer actions;
 
     // Helper methods for compatibility with existing UI code
-    int getNumLayers() const { return 1 + actions.size(); } // Movement layer + action layers
+    int getNumLayers() const { return 2; } // Movement layer + action layers
     
     juce::String getLayerName(int layerIndex) const
     {
         if (layerIndex == 0) return "Movement";
-        if (layerIndex - 1 < actions.size()) return actions[layerIndex - 1].name;
-        return "Layer " + juce::String(layerIndex);
+        if (layerIndex == 1) return "Actions";
+        return "Invalid";
     }
     
     int getNumClips(int layerIndex) const
     {
         if (layerIndex == 0) return movement.clips.size();
-        if (layerIndex - 1 < actions.size()) return actions[layerIndex - 1].clips.size();
+        if (layerIndex == 1) return actions.clips.size();
         return 0;
     }
     
@@ -89,9 +89,9 @@ struct TimelineModel
         if (layerIndex == 0) {
             if (clipIndex < movement.clips.size())
                 return static_cast<const Clip*>(&movement.clips.getReference(clipIndex));
-        } else if (layerIndex - 1 < actions.size()) {
-            if (clipIndex < actions[layerIndex - 1].clips.size())
-                return static_cast<const Clip*>(&actions[layerIndex - 1].clips.getReference(clipIndex));
+        } else if (layerIndex == 1) {
+            if (clipIndex < actions.clips.size())
+                return static_cast<const Clip*>(&actions.clips.getReference(clipIndex));
         }
         return nullptr;
     }
@@ -101,9 +101,9 @@ struct TimelineModel
         if (layerIndex == 0) {
             if (clipIndex < movement.clips.size())
                 return static_cast<Clip*>(&movement.clips.getReference(clipIndex));
-        } else if (layerIndex - 1 < actions.size()) {
-            if (clipIndex < actions[layerIndex - 1].clips.size())
-                return static_cast<Clip*>(&actions[layerIndex - 1].clips.getReference(clipIndex));
+        } else if (layerIndex == 1) {
+            if (clipIndex < actions.clips.size())
+                return static_cast<Clip*>(&actions.clips.getReference(clipIndex));
         }
         return nullptr;
     }
@@ -114,10 +114,9 @@ struct TimelineModel
             for (int i = 0; i < movement.clips.size(); ++i)
                 if (t >= movement.clips[i].start && t <= movement.clips[i].end())
                     return i;
-        } else if (layerIndex - 1 < actions.size()) {
-            const auto& layer = actions[layerIndex - 1];
-            for (int i = 0; i < layer.clips.size(); ++i)
-                if (t >= layer.clips[i].start && t <= layer.clips[i].end())
+        } else if (layerIndex == 1) {
+            for (int i = 0; i < actions.clips.size(); ++i)
+                if (t >= actions.clips[i].start && t <= actions.clips[i].end())
                     return i;
         }
         return -1;
@@ -125,7 +124,7 @@ struct TimelineModel
     
     std::unique_ptr<juce::XmlElement> toXml() const
     {
-        auto xml = std::make_unique<juce::XmlElement>("Timeline2");
+        auto xml = std::make_unique<juce::XmlElement>("Timeline");
 
         // Serialize movement layer
         auto* xMovement = new juce::XmlElement("MovementLayer");
@@ -174,48 +173,45 @@ struct TimelineModel
         }
         xml->addChildElement(xMovement);
 
-        // Serialize action layers
-        for (const auto& actionLayer : actions)
+        // Serialize action layer
+        auto* xActionLayer = new juce::XmlElement("ActionLayer");
+        xActionLayer->setAttribute("name", actions.name);
+        
+        for (const auto& c : actions.clips)
         {
-            auto* xActionLayer = new juce::XmlElement("ActionLayer");
-            xActionLayer->setAttribute("name", actionLayer.name);
+            auto* xClip = new juce::XmlElement("ActionClip");
+            xClip->setAttribute("id", c.id);
+            xClip->setAttribute("start", juce::String((juce::int64)c.start));
+            xClip->setAttribute("length", juce::String((juce::int64)c.length));
+            xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
             
-            for (const auto& c : actionLayer.clips)
+            // Serialize ActionClip actions
+            auto* xActions = new juce::XmlElement("Actions");
+            for (const auto& action : c.actions)
             {
-                auto* xClip = new juce::XmlElement("ActionClip");
-                xClip->setAttribute("id", c.id);
-                xClip->setAttribute("start", juce::String((juce::int64)c.start));
-                xClip->setAttribute("length", juce::String((juce::int64)c.length));
-                xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
-                
-                // Serialize ActionClip actions
-                auto* xActions = new juce::XmlElement("Actions");
-                for (const auto& action : c.actions)
-                {
-                    auto* xAction = new juce::XmlElement("Action");
-                    xAction->setAttribute("actionType", static_cast<int>(action.action));
-                    xAction->setAttribute("timingType", static_cast<int>(action.timing));
-                    xAction->setAttribute("value", action.value);
-                    xActions->addChildElement(xAction);
-                }
-                xClip->addChildElement(xActions);
-                
-                xActionLayer->addChildElement(xClip);
+                auto* xAction = new juce::XmlElement("Action");
+                xAction->setAttribute("actionType", static_cast<int>(action.action));
+                xAction->setAttribute("timingType", static_cast<int>(action.timing));
+                xAction->setAttribute("value", action.value);
+                xActions->addChildElement(xAction);
             }
-            xml->addChildElement(xActionLayer);
+            xClip->addChildElement(xActions);
+            
+            xActionLayer->addChildElement(xClip);
         }
-
+        xml->addChildElement(xActionLayer);
+    
         return xml;
     }
 
     // Fixed XML deserialization
     bool fromXml(const juce::XmlElement& xml)
     {
-        if (!xml.hasTagName("Timeline2"))
+        if (!xml.hasTagName("Timeline"))
             return false;
 
         movement.clips.clear();
-        actions.clear();
+        actions.clips.clear();
 
         for (auto* xLayer = xml.getFirstChildElement(); xLayer != nullptr; xLayer = xLayer->getNextElement())
         {
@@ -283,9 +279,6 @@ struct TimelineModel
             }
             else if (xLayer->hasTagName("ActionLayer"))
             {
-                ActionLayer actionLayer;
-                actionLayer.name = xLayer->getStringAttribute("name");
-
                 for (auto* xClip = xLayer->getFirstChildElement(); xClip != nullptr; xClip = xClip->getNextElement())
                 {
                     if (!xClip->hasTagName("ActionClip")) continue;
@@ -316,9 +309,8 @@ struct TimelineModel
                         }
                     }
 
-                    actionLayer.clips.add(c);
+                    actions.clips.add(c);
                 }
-                actions.add(actionLayer);
             }
         }
 

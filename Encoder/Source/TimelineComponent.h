@@ -50,7 +50,8 @@ private:
     struct DragState
     {
         bool isDragging = false;
-        bool isResizing = false;
+        bool isResizingLeft = false;
+        bool isResizingRight = false;
         int timelineIndex = -1;
         int layerIndex = -1;
         int clipIndex = -1;
@@ -67,6 +68,7 @@ private:
     std::unique_ptr<juce::ScrollBar> horizontalScrollBar;
     std::unique_ptr<juce::ScrollBar> verticalScrollBar;
     std::unique_ptr<juce::ComboBox> timelineSelector;
+    std::unique_ptr<juce::Button> tempButton;
     
     ms_t playheadPosition = 0;
     bool autoFollow = false;
@@ -110,7 +112,8 @@ private:
     juce::String getClipTimeInfo(const Clip& clip) const;
     juce::Path getClipIcon(int layerIndex, bool isMovementClip) const;
     juce::Colour getTimelineColour(int timelineIndex) const;
-    
+    juce::Rectangle<float> getIconBoundsWithinClip(const Rectangle<float>& clipBounds);
+    juce::Rectangle<float> getButtonBoundsWithinClip(const Rectangle<float>& clipBounds);
     // Clip access helpers
     const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);

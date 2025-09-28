@@ -5,6 +5,7 @@ TimelineComponent::TimelineComponent()
     horizontalScrollBar = std::make_unique<juce::ScrollBar>(true);
     verticalScrollBar = std::make_unique<juce::ScrollBar>(false);
     timelineSelector = std::make_unique<juce::ComboBox>();
+    tempButton = std::make_unique<juce::TextButton>();
     
     horizontalScrollBar->addListener(this);
     verticalScrollBar->addListener(this);
@@ -15,6 +16,10 @@ TimelineComponent::TimelineComponent()
     addAndMakeVisible(horizontalScrollBar.get());
     addAndMakeVisible(verticalScrollBar.get());
     addAndMakeVisible(timelineSelector.get());
+
+    // TODO
+    addAndMakeVisible(tempButton.get());
+    timelineSelector->setVisible(false);
     
     setWantsKeyboardFocus(true);
 }
@@ -36,7 +41,7 @@ void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelin
     {
         for (int i = 0; i < timelines->size(); ++i)
         {
-            timelineSelector->addItem("Timeline " + juce::String(i + 1), i + 1);
+            timelineSelector->addItem("Group " + juce::String(i + 1), i + 1);
         }
         if (timelines->size() > 0)
         {
@@ -88,6 +93,24 @@ void TimelineComponent::scrollBarMoved(juce::ScrollBar* scrollBar, double newRan
     repaint();
 }
 
+juce::Rectangle<float> TimelineComponent::getIconBoundsWithinClip(const Rectangle<float>& clipBounds)
+{
+    const float iconSize = (clipHeight - 10.0f) * 0.5f;
+    const float iconX = clipBounds.getX() + 5.0f;
+    const float iconY = clipBounds.getY() + (clipBounds.getHeight() - 2.0f * iconSize) * 0.25f;
+    
+    return Rectangle<float>(iconX, iconY, iconSize, iconSize);
+}
+
+juce::Rectangle<float> TimelineComponent::getButtonBoundsWithinClip(const Rectangle<float>& clipBounds)
+{
+    const float btnSize = (clipHeight - 10.0f) * 0.5f;
+    const float btnX = clipBounds.getX() + 5.0f;
+    const float btnY = clipBounds.getBottom() - btnSize - (clipBounds.getHeight() - 2.0f * btnSize) * 0.25f;
+    
+    return Rectangle<float>(btnX, btnY, btnSize, btnSize);
+}
+
 void TimelineComponent::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xff2d2d30));
@@ -135,14 +158,6 @@ void TimelineComponent::paint(juce::Graphics& g)
         currentTime += timeStep;
     }
     
-    // Draw playhead
-    if (playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
-    {
-        const float playheadX = timeToX(playheadPosition);
-        g.setColour(juce::Colours::red);
-        g.drawLine(playheadX, headerHeight, playheadX, totalHeight, 2.0f);
-    }
-    
     // Draw timelines
     updateVisibleClips();
     
@@ -161,7 +176,7 @@ void TimelineComponent::paint(juce::Graphics& g)
         // Draw timeline name
         g.setColour(juce::Colours::white);
         g.setFont(juce::Font(16.0f).boldened());
-        g.drawText("Timeline " + juce::String(timelineIndex + 1),
+        g.drawText("Group " + juce::String(timelineIndex + 1),
                    10, timelineY + 5, trackHeaderWidth - 20, timelineHeaderHeight - 10,
                    juce::Justification::centredLeft);
         
@@ -225,19 +240,17 @@ void TimelineComponent::paint(juce::Graphics& g)
         }
         
         // Clip content (faded for non-current timelines)
-        const float iconSize = clipHeight - 10.0f;
-        const float iconX = bounds.getX() + 5.0f;
-        const float iconY = bounds.getY() + (bounds.getHeight() - iconSize) * 0.5f;
+        Rectangle<float> iconBounds = getIconBoundsWithinClip(bounds);
         
         // Draw icon
         g.setColour(juce::Colours::white.withAlpha(isCurrentTimeline ? 1.0f : 0.5f));
         auto icon = getClipIcon(clipBounds.layerIndex, clipBounds.isMovementClip);
         if (!icon.isEmpty())
-            g.fillPath(icon, icon.getTransformToScaleToFit(iconX, iconY, iconSize, iconSize, true));
+            g.fillPath(icon, icon.getTransformToScaleToFit(iconBounds, true));
         
         // Draw text
-        const float textX = iconX + iconSize + 5.0f;
-        const float textWidth = jmax(10.0f,bounds.getWidth() - (iconSize + 15.0f));
+        const float textX = iconBounds.getRight() + 5.0f;
+        const float textWidth = jmax(10.0f, bounds.getWidth() - (iconBounds.getWidth() + 10.0f));
         
         g.setFont(juce::Font(12.0f).boldened());
         g.drawText(getClipDisplayName(clipBounds.timelineIndex, clipBounds.layerIndex, clipBounds.clipIndex, clipBounds.isMovementClip),
@@ -252,18 +265,24 @@ void TimelineComponent::paint(juce::Graphics& g)
         // Menu button only for current timeline
         if (isCurrentTimeline)
         {
-            const float buttonSize = 16.0f;
-            const float buttonX = bounds.getRight() - buttonSize - 3.0f;
-            const float buttonY = bounds.getY() + 3.0f;
+            Rectangle<float> buttonBounds = getButtonBoundsWithinClip(bounds);
             
             g.setColour(juce::Colours::white.withAlpha(0.7f));
-            g.fillEllipse(buttonX, buttonY, buttonSize, buttonSize);
+            g.fillEllipse(buttonBounds);
             
             g.setColour(juce::Colours::black);
             g.setFont(juce::Font(10.0f).boldened());
-            g.drawText("...", buttonX, buttonY, buttonSize, buttonSize,
+            g.drawText("...", buttonBounds,
                        juce::Justification::centred);
         }
+    }
+    
+    // Draw playhead
+    if (playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
+    {
+        const float playheadX = timeToX(playheadPosition);
+        g.setColour(juce::Colours::red);
+        g.drawLine(playheadX, headerHeight, playheadX, totalHeight, 2.0f);
     }
 }
 
@@ -280,7 +299,7 @@ void TimelineComponent::resized()
                                   totalWidth - trackHeaderWidth - scrollBarSize, scrollBarSize);
     verticalScrollBar->setBounds(totalWidth - scrollBarSize, headerHeight,
                                 scrollBarSize, totalHeight - headerHeight - scrollBarSize);
-    
+    tempButton->setBounds(2, 2, 200, 20);
     updateScrollBars();
 }
 
@@ -309,17 +328,18 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             dragState.originalStart = clip->start;
             dragState.originalLength = clip->length;
             
-            dragState.isResizing = clipBounds.isResizeLeft || clipBounds.isResizeRight;
+            dragState.isResizingLeft = clipBounds.isResizeLeft;
+            if(!clipBounds.isResizeLeft)
+            {
+                dragState.isResizingRight = clipBounds.isResizeRight;
+            }
         }
         
         // Check if menu button was clicked (only for current timeline)
         if (clipBounds.timelineIndex == currentTimelineIndex)
         {
             const auto bounds = clipBounds.bounds;
-            const float buttonSize = 16.0f;
-            const float buttonX = bounds.getRight() - buttonSize - 3.0f;
-            const float buttonY = bounds.getY() + 3.0f;
-            const juce::Rectangle<float> buttonArea(buttonX, buttonY, buttonSize, buttonSize);
+            auto buttonArea = getButtonBoundsWithinClip(bounds);
             
             if (buttonArea.contains(pos.toFloat()))
             {
@@ -345,23 +365,22 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
     const auto currentPos = event.getPosition();
     const ms_t currentTime = xToTime(static_cast<float>(currentPos.x));
     const ms_t timeDelta = currentTime - dragState.dragStartTime;
-    
-    if (dragState.isResizing)
+    if (dragState.isResizingLeft || dragState.isResizingRight)
     {
         auto clipBounds = findClipAtPosition(dragState.dragStartPosition);
         
-        if (clipBounds.isResizeLeft)
+        if (dragState.isResizingLeft)
         {
             const ms_t newStart = juce::jmax<ms_t>(0, dragState.originalStart + timeDelta);
-            const ms_t newLength = dragState.originalLength - (newStart - dragState.originalStart);
-            
+            const ms_t newLength = juce::jmax<ms_t>(10, dragState.originalLength - (newStart - dragState.originalStart));
+         
             if (newLength > 10)
             {
                 clip->start = newStart;
                 clip->length = newLength;
             }
         }
-        else if (clipBounds.isResizeRight)
+        else if (dragState.isResizingRight)
         {
             const ms_t newLength = juce::jmax<ms_t>(10, dragState.originalLength + timeDelta);
             clip->length = newLength;
@@ -628,7 +647,6 @@ juce::String TimelineComponent::getClipDisplayName(int timelineIndex, int layerI
     if (timelines == nullptr) return "Clip";
     
     bool tempIsMovementClip = isMovementClip;
-    if(!isMovementClip) return "ACT";
     const auto* clip = getClip(timelineIndex, layerIndex, clipIndex, tempIsMovementClip);
     if (!clip) return "Clip";
     
@@ -698,11 +716,11 @@ const Clip* TimelineComponent::getClip(int timelineIndex, int layerIndex, int cl
         if (clipIndex >= 0 && clipIndex < timeline->movement.clips.size())
             return static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex));
     }
-    else if (layerIndex - 1 < timeline->actions.size())
+    else if (layerIndex == 1)
     {
         isMovementClip = false;
-        if (clipIndex >= 0 && clipIndex < timeline->actions[layerIndex - 1].clips.size())
-            return static_cast<const Clip*>(&timeline->actions[layerIndex - 1].clips.getReference(clipIndex));
+        if (clipIndex >= 0 && clipIndex < timeline->actions.clips.size())
+            return static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
     }
     
     return nullptr;
@@ -729,11 +747,11 @@ bool TimelineComponent::removeClip(int timelineIndex, int layerIndex, int clipIn
             return true;
         }
     }
-    else if (!isMovementClip && layerIndex - 1 < timeline->actions.size())
+    else if (!isMovementClip && layerIndex == 1)
     {
-        if (clipIndex >= 0 && clipIndex < timeline->actions[layerIndex - 1].clips.size())
+        if (clipIndex >= 0 && clipIndex < timeline->actions.clips.size())
         {
-            timeline->actions[layerIndex - 1].clips.remove(clipIndex);
+            timeline->actions.clips.remove(clipIndex);
             return true;
         }
     }

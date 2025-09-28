@@ -428,20 +428,18 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             scalingInfo.SetScaler(sources->getDistanceScaler());
             zoomSettings->loadFromXml(xmlState.get());
             animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
-#if(false)
             if (auto* xTimelines = xmlState->getChildByName("Timelines"))
             {
                 timelines.clear(true);
                 forEachXmlChildElementWithTagName (*xTimelines, xTimeline, "Timeline")
                 {
                     auto* tm = new TimelineModel();
-                    tm->fromXml (*xTimeline); // <-- Model liest sich selbst
+                    tm->fromXml (*xTimeline);
                     timelines.add (tm);
                 }
                 //listeners.call (&Listener::timelineListChanged);
             }
-#endif
-            //if (timelines.isEmpty())
+            if (timelines.isEmpty())
             {
                 populateDefaultTimelineModels();
             }
@@ -496,16 +494,11 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         t->movement.clips.add(makeMovementClip("Secondary Move", 1600, 220, juce::Colours::orangered));
         t->movement.clips.add(makeMovementClip("Final Position", 1900, 800, juce::Colours::goldenrod));
         
-        // Action layers
-        t->actions.add(makeActionLayer("Choreography A", {
-            makeActionClip("Rotation X", 1200, 2000, juce::Colours::slateblue),
-            makeActionClip("Rotation Y", 800, 1500, juce::Colours::lightsteelblue),
-        }));
-        
-        t->actions.add(makeActionLayer("Choreography B", {
-            makeActionClip("Scale", 500, 1000, juce::Colours::mediumseagreen),
-            makeActionClip("Stretch", 1800, 600, juce::Colours::seagreen),
-        }));
+        // Action layer
+        t->actions.clips.add(makeActionClip("Rotation X", 1200, 2000, juce::Colours::slateblue));
+        t->actions.clips.add(makeActionClip("Rotation Y", 800, 1500, juce::Colours::lightsteelblue));
+        t->actions.clips.add(makeActionClip("Scale", 500, 1000, juce::Colours::mediumseagreen));
+        t->actions.clips.add(makeActionClip("Stretch", 1800, 600, juce::Colours::seagreen));
         
         timelines.add(t);
     }
@@ -519,12 +512,10 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         t->movement.clips.add(makeMovementClip("Hold Position", 800, 400, juce::Colours::lightsteelblue));
         t->movement.clips.add(makeMovementClip("EaseOut Path", 1200, 700, juce::Colours::royalblue));
         
-        // Action layers
-        t->actions.add(makeActionLayer("Path Controls", {
-            makeActionClip("X Offset", 300, 900, juce::Colours::mediumseagreen),
-            makeActionClip("Y Offset", 900, 600, juce::Colours::seagreen),
-            makeActionClip("Z Offset", 600, 800, juce::Colours::darkseagreen),
-        }));
+        // Action layer
+        t->actions.clips.add(makeActionClip("X Offset", 300, 900, juce::Colours::mediumseagreen));
+        t->actions.clips.add(makeActionClip("Y Offset", 900, 600, juce::Colours::seagreen));
+        t->actions.clips.add(makeActionClip("Z Offset", 600, 800, juce::Colours::darkseagreen));
         
         timelines.add(t);
     }
@@ -536,18 +527,14 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         // Movement layer
         t->movement.clips.add(makeMovementClip("Base Movement", 500, 2500, juce::Colours::purple));
         
-        // Action layers
-        t->actions.add(makeActionLayer("Lighting", {
-            makeActionClip("Flash", 500, 120, juce::Colours::yellow),
-            makeActionClip("Strobe", 1500, 300, juce::Colours::gold),
-            makeActionClip("Dim", 2200, 700, juce::Colours::darkkhaki),
-        }));
+        // Action layer
+        t->actions.clips.add(makeActionClip("Flash", 500, 120, juce::Colours::yellow));
+        t->actions.clips.add(makeActionClip("Strobe", 1500, 300, juce::Colours::gold));
+        t->actions.clips.add(makeActionClip("Dim", 2200, 700, juce::Colours::darkkhaki));
         
-        t->actions.add(makeActionLayer("Post Processing", {
-            makeActionClip("Vignette", 1000, 1200, juce::Colours::darkslategrey),
-            makeActionClip("Bloom", 1800, 600, juce::Colours::plum),
-            makeActionClip("Blur", 800, 1000, juce::Colours::lightblue),
-        }));
+        t->actions.clips.add(makeActionClip("Vignette", 1000, 1200, juce::Colours::darkslategrey));
+        t->actions.clips.add(makeActionClip("Bloom", 1800, 600, juce::Colours::plum));
+        t->actions.clips.add(makeActionClip("Blur", 800, 1000, juce::Colours::lightblue));
         
         timelines.add(t);
     }
@@ -559,20 +546,14 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         // Movement layer
         t->movement.clips.add(makeMovementClip("Complex Movement", 0, 3000, juce::Colours::teal));
         
-        // Action layer with detailed action definitions
-        ActionLayer fxLayer;
-        fxLayer.name = "Advanced FX";
-        
         ActionClip rotationClip = makeActionClip("3D Rotation", 500, 1000, juce::Colours::orange);
         rotationClip.actions.add(ActionDefinition{ActionType::RotationX, TimingType::AbsoluteTarget, 45.0});
         rotationClip.actions.add(ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 90.0});
-        fxLayer.clips.add(rotationClip);
+        t->actions.clips.add(rotationClip);
         
         ActionClip stretchClip = makeActionClip("Dynamic Stretch", 1600, 800, juce::Colours::red);
         stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::AbsolutePerSecond, 2.0});
-        fxLayer.clips.add(stretchClip);
-        
-        t->actions.add(fxLayer);
+        t->actions.clips.add(stretchClip);
         
         timelines.add(t);
     }
