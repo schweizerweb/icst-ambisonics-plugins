@@ -8,6 +8,8 @@ SET(SRC_FILES
 	../Source/AnimatorAction.h
 	../Source/AnimatorActionComponent.cpp
 	../Source/AnimatorActionComponent.h
+	../Source/AnimatorMainView.h
+	../Source/AnimatorMainView.cpp
 	../Source/AnimatorComponent.cpp
 	../Source/AnimatorComponent.h
 	../Source/AnimatorDataset.h
@@ -68,6 +70,7 @@ SET(SRC_FILES
 	../Source/SourceTableListModel.h
 	../Source/StandardOscTarget.cpp
 	../Source/StandardOscTarget.h
+	../Source/TimelineTypes.h
 	../Source/TimelineModel.h
 	../Source/TimelineComponent.h
 	../Source/TimelineComponent.cpp

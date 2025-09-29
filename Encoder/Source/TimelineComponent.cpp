@@ -541,6 +541,49 @@ void TimelineComponent::timelineSelectionChanged()
 
 bool TimelineComponent::keyPressed(const juce::KeyPress& key)
 {
+    // Nudge selected clips left/right with arrow keys
+    if (selectedClips.size() > 0)
+    {
+        ms_t nudgeAmount = 0;
+        bool isNudge = false;
+        
+        // Determine nudge amount based on modifier keys
+        if (key.getModifiers().isShiftDown())
+        {
+            // Shift + arrow = large nudge (1 second)
+            nudgeAmount = NUDGE_LARGE_MS;
+        }
+        else if (key.getModifiers().isAltDown() || key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown())
+        {
+            // Alt/Cmd/Ctrl + arrow = medium nudge (100ms)
+            nudgeAmount = NUDGE_MEDIUM_MS;
+        }
+        else
+        {
+            // Arrow only = small nudge (10ms)
+            nudgeAmount = NUDGE_SMALL_MS;
+        }
+        
+        // Apply nudge based on arrow key direction
+        if (key.getKeyCode() == juce::KeyPress::leftKey)
+        {
+            nudgeSelectedClips(-nudgeAmount);
+            isNudge = true;
+        }
+        else if (key.getKeyCode() == juce::KeyPress::rightKey)
+        {
+            nudgeSelectedClips(nudgeAmount);
+            isNudge = true;
+        }
+        
+        if (isNudge)
+        {
+            repaint();
+            return true;
+        }
+    }
+    
+    // Existing keyboard shortcuts
     if (key.getKeyCode() == juce::KeyPress::escapeKey)
     {
         clearSelection();
@@ -594,6 +637,29 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
     }
     
     return false;
+}
+
+void TimelineComponent::nudgeSelectedClips(ms_t nudgeAmount)
+{
+    if (selectedClips.isEmpty() || nudgeAmount == 0)
+        return;
+    
+    // Nudge all selected clips
+    for (const auto& selected : selectedClips)
+    {
+        bool isMovementClip = selected.isMovementClip;
+        auto* clip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, isMovementClip);
+        if (clip)
+        {
+            ms_t newStart = clip->start + nudgeAmount;
+            
+            // Ensure clip doesn't go below 0
+            if (newStart < 0)
+                newStart = 0;
+            
+            clip->start = newStart;
+        }
+    }
 }
 
 float TimelineComponent::timeToX(ms_t time) const

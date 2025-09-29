@@ -1,7 +1,6 @@
 #pragma once
 #include "../../Common/Point3D.h"
-
-typedef int ms_t;
+#include "TimelineTypes.h"
 
 struct Clip
 {

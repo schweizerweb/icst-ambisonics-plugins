@@ -1,18 +1,9 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "TimelineComponent.h"
-
-struct PlayheadSnapshot
-{
-    bool valid = false;
-    ms_t timeMs = 0;
-    bool playing = false;
-    double bpm = 120.0;
-    bool looping = false;
-    ms_t loopStartMs = 0;
-    ms_t loopEndMs = 0;
-};
+#include "AnimatorMainView.h"  // Include the new main view
+#include "TimelineModel.h"
+#include "TimelineTypes.h"
 
 class TimelineWidgetMS : public juce::Component,
                          private juce::Timer
@@ -29,7 +20,7 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<TimelineComponent> timeline;
+    std::unique_ptr<AnimatorMainView> mainView;  // Use main view instead of timeline component
     std::function<PlayheadSnapshot()> playheadProvider;
     
     void timerCallback() override;

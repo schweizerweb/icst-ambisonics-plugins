@@ -2,8 +2,8 @@
 
 TimelineWidgetMS::TimelineWidgetMS()
 {
-    timeline = std::make_unique<TimelineComponent>();
-    addAndMakeVisible(timeline.get());
+    mainView = std::make_unique<AnimatorMainView>();
+    addAndMakeVisible(mainView.get());
     
     startTimerHz(30);
 }
@@ -15,17 +15,18 @@ TimelineWidgetMS::~TimelineWidgetMS()
 
 void TimelineWidgetMS::setModels(juce::OwnedArray<TimelineModel>* models)
 {
-    timeline->setTimelines(models);
+    mainView->setTimelines(models);
 }
 
 void TimelineWidgetMS::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
 {
     playheadProvider = provider;
+    mainView->setPlayheadProvider(provider);
 }
 
 void TimelineWidgetMS::setAutoFollow(bool shouldAutoFollow)
 {
-    timeline->setAutoFollow(shouldAutoFollow);
+    mainView->setAutoFollow(shouldAutoFollow);
 }
 
 void TimelineWidgetMS::paint(juce::Graphics& g)
@@ -35,7 +36,7 @@ void TimelineWidgetMS::paint(juce::Graphics& g)
 
 void TimelineWidgetMS::resized()
 {
-    timeline->setBounds(getLocalBounds());
+    mainView->setBounds(getLocalBounds());
 }
 
 void TimelineWidgetMS::timerCallback()
@@ -45,7 +46,7 @@ void TimelineWidgetMS::timerCallback()
         auto snapshot = playheadProvider();
         if (snapshot.valid)
         {
-            timeline->setPlayheadPosition(snapshot.timeMs);
+            mainView->setPlayheadPosition(snapshot.timeMs);
         }
     }
 }

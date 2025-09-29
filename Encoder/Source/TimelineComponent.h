@@ -2,6 +2,7 @@
 
 #include "JuceHeader.h"
 #include "TimelineModel.h"
+#include "TimelineTypes.h"
 
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
@@ -37,6 +38,7 @@ public:
 
     // Keyboard
     bool keyPressed(const juce::KeyPress& key) override;
+    void nudgeSelectedClips(ms_t nudgeAmount);
 
 private:
     struct ClipBounds
@@ -122,6 +124,11 @@ private:
     float clipHeight = 40.0f;
     float clipCornerSize = 4.0f;
     float resizeHandleWidth = 6.0f;
+    
+    // constants for nudge amounts
+    static constexpr ms_t NUDGE_SMALL_MS = 10;    // 10ms nudge
+    static constexpr ms_t NUDGE_MEDIUM_MS = 100;  // 100ms nudge
+    static constexpr ms_t NUDGE_LARGE_MS = 1000;  // 1 second nudge
     
     // View state
     ms_t visibleStartTime = 0;
