@@ -472,15 +472,6 @@ static inline ActionClip makeActionClip(juce::String id, ms_t start, ms_t length
     return c;
 }
 
-static inline ActionLayer makeActionLayer(juce::String name, std::initializer_list<ActionClip> clips)
-{
-    ActionLayer L;
-    L.name = std::move(name);
-    for (const auto& c : clips)
-        L.clips.add(std::move(c));
-    return L;
-}
-
 void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
 {
     timelines.clear(true);
