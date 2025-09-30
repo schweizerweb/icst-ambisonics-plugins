@@ -1,7 +1,6 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "TimelineModel.h"
 #include "TimelineComponent.h"
 #include "TimelineTypes.h"
 
@@ -24,18 +23,14 @@ private:
     class MainMenuBarModel : public juce::MenuBarModel
     {
     public:
-        MainMenuBarModel(AnimatorMainView& owner) : owner(owner) {}
+        MainMenuBarModel(AnimatorMainView* owner) : owner(owner) {}
         
-        juce::StringArray getMenuBarNames() override
-        {
-            return { "File", "Edit", "View", "Insert" };
-        }
-        
+        juce::StringArray getMenuBarNames() override { return { "File", "Edit", "View", "Insert" }; }
         juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName) override;
         void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
         
     private:
-        AnimatorMainView& owner;
+        AnimatorMainView* owner;
     };
 
     // Toolbar component
@@ -53,12 +48,14 @@ private:
         std::unique_ptr<juce::TextButton> deleteButton;
         std::unique_ptr<juce::TextButton> zoomInButton;
         std::unique_ptr<juce::TextButton> zoomOutButton;
+        std::unique_ptr<juce::TextButton> resetZoomButton;
         
         juce::Path createMovementIcon();
         juce::Path createActionIcon();
         juce::Path createDeleteIcon();
         juce::Path createZoomInIcon();
         juce::Path createZoomOutIcon();
+        juce::Path createResetZoomIcon();
     };
 
     std::unique_ptr<juce::MenuBarComponent> menuBar;
@@ -66,9 +63,21 @@ private:
     std::unique_ptr<ToolbarComponent> toolbar;
     std::unique_ptr<TimelineComponent> timelineComponent;
 
+    // Zoom state
+    float zoomLevel = 1.0f;
+    static constexpr float MIN_ZOOM = 0.1f;
+    static constexpr float MAX_ZOOM = 10.0f;
+    static constexpr float ZOOM_STEP = 1.2f;
+    static constexpr float DEFAULT_ZOOM = 1.0f;
+
     void handleMenuAction(int menuItemID);
     void addMovementClip();
     void addActionClip();
+    void deleteSelectedClips();
+    void zoomIn();
+    void zoomOut();
+    void resetZoom();
+    void updateTimelineZoom();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnimatorMainView)
 };

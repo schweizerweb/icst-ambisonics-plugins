@@ -2,8 +2,8 @@
 
 AnimatorMainView::AnimatorMainView()
 {
-    // Create menu bar
-    menuBarModel = std::make_unique<MainMenuBarModel>(*this);
+    // Create menu bar model with pointer
+    menuBarModel = std::make_unique<MainMenuBarModel>(this);
     menuBar = std::make_unique<juce::MenuBarComponent>(menuBarModel.get());
     
     // Create toolbar
@@ -45,7 +45,7 @@ void AnimatorMainView::setAutoFollow(bool shouldAutoFollow)
 
 void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
 {
-    // If you need to pass this to the timeline component
+    // Store if needed
 }
 
 void AnimatorMainView::paint(juce::Graphics& g)
@@ -75,12 +75,8 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
     switch (topLevelMenuIndex)
     {
         case 0: // File
-            menu.addItem(1, "New Project");
-            menu.addItem(2, "Open Project...");
-            menu.addItem(3, "Save Project");
-            menu.addItem(4, "Save Project As...");
-            menu.addSeparator();
-            menu.addItem(5, "Export...");
+            menu.addItem(2, "Import Scene...");
+            menu.addItem(3, "Export Scene...");
             menu.addSeparator();
             menu.addItem(6, "Preferences");
             break;
@@ -92,7 +88,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             menu.addItem(12, "Cut");
             menu.addItem(13, "Copy");
             menu.addItem(14, "Paste");
-            menu.addItem(15, "Delete");
+            menu.addItem(15, "Delete Selected Clips");
             menu.addSeparator();
             menu.addItem(16, "Select All");
             menu.addItem(17, "Deselect All");
@@ -110,9 +106,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
         case 3: // Insert
             menu.addItem(30, "Add Movement Clip");
             menu.addItem(31, "Add Action Clip");
-            menu.addSeparator();
-            menu.addItem(32, "Add New Timeline");
-            menu.addItem(33, "Add New Layer");
             break;
     }
     
@@ -121,41 +114,113 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
 
 void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int topLevelMenuIndex)
 {
-    owner.handleMenuAction(menuItemID);
+    if (owner != nullptr)
+        owner->handleMenuAction(menuItemID);
 }
 
 void AnimatorMainView::handleMenuAction(int menuItemID)
 {
     switch (menuItemID)
     {
+        case 15: // Delete Selected Clips
+            deleteSelectedClips();
+            break;
+        case 20: // Zoom In
+            zoomIn();
+            break;
+        case 21: // Zoom Out
+            zoomOut();
+            break;
+        case 22: // Reset Zoom
+            resetZoom();
+            break;
         case 30: // Add Movement Clip
             addMovementClip();
             break;
         case 31: // Add Action Clip
             addActionClip();
             break;
-        case 15: // Delete
         case 16: // Select All
         case 17: // Deselect All
-            // These would be handled by the timeline component
-            break;
-        case 20: // Zoom In
-        case 21: // Zoom Out
-            // These would adjust timeline zoom
+            // These would need to be implemented in TimelineComponent
             break;
     }
 }
 
 void AnimatorMainView::addMovementClip()
 {
-    // This would need to interface with the timeline component
-    // For now, just a placeholder
+    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    {
+        MovementClip newClip;
+        newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
+        newClip.start = timelineComponent->getPlayheadPosition();
+        newClip.length = 2000; // 2 second default
+        newClip.colour = juce::Colours::cornflowerblue;
+        
+        currentTimeline->movement.clips.add(newClip);
+        timelineComponent->repaint();
+    }
 }
 
 void AnimatorMainView::addActionClip()
 {
-    // This would need to interface with the timeline component
-    // For now, just a placeholder
+    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    {
+        ActionClip newClip;
+        newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
+        newClip.start = timelineComponent->getPlayheadPosition();
+        newClip.length = 2000; // 2 second default
+        newClip.colour = juce::Colours::orange;
+        
+        // Add a default action
+        ActionDefinition defaultAction;
+        defaultAction.action = ActionType::RotationX;
+        defaultAction.timing = TimingType::AbsoluteTarget;
+        defaultAction.value = 45.0;
+        newClip.actions.add(defaultAction);
+        
+        currentTimeline->actions.clips.add(newClip);
+        timelineComponent->repaint();
+    }
+}
+
+void AnimatorMainView::deleteSelectedClips()
+{
+    // This would need to be implemented in TimelineComponent
+    // For now, we'll trigger the delete key functionality
+    timelineComponent->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
+}
+
+void AnimatorMainView::zoomIn()
+{
+    zoomLevel = juce::jmin(MAX_ZOOM, zoomLevel * ZOOM_STEP);
+    updateTimelineZoom();
+}
+
+void AnimatorMainView::zoomOut()
+{
+    zoomLevel = juce::jmax(MIN_ZOOM, zoomLevel / ZOOM_STEP);
+    updateTimelineZoom();
+}
+
+void AnimatorMainView::resetZoom()
+{
+    zoomLevel = DEFAULT_ZOOM;
+    updateTimelineZoom();
+}
+
+void AnimatorMainView::updateTimelineZoom()
+{
+    // Convert zoom level to pixels per millisecond
+    // Higher zoom level = more pixels per millisecond = more detailed view
+    float basePixelsPerMs = 0.1f; // Base zoom level
+    float pixelsPerMs = basePixelsPerMs * zoomLevel;
+    
+    timelineComponent->setPixelsPerMillisecond(pixelsPerMs);
+    timelineComponent->repaint();
+    
+    // Update window title or status bar with zoom level
+    // getTopLevelComponent()->setName("Timeline - " + juce::String(int(zoomLevel * 100)) + "%");
 }
 
 // ToolbarComponent implementation
@@ -168,32 +233,30 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     deleteButton = std::make_unique<juce::TextButton>();
     zoomInButton = std::make_unique<juce::TextButton>();
     zoomOutButton = std::make_unique<juce::TextButton>();
+    resetZoomButton = std::make_unique<juce::TextButton>();
     
     // Set button properties
     addMovementButton->setTooltip("Add Movement Clip");
     addActionButton->setTooltip("Add Action Clip");
-    deleteButton->setTooltip("Delete Selected");
+    deleteButton->setTooltip("Delete Selected Clips");
     zoomInButton->setTooltip("Zoom In");
     zoomOutButton->setTooltip("Zoom Out");
+    resetZoomButton->setTooltip("Reset Zoom");
     
     // Connect buttons to actions
     addMovementButton->onClick = [this] { owner.addMovementClip(); };
     addActionButton->onClick = [this] { owner.addActionClip(); };
-    deleteButton->onClick = [this] { 
-        // Would delete selected clips in timeline
-    };
-    zoomInButton->onClick = [this] {
-        // Would zoom in timeline
-    };
-    zoomOutButton->onClick = [this] {
-        // Would zoom out timeline
-    };
+    deleteButton->onClick = [this] { owner.deleteSelectedClips(); };
+    zoomInButton->onClick = [this] { owner.zoomIn(); };
+    zoomOutButton->onClick = [this] { owner.zoomOut(); };
+    resetZoomButton->onClick = [this] { owner.resetZoom(); };
     
     addAndMakeVisible(addMovementButton.get());
     addAndMakeVisible(addActionButton.get());
     addAndMakeVisible(deleteButton.get());
     addAndMakeVisible(zoomInButton.get());
     addAndMakeVisible(zoomOutButton.get());
+    addAndMakeVisible(resetZoomButton.get());
 }
 
 void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
@@ -217,6 +280,7 @@ void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
     drawIconOnButton(deleteButton.get(), createDeleteIcon());
     drawIconOnButton(zoomInButton.get(), createZoomInIcon());
     drawIconOnButton(zoomOutButton.get(), createZoomOutIcon());
+    drawIconOnButton(resetZoomButton.get(), createResetZoomIcon());
 }
 
 void AnimatorMainView::ToolbarComponent::resized()
@@ -229,11 +293,15 @@ void AnimatorMainView::ToolbarComponent::resized()
     area.removeFromLeft(spacing);
     addActionButton->setBounds(area.removeFromLeft(buttonSize));
     area.removeFromLeft(spacing * 2);
+    
     deleteButton->setBounds(area.removeFromLeft(buttonSize));
-    area.removeFromLeft(spacing * 3);
+    area.removeFromLeft(spacing * 2);
+    
     zoomOutButton->setBounds(area.removeFromLeft(buttonSize));
     area.removeFromLeft(spacing);
     zoomInButton->setBounds(area.removeFromLeft(buttonSize));
+    area.removeFromLeft(spacing);
+    resetZoomButton->setBounds(area.removeFromLeft(buttonSize));
 }
 
 juce::Path AnimatorMainView::ToolbarComponent::createMovementIcon()
@@ -286,5 +354,14 @@ juce::Path AnimatorMainView::ToolbarComponent::createZoomOutIcon()
     path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f);
     path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f);
     path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f);
+    return path;
+}
+
+juce::Path AnimatorMainView::ToolbarComponent::createResetZoomIcon()
+{
+    juce::Path path;
+    // Create a house-like icon for "home"/reset
+    path.addRectangle(0.3f, 0.6f, 0.4f, 0.4f); // Base
+    path.addTriangle({0.1f, 0.6f}, {0.5f, 0.2f}, {0.9f, 0.6f}); // Roof
     return path;
 }

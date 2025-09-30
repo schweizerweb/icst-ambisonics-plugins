@@ -39,7 +39,18 @@ public:
     // Keyboard
     bool keyPressed(const juce::KeyPress& key) override;
     void nudgeSelectedClips(ms_t nudgeAmount);
-
+    
+    ms_t getPlayheadPosition() const { return playheadPosition; }
+    void setPixelsPerMillisecond(float newPixelsPerMs)
+    {
+        pixelsPerMillisecond = newPixelsPerMs;
+        updateScrollBars();
+        repaint();
+    }
+    
+    float getPixelsPerMillisecond() const { return pixelsPerMillisecond; }
+    TimelineModel* getCurrentTimeline() const;
+    
 private:
     struct ClipBounds
     {
@@ -167,7 +178,6 @@ private:
     const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
     bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
-    TimelineModel* getCurrentTimeline() const;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };
