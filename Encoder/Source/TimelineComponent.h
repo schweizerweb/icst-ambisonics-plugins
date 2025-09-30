@@ -86,23 +86,6 @@ private:
         juce::Rectangle<int> selectionRectangle;
     };
 
-    struct SelectedClip
-    {
-        int timelineIndex = -1;
-        int layerIndex = -1;
-        int clipIndex = -1;
-        bool isMovementClip = false;
-        
-        bool isValid() const { return timelineIndex >= 0 && layerIndex >= 0 && clipIndex >= 0; }
-        bool equals(int t, int l, int c, bool m) const {
-            return timelineIndex == t && layerIndex == l && clipIndex == c && isMovementClip == m;
-        }
-        bool equals(const SelectedClip& other) const {
-            return equals(other.timelineIndex, other.layerIndex, other.clipIndex, other.isMovementClip);
-        }
-        void reset() { timelineIndex = -1; layerIndex = -1; clipIndex = -1; }
-    };
-
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     int currentTimelineIndex = 0;
     

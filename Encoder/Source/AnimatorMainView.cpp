@@ -28,9 +28,16 @@ AnimatorMainView::~AnimatorMainView()
     menuBarModel.reset();
 }
 
-void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* timelines)
+void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
 {
+    timelines = newTimelines;
     timelineComponent->setTimelines(timelines);
+    
+    // Refresh menu bar to update the import/export submenus
+    if (menuBarModel != nullptr)
+    {
+        menuBarModel->menuItemsChanged();
+    }
 }
 
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
@@ -40,6 +47,7 @@ void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 
 void AnimatorMainView::setAutoFollow(bool shouldAutoFollow)
 {
+    autoFollowEnabled = shouldAutoFollow;
     timelineComponent->setAutoFollow(shouldAutoFollow);
 }
 
@@ -75,10 +83,46 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
     switch (topLevelMenuIndex)
     {
         case 0: // File
-            menu.addItem(2, "Import Scene...");
-            menu.addItem(3, "Export Scene...");
-            menu.addSeparator();
-            menu.addItem(6, "Preferences");
+            {
+                // Import submenu
+                juce::PopupMenu importSubMenu;
+                importSubMenu.addItem(100, "Append as new timeline");
+                
+                // Add overwrite options for existing timelines
+                if (owner->timelines != nullptr && !owner->timelines->isEmpty())
+                {
+                    importSubMenu.addSeparator();
+                    for (int i = 0; i < owner->timelines->size(); ++i)
+                    {
+                        auto* timeline = owner->timelines->getUnchecked(i);
+                        juce::String timelineName = "Timeline " + juce::String(i + 1);
+                            
+                        importSubMenu.addItem(101 + i, "Overwrite " + timelineName);
+                    }
+                }
+                menu.addSubMenu("Import Scene...", importSubMenu);
+                
+                // Export submenu
+                juce::PopupMenu exportSubMenu;
+                if (owner->timelines != nullptr && !owner->timelines->isEmpty())
+                {
+                    for (int i = 0; i < owner->timelines->size(); ++i)
+                    {
+                        auto* timeline = owner->timelines->getUnchecked(i);
+                        juce::String timelineName = "Group " + juce::String(i + 1);
+                            
+                        exportSubMenu.addItem(200 + i, timelineName);
+                    }
+                }
+                else
+                {
+                    exportSubMenu.addItem(1, "No timelines available", false);
+                }
+                menu.addSubMenu("Export Scene...", exportSubMenu);
+                
+                menu.addSeparator();
+                menu.addItem(6, "Preferences");
+            }
             break;
             
         case 1: // Edit
@@ -122,8 +166,31 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
 {
     switch (menuItemID)
     {
+        case 100: // Import - Append as new timeline
+            importScene(-1); // -1 means append
+            break;
+            
+        case 6: // Preferences
+            // Handle preferences
+            break;
+            
+        case 12: // Cut
+            cutSelectedClips();
+            break;
+        case 13: // Copy
+            copySelectedClips();
+            break;
+        case 14: // Paste
+            pasteClips();
+            break;
         case 15: // Delete Selected Clips
             deleteSelectedClips();
+            break;
+        case 16: // Select All
+            selectAllClips();
+            break;
+        case 17: // Deselect All
+            deselectAllClips();
             break;
         case 20: // Zoom In
             zoomIn();
@@ -134,17 +201,230 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
         case 22: // Reset Zoom
             resetZoom();
             break;
+        case 23: // Toggle Auto-follow
+            toggleAutoFollow();
+            break;
         case 30: // Add Movement Clip
             addMovementClip();
             break;
         case 31: // Add Action Clip
             addActionClip();
             break;
-        case 16: // Select All
-        case 17: // Deselect All
-            // These would need to be implemented in TimelineComponent
+            
+        default:
+            // Handle import overwrite and export menu items
+            if (menuItemID >= 101 && menuItemID < 200)
+            {
+                // Import overwrite - menuItemID 101+ corresponds to timeline index 0+
+                int timelineIndex = menuItemID - 101;
+                importScene(timelineIndex);
+            }
+            else if (menuItemID >= 200 && menuItemID < 300)
+            {
+                // Export - menuItemID 200+ corresponds to timeline index 0+
+                int timelineIndex = menuItemID - 200;
+                exportScene(timelineIndex);
+            }
             break;
     }
+}
+
+void AnimatorMainView::importScene(int targetTimelineIndex)
+{
+    juce::FileChooser chooser("Import Scene...",
+                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             "*.xml");
+    
+    if (chooser.browseForFileToOpen())
+    {
+        auto file = chooser.getResult();
+        auto xml = juce::XmlDocument::parse(file);
+        
+        if (xml != nullptr && xml->hasTagName("Timeline"))
+        {
+            auto* newTimeline = new TimelineModel();
+            if (newTimeline->fromXml(*xml))
+            {
+                if (targetTimelineIndex == -1)
+                {
+                    // Append as new timeline
+                    if (timelines == nullptr)
+                        timelines = new juce::OwnedArray<TimelineModel>();
+                        
+                    timelines->add(newTimeline);
+                    
+                    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
+                                                          "Import Successful",
+                                                          "Timeline imported and appended successfully.");
+                }
+                else
+                {
+                    // Overwrite existing timeline
+                    if (timelines != nullptr && targetTimelineIndex < timelines->size())
+                    {
+                        timelines->set(targetTimelineIndex, newTimeline);
+                        
+                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
+                                                              "Import Successful",
+                                                              "Timeline imported and overwritten successfully.");
+                    }
+                    else
+                    {
+                        delete newTimeline;
+                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                              "Import Error",
+                                                              "Invalid timeline index for overwrite.");
+                        return;
+                    }
+                }
+                
+                // Update the timeline component
+                timelineComponent->setTimelines(timelines);
+                timelineComponent->repaint();
+            }
+            else
+            {
+                delete newTimeline;
+                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                      "Import Error",
+                                                      "Failed to import timeline file.");
+            }
+        }
+        else
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                  "Import Error",
+                                                  "Invalid timeline file format.");
+        }
+    }
+}
+
+void AnimatorMainView::exportScene(int timelineIndex)
+{
+    if (timelines == nullptr || timelines->isEmpty())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Export Error",
+                                              "No timeline data to export.");
+        return;
+    }
+    
+    if (timelineIndex < 0 || timelineIndex >= timelines->size())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Export Error",
+                                              "Invalid timeline index.");
+        return;
+    }
+    
+    auto* timelineToExport = (*timelines)[timelineIndex];
+    juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
+    
+    juce::FileChooser chooser("Export Scene: " + timelineName,
+                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             "*.xml");
+    
+    if (chooser.browseForFileToSave(true))
+    {
+        auto file = chooser.getResult().withFileExtension("xml");
+        auto xml = timelineToExport->toXml();
+        
+        if (xml != nullptr && xml->writeTo(file))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
+                                                  "Export Successful",
+                                                  "Timeline exported successfully to: " + file.getFullPathName());
+        }
+        else
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                  "Export Error",
+                                                  "Failed to export timeline file.");
+        }
+    }
+}
+
+void AnimatorMainView::cutSelectedClips()
+{
+    copySelectedClips();
+    deleteSelectedClips();
+}
+
+void AnimatorMainView::copySelectedClips()
+{
+    // Clear previous clipboard data
+    clipboard.clips.clear();
+    clipboard.timelineData.clear();
+    clipboard.hasData = false;
+    
+    // Get selected clips from timeline component
+    // This would need access to TimelineComponent's selected clips
+    // For now, we'll implement a basic version
+    
+    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    {
+        // Create a copy of the current timeline for clipboard
+        auto* timelineCopy = new TimelineModel();
+        
+        // Copy movement clips
+        for (const auto& clip : currentTimeline->movement.clips)
+        {
+            // Only copy if selected (you'd need selection info from TimelineComponent)
+            timelineCopy->movement.clips.add(clip);
+        }
+        
+        // Copy action clips
+        for (const auto& clip : currentTimeline->actions.clips)
+        {
+            // Only copy if selected (you'd need selection info from TimelineComponent)
+            timelineCopy->actions.clips.add(clip);
+        }
+        
+        clipboard.timelineData.add(timelineCopy);
+        clipboard.hasData = true;
+    }
+}
+
+void AnimatorMainView::pasteClips()
+{
+    if (!clipboard.hasData || clipboard.timelineData.isEmpty())
+        return;
+        
+    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    {
+        if (auto* sourceTimeline = clipboard.timelineData.getFirst())
+        {
+            // Paste movement clips with time offset
+            ms_t timeOffset = timelineComponent->getPlayheadPosition();
+            
+            for (const auto& clip : sourceTimeline->movement.clips)
+            {
+                MovementClip newClip = clip;
+                newClip.start += timeOffset;
+                currentTimeline->movement.clips.add(newClip);
+            }
+            
+            // Paste action clips with time offset
+            for (const auto& clip : sourceTimeline->actions.clips)
+            {
+                ActionClip newClip = clip;
+                newClip.start += timeOffset;
+                currentTimeline->actions.clips.add(newClip);
+            }
+            
+            timelineComponent->repaint();
+        }
+    }
+}
+
+void AnimatorMainView::selectAllClips()
+{
+    timelineComponent->keyPressed(juce::KeyPress('a', juce::ModifierKeys::commandModifier, 0));
+}
+
+void AnimatorMainView::deselectAllClips()
+{
+    timelineComponent->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
 }
 
 void AnimatorMainView::addMovementClip()
@@ -186,8 +466,6 @@ void AnimatorMainView::addActionClip()
 
 void AnimatorMainView::deleteSelectedClips()
 {
-    // This would need to be implemented in TimelineComponent
-    // For now, we'll trigger the delete key functionality
     timelineComponent->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
 }
 
@@ -209,54 +487,90 @@ void AnimatorMainView::resetZoom()
     updateTimelineZoom();
 }
 
+void AnimatorMainView::toggleAutoFollow()
+{
+    autoFollowEnabled = !autoFollowEnabled;
+    timelineComponent->setAutoFollow(autoFollowEnabled);
+    
+    // Update toolbar button state
+    if (toolbar != nullptr && toolbar->autoFollowButton != nullptr)
+    {
+        toolbar->autoFollowButton->setToggleState(autoFollowEnabled, juce::dontSendNotification);
+    }
+    
+    toolbar->repaint();
+}
+
 void AnimatorMainView::updateTimelineZoom()
 {
     // Convert zoom level to pixels per millisecond
-    // Higher zoom level = more pixels per millisecond = more detailed view
-    float basePixelsPerMs = 0.1f; // Base zoom level
+    float basePixelsPerMs = 0.1f;
     float pixelsPerMs = basePixelsPerMs * zoomLevel;
     
     timelineComponent->setPixelsPerMillisecond(pixelsPerMs);
-    timelineComponent->repaint();
-    
-    // Update window title or status bar with zoom level
-    // getTopLevelComponent()->setName("Timeline - " + juce::String(int(zoomLevel * 100)) + "%");
 }
 
 // ToolbarComponent implementation
 AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     : owner(ownerRef)
 {
-    // Create buttons with icons
+    // Create transparent buttons for custom drawing
     addMovementButton = std::make_unique<juce::TextButton>();
     addActionButton = std::make_unique<juce::TextButton>();
     deleteButton = std::make_unique<juce::TextButton>();
     zoomInButton = std::make_unique<juce::TextButton>();
     zoomOutButton = std::make_unique<juce::TextButton>();
     resetZoomButton = std::make_unique<juce::TextButton>();
+    autoFollowButton = std::make_unique<juce::TextButton>();
+
+    // Make buttons transparent and remove borders
+    auto setupIconButton = [](juce::TextButton* button) {
+        button->setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
+        button->setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
+        button->setClickingTogglesState(false);
+    };
+
+    setupIconButton(addMovementButton.get());
+    setupIconButton(addActionButton.get());
+    setupIconButton(deleteButton.get());
+    setupIconButton(zoomInButton.get());
+    setupIconButton(zoomOutButton.get());
+    setupIconButton(resetZoomButton.get());
     
-    // Set button properties
+    // Auto-follow button should toggle state but still be transparent
+    autoFollowButton->setClickingTogglesState(true);
+    autoFollowButton->setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
+    autoFollowButton->setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
+
+    // Set tooltips (same as before)
     addMovementButton->setTooltip("Add Movement Clip");
     addActionButton->setTooltip("Add Action Clip");
     deleteButton->setTooltip("Delete Selected Clips");
     zoomInButton->setTooltip("Zoom In");
     zoomOutButton->setTooltip("Zoom Out");
     resetZoomButton->setTooltip("Reset Zoom");
-    
-    // Connect buttons to actions
+    autoFollowButton->setTooltip("Toggle Auto-follow");
+
+    // Connect buttons to actions (same as before)
     addMovementButton->onClick = [this] { owner.addMovementClip(); };
     addActionButton->onClick = [this] { owner.addActionClip(); };
     deleteButton->onClick = [this] { owner.deleteSelectedClips(); };
     zoomInButton->onClick = [this] { owner.zoomIn(); };
     zoomOutButton->onClick = [this] { owner.zoomOut(); };
     resetZoomButton->onClick = [this] { owner.resetZoom(); };
-    
+    autoFollowButton->onClick = [this] {
+        owner.toggleAutoFollow();
+        repaint(); // Repaint to update icon color
+    };
+
+    // Add buttons to component
     addAndMakeVisible(addMovementButton.get());
     addAndMakeVisible(addActionButton.get());
     addAndMakeVisible(deleteButton.get());
     addAndMakeVisible(zoomInButton.get());
     addAndMakeVisible(zoomOutButton.get());
     addAndMakeVisible(resetZoomButton.get());
+    addAndMakeVisible(autoFollowButton.get());
 }
 
 void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
@@ -268,19 +582,30 @@ void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
     g.setColour(juce::Colours::black.withAlpha(0.3f));
     g.drawLine(0.0f, (float)getHeight(), (float)getWidth(), (float)getHeight(), 1.0f);
     
-    // Draw icons on buttons
-    auto drawIconOnButton = [&g](juce::Button* button, const juce::Path& icon) {
-        auto bounds = button->getLocalBounds().toFloat().reduced(8.0f);
-        g.setColour(juce::Colours::white.withAlpha(button->isOver() ? 1.0f : 0.8f));
-        g.fillPath(icon, icon.getTransformToScaleToFit(bounds, true));
-    };
+    // Draw each icon on its respective button
+    drawButtonIcon(g, addMovementButton.get(), createMovementIcon());
+    drawButtonIcon(g, addActionButton.get(), createActionIcon());
+    drawButtonIcon(g, deleteButton.get(), createDeleteIcon());
+    drawButtonIcon(g, zoomInButton.get(), createZoomInIcon());
+    drawButtonIcon(g, zoomOutButton.get(), createZoomOutIcon());
+    drawButtonIcon(g, resetZoomButton.get(), createResetZoomIcon());
+    drawButtonIcon(g, autoFollowButton.get(), createAutoFollowIcon(), owner.autoFollowEnabled);
+}
+
+void AnimatorMainView::ToolbarComponent::drawButtonIcon(juce::Graphics& g, juce::Button* button, const juce::Path& icon, bool isToggled)
+{
+    auto bounds = button->getLocalBounds().toFloat().reduced(6.0f);
     
-    drawIconOnButton(addMovementButton.get(), createMovementIcon());
-    drawIconOnButton(addActionButton.get(), createActionIcon());
-    drawIconOnButton(deleteButton.get(), createDeleteIcon());
-    drawIconOnButton(zoomInButton.get(), createZoomInIcon());
-    drawIconOnButton(zoomOutButton.get(), createZoomOutIcon());
-    drawIconOnButton(resetZoomButton.get(), createResetZoomIcon());
+    // Set color based on button state
+    if (isToggled || button->getToggleState()) {
+        g.setColour(juce::Colour(0xff0078d7));
+    } else if (button->isOver()) {
+        g.setColour(juce::Colours::white.withAlpha(0.9f));
+    } else {
+        g.setColour(juce::Colours::white.withAlpha(0.7f));
+    }
+    
+    g.fillPath(icon, icon.getTransformToScaleToFit(bounds, true));
 }
 
 void AnimatorMainView::ToolbarComponent::resized()
@@ -302,11 +627,15 @@ void AnimatorMainView::ToolbarComponent::resized()
     zoomInButton->setBounds(area.removeFromLeft(buttonSize));
     area.removeFromLeft(spacing);
     resetZoomButton->setBounds(area.removeFromLeft(buttonSize));
+    area.removeFromLeft(spacing * 2);
+    
+    autoFollowButton->setBounds(area.removeFromLeft(buttonSize));
 }
 
 juce::Path AnimatorMainView::ToolbarComponent::createMovementIcon()
 {
     juce::Path path;
+    // Use relative coordinates (0.0 to 1.0) so the path scales properly
     path.addTriangle({0.0f, 1.0f}, {1.0f, 0.5f}, {0.0f, 0.0f});
     return path;
 }
@@ -330,38 +659,51 @@ juce::Path AnimatorMainView::ToolbarComponent::createActionIcon()
 juce::Path AnimatorMainView::ToolbarComponent::createDeleteIcon()
 {
     juce::Path path;
-    path.addRectangle(0.2f, 0.3f, 0.6f, 0.1f);
-    path.addRectangle(0.3f, 0.1f, 0.4f, 0.1f);
-    path.addRectangle(0.45f, 0.5f, 0.1f, 0.4f);
-    path.addRectangle(0.35f, 0.5f, 0.1f, 0.4f);
-    path.addRectangle(0.55f, 0.5f, 0.1f, 0.4f);
+    // Use relative coordinates (0.0 to 1.0)
+    path.addRectangle(0.2f, 0.3f, 0.6f, 0.1f);  // Horizontal line
+    path.addRectangle(0.3f, 0.1f, 0.4f, 0.1f);  // Top part
+    path.addRectangle(0.35f, 0.5f, 0.1f, 0.4f); // Left tine
+    path.addRectangle(0.45f, 0.5f, 0.1f, 0.4f); // Middle tine
+    path.addRectangle(0.55f, 0.5f, 0.1f, 0.4f); // Right tine
     return path;
 }
 
 juce::Path AnimatorMainView::ToolbarComponent::createZoomInIcon()
 {
     juce::Path path;
-    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f);
-    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f);
-    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f);
-    path.addLineSegment({0.5f, 0.2f, 0.5f, 0.5f}, 0.1f);
+    // Use relative coordinates (0.0 to 1.0)
+    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f); // Magnifying glass
+    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f); // Handle
+    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f); // Horizontal plus
+    path.addLineSegment({0.5f, 0.2f, 0.5f, 0.5f}, 0.1f); // Vertical plus
     return path;
 }
 
 juce::Path AnimatorMainView::ToolbarComponent::createZoomOutIcon()
 {
     juce::Path path;
-    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f);
-    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f);
-    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f);
+    // Use relative coordinates (0.0 to 1.0)
+    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f); // Magnifying glass
+    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f); // Handle
+    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f); // Horizontal minus
     return path;
 }
 
 juce::Path AnimatorMainView::ToolbarComponent::createResetZoomIcon()
 {
     juce::Path path;
-    // Create a house-like icon for "home"/reset
+    // Use relative coordinates (0.0 to 1.0)
     path.addRectangle(0.3f, 0.6f, 0.4f, 0.4f); // Base
-    path.addTriangle({0.1f, 0.6f}, {0.5f, 0.2f}, {0.9f, 0.6f}); // Roof
+    path.addTriangle({0.1f, 0.6f}, {0.5f, 0.2f}, {0.9f, 0.6f}); // Arrow
+    return path;
+}
+
+juce::Path AnimatorMainView::ToolbarComponent::createAutoFollowIcon()
+{
+    juce::Path path;
+    // Use relative coordinates (0.0 to 1.0)
+    path.addRectangle(0.45f, 0.1f, 0.1f, 0.8f); // Playhead
+    path.addTriangle({0.2f, 0.3f}, {0.4f, 0.5f}, {0.2f, 0.7f}); // Left follow indicator
+    path.addTriangle({0.6f, 0.3f}, {0.8f, 0.5f}, {0.6f, 0.7f}); // Right follow indicator
     return path;
 }

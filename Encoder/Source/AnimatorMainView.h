@@ -2,7 +2,6 @@
 
 #include "JuceHeader.h"
 #include "TimelineComponent.h"
-#include "TimelineTypes.h"
 
 class AnimatorMainView : public juce::Component
 {
@@ -39,8 +38,10 @@ private:
     public:
         ToolbarComponent(AnimatorMainView& owner);
         void paint(juce::Graphics& g) override;
+        void drawButtonIcon(juce::Graphics& g, juce::Button* button, const juce::Path& icon, bool isToggled = false);
         void resized() override;
-
+        std::unique_ptr<juce::TextButton> autoFollowButton;
+        
     private:
         AnimatorMainView& owner;
         std::unique_ptr<juce::TextButton> addMovementButton;
@@ -56,12 +57,19 @@ private:
         juce::Path createZoomInIcon();
         juce::Path createZoomOutIcon();
         juce::Path createResetZoomIcon();
+        juce::Path createAutoFollowIcon();
     };
 
     std::unique_ptr<juce::MenuBarComponent> menuBar;
     std::unique_ptr<MainMenuBarModel> menuBarModel;
     std::unique_ptr<ToolbarComponent> toolbar;
     std::unique_ptr<TimelineComponent> timelineComponent;
+
+    // Application state
+    juce::OwnedArray<TimelineModel>* timelines = nullptr;
+    bool autoFollowEnabled = true;
+    
+    ClipboardData clipboard;
 
     // Zoom state
     float zoomLevel = 1.0f;
@@ -77,7 +85,19 @@ private:
     void zoomIn();
     void zoomOut();
     void resetZoom();
+    void toggleAutoFollow();
     void updateTimelineZoom();
+    
+    // Import/Export
+    void importScene(int timelineIndex);
+    void exportScene(int timelineIndex);
+    
+    // Edit operations
+    void cutSelectedClips();
+    void copySelectedClips();
+    void pasteClips();
+    void selectAllClips();
+    void deselectAllClips();
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnimatorMainView)
 };
