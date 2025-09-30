@@ -2,6 +2,8 @@
 
 TimelineComponent::TimelineComponent()
 {
+    loadIcons(); // Load the SVG icons
+    
     horizontalScrollBar = std::make_unique<juce::ScrollBar>(true);
     verticalScrollBar = std::make_unique<juce::ScrollBar>(false);
     timelineSelector = std::make_unique<juce::ComboBox>();
@@ -16,7 +18,7 @@ TimelineComponent::TimelineComponent()
     addAndMakeVisible(horizontalScrollBar.get());
     addAndMakeVisible(verticalScrollBar.get());
     addAndMakeVisible(timelineSelector.get());
-    addAndMakeVisible(tempButton.get());
+    //addAndMakeVisible(tempButton.get());
     
     timelineSelector->setVisible(false);
     
@@ -254,11 +256,27 @@ void TimelineComponent::paint(juce::Graphics& g)
         // Clip content (faded for non-current timelines)
         Rectangle<float> iconBounds = getIconBoundsWithinClip(bounds);
         
-        // Draw icon
+        // Update scaled icons if needed
+        updateScaledIcons(iconBounds.getWidth());
+
+        // Draw icon using pre-scaled SVG
         g.setColour(juce::Colours::white.withAlpha(isCurrentTimeline ? 1.0f : 0.5f));
-        auto icon = getClipIcon(clipBounds.isMovementClip);
-        if (!icon.isEmpty())
-            g.fillPath(icon, icon.getTransformToScaleToFit(iconBounds, true));
+
+        juce::Drawable* iconDrawable = nullptr;
+        if (clipBounds.isMovementClip && scaledMovementIcon != nullptr)
+        {
+            iconDrawable = scaledMovementIcon.get();
+        }
+        else if (!clipBounds.isMovementClip && scaledActionIcon != nullptr)
+        {
+            iconDrawable = scaledActionIcon.get();
+        }
+
+        if (iconDrawable != nullptr)
+        {
+            auto transform = juce::AffineTransform::translation(iconBounds.getX(), iconBounds.getY());
+            iconDrawable->draw(g, 1.0f, transform);
+        }
         
         // Draw text
         const float textX = iconBounds.getRight() + 5.0f;
@@ -1059,33 +1077,6 @@ juce::String TimelineComponent::getClipTimeInfo(const Clip& clip) const
     return juce::String(clip.start) + " - " + juce::String(clip.end()) + "ms";
 }
 
-juce::Path TimelineComponent::getClipIcon(bool isMovementClip) const
-{
-    juce::Path icon;
-    
-    if (isMovementClip)
-    {
-        // Movement icon (arrow)
-        icon.addTriangle({0, 1}, {1, 0.5f}, {0, 0});
-    }
-    else
-    {
-        // Action icon (gear)
-        icon.addEllipse(0.2f, 0.2f, 0.6f, 0.6f);
-        
-        for (int i = 0; i < 8; ++i)
-        {
-            const float angle = i * juce::MathConstants<float>::pi / 4.0f;
-            juce::Path tooth;
-            tooth.addRectangle(0.45f, 0.1f, 0.1f, 0.3f);
-            tooth.applyTransform(juce::AffineTransform::rotation(angle, 0.5f, 0.5f));
-            icon.addPath(tooth);
-        }
-    }
-    
-    return icon;
-}
-
 juce::Colour TimelineComponent::getTimelineColour(int timelineIndex) const
 {
     const juce::Colour colours[] = {
@@ -1171,4 +1162,51 @@ TimelineModel* TimelineComponent::getCurrentTimeline() const
         return nullptr;
     
     return timelines->getUnchecked(currentTimelineIndex);
+}
+
+// In TimelineComponent.cpp
+void TimelineComponent::loadIcons()
+{
+    // Load movement icon from embedded SVG
+    if (BinaryData::movement_icon_svg != nullptr && BinaryData::movement_icon_svgSize > 0)
+    {
+        movementIcon = juce::Drawable::createFromImageData(BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize);
+        if (movementIcon != nullptr)
+        {
+            movementIcon->replaceColour(juce::Colours::black, juce::Colours::white);
+        }
+    }
+    
+    // Load action icon from embedded SVG
+    if (BinaryData::action_icon_svg != nullptr && BinaryData::action_icon_svgSize > 0)
+    {
+        actionIcon = juce::Drawable::createFromImageData(BinaryData::action_icon_svg, BinaryData::action_icon_svgSize);
+        if (actionIcon != nullptr)
+        {
+            actionIcon->replaceColour(juce::Colours::black, juce::Colours::white);
+        }
+    }
+}
+
+void TimelineComponent::updateScaledIcons(float iconSize)
+{
+    if (lastIconSize == iconSize) return; // Already scaled to this size
+    
+    lastIconSize = iconSize;
+    
+    // Scale movement icon
+    if (movementIcon != nullptr)
+    {
+        scaledMovementIcon = movementIcon->createCopy();
+        scaledMovementIcon->setTransformToFit(juce::Rectangle<float>(0, 0, iconSize, iconSize),
+                                            juce::RectanglePlacement::centred);
+    }
+    
+    // Scale action icon
+    if (actionIcon != nullptr)
+    {
+        scaledActionIcon = actionIcon->createCopy();
+        scaledActionIcon->setTransformToFit(juce::Rectangle<float>(0, 0, iconSize, iconSize),
+                                          juce::RectanglePlacement::centred);
+    }
 }

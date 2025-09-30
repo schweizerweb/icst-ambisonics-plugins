@@ -14,6 +14,17 @@ juce_add_plugin(AmbiEncoderMulti
 
 juce_generate_juce_header(AmbiEncoderMulti)
 
+juce_add_binary_data(AmbiEncoderMulti_SVGResources
+    SOURCES
+    ../../Resources/svg/movement_icon.svg
+    ../../Resources/svg/action_icon.svg
+    ../../Resources/svg/delete_icon.svg
+    ../../Resources/svg/zoom_in_icon.svg
+    ../../Resources/svg/zoom_out_icon.svg
+    ../../Resources/svg/reset_zoom_icon.svg
+    ../../Resources/svg/auto_follow_icon.svg
+)
+
 target_sources(AmbiEncoderMulti
     PRIVATE
 	${SRC_FILES}
@@ -30,7 +41,7 @@ target_compile_definitions(AmbiEncoderMulti
 		)
 
 target_link_libraries(AmbiEncoderMulti
-    ${COMMON_LINK_LIBRARIES}
+    ${COMMON_LINK_LIBRARIES} PRIVATE AmbiEncoderMulti_SVGResources
     )
 
 set_target_properties( AmbiEncoderMulti

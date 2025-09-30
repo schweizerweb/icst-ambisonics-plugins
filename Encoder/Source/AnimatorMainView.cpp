@@ -556,10 +556,10 @@ void AnimatorMainView::toggleAutoFollow()
     timelineComponent->setAutoFollow(autoFollowEnabled);
     
     // Update toolbar button state
-    if (toolbar != nullptr && toolbar->autoFollowButton != nullptr)
-    {
-        toolbar->autoFollowButton->setToggleState(autoFollowEnabled, juce::dontSendNotification);
-    }
+    //if (toolbar != nullptr && toolbar->autoFollowButton != nullptr)
+    //{
+    //    toolbar->autoFollowButton->setToggleState(autoFollowEnabled, juce::dontSendNotification);
+    //}
     
     toolbar->repaint();
 }
@@ -574,57 +574,58 @@ void AnimatorMainView::updateTimelineZoom()
 }
 
 // ToolbarComponent implementation
+void AnimatorMainView::ToolbarComponent::loadSVGIcon(juce::DrawableButton* button, const char* svgData, size_t svgDataSize, const juce::String& tooltip)
+{
+    if (svgData != nullptr && svgDataSize > 0)
+    {
+        auto svg = juce::Drawable::createFromImageData(svgData, svgDataSize);
+        if (svg != nullptr)
+        {
+            svg->replaceColour(juce::Colours::black, juce::Colours::lightgrey);
+            // Add some padding around the SVG
+            svg->setTransformToFit(juce::Rectangle<float>(4, 4, 16, 16), juce::RectanglePlacement::centred);
+            button->setImages(svg.get());
+            drawables.add(std::move(svg));
+        }
+    }
+    button->setTooltip(tooltip);
+}
+
+// In ToolbarComponent constructor
 AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     : owner(ownerRef)
 {
-    // Create transparent buttons for custom drawing
-    addMovementButton = std::make_unique<juce::TextButton>();
-    addActionButton = std::make_unique<juce::TextButton>();
-    deleteButton = std::make_unique<juce::TextButton>();
-    zoomInButton = std::make_unique<juce::TextButton>();
-    zoomOutButton = std::make_unique<juce::TextButton>();
-    resetZoomButton = std::make_unique<juce::TextButton>();
-    autoFollowButton = std::make_unique<juce::TextButton>();
+    // Create drawable buttons
+    addMovementButton = std::make_unique<juce::DrawableButton>("Add Movement", juce::DrawableButton::ImageOnButtonBackground);
+    addActionButton = std::make_unique<juce::DrawableButton>("Add Action", juce::DrawableButton::ImageOnButtonBackground);
+    deleteButton = std::make_unique<juce::DrawableButton>("Delete", juce::DrawableButton::ImageOnButtonBackground);
+    zoomInButton = std::make_unique<juce::DrawableButton>("Zoom In", juce::DrawableButton::ImageOnButtonBackground);
+    zoomOutButton = std::make_unique<juce::DrawableButton>("Zoom Out", juce::DrawableButton::ImageOnButtonBackground);
+    resetZoomButton = std::make_unique<juce::DrawableButton>("Reset Zoom", juce::DrawableButton::ImageOnButtonBackground);
+    autoFollowButton = std::make_unique<juce::DrawableButton>("Auto Follow", juce::DrawableButton::ImageOnButtonBackground);
 
-    // Make buttons transparent and remove borders
-    auto setupIconButton = [](juce::TextButton* button) {
-        button->setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-        button->setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
-        button->setClickingTogglesState(false);
-    };
+    loadSVGIcon(addMovementButton.get(), BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize, "Add Movement Clip");
+    loadSVGIcon(addActionButton.get(), BinaryData::action_icon_svg, BinaryData::action_icon_svgSize, "Add Action Clip");
+    loadSVGIcon(deleteButton.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "Delete Selected Clips");
+    loadSVGIcon(zoomInButton.get(), BinaryData::zoom_in_icon_svg, BinaryData::zoom_in_icon_svgSize, "Zoom In");
+    loadSVGIcon(zoomOutButton.get(), BinaryData::zoom_out_icon_svg, BinaryData::zoom_out_icon_svgSize, "Zoom Out");
+    loadSVGIcon(resetZoomButton.get(), BinaryData::reset_zoom_icon_svg, BinaryData::reset_zoom_icon_svgSize, "Reset Zoom");
+    loadSVGIcon(autoFollowButton.get(), BinaryData::auto_follow_icon_svg, BinaryData::auto_follow_icon_svgSize, "Toggle Auto-follow");
 
-    setupIconButton(addMovementButton.get());
-    setupIconButton(addActionButton.get());
-    setupIconButton(deleteButton.get());
-    setupIconButton(zoomInButton.get());
-    setupIconButton(zoomOutButton.get());
-    setupIconButton(resetZoomButton.get());
-    
-    // Auto-follow button should toggle state but still be transparent
+    // Auto-follow button should toggle state
     autoFollowButton->setClickingTogglesState(true);
-    autoFollowButton->setColour(juce::TextButton::buttonColourId, juce::Colours::transparentBlack);
-    autoFollowButton->setColour(juce::TextButton::buttonOnColourId, juce::Colours::transparentBlack);
-
-    // Set tooltips (same as before)
-    addMovementButton->setTooltip("Add Movement Clip");
-    addActionButton->setTooltip("Add Action Clip");
-    deleteButton->setTooltip("Delete Selected Clips");
-    zoomInButton->setTooltip("Zoom In");
-    zoomOutButton->setTooltip("Zoom Out");
-    resetZoomButton->setTooltip("Reset Zoom");
-    autoFollowButton->setTooltip("Toggle Auto-follow");
-
-    // Connect buttons to actions (same as before)
+    autoFollowButton->setToggleState(owner.autoFollowEnabled, juce::dontSendNotification);
+    // TODO: doesn't work
+    autoFollowButton->setColour(DrawableButton::ColourIds::backgroundOnColourId, Colours::royalblue);
+    
+    // Connect buttons to actions
     addMovementButton->onClick = [this] { owner.addMovementClip(); };
     addActionButton->onClick = [this] { owner.addActionClip(); };
     deleteButton->onClick = [this] { owner.deleteSelectedClips(); };
     zoomInButton->onClick = [this] { owner.zoomIn(); };
     zoomOutButton->onClick = [this] { owner.zoomOut(); };
     resetZoomButton->onClick = [this] { owner.resetZoom(); };
-    autoFollowButton->onClick = [this] {
-        owner.toggleAutoFollow();
-        repaint(); // Repaint to update icon color
-    };
+    autoFollowButton->onClick = [this] { owner.toggleAutoFollow(); };
 
     // Add buttons to component
     addAndMakeVisible(addMovementButton.get());
@@ -636,41 +637,18 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     addAndMakeVisible(autoFollowButton.get());
 }
 
+// Keep the paint method simple - just background
 void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
 {
-    // Draw toolbar background
+    // Draw toolbar background only
     g.fillAll(juce::Colour(0xff2d2d30));
     
     // Draw subtle border at bottom
-    g.setColour(juce::Colours::black.withAlpha(0.3f));
+    g.setColour(juce::Colours::grey.withAlpha(0.3f));
     g.drawLine(0.0f, (float)getHeight(), (float)getWidth(), (float)getHeight(), 1.0f);
-    
-    // Draw each icon on its respective button
-    drawButtonIcon(g, addMovementButton.get(), createMovementIcon());
-    drawButtonIcon(g, addActionButton.get(), createActionIcon());
-    drawButtonIcon(g, deleteButton.get(), createDeleteIcon());
-    drawButtonIcon(g, zoomInButton.get(), createZoomInIcon());
-    drawButtonIcon(g, zoomOutButton.get(), createZoomOutIcon());
-    drawButtonIcon(g, resetZoomButton.get(), createResetZoomIcon());
-    drawButtonIcon(g, autoFollowButton.get(), createAutoFollowIcon(), owner.autoFollowEnabled);
 }
 
-void AnimatorMainView::ToolbarComponent::drawButtonIcon(juce::Graphics& g, juce::Button* button, const juce::Path& icon, bool isToggled)
-{
-    auto bounds = button->getLocalBounds().toFloat().reduced(6.0f);
-    
-    // Set color based on button state
-    if (isToggled || button->getToggleState()) {
-        g.setColour(juce::Colour(0xff0078d7));
-    } else if (button->isOver()) {
-        g.setColour(juce::Colours::white.withAlpha(0.9f));
-    } else {
-        g.setColour(juce::Colours::white.withAlpha(0.7f));
-    }
-    
-    g.fillPath(icon, icon.getTransformToScaleToFit(bounds, true));
-}
-
+// Keep the resized method the same
 void AnimatorMainView::ToolbarComponent::resized()
 {
     auto area = getLocalBounds().reduced(5, 5);
@@ -695,78 +673,4 @@ void AnimatorMainView::ToolbarComponent::resized()
     autoFollowButton->setBounds(area.removeFromLeft(buttonSize));
 }
 
-juce::Path AnimatorMainView::ToolbarComponent::createMovementIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0) so the path scales properly
-    path.addTriangle({0.0f, 1.0f}, {1.0f, 0.5f}, {0.0f, 0.0f});
-    return path;
-}
 
-juce::Path AnimatorMainView::ToolbarComponent::createActionIcon()
-{
-    juce::Path path;
-    path.addEllipse(0.2f, 0.2f, 0.6f, 0.6f);
-    
-    for (int i = 0; i < 8; ++i)
-    {
-        float angle = i * juce::MathConstants<float>::pi / 4.0f;
-        juce::Path tooth;
-        tooth.addRectangle(0.45f, 0.1f, 0.1f, 0.3f);
-        tooth.applyTransform(juce::AffineTransform::rotation(angle, 0.5f, 0.5f));
-        path.addPath(tooth);
-    }
-    return path;
-}
-
-juce::Path AnimatorMainView::ToolbarComponent::createDeleteIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0)
-    path.addRectangle(0.2f, 0.3f, 0.6f, 0.1f);  // Horizontal line
-    path.addRectangle(0.3f, 0.1f, 0.4f, 0.1f);  // Top part
-    path.addRectangle(0.35f, 0.5f, 0.1f, 0.4f); // Left tine
-    path.addRectangle(0.45f, 0.5f, 0.1f, 0.4f); // Middle tine
-    path.addRectangle(0.55f, 0.5f, 0.1f, 0.4f); // Right tine
-    return path;
-}
-
-juce::Path AnimatorMainView::ToolbarComponent::createZoomInIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0)
-    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f); // Magnifying glass
-    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f); // Handle
-    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f); // Horizontal plus
-    path.addLineSegment({0.5f, 0.2f, 0.5f, 0.5f}, 0.1f); // Vertical plus
-    return path;
-}
-
-juce::Path AnimatorMainView::ToolbarComponent::createZoomOutIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0)
-    path.addEllipse(0.1f, 0.1f, 0.5f, 0.5f); // Magnifying glass
-    path.addLineSegment({0.5f, 0.35f, 0.8f, 0.65f}, 0.1f); // Handle
-    path.addLineSegment({0.35f, 0.35f, 0.65f, 0.35f}, 0.1f); // Horizontal minus
-    return path;
-}
-
-juce::Path AnimatorMainView::ToolbarComponent::createResetZoomIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0)
-    path.addRectangle(0.3f, 0.6f, 0.4f, 0.4f); // Base
-    path.addTriangle({0.1f, 0.6f}, {0.5f, 0.2f}, {0.9f, 0.6f}); // Arrow
-    return path;
-}
-
-juce::Path AnimatorMainView::ToolbarComponent::createAutoFollowIcon()
-{
-    juce::Path path;
-    // Use relative coordinates (0.0 to 1.0)
-    path.addRectangle(0.45f, 0.1f, 0.1f, 0.8f); // Playhead
-    path.addTriangle({0.2f, 0.3f}, {0.4f, 0.5f}, {0.2f, 0.7f}); // Left follow indicator
-    path.addTriangle({0.6f, 0.3f}, {0.8f, 0.5f}, {0.6f, 0.7f}); // Right follow indicator
-    return path;
-}

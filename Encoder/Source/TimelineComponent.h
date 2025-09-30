@@ -158,11 +158,17 @@ private:
     juce::Colour getClipColour(const Clip& clip) const;
     juce::String getClipDisplayName(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip) const;
     juce::String getClipTimeInfo(const Clip& clip) const;
-    juce::Path getClipIcon(bool isMovementClip) const;
     juce::Colour getTimelineColour(int timelineIndex) const;
     juce::Rectangle<float> getIconBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
     juce::Rectangle<float> getButtonBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
     
+    std::unique_ptr<juce::Drawable> movementIcon;
+    std::unique_ptr<juce::Drawable> actionIcon;
+    std::unique_ptr<juce::Drawable> scaledMovementIcon;
+    std::unique_ptr<juce::Drawable> scaledActionIcon;
+    float lastIconSize = 0.0f;
     
+    void updateScaledIcons(float iconSize);
+    void loadIcons();
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

@@ -40,24 +40,16 @@ private:
         void paint(juce::Graphics& g) override;
         void drawButtonIcon(juce::Graphics& g, juce::Button* button, const juce::Path& icon, bool isToggled = false);
         void resized() override;
-        std::unique_ptr<juce::TextButton> autoFollowButton;
         
     private:
         AnimatorMainView& owner;
-        std::unique_ptr<juce::TextButton> addMovementButton;
-        std::unique_ptr<juce::TextButton> addActionButton;
-        std::unique_ptr<juce::TextButton> deleteButton;
-        std::unique_ptr<juce::TextButton> zoomInButton;
-        std::unique_ptr<juce::TextButton> zoomOutButton;
-        std::unique_ptr<juce::TextButton> resetZoomButton;
+        std::unique_ptr<juce::DrawableButton> addMovementButton, addActionButton, deleteButton;
+        std::unique_ptr<juce::DrawableButton> zoomInButton, zoomOutButton, resetZoomButton;
+        std::unique_ptr<juce::DrawableButton> autoFollowButton;
         
-        juce::Path createMovementIcon();
-        juce::Path createActionIcon();
-        juce::Path createDeleteIcon();
-        juce::Path createZoomInIcon();
-        juce::Path createZoomOutIcon();
-        juce::Path createResetZoomIcon();
-        juce::Path createAutoFollowIcon();
+        juce::OwnedArray<juce::Drawable> drawables; // To maintain ownership of drawables
+
+        void loadSVGIcon(juce::DrawableButton* button, const char* svgData, size_t svgDataSize, const juce::String& tooltip);
     };
 
     std::unique_ptr<juce::MenuBarComponent> menuBar;
