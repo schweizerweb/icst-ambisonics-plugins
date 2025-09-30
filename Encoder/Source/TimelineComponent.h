@@ -50,6 +50,20 @@ public:
     
     float getPixelsPerMillisecond() const { return pixelsPerMillisecond; }
     TimelineModel* getCurrentTimeline() const;
+    const juce::Array<SelectedClip>& getSelectedClips() const { return selectedClips; }
+    
+    // Selection methods
+    void selectClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, bool addToSelection = false);
+    void deselectClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
+    void toggleClipSelection(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
+    bool isClipSelected(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip) const;
+    void selectClipsInRectangle(const juce::Rectangle<int>& rect, bool addToSelection = false);
+    void clearSelection();
+    
+    // Clip access helpers
+    const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
+    Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
+    bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
     
 private:
     struct ClipBounds
@@ -140,14 +154,6 @@ private:
     void showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position);
     void timelineSelectionChanged();
     
-    // Selection methods
-    void selectClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, bool addToSelection = false);
-    void deselectClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
-    void toggleClipSelection(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
-    void clearSelection();
-    bool isClipSelected(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip) const;
-    void selectClipsInRectangle(const juce::Rectangle<int>& rect, bool addToSelection = false);
-    
     // Rendering helpers
     juce::Colour getClipColour(const Clip& clip) const;
     juce::String getClipDisplayName(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip) const;
@@ -157,10 +163,6 @@ private:
     juce::Rectangle<float> getIconBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
     juce::Rectangle<float> getButtonBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
     
-    // Clip access helpers
-    const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
-    Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
-    bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

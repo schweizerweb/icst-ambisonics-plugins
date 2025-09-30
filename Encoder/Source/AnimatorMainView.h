@@ -99,5 +99,54 @@ private:
     void selectAllClips();
     void deselectAllClips();
 
+private:
+private:
+    // Helper method to generate unique clip IDs
+    juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId)
+    {
+        juce::String newId = baseId;
+        int counter = 1;
+        
+        // Check if the ID already exists
+        bool idExists;
+        do {
+            idExists = false;
+            for (const auto& clip : existingClips)
+            {
+                if (clip.id == newId)
+                {
+                    idExists = true;
+                    newId = baseId + " (" + juce::String(counter++) + ")";
+                    break;
+                }
+            }
+        } while (idExists);
+        
+        return newId;
+    }
+    
+    juce::String generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId)
+    {
+        juce::String newId = baseId;
+        int counter = 1;
+        
+        // Check if the ID already exists
+        bool idExists;
+        do {
+            idExists = false;
+            for (const auto& clip : existingClips)
+            {
+                if (clip.id == newId)
+                {
+                    idExists = true;
+                    newId = baseId + " (" + juce::String(counter++) + ")";
+                    break;
+                }
+            }
+        } while (idExists);
+        
+        return newId;
+    }
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnimatorMainView)
 };

@@ -357,63 +357,126 @@ void AnimatorMainView::copySelectedClips()
     clipboard.timelineData.clear();
     clipboard.hasData = false;
     
-    // Get selected clips from timeline component
-    // This would need access to TimelineComponent's selected clips
-    // For now, we'll implement a basic version
+    // Get selected clips from timeline component using its existing selection system
+    auto selectedClips = timelineComponent->getSelectedClips();
     
-    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    if (selectedClips.isEmpty())
     {
-        // Create a copy of the current timeline for clipboard
-        auto* timelineCopy = new TimelineModel();
-        
-        // Copy movement clips
-        for (const auto& clip : currentTimeline->movement.clips)
-        {
-            // Only copy if selected (you'd need selection info from TimelineComponent)
-            timelineCopy->movement.clips.add(clip);
-        }
-        
-        // Copy action clips
-        for (const auto& clip : currentTimeline->actions.clips)
-        {
-            // Only copy if selected (you'd need selection info from TimelineComponent)
-            timelineCopy->actions.clips.add(clip);
-        }
-        
-        clipboard.timelineData.add(timelineCopy);
-        clipboard.hasData = true;
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Copy",
+                                              "No clips selected to copy.");
+        return;
     }
+    
+    // Create a temporary timeline to store only the selected clips
+    auto* timelineCopy = new TimelineModel();
+    
+    // Group clips by their original timeline to maintain structure
+    juce::HashMap<int, TimelineModel*> timelineCopies;
+    timelineCopies.set(0, timelineCopy); // Use main timeline copy
+    
+    // Copy selected clips
+    for (const auto& selected : selectedClips)
+    {
+        bool isMovementClip = selected.isMovementClip;
+        auto* originalClip = timelineComponent->getClip(selected.timelineIndex, selected.layerIndex,
+                                                       selected.clipIndex, isMovementClip);
+        if (!originalClip) continue;
+        
+        // Use the main timeline copy for all clips
+        auto* targetTimeline = timelineCopies[0];
+        
+        if (isMovementClip)
+        {
+            MovementClip newClip = *static_cast<const MovementClip*>(originalClip);
+            targetTimeline->movement.clips.add(newClip);
+        }
+        else
+        {
+            ActionClip newClip = *static_cast<const ActionClip*>(originalClip);
+            targetTimeline->actions.clips.add(newClip);
+        }
+    }
+    
+    clipboard.timelineData.add(timelineCopy);
+    clipboard.hasData = true;
 }
 
 void AnimatorMainView::pasteClips()
 {
     if (!clipboard.hasData || clipboard.timelineData.isEmpty())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Paste",
+                                              "Clipboard is empty.");
         return;
+    }
         
     if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
     {
         if (auto* sourceTimeline = clipboard.timelineData.getFirst())
         {
-            // Paste movement clips with time offset
+            // Clear current selection
+            timelineComponent->clearSelection();
+            
+            // Calculate time offset based on playhead position
             ms_t timeOffset = timelineComponent->getPlayheadPosition();
             
+            // Find the earliest clip time in the clipboard to maintain relative timing
+            ms_t earliestTime = std::numeric_limits<ms_t>::max();
+            for (const auto& clip : sourceTimeline->movement.clips)
+                earliestTime = juce::jmin(earliestTime, clip.start);
+            for (const auto& clip : sourceTimeline->actions.clips)
+                earliestTime = juce::jmin(earliestTime, clip.start);
+            
+            if (earliestTime == std::numeric_limits<ms_t>::max())
+                earliestTime = 0;
+            
+            // Paste movement clips with time offset
             for (const auto& clip : sourceTimeline->movement.clips)
             {
                 MovementClip newClip = clip;
-                newClip.start += timeOffset;
+                newClip.start = timeOffset + (clip.start - earliestTime);
+                
+                // Generate unique ID to avoid conflicts
+                newClip.id = generateUniqueClipId(currentTimeline->movement.clips, clip.id);
+                
+                int newClipIndex = currentTimeline->movement.clips.size();
                 currentTimeline->movement.clips.add(newClip);
+                
+                // Select the newly pasted clip
+                timelineComponent->selectClip(timelineComponent->getCurrentTimelineIndex(),
+                                             0, newClipIndex, true, true);
             }
             
             // Paste action clips with time offset
             for (const auto& clip : sourceTimeline->actions.clips)
             {
                 ActionClip newClip = clip;
-                newClip.start += timeOffset;
+                newClip.start = timeOffset + (clip.start - earliestTime);
+                
+                // Generate unique ID to avoid conflicts
+                newClip.id = generateUniqueClipId(currentTimeline->actions.clips, clip.id);
+                
+                int newClipIndex = currentTimeline->actions.clips.size();
                 currentTimeline->actions.clips.add(newClip);
+                
+                // Select the newly pasted clip
+                timelineComponent->selectClip(timelineComponent->getCurrentTimelineIndex(),
+                                             1, newClipIndex, false, true);
             }
             
             timelineComponent->repaint();
+            
+            // Optional: Provide feedback
+            int totalClips = sourceTimeline->movement.clips.size() + sourceTimeline->actions.clips.size();
         }
+    }
+    else
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Paste Error",
+                                              "No active timeline to paste into.");
     }
 }
 
