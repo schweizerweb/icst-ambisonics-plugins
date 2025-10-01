@@ -29,7 +29,6 @@
 #include "../../Common/EditableCodeCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
-#include "../../Common/CommonImages.h"
 
 #define COLUMN_ID_ENABLE		201
 #define COLUMN_ID_INFO        202
@@ -213,9 +212,9 @@ public:
             if (btn == nullptr) {
                 btn = new ImageButton();
                 btn->setImages (false, true, true,
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xaeffffff),
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 0.400f, juce::Colour (0xaeee1010),
-                                juce::ImageCache::getFromMemory (CommonImages::save_png, CommonImages::save_pngSize), 1.000f, juce::Colour (0xffee1010));
+                                juce::ImageCache::getFromMemory (BinaryData::save_png, BinaryData::save_pngSize), 1.000f, juce::Colour (0xaeffffff),
+                                juce::ImageCache::getFromMemory (BinaryData::save_png, BinaryData::save_pngSize), 0.400f, juce::Colour (0xaeee1010),
+                                juce::ImageCache::getFromMemory (BinaryData::save_png, BinaryData::save_pngSize), 1.000f, juce::Colour (0xffee1010));
                 btn->setTooltip("Add to presets...");
                 btn->setName(BUTTON_TYPE_PRESET);
                 btn->addListener(this);
@@ -231,9 +230,9 @@ public:
             {
                 btn = new ImageButton();
                 btn->setImages(false, true, true,
-                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0x6effffff),
-                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                               juce::ImageCache::getFromMemory (CommonImages::info_png, CommonImages::info_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                               juce::ImageCache::getFromMemory (BinaryData::info_png, BinaryData::info_pngSize), 1.000f, juce::Colour (0x6effffff),
+                               juce::ImageCache::getFromMemory (BinaryData::info_png, BinaryData::info_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                               juce::ImageCache::getFromMemory (BinaryData::info_png, BinaryData::info_pngSize), 1.000f, juce::Colour (0xc0ee1010));
                 btn->setName(BUTTON_TYPE_INFO);
                 btn->addListener(this);
             }

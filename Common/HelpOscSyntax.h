@@ -52,11 +52,6 @@ public:
     void broughtToFront() override;
     void mouseUp (const juce::MouseEvent& e) override;
 
-    // Binary resources:
-    static const char* osc_syntax_xml;
-    static const int osc_syntax_xmlSize;
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     std::unique_ptr<XmlElement> treeXml;

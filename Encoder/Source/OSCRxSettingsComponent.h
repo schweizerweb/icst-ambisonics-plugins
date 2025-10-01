@@ -61,13 +61,6 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-    // Binary resources:
-    static const char* help_png;
-    static const int help_pngSize;
-    static const char* save_png;
-    static const int save_pngSize;
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     void controlDimming();

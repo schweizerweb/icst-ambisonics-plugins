@@ -7,9 +7,20 @@ SET(BIN_FILES
 	../../Resources/svg/reset_zoom_icon.svg
 	../../Resources/svg/auto_follow_icon.svg
 	../../Resources/svg/animator_icon.svg
+	
 	../../Resources/png/animator_icon.png
 	../../Resources/png/settings.png
 	../../Resources/png/help.png
+	../../Resources/png/info.png
+	../../Resources/png/save.png
+	../../Resources/png/objects_group.png
+	../../Resources/png/objects_ungroup.png
+	../../Resources/png/trash_bin.png	
+	../../Resources/png/flat_arrow_up.png
+	../../Resources/png/flat_arrow_down.png
+
+	../../Resources/xml/osc_syntax.xml
+	../../Resources/xml/radar_documentation.xml
 )
 
 SET(SRC_FILES
@@ -134,8 +145,6 @@ SET(SRC_FILES
 	../../Common/ColorDefinition.h
 	../../Common/ColorEditorCustomComponent.h
 	../../Common/ColorSelectionComponent.h
-	../../Common/CommonImages.cpp
-	../../Common/CommonImages.h
 	../../Common/Constants.cpp
 	../../Common/Constants.h
 	../../Common/CsvImportExport.h

@@ -49,11 +49,6 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
 
-    // Binary resources:
-    static const char* radar_documentation_xml;
-    static const int radar_documentation_xmlSize;
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     std::unique_ptr<XmlElement> treeXml;

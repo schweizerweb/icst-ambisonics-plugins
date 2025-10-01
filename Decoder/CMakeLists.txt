@@ -87,8 +87,6 @@ target_sources(AmbiDecoder
 	../Common/ColorDefinition.h
 	../Common/ColorEditorCustomComponent.h
 	../Common/ColorSelectionComponent.h
-	../Common/CommonImages.cpp
-	../Common/CommonImages.h
 	../Common/Constants.cpp
 	../Common/Constants.h
 	../Common/CsvImportExport.h
@@ -183,6 +181,24 @@ target_sources(AmbiDecoder
 	../Common/ZoomSettings.h
 	)
 
+juce_add_binary_data(AmbiDecoder_BinResources
+    SOURCES
+	../Resources/png/animator_icon.png
+	../Resources/png/settings.png
+	../Resources/png/help.png
+	../Resources/png/info.png
+	../Resources/png/save.png	
+	../Resources/png/objects_group.png
+	../Resources/png/objects_ungroup.png
+	../Resources/png/trash_bin.png
+	../Resources/png/speaker.png
+	../Resources/png/flat_arrow_up.png
+	../Resources/png/flat_arrow_down.png
+
+	../Resources/xml/osc_syntax.xml
+	../Resources/xml/radar_documentation.xml
+)
+
 target_compile_definitions(AmbiDecoder
     PUBLIC
         # JUCE_WEB_BROWSER and JUCE_USE_CURL would be on by default, but you might not need them.
@@ -194,7 +210,7 @@ target_compile_definitions(AmbiDecoder
 		)
 
 target_link_libraries(AmbiDecoder
-    ${COMMON_LINK_LIBRARIES}
+    ${COMMON_LINK_LIBRARIES} PRIVATE AmbiDecoder_BinResources
     )
 
 set_target_properties(AmbiDecoder

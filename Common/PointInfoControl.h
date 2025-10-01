@@ -63,19 +63,6 @@ public:
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
-    // Binary resources:
-    static const char* group_png;
-    static const int group_pngSize;
-    static const char* ungroup_png;
-    static const int ungroup_pngSize;
-    static const char* groupobjectsicon_png;
-    static const int groupobjectsicon_pngSize;
-    static const char* ungroupobjectsicon_png;
-    static const int ungroupobjectsicon_pngSize;
-    static const char* trashbinicon_png;
-    static const int trashbinicon_pngSize;
-
-
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiDataSet* pEditablePoints;
