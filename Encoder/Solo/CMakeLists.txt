@@ -14,6 +14,11 @@ juce_add_plugin(AmbiEncoderSolo
 
 juce_generate_juce_header(AmbiEncoderSolo)
 
+juce_add_binary_data(AmbiEncoderSolo_BinResources
+    SOURCES
+    	${BIN_FILES}
+)
+
 target_sources(AmbiEncoderSolo
     PRIVATE
 	${SRC_FILES}
@@ -30,7 +35,7 @@ target_compile_definitions(AmbiEncoderSolo
 	)
 
 target_link_libraries(AmbiEncoderSolo
-    ${COMMON_LINK_LIBRARIES}
+    ${COMMON_LINK_LIBRARIES} PRIVATE AmbiEncoderSolo_BinResources
     )
     
 set_target_properties( AmbiEncoderSolo

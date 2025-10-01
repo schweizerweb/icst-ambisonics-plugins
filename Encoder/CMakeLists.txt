@@ -1,3 +1,17 @@
+SET(BIN_FILES
+	../../Resources/svg/movement_icon.svg
+	../../Resources/svg/action_icon.svg
+	../../Resources/svg/delete_icon.svg
+	../../Resources/svg/zoom_in_icon.svg
+	../../Resources/svg/zoom_out_icon.svg
+	../../Resources/svg/reset_zoom_icon.svg
+	../../Resources/svg/auto_follow_icon.svg
+	../../Resources/svg/animator_icon.svg
+	../../Resources/png/animator_icon.png
+	../../Resources/png/settings.png
+	../../Resources/png/help.png
+)
+
 SET(SRC_FILES
 	../Source/AirAbsorbtionFilter.cpp
 	../Source/AirAbsorbtionFilter.h

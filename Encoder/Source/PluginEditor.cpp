@@ -80,9 +80,9 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     btnHelp->addListener (this);
 
     btnHelp->setImages (false, true, true,
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0x00000000),
+                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 0.400f, juce::Colour (0x6eee1010),
+                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     btnHelp->setBounds (32, 4, 24, 24);
 
 
@@ -92,9 +92,9 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     btnAnimator->addListener (this);
 
     btnAnimator->setImages (false, true, true,
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0x00000000),
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                        juce::ImageCache::getFromMemory (help_png, help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0x00000000),
+        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 0.400f, juce::Colour (0x6eee1010),
+        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     btnAnimator->setBounds (64, 4, 24, 24);
 
 

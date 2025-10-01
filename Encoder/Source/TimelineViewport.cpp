@@ -26,9 +26,6 @@ void TimelineViewport::updateContentSize()
 {
     if (timelineComponent)
     {
-        const int viewportWidth = getWidth();
-        const int viewportHeight = getHeight();
-        
         // Calculate required content size
         const int contentWidth = getMaximumVisibleWidth();
         const int contentHeight = timelineComponent->calculateTotalContentHeight();

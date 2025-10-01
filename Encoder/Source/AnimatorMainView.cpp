@@ -94,8 +94,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                     importSubMenu.addSeparator();
                     for (int i = 0; i < owner->timelines->size(); ++i)
                     {
-                        auto* timeline = owner->timelines->getUnchecked(i);
-                        juce::String timelineName = "Timeline " + juce::String(i + 1);
+                        juce::String timelineName = "Group " + juce::String(i + 1);
                             
                         importSubMenu.addItem(101 + i, "Overwrite " + timelineName);
                     }
@@ -108,7 +107,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 {
                     for (int i = 0; i < owner->timelines->size(); ++i)
                     {
-                        auto* timeline = owner->timelines->getUnchecked(i);
                         juce::String timelineName = "Group " + juce::String(i + 1);
                             
                         exportSubMenu.addItem(200 + i, timelineName);
@@ -156,7 +154,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
     return menu;
 }
 
-void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int topLevelMenuIndex)
+void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int /*topLevelMenuIndex*/)
 {
     if (owner != nullptr)
         owner->handleMenuAction(menuItemID);

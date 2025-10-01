@@ -915,7 +915,7 @@ juce::Array<TimelineComponent::ClipBounds> TimelineComponent::findAllClipsAtPosi
     return clipsAtPos;
 }
 
-TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& position) const
+TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& /*position*/) const
 {
     if (clips.size() == 1)
         return clips.getFirst();
@@ -1050,7 +1050,7 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
     return result;
 }
 
-void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position)
+void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
 {
     juce::PopupMenu menu;
     
