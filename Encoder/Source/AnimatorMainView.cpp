@@ -532,20 +532,17 @@ void AnimatorMainView::deleteSelectedClips()
 
 void AnimatorMainView::zoomIn()
 {
-    zoomLevel = juce::jmin(MAX_ZOOM, zoomLevel * ZOOM_STEP);
-    updateTimelineZoom();
+    timelineViewport->getTimelineComponent()->zoom(ZOOM_STEP);
 }
 
 void AnimatorMainView::zoomOut()
 {
-    zoomLevel = juce::jmax(MIN_ZOOM, zoomLevel / ZOOM_STEP);
-    updateTimelineZoom();
+    timelineViewport->getTimelineComponent()->zoom(1.0f/ZOOM_STEP);
 }
 
 void AnimatorMainView::resetZoom()
 {
-    zoomLevel = DEFAULT_ZOOM;
-    updateTimelineZoom();
+    timelineViewport->getTimelineComponent()->zoom(TimelineComponent::ZOOM_RESET);
 }
 
 void AnimatorMainView::toggleAutoFollow()
@@ -560,15 +557,6 @@ void AnimatorMainView::toggleAutoFollow()
     //}
     
     toolbar->repaint();
-}
-
-void AnimatorMainView::updateTimelineZoom()
-{
-    // Convert zoom level to pixels per millisecond
-    float basePixelsPerMs = 0.1f;
-    float pixelsPerMs = basePixelsPerMs * zoomLevel;
-    
-    timelineViewport->getTimelineComponent()->setPixelsPerMillisecond(pixelsPerMs);
 }
 
 // ToolbarComponent implementation

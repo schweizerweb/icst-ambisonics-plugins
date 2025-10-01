@@ -64,11 +64,7 @@ private:
     ClipboardData clipboard;
 
     // Zoom state
-    float zoomLevel = 1.0f;
-    static constexpr float MIN_ZOOM = 0.1f;
-    static constexpr float MAX_ZOOM = 10.0f;
     static constexpr float ZOOM_STEP = 1.2f;
-    static constexpr float DEFAULT_ZOOM = 1.0f;
 
     void handleMenuAction(int menuItemID);
     void addMovementClip();
@@ -78,7 +74,6 @@ private:
     void zoomOut();
     void resetZoom();
     void toggleAutoFollow();
-    void updateTimelineZoom();
     
     // Import/Export
     void importScene(int timelineIndex);

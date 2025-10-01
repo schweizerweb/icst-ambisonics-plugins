@@ -3,6 +3,7 @@
 #include "JuceHeader.h"
 #include "TimelineModel.h"
 #include "TimelineTypes.h"
+#include <cmath>
 
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
@@ -42,14 +43,28 @@ public:
     void nudgeSelectedClips(ms_t nudgeAmount);
     
     ms_t getPlayheadPosition() const { return playheadPosition; }
-    void setPixelsPerMillisecond(float newPixelsPerMs)
+    ms_t maxDuration = 60000;
+    
+    // zoom
+    static constexpr float ZOOM_RESET = 0.0f;
+    static constexpr float ZOOM_MAX = 10.0f; // pixel per ms
+    
+    void zoom(float zoomFactor)
     {
-        pixelsPerMillisecond = newPixelsPerMs;
+        if(approximatelyEqual(zoomFactor, ZOOM_RESET))
+        {
+            pixelsPerMillisecond = DEFAULT_PIXELS_PER_MS;
+        }
+        else
+        {
+            float zoomMin = getWidth() / maxDuration;
+            pixelsPerMillisecond = juce::jlimit(zoomMin, ZOOM_MAX, pixelsPerMillisecond * zoomFactor);
+        }
+        
         updateScrollBars();
         repaint();
     }
     
-    float getPixelsPerMillisecond() const { return pixelsPerMillisecond; }
     TimelineModel* getCurrentTimeline() const;
     const juce::Array<SelectedClip>& getSelectedClips() const { return selectedClips; }
     
@@ -138,12 +153,13 @@ private:
     static constexpr ms_t NUDGE_SMALL_MS = 10;    // 10ms nudge
     static constexpr ms_t NUDGE_MEDIUM_MS = 100;  // 100ms nudge
     static constexpr ms_t NUDGE_LARGE_MS = 1000;  // 1 second nudge
+    static constexpr float DEFAULT_PIXELS_PER_MS = 0.1f;
     
     // View state
     ms_t visibleStartTime = 0;
     ms_t visibleEndTime = 10000;
-    float pixelsPerMillisecond = 0.1f;
-    
+    float pixelsPerMillisecond = DEFAULT_PIXELS_PER_MS;
+   
     juce::Array<ClipBounds> visibleClips;
     
     // Update methods
@@ -172,5 +188,17 @@ private:
     
     void updateScaledIcons(float iconSize);
     void loadIcons();
+    
+    // Bitmap cache for header time markers
+    std::unique_ptr<juce::Image> headerCache;
+    ms_t cachedHeaderVisibleStartTime = 0;
+    ms_t cachedHeaderVisibleEndTime = 0;
+    float cachedHeaderPixelsPerMillisecond = 0.0f;
+    int cachedHeaderWidth = 0;
+    int cachedHeaderHeight = 0;
+    
+    void renderHeaderToCache();
+    void drawHeader(juce::Graphics& g);
+    
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

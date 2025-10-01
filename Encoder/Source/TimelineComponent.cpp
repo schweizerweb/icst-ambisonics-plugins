@@ -62,6 +62,31 @@ void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelin
         }
     }
     
+    maxDuration = 60000;
+    // Find the latest clip end time across all timelines
+    if (timelines != nullptr)
+    {
+        for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+        {
+            auto* timeline = timelines->getUnchecked(timelineIndex);
+            if (timeline == nullptr) continue;
+            
+            // Check movement clips (layer 0)
+            for (int clipIndex = 0; clipIndex < timeline->movement.clips.size(); ++clipIndex)
+            {
+                const auto& clip = timeline->movement.clips.getReference(clipIndex);
+                maxDuration = juce::jmax(maxDuration, clip.end());
+            }
+            
+            // Check action clips (layer 1)
+            for (int clipIndex = 0; clipIndex < timeline->actions.clips.size(); ++clipIndex)
+            {
+                const auto& clip = timeline->actions.clips.getReference(clipIndex);
+                maxDuration = juce::jmax(maxDuration, clip.end());
+            }
+        }
+    }
+
     // Auto-resize based on content
     const float totalHeight = calculateTotalContentHeight();
     setSize(getWidth(), static_cast<int>(totalHeight));
@@ -83,11 +108,17 @@ void TimelineComponent::setCurrentTimeline(int index)
 void TimelineComponent::setPlayheadPosition(ms_t timeMs)
 {
     playheadPosition = timeMs;
-    
-    if (autoFollow && playheadPosition > visibleEndTime - 2000)
+    if (playheadPosition > maxDuration)
     {
-        visibleStartTime = playheadPosition - 5000;
-        visibleEndTime = (ms_t)(visibleStartTime + (getWidth() - trackHeaderWidth) / pixelsPerMillisecond);
+        // Round up to the next multiple of 10000
+        maxDuration = ((playheadPosition + 9999) / 10000) * 10000;
+    }
+    
+    auto visibleTime = visibleEndTime - visibleStartTime;
+    if (autoFollow && playheadPosition > (visibleEndTime - 0.2 * visibleTime))
+    {
+        visibleStartTime = playheadPosition - visibleTime * 0.2;
+        visibleEndTime = (ms_t)(visibleStartTime + visibleTime);
         updateScrollBars();
     }
     
@@ -157,32 +188,8 @@ void TimelineComponent::paint(juce::Graphics& g)
     g.setColour(juce::Colour(0xff333337));
     g.fillRect(0.0f, headerHeight, trackHeaderWidth, totalHeight - headerHeight);
     
-    // Draw time markers
-    g.setColour(juce::Colours::lightgrey.withAlpha(0.3f));
-    g.setFont(juce::FontOptions(12.0f));
-    
-    const ms_t timeStep = 1000;
-    ms_t currentTime = (visibleStartTime / timeStep) * timeStep;
-    
-    while (currentTime <= visibleEndTime)
-    {
-        const float x = timeToX(currentTime);
-        if (x >= timelineX && x <= totalWidth)
-        {
-            g.drawVerticalLine(static_cast<int>(x), headerHeight, totalHeight);
-            
-            juce::String timeText;
-            if (currentTime < 60000)
-                timeText = juce::String(currentTime) + "ms";
-            else
-                timeText = juce::String(currentTime / 1000.0, 1) + "s";
-            
-            g.drawText(timeText,
-                      static_cast<int>(x) + 2, 2, 60, (int)(headerHeight - 4),
-                      juce::Justification::left);
-        }
-        currentTime += timeStep;
-    }
+    // Draw time markers (using bitmap cache)
+    drawHeader(g);
     
     // Draw timelines
     updateVisibleClips();
@@ -562,10 +569,7 @@ void TimelineComponent::mouseWheelMove(const juce::MouseEvent& event, const juce
 {
     if (event.mods.isAltDown())
     {
-        const float zoomFactor = wheel.deltaY > 0 ? 1.1f : 0.9f;
-        pixelsPerMillisecond = juce::jlimit(0.01f, 1.0f, pixelsPerMillisecond * zoomFactor);
-        updateScrollBars();
-        repaint();
+        zoom(wheel.deltaY > 0 ? 1.05f : (1.0f/1.05f));
     }
     else
     {
@@ -772,7 +776,6 @@ void TimelineComponent::updateScrollBars()
     }
     
     // HORIZONTAL SCROLLBAR (keep your existing logic)
-    ms_t maxDuration = 60000;
     for (int i = 0; i < timelines->size(); ++i)
     {
         if (auto* timeline = timelines->getUnchecked(i))
@@ -801,7 +804,7 @@ void TimelineComponent::updateScrollBars()
     {
         horizontalScrollBar->setRangeLimits(0, maxDuration);
         horizontalScrollBar->setCurrentRange(visibleStartTime, visibleWidthMs);
-        horizontalScrollBar->setSingleStepSize(1000);
+        horizontalScrollBar->setSingleStepSize((visibleWidthMs - visibleStartTime)*0.02);
     }
 }
 
@@ -836,15 +839,27 @@ void TimelineComponent::updateVisibleClips()
                 bounds.clipIndex = clipIndex;
                 bounds.isMovementClip = isMovementClip;
                 
-                const float x = timeToX(clip->start);
-                const float width = clip->length * pixelsPerMillisecond;
+                // Calculate the visible portion of the clip
+                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+                
+                // Ensure we have at least some visible portion
+                if (visibleClipLength <= 0)
+                    continue;
+                
+                const float x = timeToX(visibleClipStart);
+                const float width = visibleClipLength * pixelsPerMillisecond;
                 const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
                 const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
                 
+                // Ensure minimum width for visibility and interaction
                 bounds.bounds = juce::Rectangle<float>(x, clipY, juce::jmax(10.0f, width), clipHeight);
                 
                 // Check if resize handles would be visible
+                // Only show left resize handle if the actual clip start is visible
                 bounds.isResizeLeft = (clip->start >= visibleStartTime);
+                // Only show right resize handle if the actual clip end is visible
                 bounds.isResizeRight = (clip->end() <= visibleEndTime);
                 
                 // Only add if clip is vertically visible
@@ -1261,4 +1276,214 @@ int TimelineComponent::calculateTotalContentHeight() const
     }
     
     return static_cast<int>(totalHeight);
+}
+
+void TimelineComponent::renderHeaderToCache()
+{
+    const int headerAreaHeight = static_cast<int>(headerHeight);
+    
+    // Check if cache is still valid
+    if (headerCache &&
+        cachedHeaderVisibleStartTime == visibleStartTime &&
+        cachedHeaderVisibleEndTime == visibleEndTime &&
+        cachedHeaderPixelsPerMillisecond == pixelsPerMillisecond &&
+        cachedHeaderWidth == getWidth() &&
+        cachedHeaderHeight == headerAreaHeight)
+    {
+        return; // Cache is still valid
+    }
+    
+    // Update cache dimensions
+    cachedHeaderVisibleStartTime = visibleStartTime;
+    cachedHeaderVisibleEndTime = visibleEndTime;
+    cachedHeaderPixelsPerMillisecond = pixelsPerMillisecond;
+    cachedHeaderWidth = getWidth();
+    cachedHeaderHeight = headerAreaHeight;
+    
+    // Create or update the cache image
+    if (!headerCache || headerCache->getWidth() != cachedHeaderWidth || headerCache->getHeight() != cachedHeaderHeight)
+    {
+        headerCache = std::make_unique<juce::Image>(juce::Image::ARGB, cachedHeaderWidth, cachedHeaderHeight, true);
+    }
+    
+    // Clear the cache with header background color
+    juce::Graphics g(*headerCache);
+    g.fillAll(juce::Colour(0xff252526)); // Header background color
+    
+    const float totalWidth = static_cast<float>(cachedHeaderWidth);
+    const float timelineX = trackHeaderWidth;
+    
+    // Calculate visible duration
+    const float visibleDuration = visibleEndTime - visibleStartTime;
+    
+    // Determine if we should use milliseconds or seconds
+    const bool useMilliseconds = visibleDuration < 2000; // Switch to ms when full span < 2s
+    
+    // Calculate optimal time step to get approximately 7-8 labels
+    const float targetNumberOfLabels = 7.5f; // Increased for more labels
+    float baseTimeStep = visibleDuration / targetNumberOfLabels;
+    
+    // Round to a nice human-readable time step
+    ms_t timeStep;
+    if (useMilliseconds) {
+        // Millisecond steps for short durations
+        if (baseTimeStep <= 50) {
+            timeStep = 50; // 50ms steps
+        } else if (baseTimeStep <= 100) {
+            timeStep = 100; // 100ms steps
+        } else if (baseTimeStep <= 200) {
+            timeStep = 200; // 200ms steps
+        } else if (baseTimeStep <= 250) {
+            timeStep = 250; // 250ms steps
+        } else if (baseTimeStep <= 500) {
+            timeStep = 500; // 500ms steps
+        } else {
+            timeStep = 1000; // 1 second steps
+        }
+    } else {
+        // Second steps for longer durations
+        if (baseTimeStep <= 500) {
+            timeStep = 500; // 0.5 second steps
+        } else if (baseTimeStep <= 1000) {
+            timeStep = 1000; // 1 second steps
+        } else if (baseTimeStep <= 2000) {
+            timeStep = 2000; // 2 second steps
+        } else if (baseTimeStep <= 5000) {
+            timeStep = 5000; // 5 second steps
+        } else if (baseTimeStep <= 10000) {
+            timeStep = 10000; // 10 second steps
+        } else {
+            timeStep = 15000; // 15 second steps (instead of 30s)
+        }
+    }
+    
+    // Draw minor ticks in header (smaller marks between the main marks)
+    ms_t minorTimeStep = timeStep / (useMilliseconds ? 2 : 4);
+    ms_t currentMinorTime = (visibleStartTime / minorTimeStep) * minorTimeStep;
+    
+    g.setColour(juce::Colours::lightgrey.withAlpha(0.2f));
+    while (currentMinorTime <= visibleEndTime) {
+        // Skip positions that would have major ticks
+        if (currentMinorTime % timeStep != 0) {
+            const float x = timeToX(currentMinorTime);
+            if (x >= timelineX && x <= totalWidth) {
+                // Draw minor tick in header only (shorter line)
+                g.drawVerticalLine(static_cast<int>(x), headerHeight - 8, headerHeight);
+            }
+        }
+        currentMinorTime += minorTimeStep;
+    }
+    
+    // Draw major ticks with labels
+    ms_t currentTime = (visibleStartTime / timeStep) * timeStep;
+    
+    g.setColour(juce::Colours::lightgrey.withAlpha(0.3f));
+    g.setFont(juce::FontOptions(12.0f));
+    
+    while (currentTime <= visibleEndTime) {
+        const float x = timeToX(currentTime);
+        if (x >= timelineX && x <= totalWidth) {
+            // Draw major tick line in header only
+            g.drawVerticalLine(static_cast<int>(x), 0, headerHeight);
+            
+            // Format time text
+            juce::String timeText;
+            if (useMilliseconds) {
+                // Always show milliseconds when full span < 2s
+                timeText = juce::String(currentTime) + "ms";
+            } else {
+                // Show seconds for longer durations
+                double seconds = currentTime / 1000.0;
+                
+                if (timeStep >= 2000 || seconds >= 5) {
+                    // For 2s+ steps or times >= 5s, show integer seconds
+                    timeText = juce::String(static_cast<int>(seconds)) + "s";
+                } else {
+                    // For smaller steps and times < 5s, show one decimal
+                    timeText = juce::String(seconds, 1) + "s";
+                    // Remove trailing .0 but keep .1, .2, etc.
+                    if (timeText.endsWith(".0s")) {
+                        timeText = juce::String(static_cast<int>(seconds)) + "s";
+                    }
+                }
+            }
+            
+            // Draw time text
+            g.setColour(juce::Colours::lightgrey);
+            g.drawText(timeText,
+                      static_cast<int>(x) + 2, 2, 60, (int)(headerHeight - 4),
+                      juce::Justification::left);
+        }
+        currentTime += timeStep;
+    }
+}
+
+void TimelineComponent::drawHeader(juce::Graphics& g)
+{
+    // Update cache if needed
+    renderHeaderToCache();
+    
+    // Draw the cached header
+    if (headerCache)
+    {
+        g.drawImageAt(*headerCache, 0, 0);
+    }
+    
+    // Draw major lines through entire timeline (always painted fresh)
+    const float totalWidth = static_cast<float>(getWidth());
+    const float totalHeight = static_cast<float>(getHeight());
+    const float timelineX = trackHeaderWidth;
+    
+    // Calculate visible duration
+    const float visibleDuration = visibleEndTime - visibleStartTime;
+    
+    // Use the same logic as header cache to determine time step
+    const bool useMilliseconds = visibleDuration < 2000;
+    const float targetNumberOfLabels = 7.5f; // Match the cache
+    float baseTimeStep = visibleDuration / targetNumberOfLabels;
+    
+    // Round to the same human-readable time step
+    ms_t timeStep;
+    if (useMilliseconds) {
+        if (baseTimeStep <= 50) {
+            timeStep = 50;
+        } else if (baseTimeStep <= 100) {
+            timeStep = 100;
+        } else if (baseTimeStep <= 200) {
+            timeStep = 200;
+        } else if (baseTimeStep <= 250) {
+            timeStep = 250;
+        } else if (baseTimeStep <= 500) {
+            timeStep = 500;
+        } else {
+            timeStep = 1000;
+        }
+    } else {
+        if (baseTimeStep <= 500) {
+            timeStep = 500;
+        } else if (baseTimeStep <= 1000) {
+            timeStep = 1000;
+        } else if (baseTimeStep <= 2000) {
+            timeStep = 2000;
+        } else if (baseTimeStep <= 5000) {
+            timeStep = 5000;
+        } else if (baseTimeStep <= 10000) {
+            timeStep = 10000;
+        } else {
+            timeStep = 15000;
+        }
+    }
+    
+    // Draw major lines through entire timeline
+    g.setColour(juce::Colours::lightgrey.withAlpha(0.3f));
+    ms_t currentTime = (visibleStartTime / timeStep) * timeStep;
+    
+    while (currentTime <= visibleEndTime) {
+        const float x = timeToX(currentTime);
+        if (x >= timelineX && x <= totalWidth) {
+            // Draw major line through entire height (below header)
+            g.drawVerticalLine(static_cast<int>(x), headerHeight, totalHeight);
+        }
+        currentTime += timeStep;
+    }
 }
