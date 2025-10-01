@@ -74,6 +74,8 @@ SET(SRC_FILES
 	../Source/TimelineModel.h
 	../Source/TimelineComponent.h
 	../Source/TimelineComponent.cpp
+	../Source/TimelineViewport.h
+	../Source/TimelineViewport.cpp
 	../Source/TimelineWidgetMS.h
 	../Source/TimelineWidgetMS.cpp
 	../Source/UserDefinedParameter.cpp

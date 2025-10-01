@@ -5,18 +5,15 @@ TimelineComponent::TimelineComponent()
     loadIcons(); // Load the SVG icons
     
     horizontalScrollBar = std::make_unique<juce::ScrollBar>(true);
-    verticalScrollBar = std::make_unique<juce::ScrollBar>(false);
     timelineSelector = std::make_unique<juce::ComboBox>();
     tempButton = std::make_unique<juce::TextButton>();
     
     horizontalScrollBar->addListener(this);
-    verticalScrollBar->addListener(this);
     
     timelineSelector->addListener(this);
     timelineSelector->setTextWhenNoChoicesAvailable("No Timelines");
     
     addAndMakeVisible(horizontalScrollBar.get());
-    addAndMakeVisible(verticalScrollBar.get());
     addAndMakeVisible(timelineSelector.get());
     //addAndMakeVisible(tempButton.get());
     
@@ -33,11 +30,9 @@ TimelineComponent::TimelineComponent()
     };
     
     setScrollbarColors(horizontalScrollBar.get());
-    setScrollbarColors(verticalScrollBar.get());
     
     // Make scrollbars always visible for testing
     horizontalScrollBar->setAlwaysOnTop(true);
-    verticalScrollBar->setAlwaysOnTop(true);
     
     setWantsKeyboardFocus(true);
     setFocusContainerType(FocusContainerType::keyboardFocusContainer);
@@ -46,7 +41,6 @@ TimelineComponent::TimelineComponent()
 TimelineComponent::~TimelineComponent()
 {
     horizontalScrollBar->removeListener(this);
-    verticalScrollBar->removeListener(this);
     timelineSelector->removeListener(this);
 }
 
@@ -67,6 +61,10 @@ void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelin
             timelineSelector->setSelectedId(1, juce::sendNotificationSync);
         }
     }
+    
+    // Auto-resize based on content
+    const float totalHeight = calculateTotalContentHeight();
+    setSize(getWidth(), static_cast<int>(totalHeight));
     
     updateScrollBars();
     repaint();
@@ -108,11 +106,6 @@ void TimelineComponent::scrollBarMoved(juce::ScrollBar* scrollBar, double newRan
         visibleStartTime = static_cast<ms_t>(newRangeStart);
         visibleEndTime = (ms_t)(visibleStartTime + (getWidth() - trackHeaderWidth) / pixelsPerMillisecond);
     }
-    else if (scrollBar == verticalScrollBar.get())
-    {
-        // Handle vertical scrolling - you'll need to track vertical offset
-        verticalScrollOffset = static_cast<float>(newRangeStart);
-    }
     
     repaint();
 }
@@ -141,10 +134,8 @@ void TimelineComponent::paint(juce::Graphics& g)
     auto contentArea = getLocalBounds();
     if (horizontalScrollBar->isVisible())
         contentArea.removeFromBottom(horizontalScrollBar->getHeight());
-    if (verticalScrollBar->isVisible())
-        contentArea.removeFromRight(verticalScrollBar->getWidth());
     
-    // Only fill the content area, not the scrollbar areas
+    // Only fill the content area, not the scrollbar area
     g.setColour(juce::Colour(0xff2d2d30));
     g.fillRect(contentArea);
     
@@ -202,7 +193,7 @@ void TimelineComponent::paint(juce::Graphics& g)
         if (timeline == nullptr) continue;
         
         // Apply vertical scroll offset to Y position
-        const float timelineY = timelineIndexToY(timelineIndex) - verticalScrollOffset;
+        const float timelineY = timelineIndexToY(timelineIndex);
         
         // Only draw if this timeline is visible (within viewport)
         if (timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight < 0)
@@ -369,16 +360,13 @@ void TimelineComponent::paint(juce::Graphics& g)
 
 void TimelineComponent::resized()
 {
-    const int scrollBarSize = 16;
     const auto totalWidth = getWidth();
     const auto totalHeight = getHeight();
     
-    // Timeline selector at top left
     timelineSelector->setBounds(10, 5, 150, 24);
     
     horizontalScrollBar->setBounds(0, totalHeight - scrollBarSize, totalWidth, scrollBarSize);
-    verticalScrollBar->setBounds(totalWidth - scrollBarSize, 0, scrollBarSize, totalHeight);
-
+    
     tempButton->setBounds(2, 2, 200, 20);
     updateScrollBars();
 }
@@ -780,7 +768,6 @@ void TimelineComponent::updateScrollBars()
     if (timelines == nullptr || timelines->size() == 0)
     {
         horizontalScrollBar->setVisible(false);
-        verticalScrollBar->setVisible(false);
         return;
     }
     
@@ -816,57 +803,6 @@ void TimelineComponent::updateScrollBars()
         horizontalScrollBar->setCurrentRange(visibleStartTime, visibleWidthMs);
         horizontalScrollBar->setSingleStepSize(1000);
     }
-    
-    // VERTICAL SCROLLBAR - FIXED LOGIC
-    float totalContentHeight = headerHeight;
-    for (int i = 0; i < timelines->size(); ++i)
-    {
-        if (auto* timeline = timelines->getUnchecked(i))
-        {
-            totalContentHeight += timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing;
-        }
-    }
-    
-    bool needsVerticalScroll = totalContentHeight > getHeight();
-    verticalScrollBar->setVisible(needsVerticalScroll);
-    
-    if (needsVerticalScroll)
-    {
-        verticalScrollBar->setRangeLimits(0, totalContentHeight);
-        // Current range should be the visible portion, not starting at 0
-        verticalScrollBar->setCurrentRange(verticalScrollBar->getCurrentRangeStart(), getHeight());
-    }
-    
-    //repositionScrollBars();
-}
-
-void TimelineComponent::repositionScrollBars()
-{
-    const int scrollBarSize = 16;
-    const auto totalWidth = getWidth();
-    const auto totalHeight = getHeight();
-    
-    // Calculate available space considering other scrollbar visibility
-    int availableWidth = totalWidth;
-    int availableHeight = totalHeight;
-    
-    if (verticalScrollBar->isVisible())
-        availableWidth -= scrollBarSize;
-    
-    if (horizontalScrollBar->isVisible())
-        availableHeight -= scrollBarSize;
-    
-    // Position horizontal scrollbar
-    if (horizontalScrollBar->isVisible())
-    {
-        horizontalScrollBar->setBounds(0, availableHeight, availableWidth, scrollBarSize);
-    }
-    
-    // Position vertical scrollbar
-    if (verticalScrollBar->isVisible())
-    {
-        verticalScrollBar->setBounds(availableWidth, 0, scrollBarSize, availableHeight);
-    }
 }
 
 void TimelineComponent::updateVisibleClips()
@@ -879,15 +815,8 @@ void TimelineComponent::updateVisibleClips()
         auto* timeline = timelines->getUnchecked(timelineIndex);
         if (timeline == nullptr) continue;
         
-        // Apply vertical scroll offset to timeline position
-        const float timelineY = timelineIndexToY(timelineIndex) - verticalScrollOffset;
+        const float timelineY = timelineIndexToY(timelineIndex);
         
-        // Skip timelines that are completely outside the viewport
-        if (timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight < 0)
-            continue;
-        if (timelineY > getHeight())
-            continue;
-            
         for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
             const int numClips = timeline->getNumClips(layerIndex);
@@ -1306,4 +1235,30 @@ void TimelineComponent::updateScaledIcons(float iconSize)
         scaledActionIcon->setTransformToFit(juce::Rectangle<float>(0, 0, iconSize, iconSize),
                                           juce::RectanglePlacement::centred);
     }
+}
+
+int TimelineComponent::calculateTotalContentHeight() const
+{
+    if (timelines == nullptr || timelines->size() == 0)
+        return static_cast<int>(headerHeight);
+    
+    float totalHeight = headerHeight;
+    for (int i = 0; i < timelines->size(); ++i)
+    {
+        if (auto* timeline = timelines->getUnchecked(i))
+        {
+            totalHeight += timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing;
+        }
+    }
+    
+    // Subtract the last timeline spacing
+    if (timelines->size() > 0)
+        totalHeight -= timelineSpacing;
+    
+    if(horizontalScrollBar->isVisible())
+    {
+        totalHeight += ( scrollBarSize + 4 );
+    }
+    
+    return static_cast<int>(totalHeight);
 }

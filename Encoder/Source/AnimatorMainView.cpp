@@ -10,11 +10,11 @@ AnimatorMainView::AnimatorMainView()
     toolbar = std::make_unique<ToolbarComponent>(*this);
     
     // Create timeline component
-    timelineComponent = std::make_unique<TimelineComponent>();
+    timelineViewport = std::make_unique<TimelineViewport>();
     
     addAndMakeVisible(menuBar.get());
     addAndMakeVisible(toolbar.get());
-    addAndMakeVisible(timelineComponent.get());
+    addAndMakeVisible(timelineViewport.get());
 }
 
 AnimatorMainView::~AnimatorMainView()
@@ -31,7 +31,7 @@ AnimatorMainView::~AnimatorMainView()
 void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
 {
     timelines = newTimelines;
-    timelineComponent->setTimelines(timelines);
+    timelineViewport->setTimelines(timelines);
     
     // Refresh menu bar to update the import/export submenus
     if (menuBarModel != nullptr)
@@ -42,13 +42,13 @@ void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimeline
 
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 {
-    timelineComponent->setPlayheadPosition(timeMs);
+    timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);
 }
 
 void AnimatorMainView::setAutoFollow(bool shouldAutoFollow)
 {
     autoFollowEnabled = shouldAutoFollow;
-    timelineComponent->setAutoFollow(shouldAutoFollow);
+    timelineViewport->getTimelineComponent()->setAutoFollow(shouldAutoFollow);
 }
 
 void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
@@ -72,7 +72,7 @@ void AnimatorMainView::resized()
     toolbar->setBounds(area.removeFromTop(40));
     
     // Rest goes to timeline component
-    timelineComponent->setBounds(area);
+    timelineViewport->setBounds(area);
 }
 
 // Menu implementation
@@ -279,8 +279,8 @@ void AnimatorMainView::importScene(int targetTimelineIndex)
                 }
                 
                 // Update the timeline component
-                timelineComponent->setTimelines(timelines);
-                timelineComponent->repaint();
+                timelineViewport->setTimelines(timelines);
+                timelineViewport->repaint();
             }
             else
             {
@@ -358,7 +358,7 @@ void AnimatorMainView::copySelectedClips()
     clipboard.hasData = false;
     
     // Get selected clips from timeline component using its existing selection system
-    auto selectedClips = timelineComponent->getSelectedClips();
+    auto selectedClips = timelineViewport->getTimelineComponent()->getSelectedClips();
     
     if (selectedClips.isEmpty())
     {
@@ -379,7 +379,7 @@ void AnimatorMainView::copySelectedClips()
     for (const auto& selected : selectedClips)
     {
         bool isMovementClip = selected.isMovementClip;
-        auto* originalClip = timelineComponent->getClip(selected.timelineIndex, selected.layerIndex,
+        auto* originalClip = timelineViewport->getTimelineComponent()->getClip(selected.timelineIndex, selected.layerIndex,
                                                        selected.clipIndex, isMovementClip);
         if (!originalClip) continue;
         
@@ -412,15 +412,15 @@ void AnimatorMainView::pasteClips()
         return;
     }
         
-    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
     {
         if (auto* sourceTimeline = clipboard.timelineData.getFirst())
         {
             // Clear current selection
-            timelineComponent->clearSelection();
+            timelineViewport->getTimelineComponent()->clearSelection();
             
             // Calculate time offset based on playhead position
-            ms_t timeOffset = timelineComponent->getPlayheadPosition();
+            ms_t timeOffset = timelineViewport->getTimelineComponent()->getPlayheadPosition();
             
             // Find the earliest clip time in the clipboard to maintain relative timing
             ms_t earliestTime = std::numeric_limits<ms_t>::max();
@@ -445,7 +445,7 @@ void AnimatorMainView::pasteClips()
                 currentTimeline->movement.clips.add(newClip);
                 
                 // Select the newly pasted clip
-                timelineComponent->selectClip(timelineComponent->getCurrentTimelineIndex(),
+                timelineViewport->getTimelineComponent()->selectClip(timelineViewport->getTimelineComponent()->getCurrentTimelineIndex(),
                                              0, newClipIndex, true, true);
             }
             
@@ -462,11 +462,11 @@ void AnimatorMainView::pasteClips()
                 currentTimeline->actions.clips.add(newClip);
                 
                 // Select the newly pasted clip
-                timelineComponent->selectClip(timelineComponent->getCurrentTimelineIndex(),
+                timelineViewport->getTimelineComponent()->selectClip(timelineViewport->getTimelineComponent()->getCurrentTimelineIndex(),
                                              1, newClipIndex, false, true);
             }
             
-            timelineComponent->repaint();
+            timelineViewport->repaint();
             
             // Optional: Provide feedback
             int totalClips = sourceTimeline->movement.clips.size() + sourceTimeline->actions.clips.size();
@@ -482,36 +482,36 @@ void AnimatorMainView::pasteClips()
 
 void AnimatorMainView::selectAllClips()
 {
-    timelineComponent->keyPressed(juce::KeyPress('a', juce::ModifierKeys::commandModifier, 0));
+    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress('a', juce::ModifierKeys::commandModifier, 0));
 }
 
 void AnimatorMainView::deselectAllClips()
 {
-    timelineComponent->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
+    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
 }
 
 void AnimatorMainView::addMovementClip()
 {
-    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
     {
         MovementClip newClip;
         newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
-        newClip.start = timelineComponent->getPlayheadPosition();
+        newClip.start = timelineViewport->getTimelineComponent()->getPlayheadPosition();
         newClip.length = 2000; // 2 second default
         newClip.colour = juce::Colours::cornflowerblue;
         
         currentTimeline->movement.clips.add(newClip);
-        timelineComponent->repaint();
+        timelineViewport->repaint();
     }
 }
 
 void AnimatorMainView::addActionClip()
 {
-    if (auto* currentTimeline = timelineComponent->getCurrentTimeline())
+    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
     {
         ActionClip newClip;
         newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
-        newClip.start = timelineComponent->getPlayheadPosition();
+        newClip.start = timelineViewport->getTimelineComponent()->getPlayheadPosition();
         newClip.length = 2000; // 2 second default
         newClip.colour = juce::Colours::orange;
         
@@ -523,13 +523,13 @@ void AnimatorMainView::addActionClip()
         newClip.actions.add(defaultAction);
         
         currentTimeline->actions.clips.add(newClip);
-        timelineComponent->repaint();
+        timelineViewport->repaint();
     }
 }
 
 void AnimatorMainView::deleteSelectedClips()
 {
-    timelineComponent->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
+    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
 }
 
 void AnimatorMainView::zoomIn()
@@ -553,7 +553,7 @@ void AnimatorMainView::resetZoom()
 void AnimatorMainView::toggleAutoFollow()
 {
     autoFollowEnabled = !autoFollowEnabled;
-    timelineComponent->setAutoFollow(autoFollowEnabled);
+    timelineViewport->getTimelineComponent()->setAutoFollow(autoFollowEnabled);
     
     // Update toolbar button state
     //if (toolbar != nullptr && toolbar->autoFollowButton != nullptr)
@@ -570,7 +570,7 @@ void AnimatorMainView::updateTimelineZoom()
     float basePixelsPerMs = 0.1f;
     float pixelsPerMs = basePixelsPerMs * zoomLevel;
     
-    timelineComponent->setPixelsPerMillisecond(pixelsPerMs);
+    timelineViewport->getTimelineComponent()->setPixelsPerMillisecond(pixelsPerMs);
 }
 
 // ToolbarComponent implementation

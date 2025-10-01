@@ -25,7 +25,8 @@ public:
     
     // ComboBox::Listener
     void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override;
-
+    int calculateTotalContentHeight() const;
+    
     // Component
     void paint(juce::Graphics& g) override;
     void resized() override;
@@ -102,10 +103,8 @@ private:
 
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     int currentTimelineIndex = 0;
-    float verticalScrollOffset = 0.0f;
     
     std::unique_ptr<juce::ScrollBar> horizontalScrollBar;
-    std::unique_ptr<juce::ScrollBar> verticalScrollBar;
     std::unique_ptr<juce::ComboBox> timelineSelector;
     std::unique_ptr<juce::TextButton> tempButton;
     
@@ -127,12 +126,13 @@ private:
     // Layout constants
     float headerHeight = 30.0f;
     float trackHeaderWidth = 150.0f;
-    float trackHeight = 60.0f;
+    float trackHeight = 50.0f;
     float timelineSpacing = 20.0f;
-    float timelineHeaderHeight = 40.0f;
+    float timelineHeaderHeight = 20.0f;
     float clipHeight = 40.0f;
     float clipCornerSize = 4.0f;
     float resizeHandleWidth = 6.0f;
+    const int scrollBarSize = 16;
     
     // constants for nudge amounts
     static constexpr ms_t NUDGE_SMALL_MS = 10;    // 10ms nudge

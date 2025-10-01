@@ -1,7 +1,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "TimelineComponent.h"
+#include "TimelineViewport.h"
 
 class AnimatorMainView : public juce::Component
 {
@@ -55,7 +55,7 @@ private:
     std::unique_ptr<juce::MenuBarComponent> menuBar;
     std::unique_ptr<MainMenuBarModel> menuBarModel;
     std::unique_ptr<ToolbarComponent> toolbar;
-    std::unique_ptr<TimelineComponent> timelineComponent;
+    std::unique_ptr<TimelineViewport> timelineViewport;
 
     // Application state
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
