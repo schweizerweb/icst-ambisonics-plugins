@@ -102,6 +102,7 @@ private:
 
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     int currentTimelineIndex = 0;
+    float verticalScrollOffset = 0.0f;
     
     std::unique_ptr<juce::ScrollBar> horizontalScrollBar;
     std::unique_ptr<juce::ScrollBar> verticalScrollBar;
@@ -147,6 +148,7 @@ private:
     
     // Update methods
     void updateScrollBars();
+    void repositionScrollBars();
     void updateVisibleClips();
     ClipBounds findClipAtPosition(const juce::Point<int>& position);
     juce::Array<ClipBounds> findAllClipsAtPosition(const juce::Point<int>& position) const;
