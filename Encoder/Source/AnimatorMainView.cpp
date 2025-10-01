@@ -494,7 +494,7 @@ void AnimatorMainView::addMovementClip()
     {
         MovementClip newClip;
         newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
-        newClip.start = timelineViewport->getTimelineComponent()->getPlayheadPosition();
+        newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
         newClip.length = 2000; // 2 second default
         newClip.colour = juce::Colours::cornflowerblue;
         
@@ -509,7 +509,7 @@ void AnimatorMainView::addActionClip()
     {
         ActionClip newClip;
         newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
-        newClip.start = timelineViewport->getTimelineComponent()->getPlayheadPosition();
+        newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
         newClip.length = 2000; // 2 second default
         newClip.colour = juce::Colours::orange;
         

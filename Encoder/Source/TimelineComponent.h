@@ -35,7 +35,10 @@ public:
     // MouseListener
     void mouseDown(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
+    void mouseEnter(const juce::MouseEvent& event) override;
+    void mouseExit(const juce::MouseEvent& event) override;
     void mouseUp(const juce::MouseEvent& event) override;
+    void mouseMove(const juce::MouseEvent& event) override;
     void mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel) override;
 
     // Keyboard
@@ -80,6 +83,12 @@ public:
     const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
     bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
+    
+    // Cursor control methods
+    void setCursorTime(ms_t time);
+    ms_t getCursorTime() const;
+    void updatePreviewCursor(const juce::Point<int>& mousePos);
+    void hidePreviewCursor();
     
 private:
     struct ClipBounds
@@ -199,6 +208,20 @@ private:
     
     void renderHeaderToCache();
     void drawHeader(juce::Graphics& g);
+    
+    /// Cursors for placing new clips
+    ms_t cursorPosition = 0;
+    ms_t previewCursorPosition = 0;
+    bool cursorVisible = false;
+    bool previewCursorVisible = false;
+    
+    // Methods for cursor handling
+    void setCursorPosition(ms_t time);
+    void showCursor(bool shouldShow);
+    void setPreviewCursorPosition(ms_t time);
+    void showPreviewCursor(bool shouldShow);
+    ms_t getCursorPosition() const { return cursorPosition; }
+    bool shouldShowClipText(const juce::Rectangle<float>& clipBounds, float iconSize) const;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

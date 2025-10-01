@@ -117,9 +117,14 @@ void TimelineComponent::setPlayheadPosition(ms_t timeMs)
     auto visibleTime = visibleEndTime - visibleStartTime;
     if (autoFollow && playheadPosition > (visibleEndTime - 0.2 * visibleTime))
     {
-        visibleStartTime = playheadPosition - visibleTime * 0.2;
+        visibleStartTime = playheadPosition - (ms_t)(visibleTime * 0.2);
         visibleEndTime = (ms_t)(visibleStartTime + visibleTime);
         updateScrollBars();
+    }
+    
+    if(autoFollow)
+    {
+        setCursorTime(timeMs);
     }
     
     repaint();
@@ -208,15 +213,45 @@ void TimelineComponent::paint(juce::Graphics& g)
         if (timelineY > getHeight())
             continue; // Below viewport
         
+        // Draw timeline header with better active/inactive distinction
         const bool isCurrentTimeline = (timelineIndex == currentTimelineIndex);
         
-        // Draw timeline header
-        g.setColour(getTimelineColour(timelineIndex).withAlpha(isCurrentTimeline ? 0.8f : 0.5f));
-        g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
+        // Header background with stronger contrast for active timeline
+        if (isCurrentTimeline)
+        {
+            // Active timeline - more prominent
+            g.setColour(getTimelineColour(timelineIndex).withAlpha(0.9f));
+            g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
+            
+            // Add a border around active timeline header
+            g.setColour(juce::Colours::white.withAlpha(0.8f));
+            g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 2.0f);
+        }
+        else
+        {
+            // Inactive timeline - more subtle
+            g.setColour(getTimelineColour(timelineIndex).withAlpha(0.4f));
+            g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
+            
+            // Subtle border for inactive timelines
+            g.setColour(juce::Colours::white.withAlpha(0.2f));
+            g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 1.0f);
+        }
         
-        // Draw timeline name
-        g.setColour(juce::Colours::white);
-        g.setFont(juce::FontOptions(16.0f, juce::Font::bold));
+        // Draw timeline name with better contrast
+        if (isCurrentTimeline)
+        {
+            // Active timeline - bold and bright
+            g.setColour(juce::Colours::white);
+            g.setFont(juce::FontOptions(16.0f, juce::Font::bold));
+        }
+        else
+        {
+            // Inactive timeline - less prominent
+            g.setColour(juce::Colours::white.withAlpha(0.7f));
+            g.setFont(juce::FontOptions(14.0f, juce::Font::plain));
+        }
+        
         g.drawText("Group " + juce::String(timelineIndex + 1),
                    10, (int)(timelineY + 5), (int)(trackHeaderWidth - 20), (int)(timelineHeaderHeight - 10),
                    juce::Justification::centredLeft);
@@ -226,16 +261,31 @@ void TimelineComponent::paint(juce::Graphics& g)
         {
             const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
             
-            // Draw track background
-            g.setColour(juce::Colour(0xff3e3e42).withAlpha(isCurrentTimeline ? 1.0f : 0.6f));
-            g.fillRect(timelineX, trackY, timelineWidth, trackHeight);
+            // Draw track background with better active/inactive distinction
+            if (isCurrentTimeline)
+            {
+                // Active timeline tracks - more contrast
+                g.setColour(juce::Colour(0xff4a4a4f)); // Darker for active
+                g.fillRect(timelineX, trackY, timelineWidth, trackHeight);
+            }
+            else
+            {
+                // Inactive timeline tracks - more subtle
+                g.setColour(juce::Colour(0xff3e3e42).withAlpha(0.6f));
+                g.fillRect(timelineX, trackY, timelineWidth, trackHeight);
+            }
             
-            // Draw track name
-            g.setColour(juce::Colours::white.withAlpha(isCurrentTimeline ? 1.0f : 0.7f));
-            g.setFont(juce::FontOptions(14.0f, juce::Font::bold));
-            g.drawText(timeline->getLayerName(layerIndex),
-                      10, (int)trackY, (int)(trackHeaderWidth - 20), (int)trackHeight,
-                      juce::Justification::centredLeft);
+            // Draw track name with appropriate emphasis
+            if (isCurrentTimeline)
+            {
+                g.setColour(juce::Colours::white);
+                g.setFont(juce::FontOptions(14.0f, juce::Font::bold));
+            }
+            else
+            {
+                g.setColour(juce::Colours::white.withAlpha(0.6f));
+                g.setFont(juce::FontOptions(13.0f, juce::Font::plain));
+            }
             
             // Draw track separator
             g.setColour(juce::Colours::black.withAlpha(0.5f));
@@ -265,20 +315,37 @@ void TimelineComponent::paint(juce::Graphics& g)
         const bool isSelected = isClipSelected(clipBounds.timelineIndex, clipBounds.layerIndex,
                                               clipBounds.clipIndex, clipBounds.isMovementClip);
         
-        // Clip background with alpha based on current timeline
-        g.setColour(getClipColour(*clip).withAlpha(isCurrentTimeline ? 0.8f : 0.4f));
-        g.fillRoundedRectangle(bounds, clipCornerSize);
-        
-        // Clip border - thicker and white if selected
-        if (isSelected)
+        // Clip background with stronger active/inactive distinction
+        if (isCurrentTimeline)
         {
-            g.setColour(juce::Colours::white);
-            g.drawRoundedRectangle(bounds, clipCornerSize, 3.0f); // Thicker border for selection
+            // Active timeline clips - more vibrant
+            g.setColour(getClipColour(*clip).withAlpha(isSelected ? 0.9f : 0.8f));
         }
         else
         {
-            g.setColour(juce::Colours::white.withAlpha(isCurrentTimeline ? 0.3f : 0.1f));
-            g.drawRoundedRectangle(bounds, clipCornerSize, 1.0f);
+            // Inactive timeline clips - more muted
+            g.setColour(getClipColour(*clip).withAlpha(isSelected ? 0.6f : 0.3f));
+        }
+        g.fillRoundedRectangle(bounds, clipCornerSize);
+        
+        // Clip border - more emphasis for active timeline
+        if (isSelected)
+        {
+            g.setColour(juce::Colours::white);
+            g.drawRoundedRectangle(bounds, clipCornerSize, isCurrentTimeline ? 3.0f : 2.0f);
+        }
+        else
+        {
+            if (isCurrentTimeline)
+            {
+                g.setColour(juce::Colours::white.withAlpha(0.4f));
+                g.drawRoundedRectangle(bounds, clipCornerSize, 1.5f);
+            }
+            else
+            {
+                g.setColour(juce::Colours::white.withAlpha(0.2f));
+                g.drawRoundedRectangle(bounds, clipCornerSize, 1.0f);
+            }
         }
         
         // Only show resize handles for current timeline and selected clips
@@ -317,19 +384,23 @@ void TimelineComponent::paint(juce::Graphics& g)
             iconDrawable->draw(g, 1.0f, transform);
         }
         
-        // Draw text
-        const float textX = iconBounds.getRight() + 5.0f;
-        const float textWidth = jmax(10.0f, bounds.getWidth() - (iconBounds.getWidth() + 10.0f));
-        
-        g.setFont(juce::FontOptions(12.0f, juce::Font::bold));
-        g.drawText(getClipDisplayName(clipBounds.timelineIndex, clipBounds.layerIndex, clipBounds.clipIndex, clipBounds.isMovementClip),
-                   (int)textX, (int)(bounds.getY() + 5.0f), (int)textWidth, 16,
-                   juce::Justification::left);
-        
-        g.setFont(juce::FontOptions(10.0f));
-        g.drawText(getClipTimeInfo(*clip),
-                   (int)textX, (int)(bounds.getY() + 22.0f), (int)textWidth, 14,
-                   juce::Justification::left);
+        // Draw text only if there's enough space
+        if (shouldShowClipText(bounds, iconBounds.getWidth()))
+        {
+            const float textX = iconBounds.getRight() + 5.0f;
+            const float availableTextWidth = bounds.getWidth() - (iconBounds.getWidth() + 10.0f);
+            
+            g.setFont(juce::FontOptions(12.0f, juce::Font::bold));
+            g.drawText(getClipDisplayName(clipBounds.timelineIndex, clipBounds.layerIndex, clipBounds.clipIndex, clipBounds.isMovementClip),
+                       (int)textX, (int)(bounds.getY() + 5.0f), (int)availableTextWidth, 16,
+                       juce::Justification::left);
+            
+            g.setFont(juce::FontOptions(10.0f));
+            g.drawText(getClipTimeInfo(*clip),
+                       (int)textX, (int)(bounds.getY() + 22.0f), (int)availableTextWidth, 14,
+                       juce::Justification::left);
+        }
+        // else: no text drawn, but tooltip will show all information
         
         // Menu button only for current timeline and selected clips
         if (isCurrentTimeline && isSelected)
@@ -356,8 +427,38 @@ void TimelineComponent::paint(juce::Graphics& g)
         g.drawRect(dragState.selectionRectangle, 1.0f);
     }
     
+    // Draw placement cursor (fixed, after clicking)
+    if (cursorVisible && cursorPosition >= visibleStartTime && cursorPosition <= visibleEndTime)
+    {
+        const float cursorX = timeToX(cursorPosition);
+        g.setColour(juce::Colours::cyan);
+        g.drawLine(cursorX, headerHeight, cursorX, totalHeight, 2.0f);
+        
+        // Draw a distinctive head for the fixed cursor
+        juce::Path cursorHead;
+        cursorHead.addTriangle(cursorX - 6, headerHeight,
+                              cursorX + 6, headerHeight,
+                              cursorX, headerHeight + 12);
+        g.fillPath(cursorHead);
+    }
+    
+    // Draw preview cursor (greyish, follows mouse)
+    if (previewCursorVisible && previewCursorPosition >= visibleStartTime && previewCursorPosition <= visibleEndTime)
+    {
+        const float previewX = timeToX(previewCursorPosition);
+        g.setColour(juce::Colours::lightgrey.withAlpha(0.7f));
+        g.drawLine(previewX, headerHeight, previewX, totalHeight, 1.0f);
+        
+        // Draw a subtle head for the preview cursor
+        juce::Path previewHead;
+        previewHead.addTriangle(previewX - 4, headerHeight,
+                               previewX + 4, headerHeight,
+                               previewX, headerHeight + 8);
+        g.fillPath(previewHead);
+    }
+    
     // Draw playhead
-    if (playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
+    if (!autoFollow && playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
     {
         const float playheadX = timeToX(playheadPosition);
         g.setColour(juce::Colours::red);
@@ -381,7 +482,7 @@ void TimelineComponent::resized()
 void TimelineComponent::mouseDown(const juce::MouseEvent& event)
 {
     if (timelines == nullptr || timelines->size() == 0) return;
-    
+
     const auto pos = event.getPosition();
     
     // Check if we're starting a rectangle selection (Ctrl/Cmd + drag)
@@ -391,7 +492,43 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         dragState.dragStartPosition = pos;
         dragState.selectionRectangle.setPosition(pos.x, pos.y);
         dragState.selectionRectangle.setSize(0, 0);
+        // Hide preview during drag operations
+        hidePreviewCursor();
         return;
+    }
+    
+    // Check if click is on a timeline header
+    int clickedTimelineIndex = -1;
+    float currentY = headerHeight;
+    
+    for (int i = 0; i < timelines->size(); ++i)
+    {
+        if (auto* timeline = timelines->getUnchecked(i))
+        {
+            float headerBottom = currentY + timelineHeaderHeight;
+            
+            // Check if click is within this timeline's header area
+            if (pos.y >= currentY && pos.y < headerBottom)
+            {
+                clickedTimelineIndex = i;
+                break;
+            }
+            
+            currentY += timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing;
+        }
+    }
+    
+    // If header was clicked, switch to that timeline
+    if (clickedTimelineIndex != -1)
+    {
+        setCurrentTimeline(clickedTimelineIndex);
+        
+        // Set cursor at click position in the timeline
+        ms_t clickTime = xToTime(static_cast<float>(pos.x));
+        setCursorTime(clickTime);
+        
+        repaint();
+        return; // Don't process further for header clicks
     }
     
     // Check if click is on a clip
@@ -463,6 +600,10 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
     }
     else
     {
+        // Set fixed cursor at click position and hide preview
+        ms_t clickTime = xToTime(static_cast<float>(event.getPosition().x));
+        setCursorTime(clickTime);
+        
         // Clicked on empty space - clear selection unless shift/ctrl is held
         if (!event.mods.isAnyModifierKeyDown())
         {
@@ -470,6 +611,18 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             repaint();
         }
     }
+}
+
+void TimelineComponent::mouseEnter(const juce::MouseEvent& event)
+{
+    // Show preview cursor when mouse enters component
+    updatePreviewCursor(event.getPosition());
+}
+
+void TimelineComponent::mouseExit(const juce::MouseEvent& event)
+{
+    // Hide preview cursor when mouse leaves component
+    hidePreviewCursor();
 }
 
 void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
@@ -490,6 +643,13 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
     if (!dragState.isDragging || timelines == nullptr) return;
     
     const auto currentPos = event.getPosition();
+        
+    // Optionally update cursor during resize operations for visual feedback
+    if (dragState.isResizing)
+    {
+        updatePreviewCursor(currentPos);
+    }
+    
     const ms_t currentTime = xToTime(static_cast<float>(currentPos.x));
     const ms_t timeDelta = currentTime - dragState.dragStartTime;
     
@@ -562,7 +722,21 @@ void TimelineComponent::mouseUp(const juce::MouseEvent& event)
     
     // Reset all drag state
     dragState = DragState();
+    
+    showPreviewCursor(true);
+    
     repaint();
+}
+
+void TimelineComponent::mouseMove(const juce::MouseEvent& event)
+{
+    if (timelines == nullptr || timelines->size() == 0) return;
+    
+    // Show preview cursor at mouse position when not dragging
+    if (!dragState.isDragging && !dragState.isRectangleSelecting)
+    {
+        updatePreviewCursor(event.getPosition());
+    }
 }
 
 void TimelineComponent::mouseWheelMove(const juce::MouseEvent& event, const juce::MouseWheelDetails& wheel)
@@ -1486,4 +1660,66 @@ void TimelineComponent::drawHeader(juce::Graphics& g)
         }
         currentTime += timeStep;
     }
+}
+
+void TimelineComponent::setCursorPosition(ms_t time)
+{
+    cursorPosition = juce::jmax<ms_t>(0, time);
+    repaint();
+}
+
+void TimelineComponent::showCursor(bool shouldShow)
+{
+    if (cursorVisible != shouldShow)
+    {
+        cursorVisible = shouldShow;
+        repaint();
+    }
+}
+
+void TimelineComponent::setPreviewCursorPosition(ms_t time)
+{
+    previewCursorPosition = juce::jmax<ms_t>(0, time);
+    repaint();
+}
+
+void TimelineComponent::showPreviewCursor(bool shouldShow)
+{
+    if (previewCursorVisible != shouldShow)
+    {
+        previewCursorVisible = shouldShow;
+        repaint();
+    }
+}
+
+void TimelineComponent::setCursorTime(ms_t time)
+{
+    setCursorPosition(time);
+    showCursor(true);
+    // Hide preview when setting fixed cursor
+    showPreviewCursor(false);
+}
+
+ms_t TimelineComponent::getCursorTime() const
+{
+    return cursorPosition;
+}
+
+void TimelineComponent::updatePreviewCursor(const juce::Point<int>& mousePos)
+{
+    ms_t time = xToTime(static_cast<float>(mousePos.x));
+    setPreviewCursorPosition(time);
+    showPreviewCursor(true);
+}
+
+void TimelineComponent::hidePreviewCursor()
+{
+    showPreviewCursor(false);
+}
+
+
+bool TimelineComponent::shouldShowClipText(const juce::Rectangle<float>& clipBounds, float iconSize) const
+{
+    const float minWidthForText = iconSize * 2.5f; // 2.5x icon size as threshold
+    return clipBounds.getWidth() >= minWidthForText;
 }
