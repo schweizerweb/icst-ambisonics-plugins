@@ -861,6 +861,28 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
             return true;
         }
     }
+    // Duplicate selected clips with Ctrl/Cmd + D
+    if (key.getKeyCode() == 'D' && (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown()))
+    {
+        if (!selectedClips.isEmpty())
+        {
+            // Store current selection since it will change during duplication
+            auto currentSelection = selectedClips;
+            
+            // Clear selection first
+            clearSelection();
+            
+            // Duplicate all selected clips
+            for (const auto& selected : currentSelection)
+            {
+                duplicateClip(selected.timelineIndex, selected.layerIndex,
+                             selected.clipIndex, selected.isMovementClip);
+            }
+            
+            repaint();
+            return true;
+        }
+    }
     
     return false;
 }
@@ -1263,7 +1285,8 @@ void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, i
                            }
                            else if (result == 3)
                            {
-                               // Duplicate clip - implement based on your needs
+                               duplicateClip(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                               repaint();
                            }
                        });
 }
@@ -1722,4 +1745,120 @@ bool TimelineComponent::shouldShowClipText(const juce::Rectangle<float>& clipBou
 {
     const float minWidthForText = iconSize * 2.5f; // 2.5x icon size as threshold
     return clipBounds.getWidth() >= minWidthForText;
+}
+
+bool TimelineComponent::duplicateClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip)
+{
+    if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())
+        return false;
+    
+    auto* timeline = timelines->getUnchecked(timelineIndex);
+    if (timeline == nullptr) return false;
+    
+    bool success = false;
+    
+    if (isMovementClip && layerIndex == 0)
+    {
+        if (clipIndex >= 0 && clipIndex < timeline->movement.clips.size())
+        {
+            const auto& originalClip = timeline->movement.clips.getReference(clipIndex);
+            
+            // Create a duplicate clip
+            MovementClip newClip = originalClip;
+            
+            // Place at cursor position if available, otherwise after original
+            if (cursorVisible)
+            {
+                newClip.start = cursorPosition;
+            }
+            else
+            {
+                newClip.start = originalClip.start + originalClip.length + 100; // 100ms gap after original
+            }
+            
+            newClip.id = generateDuplicateClipId(originalClip.id);
+            
+            timeline->movement.clips.add(newClip);
+            success = true;
+            
+            // Select the new duplicated clip
+            selectClip(timelineIndex, layerIndex, timeline->movement.clips.size() - 1, true, false);
+        }
+    }
+    else if (!isMovementClip && layerIndex == 1)
+    {
+        if (clipIndex >= 0 && clipIndex < timeline->actions.clips.size())
+        {
+            const auto& originalClip = timeline->actions.clips.getReference(clipIndex);
+            
+            // Create a duplicate clip
+            ActionClip newClip = originalClip;
+            
+            // Place at cursor position if available, otherwise after original
+            if (cursorVisible)
+            {
+                newClip.start = cursorPosition;
+            }
+            else
+            {
+                newClip.start = originalClip.start + originalClip.length + 100; // 100ms gap after original
+            }
+            
+            newClip.id = generateDuplicateClipId(originalClip.id);
+            
+            timeline->actions.clips.add(newClip);
+            success = true;
+            
+            // Select the new duplicated clip
+            selectClip(timelineIndex, layerIndex, timeline->actions.clips.size() - 1, false, false);
+        }
+    }
+    
+    if (success)
+    {
+        // Update max duration if needed
+        if (auto* clip = getClip(timelineIndex, layerIndex,
+                                isMovementClip ? timeline->movement.clips.size() - 1 : timeline->actions.clips.size() - 1,
+                                isMovementClip))
+        {
+            maxDuration = juce::jmax(maxDuration, clip->end() + 5000);
+        }
+        
+        repaint();
+    }
+    
+    return success;
+}
+
+juce::String TimelineComponent::generateDuplicateClipId(const juce::String& originalId)
+{
+    if (originalId.isEmpty())
+        return "Copy";
+    
+    // Check if the ID already ends with "Copy" or "Copy (n)"
+    if (originalId.endsWith("Copy"))
+    {
+        // Check for pattern "Copy (n)"
+        int openParen = originalId.lastIndexOfChar('(');
+        int closeParen = originalId.lastIndexOfChar(')');
+        
+        if (openParen != -1 && closeParen != -1 && closeParen > openParen + 1)
+        {
+            juce::String numberStr = originalId.substring(openParen + 1, closeParen);
+            int copyNumber = numberStr.getIntValue();
+            
+            if (copyNumber > 0)
+            {
+                // Increment the copy number
+                juce::String baseName = originalId.substring(0, openParen - 1); // Remove " (n)"
+                return baseName + " (" + juce::String(copyNumber + 1) + ")";
+            }
+        }
+        
+        // Just "Copy" -> make it "Copy 2"
+        return originalId + " 2";
+    }
+    
+    // Add "Copy" to the original ID
+    return originalId + " Copy";
 }

@@ -83,6 +83,7 @@ public:
     const Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip) const;
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
     bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
+    bool duplicateClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
     
     // Cursor control methods
     void setCursorTime(ms_t time);
@@ -222,6 +223,8 @@ private:
     void showPreviewCursor(bool shouldShow);
     ms_t getCursorPosition() const { return cursorPosition; }
     bool shouldShowClipText(const juce::Rectangle<float>& clipBounds, float iconSize) const;
+    
+    juce::String generateDuplicateClipId(const juce::String& originalId);
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };
