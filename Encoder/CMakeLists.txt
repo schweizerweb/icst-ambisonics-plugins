@@ -44,6 +44,9 @@ SET(SRC_FILES
 	../Source/AnimatorMovementComponent.cpp
 	../Source/AnimatorMovementComponent.h
 	../Source/AnimatorPresetHelper.h
+	../Source/CommonClipSettings.h
+	../Source/MovementClipEditor.h
+	../Source/ActionClipEditor.h
 	../Source/ComponentArguments.h
 	../Source/CustomOscBase.cpp
 	../Source/CustomOscBase.h

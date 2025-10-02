@@ -1,4 +1,6 @@
 #include "TimelineComponent.h"
+#include "MovementClipEditor.h"
+#include "ActionClipEditor.h"
 
 TimelineComponent::TimelineComponent()
 {
@@ -584,6 +586,13 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         {
             const auto bounds = clipBounds.bounds;
             auto buttonArea = getButtonBoundsWithinClip(bounds);
+            if (iconArea.contains(pos.toFloat()))
+            {
+                showClipEditor(clipBounds.timelineIndex, clipBounds.layerIndex,
+                              clipBounds.clipIndex, clipBounds.isMovementClip, pos);
+                dragState.isDragging = false;
+                return;
+            }
             
             if (buttonArea.contains(pos.toFloat()))
             {
@@ -592,7 +601,7 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
                 dragState.isDragging = false;
             }
         }
-        
+
         // Switch to clicked timeline
         setCurrentTimeline(clipBounds.timelineIndex);
         
@@ -1261,7 +1270,7 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
     return result;
 }
 
-void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
+void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position)
 {
     juce::PopupMenu menu;
     
@@ -1272,11 +1281,11 @@ void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, i
     
     menu.showMenuAsync(juce::PopupMenu::Options()
                        .withParentComponent(this),
-                       [this, timelineIndex, layerIndex, clipIndex, isMovementClip](int result)
+                       [this, timelineIndex, layerIndex, clipIndex, isMovementClip, position](int result)
                        {
                            if (result == 1)
                            {
-                               // Edit clip - implement based on your needs
+                               showClipEditor(timelineIndex, layerIndex, clipIndex, isMovementClip, position);
                            }
                            else if (result == 2)
                            {
@@ -1861,4 +1870,46 @@ juce::String TimelineComponent::generateDuplicateClipId(const juce::String& orig
     
     // Add "Copy" to the original ID
     return originalId + " Copy";
+}
+
+void TimelineComponent::showClipEditor(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
+{
+    std::unique_ptr<juce::Component> editor;
+    int width = 450;
+    int height = 0;
+    
+    if (isMovementClip)
+    {
+        auto movementEditor = std::make_unique<MovementClipEditor>(*this, timelineIndex, layerIndex, clipIndex);
+        height = movementEditor->getTotalRequiredHeight();
+        editor = std::move(movementEditor);
+    }
+    else
+    {
+        // For ActionClipEditor, you'd implement similar height calculation
+        auto actionEditor = std::make_unique<ActionClipEditor>(*this, timelineIndex, layerIndex, clipIndex);
+        height = 550; // Temporary fixed height for action editor
+        editor = std::move(actionEditor);
+    }
+    
+    editor->setSize(width, height);
+    
+    juce::DialogWindow::LaunchOptions options;
+    options.content.setOwned(editor.release());
+    options.dialogTitle = isMovementClip ? "Edit Movement Clip" : "Edit Action Clip";
+    options.componentToCentreAround = this;
+    options.escapeKeyTriggersCloseButton = true;
+    options.useNativeTitleBar = true;
+    options.resizable = false;
+    
+    auto* dialog = options.launchAsync();
+    //dialog->enterModalState(true, nullptr, true);
+}
+
+TimelineModel* TimelineComponent::getTimelineModel(int timelineIndex) const
+{
+    if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())
+        return nullptr;
+    
+    return timelines->getUnchecked(timelineIndex);
 }

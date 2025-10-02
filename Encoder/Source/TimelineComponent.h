@@ -68,6 +68,7 @@ public:
         repaint();
     }
     
+    TimelineModel* getTimelineModel(int timelineIndex) const;
     TimelineModel* getCurrentTimeline() const;
     const juce::Array<SelectedClip>& getSelectedClips() const { return selectedClips; }
     
@@ -84,6 +85,7 @@ public:
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
     bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
     bool duplicateClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
+    void showClipEditor(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position);
     
     // Cursor control methods
     void setCursorTime(ms_t time);
