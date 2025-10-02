@@ -586,6 +586,8 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         {
             const auto bounds = clipBounds.bounds;
             auto buttonArea = getButtonBoundsWithinClip(bounds);
+            auto iconArea = getIconBoundsWithinClip(bounds);
+            
             if (iconArea.contains(pos.toFloat()))
             {
                 showClipEditor(clipBounds.timelineIndex, clipBounds.layerIndex,
