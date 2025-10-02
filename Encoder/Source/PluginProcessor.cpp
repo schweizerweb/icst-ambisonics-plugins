@@ -543,7 +543,7 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         t->actions.clips.add(rotationClip);
         
         ActionClip stretchClip = makeActionClip("Dynamic Stretch", 1600, 800, juce::Colours::red);
-        stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::AbsolutePerSecond, 2.0});
+        stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 2.0});
         t->actions.clips.add(stretchClip);
         
         timelines.add(t);

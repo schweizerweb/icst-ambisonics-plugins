@@ -1890,7 +1890,7 @@ void TimelineComponent::showClipEditor(int timelineIndex, int layerIndex, int cl
     {
         // For ActionClipEditor, you'd implement similar height calculation
         auto actionEditor = std::make_unique<ActionClipEditor>(*this, timelineIndex, layerIndex, clipIndex);
-        height = 550; // Temporary fixed height for action editor
+        height = actionEditor->getTotalRequiredHeight();
         editor = std::move(actionEditor);
     }
     

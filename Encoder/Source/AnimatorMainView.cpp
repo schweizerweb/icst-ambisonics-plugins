@@ -515,9 +515,9 @@ void AnimatorMainView::addActionClip()
         
         // Add a default action
         ActionDefinition defaultAction;
-        defaultAction.action = ActionType::RotationX;
-        defaultAction.timing = TimingType::AbsoluteTarget;
-        defaultAction.value = 45.0;
+        defaultAction.setAction(ActionType::RotationX);
+        defaultAction.setTiming(TimingType::AbsoluteTarget);
+        defaultAction.setValue(45.0);
         newClip.actions.add(defaultAction);
         
         currentTimeline->actions.clips.add(newClip);

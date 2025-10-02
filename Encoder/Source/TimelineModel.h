@@ -40,14 +40,92 @@ enum class TimingType
     None,
     AbsoluteTarget,
     RelativeDuringClip,
-    AbsolutePerSecond
+    ConstantPerSecond
 };
 
-struct ActionDefinition
+class ActionDefinition
 {
     ActionType action;
     TimingType timing;
     double value;
+
+public:
+    ActionDefinition(ActionType action = ActionType::None,
+                    TimingType timing = TimingType::None,
+                    double value = 0.0)
+        : action(action), timing(timing), value(value) {}
+    
+    // 1. Get unit based on action type
+    std::string getUnit(bool verbose = false) const
+    {
+        switch (action)
+        {
+            case ActionType::RotationX:
+            case ActionType::RotationY:
+            case ActionType::RotationZ:
+                return "°";  // degrees
+            case ActionType::Stretch:
+                return verbose?"factor":"";     // unitless (ratio or factor)
+            case ActionType::None:
+            default:
+                return "";
+        }
+    }
+    
+    // 2. Get unit with timing consideration
+    std::string getUnitWithTiming(bool verbose = false) const
+    {
+        std::string unit = getUnit(verbose);
+        
+        if (timing == TimingType::ConstantPerSecond && !unit.empty())
+        {
+            return unit + "/s";
+        }
+        
+        return unit;
+    }
+    
+    // 3. Get descriptive string of all settings
+    std::string getDescription() const
+    {
+        std::string actionStr;
+        switch (action)
+        {
+            case ActionType::None: actionStr = "None"; break;
+            case ActionType::RotationX: actionStr = "Rotation X"; break;
+            case ActionType::RotationY: actionStr = "Rotation Y"; break;
+            case ActionType::RotationZ: actionStr = "Rotation Z"; break;
+            case ActionType::Stretch: actionStr = "Stretch"; break;
+        }
+        
+        std::string timingSymbol;
+        switch (timing)
+        {
+            case TimingType::None: timingSymbol = ""; break;
+            case TimingType::AbsoluteTarget: timingSymbol = " →"; break;
+            case TimingType::RelativeDuringClip: timingSymbol = " |▷|"; break;
+            case TimingType::ConstantPerSecond: timingSymbol = ""; break;
+        }
+        
+        std::string unit = getUnitWithTiming(true);
+        std::string valueStr = std::to_string(value);
+        
+        // Remove trailing zeros for cleaner display
+        valueStr.erase(valueStr.find_last_not_of('0') + 1, std::string::npos);
+        if (valueStr.back() == '.') valueStr.pop_back();
+        
+        return actionStr + timingSymbol + " " + valueStr + (unit.empty() ? "" : " " + unit);
+    }
+    
+    // Getters and setters
+    ActionType getAction() const { return action; }
+    void setAction(ActionType newAction) { action = newAction; }
+    
+    TimingType getTiming() const { return timing; }
+    void setTiming(TimingType newTiming) { timing = newTiming; }
+    
+    double getValue() const { return value; }
+    void setValue(double newValue) { value = newValue; }
 };
 
 struct ActionClip : public Clip
@@ -189,9 +267,9 @@ struct TimelineModel
             for (const auto& action : c.actions)
             {
                 auto* xAction = new juce::XmlElement("Action");
-                xAction->setAttribute("actionType", static_cast<int>(action.action));
-                xAction->setAttribute("timingType", static_cast<int>(action.timing));
-                xAction->setAttribute("value", action.value);
+                xAction->setAttribute("actionType", static_cast<int>(action.getAction()));
+                xAction->setAttribute("timingType", static_cast<int>(action.getTiming()));
+                xAction->setAttribute("value", action.getValue());
                 xActions->addChildElement(xAction);
             }
             xClip->addChildElement(xActions);
@@ -300,9 +378,9 @@ struct TimelineModel
                             if (xAction->hasTagName("Action"))
                             {
                                 ActionDefinition action;
-                                action.action = static_cast<ActionType>(xAction->getIntAttribute("actionType", 0));
-                                action.timing = static_cast<TimingType>(xAction->getIntAttribute("timingType", 0));
-                                action.value = xAction->getDoubleAttribute("value", 0.0);
+                                action.setAction(static_cast<ActionType>(xAction->getIntAttribute("actionType", 0)));
+                                action.setTiming(static_cast<TimingType>(xAction->getIntAttribute("timingType", 0)));
+                                action.setValue(xAction->getDoubleAttribute("value", 0.0));
                                 c.actions.add(action);
                             }
                         }

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "CommonClipSettings.h"
+#include "ActionEditDialog.h"
 
 class ActionClipEditor : public juce::Component, public juce::ListBoxModel
 {
@@ -24,7 +25,7 @@ public:
         auto area = getLocalBounds().reduced(10);
         
         // Calculate heights
-        const int clipGroupHeight = commonSettings.getRequiredHeight() + 30;
+        const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
         const int actionsGroupHeight = getActionsControlsHeight() + 40;
         const int buttonHeight = 28;
         
@@ -103,27 +104,9 @@ public:
         g.setFont(14.0f);
         
         const auto& action = currentClip.actions.getReference(rowNumber);
-        juce::String text;
         
-        switch (action.action)
-        {
-            case ActionType::RotationX: text = "Rotate X"; break;
-            case ActionType::RotationY: text = "Rotate Y"; break;
-            case ActionType::RotationZ: text = "Rotate Z"; break;
-            case ActionType::Stretch: text = "Stretch"; break;
-            default: text = "Unknown"; break;
-        }
-        
-        switch (action.timing)
-        {
-            case TimingType::AbsoluteTarget: text += " → "; break;
-            case TimingType::RelativeDuringClip: text += " + "; break;
-            case TimingType::AbsolutePerSecond: text += " /s "; break;
-            default: text += " ? "; break;
-        }
-        
-        text += juce::String(action.value);
-        g.drawText(text, 10, 0, width - 10, height, juce::Justification::centredLeft);
+        // Use the getDescription method for display
+        g.drawText(action.getDescription(), 10, 0, width - 10, height, juce::Justification::centredLeft);
     }
     
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override
@@ -215,9 +198,9 @@ private:
     void addAction()
     {
         ActionDefinition newAction;
-        newAction.action = ActionType::RotationX;
-        newAction.timing = TimingType::AbsoluteTarget;
-        newAction.value = 0.0;
+        newAction.setAction(ActionType::RotationX);
+        newAction.setTiming(TimingType::AbsoluteTarget);
+        newAction.setValue(0.0);
         
         if (editActionDialog(newAction, "Add New Action"))
         {
@@ -252,25 +235,17 @@ private:
     
     bool editActionDialog(ActionDefinition& action, const juce::String& title)
     {
-        juce::AlertWindow w(title, "", juce::AlertWindow::NoIcon);
-        w.addComboBox("type", {"Rotation X", "Rotation Y", "Rotation Z", "Stretch"}, "Type");
-        w.addComboBox("timing", {"Absolute Target", "Relative During Clip", "Absolute Per Second"}, "Timing");
-        w.addTextEditor("value", juce::String(action.value), "Value");
+        // Create the dialog component
+        auto* dialogComponent = new ActionEditDialog(action, title);
         
-        w.getComboBoxComponent("type")->setSelectedItemIndex((int)action.action - 1);
-        w.getComboBoxComponent("timing")->setSelectedItemIndex((int)action.timing - 1);
+        juce::DialogWindow::LaunchOptions options;
+        options.content.setOwned(dialogComponent);
+        options.dialogTitle = title;
+        options.componentToCentreAround = this;
+        options.escapeKeyTriggersCloseButton = true;
+        options.useNativeTitleBar = true;
+        options.resizable = false;
         
-        w.addButton("OK", 1);
-        w.addButton("Cancel", 0);
-        
-        if (w.runModalLoop() == 1)
-        {
-            action.action = (ActionType)(w.getComboBoxComponent("type")->getSelectedItemIndex() + 1);
-            action.timing = (TimingType)(w.getComboBoxComponent("timing")->getSelectedItemIndex() + 1);
-            action.value = w.getTextEditorContents("value").getDoubleValue();
-            return true;
-        }
-        
-        return false;
+        return options.runModal() != 0;
     }
 };

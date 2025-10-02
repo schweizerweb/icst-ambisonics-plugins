@@ -44,6 +44,7 @@ SET(SRC_FILES
 	../Source/AnimatorMovementComponent.cpp
 	../Source/AnimatorMovementComponent.h
 	../Source/AnimatorPresetHelper.h
+	../Source/ActionEditDialog.h
 	../Source/CommonClipSettings.h
 	../Source/MovementClipEditor.h
 	../Source/ActionClipEditor.h
