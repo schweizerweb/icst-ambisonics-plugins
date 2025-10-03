@@ -7,6 +7,8 @@ SET(BIN_FILES
 	../../Resources/svg/reset_zoom_icon.svg
 	../../Resources/svg/auto_follow_icon.svg
 	../../Resources/svg/animator_icon.svg
+	../../Resources/svg/error_icon.svg
+	../../Resources/svg/ok_icon.svg
 	
 	../../Resources/png/animator_icon.png
 	../../Resources/png/settings.png
@@ -103,6 +105,8 @@ SET(SRC_FILES
 	../Source/SourceTableListModel.h
 	../Source/StandardOscTarget.cpp
 	../Source/StandardOscTarget.h
+	../Source/StatusBarComponent.cpp
+	../Source/StatusBarComponent.h
 	../Source/TimelineTypes.h
 	../Source/TimelineModel.h
 	../Source/TimelineComponent.h
@@ -241,6 +245,7 @@ SET(SRC_FILES
 	../../Common/TrackColors.h
 	../../Common/TrackColorSelector.h
 	../../Common/TreeViewItemHelp.h
+	../../Common/UTF8Helpers.h
 	../../Common/VarDelayBuffer.cpp
 	../../Common/VarDelayBuffer.h
 	../../Common/ZoomSettings.cpp

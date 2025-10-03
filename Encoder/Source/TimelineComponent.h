@@ -20,6 +20,7 @@ public:
 
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
     void setSelectionControl(PointSelection* pPointSelection);
+    void setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
     void setCurrentTimeline(int index);
@@ -240,6 +241,8 @@ private:
     PointSelection* pPointSelectionControl = nullptr;
     void syncTimelineSelectionToPointSelection();
     void syncPointSelectionToTimelineSelection();
+    
+    std::function<void(const juce::AttributedString&)> statusMessageFunction;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

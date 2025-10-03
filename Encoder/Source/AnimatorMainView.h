@@ -2,8 +2,9 @@
 
 #include "JuceHeader.h"
 #include "TimelineViewport.h"
+#include "StatusBarComponent.h"
 
-class AnimatorMainView : public juce::Component
+class AnimatorMainView : public juce::Component, public juce::Timer
 {
 public:
     AnimatorMainView();
@@ -17,7 +18,17 @@ public:
 
     void paint(juce::Graphics& g) override;
     void resized() override;
+    void timerCallback() override;
 
+    // Status bar functionality
+    void setStatusMessage(const juce::AttributedString& message);
+    void clearStatusMessage();
+    
+    // Validation interface
+    void setValidationFrequency(double frequencyHz);
+    void validateTimelines();
+    std::function<void(const juce::AttributedString&)> getStatusMessageFunction();
+    
 private:
     // Menu bar
     class MainMenuBarModel : public juce::MenuBarModel
@@ -88,7 +99,6 @@ private:
     void deselectAllClips();
 
 private:
-private:
     // Helper method to generate unique clip IDs
     juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId)
     {
@@ -135,6 +145,14 @@ private:
         
         return newId;
     }
+    
+    // Status bar
+    std::unique_ptr<StatusBarComponent> statusBar;
+    void updateStatusBarValidation();
+    
+    // Validation state
+    bool validationResult = true;
+    juce::String validationDetails;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnimatorMainView)
 };

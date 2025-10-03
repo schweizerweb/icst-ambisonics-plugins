@@ -1,4 +1,5 @@
 #include "AnimatorMainView.h"
+#include "../../Common/UTF8Helpers.h"
 
 AnimatorMainView::AnimatorMainView()
 {
@@ -12,13 +13,32 @@ AnimatorMainView::AnimatorMainView()
     // Create timeline component
     timelineViewport = std::make_unique<TimelineViewport>();
     
+    // Create status bar
+    statusBar = std::make_unique<StatusBarComponent>(*this);
+    
     addAndMakeVisible(menuBar.get());
     addAndMakeVisible(toolbar.get());
     addAndMakeVisible(timelineViewport.get());
+    addAndMakeVisible(statusBar.get());
+    
+    // Start validation timer (1Hz default)
+    startTimerHz(1);
+    
+    // Show initial status
+    juce::AttributedString welcomeMessage;
+    welcomeMessage.append("Timeline Animator Ready",
+                         juce::FontOptions(12.0f, juce::Font::bold),
+                         juce::Colours::lightgreen);
+    welcomeMessage.append(" - Create or import timelines to begin",
+                         juce::FontOptions(12.0f),
+                         juce::Colours::lightgrey);
+    setStatusMessage(welcomeMessage);
 }
 
 AnimatorMainView::~AnimatorMainView()
 {
+    stopTimer();
+    
     // Remove menu bar before destruction to prevent JUCE assertion
     if (menuBar != nullptr)
     {
@@ -32,6 +52,7 @@ void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimeline
 {
     timelines = newTimelines;
     timelineViewport->setTimelines(timelines);
+    timelineViewport->getTimelineComponent()->setStatusMessageFunction(getStatusMessageFunction());
     
     // Refresh menu bar to update the import/export submenus
     if (menuBarModel != nullptr)
@@ -75,6 +96,9 @@ void AnimatorMainView::resized()
     
     // Toolbar below menu (40 pixels)
     toolbar->setBounds(area.removeFromTop(40));
+    
+    // Status bar at bottom (24 pixels)
+    statusBar->setBounds(area.removeFromBottom(24));
     
     // Rest goes to timeline component
     timelineViewport->setBounds(area);
@@ -664,4 +688,156 @@ void AnimatorMainView::ToolbarComponent::resized()
     autoFollowButton->setBounds(area.removeFromLeft(buttonSize));
 }
 
+// Status bar interface implementation
+void AnimatorMainView::setStatusMessage(const juce::AttributedString& message)
+{
+    if (statusBar != nullptr)
+    {
+        statusBar->setMessage(message);
+    }
+}
 
+void AnimatorMainView::clearStatusMessage()
+{
+    if (statusBar != nullptr)
+    {
+        statusBar->clearMessage();
+    }
+}
+
+void AnimatorMainView::setValidationFrequency(double frequencyHz)
+{
+    stopTimer();
+    if (frequencyHz > 0)
+    {
+        startTimerHz(static_cast<int>(frequencyHz));
+    }
+}
+
+void AnimatorMainView::validateTimelines()
+{
+    if (timelines == nullptr || timelines->isEmpty())
+    {
+        validationResult = true;
+        validationDetails = "No timelines to validate.";
+        updateStatusBarValidation();
+        return;
+    }
+    
+    juce::StringArray issues;
+    bool valid = true;
+    
+    // Perform validation checks
+    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+    {
+        auto* timeline = (*timelines)[timelineIndex];
+        if (timeline == nullptr) continue;
+        
+        juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
+        
+        // Check for overlapping clips
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
+        {
+            juce::Array<const Clip*> layerClips;
+            
+            // Collect all clips in this layer
+            for (int clipIndex = 0; clipIndex < timeline->getNumClips(layerIndex); ++clipIndex)
+            {
+                bool isMovementClip = false;
+                if (auto* clip = timelineViewport->getTimelineComponent()->getClip(timelineIndex, layerIndex, clipIndex, isMovementClip))
+                {
+                    layerClips.add(clip);
+                }
+            }
+            
+            // Check for overlaps
+            for (int i = 0; i < layerClips.size(); ++i)
+            {
+                for (int j = i + 1; j < layerClips.size(); ++j)
+                {
+                    const auto* clip1 = layerClips[i];
+                    const auto* clip2 = layerClips[j];
+                    
+                    if (clip1->start < clip2->end() && clip2->start < clip1->end())
+                    {
+                        valid = false;
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                                  ": Overlapping clips at " + juce::String(clip1->start) + "ms and " +
+                                  juce::String(clip2->start) + "ms");
+                    }
+                }
+            }
+        }
+        
+        // Check for clips with zero or negative duration
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
+        {
+            for (int clipIndex = 0; clipIndex < timeline->getNumClips(layerIndex); ++clipIndex)
+            {
+                bool isMovementClip = false;
+                if (auto* clip = timelineViewport->getTimelineComponent()->getClip(timelineIndex, layerIndex, clipIndex, isMovementClip))
+                {
+                    if (clip->length <= 0)
+                    {
+                        valid = false;
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                                  " Clip " + juce::String(clipIndex) + ": Invalid duration " +
+                                  juce::String(clip->length) + "ms");
+                    }
+                }
+            }
+        }
+        
+        // Check for clips with invalid start times
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
+        {
+            for (int clipIndex = 0; clipIndex < timeline->getNumClips(layerIndex); ++clipIndex)
+            {
+                bool isMovementClip = false;
+                if (auto* clip = timelineViewport->getTimelineComponent()->getClip(timelineIndex, layerIndex, clipIndex, isMovementClip))
+                {
+                    if (clip->start < 0)
+                    {
+                        valid = false;
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                                  " Clip " + juce::String(clipIndex) + ": Negative start time " +
+                                  juce::String(clip->start) + "ms");
+                    }
+                }
+            }
+        }
+    }
+    
+    // Prepare validation results
+    validationResult = valid;
+    if (!issues.isEmpty())
+    {
+        validationDetails = "Validation issues found:\n" + issues.joinIntoString("\n");
+        
+        //juce::AttributedString message;
+        //message.append(UTF8Helpers::xMark() + " Validation: " + juce::String(issues.size()) + " issues", juce::FontOptions(12.0f, juce::Font::bold), juce::Colours::orangered);
+        //setStatusMessage(message);
+    }
+    
+    updateStatusBarValidation();
+}
+
+void AnimatorMainView::updateStatusBarValidation()
+{
+    if (statusBar != nullptr)
+    {
+        statusBar->setValidationState(validationResult, validationDetails);
+    }
+}
+
+void AnimatorMainView::timerCallback()
+{
+    validateTimelines();
+}
+
+std::function<void(const juce::AttributedString&)> AnimatorMainView::getStatusMessageFunction()
+{
+    return [this](const juce::AttributedString& message) {
+        setStatusMessage(message);
+    };
+}

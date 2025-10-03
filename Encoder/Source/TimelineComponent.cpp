@@ -414,6 +414,7 @@ void TimelineComponent::paint(juce::Graphics& g)
             iconDrawable->draw(g, 1.0f, transform);
         }
         
+        // TODO: this is in the wrong place!!
         // Draw text only if there's enough space
         if (shouldShowClipText(bounds, iconBounds.getWidth()))
         {
@@ -1973,4 +1974,9 @@ void TimelineComponent::syncPointSelectionToTimelineSelection()
             }
         }
     }
+}
+
+void TimelineComponent::setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function)
+{
+    statusMessageFunction = function;
 }
