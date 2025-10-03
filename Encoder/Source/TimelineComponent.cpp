@@ -591,7 +591,7 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         // Handle selection based on modifier keys
         bool addToSelection = event.mods.isShiftDown();
         bool toggleSelection = (event.mods.isCommandDown() || event.mods.isCtrlDown()) && !dragState.isResizing;
-        
+
         if (toggleSelection)
         {
             toggleClipSelection(clipBounds.timelineIndex, clipBounds.layerIndex,
@@ -604,9 +604,17 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         }
         else if (!dragState.isResizing) // Only clear selection if we're not resizing
         {
-            // Single selection - clear others
-            selectClip(clipBounds.timelineIndex, clipBounds.layerIndex,
-                      clipBounds.clipIndex, clipBounds.isMovementClip, false);
+            // Check if the clicked clip is already selected
+            bool clipAlreadySelected = isClipSelected(clipBounds.timelineIndex, clipBounds.layerIndex,
+                                                     clipBounds.clipIndex, clipBounds.isMovementClip);
+            
+            if (!clipAlreadySelected)
+            {
+                // Single selection - clear others only if this clip isn't already selected
+                selectClip(clipBounds.timelineIndex, clipBounds.layerIndex,
+                          clipBounds.clipIndex, clipBounds.isMovementClip, false);
+            }
+            // If clip is already selected, keep the multi-selection and drag all
         }
         
         bool isMovementClip = clipBounds.isMovementClip;

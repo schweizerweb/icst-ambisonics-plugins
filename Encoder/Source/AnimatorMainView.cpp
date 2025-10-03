@@ -509,12 +509,50 @@ void AnimatorMainView::pasteClips()
 
 void AnimatorMainView::selectAllClips()
 {
-    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress('a', juce::ModifierKeys::commandModifier, 0));
+    if (auto* timelineComp = timelineViewport->getTimelineComponent())
+    {
+        timelineComp->clearSelection();
+        
+        if (auto* currentTimeline = timelineComp->getCurrentTimeline())
+        {
+            // Add movement clips
+            for (int i = 0; i < currentTimeline->movement.clips.size(); ++i)
+            {
+                timelineComp->selectClip(timelineComp->getCurrentTimelineIndex(), 0, i, true, true);
+            }
+            
+            // Add action clips
+            for (int i = 0; i < currentTimeline->actions.clips.size(); ++i)
+            {
+                timelineComp->selectClip(timelineComp->getCurrentTimelineIndex(), 1, i, false, true);
+            }
+            
+            timelineViewport->repaint();
+            
+            // Provide feedback
+            int totalClips = currentTimeline->movement.clips.size() + currentTimeline->actions.clips.size();
+            juce::AttributedString message;
+            message.append("Selected " + juce::String(totalClips) + " clips",
+                          juce::FontOptions(12.0f),
+                          juce::Colours::lightblue);
+            setStatusMessage(message);
+        }
+    }
 }
 
 void AnimatorMainView::deselectAllClips()
 {
-    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
+    if (auto* timelineComp = timelineViewport->getTimelineComponent())
+    {
+        timelineComp->clearSelection();
+        timelineViewport->repaint();
+        
+        juce::AttributedString message;
+        message.append("Selection cleared",
+                      juce::FontOptions(12.0f),
+                      juce::Colours::lightgrey);
+        setStatusMessage(message);
+    }
 }
 
 void AnimatorMainView::addMovementClip()
