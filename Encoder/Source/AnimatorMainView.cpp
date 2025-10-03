@@ -447,7 +447,7 @@ void AnimatorMainView::pasteClips()
             timelineViewport->getTimelineComponent()->clearSelection();
             
             // Calculate time offset based on playhead position
-            ms_t timeOffset = timelineViewport->getTimelineComponent()->getPlayheadPosition();
+            ms_t timeOffset = timelineViewport->getTimelineComponent()->getCursorTime();
             
             // Find the earliest clip time in the clipboard to maintain relative timing
             ms_t earliestTime = std::numeric_limits<ms_t>::max();
