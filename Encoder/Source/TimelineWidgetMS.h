@@ -13,6 +13,7 @@ public:
     ~TimelineWidgetMS() override;
     
     void setModels(juce::OwnedArray<TimelineModel>* models);
+    void setSelectionControl(PointSelection* pPointSelection);
     void setPlayheadProvider(std::function<PlayheadSnapshot()> provider);
     void setAutoFollow(bool shouldAutoFollow);
     

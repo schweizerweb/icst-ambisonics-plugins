@@ -40,6 +40,11 @@ void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimeline
     }
 }
 
+void AnimatorMainView::setSelectionControl(PointSelection* pPointSelection)
+{
+    timelineViewport->getTimelineComponent()->setSelectionControl(pPointSelection);
+}
+
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 {
     timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);

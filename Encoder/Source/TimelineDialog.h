@@ -83,13 +83,14 @@ public:
     }
 
     // Dialog öffnen; pParent bestimmt Referenz-Position
-    void show(juce::Component* pParent, AmbisonicEncoderAudioProcessor* pProcessor)
+    void show(juce::Component* pParent, AmbisonicEncoderAudioProcessor* pProcessor, PointSelection* pPointSelection)
     {
         if (window != nullptr)
             delete window;
 
         auto* timeline = new TimelineWidgetMS();
         timeline->setModels(pProcessor->getTimelines());
+        timeline->setSelectionControl(pPointSelection);
         timeline->setPlayheadProvider([pProcessor]() -> PlayheadSnapshot {
             PlayheadSnapshot s;
                 const auto& st = pProcessor->playheadState;

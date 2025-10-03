@@ -47,6 +47,12 @@ TimelineComponent::~TimelineComponent()
 {
     horizontalScrollBar->removeListener(this);
     timelineSelector->removeListener(this);
+    
+    // Remove as ChangeListener from PointSelection
+    if (pPointSelectionControl != nullptr)
+    {
+        pPointSelectionControl->removeChangeListener(this);
+    }
 }
 
 void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
@@ -106,7 +112,26 @@ void TimelineComponent::setCurrentTimeline(int index)
     {
         currentTimelineIndex = index;
         timelineSelector->setSelectedId(index + 1, juce::sendNotificationSync);
+        
+        // Sync to PointSelection
+        syncTimelineSelectionToPointSelection();
+        
         repaint();
+    }
+}
+
+void TimelineComponent::setSelectionControl(PointSelection* pPointSelection)
+{
+    if(pPointSelectionControl != nullptr)
+    {
+        pPointSelectionControl->removeChangeListener(this);
+    }
+    
+    pPointSelectionControl = pPointSelection;
+    
+    if (pPointSelectionControl != nullptr)
+    {
+        pPointSelectionControl->addChangeListener(this);
     }
 }
 
@@ -776,6 +801,10 @@ void TimelineComponent::comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged)
 void TimelineComponent::timelineSelectionChanged()
 {
     currentTimelineIndex = timelineSelector->getSelectedId() - 1;
+    
+    // Sync to PointSelection
+    syncTimelineSelectionToPointSelection();
+        
     repaint();
 }
 
@@ -1380,6 +1409,8 @@ bool TimelineComponent::removeClip(int timelineIndex, int layerIndex, int clipIn
     auto* timeline = timelines->getUnchecked(timelineIndex);
     if (timeline == nullptr) return false;
     
+    clipEditorManager->closeAllWindows();
+    
     bool success = false;
     
     if (isMovementClip && layerIndex == 0)
@@ -1895,4 +1926,51 @@ TimelineModel* TimelineComponent::getTimelineModel(int timelineIndex) const
         return nullptr;
     
     return timelines->getUnchecked(timelineIndex);
+}
+
+void TimelineComponent::changeListenerCallback(ChangeBroadcaster* source)
+{
+    if (source == pPointSelectionControl && pPointSelectionControl != nullptr)
+    {
+        // PointSelection changed - sync timeline selection
+        syncPointSelectionToTimelineSelection();
+    }
+}
+
+void TimelineComponent::syncTimelineSelectionToPointSelection()
+{
+    if (pPointSelectionControl == nullptr) return;
+    
+    // When timeline selection changes, update PointSelection
+    if (timelines != nullptr && currentTimelineIndex >= 0 && currentTimelineIndex < timelines->size())
+    {
+        // Select the group corresponding to the current timeline
+        // Assuming timeline index maps directly to group index
+        pPointSelectionControl->selectGroup(currentTimelineIndex, false);
+    }
+    else
+    {
+        // No timeline selected, clear group selection
+        pPointSelectionControl->unselectPoint();
+    }
+}
+
+void TimelineComponent::syncPointSelectionToTimelineSelection()
+{
+    if (pPointSelectionControl == nullptr) return;
+    
+    // When PointSelection changes, update timeline selection
+    if (pPointSelectionControl->getSelectionMode() == PointSelection::Group)
+    {
+        Array<int> selectedGroups = pPointSelectionControl->getSelectedIndices();
+        if (!selectedGroups.isEmpty())
+        {
+            // Use the first selected group as the current timeline
+            int groupIndex = selectedGroups.getFirst();
+            if (groupIndex >= 0 && groupIndex < getNumTimelines())
+            {
+                setCurrentTimeline(groupIndex);
+            }
+        }
+    }
 }

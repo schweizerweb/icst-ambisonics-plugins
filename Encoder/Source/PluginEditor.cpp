@@ -207,7 +207,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         //[UserButtonCode_btnHelp] -- add your button handler code here..
 
         // CallOutBox zeigt ein neues TimelineWidgetMS
-        timelineDialogManager.show(this, &mainProcessor);
+        timelineDialogManager.show(this, &mainProcessor, &pointSelection);
         //[/UserButtonCode_btnHelp]
     }
 

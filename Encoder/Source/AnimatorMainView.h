@@ -10,6 +10,7 @@ public:
     ~AnimatorMainView() override;
 
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
+    void setSelectionControl(PointSelection* pPointSelection);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
     void setPlayheadProvider(std::function<PlayheadSnapshot()> provider);

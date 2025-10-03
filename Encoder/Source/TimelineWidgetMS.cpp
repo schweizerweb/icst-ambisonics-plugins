@@ -18,6 +18,12 @@ void TimelineWidgetMS::setModels(juce::OwnedArray<TimelineModel>* models)
     mainView->setTimelines(models);
 }
 
+
+void TimelineWidgetMS::setSelectionControl(PointSelection* pPointSelection)
+{
+    mainView->setSelectionControl(pPointSelection);
+}
+
 void TimelineWidgetMS::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
 {
     playheadProvider = provider;

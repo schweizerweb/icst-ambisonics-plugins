@@ -19,6 +19,15 @@ public:
         }
     }
     
+    void closeAllWindows()
+    {
+        if (window != nullptr)
+        {
+            delete window;
+            window = nullptr;
+        }
+    }
+    
     void actionListenerCallback(const juce::String &message) override
     {
         if (message == ACTION_CLOSE_CLIP_EDITOR)

@@ -3,6 +3,7 @@
 #include "JuceHeader.h"
 #include "TimelineModel.h"
 #include "TimelineTypes.h"
+#include "../../Common/PointSelection.h"
 #include <cmath>
 
 class ClipEditorDialogManager;
@@ -10,13 +11,15 @@ class ClipEditorDialogManager;
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
                           public juce::ComboBox::Listener,
-                          public juce::MouseListener
+                          public juce::MouseListener,
+                          public juce::ChangeListener
 {
 public:
     TimelineComponent();
     ~TimelineComponent() override;
 
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
+    void setSelectionControl(PointSelection* pPointSelection);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
     void setCurrentTimeline(int index);
@@ -46,6 +49,9 @@ public:
     // Keyboard
     bool keyPressed(const juce::KeyPress& key) override;
     void nudgeSelectedClips(ms_t nudgeAmount);
+    
+    // ChangeListener method
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
     
     ms_t getPlayheadPosition() const { return playheadPosition; }
     ms_t maxDuration = 60000;
@@ -231,6 +237,9 @@ private:
     juce::String generateDuplicateClipId(const juce::String& originalId);
     
     std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
+    PointSelection* pPointSelectionControl = nullptr;
+    void syncTimelineSelectionToPointSelection();
+    void syncPointSelectionToTimelineSelection();
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };
