@@ -300,6 +300,11 @@ bool AmbiSourceSet::setMasterGain(float gainDb)
     return true;
 }
 
+ScalingInfo* AmbiSourceSet::getScalingInfo()
+{
+    return pScalingInfo;
+}
+
 void AmbiSourceSet::initialize(AudioProcessor* pProcessor)
 {
     masterGain = new AudioParameterFloat(ParameterID("MasterGain", Constants::audioParamVersion), "MasterGain", NormalisableRange<float>(EncoderConstants::MasterGainMin, EncoderConstants::MasterGainMax), localMasterGain, AudioParameterFloatAttributes().withLabel("Master Gain for B-Format output"));

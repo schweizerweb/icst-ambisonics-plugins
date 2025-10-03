@@ -70,6 +70,8 @@ public:
     float getMasterGain() const;
     bool setMasterGain(float gainDb);
     
+    ScalingInfo* getScalingInfo(); // quick workaround for animator
+    
 private:
 	OwnedArray<AmbiSource> elements;
 	OwnedArray<AmbiSource> removedElements;

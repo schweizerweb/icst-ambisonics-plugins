@@ -6,6 +6,29 @@
 
 class TimelineComponent;
 
+class UnlimitedRangeSlider : public juce::Slider
+{
+public:
+    double getValueFromText(const juce::String& text) override
+    {
+        // Allow any numeric value from text input
+        return text.getDoubleValue();
+    }
+    
+    juce::String getTextFromValue(double value) override
+    {
+        // Always display the actual value
+        return juce::String(value, 2);
+    }
+    
+private:
+    // Override to allow thumb to move beyond range visually
+    double snapValue(double attemptedValue, DragMode) override
+    {
+        return attemptedValue; // No snapping to range
+    }
+};
+
 class MovementClipEditor : public juce::Component, public juce::ChangeListener
 {
 public:
@@ -38,15 +61,15 @@ private:
     juce::TextButton applyCurrentStartButton, applyCurrentTargetButton;
     
     juce::ToggleButton useStartPosition;
-    juce::Slider startXSlider, startYSlider, startZSlider;
-    juce::Slider targetXSlider, targetYSlider, targetZSlider;
+    UnlimitedRangeSlider startXSlider, startYSlider, startZSlider;
+    UnlimitedRangeSlider targetXSlider, targetYSlider, targetZSlider;
     juce::Label startXLabel, startYLabel, startZLabel;
     juce::Label targetXLabel, targetYLabel, targetZLabel;
     
     void createControls();
-    void createCoordinateSlider(juce::Slider& slider, juce::Label& label, const juce::String& name,
-                               float min, float max, float defaultValue);
-    void createApplyCurrentPositionButton(juce::TextButton& button, juce::Slider& xSlider, juce::Slider& ySlider, juce::Slider& zSlider);
+    void createCoordinateSlider(UnlimitedRangeSlider& slider, juce::Label& label, const juce::String& name,
+                               double min, double max, double defaultValue);
+    void createApplyCurrentPositionButton(juce::TextButton& button, UnlimitedRangeSlider& xSlider, UnlimitedRangeSlider& ySlider, UnlimitedRangeSlider& zSlider);
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
     void updateCurrentPosition();
     int getMovementControlsHeight() const;

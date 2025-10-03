@@ -137,10 +137,14 @@ void MovementClipEditor::createControls()
     // Create coordinate sliders for start and target positions
     double minVal = -10.0f;
     double maxVal = 10.0f;
-    if(pSourceSet != nullptr && pSourceSet->getDistanceScaler() pScalingInfo != nullptr && !pSourceSet->pScalingInfo->IsInfinite())
+    if(pSourceSet != nullptr)
     {
-        minVal = pSourceSet->pScalingInfo->CartesianMin();
-        maxVal = pSourceSet->pScalingInfo->CartesianMax();
+        ScalingInfo* scaling = pSourceSet->getScalingInfo();
+        if(scaling != nullptr && !scaling->IsInfinite())
+        {
+            minVal = scaling->CartesianMin();
+            maxVal = scaling->CartesianMax();
+        }
     }
     
     createCoordinateSlider(startXSlider, startXLabel, "Start X:", minVal, maxVal, currentClip.startPointGroup.getX());
@@ -159,11 +163,11 @@ void MovementClipEditor::createControls()
     updateCurrentPosition(); // Initial update to set button states
 }
 
-void MovementClipEditor::createCoordinateSlider(juce::Slider& slider, juce::Label& label, const juce::String& name,
-                           float min, float max, float defaultValue)
+void MovementClipEditor::createCoordinateSlider(UnlimitedRangeSlider& slider, juce::Label& label, const juce::String& name,
+                           double min, double max, double defaultValue)
 {
     addAndMakeVisible(slider);
-    slider.setRange(min, max, 0.01f);
+    slider.setRange(min, max, 0.01);
     slider.setValue(defaultValue);
     slider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 70, 22);
     
@@ -172,7 +176,7 @@ void MovementClipEditor::createCoordinateSlider(juce::Slider& slider, juce::Labe
     label.setJustificationType(juce::Justification::centredLeft);
 }
 
-void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, juce::Slider& xSlider, juce::Slider& ySlider, juce::Slider& zSlider)
+void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, UnlimitedRangeSlider& xSlider, UnlimitedRangeSlider& ySlider, UnlimitedRangeSlider& zSlider)
 {
     addAndMakeVisible(button);
     button.onClick = [this, &xSlider, &ySlider, &zSlider] {
