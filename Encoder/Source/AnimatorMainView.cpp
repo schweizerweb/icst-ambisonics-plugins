@@ -66,6 +66,11 @@ void AnimatorMainView::setSelectionControl(PointSelection* pPointSelection)
     timelineViewport->getTimelineComponent()->setSelectionControl(pPointSelection);
 }
 
+void AnimatorMainView::setSourceSet(AmbiSourceSet *pSources)
+{
+    timelineViewport->getTimelineComponent()->setSourceSet(pSources);
+}
+
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 {
     timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);

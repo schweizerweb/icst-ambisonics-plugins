@@ -135,6 +135,11 @@ void TimelineComponent::setSelectionControl(PointSelection* pPointSelection)
     }
 }
 
+void TimelineComponent::setSourceSet(AmbiSourceSet *pSources)
+{
+    pSourceSet = pSources;
+}
+
 void TimelineComponent::setPlayheadPosition(ms_t timeMs)
 {
     playheadPosition = timeMs;
@@ -2100,6 +2105,11 @@ void TimelineComponent::showClipEditor(int timelineIndex, int clipIndex, bool is
     {
         clipEditorManager->showActionEditor(this, timelineIndex, clipIndex, this);
     }
+}
+
+AmbiSourceSet* TimelineComponent::getSources() const
+{
+    return pSourceSet;
 }
 
 TimelineModel* TimelineComponent::getTimelineModel(int timelineIndex) const

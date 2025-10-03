@@ -4,6 +4,7 @@
 #include "TimelineModel.h"
 #include "TimelineTypes.h"
 #include "../../Common/PointSelection.h"
+#include "../../Common/AmbiSourceSet.h"
 #include <cmath>
 
 class ClipEditorDialogManager;
@@ -20,6 +21,7 @@ public:
 
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
     void setSelectionControl(PointSelection* pPointSelection);
+    void setSourceSet(AmbiSourceSet* pSources);
     void setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
@@ -77,6 +79,7 @@ public:
         repaint();
     }
     
+    AmbiSourceSet* getSources() const;
     TimelineModel* getTimelineModel(int timelineIndex) const;
     TimelineModel* getCurrentTimeline() const;
     const juce::Array<SelectedClip>& getSelectedClips() const { return selectedClips; }
@@ -244,6 +247,7 @@ private:
     
     std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
     PointSelection* pPointSelectionControl = nullptr;
+    AmbiSourceSet* pSourceSet = nullptr;
     void syncTimelineSelectionToPointSelection();
     void syncPointSelectionToTimelineSelection();
     

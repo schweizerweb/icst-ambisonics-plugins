@@ -90,6 +90,7 @@ public:
 
         auto* timeline = new TimelineWidgetMS();
         timeline->setModels(pProcessor->getTimelines());
+        timeline->setSourceSet(pProcessor->getSources());
         timeline->setSelectionControl(pPointSelection);
         timeline->setPlayheadProvider([pProcessor]() -> PlayheadSnapshot {
             PlayheadSnapshot s;

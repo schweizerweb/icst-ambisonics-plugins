@@ -24,6 +24,11 @@ void TimelineWidgetMS::setSelectionControl(PointSelection* pPointSelection)
     mainView->setSelectionControl(pPointSelection);
 }
 
+void TimelineWidgetMS::setSourceSet(AmbiSourceSet *pSources)
+{
+    mainView->setSourceSet(pSources);
+}
+
 void TimelineWidgetMS::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
 {
     playheadProvider = provider;

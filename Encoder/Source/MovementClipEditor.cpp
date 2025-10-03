@@ -14,14 +14,29 @@ MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timeline
         }
     }
     
+    pSourceSet = timelineComp.getSources();
+    if(pSourceSet != nullptr)
+    {
+        pSourceSet->addChangeListener(this);
+        updateCurrentPosition();
+    }
+    
     createControls();
+}
+
+MovementClipEditor::~MovementClipEditor()
+{
+    if (pSourceSet != nullptr)
+    {
+        pSourceSet->removeChangeListener(this);
+    }
 }
 
 void MovementClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
     
-    // Calculate group heights
+    // Calculate group heights - increased to accommodate new buttons
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
     const int movementGroupHeight = getMovementControlsHeight() + 40;
     const int buttonHeight = 28;
@@ -120,15 +135,28 @@ void MovementClipEditor::createControls()
     useStartPosition.onClick = [this] { updateStartPositionVisibility(); };
     
     // Create coordinate sliders for start and target positions
-    createCoordinateSlider(startXSlider, startXLabel, "Start X:", -10.0f, 10.0f, currentClip.startPointGroup.getX());
-    createCoordinateSlider(startYSlider, startYLabel, "Start Y:", -10.0f, 10.0f, currentClip.startPointGroup.getY());
-    createCoordinateSlider(startZSlider, startZLabel, "Start Z:", -10.0f, 10.0f, currentClip.startPointGroup.getZ());
+    double minVal = -10.0f;
+    double maxVal = 10.0f;
+    if(pSourceSet != nullptr && pSourceSet->getDistanceScaler() pScalingInfo != nullptr && !pSourceSet->pScalingInfo->IsInfinite())
+    {
+        minVal = pSourceSet->pScalingInfo->CartesianMin();
+        maxVal = pSourceSet->pScalingInfo->CartesianMax();
+    }
     
-    createCoordinateSlider(targetXSlider, targetXLabel, "Target X:", -10.0f, 10.0f, currentClip.endPointGroup.getX());
-    createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", -10.0f, 10.0f, currentClip.endPointGroup.getY());
-    createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", -10.0f, 10.0f, currentClip.endPointGroup.getZ());
+    createCoordinateSlider(startXSlider, startXLabel, "Start X:", minVal, maxVal, currentClip.startPointGroup.getX());
+    createCoordinateSlider(startYSlider, startYLabel, "Start Y:", minVal, maxVal, currentClip.startPointGroup.getY());
+    createCoordinateSlider(startZSlider, startZLabel, "Start Z:", minVal, maxVal, currentClip.startPointGroup.getZ());
+    
+    createCoordinateSlider(targetXSlider, targetXLabel, "Target X:", minVal, maxVal, currentClip.endPointGroup.getX());
+    createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", minVal, maxVal, currentClip.endPointGroup.getY());
+    createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", minVal, maxVal, currentClip.endPointGroup.getZ());
+    
+    // Create apply current position buttons
+    createApplyCurrentPositionButton(applyCurrentStartButton, startXSlider, startYSlider, startZSlider);
+    createApplyCurrentPositionButton(applyCurrentTargetButton, targetXSlider, targetYSlider, targetZSlider);
     
     updateStartPositionVisibility();
+    updateCurrentPosition(); // Initial update to set button states
 }
 
 void MovementClipEditor::createCoordinateSlider(juce::Slider& slider, juce::Label& label, const juce::String& name,
@@ -144,13 +172,44 @@ void MovementClipEditor::createCoordinateSlider(juce::Slider& slider, juce::Labe
     label.setJustificationType(juce::Justification::centredLeft);
 }
 
+void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, juce::Slider& xSlider, juce::Slider& ySlider, juce::Slider& zSlider)
+{
+    addAndMakeVisible(button);
+    button.onClick = [this, &xSlider, &ySlider, &zSlider] {
+        if (currentPositionValid)
+        {
+            xSlider.setValue(currentPosition.x);
+            ySlider.setValue(currentPosition.y);
+            zSlider.setValue(currentPosition.z);
+        }
+    };
+}
+
+void MovementClipEditor::updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid)
+{
+    if (isValid)
+    {
+        button.setButtonText(juce::String("Apply ") +
+                             juce::String(vector.x, 2) + " (X); " +
+                             juce::String(vector.y, 2) + " (Y); " +
+                             juce::String(vector.z, 2) + " (Z)");
+    }
+    else
+    {
+        button.setButtonText("Unable to determine current position");
+    }
+}
+
 int MovementClipEditor::getMovementControlsHeight() const
 {
     const int rowHeight = 28;
     const int verticalSpacing = 8;
+    const int buttonSpacing = 4;
     
-    // Checkbox + 3 start sliders + 3 target sliders + spacing
-    return rowHeight + verticalSpacing + (rowHeight * 3) + verticalSpacing + (rowHeight * 3);
+    // Checkbox + 3 start sliders + start button + 3 target sliders + target button + spacing
+    return rowHeight + verticalSpacing +
+           (rowHeight * 3) + buttonSpacing + rowHeight + verticalSpacing +
+           (rowHeight * 3) + buttonSpacing + rowHeight;
 }
 
 void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
@@ -158,6 +217,7 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     const int rowHeight = 28;
     const int labelWidth = 100;
     const int verticalSpacing = 8;
+    const int buttonSpacing = 4;
     const int rightMargin = 10;
     const int labelLeftMargin = 10; // Labels indented from group box
     
@@ -180,6 +240,12 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     startZLabel.setBounds(startZArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
     startZSlider.setBounds(startZArea.withTrimmedRight(rightMargin));
     
+    area.removeFromTop(buttonSpacing);
+    
+    // Start position apply button
+    auto startButtonArea = area.removeFromTop(rowHeight);
+    applyCurrentStartButton.setBounds(startButtonArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
+    
     area.removeFromTop(verticalSpacing);
     
     // Target position controls
@@ -194,6 +260,12 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     auto targetZArea = area.removeFromTop(rowHeight);
     targetZLabel.setBounds(targetZArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
     targetZSlider.setBounds(targetZArea.withTrimmedRight(rightMargin));
+    
+    area.removeFromTop(buttonSpacing);
+    
+    // Target position apply button
+    auto targetButtonArea = area.removeFromTop(rowHeight);
+    applyCurrentTargetButton.setBounds(targetButtonArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
 }
 
 void MovementClipEditor::updateStartPositionVisibility()
@@ -207,6 +279,7 @@ void MovementClipEditor::updateStartPositionVisibility()
     startXLabel.setEnabled(enabled);
     startYLabel.setEnabled(enabled);
     startZLabel.setEnabled(enabled);
+    applyCurrentStartButton.setEnabled(enabled && currentPositionValid);
     
     startXSlider.setAlpha(enabled ? 1.0f : 0.5f);
     startYSlider.setAlpha(enabled ? 1.0f : 0.5f);
@@ -214,4 +287,39 @@ void MovementClipEditor::updateStartPositionVisibility()
     startXLabel.setAlpha(enabled ? 1.0f : 0.5f);
     startYLabel.setAlpha(enabled ? 1.0f : 0.5f);
     startZLabel.setAlpha(enabled ? 1.0f : 0.5f);
+    applyCurrentStartButton.setAlpha((enabled && currentPositionValid) ? 1.0f : 0.5f);
+}
+
+void MovementClipEditor::updateCurrentPosition()
+{
+    currentPositionValid = false;
+    
+    if (pSourceSet != nullptr)
+    {
+        auto grp = pSourceSet->getGroup(timelineIndex);
+        if (grp != nullptr)
+        {
+            currentPosition = grp->getVector3D();
+            currentPositionValid = true;
+        }
+        else
+        {
+            currentPositionValid = false;
+        }
+    }
+
+    updateApplyCurrentPositionButtonText(applyCurrentStartButton, currentPosition, currentPositionValid);
+    updateApplyCurrentPositionButtonText(applyCurrentTargetButton, currentPosition, currentPositionValid);
+    
+    // Update button enablement
+    applyCurrentTargetButton.setEnabled(currentPositionValid);
+    applyCurrentStartButton.setEnabled(useStartPosition.getToggleState() && currentPositionValid);
+    
+    applyCurrentTargetButton.setAlpha(currentPositionValid ? 1.0f : 0.5f);
+    applyCurrentStartButton.setAlpha((useStartPosition.getToggleState() && currentPositionValid) ? 1.0f : 0.5f);
+}
+
+void MovementClipEditor::changeListenerCallback(ChangeBroadcaster *source)
+{
+    updateCurrentPosition();
 }
