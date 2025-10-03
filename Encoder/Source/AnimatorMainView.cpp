@@ -171,7 +171,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             menu.addItem(22, "Reset Zoom");
             menu.addSeparator();
             menu.addItem(23, "Toggle Auto-follow");
-            menu.addItem(24, "Show/Hide Rulers");
             break;
             
         case 3: // Insert
