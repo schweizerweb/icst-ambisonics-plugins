@@ -47,7 +47,11 @@ SET(SRC_FILES
 	../Source/ActionEditDialog.h
 	../Source/CommonClipSettings.h
 	../Source/MovementClipEditor.h
+	../Source/MovementClipEditor.cpp
 	../Source/ActionClipEditor.h
+	../Source/ActionClipEditor.cpp
+	../Source/ClipEditorDialog.h
+	../Source/ClipEditorDialogManager.h
 	../Source/ComponentArguments.h
 	../Source/CustomOscBase.cpp
 	../Source/CustomOscBase.h

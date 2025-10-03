@@ -1,6 +1,7 @@
 #include "TimelineComponent.h"
 #include "MovementClipEditor.h"
 #include "ActionClipEditor.h"
+#include "ClipEditorDialogManager.h"
 
 TimelineComponent::TimelineComponent()
 {
@@ -35,6 +36,8 @@ TimelineComponent::TimelineComponent()
     
     // Make scrollbars always visible for testing
     horizontalScrollBar->setAlwaysOnTop(true);
+    
+    clipEditorManager = std::make_unique<ClipEditorDialogManager>();
     
     setWantsKeyboardFocus(true);
     setFocusContainerType(FocusContainerType::keyboardFocusContainer);
@@ -590,8 +593,8 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             
             if (iconArea.contains(pos.toFloat()))
             {
-                showClipEditor(clipBounds.timelineIndex, clipBounds.layerIndex,
-                              clipBounds.clipIndex, clipBounds.isMovementClip, pos);
+                showClipEditor(clipBounds.timelineIndex,
+                              clipBounds.clipIndex, clipBounds.isMovementClip);
                 dragState.isDragging = false;
                 return;
             }
@@ -1287,7 +1290,7 @@ void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, i
                        {
                            if (result == 1)
                            {
-                               showClipEditor(timelineIndex, layerIndex, clipIndex, isMovementClip, position);
+                               showClipEditor(timelineIndex, clipIndex, isMovementClip);
                            }
                            else if (result == 2)
                            {
@@ -1874,38 +1877,16 @@ juce::String TimelineComponent::generateDuplicateClipId(const juce::String& orig
     return originalId + " Copy";
 }
 
-void TimelineComponent::showClipEditor(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
+void TimelineComponent::showClipEditor(int timelineIndex, int clipIndex, bool isMovementClip)
 {
-    std::unique_ptr<juce::Component> editor;
-    int width = 450;
-    int height = 0;
-    
     if (isMovementClip)
     {
-        auto movementEditor = std::make_unique<MovementClipEditor>(*this, timelineIndex, layerIndex, clipIndex);
-        height = movementEditor->getTotalRequiredHeight();
-        editor = std::move(movementEditor);
+        clipEditorManager->showMovementEditor(this, timelineIndex, clipIndex, this);
     }
     else
     {
-        // For ActionClipEditor, you'd implement similar height calculation
-        auto actionEditor = std::make_unique<ActionClipEditor>(*this, timelineIndex, layerIndex, clipIndex);
-        height = actionEditor->getTotalRequiredHeight();
-        editor = std::move(actionEditor);
+        clipEditorManager->showActionEditor(this, timelineIndex, clipIndex, this);
     }
-    
-    editor->setSize(width, height);
-    
-    juce::DialogWindow::LaunchOptions options;
-    options.content.setOwned(editor.release());
-    options.dialogTitle = isMovementClip ? "Edit Movement Clip" : "Edit Action Clip";
-    options.componentToCentreAround = this;
-    options.escapeKeyTriggersCloseButton = true;
-    options.useNativeTitleBar = true;
-    options.resizable = false;
-    
-    auto* dialog = options.launchAsync();
-    //dialog->enterModalState(true, nullptr, true);
 }
 
 TimelineModel* TimelineComponent::getTimelineModel(int timelineIndex) const

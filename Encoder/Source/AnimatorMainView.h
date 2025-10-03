@@ -22,7 +22,7 @@ private:
     class MainMenuBarModel : public juce::MenuBarModel
     {
     public:
-        MainMenuBarModel(AnimatorMainView* owner) : owner(owner) {}
+        MainMenuBarModel(AnimatorMainView* ownerView) : owner(ownerView) {}
         
         juce::StringArray getMenuBarNames() override { return { "File", "Edit", "View", "Insert" }; }
         juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName) override;

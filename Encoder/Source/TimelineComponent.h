@@ -5,6 +5,8 @@
 #include "TimelineTypes.h"
 #include <cmath>
 
+class ClipEditorDialogManager;
+
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
                           public juce::ComboBox::Listener,
@@ -85,7 +87,7 @@ public:
     Clip* getClip(int timelineIndex, int layerIndex, int clipIndex, bool& isMovementClip);
     bool removeClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
     bool duplicateClip(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip);
-    void showClipEditor(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position);
+    void showClipEditor(int timelineIndex, int clipIndex, bool isMovementClip);
     
     // Cursor control methods
     void setCursorTime(ms_t time);
@@ -227,6 +229,8 @@ private:
     bool shouldShowClipText(const juce::Rectangle<float>& clipBounds, float iconSize) const;
     
     juce::String generateDuplicateClipId(const juce::String& originalId);
+    
+    std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

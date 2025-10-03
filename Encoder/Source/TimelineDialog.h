@@ -23,7 +23,7 @@ public:
             juce::Colours::darkgrey,
             DocumentWindow::allButtons)
     {
-        setUsingNativeTitleBar(true);
+        setUsingNativeTitleBar(false);
         setResizable(true, true);
         setContentOwned(content, true);
         setAlwaysOnTop(false);
@@ -50,7 +50,6 @@ public:
             centreWithSize(w, h);
     }
 
-    // jetzt passt override:
     void closeButtonPressed() override
     {
         sendActionMessage(ACTION_CLOSE_TIMELINE);

@@ -1,8 +1,7 @@
 #pragma once
 
 #include <JuceHeader.h>
-#include "../../Common/Point3D.h"
-#include "TimelineTypes.h"
+#include "TimelineModel.h"
 
 class CommonClipSettings : public juce::Component, public juce::ChangeListener
 {
