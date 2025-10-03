@@ -518,6 +518,9 @@ void TimelineComponent::resized()
 
 void TimelineComponent::mouseDown(const juce::MouseEvent& event)
 {
+    // Reset cursor to normal when starting interaction
+    setMouseCursor(juce::MouseCursor::NormalCursor);
+    
     if (timelines == nullptr || timelines->size() == 0) return;
 
     const auto pos = event.getPosition();
@@ -661,14 +664,28 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
 
 void TimelineComponent::mouseEnter(const juce::MouseEvent& event)
 {
-    // Show preview cursor when mouse enters component
-    updatePreviewCursor(event.getPosition());
+    // Show preview cursor when mouse enters component (if not over clip)
+    if (findClipAtPosition(event.getPosition()).timelineIndex == -1)
+    {
+        updatePreviewCursor(event.getPosition());
+    }
 }
 
 void TimelineComponent::mouseExit(const juce::MouseEvent& event)
 {
     // Hide preview cursor when mouse leaves component
     hidePreviewCursor();
+    setMouseCursor(juce::MouseCursor::NormalCursor);
+    
+    // Clear status message
+    if (statusMessageFunction)
+    {
+        juce::AttributedString message;
+        message.append("Ready",
+                      juce::FontOptions(12.0f),
+                      juce::Colours::lightgrey);
+        statusMessageFunction(message);
+    }
 }
 
 void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
@@ -776,12 +793,113 @@ void TimelineComponent::mouseUp(const juce::MouseEvent& event)
 
 void TimelineComponent::mouseMove(const juce::MouseEvent& event)
 {
-    if (timelines == nullptr || timelines->size() == 0) return;
-    
-    // Show preview cursor at mouse position when not dragging
-    if (!dragState.isDragging && !dragState.isRectangleSelecting)
+    if (timelines == nullptr || timelines->size() == 0)
     {
-        updatePreviewCursor(event.getPosition());
+        hidePreviewCursor();
+        return;
+    }
+    
+    const auto pos = event.getPosition();
+    
+    // Check if mouse is in the row header section (left side with trackHeaderWidth)
+    bool isInRowHeaderSection = pos.x < trackHeaderWidth;
+    
+    if (isInRowHeaderSection)
+    {
+        // Mouse is in row header section - hide preview cursor and don't show status messages
+        hidePreviewCursor();
+        setMouseCursor(juce::MouseCursor::NormalCursor);
+        
+        // Clear status message when in header area
+        if (statusMessageFunction)
+        {
+            juce::AttributedString message;
+            message.append("Ready",
+                          juce::FontOptions(12.0f),
+                          juce::Colours::lightgrey);
+            statusMessageFunction(message);
+        }
+        return;
+    }
+    
+    // Check if we're over a clip
+    auto clipBounds = findClipAtPosition(pos);
+    
+    if (clipBounds.timelineIndex != -1)
+    {
+        // Mouse is over a clip - hide preview cursor and change cursor
+        hidePreviewCursor();
+        
+        // Set appropriate cursor based on resize handles
+        if (clipBounds.isResizeLeft || clipBounds.isResizeRight)
+        {
+            setMouseCursor(juce::MouseCursor::LeftRightResizeCursor);
+        }
+        else
+        {
+            setMouseCursor(juce::MouseCursor::PointingHandCursor);
+        }
+        
+        // Send clip information to status bar
+        if (statusMessageFunction)
+        {
+            juce::AttributedString message;
+            
+            // Clip name in bold
+            message.append(clipBounds.displayName,
+                          juce::FontOptions(12.0f, juce::Font::bold),
+                          getClipColourFromTimeline(clipBounds.timelineIndex));
+            
+            // Time info
+            message.append(" - " + clipBounds.timeInfo,
+                          juce::FontOptions(12.0f),
+                          juce::Colours::lightgrey);
+            
+            // Resize hint if applicable
+            if (clipBounds.isResizeLeft)
+            {
+                message.append(" (Drag left edge to resize)",
+                              juce::FontOptions(11.0f),
+                              juce::Colours::yellow);
+            }
+            else if (clipBounds.isResizeRight)
+            {
+                message.append(" (Drag right edge to resize)",
+                              juce::FontOptions(11.0f),
+                              juce::Colours::yellow);
+            }
+            else
+            {
+                message.append(" (Drag to move)",
+                              juce::FontOptions(11.0f),
+                              juce::Colours::lightblue);
+            }
+            
+            statusMessageFunction(message);
+        }
+    }
+    else
+    {
+        // Mouse is not over a clip - show preview cursor and time position
+        setMouseCursor(juce::MouseCursor::NormalCursor);
+        updatePreviewCursor(pos);
+        
+        // Send time position to status bar
+        if (statusMessageFunction)
+        {
+            ms_t currentTime = xToTime(static_cast<float>(pos.x));
+            
+            juce::AttributedString message;
+            message.append("Position: ",
+                          juce::FontOptions(12.0f),
+                          juce::Colours::lightgrey);
+            
+            message.append(formatTimeWithSeparators(currentTime) + " ms",
+                          juce::FontOptions(12.0f, juce::Font::bold),
+                          juce::Colours::white);
+            
+            statusMessageFunction(message);
+        }
     }
 }
 
@@ -1103,10 +1221,13 @@ void TimelineComponent::updateVisibleClips()
                 bounds.bounds = juce::Rectangle<float>(x, clipY, juce::jmax(10.0f, width), clipHeight);
                 
                 // Check if resize handles would be visible
-                // Only show left resize handle if the actual clip start is visible
                 bounds.isResizeLeft = (clip->start >= visibleStartTime);
-                // Only show right resize handle if the actual clip end is visible
                 bounds.isResizeRight = (clip->end() <= visibleEndTime);
+                
+                // Populate clip information for tooltips
+                bounds.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                bounds.timeInfo = getClipTimeInfo(*clip);
+                bounds.fullInfo = generateClipFullInfo(timelineIndex, layerIndex, clipIndex, isMovementClip, *clip);
                 
                 // Only add if clip is vertically visible
                 if (bounds.bounds.getBottom() >= 0 && bounds.bounds.getY() <= getHeight())
@@ -1114,6 +1235,52 @@ void TimelineComponent::updateVisibleClips()
             }
         }
     }
+}
+
+juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const
+{
+    juce::String info;
+    
+    // Basic information
+    info << "Group " << (timelineIndex + 1) << " - ";
+    info << (layerIndex == 0 ? "Movement" : "Action") << " Clip\n";
+    info << "Name: " << (clip.id.isNotEmpty() ? clip.id : "Unnamed") << "\n";
+    
+    // Time information with formatted numbers
+    info << "Start: " << formatTimeWithSeparators(clip.start) << " ms\n";
+    info << "End: " << formatTimeWithSeparators(clip.end()) << " ms\n";
+    info << "Duration: " << formatTimeWithSeparators(clip.length) << " ms\n";
+    
+    // Additional clip-specific information
+    if (isMovementClip)
+    {
+        const auto& movementClip = static_cast<const MovementClip&>(clip);
+        // Add movement-specific info if needed
+    }
+    else
+    {
+        const auto& actionClip = static_cast<const ActionClip&>(clip);
+        info << "Actions: " << actionClip.actions.size() << "\n";
+    }
+    
+    return info;
+}
+
+juce::String TimelineComponent::formatTimeWithSeparators(ms_t timeMs) const
+{
+    juce::String timeStr = juce::String(timeMs);
+    juce::String result;
+    
+    // Add thousands separators for readability
+    int length = timeStr.length();
+    for (int i = 0; i < length; ++i)
+    {
+        if (i > 0 && (length - i) % 3 == 0)
+            result << ",";
+        result << timeStr[i];
+    }
+    
+    return result;
 }
 
 // Selection methods implementation
@@ -1985,4 +2152,10 @@ void TimelineComponent::syncPointSelectionToTimelineSelection()
 void TimelineComponent::setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function)
 {
     statusMessageFunction = function;
+}
+
+juce::Colour TimelineComponent::getClipColourFromTimeline(int timelineIndex) const
+{
+    // Use the same colors as timeline headers for consistency
+    return getTimelineColour(timelineIndex).brighter(0.3f);
 }

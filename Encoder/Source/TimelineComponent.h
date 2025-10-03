@@ -113,6 +113,11 @@ private:
         bool isResizeLeft;
         bool isResizeRight;
         
+        // Clip information for tooltips
+        juce::String displayName;
+        juce::String timeInfo;
+        juce::String fullInfo;
+    
         // For selection comparison
         bool equals(int t, int l, int c, bool m) const {
             return timelineIndex == t && layerIndex == l && clipIndex == c && isMovementClip == m;
@@ -243,6 +248,9 @@ private:
     void syncPointSelectionToTimelineSelection();
     
     std::function<void(const juce::AttributedString&)> statusMessageFunction;
+    juce::String formatTimeWithSeparators(ms_t timeMs) const;
+    juce::String generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const;
+    juce::Colour getClipColourFromTimeline(int timelineIndex) const;
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };
