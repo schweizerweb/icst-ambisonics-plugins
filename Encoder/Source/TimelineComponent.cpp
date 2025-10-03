@@ -282,6 +282,7 @@ void TimelineComponent::paint(juce::Graphics& g)
             g.setFont(juce::FontOptions(14.0f, juce::Font::plain));
         }
         
+        // Draw in the track headers area (left side)
         g.drawText("Group " + juce::String(timelineIndex + 1),
                    10, (int)(timelineY + 5), (int)(trackHeaderWidth - 20), (int)(timelineHeaderHeight - 10),
                    juce::Justification::centredLeft);
@@ -316,6 +317,12 @@ void TimelineComponent::paint(juce::Graphics& g)
                 g.setColour(juce::Colours::white.withAlpha(0.6f));
                 g.setFont(juce::FontOptions(13.0f, juce::Font::plain));
             }
+            
+            // Draw track name in the track headers area
+            juce::String trackName = layerIndex == 0 ? "Movement" : "Action";
+            g.drawText(trackName,
+                       10, (int)(trackY + 5), (int)(trackHeaderWidth - 20), (int)(trackHeight - 10),
+                       juce::Justification::centredLeft);
             
             // Draw track separator
             g.setColour(juce::Colours::black.withAlpha(0.5f));
@@ -414,7 +421,6 @@ void TimelineComponent::paint(juce::Graphics& g)
             iconDrawable->draw(g, 1.0f, transform);
         }
         
-        // TODO: this is in the wrong place!!
         // Draw text only if there's enough space
         if (shouldShowClipText(bounds, iconBounds.getWidth()))
         {
