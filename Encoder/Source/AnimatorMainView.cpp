@@ -153,8 +153,8 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             break;
             
         case 1: // Edit
-            menu.addItem(10, "Undo");
-            menu.addItem(11, "Redo");
+            menu.addItem(10, "Undo", false);
+            menu.addItem(11, "Redo", false);
             menu.addSeparator();
             menu.addItem(12, "Cut");
             menu.addItem(13, "Copy");
