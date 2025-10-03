@@ -780,6 +780,8 @@ void AnimatorMainView::validateTimelines()
         // Check for overlapping clips
         for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
+            juce::String layerName = layerIndex == 0 ? "Movement layer" : "Action layer";
+            
             juce::Array<const Clip*> layerClips;
             
             // Collect all clips in this layer
@@ -803,7 +805,7 @@ void AnimatorMainView::validateTimelines()
                     if (clip1->start < clip2->end() && clip2->start < clip1->end())
                     {
                         valid = false;
-                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " " + layerName +
                                   ": Overlapping clips at " + juce::String(clip1->start) + "ms and " +
                                   juce::String(clip2->start) + "ms");
                     }
@@ -814,6 +816,8 @@ void AnimatorMainView::validateTimelines()
         // Check for clips with zero or negative duration
         for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
+            juce::String layerName = layerIndex == 0 ? "Movement layer" : "Action layer";
+            
             for (int clipIndex = 0; clipIndex < timeline->getNumClips(layerIndex); ++clipIndex)
             {
                 bool isMovementClip = false;
@@ -822,7 +826,7 @@ void AnimatorMainView::validateTimelines()
                     if (clip->length <= 0)
                     {
                         valid = false;
-                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " " + layerName +
                                   " Clip " + juce::String(clipIndex) + ": Invalid duration " +
                                   juce::String(clip->length) + "ms");
                     }
@@ -833,6 +837,8 @@ void AnimatorMainView::validateTimelines()
         // Check for clips with invalid start times
         for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
+            juce::String layerName = layerIndex == 0 ? "Movement layer" : "Action layer";
+            
             for (int clipIndex = 0; clipIndex < timeline->getNumClips(layerIndex); ++clipIndex)
             {
                 bool isMovementClip = false;
@@ -841,7 +847,7 @@ void AnimatorMainView::validateTimelines()
                     if (clip->start < 0)
                     {
                         valid = false;
-                        issues.add(UTF8Helpers::dot() + " " + timelineName + " Layer " + juce::String(layerIndex) +
+                        issues.add(UTF8Helpers::dot() + " " + timelineName + " " + layerName +
                                   " Clip " + juce::String(clipIndex) + ": Negative start time " +
                                   juce::String(clip->start) + "ms");
                     }

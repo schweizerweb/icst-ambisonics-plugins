@@ -14,7 +14,7 @@ public:
     ClipEditorDialog(juce::ActionListener* actionListener, const juce::String& title, std::unique_ptr<juce::Component> editorComponent, int width, int height)
         : AdditionalWindow(title, editorComponent.get())
     {
-        setAlwaysOnTop(false); // Allow interaction with parent
+        setAlwaysOnTop(true); // Allow interaction with parent
         setContentOwned(editorComponent.release(), true);
         addActionListener(actionListener);
         setResizable(false, false);

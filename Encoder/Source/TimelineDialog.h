@@ -19,14 +19,14 @@ class TimelineDialog : public juce::DocumentWindow,
 {
 public:
     TimelineDialog(juce::ActionListener* listener, juce::Component* content)
-        : juce::DocumentWindow("Timeline",
+        : juce::DocumentWindow("Animator",
             juce::Colours::darkgrey,
             DocumentWindow::allButtons)
     {
         setUsingNativeTitleBar(false);
         setResizable(true, true);
         setContentOwned(content, true);
-        setAlwaysOnTop(false);
+        setAlwaysOnTop(true);
         setVisible(false);
 
         if (listener != nullptr)

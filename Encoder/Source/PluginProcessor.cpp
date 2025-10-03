@@ -488,8 +488,8 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         // Action layer
         t->actions.clips.add(makeActionClip("Rotation X", 1200, 2000, juce::Colours::slateblue));
         t->actions.clips.add(makeActionClip("Rotation Y", 800, 1500, juce::Colours::lightsteelblue));
-        t->actions.clips.add(makeActionClip("Scale", 500, 1000, juce::Colours::mediumseagreen));
-        t->actions.clips.add(makeActionClip("Stretch", 1800, 600, juce::Colours::seagreen));
+        t->actions.clips.add(makeActionClip("Stretch In", 500, 1000, juce::Colours::mediumseagreen));
+        t->actions.clips.add(makeActionClip("Stretch Out", 1800, 600, juce::Colours::seagreen));
         
         timelines.add(t);
     }
