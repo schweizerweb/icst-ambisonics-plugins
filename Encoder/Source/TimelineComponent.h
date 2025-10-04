@@ -191,7 +191,6 @@ private:
     ClipBounds findClipAtPosition(const juce::Point<int>& position);
     juce::Array<ClipBounds> findAllClipsAtPosition(const juce::Point<int>& position) const;
     ClipBounds findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& position) const;
-    void showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position);
     void timelineSelectionChanged();
     
     // Rendering helpers
@@ -200,7 +199,6 @@ private:
     juce::String getClipTimeInfo(const Clip& clip) const;
     juce::Colour getTimelineColour(int timelineIndex) const;
     juce::Rectangle<float> getIconBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
-    juce::Rectangle<float> getButtonBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
     
     std::unique_ptr<juce::Drawable> movementIcon;
     std::unique_ptr<juce::Drawable> actionIcon;

@@ -83,6 +83,7 @@ private:
     void addMovementClip();
     void addActionClip();
     void deleteSelectedClips();
+    void duplicateSelectedClips();
     void zoomIn();
     void zoomOut();
     void resetZoom();

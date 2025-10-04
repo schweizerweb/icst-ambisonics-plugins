@@ -297,20 +297,11 @@ void TimelineComponent::scrollBarMoved(juce::ScrollBar* scrollBar, double newRan
 
 juce::Rectangle<float> TimelineComponent::getIconBoundsWithinClip(const Rectangle<float>& clipBounds)
 {
-    const float iconSize = (clipHeight - 10.0f) * 0.5f;
-    const float iconX = clipBounds.getX() + 7.0f;
-    const float iconY = clipBounds.getY() + (clipBounds.getHeight() - 2.0f * iconSize) * 0.25f;
+    const float iconSize = (clipHeight - 8.0f) * 0.5f;
+    const float iconX = clipBounds.getX() + 4.0f;
+    const float iconY = clipBounds.getY() + (clipBounds.getHeight() - 2.0f * iconSize) * 0.5f;
     
     return Rectangle<float>(iconX, iconY, iconSize, iconSize);
-}
-
-juce::Rectangle<float> TimelineComponent::getButtonBoundsWithinClip(const Rectangle<float>& clipBounds)
-{
-    const float btnSize = (clipHeight - 10.0f) * 0.5f;
-    const float btnX = clipBounds.getX() + 7.0f;
-    const float btnY = clipBounds.getBottom() - btnSize - (clipBounds.getHeight() - 2.0f * btnSize) * 0.25f;
-    
-    return Rectangle<float>(btnX, btnY, btnSize, btnSize);
 }
 
 void TimelineComponent::paint(juce::Graphics& g)
@@ -612,20 +603,6 @@ void TimelineComponent::paint(juce::Graphics& g)
                                    (int)textX, (int)(bounds.getY() + 22.0f), (int)availableTextWidth, 14,
                                    juce::Justification::left);
                     }
-                    
-                    // Menu button only for current timeline, selected clips, and valid timelines
-                    if (isCurrentTimeline && isSelected && !isDisabled)
-                    {
-                        Rectangle<float> buttonBounds = getButtonBoundsWithinClip(bounds);
-                        
-                        g.setColour(juce::Colours::white.withAlpha(0.7f));
-                        g.fillEllipse(buttonBounds);
-                        
-                        g.setColour(juce::Colours::black);
-                        g.setFont(juce::FontOptions(10.0f, juce::Font::bold));
-                        g.drawText("...", buttonBounds,
-                                   juce::Justification::centred);
-                    }
                 }
             }
             
@@ -919,7 +896,6 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
         if (clipBounds.timelineIndex == currentTimelineIndex)
         {
             const auto bounds = clipBounds.bounds;
-            auto buttonArea = getButtonBoundsWithinClip(bounds);
             auto iconArea = getIconBoundsWithinClip(bounds);
             
             if (iconArea.contains(pos.toFloat()))
@@ -928,13 +904,6 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
                               clipBounds.clipIndex, clipBounds.isMovementClip);
                 dragState.isDragging = false;
                 return;
-            }
-            
-            if (buttonArea.contains(pos.toFloat()))
-            {
-                showClipContextMenu(clipBounds.timelineIndex, clipBounds.layerIndex,
-                                   clipBounds.clipIndex, clipBounds.isMovementClip, pos);
-                dragState.isDragging = false;
             }
         }
 
@@ -1869,36 +1838,6 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
     }
     
     return result;
-}
-
-void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
-{
-    juce::PopupMenu menu;
-    
-    menu.addItem(1, "Edit Clip Properties");
-    menu.addItem(2, "Delete Clip");
-    menu.addSeparator();
-    menu.addItem(3, "Duplicate Clip");
-    
-    menu.showMenuAsync(juce::PopupMenu::Options()
-                       .withParentComponent(this),
-                       [this, timelineIndex, layerIndex, clipIndex, isMovementClip](int result)
-                       {
-                           if (result == 1)
-                           {
-                               showClipEditor(timelineIndex, clipIndex, isMovementClip);
-                           }
-                           else if (result == 2)
-                           {
-                               removeClip(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                               repaint();
-                           }
-                           else if (result == 3)
-                           {
-                               duplicateClip(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                               repaint();
-                           }
-                       });
 }
 
 juce::Colour TimelineComponent::getClipColour(const Clip& clip) const

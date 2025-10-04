@@ -165,6 +165,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             menu.addItem(13, "Copy");
             menu.addItem(14, "Paste");
             menu.addItem(15, "Delete Selected Clips");
+            menu.addItem(18, "Duplicate Selected Clips");
             menu.addSeparator();
             menu.addItem(16, "Select All");
             menu.addItem(17, "Deselect All");
@@ -216,6 +217,9 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
             break;
         case 15: // Delete Selected Clips
             deleteSelectedClips();
+            break;
+        case 18: // Duplicate Selected Clips
+            duplicateSelectedClips();
             break;
         case 16: // Select All
             selectAllClips();
@@ -596,6 +600,11 @@ void AnimatorMainView::addActionClip()
 void AnimatorMainView::deleteSelectedClips()
 {
     timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
+}
+
+void AnimatorMainView::duplicateSelectedClips()
+{
+    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress('D', juce::ModifierKeys::ctrlModifier, 'D'));
 }
 
 void AnimatorMainView::zoomIn()
