@@ -103,6 +103,13 @@ public:
     void updatePreviewCursor(const juce::Point<int>& mousePos);
     void hidePreviewCursor();
     
+    // TODO: public?
+    // New public methods for clipboard operations
+    void cutSelectedClips();
+    void copySelectedClips();
+    void pasteClips();
+    void selectAllClips();
+    void deselectAllClips();
 private:
     struct ClipBounds
     {
@@ -235,7 +242,8 @@ private:
     bool shouldShowClipText(const juce::Rectangle<float>& clipBounds, float iconSize) const;
     
     juce::String generateDuplicateClipId(const juce::String& originalId);
-    
+    juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId);
+    juce::String generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId);
     std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
     PointSelection* pPointSelectionControl = nullptr;
     AmbiSourceSet* pSourceSet = nullptr;
@@ -259,6 +267,8 @@ private:
     void updateTimelineValidationStates();
     void validateTimelineSelection();
     void syncTimelinesToGroupCount();
+    
+    ClipboardData clipboard;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };

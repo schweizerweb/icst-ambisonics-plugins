@@ -196,6 +196,8 @@ void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int /*
 
 void AnimatorMainView::handleMenuAction(int menuItemID)
 {
+    auto* timelineComp = timelineViewport->getTimelineComponent();
+    
     switch (menuItemID)
     {
         case 100: // Import - Append as new timeline
@@ -206,42 +208,54 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
             // Handle preferences
             break;
             
-        case 12: // Cut
-            cutSelectedClips();
+        case 12: // Cut - Send Ctrl+X
+            timelineComp->keyPressed(juce::KeyPress('X', juce::ModifierKeys::ctrlModifier, 'X'));
             break;
-        case 13: // Copy
-            copySelectedClips();
+            
+        case 13: // Copy - Send Ctrl+C
+            timelineComp->keyPressed(juce::KeyPress('C', juce::ModifierKeys::ctrlModifier, 'C'));
             break;
-        case 14: // Paste
-            pasteClips();
+            
+        case 14: // Paste - Send Ctrl+V
+            timelineComp->keyPressed(juce::KeyPress('V', juce::ModifierKeys::ctrlModifier, 'V'));
             break;
-        case 15: // Delete Selected Clips
-            deleteSelectedClips();
+            
+        case 15: // Delete Selected Clips - Send Delete key
+            timelineComp->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
             break;
-        case 18: // Duplicate Selected Clips
-            duplicateSelectedClips();
+            
+        case 18: // Duplicate Selected Clips - Send Ctrl+D
+            timelineComp->keyPressed(juce::KeyPress('D', juce::ModifierKeys::ctrlModifier, 'D'));
             break;
-        case 16: // Select All
-            selectAllClips();
+            
+        case 16: // Select All - Send Ctrl+A
+            timelineComp->keyPressed(juce::KeyPress('A', juce::ModifierKeys::ctrlModifier, 'A'));
             break;
-        case 17: // Deselect All
-            deselectAllClips();
+            
+        case 17: // Deselect All - Send Escape key
+            timelineComp->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
             break;
+            
         case 20: // Zoom In
             zoomIn();
             break;
+            
         case 21: // Zoom Out
             zoomOut();
             break;
+            
         case 22: // Reset Zoom
             resetZoom();
             break;
+            
         case 23: // Toggle Auto-follow
             toggleAutoFollow();
             break;
+            
         case 30: // Add Movement Clip
             addMovementClip();
             break;
+            
         case 31: // Add Action Clip
             addActionClip();
             break;
@@ -379,187 +393,6 @@ void AnimatorMainView::exportScene(int timelineIndex)
     }
 }
 
-void AnimatorMainView::cutSelectedClips()
-{
-    copySelectedClips();
-    deleteSelectedClips();
-}
-
-void AnimatorMainView::copySelectedClips()
-{
-    // Clear previous clipboard data
-    clipboard.clips.clear();
-    clipboard.timelineData.clear();
-    clipboard.hasData = false;
-    
-    // Get selected clips from timeline component using its existing selection system
-    auto selectedClips = timelineViewport->getTimelineComponent()->getSelectedClips();
-    
-    if (selectedClips.isEmpty())
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                              "Copy",
-                                              "No clips selected to copy.");
-        return;
-    }
-    
-    // Create a temporary timeline to store only the selected clips
-    auto* timelineCopy = new TimelineModel();
-    
-    // Group clips by their original timeline to maintain structure
-    juce::HashMap<int, TimelineModel*> timelineCopies;
-    timelineCopies.set(0, timelineCopy); // Use main timeline copy
-    
-    // Copy selected clips
-    for (const auto& selected : selectedClips)
-    {
-        bool isMovementClip = selected.isMovementClip;
-        auto* originalClip = timelineViewport->getTimelineComponent()->getClip(selected.timelineIndex, selected.layerIndex,
-                                                       selected.clipIndex, isMovementClip);
-        if (!originalClip) continue;
-        
-        // Use the main timeline copy for all clips
-        auto* targetTimeline = timelineCopies[0];
-        
-        if (isMovementClip)
-        {
-            MovementClip newClip = *static_cast<const MovementClip*>(originalClip);
-            targetTimeline->movement.clips.add(newClip);
-        }
-        else
-        {
-            ActionClip newClip = *static_cast<const ActionClip*>(originalClip);
-            targetTimeline->actions.clips.add(newClip);
-        }
-    }
-    
-    clipboard.timelineData.add(timelineCopy);
-    clipboard.hasData = true;
-}
-
-void AnimatorMainView::pasteClips()
-{
-    if (!clipboard.hasData || clipboard.timelineData.isEmpty())
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                              "Paste",
-                                              "Clipboard is empty.");
-        return;
-    }
-        
-    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
-    {
-        if (auto* sourceTimeline = clipboard.timelineData.getFirst())
-        {
-            // Clear current selection
-            timelineViewport->getTimelineComponent()->clearSelection();
-            
-            // Calculate time offset based on playhead position
-            ms_t timeOffset = timelineViewport->getTimelineComponent()->getCursorTime();
-            
-            // Find the earliest clip time in the clipboard to maintain relative timing
-            ms_t earliestTime = std::numeric_limits<ms_t>::max();
-            for (const auto& clip : sourceTimeline->movement.clips)
-                earliestTime = juce::jmin(earliestTime, clip.start);
-            for (const auto& clip : sourceTimeline->actions.clips)
-                earliestTime = juce::jmin(earliestTime, clip.start);
-            
-            if (earliestTime == std::numeric_limits<ms_t>::max())
-                earliestTime = 0;
-            
-            // Paste movement clips with time offset
-            for (const auto& clip : sourceTimeline->movement.clips)
-            {
-                MovementClip newClip = clip;
-                newClip.start = timeOffset + (clip.start - earliestTime);
-                
-                // Generate unique ID to avoid conflicts
-                newClip.id = generateUniqueClipId(currentTimeline->movement.clips, clip.id);
-                
-                int newClipIndex = currentTimeline->movement.clips.size();
-                currentTimeline->movement.clips.add(newClip);
-                
-                // Select the newly pasted clip
-                timelineViewport->getTimelineComponent()->selectClip(timelineViewport->getTimelineComponent()->getCurrentTimelineIndex(),
-                                             0, newClipIndex, true, true);
-            }
-            
-            // Paste action clips with time offset
-            for (const auto& clip : sourceTimeline->actions.clips)
-            {
-                ActionClip newClip = clip;
-                newClip.start = timeOffset + (clip.start - earliestTime);
-                
-                // Generate unique ID to avoid conflicts
-                newClip.id = generateUniqueClipId(currentTimeline->actions.clips, clip.id);
-                
-                int newClipIndex = currentTimeline->actions.clips.size();
-                currentTimeline->actions.clips.add(newClip);
-                
-                // Select the newly pasted clip
-                timelineViewport->getTimelineComponent()->selectClip(timelineViewport->getTimelineComponent()->getCurrentTimelineIndex(),
-                                             1, newClipIndex, false, true);
-            }
-            
-            timelineViewport->repaint();
-        }
-    }
-    else
-    {
-        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                              "Paste Error",
-                                              "No active timeline to paste into.");
-    }
-}
-
-void AnimatorMainView::selectAllClips()
-{
-    if (auto* timelineComp = timelineViewport->getTimelineComponent())
-    {
-        timelineComp->clearSelection();
-        
-        if (auto* currentTimeline = timelineComp->getCurrentTimeline())
-        {
-            // Add movement clips
-            for (int i = 0; i < currentTimeline->movement.clips.size(); ++i)
-            {
-                timelineComp->selectClip(timelineComp->getCurrentTimelineIndex(), 0, i, true, true);
-            }
-            
-            // Add action clips
-            for (int i = 0; i < currentTimeline->actions.clips.size(); ++i)
-            {
-                timelineComp->selectClip(timelineComp->getCurrentTimelineIndex(), 1, i, false, true);
-            }
-            
-            timelineViewport->repaint();
-            
-            // Provide feedback
-            int totalClips = currentTimeline->movement.clips.size() + currentTimeline->actions.clips.size();
-            juce::AttributedString message;
-            message.append("Selected " + juce::String(totalClips) + " clips",
-                          juce::FontOptions(12.0f),
-                          juce::Colours::lightblue);
-            setStatusMessage(message);
-        }
-    }
-}
-
-void AnimatorMainView::deselectAllClips()
-{
-    if (auto* timelineComp = timelineViewport->getTimelineComponent())
-    {
-        timelineComp->clearSelection();
-        timelineViewport->repaint();
-        
-        juce::AttributedString message;
-        message.append("Selection cleared",
-                      juce::FontOptions(12.0f),
-                      juce::Colours::lightgrey);
-        setStatusMessage(message);
-    }
-}
-
 void AnimatorMainView::addMovementClip()
 {
     if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
@@ -684,7 +517,10 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     // Connect buttons to actions
     addMovementButton->onClick = [this] { owner.addMovementClip(); };
     addActionButton->onClick = [this] { owner.addActionClip(); };
-    deleteButton->onClick = [this] { owner.deleteSelectedClips(); };
+    deleteButton->onClick = [this] {
+        owner.timelineViewport->getTimelineComponent()->keyPressed(
+            juce::KeyPress(juce::KeyPress::deleteKey));
+    };
     zoomInButton->onClick = [this] { owner.zoomIn(); };
     zoomOutButton->onClick = [this] { owner.zoomOut(); };
     resetZoomButton->onClick = [this] { owner.resetZoom(); };

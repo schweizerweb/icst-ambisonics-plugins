@@ -29,7 +29,7 @@ public:
     void setValidationFrequency(double frequencyHz);
     void validateTimelines();
     std::function<void(const juce::AttributedString&)> getStatusMessageFunction();
-    
+
 private:
     // Menu bar
     class MainMenuBarModel : public juce::MenuBarModel
@@ -74,8 +74,6 @@ private:
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     bool autoFollowEnabled = true;
     
-    ClipboardData clipboard;
-
     // Zoom state
     static constexpr float ZOOM_STEP = 1.2f;
 

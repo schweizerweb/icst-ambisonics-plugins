@@ -415,7 +415,12 @@ struct SelectedClip
 // Clipboard for cut/copy/paste
 struct ClipboardData
 {
-    juce::Array<SelectedClip> clips;
     juce::OwnedArray<TimelineModel> timelineData;
     bool hasData = false;
+    
+    void clear()
+    {
+        timelineData.clear();
+        hasData = false;
+    }
 };

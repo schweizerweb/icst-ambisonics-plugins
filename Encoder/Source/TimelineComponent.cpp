@@ -1265,14 +1265,61 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
         }
     }
     
-    // Existing keyboard shortcuts
-    if (key.getKeyCode() == juce::KeyPress::escapeKey)
+    // Handle standard keyboard shortcuts with Ctrl/Cmd modifier
+    if (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown())
+    {
+        switch (key.getKeyCode())
+        {
+            case 'A': // Select All
+                selectAllClips();
+                return true;
+                
+            case 'C': // Copy
+                copySelectedClips();
+                return true;
+                
+            case 'X': // Cut
+                cutSelectedClips();
+                return true;
+                
+            case 'V': // Paste
+                pasteClips();
+                return true;
+                
+            case 'D': // Duplicate
+                if (!selectedClips.isEmpty())
+                {
+                    // Store current selection since it will change during duplication
+                    auto currentSelection = selectedClips;
+                    
+                    // Clear selection first
+                    clearSelection();
+                    
+                    // Duplicate all selected clips
+                    for (const auto& selected : currentSelection)
+                    {
+                        duplicateClip(selected.timelineIndex, selected.layerIndex,
+                                     selected.clipIndex, selected.isMovementClip);
+                    }
+                    
+                    repaint();
+                    return true;
+                }
+                break;
+        }
+    }
+    
+    // Handle keys without modifiers
+    // Handle keys without modifiers using if-else (not switch)
+    const int keyCode = key.getKeyCode();
+    
+    if (keyCode == juce::KeyPress::escapeKey)
     {
         clearSelection();
         repaint();
         return true;
     }
-    else if (key.getKeyCode() == juce::KeyPress::deleteKey || key.getKeyCode() == juce::KeyPress::backspaceKey)
+    else if (keyCode == juce::KeyPress::deleteKey || keyCode == juce::KeyPress::backspaceKey)
     {
         // Delete all selected clips
         for (int i = selectedClips.size() - 1; i >= 0; --i)
@@ -1283,61 +1330,6 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
         selectedClips.clear();
         repaint();
         return true;
-    }
-    else if (key.getKeyCode() == 'A' && (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown()))
-    {
-        // Select all clips in current timeline
-        if (auto* timeline = getCurrentTimeline())
-        {
-            selectedClips.clear();
-            
-            // Add movement clips
-            for (int i = 0; i < timeline->movement.clips.size(); ++i)
-            {
-                SelectedClip clip;
-                clip.timelineIndex = currentTimelineIndex;
-                clip.layerIndex = 0;
-                clip.clipIndex = i;
-                clip.isMovementClip = true;
-                selectedClips.add(clip);
-            }
-            
-            // Add action clips
-            for (int i = 0; i < timeline->actions.clips.size(); ++i)
-            {
-                SelectedClip clip;
-                clip.timelineIndex = currentTimelineIndex;
-                clip.layerIndex = 1;
-                clip.clipIndex = i;
-                clip.isMovementClip = false;
-                selectedClips.add(clip);
-            }
-            
-            repaint();
-            return true;
-        }
-    }
-    // Duplicate selected clips with Ctrl/Cmd + D
-    if (key.getKeyCode() == 'D' && (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown()))
-    {
-        if (!selectedClips.isEmpty())
-        {
-            // Store current selection since it will change during duplication
-            auto currentSelection = selectedClips;
-            
-            // Clear selection first
-            clearSelection();
-            
-            // Duplicate all selected clips
-            for (const auto& selected : currentSelection)
-            {
-                duplicateClip(selected.timelineIndex, selected.layerIndex,
-                             selected.clipIndex, selected.isMovementClip);
-            }
-            
-            repaint();
-            return true;
-        }
     }
     
     return false;
@@ -2491,4 +2483,195 @@ juce::Colour TimelineComponent::getClipColourFromTimeline(int timelineIndex) con
 {
     // Use the same colors as timeline headers for consistency
     return getTimelineColour(timelineIndex).brighter(0.3f);
+}
+
+void TimelineComponent::cutSelectedClips()
+{
+    copySelectedClips();
+    
+    // Delete all selected clips after copying
+    for (int i = selectedClips.size() - 1; i >= 0; --i)
+    {
+        const auto& selected = selectedClips.getReference(i);
+        removeClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, selected.isMovementClip);
+    }
+    selectedClips.clear();
+    
+    repaint();
+}
+
+void TimelineComponent::copySelectedClips()
+{
+    // Clear previous clipboard data
+    clipboard.clear();
+    
+    if (selectedClips.isEmpty())
+        return;
+    
+    // Create a temporary timeline to store only the selected clips
+    auto* timelineCopy = new TimelineModel();
+    
+    // Copy selected clips
+    for (const auto& selected : selectedClips)
+    {
+        bool isMovementClip = selected.isMovementClip;
+        auto* originalClip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, isMovementClip);
+        if (!originalClip) continue;
+        
+        if (isMovementClip)
+        {
+            MovementClip newClip = *static_cast<const MovementClip*>(originalClip);
+            timelineCopy->movement.clips.add(newClip);
+        }
+        else
+        {
+            ActionClip newClip = *static_cast<const ActionClip*>(originalClip);
+            timelineCopy->actions.clips.add(newClip);
+        }
+    }
+    
+    clipboard.timelineData.add(timelineCopy);
+    clipboard.hasData = true;
+}
+
+void TimelineComponent::pasteClips()
+{
+    if (!clipboard.hasData || clipboard.timelineData.isEmpty())
+        return;
+        
+    if (auto* currentTimeline = getCurrentTimeline())
+    {
+        if (auto* sourceTimeline = clipboard.timelineData.getFirst())
+        {
+            // Clear current selection
+            clearSelection();
+            
+            // Calculate time offset based on cursor position
+            ms_t timeOffset = getCursorTime();
+            
+            // Find the earliest clip time in the clipboard to maintain relative timing
+            ms_t earliestTime = std::numeric_limits<ms_t>::max();
+            for (const auto& clip : sourceTimeline->movement.clips)
+                earliestTime = juce::jmin(earliestTime, clip.start);
+            for (const auto& clip : sourceTimeline->actions.clips)
+                earliestTime = juce::jmin(earliestTime, clip.start);
+            
+            if (earliestTime == std::numeric_limits<ms_t>::max())
+                earliestTime = 0;
+            
+            // Paste movement clips with time offset
+            for (const auto& clip : sourceTimeline->movement.clips)
+            {
+                MovementClip newClip = clip;
+                newClip.start = timeOffset + (clip.start - earliestTime);
+                
+                // Generate unique ID to avoid conflicts
+                newClip.id = generateUniqueClipId(currentTimeline->movement.clips, clip.id);
+                
+                int newClipIndex = currentTimeline->movement.clips.size();
+                currentTimeline->movement.clips.add(newClip);
+                
+                // Select the newly pasted clip
+                selectClip(getCurrentTimelineIndex(), 0, newClipIndex, true, true);
+            }
+            
+            // Paste action clips with time offset
+            for (const auto& clip : sourceTimeline->actions.clips)
+            {
+                ActionClip newClip = clip;
+                newClip.start = timeOffset + (clip.start - earliestTime);
+                
+                // Generate unique ID to avoid conflicts
+                newClip.id = generateUniqueClipId(currentTimeline->actions.clips, clip.id);
+                
+                int newClipIndex = currentTimeline->actions.clips.size();
+                currentTimeline->actions.clips.add(newClip);
+                
+                // Select the newly pasted clip
+                selectClip(getCurrentTimelineIndex(), 1, newClipIndex, false, true);
+            }
+            
+            repaint();
+        }
+    }
+}
+
+void TimelineComponent::selectAllClips()
+{
+    clearSelection();
+    
+    if (auto* currentTimeline = getCurrentTimeline())
+    {
+        // Add movement clips
+        for (int i = 0; i < currentTimeline->movement.clips.size(); ++i)
+        {
+            selectClip(getCurrentTimelineIndex(), 0, i, true, true);
+        }
+        
+        // Add action clips
+        for (int i = 0; i < currentTimeline->actions.clips.size(); ++i)
+        {
+            selectClip(getCurrentTimelineIndex(), 1, i, false, true);
+        }
+        
+        repaint();
+    }
+}
+
+void TimelineComponent::deselectAllClips()
+{
+    clearSelection();
+    repaint();
+}
+
+juce::String TimelineComponent::generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId)
+{
+    if (baseId.isEmpty())
+        return "Movement Clip";
+    
+    juce::String newId = baseId;
+    int copyNumber = 1;
+    
+    // Check if this ID already exists
+    bool idExists = false;
+    do {
+        idExists = false;
+        for (const auto& clip : existingClips)
+        {
+            if (clip.id == newId)
+            {
+                idExists = true;
+                newId = baseId + " (" + juce::String(copyNumber++) + ")";
+                break;
+            }
+        }
+    } while (idExists);
+    
+    return newId;
+}
+
+juce::String TimelineComponent::generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId)
+{
+    if (baseId.isEmpty())
+        return "Action Clip";
+    
+    juce::String newId = baseId;
+    int copyNumber = 1;
+    
+    // Check if this ID already exists
+    bool idExists = false;
+    do {
+        idExists = false;
+        for (const auto& clip : existingClips)
+        {
+            if (clip.id == newId)
+            {
+                idExists = true;
+                newId = baseId + " (" + juce::String(copyNumber++) + ")";
+                break;
+            }
+        }
+    } while (idExists);
+    
+    return newId;
 }
