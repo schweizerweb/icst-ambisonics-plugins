@@ -7,7 +7,7 @@ TimelineComponent::TimelineComponent()
 {
     loadIcons(); // Load the SVG icons
     
-    horizontalScrollBar = std::make_unique<juce::ScrollBar>(true);
+    horizontalScrollBar = std::make_unique<juce::ScrollBar>(false);
     timelineSelector = std::make_unique<juce::ComboBox>();
     tempButton = std::make_unique<juce::TextButton>();
     
@@ -21,21 +21,6 @@ TimelineComponent::TimelineComponent()
     //addAndMakeVisible(tempButton.get());
     
     timelineSelector->setVisible(false);
-    horizontalScrollBar->setVisible(true);
-    
-    auto setScrollbarColors = [](juce::ScrollBar* scrollbar) {
-        scrollbar->setColour(juce::ScrollBar::backgroundColourId, juce::Colour(0xffff0000));
-        scrollbar->setColour(juce::ScrollBar::thumbColourId, juce::Colour(0xff00ff00));
-        scrollbar->setColour(juce::ScrollBar::trackColourId, juce::Colour(0xff0000ff));
-        
-        // Force the scrollbar to be opaque
-        scrollbar->setOpaque(true);
-    };
-    
-    setScrollbarColors(horizontalScrollBar.get());
-    
-    // Make scrollbars always visible for testing
-    horizontalScrollBar->setAlwaysOnTop(true);
     
     clipEditorManager = std::make_unique<ClipEditorDialogManager>();
     
