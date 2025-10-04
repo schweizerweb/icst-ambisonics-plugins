@@ -11,7 +11,6 @@ class ClipEditorDialogManager;
 
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
-                          public juce::MouseListener,
                           public juce::ChangeListener
 {
 public:
