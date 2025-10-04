@@ -791,7 +791,7 @@ void TimelineComponent::paint(juce::Graphics& g)
     }
     
     // Draw preview cursor (greyish, follows mouse)
-    if (previewCursorVisible && previewCursorPosition >= visibleStartTime && previewCursorPosition <= visibleEndTime)
+    if (!autoFollow && previewCursorVisible && previewCursorPosition >= visibleStartTime && previewCursorPosition <= visibleEndTime)
     {
         const float previewX = timeToX(previewCursorPosition);
         g.setColour(juce::Colours::lightgrey.withAlpha(0.7f));
@@ -1561,7 +1561,7 @@ void TimelineComponent::updateScrollBars()
     {
         horizontalScrollBar->setRangeLimits(0, maxDuration);
         horizontalScrollBar->setCurrentRange(visibleStartTime, visibleWidthMs);
-        horizontalScrollBar->setSingleStepSize((visibleWidthMs - visibleStartTime)*0.02);
+        horizontalScrollBar->setSingleStepSize((visibleEndTime - visibleStartTime)*0.02);
     }
 }
 
