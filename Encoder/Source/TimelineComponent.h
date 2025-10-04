@@ -256,5 +256,18 @@ private:
     juce::String generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const;
     juce::Colour getClipColourFromTimeline(int timelineIndex) const;
     
+    // Timeline validation state
+    struct TimelineValidationState
+    {
+        bool isValid = true;
+        bool hasClips = false;
+    };
+    juce::Array<TimelineValidationState> timelineValidationStates;
+    
+    // Methods for timeline management
+    void updateTimelineValidationStates();
+    void validateTimelineSelection();
+    void syncTimelinesToGroupCount();
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(TimelineComponent)
 };
