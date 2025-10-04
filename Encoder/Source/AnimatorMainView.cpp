@@ -164,8 +164,8 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             menu.addItem(12, "Cut");
             menu.addItem(13, "Copy");
             menu.addItem(14, "Paste");
-            menu.addItem(15, "Delete Selected Clips");
-            menu.addItem(18, "Duplicate Selected Clips");
+            menu.addItem(15, "Delete");
+            menu.addItem(18, "Duplicate");
             menu.addSeparator();
             menu.addItem(16, "Select All");
             menu.addItem(17, "Deselect All");
