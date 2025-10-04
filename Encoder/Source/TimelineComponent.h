@@ -81,6 +81,7 @@ public:
     }
     
     AmbiSourceSet* getSources() const;
+    PointSelection* getPointSelection() const;
     TimelineModel* getTimelineModel(int timelineIndex) const;
     TimelineModel* getCurrentTimeline() const;
     const juce::Array<SelectedClip>& getSelectedClips() const { return selectedClips; }

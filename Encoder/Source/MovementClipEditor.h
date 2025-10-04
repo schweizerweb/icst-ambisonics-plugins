@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "CommonClipSettings.h"
 #include "../../Common/AmbiSourceSet.h"
+#include "../../Common/PointSelection.h"
 
 class TimelineComponent;
 
@@ -45,6 +46,7 @@ public:
 
 private:
     AmbiSourceSet* pSourceSet;
+    PointSelection* pPointSelection;
     TimelineComponent& timelineComp;
     int timelineIndex, clipIndex;
     MovementClip currentClip;

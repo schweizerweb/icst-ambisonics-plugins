@@ -2559,6 +2559,11 @@ AmbiSourceSet* TimelineComponent::getSources() const
     return pSourceSet;
 }
 
+PointSelection* TimelineComponent::getPointSelection() const
+{
+    return pPointSelectionControl;
+}
+
 TimelineModel* TimelineComponent::getTimelineModel(int timelineIndex) const
 {
     if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())

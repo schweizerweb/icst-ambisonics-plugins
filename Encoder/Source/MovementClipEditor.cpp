@@ -15,9 +15,14 @@ MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timeline
     }
     
     pSourceSet = timelineComp.getSources();
+    pPointSelection = timelineComp.getPointSelection();
+    if(pPointSelection != nullptr)
+    {
+        pPointSelection->addChangeListener(this);
+    }
+    
     if(pSourceSet != nullptr)
     {
-        pSourceSet->addChangeListener(this);
         updateCurrentPosition();
     }
     
@@ -26,9 +31,9 @@ MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timeline
 
 MovementClipEditor::~MovementClipEditor()
 {
-    if (pSourceSet != nullptr)
+    if (pPointSelection != nullptr)
     {
-        pSourceSet->removeChangeListener(this);
+        pPointSelection->removeChangeListener(this);
     }
 }
 
@@ -296,6 +301,9 @@ void MovementClipEditor::updateStartPositionVisibility()
 
 void MovementClipEditor::updateCurrentPosition()
 {
+    auto lastPosition = currentPosition;
+    auto lastPositionValid = currentPositionValid;
+    
     currentPositionValid = false;
     
     if (pSourceSet != nullptr)
@@ -312,15 +320,18 @@ void MovementClipEditor::updateCurrentPosition()
         }
     }
 
-    updateApplyCurrentPositionButtonText(applyCurrentStartButton, currentPosition, currentPositionValid);
-    updateApplyCurrentPositionButtonText(applyCurrentTargetButton, currentPosition, currentPositionValid);
-    
-    // Update button enablement
-    applyCurrentTargetButton.setEnabled(currentPositionValid);
-    applyCurrentStartButton.setEnabled(useStartPosition.getToggleState() && currentPositionValid);
-    
-    applyCurrentTargetButton.setAlpha(currentPositionValid ? 1.0f : 0.5f);
-    applyCurrentStartButton.setAlpha((useStartPosition.getToggleState() && currentPositionValid) ? 1.0f : 0.5f);
+    if(lastPositionValid != currentPositionValid || lastPosition.x != currentPosition.x || lastPosition.y != currentPosition.y || lastPosition.z != currentPosition.z)
+    {
+        updateApplyCurrentPositionButtonText(applyCurrentStartButton, currentPosition, currentPositionValid);
+        updateApplyCurrentPositionButtonText(applyCurrentTargetButton, currentPosition, currentPositionValid);
+        
+        // Update button enablement
+        applyCurrentTargetButton.setEnabled(currentPositionValid);
+        applyCurrentStartButton.setEnabled(useStartPosition.getToggleState() && currentPositionValid);
+        
+        applyCurrentTargetButton.setAlpha(currentPositionValid ? 1.0f : 0.5f);
+        applyCurrentStartButton.setAlpha((useStartPosition.getToggleState() && currentPositionValid) ? 1.0f : 0.5f);
+    }
 }
 
 void MovementClipEditor::changeListenerCallback(ChangeBroadcaster *source)
