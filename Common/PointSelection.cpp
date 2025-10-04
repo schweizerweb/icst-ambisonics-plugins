@@ -89,9 +89,14 @@ void PointSelection::selectGroup(int index, bool add)
 		unselectPoint();
 	}
 
+    bool change = mainSelectedIndex != index;
+    
 	selectionMode = Group;
 	mainSelectedIndex = index;
-	selectedIndices.addIfNotAlreadyThere(index);
+	change |= selectedIndices.addIfNotAlreadyThere(index);
 
-	notifyChange();
+    if(change)
+    {
+        notifyChange();
+    }
 }
