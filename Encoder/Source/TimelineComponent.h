@@ -25,6 +25,7 @@ public:
     void setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
+    void autoResizeBasedOnContent();
     void setCurrentTimeline(int index);
     int getCurrentTimelineIndex() const { return currentTimelineIndex; }
     int getNumTimelines() const { return timelines != nullptr ? timelines->size() : 0; }

@@ -53,11 +53,6 @@ TimelineComponent::~TimelineComponent()
     {
         pPointSelectionControl->removeChangeListener(this);
     }
-    
-    if (pSourceSet != nullptr)
-    {
-        pSourceSet->removeChangeListener(this);
-    }
 }
 
 void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
@@ -103,12 +98,17 @@ void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelin
         }
     }
 
-    // Auto-resize based on content
+    autoResizeBasedOnContent();
+    
+    repaint();
+}
+
+void TimelineComponent::autoResizeBasedOnContent()
+{
     const float totalHeight = calculateTotalContentHeight();
     setSize(getWidth(), static_cast<int>(totalHeight));
     
     updateScrollBars();
-    repaint();
 }
 
 void TimelineComponent::setCurrentTimeline(int index)
@@ -142,22 +142,7 @@ void TimelineComponent::setSelectionControl(PointSelection* pPointSelection)
 
 void TimelineComponent::setSourceSet(AmbiSourceSet* pSources)
 {
-    // Remove existing listener if any
-    if (pSourceSet != nullptr)
-    {
-        pSourceSet->removeChangeListener(this);
-    }
-    
     pSourceSet = pSources;
-    
-    // Add as ChangeListener to monitor group count changes
-    if (pSourceSet != nullptr)
-    {
-        pSourceSet->addChangeListener(this);
-        
-        // Initial sync of timelines to group count
-        syncTimelinesToGroupCount();
-    }
 }
 
 void TimelineComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
@@ -166,10 +151,8 @@ void TimelineComponent::changeListenerCallback(juce::ChangeBroadcaster* source)
     {
         // PointSelection changed - sync timeline selection
         syncPointSelectionToTimelineSelection();
-    }
-    else if (source == pSourceSet && pSourceSet != nullptr)
-    {
-        // Source set changed - check if group count changed
+    
+        // check if group count changed
         int previousGroupCount = timelineValidationStates.size();
         int currentGroupCount = pSourceSet->activeGroupCount();
         
@@ -250,6 +233,8 @@ void TimelineComponent::syncTimelinesToGroupCount()
     
     // Validate current selection
     validateTimelineSelection();
+    
+    autoResizeBasedOnContent();
     
     repaint();
 }
@@ -1921,6 +1906,10 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
                     result.clipIndex = clipIndex;
                     result.isMovementClip = isMovementClip;
                     result.bounds = bounds;
+                    
+                    // Populate clip information
+                    result.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                    result.timeInfo = getClipTimeInfo(*clip);
                     
                     // Check resize handles (only for current timeline and selected clips)
                     if (timelineIndex == currentTimelineIndex &&
