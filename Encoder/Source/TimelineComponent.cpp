@@ -426,425 +426,401 @@ void TimelineComponent::paint(juce::Graphics& g)
     // Draw time markers (using bitmap cache)
     drawHeader(g);
     
-    // Draw timelines
-    updateVisibleClips();
-    
-    // Draw timelines (headers, tracks, separators)
-        for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+    // =========================================================================
+    // TIMELINE-BY-TIMELINE PAINTING
+    // =========================================================================
+    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+    {
+        auto* timeline = timelines->getUnchecked(timelineIndex);
+        if (timeline == nullptr) continue;
+        
+        const float timelineY = timelineIndexToY(timelineIndex);
+        
+        // Only draw if this timeline is visible (within viewport)
+        if (timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight < 0)
+            continue;
+        if (timelineY > getHeight())
+            continue;
+        
+        // Check timeline validation state
+        bool isValid = true;
+        bool hasClips = false;
+        bool isDisabled = false;
+        
+        if (pSourceSet != nullptr)
         {
-            auto* timeline = timelines->getUnchecked(timelineIndex);
-            if (timeline == nullptr) continue;
+            int groupCount = pSourceSet->activeGroupCount();
+            isValid = (timelineIndex < groupCount);
             
-            const float timelineY = timelineIndexToY(timelineIndex);
+            // Check if timeline has clips
+            hasClips = (timeline->movement.clips.size() > 0) ||
+                      (timeline->actions.clips.size() > 0);
             
-            // Only draw if this timeline is visible (within viewport)
-            if (timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight < 0)
-                continue;
-            if (timelineY > getHeight())
-                continue;
+            isDisabled = !isValid && hasClips;
+        }
+        
+        const bool isCurrentTimeline = (timelineIndex == currentTimelineIndex);
+        
+        // Draw timeline header
+        juce::Colour headerColour = getTimelineColour(timelineIndex);
+        if (isDisabled)
+        {
+            headerColour = headerColour.withMultipliedBrightness(0.5f).withMultipliedSaturation(0.7f);
+        }
+        else if (!isValid)
+        {
+            headerColour = headerColour.withMultipliedBrightness(0.3f).withMultipliedSaturation(0.5f);
+        }
+        
+        if (isCurrentTimeline)
+        {
+            g.setColour(headerColour.withAlpha(isDisabled ? 0.6f : 0.9f));
+            g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
             
-            // Check if this timeline is valid
-            bool isValid = true;
-            bool hasClips = false;
-            
-            if (pSourceSet != nullptr)
+            if (!isDisabled)
             {
-                int groupCount = pSourceSet->activeGroupCount();
-                isValid = (timelineIndex < groupCount);
-                
-                // Check if timeline has clips
-                hasClips = (timeline->movement.clips.size() > 0) ||
-                          (timeline->actions.clips.size() > 0);
+                g.setColour(juce::Colours::white.withAlpha(0.8f));
+                g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 2.0f);
             }
+        }
+        else
+        {
+            g.setColour(headerColour.withAlpha(isDisabled ? 0.3f : 0.4f));
+            g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
             
-            // Determine if timeline should be disabled (invalid but has clips)
-            bool isDisabled = !isValid && hasClips;
+            if (!isDisabled && isValid)
+            {
+                g.setColour(juce::Colours::white.withAlpha(0.2f));
+                g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 1.0f);
+            }
+        }
+        
+        // Draw timeline name
+        juce::Colour textColour;
+        if (isDisabled)
+        {
+            textColour = juce::Colours::lightgrey.withAlpha(0.5f);
+        }
+        else if (isCurrentTimeline)
+        {
+            textColour = juce::Colours::white;
+        }
+        else
+        {
+            textColour = juce::Colours::white.withAlpha(0.7f);
+        }
+        
+        g.setColour(textColour);
+        g.setFont(juce::FontOptions(isCurrentTimeline ? 16.0f : 14.0f,
+                                   isCurrentTimeline ? juce::Font::bold : juce::Font::plain));
+        
+        juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
+        if (isDisabled)
+        {
+            timelineName += " (Invalid)";
+        }
+        else if (!isValid)
+        {
+            timelineName += " (No Source)";
+        }
+        
+        g.drawText(timelineName,
+                   10, (int)(timelineY + 5), (int)(trackHeaderWidth - 20), (int)(timelineHeaderHeight - 10),
+                   juce::Justification::centredLeft);
+        
+        // Draw tracks and clips for this timeline
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
+        {
+            const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
             
-            // Store the disabled state for later use in the diagonal pattern
-            // We'll draw the pattern at the end after all clips
-            
-            // Draw timeline header with validation state (but no pattern yet)
-            const bool isCurrentTimeline = (timelineIndex == currentTimelineIndex);
-            
-            // Header background with validation state
-            juce::Colour headerColour = getTimelineColour(timelineIndex);
+            // Draw track background
+            juce::Colour trackColour;
             if (isDisabled)
             {
-                headerColour = headerColour.withMultipliedBrightness(0.5f).withMultipliedSaturation(0.7f);
-            }
-            else if (!isValid)
-            {
-                headerColour = headerColour.withMultipliedBrightness(0.3f).withMultipliedSaturation(0.5f);
-            }
-            
-            if (isCurrentTimeline)
-            {
-                g.setColour(headerColour.withAlpha(isDisabled ? 0.6f : 0.9f));
-                g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
-                
-                if (!isDisabled)
-                {
-                    g.setColour(juce::Colours::white.withAlpha(0.8f));
-                    g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 2.0f);
-                }
-            }
-            else
-            {
-                g.setColour(headerColour.withAlpha(isDisabled ? 0.3f : 0.4f));
-                g.fillRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight);
-                
-                if (!isDisabled && isValid)
-                {
-                    g.setColour(juce::Colours::white.withAlpha(0.2f));
-                    g.drawRect(0.0f, timelineY, (float)totalWidth, timelineHeaderHeight, 1.0f);
-                }
-            }
-            
-            // Draw timeline name with disabled state
-            juce::Colour textColour;
-            if (isDisabled)
-            {
-                textColour = juce::Colours::lightgrey.withAlpha(0.5f);
+                trackColour = juce::Colour(0xff2a2a2a);
             }
             else if (isCurrentTimeline)
             {
-                textColour = juce::Colours::white;
+                trackColour = juce::Colour(0xff4a4a4f);
             }
             else
             {
-                textColour = juce::Colours::white.withAlpha(0.7f);
+                trackColour = juce::Colour(0xff3e3e42).withAlpha(0.6f);
             }
             
-            g.setColour(textColour);
-            g.setFont(juce::FontOptions(isCurrentTimeline ? 16.0f : 14.0f,
+            g.setColour(trackColour);
+            g.fillRect(timelineX, trackY, timelineWidth, trackHeight);
+            
+            // Draw track name
+            juce::Colour trackTextColour;
+            if (isDisabled)
+            {
+                trackTextColour = juce::Colours::lightgrey.withAlpha(0.3f);
+            }
+            else if (isCurrentTimeline)
+            {
+                trackTextColour = juce::Colours::white;
+            }
+            else
+            {
+                trackTextColour = juce::Colours::white.withAlpha(0.6f);
+            }
+            
+            g.setColour(trackTextColour);
+            g.setFont(juce::FontOptions(isCurrentTimeline ? 14.0f : 13.0f,
                                        isCurrentTimeline ? juce::Font::bold : juce::Font::plain));
             
-            juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
-            if (isDisabled)
-            {
-                timelineName += " (Invalid)";
-            }
-            else if (!isValid)
-            {
-                timelineName += " (No Source)";
-            }
-            
-            g.drawText(timelineName,
-                       10, (int)(timelineY + 5), (int)(trackHeaderWidth - 20), (int)(timelineHeaderHeight - 10),
+            juce::String trackName = layerIndex == 0 ? "Movement" : "Action";
+            g.drawText(trackName,
+                       10, (int)(trackY + 5), (int)(trackHeaderWidth - 20), (int)(trackHeight - 10),
                        juce::Justification::centredLeft);
             
-            // Draw tracks for this timeline with disabled state
+            // Draw clips for this track
+            bool isMovementClip = (layerIndex == 0);
+            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
+            
+            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
+            {
+                const Clip* clip = isMovementClip ?
+                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
+                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
+                
+                if (!clip) continue;
+                
+                // Check if clip is visible in current view
+                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                    continue;
+                
+                // Calculate the visible portion of the clip
+                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+                
+                // Ensure we have at least some visible portion
+                if (visibleClipLength <= 0)
+                    continue;
+                
+                const float x = timeToX(visibleClipStart);
+                const float width = visibleClipLength * pixelsPerMillisecond;
+                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
+                
+                // Ensure minimum width for visibility and interaction
+                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
+                
+                // Only draw if clip is vertically visible
+                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight())
+                {
+                    // Check if this clip is selected
+                    const bool isSelected = isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                    
+                    // Clip background with disabled state
+                    juce::Colour clipColour = getClipColour(*clip);
+                    if (isDisabled)
+                    {
+                        clipColour = clipColour.withMultipliedBrightness(0.6f).withMultipliedSaturation(0.5f);
+                    }
+                    else if (isCurrentTimeline)
+                    {
+                        clipColour = clipColour.withAlpha(isSelected ? 0.9f : 0.8f);
+                    }
+                    else
+                    {
+                        clipColour = clipColour.withAlpha(isSelected ? 0.6f : 0.3f);
+                    }
+                    
+                    g.setColour(clipColour);
+                    g.fillRoundedRectangle(bounds, clipCornerSize);
+                    
+                    // Clip border
+                    if (isSelected)
+                    {
+                        g.setColour(juce::Colours::white.withAlpha(isDisabled ? 0.4f : 1.0f));
+                        g.drawRoundedRectangle(bounds, clipCornerSize, isCurrentTimeline ? 3.0f : 2.0f);
+                    }
+                    else if (!isDisabled)
+                    {
+                        if (isCurrentTimeline)
+                        {
+                            g.setColour(juce::Colours::white.withAlpha(0.4f));
+                            g.drawRoundedRectangle(bounds, clipCornerSize, 1.5f);
+                        }
+                        else
+                        {
+                            g.setColour(juce::Colours::white.withAlpha(0.2f));
+                            g.drawRoundedRectangle(bounds, clipCornerSize, 1.0f);
+                        }
+                    }
+                    
+                    // Clip content (faded for disabled timelines)
+                    Rectangle<float> iconBounds = getIconBoundsWithinClip(bounds);
+                    updateScaledIcons(iconBounds.getWidth());
+
+                    float iconAlpha = isDisabled ? 0.3f : (isCurrentTimeline ? 1.0f : 0.5f);
+                    g.setColour(juce::Colours::white.withAlpha(iconAlpha));
+
+                    juce::Drawable* iconDrawable = nullptr;
+                    if (isMovementClip && scaledMovementIcon != nullptr)
+                    {
+                        iconDrawable = scaledMovementIcon.get();
+                    }
+                    else if (!isMovementClip && scaledActionIcon != nullptr)
+                    {
+                        iconDrawable = scaledActionIcon.get();
+                    }
+
+                    if (iconDrawable != nullptr)
+                    {
+                        auto transform = juce::AffineTransform::translation(iconBounds.getX(), iconBounds.getY());
+                        iconDrawable->draw(g, iconAlpha, transform);
+                    }
+                    
+                    // Draw text only if there's enough space and timeline is not disabled
+                    if (!isDisabled && shouldShowClipText(bounds, iconBounds.getWidth()))
+                    {
+                        const float textX = iconBounds.getRight() + 5.0f;
+                        const float availableTextWidth = bounds.getWidth() - (iconBounds.getWidth() + 10.0f);
+                        
+                        juce::String clipName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                        juce::String timeInfo = getClipTimeInfo(*clip);
+                        
+                        g.setFont(juce::FontOptions(12.0f, juce::Font::bold));
+                        g.drawText(clipName,
+                                   (int)textX, (int)(bounds.getY() + 5.0f), (int)availableTextWidth, 16,
+                                   juce::Justification::left);
+                        
+                        g.setFont(juce::FontOptions(10.0f));
+                        g.drawText(timeInfo,
+                                   (int)textX, (int)(bounds.getY() + 22.0f), (int)availableTextWidth, 14,
+                                   juce::Justification::left);
+                    }
+                    
+                    // Menu button only for current timeline, selected clips, and valid timelines
+                    if (isCurrentTimeline && isSelected && !isDisabled)
+                    {
+                        Rectangle<float> buttonBounds = getButtonBoundsWithinClip(bounds);
+                        
+                        g.setColour(juce::Colours::white.withAlpha(0.7f));
+                        g.fillEllipse(buttonBounds);
+                        
+                        g.setColour(juce::Colours::black);
+                        g.setFont(juce::FontOptions(10.0f, juce::Font::bold));
+                        g.drawText("...", buttonBounds,
+                                   juce::Justification::centred);
+                    }
+                }
+            }
+            
+            // Draw track separator
+            juce::Colour separatorColour = juce::Colours::black.withAlpha(isDisabled ? 0.1f : 0.5f);
+            g.setColour(separatorColour);
+            g.drawLine(0, (int)(trackY + trackHeight), (int)totalWidth, (int)(trackY + trackHeight), 1.0f);
+        }
+        
+        // Draw timeline separator
+        if (timelineIndex < timelines->size() - 1)
+        {
+            juce::Colour separatorColour = juce::Colours::white.withAlpha(isDisabled ? 0.1f : 0.3f);
+            g.setColour(separatorColour);
+            g.drawLine(0, timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing / 2,
+                      totalWidth, timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing / 2, 2.0f);
+        }
+        
+        // =====================================================================
+        // Draw diagonal pattern for invalid timelines (after clips)
+        // =====================================================================
+        if (isDisabled)
+        {
+            // Calculate the full height of this timeline
+            float timelineTotalHeight = timelineHeaderHeight;
             for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
             {
-                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
-                
-                // Draw track background with disabled state
-                juce::Colour trackColour;
-                if (isDisabled)
-                {
-                    trackColour = juce::Colour(0xff2a2a2a);
-                }
-                else if (isCurrentTimeline)
-                {
-                    trackColour = juce::Colour(0xff4a4a4f);
-                }
-                else
-                {
-                    trackColour = juce::Colour(0xff3e3e42).withAlpha(0.6f);
-                }
-                
-                g.setColour(trackColour);
-                g.fillRect(timelineX, trackY, timelineWidth, trackHeight);
-                
-                // Draw track name with disabled state
-                juce::Colour trackTextColour;
-                if (isDisabled)
-                {
-                    trackTextColour = juce::Colours::lightgrey.withAlpha(0.3f);
-                }
-                else if (isCurrentTimeline)
-                {
-                    trackTextColour = juce::Colours::white;
-                }
-                else
-                {
-                    trackTextColour = juce::Colours::white.withAlpha(0.6f);
-                }
-                
-                g.setColour(trackTextColour);
-                g.setFont(juce::FontOptions(isCurrentTimeline ? 14.0f : 13.0f,
-                                           isCurrentTimeline ? juce::Font::bold : juce::Font::plain));
-                
-                juce::String trackName = layerIndex == 0 ? "Movement" : "Action";
-                g.drawText(trackName,
-                           10, (int)(trackY + 5), (int)(trackHeaderWidth - 20), (int)(trackHeight - 10),
-                           juce::Justification::centredLeft);
-                
-                // Draw track separator
-                juce::Colour separatorColour = juce::Colours::black.withAlpha(isDisabled ? 0.1f : 0.5f);
-                g.setColour(separatorColour);
-                g.drawLine(0, (int)(trackY + trackHeight), (int)totalWidth, (int)(trackY + trackHeight), 1.0f);
+                timelineTotalHeight += trackHeight;
             }
             
-            // Draw timeline separator
+            // Add spacing if this isn't the last timeline
             if (timelineIndex < timelines->size() - 1)
             {
-                juce::Colour separatorColour = juce::Colours::white.withAlpha(isDisabled ? 0.1f : 0.3f);
-                g.setColour(separatorColour);
-                g.drawLine(0, timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing / 2,
-                          totalWidth, timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight + timelineSpacing / 2, 2.0f);
-            }
-        }
-        
-        // Draw visible clips (on top of tracks)
-        for (const auto& clipBounds : visibleClips)
-        {
-            bool isMovementClip = clipBounds.isMovementClip;
-            const auto* clip = getClip(clipBounds.timelineIndex, clipBounds.layerIndex, clipBounds.clipIndex, isMovementClip);
-            if (!clip) continue;
-            
-            // Check if the timeline containing this clip is disabled
-            bool isTimelineDisabled = false;
-            if (pSourceSet != nullptr)
-            {
-                int groupCount = pSourceSet->activeGroupCount();
-                bool isValid = (clipBounds.timelineIndex < groupCount);
-                bool hasClips = true; // We're drawing a clip
-                isTimelineDisabled = !isValid && hasClips;
+                timelineTotalHeight += timelineSpacing;
             }
             
-            const bool isCurrentTimeline = (clipBounds.timelineIndex == currentTimelineIndex);
-            const auto bounds = clipBounds.bounds;
+            // Draw diagonal pattern over the entire timeline area
+            g.setColour(juce::Colour(0xaa800000)); // Dark red with transparency
             
-            // Check if this clip is selected
-            const bool isSelected = isClipSelected(clipBounds.timelineIndex, clipBounds.layerIndex,
-                                                  clipBounds.clipIndex, clipBounds.isMovementClip);
+            const float patternSpacing = 8.0f; // Space between diagonal lines
+            const float patternWidth = patternSpacing * 2.0f;
             
-            // Clip background with disabled state
-            juce::Colour clipColour = getClipColour(*clip);
-            if (isTimelineDisabled)
-            {
-                clipColour = clipColour.withMultipliedBrightness(0.6f).withMultipliedSaturation(0.5f);
-            }
-            else if (isCurrentTimeline)
-            {
-                clipColour = clipColour.withAlpha(isSelected ? 0.9f : 0.8f);
-            }
-            else
-            {
-                clipColour = clipColour.withAlpha(isSelected ? 0.6f : 0.3f);
-            }
+            // Create a clipping region for this specific timeline
+            g.saveState();
+            g.reduceClipRegion(juce::Rectangle<int>(0, (int)timelineY, (int)totalWidth, (int)timelineTotalHeight));
             
-            g.setColour(clipColour);
-            g.fillRoundedRectangle(bounds, clipCornerSize);
-            
-            // Clip border - more emphasis for active timeline
-            if (isSelected)
+            // Draw diagonal lines across the entire width
+            float startX = -patternWidth; // Start slightly offscreen to ensure full coverage
+            while (startX < totalWidth + patternWidth)
             {
-                g.setColour(juce::Colours::white.withAlpha(isTimelineDisabled ? 0.4f : 1.0f));
-                g.drawRoundedRectangle(bounds, clipCornerSize, isCurrentTimeline ? 3.0f : 2.0f);
-            }
-            else
-            {
-                if (isCurrentTimeline && !isTimelineDisabled)
-                {
-                    g.setColour(juce::Colours::white.withAlpha(0.4f));
-                    g.drawRoundedRectangle(bounds, clipCornerSize, 1.5f);
-                }
-                else if (!isTimelineDisabled)
-                {
-                    g.setColour(juce::Colours::white.withAlpha(0.2f));
-                    g.drawRoundedRectangle(bounds, clipCornerSize, 1.0f);
-                }
-            }
-            
-            // Only show resize handles for current timeline, selected clips, and valid timelines
-            if (isCurrentTimeline && isSelected && !isTimelineDisabled &&
-                (clipBounds.isResizeLeft || clipBounds.isResizeRight))
-            {
-                g.setColour(juce::Colours::white.withAlpha(0.6f));
-                if (clipBounds.isResizeLeft)
-                    g.fillRect(bounds.getX(), bounds.getY(), resizeHandleWidth, bounds.getHeight());
-                if (clipBounds.isResizeRight)
-                    g.fillRect(bounds.getRight() - resizeHandleWidth, bounds.getY(),
-                              resizeHandleWidth, bounds.getHeight());
-            }
-            
-            // Clip content (faded for non-current timelines and disabled timelines)
-            Rectangle<float> iconBounds = getIconBoundsWithinClip(bounds);
-            
-            // Update scaled icons if needed
-            updateScaledIcons(iconBounds.getWidth());
-
-            // Draw icon using pre-scaled SVG
-            float iconAlpha = isTimelineDisabled ? 0.3f : (isCurrentTimeline ? 1.0f : 0.5f);
-            g.setColour(juce::Colours::white.withAlpha(iconAlpha));
-
-            juce::Drawable* iconDrawable = nullptr;
-            if (clipBounds.isMovementClip && scaledMovementIcon != nullptr)
-            {
-                iconDrawable = scaledMovementIcon.get();
-            }
-            else if (!clipBounds.isMovementClip && scaledActionIcon != nullptr)
-            {
-                iconDrawable = scaledActionIcon.get();
-            }
-
-            if (iconDrawable != nullptr)
-            {
-                auto transform = juce::AffineTransform::translation(iconBounds.getX(), iconBounds.getY());
-                iconDrawable->draw(g, iconAlpha, transform);
-            }
-            
-            // Draw text only if there's enough space and timeline is not disabled
-            if (!isTimelineDisabled && shouldShowClipText(bounds, iconBounds.getWidth()))
-            {
-                const float textX = iconBounds.getRight() + 5.0f;
-                const float availableTextWidth = bounds.getWidth() - (iconBounds.getWidth() + 10.0f);
+                // Draw diagonal line from top-left to bottom-right
+                juce::Line<float> diagonalLine(
+                    startX, timelineY,
+                    startX + patternWidth, timelineY + timelineTotalHeight
+                );
+                g.drawLine(diagonalLine, 1.5f);
                 
-                g.setFont(juce::FontOptions(12.0f, juce::Font::bold));
-                g.drawText(getClipDisplayName(clipBounds.timelineIndex, clipBounds.layerIndex, clipBounds.clipIndex, clipBounds.isMovementClip),
-                           (int)textX, (int)(bounds.getY() + 5.0f), (int)availableTextWidth, 16,
-                           juce::Justification::left);
-                
-                g.setFont(juce::FontOptions(10.0f));
-                g.drawText(getClipTimeInfo(*clip),
-                           (int)textX, (int)(bounds.getY() + 22.0f), (int)availableTextWidth, 14,
-                           juce::Justification::left);
+                startX += patternSpacing;
             }
             
-            // Menu button only for current timeline, selected clips, and valid timelines
-            if (isCurrentTimeline && isSelected && !isTimelineDisabled)
-            {
-                Rectangle<float> buttonBounds = getButtonBoundsWithinClip(bounds);
-                
-                g.setColour(juce::Colours::white.withAlpha(0.7f));
-                g.fillEllipse(buttonBounds);
-                
-                g.setColour(juce::Colours::black);
-                g.setFont(juce::FontOptions(10.0f, juce::Font::bold));
-                g.drawText("...", buttonBounds,
-                           juce::Justification::centred);
-            }
-        }
-        
-        // Draw selection rectangle
-        if (dragState.isRectangleSelecting && !dragState.selectionRectangle.isEmpty())
-        {
-            g.setColour(juce::Colours::white.withAlpha(0.3f));
-            g.fillRect(dragState.selectionRectangle);
-            
-            g.setColour(juce::Colours::white);
-            g.drawRect(dragState.selectionRectangle, 1.0f);
-        }
-        
-        // Draw placement cursor (fixed, after clicking)
-        if (cursorVisible && cursorPosition >= visibleStartTime && cursorPosition <= visibleEndTime)
-        {
-            const float cursorX = timeToX(cursorPosition);
-            g.setColour(juce::Colours::cyan);
-            g.drawLine(cursorX, headerHeight, cursorX, totalHeight, 2.0f);
-            
-            // Draw a distinctive head for the fixed cursor
-            juce::Path cursorHead;
-            cursorHead.addTriangle(cursorX - 6, headerHeight,
-                                  cursorX + 6, headerHeight,
-                                  cursorX, headerHeight + 12);
-            g.fillPath(cursorHead);
-        }
-        
-        // Draw preview cursor (greyish, follows mouse)
-        if (previewCursorVisible && previewCursorPosition >= visibleStartTime && previewCursorPosition <= visibleEndTime)
-        {
-            const float previewX = timeToX(previewCursorPosition);
-            g.setColour(juce::Colours::lightgrey.withAlpha(0.7f));
-            g.drawLine(previewX, headerHeight, previewX, totalHeight, 1.0f);
-            
-            // Draw a subtle head for the preview cursor
-            juce::Path previewHead;
-            previewHead.addTriangle(previewX - 4, headerHeight,
-                                   previewX + 4, headerHeight,
-                                   previewX, headerHeight + 8);
-            g.fillPath(previewHead);
-        }
-        
-        // Draw playhead
-        if (!autoFollow && playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
-        {
-            const float playheadX = timeToX(playheadPosition);
-            g.setColour(juce::Colours::red);
-            g.drawLine(playheadX, headerHeight, playheadX, totalHeight, 2.0f);
-        }
-        
-        // =========================================================================
-        // FINAL STEP: Draw diagonal pattern over invalid timelines (over everything)
-        // =========================================================================
-        for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
-        {
-            auto* timeline = timelines->getUnchecked(timelineIndex);
-            if (timeline == nullptr) continue;
-            
-            const float timelineY = timelineIndexToY(timelineIndex);
-            
-            // Only draw if this timeline is visible
-            if (timelineY + timelineHeaderHeight + timeline->getNumLayers() * trackHeight < 0)
-                continue;
-            if (timelineY > getHeight())
-                continue;
-            
-            // Check if this timeline is invalid but has clips
-            bool isDisabled = false;
-            if (pSourceSet != nullptr)
-            {
-                int groupCount = pSourceSet->activeGroupCount();
-                bool isValid = (timelineIndex < groupCount);
-                bool hasClips = (timeline->movement.clips.size() > 0) ||
-                               (timeline->actions.clips.size() > 0);
-                isDisabled = !isValid && hasClips;
-            }
-            
-            if (isDisabled)
-            {
-                // Calculate the full height of this timeline (header + all tracks + spacing)
-                float timelineTotalHeight = timelineHeaderHeight;
-                for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
-                {
-                    timelineTotalHeight += trackHeight;
-                }
-                
-                // Add spacing if this isn't the last timeline
-                if (timelineIndex < timelines->size() - 1)
-                {
-                    timelineTotalHeight += timelineSpacing;
-                }
-                
-                // Draw diagonal pattern over the entire timeline area (including clips)
-                g.setColour(juce::Colour(0xaa600000)); // Dark red with transparency
-                
-                const float patternSpacing = 8.0f;
-                const float patternStroke = 1.5f;
-                
-                // Create a clipping region for this specific timeline
-                g.saveState();
-                g.reduceClipRegion(juce::Rectangle<int>(0, (int)timelineY, (int)totalWidth, (int)timelineTotalHeight));
-                
-                // Draw diagonal lines across the entire width
-                float startX = -patternSpacing * 4;
-                while (startX < totalWidth + patternSpacing * 4)
-                {
-                    juce::Line<float> diagonalLine(
-                        startX, timelineY,
-                        startX + totalWidth + timelineTotalHeight, timelineY + timelineTotalHeight
-                    );
-                    g.drawLine(diagonalLine, patternStroke);
-                    
-                    startX += patternSpacing;
-                }
-                
-                g.restoreState();
-            }
+            g.restoreState();
         }
     }
+    
+    // =========================================================================
+    // GLOBAL ELEMENTS (cursors, playhead, selection rectangle)
+    // =========================================================================
+    
+    // Draw selection rectangle
+    if (dragState.isRectangleSelecting && !dragState.selectionRectangle.isEmpty())
+    {
+        g.setColour(juce::Colours::white.withAlpha(0.3f));
+        g.fillRect(dragState.selectionRectangle);
+        
+        g.setColour(juce::Colours::white);
+        g.drawRect(dragState.selectionRectangle, 1.0f);
+    }
+    
+    // Draw placement cursor (fixed, after clicking)
+    if (cursorVisible && cursorPosition >= visibleStartTime && cursorPosition <= visibleEndTime)
+    {
+        const float cursorX = timeToX(cursorPosition);
+        g.setColour(juce::Colours::cyan);
+        g.drawLine(cursorX, headerHeight, cursorX, totalHeight, 2.0f);
+        
+        juce::Path cursorHead;
+        cursorHead.addTriangle(cursorX - 6, headerHeight,
+                              cursorX + 6, headerHeight,
+                              cursorX, headerHeight + 12);
+        g.fillPath(cursorHead);
+    }
+    
+    // Draw preview cursor (greyish, follows mouse)
+    if (previewCursorVisible && previewCursorPosition >= visibleStartTime && previewCursorPosition <= visibleEndTime)
+    {
+        const float previewX = timeToX(previewCursorPosition);
+        g.setColour(juce::Colours::lightgrey.withAlpha(0.7f));
+        g.drawLine(previewX, headerHeight, previewX, totalHeight, 1.0f);
+        
+        juce::Path previewHead;
+        previewHead.addTriangle(previewX - 4, headerHeight,
+                               previewX + 4, headerHeight,
+                               previewX, headerHeight + 8);
+        g.fillPath(previewHead);
+    }
+    
+    // Draw playhead
+    if (!autoFollow && playheadPosition >= visibleStartTime && playheadPosition <= visibleEndTime)
+    {
+        const float playheadX = timeToX(playheadPosition);
+        g.setColour(juce::Colours::red);
+        g.drawLine(playheadX, headerHeight, playheadX, totalHeight, 2.0f);
+    }
+}
 
 void TimelineComponent::resized()
 {
@@ -1598,71 +1574,6 @@ void TimelineComponent::updateScrollBars()
     }
 }
 
-void TimelineComponent::updateVisibleClips()
-{
-    visibleClips.clear();
-    if (timelines == nullptr) return;
-    
-    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
-    {
-        auto* timeline = timelines->getUnchecked(timelineIndex);
-        if (timeline == nullptr) continue;
-        
-        const float timelineY = timelineIndexToY(timelineIndex);
-        
-        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
-        {
-            const int numClips = timeline->getNumClips(layerIndex);
-            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
-            {
-                bool isMovementClip = false;
-                const auto* clip = getClip(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                if (!clip) continue;
-                
-                // Check if clip is visible in current view
-                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
-                    continue;
-                
-                ClipBounds bounds;
-                bounds.timelineIndex = timelineIndex;
-                bounds.layerIndex = layerIndex;
-                bounds.clipIndex = clipIndex;
-                bounds.isMovementClip = isMovementClip;
-                
-                // Calculate the visible portion of the clip
-                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
-                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
-                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
-                
-                // Ensure we have at least some visible portion
-                if (visibleClipLength <= 0)
-                    continue;
-                
-                const float x = timeToX(visibleClipStart);
-                const float width = visibleClipLength * pixelsPerMillisecond;
-                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
-                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
-                
-                // Ensure minimum width for visibility and interaction
-                bounds.bounds = juce::Rectangle<float>(x, clipY, juce::jmax(10.0f, width), clipHeight);
-                
-                // Check if resize handles would be visible
-                bounds.isResizeLeft = (clip->start >= visibleStartTime);
-                bounds.isResizeRight = (clip->end() <= visibleEndTime);
-                
-                // Populate clip information for tooltips
-                bounds.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                bounds.timeInfo = getClipTimeInfo(*clip);
-                bounds.fullInfo = generateClipFullInfo(timelineIndex, layerIndex, clipIndex, isMovementClip, *clip);
-                
-                // Only add if clip is vertically visible
-                if (bounds.bounds.getBottom() >= 0 && bounds.bounds.getY() <= getHeight())
-                    visibleClips.add(bounds);
-            }
-        }
-    }
-}
-
 juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const
 {
     juce::String info;
@@ -1757,12 +1668,65 @@ void TimelineComponent::toggleClipSelection(int timelineIndex, int layerIndex, i
 juce::Array<TimelineComponent::ClipBounds> TimelineComponent::findAllClipsAtPosition(const juce::Point<int>& position) const
 {
     juce::Array<ClipBounds> clipsAtPos;
-    
-    for (const auto& bounds : visibleClips)
+
+    if (timelines == nullptr) return clipsAtPos;
+
+    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
     {
-        if (bounds.bounds.contains(position.toFloat()))
+        auto* timeline = timelines->getUnchecked(timelineIndex);
+        if (timeline == nullptr) continue;
+        
+        const float timelineY = timelineIndexToY(timelineIndex);
+        
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
-            clipsAtPos.add(bounds);
+            bool isMovementClip = (layerIndex == 0);
+            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
+            
+            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
+            {
+                const Clip* clip = isMovementClip ?
+                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
+                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
+                
+                if (!clip) continue;
+                
+                // Check if clip is visible
+                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                    continue;
+                
+                // Calculate clip bounds
+                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+                
+                if (visibleClipLength <= 0) continue;
+                
+                const float x = timeToX(visibleClipStart);
+                const float width = visibleClipLength * pixelsPerMillisecond;
+                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
+                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
+                
+                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
+                
+                // Only add if clip is vertically visible
+                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight() &&
+                    bounds.contains(position.toFloat()))
+                {
+                    ClipBounds clipBounds;
+                    clipBounds.timelineIndex = timelineIndex;
+                    clipBounds.layerIndex = layerIndex;
+                    clipBounds.clipIndex = clipIndex;
+                    clipBounds.isMovementClip = isMovementClip;
+                    clipBounds.bounds = bounds;
+                    
+                    // Populate clip information
+                    clipBounds.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                    clipBounds.timeInfo = getClipTimeInfo(*clip);
+                    
+                    clipsAtPos.add(clipBounds);
+                }
+            }
         }
     }
     
@@ -1774,11 +1738,13 @@ TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::
     if (clips.size() == 1)
         return clips.getFirst();
     
-    // Sort clips by how many other clips they're covered by
+    // Sort clips by selection status and coverage
     struct ClipCoverage
     {
         ClipBounds bounds;
         int coverageCount = 0;
+        bool isSelected = false;
+        int priorityScore = 0; // Higher score = higher priority
     };
     
     juce::Array<ClipCoverage> coverage;
@@ -1787,6 +1753,8 @@ TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::
     {
         ClipCoverage item;
         item.bounds = clip;
+        item.isSelected = isClipSelected(clip.timelineIndex, clip.layerIndex,
+                                       clip.clipIndex, clip.isMovementClip);
         
         // Count how many other clips cover this one
         for (const auto& other : clips)
@@ -1797,18 +1765,23 @@ TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::
             }
         }
         
+        // Calculate priority score: selected clips get high priority
+        // Selected clips: 1000 + coverage count (so most hidden selected clips are prioritized)
+        // Non-selected clips: coverage count only
+        item.priorityScore = item.isSelected ? (1000 + item.coverageCount) : item.coverageCount;
+        
         coverage.add(item);
     }
     
-    // Find the clip with the highest coverage count (most hidden)
-    int maxCoverage = -1;
+    // Find the clip with the highest priority score
+    int maxPriorityScore = -1;
     ClipBounds mostHidden = clips.getFirst();
     
     for (const auto& item : coverage)
     {
-        if (item.coverageCount > maxCoverage)
+        if (item.priorityScore > maxPriorityScore)
         {
-            maxCoverage = item.coverageCount;
+            maxPriorityScore = item.priorityScore;
             mostHidden = item.bounds;
         }
     }
@@ -1840,12 +1813,53 @@ void TimelineComponent::selectClipsInRectangle(const juce::Rectangle<int>& rect,
         clearSelection();
     }
     
-    for (const auto& clipBounds : visibleClips)
+    if (timelines == nullptr) return;
+
+    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
     {
-        if (rect.intersects(clipBounds.bounds.toNearestInt()))
+        auto* timeline = timelines->getUnchecked(timelineIndex);
+        if (timeline == nullptr) continue;
+        
+        const float timelineY = timelineIndexToY(timelineIndex);
+        
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
-            selectClip(clipBounds.timelineIndex, clipBounds.layerIndex,
-                      clipBounds.clipIndex, clipBounds.isMovementClip, true);
+            bool isMovementClip = (layerIndex == 0);
+            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
+            
+            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
+            {
+                const Clip* clip = isMovementClip ?
+                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
+                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
+                
+                if (!clip) continue;
+                
+                // Check if clip is visible
+                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                    continue;
+                
+                // Calculate clip bounds
+                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+                
+                if (visibleClipLength <= 0) continue;
+                
+                const float x = timeToX(visibleClipStart);
+                const float width = visibleClipLength * pixelsPerMillisecond;
+                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
+                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
+                
+                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
+                
+                // Only select if clip is vertically visible and intersects rectangle
+                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight() &&
+                    rect.intersects(bounds.toNearestInt()))
+                {
+                    selectClip(timelineIndex, layerIndex, clipIndex, isMovementClip, true);
+                }
+            }
         }
     }
 }
@@ -1860,44 +1874,75 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
     result.isResizeLeft = false;
     result.isResizeRight = false;
 
-    for (const auto& bounds : visibleClips)
+    if (timelines == nullptr) return result;
+
+    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
     {
-        if (bounds.bounds.contains(position.toFloat()))
+        auto* timeline = timelines->getUnchecked(timelineIndex);
+        if (timeline == nullptr) continue;
+        
+        const float timelineY = timelineIndexToY(timelineIndex);
+        
+        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
-            result = bounds;
+            bool isMovementClip = (layerIndex == 0);
+            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
             
-            // Check if click is on resize handles (only for current timeline and selected clips)
-            if (bounds.timelineIndex == currentTimelineIndex &&
-                isClipSelected(bounds.timelineIndex, bounds.layerIndex, bounds.clipIndex, bounds.isMovementClip))
+            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
             {
-                const auto posX = static_cast<float>(position.x);
-                const auto clipBounds = bounds.bounds;
+                const Clip* clip = isMovementClip ?
+                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
+                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
                 
-                // Check left resize handle
-                if (posX >= clipBounds.getX() && posX <= clipBounds.getX() + resizeHandleWidth)
+                if (!clip) continue;
+                
+                // Check if clip is visible
+                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                    continue;
+                
+                // Calculate clip bounds
+                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+                
+                if (visibleClipLength <= 0) continue;
+                
+                const float x = timeToX(visibleClipStart);
+                const float width = visibleClipLength * pixelsPerMillisecond;
+                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
+                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
+                
+                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
+                
+                if (bounds.contains(position.toFloat()))
                 {
-                    result.isResizeLeft = true;
-                    result.isResizeRight = false;
-                }
-                // Check right resize handle
-                else if (posX >= clipBounds.getRight() - resizeHandleWidth && posX <= clipBounds.getRight())
-                {
-                    result.isResizeLeft = false;
-                    result.isResizeRight = true;
-                }
-                else
-                {
-                    result.isResizeLeft = false;
-                    result.isResizeRight = false;
+                    result.timelineIndex = timelineIndex;
+                    result.layerIndex = layerIndex;
+                    result.clipIndex = clipIndex;
+                    result.isMovementClip = isMovementClip;
+                    result.bounds = bounds;
+                    
+                    // Check resize handles (only for current timeline and selected clips)
+                    if (timelineIndex == currentTimelineIndex &&
+                        isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip))
+                    {
+                        const auto posX = static_cast<float>(position.x);
+                        
+                        // Check left resize handle
+                        if (posX >= bounds.getX() && posX <= bounds.getX() + resizeHandleWidth)
+                        {
+                            result.isResizeLeft = true;
+                        }
+                        // Check right resize handle
+                        else if (posX >= bounds.getRight() - resizeHandleWidth && posX <= bounds.getRight())
+                        {
+                            result.isResizeRight = true;
+                        }
+                    }
+                    
+                    return result; // Return first found clip
                 }
             }
-            else
-            {
-                result.isResizeLeft = false;
-                result.isResizeRight = false;
-            }
-            
-            break;
         }
     }
     

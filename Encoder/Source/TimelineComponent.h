@@ -189,12 +189,9 @@ private:
     ms_t visibleEndTime = 10000;
     float pixelsPerMillisecond = DEFAULT_PIXELS_PER_MS;
    
-    juce::Array<ClipBounds> visibleClips;
-    
     // Update methods
     void updateScrollBars();
     void repositionScrollBars();
-    void updateVisibleClips();
     ClipBounds findClipAtPosition(const juce::Point<int>& position);
     juce::Array<ClipBounds> findAllClipsAtPosition(const juce::Point<int>& position) const;
     ClipBounds findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& position) const;
