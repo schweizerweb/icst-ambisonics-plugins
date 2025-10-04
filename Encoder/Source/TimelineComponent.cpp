@@ -216,22 +216,6 @@ void TimelineComponent::updateTimelineValidationStates()
             timelineValidationStates.getReference(i).hasClips = hasClips;
         }
     }
-    
-    // Also check timelines beyond group count for invalidation
-    for (int i = groupCount; i < timelineCount; ++i)
-    {
-        bool hasClips = false;
-        
-        if (auto* timeline = timelines->getUnchecked(i))
-        {
-            hasClips = (timeline->movement.clips.size() > 0) ||
-                      (timeline->actions.clips.size() > 0);
-        }
-        
-        // These timelines are always invalid (beyond group count)
-        // We track them in a separate part of the array if needed
-        // For now, we'll handle them in the painting logic
-    }
 }
 
 void TimelineComponent::validateTimelineSelection()
@@ -986,7 +970,7 @@ void TimelineComponent::mouseEnter(const juce::MouseEvent& event)
     }
 }
 
-void TimelineComponent::mouseExit(const juce::MouseEvent& event)
+void TimelineComponent::mouseExit(const juce::MouseEvent& /*event*/)
 {
     // Hide preview cursor when mouse leaves component
     hidePreviewCursor();
@@ -1507,7 +1491,7 @@ void TimelineComponent::updateScrollBars()
     }
 }
 
-juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const
+juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int layerIndex, int /*clipIndex*/, bool isMovementClip, const Clip& clip) const
 {
     juce::String info;
     
@@ -1525,6 +1509,7 @@ juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int laye
     if (isMovementClip)
     {
         const auto& movementClip = static_cast<const MovementClip&>(clip);
+        info << (movementClip.useStartPoint ? "Defined start position" : "Undefined start position") << "\n";
         // Add movement-specific info if needed
     }
     else
@@ -1886,7 +1871,7 @@ TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::
     return result;
 }
 
-void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& position)
+void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const juce::Point<int>& /*position*/)
 {
     juce::PopupMenu menu;
     
@@ -1897,7 +1882,7 @@ void TimelineComponent::showClipContextMenu(int timelineIndex, int layerIndex, i
     
     menu.showMenuAsync(juce::PopupMenu::Options()
                        .withParentComponent(this),
-                       [this, timelineIndex, layerIndex, clipIndex, isMovementClip, position](int result)
+                       [this, timelineIndex, layerIndex, clipIndex, isMovementClip](int result)
                        {
                            if (result == 1)
                            {
@@ -2055,7 +2040,7 @@ void TimelineComponent::loadIcons()
 
 void TimelineComponent::updateScaledIcons(float iconSize)
 {
-    if (lastIconSize == iconSize) return; // Already scaled to this size
+    if (approximatelyEqual(lastIconSize, iconSize)) return; // Already scaled to this size
     
     lastIconSize = iconSize;
     
@@ -2110,7 +2095,7 @@ void TimelineComponent::renderHeaderToCache()
     if (headerCache &&
         cachedHeaderVisibleStartTime == visibleStartTime &&
         cachedHeaderVisibleEndTime == visibleEndTime &&
-        cachedHeaderPixelsPerMillisecond == pixelsPerMillisecond &&
+        approximatelyEqual(cachedHeaderPixelsPerMillisecond, pixelsPerMillisecond) &&
         cachedHeaderWidth == getWidth() &&
         cachedHeaderHeight == headerAreaHeight)
     {
@@ -2494,11 +2479,11 @@ void TimelineComponent::showClipEditor(int timelineIndex, int clipIndex, bool is
 {
     if (isMovementClip)
     {
-        clipEditorManager->showMovementEditor(this, timelineIndex, clipIndex, this);
+        clipEditorManager->showMovementEditor(this, timelineIndex, clipIndex);
     }
     else
     {
-        clipEditorManager->showActionEditor(this, timelineIndex, clipIndex, this);
+        clipEditorManager->showActionEditor(this, timelineIndex, clipIndex);
     }
 }
 

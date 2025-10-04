@@ -82,7 +82,7 @@ void AnimatorMainView::setAutoFollow(bool shouldAutoFollow)
     timelineViewport->getTimelineComponent()->setAutoFollow(shouldAutoFollow);
 }
 
-void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
+void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> /*provider*/)
 {
     // Store if needed
 }
@@ -110,7 +110,7 @@ void AnimatorMainView::resized()
 }
 
 // Menu implementation
-juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName)
+juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevelMenuIndex, const juce::String& /*menuName*/)
 {
     juce::PopupMenu menu;
     
@@ -498,9 +498,6 @@ void AnimatorMainView::pasteClips()
             }
             
             timelineViewport->repaint();
-            
-            // Optional: Provide feedback
-            int totalClips = sourceTimeline->movement.clips.size() + sourceTimeline->actions.clips.size();
         }
     }
     else

@@ -37,7 +37,7 @@ public:
         }
     }
     
-    void showMovementEditor(TimelineComponent* timelineComp, int timelineIndex, int clipIndex, juce::Component* pParent)
+    void showMovementEditor(TimelineComponent* timelineComp, int timelineIndex, int clipIndex)
     {
         if (window)
             delete window;
@@ -50,7 +50,7 @@ public:
         window->setVisible(true);
     }
     
-    void showActionEditor(TimelineComponent* timelineComp, int timelineIndex, int clipIndex, juce::Component* pParent)
+    void showActionEditor(TimelineComponent* timelineComp, int timelineIndex, int clipIndex)
     {
         if (window)
             delete window;

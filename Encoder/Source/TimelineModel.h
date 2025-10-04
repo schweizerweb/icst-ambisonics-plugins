@@ -50,10 +50,10 @@ class ActionDefinition
     double value;
 
 public:
-    ActionDefinition(ActionType action = ActionType::None,
-                    TimingType timing = TimingType::None,
-                    double value = 0.0)
-        : action(action), timing(timing), value(value) {}
+    ActionDefinition(ActionType action_ = ActionType::None,
+                    TimingType timing_ = TimingType::None,
+                    double value_ = 0.0)
+        : action(action_), timing(timing_), value(value_) {}
     
     // 1. Get unit based on action type
     std::string getUnit(bool verbose = false) const

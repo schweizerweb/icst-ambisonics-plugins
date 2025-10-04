@@ -320,7 +320,7 @@ void MovementClipEditor::updateCurrentPosition()
         }
     }
 
-    if(lastPositionValid != currentPositionValid || lastPosition.x != currentPosition.x || lastPosition.y != currentPosition.y || lastPosition.z != currentPosition.z)
+    if(lastPositionValid != currentPositionValid || !approximatelyEqual(lastPosition.x, currentPosition.x) || !approximatelyEqual(lastPosition.y, currentPosition.y) || !approximatelyEqual(lastPosition.z, currentPosition.z))
     {
         updateApplyCurrentPositionButtonText(applyCurrentStartButton, currentPosition, currentPositionValid);
         updateApplyCurrentPositionButtonText(applyCurrentTargetButton, currentPosition, currentPositionValid);
@@ -334,7 +334,7 @@ void MovementClipEditor::updateCurrentPosition()
     }
 }
 
-void MovementClipEditor::changeListenerCallback(ChangeBroadcaster *source)
+void MovementClipEditor::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
     updateCurrentPosition();
 }

@@ -781,7 +781,7 @@ void Radar2D::resized()
     }
     
     radarViewportWithBorder = Rectangle<double>(x-border, y-border, w+2*border, h+2*border).toNearestInt();
-    radarViewport = radarViewportWithBorder.reduced(border);
+    radarViewport = radarViewportWithBorder.reduced((int)border);
     updateRadarBackground();
 }
 
