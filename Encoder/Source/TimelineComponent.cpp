@@ -330,15 +330,21 @@ void TimelineComponent::setPlayheadPosition(ms_t timeMs)
     }
     
     auto visibleTime = visibleEndTime - visibleStartTime;
-    if (autoFollow && playheadPosition > (visibleEndTime - 0.2 * visibleTime))
+    if (autoFollow)
     {
-        visibleStartTime = playheadPosition - (ms_t)(visibleTime * 0.2);
-        visibleEndTime = (ms_t)(visibleStartTime + visibleTime);
-        updateScrollBars();
-    }
+        if(playheadPosition > (visibleEndTime - 0.2 * visibleTime))
+        {
+            visibleStartTime = playheadPosition - (ms_t)(visibleTime * 0.2);
+            visibleEndTime = (ms_t)(visibleStartTime + visibleTime);
+            updateScrollBars();
+        }
+        else if(playheadPosition < visibleStartTime)
+        {
+            visibleStartTime = playheadPosition - (ms_t)(visibleTime * 0.5);
+            visibleEndTime = (ms_t)(visibleStartTime + visibleTime);
+            updateScrollBars();
+        }
     
-    if(autoFollow)
-    {
         setCursorTime(timeMs);
     }
     
