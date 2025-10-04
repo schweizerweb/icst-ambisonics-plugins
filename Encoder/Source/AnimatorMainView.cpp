@@ -153,13 +153,13 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addSubMenu("Export Scene...", exportSubMenu);
                 
                 menu.addSeparator();
-                menu.addItem(6, "Preferences");
+                menu.addItem(6, "Preferences", false); // not implemented yet
             }
             break;
             
         case 1: // Edit
-            menu.addItem(10, "Undo", false);
-            menu.addItem(11, "Redo", false);
+            menu.addItem(10, "Undo", false); // not implemented yet
+            menu.addItem(11, "Redo", false); // not implemented yet
             menu.addSeparator();
             menu.addItem(12, "Cut");
             menu.addItem(13, "Copy");
