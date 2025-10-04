@@ -11,7 +11,6 @@ class ClipEditorDialogManager;
 
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
-                          public juce::ComboBox::Listener,
                           public juce::MouseListener,
                           public juce::ChangeListener
 {
@@ -33,8 +32,6 @@ public:
     // ScrollBar::Listener
     void scrollBarMoved(juce::ScrollBar* scrollBar, double newRangeStart) override;
     
-    // ComboBox::Listener
-    void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override;
     int calculateTotalContentHeight() const;
     
     // Component
@@ -151,7 +148,6 @@ private:
     int currentTimelineIndex = 0;
     
     std::unique_ptr<juce::ScrollBar> horizontalScrollBar;
-    std::unique_ptr<juce::ComboBox> timelineSelector;
     
     ms_t playheadPosition = 0;
     bool autoFollow = true;

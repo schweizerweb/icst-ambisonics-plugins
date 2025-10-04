@@ -8,17 +8,8 @@ TimelineComponent::TimelineComponent()
     loadIcons(); // Load the SVG icons
     
     horizontalScrollBar = std::make_unique<juce::ScrollBar>(false);
-    timelineSelector = std::make_unique<juce::ComboBox>();
-    
     horizontalScrollBar->addListener(this);
-    
-    timelineSelector->addListener(this);
-    timelineSelector->setTextWhenNoChoicesAvailable("No Timelines");
-    
     addAndMakeVisible(horizontalScrollBar.get());
-    addAndMakeVisible(timelineSelector.get());
-    
-    timelineSelector->setVisible(false);
     
     clipEditorManager = std::make_unique<ClipEditorDialogManager>();
     
@@ -29,7 +20,6 @@ TimelineComponent::TimelineComponent()
 TimelineComponent::~TimelineComponent()
 {
     horizontalScrollBar->removeListener(this);
-    timelineSelector->removeListener(this);
     
     // Remove as ChangeListener from PointSelection and AmbiSourceSet
     if (pPointSelectionControl != nullptr)
@@ -41,20 +31,6 @@ TimelineComponent::~TimelineComponent()
 void TimelineComponent::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
 {
     timelines = newTimelines;
-    
-    // Update timeline selector
-    timelineSelector->clear();
-    if (timelines != nullptr)
-    {
-        for (int i = 0; i < timelines->size(); ++i)
-        {
-            timelineSelector->addItem("Group " + juce::String(i + 1), i + 1);
-        }
-        if (timelines->size() > 0)
-        {
-            timelineSelector->setSelectedId(1, juce::sendNotificationSync);
-        }
-    }
     
     maxDuration = 60000;
     // Find the latest clip end time across all timelines
@@ -99,7 +75,6 @@ void TimelineComponent::setCurrentTimeline(int index)
     if (timelines != nullptr && index >= 0 && index < timelines->size())
     {
         currentTimelineIndex = index;
-        timelineSelector->setSelectedId(index + 1, juce::sendNotificationSync);
         
         // Sync to PointSelection
         syncTimelineSelectionToPointSelection();
@@ -163,16 +138,6 @@ void TimelineComponent::syncTimelinesToGroupCount()
         {
             timelines->add(new TimelineModel());
         }
-        
-        // Update timeline selector
-        if (timelineSelector != nullptr)
-        {
-            timelineSelector->clear();
-            for (int i = 0; i < timelines->size(); ++i)
-            {
-                timelineSelector->addItem("Group " + juce::String(i + 1), i + 1);
-            }
-        }
     }
     // If we have more timelines than groups, remove empty ones
     else if (currentGroupCount < currentTimelineCount && timelines != nullptr)
@@ -197,10 +162,6 @@ void TimelineComponent::syncTimelinesToGroupCount()
                 if (i == currentTimelineIndex)
                 {
                     currentTimelineIndex = juce::jmin(currentGroupCount - 1, 0);
-                    if (timelineSelector != nullptr)
-                    {
-                        timelineSelector->setSelectedId(currentTimelineIndex + 1, juce::sendNotificationSync);
-                    }
                 }
                 // Adjust current timeline index if needed
                 else if (i < currentTimelineIndex)
@@ -801,8 +762,6 @@ void TimelineComponent::resized()
     const auto totalWidth = getWidth();
     const auto totalHeight = getHeight();
     
-    timelineSelector->setBounds(10, 5, 150, 24);
-    
     horizontalScrollBar->setBounds(0, totalHeight - scrollBarSize, totalWidth, scrollBarSize);
     
     updateScrollBars();
@@ -1299,17 +1258,9 @@ void TimelineComponent::mouseWheelMove(const juce::MouseEvent& event, const juce
     }
 }
 
-void TimelineComponent::comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged)
-{
-    if (comboBoxThatHasChanged == timelineSelector.get())
-    {
-        timelineSelectionChanged();
-    }
-}
-
 void TimelineComponent::timelineSelectionChanged()
 {
-    currentTimelineIndex = timelineSelector->getSelectedId() - 1;
+//    currentTimelineIndex = timelineSelector->getSelectedId() - 1;
     
     // Sync to PointSelection
     syncTimelineSelectionToPointSelection();
