@@ -152,7 +152,6 @@ private:
     
     std::unique_ptr<juce::ScrollBar> horizontalScrollBar;
     std::unique_ptr<juce::ComboBox> timelineSelector;
-    std::unique_ptr<juce::TextButton> tempButton;
     
     ms_t playheadPosition = 0;
     bool autoFollow = true;

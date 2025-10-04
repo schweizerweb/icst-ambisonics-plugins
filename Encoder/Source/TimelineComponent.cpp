@@ -9,7 +9,6 @@ TimelineComponent::TimelineComponent()
     
     horizontalScrollBar = std::make_unique<juce::ScrollBar>(false);
     timelineSelector = std::make_unique<juce::ComboBox>();
-    tempButton = std::make_unique<juce::TextButton>();
     
     horizontalScrollBar->addListener(this);
     
@@ -18,7 +17,6 @@ TimelineComponent::TimelineComponent()
     
     addAndMakeVisible(horizontalScrollBar.get());
     addAndMakeVisible(timelineSelector.get());
-    //addAndMakeVisible(tempButton.get());
     
     timelineSelector->setVisible(false);
     
@@ -807,7 +805,6 @@ void TimelineComponent::resized()
     
     horizontalScrollBar->setBounds(0, totalHeight - scrollBarSize, totalWidth, scrollBarSize);
     
-    tempButton->setBounds(2, 2, 200, 20);
     updateScrollBars();
 }
 
@@ -1291,6 +1288,15 @@ void TimelineComponent::mouseWheelMove(const juce::MouseEvent& event, const juce
     {
         horizontalScrollBar->mouseWheelMove(event, wheel);
     }
+    
+    if(!approximatelyEqual(wheel.deltaY, 0.0f) && !event.mods.isAnyModifierKeyDown())
+    {
+        // Vertical scrolling - forward to parent viewport
+        if (auto* viewport = findParentComponentOfClass<juce::Viewport>())
+        {
+            viewport->mouseWheelMove(event.getEventRelativeTo(viewport), wheel);
+        }
+    }
 }
 
 void TimelineComponent::comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged)
@@ -1546,7 +1552,7 @@ void TimelineComponent::updateScrollBars()
     {
         horizontalScrollBar->setRangeLimits(0, maxDuration);
         horizontalScrollBar->setCurrentRange(visibleStartTime, visibleWidthMs);
-        horizontalScrollBar->setSingleStepSize((visibleEndTime - visibleStartTime)*0.02);
+        horizontalScrollBar->setSingleStepSize((visibleEndTime - visibleStartTime)*0.01);
     }
 }
 
