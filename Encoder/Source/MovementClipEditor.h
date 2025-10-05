@@ -62,6 +62,7 @@ private:
     juce::TextButton applyButton{"Apply"}, cancelButton{"Cancel"};
     juce::TextButton applyCurrentStartButton, applyCurrentTargetButton;
     
+    juce::ToggleButton usePolarCoordinates;  // New checkbox for coordinate system
     juce::ToggleButton useStartPosition;
     UnlimitedRangeSlider startXSlider, startYSlider, startZSlider;
     UnlimitedRangeSlider targetXSlider, targetYSlider, targetZSlider;
@@ -73,8 +74,12 @@ private:
                                double min, double max, double defaultValue);
     void createApplyCurrentPositionButton(juce::TextButton& button, UnlimitedRangeSlider& xSlider, UnlimitedRangeSlider& ySlider, UnlimitedRangeSlider& zSlider);
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
-    void updateCurrentPosition();
+    void updateCurrentPosition(bool force = false);
     int getMovementControlsHeight() const;
     void layoutMovementControls(juce::Rectangle<int> area);
     void updateStartPositionVisibility();
+    void updateCoordinateSystem();  // New method to handle coordinate system changes
+    void updateSliderLabelsAndRanges();  // New method to update UI based on coordinate system
+    juce::Vector3D<double> getCurrentPositionInSelectedSystem() const;  // New method to get position in current coordinate system
+    juce::String getCoordinateDisplayText(const juce::Vector3D<double>& vector, bool isValid) const;  // New method for coordinate display
 };

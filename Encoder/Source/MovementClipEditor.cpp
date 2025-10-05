@@ -21,11 +21,6 @@ MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timeline
         pPointSelection->addChangeListener(this);
     }
     
-    if(pSourceSet != nullptr)
-    {
-        updateCurrentPosition();
-    }
-    
     createControls();
 }
 
@@ -41,7 +36,7 @@ void MovementClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
     
-    // Calculate group heights - increased to accommodate new buttons
+    // Calculate group heights - increased to accommodate new checkbox
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
     const int movementGroupHeight = getMovementControlsHeight() + 40;
     const int buttonHeight = 28;
@@ -91,8 +86,27 @@ bool MovementClipEditor::applyChanges()
     commonSettings.applyToClip(currentClip);
     
     currentClip.useStartPoint = useStartPosition.getToggleState();
-    currentClip.startPointGroup.setXYZ(startXSlider.getValue(), startYSlider.getValue(), startZSlider.getValue());
-    currentClip.endPointGroup.setXYZ(targetXSlider.getValue(), targetYSlider.getValue(), targetZSlider.getValue());
+    currentClip.usePolar = usePolarCoordinates.getToggleState();
+    
+    if (usePolarCoordinates.getToggleState())
+    {
+        // Convert from degrees (UI) to radians (storage)
+        double startAzimuthRad = Constants::GradToRad(startXSlider.getValue());
+        double startElevationRad = Constants::GradToRad(startYSlider.getValue());
+        double startDistance = startZSlider.getValue();
+        
+        double targetAzimuthRad = Constants::GradToRad(targetXSlider.getValue());
+        double targetElevationRad = Constants::GradToRad(targetYSlider.getValue());
+        double targetDistance = targetZSlider.getValue();
+        
+        currentClip.startPointGroup.setAed(startAzimuthRad, startElevationRad, startDistance);
+        currentClip.endPointGroup.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
+    }
+    else
+    {
+        currentClip.startPointGroup.setXYZ(startXSlider.getValue(), startYSlider.getValue(), startZSlider.getValue());
+        currentClip.endPointGroup.setXYZ(targetXSlider.getValue(), targetYSlider.getValue(), targetZSlider.getValue());
+    }
     
     if (auto* timelineModel = timelineComp.getTimelineModel(timelineIndex))
     {
@@ -134,36 +148,32 @@ void MovementClipEditor::createControls()
             broadcaster->sendActionMessage(ACTION_CLOSE_CLIP_EDITOR);
     };
     
+    // Add the new polar coordinates checkbox
+    addAndMakeVisible(usePolarCoordinates);
+    usePolarCoordinates.setButtonText("Use Polar Coordinates (AED)");
+    usePolarCoordinates.setToggleState(currentClip.usePolar, juce::dontSendNotification);
+    usePolarCoordinates.onClick = [this] { updateCoordinateSystem(); };
+    
     addAndMakeVisible(useStartPosition);
     useStartPosition.setButtonText("Use Defined Start Position");
     useStartPosition.setToggleState(currentClip.useStartPoint, juce::dontSendNotification);
     useStartPosition.onClick = [this] { updateStartPositionVisibility(); };
     
-    // Create coordinate sliders for start and target positions
-    double minVal = -10.0f;
-    double maxVal = 10.0f;
-    if(pSourceSet != nullptr)
-    {
-        ScalingInfo* scaling = pSourceSet->getScalingInfo();
-        if(scaling != nullptr && !scaling->IsInfinite())
-        {
-            minVal = scaling->CartesianMin();
-            maxVal = scaling->CartesianMax();
-        }
-    }
+    // Create coordinate sliders - ranges will be set by updateSliderLabelsAndRanges
+    createCoordinateSlider(startXSlider, startXLabel, "Start X:", -10.0, 10.0, 0.0);
+    createCoordinateSlider(startYSlider, startYLabel, "Start Y:", -10.0, 10.0, 0.0);
+    createCoordinateSlider(startZSlider, startZLabel, "Start Z:", -10.0, 10.0, 0.0);
     
-    createCoordinateSlider(startXSlider, startXLabel, "Start X:", minVal, maxVal, currentClip.startPointGroup.getX());
-    createCoordinateSlider(startYSlider, startYLabel, "Start Y:", minVal, maxVal, currentClip.startPointGroup.getY());
-    createCoordinateSlider(startZSlider, startZLabel, "Start Z:", minVal, maxVal, currentClip.startPointGroup.getZ());
-    
-    createCoordinateSlider(targetXSlider, targetXLabel, "Target X:", minVal, maxVal, currentClip.endPointGroup.getX());
-    createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", minVal, maxVal, currentClip.endPointGroup.getY());
-    createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", minVal, maxVal, currentClip.endPointGroup.getZ());
+    createCoordinateSlider(targetXSlider, targetXLabel, "Target X:", -10.0, 10.0, 0.0);
+    createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", -10.0, 10.0, 0.0);
+    createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", -10.0, 10.0, 0.0);
     
     // Create apply current position buttons
     createApplyCurrentPositionButton(applyCurrentStartButton, startXSlider, startYSlider, startZSlider);
     createApplyCurrentPositionButton(applyCurrentTargetButton, targetXSlider, targetYSlider, targetZSlider);
     
+    // Initialize slider values based on current clip and coordinate system
+    updateSliderLabelsAndRanges();
     updateStartPositionVisibility();
     updateCurrentPosition(); // Initial update to set button states
 }
@@ -187,26 +197,214 @@ void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& butt
     button.onClick = [this, &xSlider, &ySlider, &zSlider] {
         if (currentPositionValid)
         {
-            xSlider.setValue(currentPosition.x);
-            ySlider.setValue(currentPosition.y);
-            zSlider.setValue(currentPosition.z);
+            auto position = getCurrentPositionInSelectedSystem();
+            xSlider.setValue(position.x);
+            ySlider.setValue(position.y);
+            zSlider.setValue(position.z);
         }
     };
 }
 
 void MovementClipEditor::updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid)
 {
-    if (isValid)
+    button.setButtonText(getCoordinateDisplayText(vector, isValid));
+}
+
+juce::String MovementClipEditor::getCoordinateDisplayText(const juce::Vector3D<double>& vector, bool isValid) const
+{
+    if (!isValid)
     {
-        button.setButtonText(juce::String("Apply ") +
-                             juce::String(vector.x, 2) + " (X); " +
-                             juce::String(vector.y, 2) + " (Y); " +
-                             juce::String(vector.z, 2) + " (Z)");
+        return "Unable to determine current position";
+    }
+    
+    if (usePolarCoordinates.getToggleState())
+    {
+        // Display in polar coordinates (AED)
+        return juce::String("Apply ") +
+               juce::String(vector.x, 1) + "° (A); " +
+               juce::String(vector.y, 1) + "° (E); " +
+               juce::String(vector.z, 2) + " (D)";
     }
     else
     {
-        button.setButtonText("Unable to determine current position");
+        // Display in Cartesian coordinates (XYZ)
+        return juce::String("Apply ") +
+               juce::String(vector.x, 2) + " (X); " +
+               juce::String(vector.y, 2) + " (Y); " +
+               juce::String(vector.z, 2) + " (Z)";
     }
+}
+
+juce::Vector3D<double> MovementClipEditor::getCurrentPositionInSelectedSystem() const
+{
+    if (!currentPositionValid)
+        return juce::Vector3D<double>();
+    
+    if (usePolarCoordinates.getToggleState())
+    {
+        // Convert Cartesian to polar (AED) and return in degrees for UI
+        Point3D<double> point(currentPosition.x, currentPosition.y, currentPosition.z);
+        return juce::Vector3D<double>(
+            Constants::RadToGrad(point.getAzimuth()),  // Convert to degrees
+            Constants::RadToGrad(point.getElevation()), // Convert to degrees
+            point.getDistance()
+        );
+    }
+    else
+    {
+        // Use Cartesian directly
+        return currentPosition;
+    }
+}
+
+void MovementClipEditor::updateSliderLabelsAndRanges()
+{
+    bool usePolar = usePolarCoordinates.getToggleState();
+    
+    if (usePolar)
+    {
+        // Polar coordinates (Azimuth, Elevation, Distance)
+        startXLabel.setText("Start Azimuth:", juce::dontSendNotification);
+        startYLabel.setText("Start Elevation:", juce::dontSendNotification);
+        startZLabel.setText("Start Distance:", juce::dontSendNotification);
+        
+        targetXLabel.setText("Target Azimuth:", juce::dontSendNotification);
+        targetYLabel.setText("Target Elevation:", juce::dontSendNotification);
+        targetZLabel.setText("Target Distance:", juce::dontSendNotification);
+        
+        // Set polar ranges in degrees for UI
+        ScalingInfo* scaling = pSourceSet->getScalingInfo();
+        if (scaling != nullptr)
+        {
+            startXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);  // Azimuth in degrees
+            startYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);    // Elevation in degrees
+            startZSlider.setRange(Constants::DistanceMin, scaling->IsInfinite() ? scaling->DistanceMax() : 15.0, 0.01);     // Distance
+            
+            targetXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
+            targetYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+            targetZSlider.setRange(Constants::DistanceMin, scaling->IsInfinite() ? scaling->DistanceMax() : 15.0, 0.01);
+        }
+        
+        // Convert current polar values from radians (storage) to degrees (UI)
+        Point3D<double> startPoint(currentClip.startPointGroup);
+        startXSlider.setValue(Constants::RadToGrad(startPoint.getAzimuth()));  // Convert to degrees
+        startYSlider.setValue(Constants::RadToGrad(startPoint.getElevation())); // Convert to degrees
+        startZSlider.setValue(startPoint.getDistance());
+        
+        Point3D<double> targetPoint(currentClip.endPointGroup);
+        targetXSlider.setValue(Constants::RadToGrad(targetPoint.getAzimuth()));  // Convert to degrees
+        targetYSlider.setValue(Constants::RadToGrad(targetPoint.getElevation())); // Convert to degrees
+        targetZSlider.setValue(targetPoint.getDistance());
+    }
+    else
+    {
+        // Cartesian coordinates (X, Y, Z) - no conversion needed
+        startXLabel.setText("Start X:", juce::dontSendNotification);
+        startYLabel.setText("Start Y:", juce::dontSendNotification);
+        startZLabel.setText("Start Z:", juce::dontSendNotification);
+        
+        targetXLabel.setText("Target X:", juce::dontSendNotification);
+        targetYLabel.setText("Target Y:", juce::dontSendNotification);
+        targetZLabel.setText("Target Z:", juce::dontSendNotification);
+        
+        // Set Cartesian ranges based on source set scaling
+        double minVal = -10.0;
+        double maxVal = 10.0;
+        if (pSourceSet != nullptr)
+        {
+            ScalingInfo* scaling = pSourceSet->getScalingInfo();
+            if (scaling != nullptr && !scaling->IsInfinite())
+            {
+                minVal = scaling->CartesianMin();
+                maxVal = scaling->CartesianMax();
+            }
+        }
+        
+        startXSlider.setRange(minVal, maxVal, 0.01);
+        startYSlider.setRange(minVal, maxVal, 0.01);
+        startZSlider.setRange(minVal, maxVal, 0.01);
+        
+        targetXSlider.setRange(minVal, maxVal, 0.01);
+        targetYSlider.setRange(minVal, maxVal, 0.01);
+        targetZSlider.setRange(minVal, maxVal, 0.01);
+        
+        // Use Cartesian values directly
+        startXSlider.setValue(currentClip.startPointGroup.getX());
+        startYSlider.setValue(currentClip.startPointGroup.getY());
+        startZSlider.setValue(currentClip.startPointGroup.getZ());
+        
+        targetXSlider.setValue(currentClip.endPointGroup.getX());
+        targetYSlider.setValue(currentClip.endPointGroup.getY());
+        targetZSlider.setValue(currentClip.endPointGroup.getZ());
+    }
+}
+
+void MovementClipEditor::updateCoordinateSystem()
+{
+    bool wasPolar = !usePolarCoordinates.getToggleState();
+    
+    if (wasPolar != usePolarCoordinates.getToggleState())
+    {
+        // Store the actual point values before switching
+        Point3D<double> startPoint, targetPoint;
+        
+        if (wasPolar)
+        {
+            // Was polar, now switching to Cartesian
+            // Convert current polar values (in degrees from UI) to actual points
+            double startAzimuthRad = Constants::GradToRad(startXSlider.getValue());
+            double startElevationRad = Constants::GradToRad(startYSlider.getValue());
+            double startDistance = startZSlider.getValue();
+            
+            double targetAzimuthRad = Constants::GradToRad(targetXSlider.getValue());
+            double targetElevationRad = Constants::GradToRad(targetYSlider.getValue());
+            double targetDistance = targetZSlider.getValue();
+            
+            startPoint.setAed(startAzimuthRad, startElevationRad, startDistance);
+            targetPoint.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
+        }
+        else
+        {
+            // Was Cartesian, now switching to polar
+            // Convert current Cartesian values to actual points
+            startPoint.setXYZ(startXSlider.getValue(), startYSlider.getValue(), startZSlider.getValue());
+            targetPoint.setXYZ(targetXSlider.getValue(), targetYSlider.getValue(), targetZSlider.getValue());
+        }
+        
+        // Update UI
+        updateSliderLabelsAndRanges();
+        
+        // Set values in new coordinate system
+        if (usePolarCoordinates.getToggleState())
+        {
+            // Convert from radians to degrees for display
+            startXSlider.setValue(Constants::RadToGrad(startPoint.getAzimuth()));
+            startYSlider.setValue(Constants::RadToGrad(startPoint.getElevation()));
+            startZSlider.setValue(startPoint.getDistance());
+            
+            targetXSlider.setValue(Constants::RadToGrad(targetPoint.getAzimuth()));
+            targetYSlider.setValue(Constants::RadToGrad(targetPoint.getElevation()));
+            targetZSlider.setValue(targetPoint.getDistance());
+        }
+        else
+        {
+            startXSlider.setValue(startPoint.getX());
+            startYSlider.setValue(startPoint.getY());
+            startZSlider.setValue(startPoint.getZ());
+            
+            targetXSlider.setValue(targetPoint.getX());
+            targetYSlider.setValue(targetPoint.getY());
+            targetZSlider.setValue(targetPoint.getZ());
+        }
+    }
+    else
+    {
+        // Just update labels and ranges without converting values
+        updateSliderLabelsAndRanges();
+    }
+    
+    updateCurrentPosition(true);
+    repaint();
 }
 
 int MovementClipEditor::getMovementControlsHeight() const
@@ -215,10 +413,11 @@ int MovementClipEditor::getMovementControlsHeight() const
     const int verticalSpacing = 8;
     const int buttonSpacing = 4;
     
-    // Checkbox + 3 start sliders + start button + 3 target sliders + target button + spacing
-    return rowHeight + verticalSpacing +
-           (rowHeight * 3) + buttonSpacing + rowHeight + verticalSpacing +
-           (rowHeight * 3) + buttonSpacing + rowHeight;
+    // New checkbox + existing checkbox + 3 start sliders + start button + 3 target sliders + target button + spacing
+    return rowHeight + verticalSpacing +  // usePolarCoordinates
+           rowHeight + verticalSpacing +  // useStartPosition
+           (rowHeight * 3) + buttonSpacing + rowHeight + verticalSpacing +  // Start controls
+           (rowHeight * 3) + buttonSpacing + rowHeight;  // Target controls
 }
 
 void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
@@ -230,7 +429,13 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     const int rightMargin = 10;
     const int labelLeftMargin = 10; // Labels indented from group box
     
-    // Checkbox
+    // Polar coordinates checkbox
+    auto polarCheckboxArea = area.removeFromTop(rowHeight);
+    usePolarCoordinates.setBounds(polarCheckboxArea.withTrimmedLeft(labelLeftMargin));
+    
+    area.removeFromTop(verticalSpacing);
+    
+    // Start position checkbox
     auto checkboxArea = area.removeFromTop(rowHeight);
     useStartPosition.setBounds(checkboxArea.withTrimmedLeft(labelLeftMargin));
     
@@ -299,7 +504,7 @@ void MovementClipEditor::updateStartPositionVisibility()
     applyCurrentStartButton.setAlpha((enabled && currentPositionValid) ? 1.0f : 0.5f);
 }
 
-void MovementClipEditor::updateCurrentPosition()
+void MovementClipEditor::updateCurrentPosition(bool force)
 {
     auto lastPosition = currentPosition;
     auto lastPositionValid = currentPositionValid;
@@ -320,10 +525,10 @@ void MovementClipEditor::updateCurrentPosition()
         }
     }
 
-    if(lastPositionValid != currentPositionValid || !approximatelyEqual(lastPosition.x, currentPosition.x) || !approximatelyEqual(lastPosition.y, currentPosition.y) || !approximatelyEqual(lastPosition.z, currentPosition.z))
+    if(force || lastPositionValid != currentPositionValid || !approximatelyEqual(lastPosition.x, currentPosition.x) || !approximatelyEqual(lastPosition.y, currentPosition.y) || !approximatelyEqual(lastPosition.z, currentPosition.z))
     {
-        updateApplyCurrentPositionButtonText(applyCurrentStartButton, currentPosition, currentPositionValid);
-        updateApplyCurrentPositionButtonText(applyCurrentTargetButton, currentPosition, currentPositionValid);
+        updateApplyCurrentPositionButtonText(applyCurrentStartButton, getCurrentPositionInSelectedSystem(), currentPositionValid);
+        updateApplyCurrentPositionButtonText(applyCurrentTargetButton, getCurrentPositionInSelectedSystem(), currentPositionValid);
         
         // Update button enablement
         applyCurrentTargetButton.setEnabled(currentPositionValid);

@@ -17,6 +17,7 @@ struct MovementClip : public Clip
     Point3D<double> startPointGroup;
     Point3D<double> endPointGroup;
     bool useStartPoint;
+    bool usePolar = false;  // Add this line
     Array<Point3D<double>> startPointsRel;
     Array<Point3D<double>> endPointsRel;
 };
@@ -221,6 +222,7 @@ struct TimelineModel
             xClip->setAttribute("endPointGroupY", c.endPointGroup.getY());
             xClip->setAttribute("endPointGroupZ", c.endPointGroup.getZ());
             xClip->setAttribute("useStartPoint", c.useStartPoint ? 1 : 0);
+            xClip->setAttribute("usePolar", c.usePolar ? 1 : 0);  // Add this line
             
             // Serialize startPointsRel array
             auto* xStartPoints = new juce::XmlElement("StartPointsRel");
@@ -281,7 +283,6 @@ struct TimelineModel
         return xml;
     }
 
-    // Fixed XML deserialization
     bool fromXml(const juce::XmlElement& xml)
     {
         if (!xml.hasTagName("Timeline"))
@@ -318,6 +319,7 @@ struct TimelineModel
                                            xClip->getDoubleAttribute("endPointGroupY", 0.0),
                                            xClip->getDoubleAttribute("endPointGroupZ", 0.0));
                     c.useStartPoint = xClip->getBoolAttribute("useStartPoint", false);
+                    c.usePolar = xClip->getBoolAttribute("usePolar", false);  // Add this line
 
                     // Deserialize startPointsRel array
                     if (auto* xStartPoints = xClip->getChildByName("StartPointsRel"))
