@@ -91,21 +91,21 @@ bool MovementClipEditor::applyChanges()
     if (usePolarCoordinates.getToggleState())
     {
         // Convert from degrees (UI) to radians (storage)
-        double startAzimuthRad = Constants::GradToRad(startXSlider.getValue());
-        double startElevationRad = Constants::GradToRad(startYSlider.getValue());
-        double startDistance = startZSlider.getValue();
+        double startAzimuthRad = Constants::GradToRad(startXSlider.getPreciseValue());
+        double startElevationRad = Constants::GradToRad(startYSlider.getPreciseValue());
+        double startDistance = startZSlider.getPreciseValue();
         
-        double targetAzimuthRad = Constants::GradToRad(targetXSlider.getValue());
-        double targetElevationRad = Constants::GradToRad(targetYSlider.getValue());
-        double targetDistance = targetZSlider.getValue();
+        double targetAzimuthRad = Constants::GradToRad(targetXSlider.getPreciseValue());
+        double targetElevationRad = Constants::GradToRad(targetYSlider.getPreciseValue());
+        double targetDistance = targetZSlider.getPreciseValue();
         
         currentClip.startPointGroup.setAed(startAzimuthRad, startElevationRad, startDistance);
         currentClip.endPointGroup.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
     }
     else
     {
-        currentClip.startPointGroup.setXYZ(startXSlider.getValue(), startYSlider.getValue(), startZSlider.getValue());
-        currentClip.endPointGroup.setXYZ(targetXSlider.getValue(), targetYSlider.getValue(), targetZSlider.getValue());
+        currentClip.startPointGroup.setXYZ(startXSlider.getPreciseValue(), startYSlider.getPreciseValue(), startZSlider.getPreciseValue());
+        currentClip.endPointGroup.setXYZ(targetXSlider.getPreciseValue(), targetYSlider.getPreciseValue(), targetZSlider.getPreciseValue());
     }
     
     if (auto* timelineModel = timelineComp.getTimelineModel(timelineIndex))
@@ -178,7 +178,7 @@ void MovementClipEditor::createControls()
     updateCurrentPosition(); // Initial update to set button states
 }
 
-void MovementClipEditor::createCoordinateSlider(UnlimitedRangeSlider& slider, juce::Label& label, const juce::String& name,
+void MovementClipEditor::createCoordinateSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name,
                            double min, double max, double defaultValue)
 {
     addAndMakeVisible(slider);
@@ -191,7 +191,7 @@ void MovementClipEditor::createCoordinateSlider(UnlimitedRangeSlider& slider, ju
     label.setJustificationType(juce::Justification::centredLeft);
 }
 
-void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, UnlimitedRangeSlider& xSlider, UnlimitedRangeSlider& ySlider, UnlimitedRangeSlider& zSlider)
+void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, PrecisionSlider& xSlider, PrecisionSlider& ySlider, PrecisionSlider& zSlider)
 {
     addAndMakeVisible(button);
     button.onClick = [this, &xSlider, &ySlider, &zSlider] {
@@ -286,15 +286,13 @@ void MovementClipEditor::updateSliderLabelsAndRanges()
         }
         
         // Convert current polar values from radians (storage) to degrees (UI)
-        Point3D<double> startPoint(currentClip.startPointGroup);
-        startXSlider.setValue(Constants::RadToGrad(startPoint.getAzimuth()));  // Convert to degrees
-        startYSlider.setValue(Constants::RadToGrad(startPoint.getElevation())); // Convert to degrees
-        startZSlider.setValue(startPoint.getDistance());
+        startXSlider.setValue(Constants::RadToGrad(currentClip.startPointGroup.getAzimuth()));  // Convert to degrees
+        startYSlider.setValue(Constants::RadToGrad(currentClip.startPointGroup.getElevation())); // Convert to degrees
+        startZSlider.setValue(currentClip.startPointGroup.getDistance());
         
-        Point3D<double> targetPoint(currentClip.endPointGroup);
-        targetXSlider.setValue(Constants::RadToGrad(targetPoint.getAzimuth()));  // Convert to degrees
-        targetYSlider.setValue(Constants::RadToGrad(targetPoint.getElevation())); // Convert to degrees
-        targetZSlider.setValue(targetPoint.getDistance());
+        targetXSlider.setValue(Constants::RadToGrad(currentClip.endPointGroup.getAzimuth()));  // Convert to degrees
+        targetYSlider.setValue(Constants::RadToGrad(currentClip.endPointGroup.getElevation())); // Convert to degrees
+        targetZSlider.setValue(currentClip.endPointGroup.getDistance());
     }
     else
     {
@@ -352,13 +350,13 @@ void MovementClipEditor::updateCoordinateSystem()
         {
             // Was polar, now switching to Cartesian
             // Convert current polar values (in degrees from UI) to actual points
-            double startAzimuthRad = Constants::GradToRad(startXSlider.getValue());
-            double startElevationRad = Constants::GradToRad(startYSlider.getValue());
-            double startDistance = startZSlider.getValue();
+            double startAzimuthRad = Constants::GradToRad(startXSlider.getPreciseValue());
+            double startElevationRad = Constants::GradToRad(startYSlider.getPreciseValue());
+            double startDistance = startZSlider.getPreciseValue();
             
-            double targetAzimuthRad = Constants::GradToRad(targetXSlider.getValue());
-            double targetElevationRad = Constants::GradToRad(targetYSlider.getValue());
-            double targetDistance = targetZSlider.getValue();
+            double targetAzimuthRad = Constants::GradToRad(targetXSlider.getPreciseValue());
+            double targetElevationRad = Constants::GradToRad(targetYSlider.getPreciseValue());
+            double targetDistance = targetZSlider.getPreciseValue();
             
             startPoint.setAed(startAzimuthRad, startElevationRad, startDistance);
             targetPoint.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
@@ -367,8 +365,8 @@ void MovementClipEditor::updateCoordinateSystem()
         {
             // Was Cartesian, now switching to polar
             // Convert current Cartesian values to actual points
-            startPoint.setXYZ(startXSlider.getValue(), startYSlider.getValue(), startZSlider.getValue());
-            targetPoint.setXYZ(targetXSlider.getValue(), targetYSlider.getValue(), targetZSlider.getValue());
+            startPoint.setXYZ(startXSlider.getPreciseValue(), startYSlider.getPreciseValue(), startZSlider.getPreciseValue());
+            targetPoint.setXYZ(targetXSlider.getPreciseValue(), targetYSlider.getPreciseValue(), targetZSlider.getPreciseValue());
         }
         
         // Update UI

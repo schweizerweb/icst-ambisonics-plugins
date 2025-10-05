@@ -7,27 +7,35 @@
 
 class TimelineComponent;
 
-class UnlimitedRangeSlider : public juce::Slider
+class PrecisionSlider : public juce::Slider
 {
 public:
-    double getValueFromText(const juce::String& text) override
+    PrecisionSlider() = default;
+    
+    double getPreciseValue()
     {
-        // Allow any numeric value from text input
-        return text.getDoubleValue();
+        return normalizeNearZero(Slider::getValue());
     }
     
-    juce::String getTextFromValue(double value) override
+    double getValue() const
     {
-        // Always display the actual value
-        return juce::String(value, 2);
+        return normalizeNearZero(Slider::getValue());
     }
     
+    void setPrecisionThreshold(double newThreshold) { threshold = newThreshold; }
+    double getPrecisionThreshold() const { return threshold; }
+
 private:
-    // Override to allow thumb to move beyond range visually
-    double snapValue(double attemptedValue, DragMode) override
+    double threshold = 0.001;
+    
+    double normalizeNearZero(double value) const
     {
-        return attemptedValue; // No snapping to range
+        if (std::abs(value) < threshold)
+            return 0.0;
+        return value;
     }
+    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PrecisionSlider)
 };
 
 class MovementClipEditor : public juce::Component, public juce::ChangeListener
@@ -64,15 +72,15 @@ private:
     
     juce::ToggleButton usePolarCoordinates;  // New checkbox for coordinate system
     juce::ToggleButton useStartPosition;
-    UnlimitedRangeSlider startXSlider, startYSlider, startZSlider;
-    UnlimitedRangeSlider targetXSlider, targetYSlider, targetZSlider;
+    PrecisionSlider startXSlider, startYSlider, startZSlider;
+    PrecisionSlider targetXSlider, targetYSlider, targetZSlider;
     juce::Label startXLabel, startYLabel, startZLabel;
     juce::Label targetXLabel, targetYLabel, targetZLabel;
     
     void createControls();
-    void createCoordinateSlider(UnlimitedRangeSlider& slider, juce::Label& label, const juce::String& name,
+    void createCoordinateSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name,
                                double min, double max, double defaultValue);
-    void createApplyCurrentPositionButton(juce::TextButton& button, UnlimitedRangeSlider& xSlider, UnlimitedRangeSlider& ySlider, UnlimitedRangeSlider& zSlider);
+    void createApplyCurrentPositionButton(juce::TextButton& button, PrecisionSlider& xSlider, PrecisionSlider& ySlider, PrecisionSlider& zSlider);
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
     void updateCurrentPosition(bool force = false);
     int getMovementControlsHeight() const;
