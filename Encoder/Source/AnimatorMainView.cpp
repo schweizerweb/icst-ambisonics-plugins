@@ -375,36 +375,6 @@ void AnimatorMainView::exportScene(int timelineIndex)
     }
 }
 
-void AnimatorMainView::addMovementClip()
-{
-    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
-    {
-        MovementClip newClip;
-        newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
-        newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
-        newClip.length = 1000; // 1 second default
-        newClip.colour = juce::Colours::cornflowerblue;
-        
-        currentTimeline->movement.clips.add(newClip);
-        timelineViewport->repaint();
-    }
-}
-
-void AnimatorMainView::addActionClip()
-{
-    if (auto* currentTimeline = timelineViewport->getTimelineComponent()->getCurrentTimeline())
-    {
-        ActionClip newClip;
-        newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
-        newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
-        newClip.length = 1000; // 1 second default
-        newClip.colour = juce::Colours::orange;
-        
-        currentTimeline->actions.clips.add(newClip);
-        timelineViewport->repaint();
-    }
-}
-
 void AnimatorMainView::toggleAutoFollow()
 {
     autoFollowEnabled = !autoFollowEnabled;
@@ -806,10 +776,10 @@ bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationI
             timelineComp->zoom(TimelineComponent::ZOOM_RESET);
             return true;
         case CMD_addMovementClip:
-            addMovementClip();
+            timelineComp->addMovementClip();
             return true;
         case CMD_addActionClip:
-            addActionClip();
+            timelineComp->addActionClip();
             return true;
         case CMD_toggleAutoFollow:
             toggleAutoFollow();

@@ -2571,7 +2571,36 @@ void TimelineComponent::duplicateSelectedClips()
         }
         
         repaint();
-        return true;
+    }
+}
+
+void TimelineComponent::addMovementClip()
+{
+    if (auto* currentTimeline = getCurrentTimeline())
+    {
+        MovementClip newClip;
+        newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
+        newClip.start = getCursorTime();
+        newClip.length = 1000; // 1 second default
+        newClip.colour = juce::Colours::cornflowerblue;
+        
+        currentTimeline->movement.clips.add(newClip);
+        repaint();
+    }
+}
+
+void TimelineComponent::addActionClip()
+{
+    if (auto* currentTimeline = getCurrentTimeline())
+    {
+        ActionClip newClip;
+        newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
+        newClip.start = getCursorTime();
+        newClip.length = 1000; // 1 second default
+        newClip.colour = juce::Colours::orange;
+        
+        currentTimeline->actions.clips.add(newClip);
+        repaint();
     }
 }
 

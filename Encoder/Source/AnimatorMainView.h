@@ -104,8 +104,6 @@ private:
     void pasteClips();
     void selectAllClips();
     void deselectAllClips();
-    void addMovementClip();
-    void addActionClip();
     void toggleAutoFollow();
     
     // Import/Export

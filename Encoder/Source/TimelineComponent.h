@@ -115,6 +115,8 @@ public:
     void duplicateSelectedClips();
     void selectAllClips();
     void deselectAllClips();
+    void addMovementClip();
+    void addActionClip();
     
 private:
     struct ClipBounds
