@@ -46,7 +46,9 @@ public:
         CMD_resetZoom,
         CMD_addMovementClip,
         CMD_addActionClip,
-        CMD_toggleAutoFollow
+        CMD_toggleAutoFollow,
+        CMD_undo,
+        CMD_redo
     };
     
 private:

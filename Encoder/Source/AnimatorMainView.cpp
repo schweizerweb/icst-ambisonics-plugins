@@ -165,8 +165,8 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             
         case 1: // Edit - Use command items for standard operations
             {
-                menu.addItem(10, "Undo", false); // not implemented yet
-                menu.addItem(11, "Redo", false); // not implemented yet
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_undo);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_redo);
                 menu.addSeparator();
                 
                 // Use command items for standard operations - these will show proper shortcuts!
@@ -654,7 +654,7 @@ void AnimatorMainView::getAllCommands(juce::Array<juce::CommandID>& commands)
     const juce::CommandID commandList[] = {
         CMD_cut, CMD_copy, CMD_paste, CMD_deleteSelected, CMD_duplicate,
         CMD_selectAll, CMD_deselectAll, CMD_zoomIn, CMD_zoomOut, CMD_resetZoom,
-        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow
+        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow, CMD_undo, CMD_redo
     };
     
     commands.addArray(commandList, numElementsInArray(commandList));
@@ -736,6 +736,19 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
         case CMD_toggleAutoFollow:
             result.setInfo("Toggle Auto-follow", "Toggle auto-follow mode", "View", 0);
             break;
+        
+        case CMD_undo:
+            result.setInfo("Undo", "Undo last manipulation", "Edit", 0);
+            result.addDefaultKeypress('Z', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(false);
+            break;
+            
+        case CMD_redo:
+            result.setInfo("Redo", "Redo last undone manipulation", "Edit", 0);
+            result.addDefaultKeypress('Y', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(false);
+            break;
+            
     }
 }
 
@@ -783,6 +796,23 @@ bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationI
             return true;
         case CMD_toggleAutoFollow:
             toggleAutoFollow();
+            return true;
+        case CMD_undo:
+            {
+                juce::AttributedString msg;
+                msg.append("Undo is not implemented yet!",
+                           juce::FontOptions(12.0f, juce::Font::bold),
+                           juce::Colours::orangered);
+                setStatusMessage(msg);
+            }
+            return true;
+        case CMD_redo:
+            { juce::AttributedString msg;
+                msg.append("Redo is not implemented yet!",
+                           juce::FontOptions(12.0f, juce::Font::bold),
+                           juce::Colours::orangered);
+                setStatusMessage(msg);
+            }
             return true;
     }
     return false;
