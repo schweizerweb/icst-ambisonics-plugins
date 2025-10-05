@@ -4,7 +4,9 @@
 #include "TimelineViewport.h"
 #include "StatusBarComponent.h"
 
-class AnimatorMainView : public juce::Component, public juce::Timer
+class AnimatorMainView : public juce::Component,
+                        public juce::Timer,
+                        public juce::ApplicationCommandTarget
 {
 public:
     AnimatorMainView();
@@ -30,6 +32,23 @@ public:
     void validateTimelines();
     std::function<void(const juce::AttributedString&)> getStatusMessageFunction();
 
+    enum CommandIDs
+    {
+        CMD_cut = 0x2000,
+        CMD_copy,
+        CMD_paste,
+        CMD_deleteSelected,
+        CMD_duplicate,
+        CMD_selectAll,
+        CMD_deselectAll,
+        CMD_zoomIn,
+        CMD_zoomOut,
+        CMD_resetZoom,
+        CMD_addMovementClip,
+        CMD_addActionClip,
+        CMD_toggleAutoFollow
+    };
+    
 private:
     // Menu bar
     class MainMenuBarModel : public juce::MenuBarModel
@@ -78,10 +97,15 @@ private:
     static constexpr float ZOOM_STEP = 1.2f;
 
     void handleMenuAction(int menuItemID);
+    
+    // Edit operations
+    void cutSelectedClips();
+    void copySelectedClips();
+    void pasteClips();
+    void selectAllClips();
+    void deselectAllClips();
     void addMovementClip();
     void addActionClip();
-    void deleteSelectedClips();
-    void duplicateSelectedClips();
     void zoomIn();
     void zoomOut();
     void resetZoom();
@@ -91,68 +115,18 @@ private:
     void importScene(int timelineIndex);
     void exportScene(int timelineIndex);
     
-    // Edit operations
-    void cutSelectedClips();
-    void copySelectedClips();
-    void pasteClips();
-    void selectAllClips();
-    void deselectAllClips();
-
-private:
-    // Helper method to generate unique clip IDs
-    juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId)
-    {
-        juce::String newId = baseId;
-        int counter = 1;
-        
-        // Check if the ID already exists
-        bool idExists;
-        do {
-            idExists = false;
-            for (const auto& clip : existingClips)
-            {
-                if (clip.id == newId)
-                {
-                    idExists = true;
-                    newId = baseId + " (" + juce::String(counter++) + ")";
-                    break;
-                }
-            }
-        } while (idExists);
-        
-        return newId;
-    }
-    
-    juce::String generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId)
-    {
-        juce::String newId = baseId;
-        int counter = 1;
-        
-        // Check if the ID already exists
-        bool idExists;
-        do {
-            idExists = false;
-            for (const auto& clip : existingClips)
-            {
-                if (clip.id == newId)
-                {
-                    idExists = true;
-                    newId = baseId + " (" + juce::String(counter++) + ")";
-                    break;
-                }
-            }
-        } while (idExists);
-        
-        return newId;
-    }
-    
     // Status bar
     std::unique_ptr<StatusBarComponent> statusBar;
     void updateStatusBarValidation();
-    
-    // Validation state
     bool validationResult = true;
     juce::String validationDetails;
-    
+        
+    // ApplicationCommandTarget implementation
+    std::unique_ptr<juce::ApplicationCommandManager> commandManager;
+    juce::ApplicationCommandTarget* getNextCommandTarget() override { return nullptr; }
+    void getAllCommands(juce::Array<juce::CommandID>& commands) override;
+    void getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result) override;
+    bool perform(const juce::ApplicationCommandTarget::InvocationInfo& info) override;
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(AnimatorMainView)
 };

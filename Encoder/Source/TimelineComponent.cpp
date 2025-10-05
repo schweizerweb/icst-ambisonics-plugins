@@ -1265,50 +1265,6 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
         }
     }
     
-    // Handle standard keyboard shortcuts with Ctrl/Cmd modifier
-    if (key.getModifiers().isCommandDown() || key.getModifiers().isCtrlDown())
-    {
-        switch (key.getKeyCode())
-        {
-            case 'A': // Select All
-                selectAllClips();
-                return true;
-                
-            case 'C': // Copy
-                copySelectedClips();
-                return true;
-                
-            case 'X': // Cut
-                cutSelectedClips();
-                return true;
-                
-            case 'V': // Paste
-                pasteClips();
-                return true;
-                
-            case 'D': // Duplicate
-                if (!selectedClips.isEmpty())
-                {
-                    // Store current selection since it will change during duplication
-                    auto currentSelection = selectedClips;
-                    
-                    // Clear selection first
-                    clearSelection();
-                    
-                    // Duplicate all selected clips
-                    for (const auto& selected : currentSelection)
-                    {
-                        duplicateClip(selected.timelineIndex, selected.layerIndex,
-                                     selected.clipIndex, selected.isMovementClip);
-                    }
-                    
-                    repaint();
-                    return true;
-                }
-                break;
-        }
-    }
-    
     // Handle keys without modifiers
     // Handle keys without modifiers using if-else (not switch)
     const int keyCode = key.getKeyCode();
@@ -1316,18 +1272,6 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
     if (keyCode == juce::KeyPress::escapeKey)
     {
         clearSelection();
-        repaint();
-        return true;
-    }
-    else if (keyCode == juce::KeyPress::deleteKey || keyCode == juce::KeyPress::backspaceKey)
-    {
-        // Delete all selected clips
-        for (int i = selectedClips.size() - 1; i >= 0; --i)
-        {
-            const auto& selected = selectedClips.getReference(i);
-            removeClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, selected.isMovementClip);
-        }
-        selectedClips.clear();
         repaint();
         return true;
     }
@@ -2485,6 +2429,19 @@ juce::Colour TimelineComponent::getClipColourFromTimeline(int timelineIndex) con
     return getTimelineColour(timelineIndex).brighter(0.3f);
 }
 
+void TimelineComponent::deleteSelectedClips()
+{
+    // Delete all selected clips
+    for (int i = selectedClips.size() - 1; i >= 0; --i)
+    {
+        const auto& selected = selectedClips.getReference(i);
+        removeClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, selected.isMovementClip);
+    }
+    
+    selectedClips.clear();
+    repaint();
+}
+
 void TimelineComponent::cutSelectedClips()
 {
     copySelectedClips();
@@ -2593,6 +2550,28 @@ void TimelineComponent::pasteClips()
             
             repaint();
         }
+    }
+}
+
+void TimelineComponent::duplicateSelectedClips()
+{
+    if (!selectedClips.isEmpty())
+    {
+        // Store current selection since it will change during duplication
+        auto currentSelection = selectedClips;
+        
+        // Clear selection first
+        clearSelection();
+        
+        // Duplicate all selected clips
+        for (const auto& selected : currentSelection)
+        {
+            duplicateClip(selected.timelineIndex, selected.layerIndex,
+                         selected.clipIndex, selected.isMovementClip);
+        }
+        
+        repaint();
+        return true;
     }
 }
 

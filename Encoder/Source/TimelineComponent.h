@@ -103,13 +103,19 @@ public:
     void updatePreviewCursor(const juce::Point<int>& mousePos);
     void hidePreviewCursor();
     
-    // TODO: public?
-    // New public methods for clipboard operations
+    // Selection state queries for menu enabling
+    bool hasSelectedClips() const { return !selectedClips.isEmpty(); }
+    bool hasClipboardData() const { return clipboard.hasData; }
+
+    // Public methods for manipulations
+    void deleteSelectedClips();
     void cutSelectedClips();
     void copySelectedClips();
     void pasteClips();
+    void duplicateSelectedClips();
     void selectAllClips();
     void deselectAllClips();
+    
 private:
     struct ClipBounds
     {

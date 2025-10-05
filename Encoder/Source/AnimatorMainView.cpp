@@ -16,13 +16,17 @@ AnimatorMainView::AnimatorMainView()
     // Create status bar
     statusBar = std::make_unique<StatusBarComponent>(*this);
     
+    // Create command manager
+    commandManager = std::make_unique<juce::ApplicationCommandManager>();
+    commandManager->registerAllCommandsForTarget(this);
+    
+    // Add as key listener to handle shortcuts globally
+    addKeyListener(commandManager->getKeyMappings());
+    
     addAndMakeVisible(menuBar.get());
     addAndMakeVisible(toolbar.get());
     addAndMakeVisible(timelineViewport.get());
     addAndMakeVisible(statusBar.get());
-    
-    // Start validation timer (1Hz default)
-    startTimerHz(1);
     
     // Show initial status
     juce::AttributedString welcomeMessage;
@@ -33,6 +37,9 @@ AnimatorMainView::AnimatorMainView()
                          juce::FontOptions(12.0f),
                          juce::Colours::lightgrey);
     setStatusMessage(welcomeMessage);
+    
+    // Start validation timer (1Hz default)
+    startTimerHz(1);
 }
 
 AnimatorMainView::~AnimatorMainView()
@@ -116,7 +123,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
     
     switch (topLevelMenuIndex)
     {
-        case 0: // File
+        case 0: // File - Keep custom handling for import/export
             {
                 // Import submenu
                 juce::PopupMenu importSubMenu;
@@ -129,7 +136,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                     for (int i = 0; i < owner->timelines->size(); ++i)
                     {
                         juce::String timelineName = "Group " + juce::String(i + 1);
-                            
                         importSubMenu.addItem(101 + i, "Overwrite " + timelineName);
                     }
                 }
@@ -142,7 +148,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                     for (int i = 0; i < owner->timelines->size(); ++i)
                     {
                         juce::String timelineName = "Group " + juce::String(i + 1);
-                            
                         exportSubMenu.addItem(200 + i, timelineName);
                     }
                 }
@@ -157,31 +162,40 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             }
             break;
             
-        case 1: // Edit
-            menu.addItem(10, "Undo", false); // not implemented yet
-            menu.addItem(11, "Redo", false); // not implemented yet
-            menu.addSeparator();
-            menu.addItem(12, "Cut");
-            menu.addItem(13, "Copy");
-            menu.addItem(14, "Paste");
-            menu.addItem(15, "Delete");
-            menu.addItem(18, "Duplicate");
-            menu.addSeparator();
-            menu.addItem(16, "Select All");
-            menu.addItem(17, "Deselect All");
+        case 1: // Edit - Use command items for standard operations
+            {
+                menu.addItem(10, "Undo", false); // not implemented yet
+                menu.addItem(11, "Redo", false); // not implemented yet
+                menu.addSeparator();
+                
+                // Use command items for standard operations - these will show proper shortcuts!
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_cut);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_copy);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_paste);
+                menu.addSeparator();
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_deleteSelected);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_duplicate);
+                menu.addSeparator();
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_selectAll);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_deselectAll);
+            }
             break;
             
-        case 2: // View
-            menu.addItem(20, "Zoom In");
-            menu.addItem(21, "Zoom Out");
-            menu.addItem(22, "Reset Zoom");
-            menu.addSeparator();
-            menu.addItem(23, "Toggle Auto-follow");
+        case 2: // View - Use command items
+            {
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_zoomIn);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_zoomOut);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_resetZoom);
+                menu.addSeparator();
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_toggleAutoFollow);
+            }
             break;
             
-        case 3: // Insert
-            menu.addItem(30, "Add Movement Clip");
-            menu.addItem(31, "Add Action Clip");
+        case 3: // Insert - Use command items
+            {
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addMovementClip);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addActionClip);
+            }
             break;
     }
     
@@ -191,12 +205,23 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
 void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int /*topLevelMenuIndex*/)
 {
     if (owner != nullptr)
-        owner->handleMenuAction(menuItemID);
+    {
+        // Only handle custom menu items (import/export, undo/redo, preferences)
+        // Command items are handled automatically by ApplicationCommandManager
+        if (menuItemID == 10 || menuItemID == 11 || menuItemID == 6 ||
+            menuItemID == 100 ||
+            (menuItemID >= 101 && menuItemID < 300))
+        {
+            owner->handleMenuAction(menuItemID);
+        }
+        // Command items (CMD_*) are handled automatically
+    }
 }
 
 void AnimatorMainView::handleMenuAction(int menuItemID)
 {
-    auto* timelineComp = timelineViewport->getTimelineComponent();
+    // Only handle custom menu items (import/export, undo/redo, preferences)
+    // Command items are handled automatically by ApplicationCommandManager
     
     switch (menuItemID)
     {
@@ -208,56 +233,12 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
             // Handle preferences
             break;
             
-        case 12: // Cut - Send Ctrl+X
-            timelineComp->keyPressed(juce::KeyPress('X', juce::ModifierKeys::ctrlModifier, 'X'));
+        case 10: // Undo
+            // Handle undo (not implemented yet)
             break;
             
-        case 13: // Copy - Send Ctrl+C
-            timelineComp->keyPressed(juce::KeyPress('C', juce::ModifierKeys::ctrlModifier, 'C'));
-            break;
-            
-        case 14: // Paste - Send Ctrl+V
-            timelineComp->keyPressed(juce::KeyPress('V', juce::ModifierKeys::ctrlModifier, 'V'));
-            break;
-            
-        case 15: // Delete Selected Clips - Send Delete key
-            timelineComp->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
-            break;
-            
-        case 18: // Duplicate Selected Clips - Send Ctrl+D
-            timelineComp->keyPressed(juce::KeyPress('D', juce::ModifierKeys::ctrlModifier, 'D'));
-            break;
-            
-        case 16: // Select All - Send Ctrl+A
-            timelineComp->keyPressed(juce::KeyPress('A', juce::ModifierKeys::ctrlModifier, 'A'));
-            break;
-            
-        case 17: // Deselect All - Send Escape key
-            timelineComp->keyPressed(juce::KeyPress(juce::KeyPress::escapeKey));
-            break;
-            
-        case 20: // Zoom In
-            zoomIn();
-            break;
-            
-        case 21: // Zoom Out
-            zoomOut();
-            break;
-            
-        case 22: // Reset Zoom
-            resetZoom();
-            break;
-            
-        case 23: // Toggle Auto-follow
-            toggleAutoFollow();
-            break;
-            
-        case 30: // Add Movement Clip
-            addMovementClip();
-            break;
-            
-        case 31: // Add Action Clip
-            addActionClip();
+        case 11: // Redo
+            // Handle redo (not implemented yet)
             break;
             
         default:
@@ -430,16 +411,6 @@ void AnimatorMainView::addActionClip()
     }
 }
 
-void AnimatorMainView::deleteSelectedClips()
-{
-    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress(juce::KeyPress::deleteKey));
-}
-
-void AnimatorMainView::duplicateSelectedClips()
-{
-    timelineViewport->getTimelineComponent()->keyPressed(juce::KeyPress('D', juce::ModifierKeys::ctrlModifier, 'D'));
-}
-
 void AnimatorMainView::zoomIn()
 {
     timelineViewport->getTimelineComponent()->zoom(ZOOM_STEP);
@@ -459,12 +430,6 @@ void AnimatorMainView::toggleAutoFollow()
 {
     autoFollowEnabled = !autoFollowEnabled;
     timelineViewport->getTimelineComponent()->setAutoFollow(autoFollowEnabled);
-    
-    // Update toolbar button state
-    //if (toolbar != nullptr && toolbar->autoFollowButton != nullptr)
-    //{
-    //    toolbar->autoFollowButton->setToggleState(autoFollowEnabled, juce::dontSendNotification);
-    //}
     
     toolbar->repaint();
 }
@@ -731,3 +696,80 @@ std::function<void(const juce::AttributedString&)> AnimatorMainView::getStatusMe
         setStatusMessage(message);
     };
 }
+
+void AnimatorMainView::getAllCommands(juce::Array<juce::CommandID>& commands)
+{
+    const juce::CommandID commandList[] = {
+        CMD_cut, CMD_copy, CMD_paste, CMD_deleteSelected, CMD_duplicate,
+        CMD_selectAll, CMD_deselectAll, CMD_zoomIn, CMD_zoomOut, CMD_resetZoom,
+        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow
+    };
+    
+    commands.addArray(commandList, numElementsInArray(commandList));
+}
+
+void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::ApplicationCommandInfo& result)
+{
+    bool isMac = false;
+#if JUCE_MAC
+    isMac = true;
+#endif
+
+    switch (commandID)
+    {
+        case CMD_cut:
+            result.setInfo("Cut", "Cut selected clips", "Edit", 0);
+            result.addDefaultKeypress('X', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(timelineViewport->getTimelineComponent()->hasSelectedClips());
+            break;
+            
+        case CMD_copy:
+            result.setInfo("Copy", "Copy selected clips", "Edit", 0);
+            result.addDefaultKeypress('C', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(timelineViewport->getTimelineComponent()->hasSelectedClips());
+            break;
+            
+        case CMD_paste:
+            result.setInfo("Paste", "Paste clips", "Edit", 0);
+            result.addDefaultKeypress('V', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(timelineViewport->getTimelineComponent()->hasClipboardData());
+            break;
+            
+        case CMD_deleteSelected:
+            result.setInfo("Delete", "Delete selected clips", "Edit", 0);
+            result.addDefaultKeypress(juce::KeyPress::deleteKey, 0);
+            result.addDefaultKeypress(juce::KeyPress::backspaceKey, 0);
+            result.setActive(timelineViewport->getTimelineComponent()->hasSelectedClips());
+            break;
+            
+        case CMD_duplicate:
+            result.setInfo("Duplicate", "Duplicate selected clips", "Edit", 0);
+            result.addDefaultKeypress('D', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(timelineViewport->getTimelineComponent()->hasSelectedClips());
+            break;
+            
+        case CMD_selectAll:
+            result.setInfo("Select All", "Select all clips", "Edit", 0);
+            result.addDefaultKeypress('A', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            break;
+            
+        case CMD_deselectAll:
+            result.setInfo("Deselect All", "Deselect all clips", "Edit", 0);
+            result.addDefaultKeypress(juce::KeyPress::escapeKey, 0);
+            result.setActive(timelineViewport->getTimelineComponent()->hasSelectedClips());
+            break;
+            
+        case CMD_zoomIn:
+            result.setInfo("Zoom In", "Zoom in timeline", "View", 0);
+            result.addDefaultKeypress('=', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            break;
+            
+        case CMD_zoomOut:
+            result.setInfo("Zoom Out", "Zoom out timeline", "View", 0);
+            result.addDefaultKeypress('-', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            break;
+            
+        case CMD_resetZoom:
+            result.setInfo("Reset Zoom", "Reset zoom level", "View", 0);
+            break;
+            
