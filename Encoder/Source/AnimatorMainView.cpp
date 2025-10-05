@@ -23,6 +23,7 @@ AnimatorMainView::AnimatorMainView()
     // Add as key listener to handle shortcuts globally
     addKeyListener(commandManager->getKeyMappings());
     
+    // Add controls
     addAndMakeVisible(menuBar.get());
     addAndMakeVisible(toolbar.get());
     addAndMakeVisible(timelineViewport.get());
@@ -46,12 +47,12 @@ AnimatorMainView::~AnimatorMainView()
 {
     stopTimer();
     
-    // Remove menu bar before destruction to prevent JUCE assertion
     if (menuBar != nullptr)
     {
         removeChildComponent(menuBar.get());
         menuBar.reset();
     }
+    
     menuBarModel.reset();
 }
 
@@ -381,7 +382,7 @@ void AnimatorMainView::addMovementClip()
         MovementClip newClip;
         newClip.id = "Movement " + juce::String(currentTimeline->movement.clips.size() + 1);
         newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
-        newClip.length = 2000; // 2 second default
+        newClip.length = 1000; // 1 second default
         newClip.colour = juce::Colours::cornflowerblue;
         
         currentTimeline->movement.clips.add(newClip);
@@ -396,15 +397,8 @@ void AnimatorMainView::addActionClip()
         ActionClip newClip;
         newClip.id = "Action " + juce::String(currentTimeline->actions.clips.size() + 1);
         newClip.start = timelineViewport->getTimelineComponent()->getCursorTime();
-        newClip.length = 2000; // 2 second default
+        newClip.length = 1000; // 1 second default
         newClip.colour = juce::Colours::orange;
-        
-        // Add a default action
-        ActionDefinition defaultAction;
-        defaultAction.setAction(ActionType::RotationX);
-        defaultAction.setTiming(TimingType::AbsoluteTarget);
-        defaultAction.setValue(45.0);
-        newClip.actions.add(defaultAction);
         
         currentTimeline->actions.clips.add(newClip);
         timelineViewport->repaint();
@@ -461,8 +455,6 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     // Auto-follow button should toggle state
     autoFollowButton->setClickingTogglesState(true);
     autoFollowButton->setToggleState(owner.autoFollowEnabled, juce::dontSendNotification);
-    // TODO: doesn't work
-    autoFollowButton->setColour(DrawableButton::ColourIds::backgroundOnColourId, Colours::royalblue);
     
     // Connect buttons to actions
     addMovementButton->onClick = [this] {
@@ -497,7 +489,6 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     addAndMakeVisible(autoFollowButton.get());
 }
 
-// Keep the paint method simple - just background
 void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
 {
     // Draw toolbar background only
@@ -508,7 +499,6 @@ void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
     g.drawLine(0.0f, (float)getHeight(), (float)getWidth(), (float)getHeight(), 1.0f);
 }
 
-// Keep the resized method the same
 void AnimatorMainView::ToolbarComponent::resized()
 {
     auto area = getLocalBounds().reduced(5, 5);
@@ -664,10 +654,6 @@ void AnimatorMainView::validateTimelines()
     if (!issues.isEmpty())
     {
         validationDetails = "Validation issues found:\n" + issues.joinIntoString("\n");
-        
-        //juce::AttributedString message;
-        //message.append(UTF8Helpers::xMark() + " Validation: " + juce::String(issues.size()) + " issues", juce::FontOptions(12.0f, juce::Font::bold), juce::Colours::orangered);
-        //setStatusMessage(message);
     }
     
     updateStatusBarValidation();
