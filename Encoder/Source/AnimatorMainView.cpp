@@ -411,21 +411,6 @@ void AnimatorMainView::addActionClip()
     }
 }
 
-void AnimatorMainView::zoomIn()
-{
-    timelineViewport->getTimelineComponent()->zoom(ZOOM_STEP);
-}
-
-void AnimatorMainView::zoomOut()
-{
-    timelineViewport->getTimelineComponent()->zoom(1.0f/ZOOM_STEP);
-}
-
-void AnimatorMainView::resetZoom()
-{
-    timelineViewport->getTimelineComponent()->zoom(TimelineComponent::ZOOM_RESET);
-}
-
 void AnimatorMainView::toggleAutoFollow()
 {
     autoFollowEnabled = !autoFollowEnabled;
@@ -480,17 +465,28 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     autoFollowButton->setColour(DrawableButton::ColourIds::backgroundOnColourId, Colours::royalblue);
     
     // Connect buttons to actions
-    addMovementButton->onClick = [this] { owner.addMovementClip(); };
-    addActionButton->onClick = [this] { owner.addActionClip(); };
-    deleteButton->onClick = [this] {
-        owner.timelineViewport->getTimelineComponent()->keyPressed(
-            juce::KeyPress(juce::KeyPress::deleteKey));
+    addMovementButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_addMovementClip, true);
     };
-    zoomInButton->onClick = [this] { owner.zoomIn(); };
-    zoomOutButton->onClick = [this] { owner.zoomOut(); };
-    resetZoomButton->onClick = [this] { owner.resetZoom(); };
-    autoFollowButton->onClick = [this] { owner.toggleAutoFollow(); };
-
+    addActionButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_addActionClip, true);
+    };
+    deleteButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_deleteSelected, true);
+    };
+    zoomInButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_zoomIn, true);
+    };
+    zoomOutButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_zoomOut, true);
+    };
+    resetZoomButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_resetZoom, true);
+    };
+    autoFollowButton->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_toggleAutoFollow, true);
+    };
+    
     // Add buttons to component
     addAndMakeVisible(addMovementButton.get());
     addAndMakeVisible(addActionButton.get());
@@ -773,3 +769,65 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
             result.setInfo("Reset Zoom", "Reset zoom level", "View", 0);
             break;
             
+        case CMD_addMovementClip:
+            result.setInfo("Add Movement Clip", "Add a new movement clip", "Insert", 0);
+            break;
+            
+        case CMD_addActionClip:
+            result.setInfo("Add Action Clip", "Add a new action clip", "Insert", 0);
+            break;
+            
+        case CMD_toggleAutoFollow:
+            result.setInfo("Toggle Auto-follow", "Toggle auto-follow mode", "View", 0);
+            break;
+    }
+}
+
+bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationInfo& info)
+{
+    auto* timelineComp = timelineViewport->getTimelineComponent();
+    
+    switch (info.commandID)
+    {
+        case CMD_cut:
+            timelineComp->cutSelectedClips();
+            return true;
+        case CMD_copy:
+            timelineComp->copySelectedClips();
+            return true;
+        case CMD_paste:
+            timelineComp->pasteClips();
+            return true;
+        case CMD_deleteSelected:
+            timelineComp->deleteSelectedClips();
+            return true;
+        case CMD_duplicate:
+            timelineComp->duplicateSelectedClips();
+            return true;
+        case CMD_selectAll:
+            timelineComp->selectAllClips();
+            return true;
+        case CMD_deselectAll:
+            timelineComp->deselectAllClips();
+            return true;
+        case CMD_zoomIn:
+            timelineComp->zoom(ZOOM_STEP);
+            return true;
+        case CMD_zoomOut:
+            timelineComp->zoom(1.0f/ZOOM_STEP);
+            return true;
+        case CMD_resetZoom:
+            timelineComp->zoom(TimelineComponent::ZOOM_RESET);
+            return true;
+        case CMD_addMovementClip:
+            addMovementClip();
+            return true;
+        case CMD_addActionClip:
+            addActionClip();
+            return true;
+        case CMD_toggleAutoFollow:
+            toggleAutoFollow();
+            return true;
+    }
+    return false;
+}

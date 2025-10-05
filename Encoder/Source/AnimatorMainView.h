@@ -106,9 +106,6 @@ private:
     void deselectAllClips();
     void addMovementClip();
     void addActionClip();
-    void zoomIn();
-    void zoomOut();
-    void resetZoom();
     void toggleAutoFollow();
     
     // Import/Export
