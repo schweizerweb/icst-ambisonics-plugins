@@ -2,6 +2,15 @@
 #include "../../Common/Point3D.h"
 #include "TimelineTypes.h"
 
+// Add this enum before MovementClip definition
+enum class MovementType
+{
+    MoveToCartesian,
+    MoveToPolar,
+    Circle,
+    Spiral
+};
+
 struct Clip
 {
     juce::String id = "";
@@ -14,12 +23,16 @@ struct Clip
 
 struct MovementClip : public Clip
 {
+    MovementType movementType = MovementType::MoveToCartesian;
     Point3D<double> startPointGroup;
-    Point3D<double> endPointGroup;
+    Point3D<double> targetPointGroup;
     bool useStartPoint;
-    bool usePolar = false;  // Add this line
     Array<Point3D<double>> startPointsRel;
-    Array<Point3D<double>> endPointsRel;
+    Array<Point3D<double>> targetPointsRel;
+    
+    // New properties
+    float count = 1.0f;           // For Circle and Spiral
+    float radiusChange = 0.0f;    // For Spiral only
 };
 
 struct MovementLayer
@@ -215,15 +228,19 @@ struct TimelineModel
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
             
             // Serialize MovementClip specific data
+            xClip->setAttribute("movementType", static_cast<int>(c.movementType));  // Add this
             xClip->setAttribute("startPointGroupX", c.startPointGroup.getX());
             xClip->setAttribute("startPointGroupY", c.startPointGroup.getY());
             xClip->setAttribute("startPointGroupZ", c.startPointGroup.getZ());
-            xClip->setAttribute("endPointGroupX", c.endPointGroup.getX());
-            xClip->setAttribute("endPointGroupY", c.endPointGroup.getY());
-            xClip->setAttribute("endPointGroupZ", c.endPointGroup.getZ());
+            xClip->setAttribute("targetPointGroupX", c.targetPointGroup.getX());
+            xClip->setAttribute("targetPointGroupY", c.targetPointGroup.getY());
+            xClip->setAttribute("targetPointGroupZ", c.targetPointGroup.getZ());
             xClip->setAttribute("useStartPoint", c.useStartPoint ? 1 : 0);
-            xClip->setAttribute("usePolar", c.usePolar ? 1 : 0);  // Add this line
+            // Remove usePolar serialization
+            xClip->setAttribute("count", c.count);  // Add this
+            xClip->setAttribute("radiusChange", c.radiusChange);  // Add this
             
+            // ... rest of XML serialization for arrays remains the same ...
             // Serialize startPointsRel array
             auto* xStartPoints = new juce::XmlElement("StartPointsRel");
             for (const auto& point : c.startPointsRel)
@@ -236,17 +253,17 @@ struct TimelineModel
             }
             xClip->addChildElement(xStartPoints);
             
-            // Serialize endPointsRel array
-            auto* xEndPoints = new juce::XmlElement("EndPointsRel");
-            for (const auto& point : c.endPointsRel)
+            // Serialize targetPointsRel array
+            auto* xTargetPoints = new juce::XmlElement("TargetPointsRel");
+            for (const auto& point : c.targetPointsRel)
             {
                 auto* xPoint = new juce::XmlElement("Point");
                 xPoint->setAttribute("x", point.getX());
                 xPoint->setAttribute("y", point.getY());
                 xPoint->setAttribute("z", point.getZ());
-                xEndPoints->addChildElement(xPoint);
+                xTargetPoints->addChildElement(xPoint);
             }
-            xClip->addChildElement(xEndPoints);
+            xClip->addChildElement(xTargetPoints);
             
             xMovement->addChildElement(xClip);
         }
@@ -310,17 +327,21 @@ struct TimelineModel
                              : juce::Colours::cornflowerblue;
 
                     // Deserialize MovementClip specific data
+                    c.movementType = static_cast<MovementType>(xClip->getIntAttribute("movementType", 0));  // Add this
                     c.startPointGroup.setXYZ(
                                              xClip->getDoubleAttribute("startPointGroupX", 0.0),
                                              xClip->getDoubleAttribute("startPointGroupY", 0.0),
                                              xClip->getDoubleAttribute("startPointGroupZ", 0.0));
-                    c.endPointGroup.setXYZ(
-                                           xClip->getDoubleAttribute("endPointGroupX", 0.0),
-                                           xClip->getDoubleAttribute("endPointGroupY", 0.0),
-                                           xClip->getDoubleAttribute("endPointGroupZ", 0.0));
+                    c.targetPointGroup.setXYZ(
+                                           xClip->getDoubleAttribute("targetPointGroupX", 0.0),
+                                           xClip->getDoubleAttribute("targetPointGroupY", 0.0),
+                                           xClip->getDoubleAttribute("targetPointGroupZ", 0.0));
                     c.useStartPoint = xClip->getBoolAttribute("useStartPoint", false);
-                    c.usePolar = xClip->getBoolAttribute("usePolar", false);  // Add this line
+                    // Remove usePolar deserialization
+                    c.count = xClip->getDoubleAttribute("count", 1.0f);  // Add this
+                    c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0f);  // Add this
 
+                    // ... rest of XML deserialization for arrays remains the same ...
                     // Deserialize startPointsRel array
                     if (auto* xStartPoints = xClip->getChildByName("StartPointsRel"))
                     {
@@ -337,10 +358,10 @@ struct TimelineModel
                         }
                     }
 
-                    // Deserialize endPointsRel array
-                    if (auto* xEndPoints = xClip->getChildByName("EndPointsRel"))
+                    // Deserialize targetPointsRel array
+                    if (auto* xTargetPoints = xClip->getChildByName("TargetPointsRel"))
                     {
-                        for (auto* xPoint = xEndPoints->getFirstChildElement(); xPoint != nullptr; xPoint = xPoint->getNextElement())
+                        for (auto* xPoint = xTargetPoints->getFirstChildElement(); xPoint != nullptr; xPoint = xPoint->getNextElement())
                         {
                             if (xPoint->hasTagName("Point"))
                             {
@@ -348,7 +369,7 @@ struct TimelineModel
                                                       xPoint->getDoubleAttribute("x", 0.0),
                                                       xPoint->getDoubleAttribute("y", 0.0),
                                                       xPoint->getDoubleAttribute("z", 0.0));
-                                c.endPointsRel.add(point);
+                                c.targetPointsRel.add(point);
                             }
                         }
                     }
