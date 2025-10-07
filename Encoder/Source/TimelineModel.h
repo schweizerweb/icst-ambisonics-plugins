@@ -24,15 +24,17 @@ struct Clip
 struct MovementClip : public Clip
 {
     MovementType movementType = MovementType::MoveToCartesian;
-    Point3D<double> startPointGroup;
-    Point3D<double> targetPointGroup;
-    bool useStartPoint;
-    Array<Point3D<double>> startPointsRel;
-    Array<Point3D<double>> targetPointsRel;
+    Point3D<double> startPointGroup; // is used as start position of the group point, if useStartFlag = true, otherwise just start at the current position (wherever that is)
+    Point3D<double> targetPointGroup; // is used depending on the movementType:
+        // MoveToCartesian/MoveToPolar: the target position, where the group point shall be at the end of the clip, since the data is always stored as XYZ in the background, there's no difference between the two MoveTo-Types regarding the targetPoint, but the movement between will be different.
+        // Circle/Spiral: The center point, around which the group point will rotate.
     
-    // New properties
-    double count = 1.0;           // For Circle and Spiral
-    double radiusChange = 0.0;    // For Spiral only
+    bool useStartPoint;
+    Array<Point3D<double>> startPointsRel; // to be implemented later
+    Array<Point3D<double>> targetPointsRel; // to be implemented later
+    
+    double count = 1.0;           // For Circle and Spiral: number of full rounds
+    double radiusChange = 0.0;    // For Spiral only: change of the radius per round, with which the group point will rotate around the target point. for now it's the absolute radius change per round.
 };
 
 struct MovementLayer
