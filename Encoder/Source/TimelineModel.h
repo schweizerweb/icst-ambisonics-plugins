@@ -31,8 +31,8 @@ struct MovementClip : public Clip
     Array<Point3D<double>> targetPointsRel;
     
     // New properties
-    float count = 1.0f;           // For Circle and Spiral
-    float radiusChange = 0.0f;    // For Spiral only
+    double count = 1.0;           // For Circle and Spiral
+    double radiusChange = 0.0;    // For Spiral only
 };
 
 struct MovementLayer
@@ -236,11 +236,9 @@ struct TimelineModel
             xClip->setAttribute("targetPointGroupY", c.targetPointGroup.getY());
             xClip->setAttribute("targetPointGroupZ", c.targetPointGroup.getZ());
             xClip->setAttribute("useStartPoint", c.useStartPoint ? 1 : 0);
-            // Remove usePolar serialization
-            xClip->setAttribute("count", c.count);  // Add this
-            xClip->setAttribute("radiusChange", c.radiusChange);  // Add this
+            xClip->setAttribute("count", c.count);
+            xClip->setAttribute("radiusChange", c.radiusChange);
             
-            // ... rest of XML serialization for arrays remains the same ...
             // Serialize startPointsRel array
             auto* xStartPoints = new juce::XmlElement("StartPointsRel");
             for (const auto& point : c.startPointsRel)
@@ -337,11 +335,9 @@ struct TimelineModel
                                            xClip->getDoubleAttribute("targetPointGroupY", 0.0),
                                            xClip->getDoubleAttribute("targetPointGroupZ", 0.0));
                     c.useStartPoint = xClip->getBoolAttribute("useStartPoint", false);
-                    // Remove usePolar deserialization
-                    c.count = xClip->getDoubleAttribute("count", 1.0f);  // Add this
-                    c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0f);  // Add this
+                    c.count = xClip->getDoubleAttribute("count", 1.0);
+                    c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0);
 
-                    // ... rest of XML deserialization for arrays remains the same ...
                     // Deserialize startPointsRel array
                     if (auto* xStartPoints = xClip->getChildByName("StartPointsRel"))
                     {

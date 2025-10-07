@@ -511,7 +511,6 @@ int MovementClipEditor::getMovementControlsHeight() const
 {
     const int rowHeight = 28;
     const int verticalSpacing = 8;
-    const int buttonSpacing = 4;
     
     // Fixed number of rows since all controls are always visible
     const int fixedRows = 1 +  // movement type combo
