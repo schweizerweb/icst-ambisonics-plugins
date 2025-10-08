@@ -165,9 +165,12 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
 
-	iirFilterSpec.numChannels = 1;
+    iirFilterSpec.numChannels = 1;
 	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
+    
+    debugLogHandler.logMessage("PrepareToPlayCalled");
+    animatorEngine.reset(getTimelines(), getSources(), getSampleRate());
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -236,6 +239,12 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     {
         if (auto pos = ph->getPosition())
         {
+            if(pos->getTimeInSeconds().hasValue())
+            {
+                // Process animator engine
+                animatorEngine.processAnimationAt((ms_t)(*pos->getTimeInSeconds() * 1000.0));
+            }
+            
             if (pos->getTimeInSeconds().hasValue())
                 playheadState.timeSeconds.store (*pos->getTimeInSeconds());
 
@@ -243,29 +252,28 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
                 playheadState.bpm.store (*pos->getBpm());
                 
             playheadState.playing.store (pos->getIsPlaying());
-            
             playheadState.looping.store (pos->getIsLooping(), std::memory_order_relaxed);
 
-                if (playheadState.looping.load(std::memory_order_relaxed))
+            if (playheadState.looping.load(std::memory_order_relaxed))
+            {
+                if (auto lp = pos->getLoopPoints())
                 {
-                    if (auto lp = pos->getLoopPoints())
+                    // lp->ppqStart / lp->ppqEnd sind *PPQ* (quarter-notes)
+                    double bpm = 120.0;
+                    if (auto b = pos->getBpm()) bpm = *b;
+
+                    const double qps = bpm / 60.0; // quarters per second
+
+                    const double ppqStart = lp->ppqStart;
+                    const double ppqEnd   = lp->ppqEnd;
+
+                    if (qps > 0.0 && std::isfinite(ppqStart) && std::isfinite(ppqEnd) && ppqEnd > ppqStart)
                     {
-                        // lp->ppqStart / lp->ppqEnd sind *PPQ* (quarter-notes)
-                        double bpm = 120.0;
-                        if (auto b = pos->getBpm()) bpm = *b;
-
-                        const double qps = bpm / 60.0; // quarters per second
-
-                        const double ppqStart = lp->ppqStart;
-                        const double ppqEnd   = lp->ppqEnd;
-
-                        if (qps > 0.0 && std::isfinite(ppqStart) && std::isfinite(ppqEnd) && ppqEnd > ppqStart)
-                        {
-                            playheadState.loopStartSeconds.store (ppqStart / qps, std::memory_order_relaxed);
-                            playheadState.loopEndSeconds.store   (ppqEnd   / qps, std::memory_order_relaxed);
-                        }
+                        playheadState.loopStartSeconds.store (ppqStart / qps, std::memory_order_relaxed);
+                        playheadState.loopEndSeconds.store   (ppqEnd   / qps, std::memory_order_relaxed);
                     }
                 }
+            }
 
             playheadState.valid.store (true, std::memory_order_release);
         }
@@ -279,7 +287,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
         playheadState.valid.store (false, std::memory_order_release);
     }
     
-	// Audio handling
+    // Audio handling
     const float masterGainFactor = float(Decibels::decibelsToGain(sources->getMasterGain()));
 	const int totalNumInputChannels = jmin(getTotalNumInputChannels(), sources->size(), buffer.getNumChannels());
 	const int totalUsedOutputChannels = jmin(getTotalNumOutputChannels(), encoderSettings.getAmbiChannelCount(), buffer.getNumChannels());
@@ -431,7 +439,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             if (auto* xTimelines = xmlState->getChildByName("Timelines"))
             {
                 timelines.clear(true);
-                forEachXmlChildElementWithTagName (*xTimelines, xTimeline, "Timeline")
+                for (auto* xTimeline : xTimelines->getChildWithTagNameIterator ("Timeline"))
                 {
                     auto* tm = new TimelineModel();
                     tm->fromXml (*xTimeline);
@@ -673,6 +681,12 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
         presetHelper->loadFromXmlFile(presetFile, &audioParams, sources.get());
         presetHelper->notifyPresetChanged();
     }
+}
+
+void AmbisonicEncoderAudioProcessor::reset()
+{
+    debugLogHandler.logMessage("Animator reset");
+    animatorEngine.reset(getTimelines(), getSources(), getSampleRate());
 }
 
 //==============================================================================

@@ -42,6 +42,8 @@
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
 #include "TimelineComponent.h"
+#include "AnimatorEngine.h"
+#include "../../Common/DebugLogHandler.h"
 
 //==============================================================================
 /**
@@ -65,6 +67,7 @@ public:
 	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
     using AudioProcessor::processBlock;
+    void reset() override;
     
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -109,8 +112,9 @@ public:
     RadarOptions* getRadarOptions();
     juce::OwnedArray<TimelineModel>* getTimelines();
     void populateDefaultTimelineModels();
+    DebugLogHandler debugLogHandler;
     
-	void updateTrackProperties(const TrackProperties& properties) override;
+    void updateTrackProperties(const TrackProperties& properties) override;
 
     struct SharedPlayheadState
     {
@@ -155,6 +159,9 @@ private:
     AnimatorDataset animatorDataset;
     ChannelLayout channelLayout;
     RadarOptions radarOptions;
+    
+    AnimatorEngine animatorEngine;
+    bool wasPlaying = false;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)

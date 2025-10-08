@@ -129,6 +129,8 @@ AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 	{
 		delete settingsWindow;
 	}
+    
+    debugLogWindow = nullptr;
     //[/Destructor]
 }
 
@@ -207,6 +209,7 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         //[UserButtonCode_btnHelp] -- add your button handler code here..
 
         // CallOutBox zeigt ein neues TimelineWidgetMS
+        mainProcessor.debugLogHandler.logMessage("Animator has been opened");
         timelineDialogManager.show(this, &mainProcessor, &pointSelection);
         //[/UserButtonCode_btnHelp]
     }
@@ -232,6 +235,37 @@ void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& 
 		delete settingsWindow;
 		settingsWindow = nullptr;
 	}
+}
+
+bool AmbisonicEncoderAudioProcessorEditor::keyPressed(const juce::KeyPress& key)
+{
+    if (key == juce::KeyPress('d', juce::ModifierKeys::ctrlModifier | juce::ModifierKeys::shiftModifier, 0))
+    {
+        toggleDebugLogWindow();
+        return true;
+    }
+    return false;
+}
+
+void AmbisonicEncoderAudioProcessorEditor::toggleDebugLogWindow()
+{
+    if (debugLogWindow == nullptr)
+    {
+        debugLogWindow = std::make_unique<DebugLogWindow>(mainProcessor.debugLogHandler);
+        debugLogWindow->setVisible(true);
+    }
+    else
+    {
+        if (debugLogWindow->isVisible())
+        {
+            debugLogWindow->setVisible(false);
+        }
+        else
+        {
+            debugLogWindow->setVisible(true);
+            debugLogWindow->toFront(true);
+        }
+    }
 }
 
 //[/MiscUserCode]

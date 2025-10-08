@@ -31,6 +31,7 @@
 #include "../../Common/OSCLogDialogManager.h"
 #include "AnimatorDialogManager.h"
 #include "TimelineDialog.h"
+#include "../../Common/DebugLogWindow.h"
 //[/Headers]
 
 
@@ -57,6 +58,8 @@ public:
     //[UserMethods]     -- You can add your own custom methods in this section.
 	void actionListenerCallback(const String& message) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
+    bool keyPressed(const juce::KeyPress& key) override;
+    void toggleDebugLogWindow();
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -75,6 +78,7 @@ private:
     AnimatorDialogManager animatorDialogManager;
     SharedResourcePointer<TooltipWindow> tooltipWindow;
     TimelineDialogManager timelineDialogManager;
+    std::unique_ptr<DebugLogWindow> debugLogWindow;
     //[/UserVariables]
 
     //==============================================================================

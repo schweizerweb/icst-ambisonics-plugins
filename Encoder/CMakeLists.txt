@@ -35,6 +35,8 @@ SET(SRC_FILES
 	../Source/AnimatorAction.h
 	../Source/AnimatorActionComponent.cpp
 	../Source/AnimatorActionComponent.h
+	../Source/AnimatorEngine.h
+	../Source/AnimatorEngine.cpp
 	../Source/AnimatorMainView.h
 	../Source/AnimatorMainView.cpp
 	../Source/AnimatorComponent.cpp
@@ -161,6 +163,10 @@ SET(SRC_FILES
 	../../Common/Constants.h
 	../../Common/CsvImportExport.h
 	../../Common/DawParameter.h
+	../../Common/DebugLogHandler.h
+	../../Common/DebugLogHandler.cpp
+	../../Common/DebugLogWindow.h
+	../../Common/DebugLogWindow.cpp
 	../../Common/DelayBuffer.cpp
 	../../Common/DelayBuffer.h
 	../../Common/DelayHelper.cpp
