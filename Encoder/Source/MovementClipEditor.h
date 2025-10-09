@@ -91,6 +91,7 @@ private:
     void createControls();
     void createCoordinateSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name,
                                double min, double max, double defaultValue);
+    void createStandardSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name, double defaultValue);
     void createApplyCurrentPositionButton(juce::TextButton& button, PrecisionSlider& xSlider, PrecisionSlider& ySlider, PrecisionSlider& zSlider);
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
     void updateCurrentPosition(bool force = false);

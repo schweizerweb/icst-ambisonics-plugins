@@ -21,6 +21,7 @@ private:
         bool isPrerendered;
         juce::Array<juce::Vector3D<double>> prerenderedFrames;
         double startAngle; // For circle/spiral
+        double startRadius; // For spiral
         juce::Vector3D<double> initialPosition; // Store the initial position for MoveTo operations
         
         ActiveMovement()

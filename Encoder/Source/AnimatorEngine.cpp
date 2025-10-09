@@ -195,8 +195,6 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
         {
             newMovement.initialPosition = getGroupPosition(timelineIndex);
         }
-        DBG("MoveTo - Stored initial position: (" << newMovement.initialPosition.x
-            << ", " << newMovement.initialPosition.y << ", " << newMovement.initialPosition.z << ")");
     }
     
     // Store start angle for circle/spiral (existing code)
@@ -210,6 +208,11 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
         double relX = startPos.x - centerPos.x;
         double relY = startPos.y - centerPos.y;
         newMovement.startAngle = std::atan2(relY, relX);
+        
+        if(clip.movementType == MovementType::Spiral)
+        {
+            newMovement.startRadius = std::sqrt(relX * relX + relY * relY);
+        }
     }
     
     activeMovements.add(newMovement);
@@ -238,8 +241,6 @@ void AnimatorEngine::processActiveMovements(ms_t currentTimeMs)
             static ms_t lastLogTime = 0;
             if (currentTimeMs - lastLogTime > 100) // Log every 100ms to avoid spam
             {
-                DBG("MoveTo Progress - elapsed: " << elapsed << "ms/" << movement.clip.length
-                    << "ms, progress: " << progress);
                 lastLogTime = currentTimeMs;
             }
         }
@@ -314,11 +315,7 @@ juce::Vector3D<double> AnimatorEngine::calculateLinearCartesian(const MovementCl
     }
     
     auto targetPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-    
-    DBG("Linear Cartesian - progress: " << progress
-        << ", using FIXED start: (" << startPos.x << ", " << startPos.y << ", " << startPos.z << ")"
-        << ", target: (" << targetPos.x << ", " << targetPos.y << ", " << targetPos.z << ")");
-    
+
     return startPos + (targetPos - startPos) * progress;
 }
 
@@ -351,10 +348,6 @@ juce::Vector3D<double> AnimatorEngine::calculateLinearPolar(const MovementClip& 
     }
     
     auto targetPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-    
-    DBG("Linear Polar - progress: " << progress
-        << ", using FIXED start: (" << startPos.x << ", " << startPos.y << ", " << startPos.z << ")"
-        << ", target: (" << targetPos.x << ", " << targetPos.y << ", " << targetPos.z << ")");
     
     // Convert to spherical coordinates
     auto startSpherical = cartesianToSpherical(startPos);
@@ -408,10 +401,6 @@ juce::Vector3D<double> AnimatorEngine::calculateCircle(const MovementClip& clip,
     // Calculate the motion: positive count = clockwise, so we subtract from start angle
     double angle = startAngle - (2.0 * juce::MathConstants<double>::pi * clip.count * progress);
     
-    DBG("Circle - count: " << clip.count << ", progress: " << progress
-        << ", startAngle: " << startAngle << " rad (" << (startAngle * 180.0 / juce::MathConstants<double>::pi) << "°)"
-        << ", final angle: " << angle << " rad (" << (angle * 180.0 / juce::MathConstants<double>::pi) << "°)");
-    
     // Circular motion in XY plane around center
     return juce::Vector3D<double>(
         centerPos.x + radius * std::cos(angle),
@@ -424,40 +413,33 @@ juce::Vector3D<double> AnimatorEngine::calculateSpiral(const MovementClip& clip,
 {
     auto centerPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
     
-    double startRadius;
-    if (clip.useStartPoint)
-    {
-        auto startPos = juce::Vector3D<double>(clip.startPointGroup.getX(), clip.startPointGroup.getY(), clip.startPointGroup.getZ());
-        startRadius = calculateDistance(startPos, centerPos);
-    }
-    else
-    {
-        auto currentPos = getGroupPosition(timelineIndex);
-        startRadius = calculateDistance(currentPos, centerPos);
-    }
-    
-    // Find the active movement to get the stored start angle
+    // Get stored start values
+    double startRadius = 0.0;
     double startAngle = 0.0;
     for (auto& movement : activeMovements)
     {
         if (movement.timelineIndex == timelineIndex && movement.clip.movementType == MovementType::Spiral)
         {
+            startRadius = movement.startRadius;
             startAngle = movement.startAngle;
             break;
         }
     }
     
-    // Calculate the motion: positive count = clockwise, so we subtract from start angle
-    double angle = startAngle - (2.0 * juce::MathConstants<double>::pi * clip.count * progress);
+    // FIX: Use count for direction, but absolute value for radius calculations
+    double direction = (clip.count >= 0) ? -1.0 : 1.0; // Negative for clockwise, positive for counter-clockwise
+    double absoluteCount = std::abs(clip.count);
     
-    // Calculate current radius with spiral change
-    double completedRounds = clip.count * progress;
-    double currentRadius = startRadius + (clip.radiusChange * completedRounds);
+    // Calculate the motion using direction
+    double angle = startAngle + (2.0 * juce::MathConstants<double>::pi * absoluteCount * progress * direction);
     
-    DBG("Spiral - count: " << clip.count << ", progress: " << progress
-        << ", startAngle: " << startAngle << " rad (" << (startAngle * 180.0 / juce::MathConstants<double>::pi) << "°)"
-        << ", final angle: " << angle << " rad (" << (angle * 180.0 / juce::MathConstants<double>::pi) << "°)"
-        << ", startRadius: " << startRadius << ", currentRadius: " << currentRadius);
+    // Calculate current radius with spiral change - use absolute count
+    double totalRadiusChange = clip.radiusChange * absoluteCount;
+    double currentRadius = startRadius + (totalRadiusChange * progress);
+    
+    // Prevent negative radius
+    if (currentRadius < 0.0)
+        currentRadius = 0.0;
     
     // Spiral motion in XY plane
     return juce::Vector3D<double>(

@@ -188,8 +188,8 @@ void MovementClipEditor::createControls()
     createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", -10.0, 10.0, 0.0);
     createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", -10.0, 10.0, 0.0);
     
-    createCoordinateSlider(countSlider, countLabel, "Count:", 0.1, 10.0, currentClip.count);
-        createCoordinateSlider(radiusChangeSlider, radiusChangeLabel, "Radius change:", -5.0, 5.0, currentClip.radiusChange);
+    createStandardSlider(countSlider, countLabel, "Count:", currentClip.count);
+    createStandardSlider(radiusChangeSlider, radiusChangeLabel, "Radius change:", currentClip.radiusChange);
     
     // Create apply current position buttons
     createApplyCurrentPositionButton(applyCurrentStartButton, startXSlider, startYSlider, startZSlider);
@@ -208,6 +208,19 @@ void MovementClipEditor::createCoordinateSlider(PrecisionSlider& slider, juce::L
     slider.setRange(min, max, 0.01);
     slider.setValue(defaultValue);
     slider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 70, 22);
+    
+    addAndMakeVisible(label);
+    label.setText(name, juce::dontSendNotification);
+    label.setJustificationType(juce::Justification::centredLeft);
+}
+
+void MovementClipEditor::createStandardSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name, double defaultValue)
+{
+    addAndMakeVisible(slider);
+    slider.setRange(-1000, 1000, 0.1);
+    slider.setValue(defaultValue);
+    slider.setSliderStyle(juce::Slider::IncDecButtons);
+    slider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
     
     addAndMakeVisible(label);
     label.setText(name, juce::dontSendNotification);
