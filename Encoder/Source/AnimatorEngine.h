@@ -24,28 +24,28 @@ private:
     {
         int timelineIndex;
         MovementClip clip;
-        ms_t actualStartTime;
-        bool isPrerendered;
-        juce::Array<juce::Vector3D<double>> prerenderedFrames;
-        double startAngle; // For circle/spiral
-        double startRadius; // For spiral
-        juce::Vector3D<double> initialPosition; // Store the initial position for MoveTo operations
+        ms_t actualStartTime; // The actual time when this movement should have started
+        ms_t elapsedTime = 0; // How much time has already elapsed when starting
+        
+        juce::Vector3D<double> initialPosition;
+        double startAngle = 0.0;
+        double startRadius = 0.0;
+        
+        // Original constructor (for when no elapsed time)
+        ActiveMovement(int idx, const MovementClip& c, ms_t start)
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0) {}
+        
+        // New constructor with elapsed time
+        ActiveMovement(int idx, const MovementClip& c, ms_t start, ms_t elapsed)
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed) {}
         
         ActiveMovement()
-            : timelineIndex(0), actualStartTime(0), isPrerendered(false), startAngle(0.0)
-        {}
-        
-        ActiveMovement(int idx, const MovementClip& c, ms_t actualStart)
-            : timelineIndex(idx), clip(c), actualStartTime(actualStart), isPrerendered(false), startAngle(0.0)
-        {}
-        
+            : timelineIndex(0), actualStartTime(0), elapsedTime(0)
+                {}
         double getProgress(ms_t currentTimeMs) const
         {
-            ms_t elapsed = currentTimeMs - actualStartTime;
-            if (elapsed < 0) return 0.0;
-            if (elapsed > clip.length) return 1.0;
-            double progress = static_cast<double>(elapsed) / clip.length;
-            return juce::jlimit(0.0, 1.0, progress);
+            ms_t timeInMovement = currentTimeMs - actualStartTime;
+            return static_cast<double>(timeInMovement) / clip.length;
         }
     };
 
@@ -54,7 +54,7 @@ private:
     void preRenderMovements();
     void preRenderMovementClip(int timelineIndex, const MovementClip& clip);
     void updateActiveMovements(ms_t currentTimeMs);
-    void startMovementClip(int timelineIndex, const MovementClip& clip, ms_t currentTimeMs);
+    void startMovementClip(int timelineIndex, const MovementClip& clip, ms_t currentTimeMs, ms_t elapsedTime);
     void processActiveMovements(ms_t currentTimeMs);
     
     // Movement calculation

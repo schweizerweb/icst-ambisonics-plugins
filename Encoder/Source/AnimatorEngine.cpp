@@ -136,7 +136,15 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
         {
             auto* timeline = copiedTimelines[schedule.timelineIndex];
             const auto& clip = timeline->movement.clips[schedule.clipIndex];
-            startMovementClip(schedule.timelineIndex, clip, currentTimeMs);
+            
+            // Calculate how much of the clip has already elapsed
+            ms_t elapsedTime = currentTimeMs - schedule.start;
+            
+            // Only start if the clip hasn't already ended
+            if (elapsedTime < clip.length)
+            {
+                startMovementClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
+            }
         }
         
         nextScheduledClipIndex++;
@@ -168,7 +176,7 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
     }
 }
 
-void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& clip, ms_t currentTimeMs)
+void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& clip, ms_t currentTimeMs, ms_t elapsedTime)
 {
     // Remove any existing movement for this timeline
     for (int i = activeMovements.size() - 1; i >= 0; --i)
@@ -179,8 +187,8 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
         }
     }
     
-    // Start new movement
-    ActiveMovement newMovement(timelineIndex, clip, currentTimeMs);
+    // Start new movement with adjusted start time - use the constructor with elapsedTime
+    ActiveMovement newMovement(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
     
     // Store the initial position for MoveTo operations
     if (clip.movementType == MovementType::MoveToCartesian || clip.movementType == MovementType::MoveToPolar)
@@ -198,7 +206,7 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
         }
     }
     
-    // Store start angle for circle/spiral (existing code)
+    // Store start angle for circle/spiral
     if (clip.movementType == MovementType::Circle || clip.movementType == MovementType::Spiral)
     {
         auto centerPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
@@ -232,18 +240,12 @@ void AnimatorEngine::processActiveMovements(ms_t currentTimeMs)
             continue;
         }
         
-        double progress = movement.getProgress(currentTimeMs);
+        // Calculate progress based on the actual start time and current time
+        ms_t timeInMovement = currentTimeMs - movement.actualStartTime;
+        double progress = static_cast<double>(timeInMovement) / movement.clip.length;
         
-        // Debug logging for MoveTo movements
-        if (movement.clip.movementType == MovementType::MoveToCartesian ||
-            movement.clip.movementType == MovementType::MoveToPolar)
-        {
-            static ms_t lastLogTime = 0;
-            if (currentTimeMs - lastLogTime > 100) // Log every 100ms to avoid spam
-            {
-                lastLogTime = currentTimeMs;
-            }
-        }
+        // Clamp progress to [0, 1] to handle edge cases
+        progress = juce::jlimit(0.0, 1.0, progress);
         
         auto position = calculateMovementPosition(movement, progress);
         pSourceSet->setGroupXyz(movement.timelineIndex, position.x, position.y, position.z, true);
