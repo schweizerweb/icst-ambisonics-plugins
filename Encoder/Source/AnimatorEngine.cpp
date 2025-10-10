@@ -485,10 +485,10 @@ double AnimatorEngine::calculateDistance(const juce::Vector3D<double>& a, const 
 
 void AnimatorEngine::setAnimatorState(bool enable)
 {
-    bool change = (enable != pAnimatorSettings->on);
+    bool change = (enable != pAnimatorSettings->enable);
     if(change)
     {
-        pAnimatorSettings->on = enable;
+        pAnimatorSettings->enable = enable;
         sendChangeMessage();
         if(enable)
         {
@@ -497,12 +497,22 @@ void AnimatorEngine::setAnimatorState(bool enable)
     }
 }
 
+void AnimatorEngine::setAutoFollow(bool enable)
+{
+    bool change = (enable != pAnimatorSettings->autoFollow);
+    if(change)
+    {
+        pAnimatorSettings->autoFollow = enable;
+        sendChangeMessage();
+    }
+}
+
 bool AnimatorEngine::getAnimatorState()
 {
-    if(pAnimatorSettings != nullptr)
-    {
-        return pAnimatorSettings->on;
-    }
-    
-    return false;
+    return (pAnimatorSettings != nullptr && pAnimatorSettings->enable);
+}
+
+bool AnimatorEngine::getAutoFollow()
+{
+    return (pAnimatorSettings != nullptr && pAnimatorSettings->autoFollow);
 }

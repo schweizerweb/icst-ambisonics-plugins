@@ -16,7 +16,6 @@ public:
     void setSelectionControl(PointSelection* pPointSelection);
     void setSourceSet(AmbiSourceSet* pSources);
     void setPlayheadProvider(std::function<PlayheadSnapshot()> provider);
-    void setAutoFollow(bool shouldAutoFollow);
     
     void paint(juce::Graphics& g) override;
     void resized() override;

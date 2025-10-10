@@ -236,7 +236,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     {
         if (auto pos = ph->getPosition())
         {
-            if(pos->getTimeInSeconds().hasValue() && encoderSettings.animatorSettings.on)
+            if(pos->getTimeInSeconds().hasValue() && encoderSettings.animatorSettings.enable)
             {
                 // Process animator engine
                 animatorEngine.processAnimationAt((ms_t)(*pos->getTimeInSeconds() * 1000.0));
@@ -688,7 +688,7 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
 
 void AmbisonicEncoderAudioProcessor::reset()
 {
-    if(encoderSettings.animatorSettings.on)
+    if(encoderSettings.animatorSettings.enable)
     {
         debugLogHandler.logMessage("Animator reset");
         animatorEngine.reset(getTimelines(), getSources(), getSampleRate(), &encoderSettings.animatorSettings);

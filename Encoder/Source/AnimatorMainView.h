@@ -98,7 +98,6 @@ private:
     // Application state
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     AnimatorEngine* pAnimatorEngine = nullptr;
-    bool autoFollowEnabled = true;
     
     // Zoom state
     static constexpr float ZOOM_STEP = 1.2f;

@@ -12,8 +12,12 @@ public:
     
     void reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourceSet* sourceSet, double sampleRate, AnimatorSettings* animatorSettings);
     void processAnimationAt(ms_t positionMs);
+    
     void setAnimatorState(bool enable);
+    void setAutoFollow(bool enable);
+    
     bool getAnimatorState();
+    bool getAutoFollow();
 
 private:
     struct ActiveMovement

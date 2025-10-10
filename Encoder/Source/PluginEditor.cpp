@@ -75,7 +75,7 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
                         juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 0.400f, juce::Colour (0x6eee1010),
                         juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
     
-    btnAnimator.reset (new ColorBorderButton(pEncoderSettings->animatorSettings.on));
+    btnAnimator.reset (new ColorBorderButton(pEncoderSettings->animatorSettings.enable));
     addAndMakeVisible (btnAnimator.get());
     btnAnimator->setButtonText (TRANS("new button"));
     btnAnimator->addListener (this);

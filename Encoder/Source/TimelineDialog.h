@@ -121,8 +121,6 @@ public:
                 return s;
         });
 
-        timeline->setAutoFollow(false);
-
         // Dialog erzeugen; Manager (this) als Listener registrieren
         window = new TimelineDialog(this, timeline);
 

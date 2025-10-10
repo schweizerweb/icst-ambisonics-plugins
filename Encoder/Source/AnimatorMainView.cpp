@@ -14,6 +14,7 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
     
     // Create timeline component
     timelineViewport = std::make_unique<TimelineViewport>();
+    timelineViewport->getTimelineComponent()->setAutoFollow(pAnimatorEngine->getAutoFollow());
     
     // Create status bar
     statusBar = std::make_unique<StatusBarComponent>(*this);
@@ -84,12 +85,6 @@ void AnimatorMainView::setSourceSet(AmbiSourceSet *pSources)
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 {
     timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);
-}
-
-void AnimatorMainView::setAutoFollow(bool shouldAutoFollow)
-{
-    autoFollowEnabled = shouldAutoFollow;
-    timelineViewport->getTimelineComponent()->setAutoFollow(shouldAutoFollow);
 }
 
 void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> /*provider*/)
@@ -379,7 +374,8 @@ void AnimatorMainView::exportScene(int timelineIndex)
 
 void AnimatorMainView::toggleAutoFollow()
 {
-    setAutoFollow(!autoFollowEnabled);
+    pAnimatorEngine->setAutoFollow(!pAnimatorEngine->getAutoFollow());
+    timelineViewport->getTimelineComponent()->setAutoFollow(pAnimatorEngine->getAutoFollow());
     toolbar->repaint();
 }
 
@@ -430,20 +426,11 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     loadSVGIcon(autoFollowButton.get(), BinaryData::auto_follow_icon_svg, BinaryData::auto_follow_icon_svgSize, "Toggle Auto-follow");
     loadSVGIcon(animatorOnOff.get(), BinaryData::play_icon_svg, BinaryData::play_icon_svgSize, "Turn Animator ON/OFF");
 
-    // Auto-follow button should toggle state
     autoFollowButton->setClickingTogglesState(true);
-    autoFollowButton->setToggleState(owner.autoFollowEnabled, juce::dontSendNotification);
-    autoFollowButton->setToggleColors(
-        juce::Colour(0xff2d2d30),  // Off state: dark grey (matches toolbar)
-        juce::Colour(0xff4CAF50)  // On state: green
-    );
+    autoFollowButton->setToggleState(owner.pAnimatorEngine->getAutoFollow(), juce::dontSendNotification);
 
     animatorOnOff->setClickingTogglesState(true);
     animatorOnOff->setToggleState(owner.pAnimatorEngine->getAnimatorState(), juce::dontSendNotification);
-    animatorOnOff->setToggleColors(
-        juce::Colour(0xff2d2d30),  // Off state: dark grey (matches toolbar)
-        juce::Colour(0xff4CAF50)  // On state: green
-    );
 
     // Connect buttons to actions
     addMovementButton->onClick = [this] {

@@ -42,13 +42,15 @@
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
 #define DEFAULT_ANIMATOR_ON         false
+#define DEFAULT_ANIMATOR_AUTOFOLLOW true
 #define MAXIMUM_NUMBER_OF_GROUPS    8
 #define MULTI_ENCODER_MODE (MAX_NUM_INPUT > 1)
 
 class AnimatorSettings
 {
 public:
-    bool on;
+    bool enable;
+    bool autoFollow;
 };
 
 class EncoderSettings
