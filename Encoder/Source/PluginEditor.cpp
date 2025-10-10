@@ -23,6 +23,7 @@
 #include "../../Common/RadarComponent.h"
 #include "EncoderSettingsComponent.h"
 #include "TimelineComponent.h"
+#include "../../Common/SvgHelper.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -46,15 +47,11 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
-    btnSettings.reset (new juce::ImageButton ("btnSettings"));
+    btnSettings.reset (new DrawableButton ("btnSettings", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnSettings.get());
-    btnSettings->setButtonText (TRANS("new button"));
+    btnSettings->setButtonText (TRANS("Settings"));
     btnSettings->addListener (this);
-
-    btnSettings->setImages (false, true, true,
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0x00000000),
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    SvgHelper::loadSVGIcon(btnSettings.get(), BinaryData::settings_icon_svg, BinaryData::settings_icon_svgSize, String("Settings"));
 
     labelMessage.reset (new juce::Label ("labelMessage",
                                          juce::String()));
@@ -65,25 +62,18 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     labelMessage->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelMessage->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
-    btnHelp.reset (new juce::ImageButton ("btnHelp"));
+    btnHelp.reset (new DrawableButton ("btnHelp", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnHelp.get());
-    btnHelp->setButtonText (TRANS("new button"));
+    btnHelp->setButtonText (TRANS("Help"));
     btnHelp->addListener (this);
-    btnHelp->setTooltip(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true));
-    btnHelp->setImages (false, true, true,
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0x00000000),
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    SvgHelper::loadSVGIcon(btnHelp.get(), BinaryData::help_icon_svg, BinaryData::help_icon_svgSize, String(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true)));
+
     
-    btnAnimator.reset (new ColorBorderButton(pEncoderSettings->animatorSettings.enable));
+    btnAnimator.reset (new ColorBorderDrawableButton("Animator", pEncoderSettings->animatorSettings.enable));
     addAndMakeVisible (btnAnimator.get());
     btnAnimator->setButtonText (TRANS("new button"));
     btnAnimator->addListener (this);
-    
-    btnAnimator->setImages (false, true, true,
-        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0x00000000),
-        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 0.400f, juce::Colour (0x6eee1010),
-        juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0xc0ee1010));
+    SvgHelper::loadSVGIcon(btnAnimator.get(), BinaryData::animator_icon_svg, BinaryData::animator_icon_svgSize, String("Animator"));
     
     //[UserPreSize]
 	setResizable(true, true);
@@ -138,9 +128,9 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    btnSettings->setBounds (0, 0, 32, 32);
-    btnHelp->setBounds (32, 4, 24, 24);
-    btnAnimator->setBounds(getWidth() - 28, 4, 24, 24);
+    btnSettings->setBounds (2, 2, 28, 28);
+    btnHelp->setBounds (34, 2, 28, 28);
+    btnAnimator->setBounds(getWidth() - 30, 2, 28, 28);
     labelMessage->setBounds (64, 4, getWidth() - 32, 24);
     
     //[UserResized] Add your own custom resize handling here..

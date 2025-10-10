@@ -84,10 +84,6 @@ private:
         std::unique_ptr<juce::DrawableButton> zoomInButton, zoomOutButton, resetZoomButton;
         std::unique_ptr<ColorDrawableToggleButton> autoFollowButton;
         std::unique_ptr<ColorDrawableToggleButton> animatorOnOff;
-        
-        juce::OwnedArray<juce::Drawable> drawables; // To maintain ownership of drawables
-
-        void loadSVGIcon(juce::DrawableButton* button, const char* svgData, size_t svgDataSize, const juce::String& tooltip);
     };
 
     std::unique_ptr<juce::MenuBarComponent> menuBar;

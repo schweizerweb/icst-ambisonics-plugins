@@ -10,6 +10,8 @@ SET(BIN_FILES
 	../../Resources/svg/error_icon.svg
 	../../Resources/svg/ok_icon.svg
 	../../Resources/svg/play_icon.svg
+	../../Resources/svg/settings_icon.svg
+	../../Resources/svg/help_icon.svg
 	
 	../../Resources/png/animator_icon.png
 	../../Resources/png/settings.png
@@ -157,6 +159,8 @@ SET(SRC_FILES
 	../../Common/ChannelLayout.cpp
 	../../Common/ChannelLayout.h
 	../../Common/CheckBoxCustomComponent.h
+	../../Common/ColorBorderDrawableButton.h
+	../../Common/ColorDrawableToggleButton.h
 	../../Common/ColorDefinition.h
 	../../Common/ColorEditorCustomComponent.h
 	../../Common/ColorSelectionComponent.h

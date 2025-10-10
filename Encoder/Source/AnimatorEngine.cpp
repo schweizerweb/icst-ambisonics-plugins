@@ -232,7 +232,6 @@ void AnimatorEngine::processActiveMovements(ms_t currentTimeMs)
             continue;
         }
         
-        ms_t elapsed = currentTimeMs - movement.actualStartTime;
         double progress = movement.getProgress(currentTimeMs);
         
         // Debug logging for MoveTo movements
@@ -303,7 +302,7 @@ juce::Vector3D<double> AnimatorEngine::calculateLinearCartesian(const MovementCl
     }
     
     // Fallback if no active movement found (shouldn't happen)
-    if (startPos.x == 0 && startPos.y == 0 && startPos.z == 0)
+    if (approximatelyEqual(startPos.x, 0.0) && approximatelyEqual(startPos.y, 0.0) && approximatelyEqual(startPos.z, 0.0))
     {
         if (clip.useStartPoint)
         {
@@ -336,7 +335,7 @@ juce::Vector3D<double> AnimatorEngine::calculateLinearPolar(const MovementClip& 
     }
     
     // Fallback if no active movement found (shouldn't happen)
-    if (startPos.x == 0 && startPos.y == 0 && startPos.z == 0)
+    if (approximatelyEqual(startPos.x, 0.0) && approximatelyEqual(startPos.y, 0.0) && approximatelyEqual(startPos.z, 0.0))
     {
         if (clip.useStartPoint)
         {

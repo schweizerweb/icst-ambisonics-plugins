@@ -32,7 +32,7 @@
 #include "AnimatorDialogManager.h"
 #include "TimelineDialog.h"
 #include "../../Common/DebugLogWindow.h"
-#include "../../Common/ColorBorderButton.h"
+#include "../../Common/ColorBorderDrawableButton.h"
 //[/Headers]
 
 
@@ -85,10 +85,10 @@ private:
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
-    std::unique_ptr<juce::ImageButton> btnSettings;
+    std::unique_ptr<DrawableButton> btnSettings;
     std::unique_ptr<juce::Label> labelMessage;
-    std::unique_ptr<juce::ImageButton> btnHelp;
-    std::unique_ptr<ColorBorderButton> btnAnimator;
+    std::unique_ptr<DrawableButton> btnHelp;
+    std::unique_ptr<ColorBorderDrawableButton> btnAnimator;
 
 
     //==============================================================================

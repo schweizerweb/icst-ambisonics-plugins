@@ -1,5 +1,6 @@
 #include "AnimatorMainView.h"
 #include "../../Common/UTF8Helpers.h"
+#include "../../Common/SvgHelper.h"
 
 AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
 {
@@ -385,24 +386,6 @@ void AnimatorMainView::toggleOnOff()
     toolbar->repaint();
 }
 
-// ToolbarComponent implementation
-void AnimatorMainView::ToolbarComponent::loadSVGIcon(juce::DrawableButton* button, const char* svgData, size_t svgDataSize, const juce::String& tooltip)
-{
-    if (svgData != nullptr && svgDataSize > 0)
-    {
-        auto svg = juce::Drawable::createFromImageData(svgData, svgDataSize);
-        if (svg != nullptr)
-        {
-            svg->replaceColour(juce::Colours::black, juce::Colours::lightgrey);
-            // Add some padding around the SVG
-            svg->setTransformToFit(juce::Rectangle<float>(4, 4, 16, 16), juce::RectanglePlacement::centred);
-            button->setImages(svg.get());
-            drawables.add(std::move(svg));
-        }
-    }
-    button->setTooltip(tooltip);
-}
-
 // In ToolbarComponent constructor
 AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     : owner(ownerRef)
@@ -417,14 +400,14 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     autoFollowButton = std::make_unique<ColorDrawableToggleButton>("Auto Follow");
     animatorOnOff = std::make_unique<ColorDrawableToggleButton>("Animator OnOff");
 
-    loadSVGIcon(addMovementButton.get(), BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize, "Add Movement Clip");
-    loadSVGIcon(addActionButton.get(), BinaryData::action_icon_svg, BinaryData::action_icon_svgSize, "Add Action Clip");
-    loadSVGIcon(deleteButton.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "Delete Selected Clips");
-    loadSVGIcon(zoomInButton.get(), BinaryData::zoom_in_icon_svg, BinaryData::zoom_in_icon_svgSize, "Zoom In");
-    loadSVGIcon(zoomOutButton.get(), BinaryData::zoom_out_icon_svg, BinaryData::zoom_out_icon_svgSize, "Zoom Out");
-    loadSVGIcon(resetZoomButton.get(), BinaryData::reset_zoom_icon_svg, BinaryData::reset_zoom_icon_svgSize, "Reset Zoom");
-    loadSVGIcon(autoFollowButton.get(), BinaryData::auto_follow_icon_svg, BinaryData::auto_follow_icon_svgSize, "Toggle Auto-follow");
-    loadSVGIcon(animatorOnOff.get(), BinaryData::play_icon_svg, BinaryData::play_icon_svgSize, "Turn Animator ON/OFF");
+    SvgHelper::loadSVGIcon(addMovementButton.get(), BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize, "Add Movement Clip");
+    SvgHelper::loadSVGIcon(addActionButton.get(), BinaryData::action_icon_svg, BinaryData::action_icon_svgSize, "Add Action Clip");
+    SvgHelper::loadSVGIcon(deleteButton.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "Delete Selected Clips");
+    SvgHelper::loadSVGIcon(zoomInButton.get(), BinaryData::zoom_in_icon_svg, BinaryData::zoom_in_icon_svgSize, "Zoom In");
+    SvgHelper::loadSVGIcon(zoomOutButton.get(), BinaryData::zoom_out_icon_svg, BinaryData::zoom_out_icon_svgSize, "Zoom Out");
+    SvgHelper::loadSVGIcon(resetZoomButton.get(), BinaryData::reset_zoom_icon_svg, BinaryData::reset_zoom_icon_svgSize, "Reset Zoom");
+    SvgHelper::loadSVGIcon(autoFollowButton.get(), BinaryData::auto_follow_icon_svg, BinaryData::auto_follow_icon_svgSize, "Toggle Auto-follow");
+    SvgHelper::loadSVGIcon(animatorOnOff.get(), BinaryData::play_icon_svg, BinaryData::play_icon_svgSize, "Turn Animator ON/OFF");
 
     autoFollowButton->setClickingTogglesState(true);
     autoFollowButton->setToggleState(owner.pAnimatorEngine->getAutoFollow(), juce::dontSendNotification);

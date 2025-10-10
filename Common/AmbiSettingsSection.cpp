@@ -22,7 +22,7 @@
 #include "AmbiSettingsSection.h"
 #include "MultiDecoderColors.h"
 
-AmbiSettingsSection::AmbiSettingsSection(): gain(0), mute(false), speakerMask(0), color(Colours::red)
+AmbiSettingsSection::AmbiSettingsSection(): gain(0), mute(false), color(Colours::red), speakerMask(0)
 {
 }
 

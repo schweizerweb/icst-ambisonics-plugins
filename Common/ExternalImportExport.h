@@ -50,7 +50,6 @@ public:
 
         FileInputStream stream(chooser.getResult());
         Array<ExternalDataSet> points;
-        int indexPlus1 = 1;
         while (!stream.isExhausted())
         {
             String line = stream.readNextLine();
@@ -81,7 +80,6 @@ public:
                 // for now, ignore the last value
                 set.name = String(indexString);
                 points.add(set);
-                indexPlus1++;
             }
             else if(nbTokens > 0)
             {
