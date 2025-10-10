@@ -37,22 +37,14 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 {
     //[Constructor_pre] You can add your own custom stuff here..
 	settingsWindow = nullptr;
-    pSources = ownerProc.getSources();
-	pEncoderSettings = ownerProc.getEncoderSettings();
+    pSources = mainProcessor.getSources();
+	pEncoderSettings = mainProcessor.getEncoderSettings();
+    mainProcessor.getAnimatorEngine()->addChangeListener(this);
     //[/Constructor_pre]
 
     radarComponent.reset (new RadarComponent (pSources, nullptr, &pointSelection, mainProcessor.getRadarOptions()));
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
-
-    labelVersion.reset (new juce::Label ("labelVersion",
-                                         TRANS("Version")));
-    addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
-    labelVersion->setJustificationType (juce::Justification::centredRight);
-    labelVersion->setEditable (false, false, false);
-    labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
 
     btnSettings.reset (new juce::ImageButton ("btnSettings"));
     addAndMakeVisible (btnSettings.get());
@@ -63,7 +55,6 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
                             juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0x00000000),
                             juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 0.400f, juce::Colour (0x6eee1010),
                             juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0xc0ee1010));
-    btnSettings->setBounds (0, 0, 32, 32);
 
     labelMessage.reset (new juce::Label ("labelMessage",
                                          juce::String()));
@@ -78,26 +69,22 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     addAndMakeVisible (btnHelp.get());
     btnHelp->setButtonText (TRANS("new button"));
     btnHelp->addListener (this);
-
+    btnHelp->setTooltip(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true));
     btnHelp->setImages (false, true, true,
                         juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0x00000000),
                         juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 0.400f, juce::Colour (0x6eee1010),
                         juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
-    btnHelp->setBounds (32, 4, 24, 24);
-
-
-    btnAnimator.reset (new juce::ImageButton ("btnAnimator"));
+    
+    btnAnimator.reset (new ColorBorderButton(pEncoderSettings->animatorSettings.on));
     addAndMakeVisible (btnAnimator.get());
     btnAnimator->setButtonText (TRANS("new button"));
     btnAnimator->addListener (this);
-
+    
     btnAnimator->setImages (false, true, true,
         juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0x00000000),
         juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 0.400f, juce::Colour (0x6eee1010),
         juce::ImageCache::getFromMemory (BinaryData::animator_icon_png, BinaryData::animator_icon_pngSize), 1.000f, juce::Colour (0xc0ee1010));
-    btnAnimator->setBounds (64, 4, 24, 24);
-
-
+    
     //[UserPreSize]
 	setResizable(true, true);
     //[/UserPreSize]
@@ -106,7 +93,6 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
 
 
     //[Constructor] You can add your own custom stuff here..
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true), dontSendNotification);
 	ownerProc.getStatusMessageHandler()->registerLabel(labelMessage.get());
     //[/Constructor]
 }
@@ -115,10 +101,10 @@ AmbisonicEncoderAudioProcessorEditor::~AmbisonicEncoderAudioProcessorEditor()
 {
     //[Destructor_pre]. You can add your own custom destruction code here..
 	mainProcessor.getStatusMessageHandler()->unregisterLabel();
+    mainProcessor.getAnimatorEngine()->removeChangeListener(this);
     //[/Destructor_pre]
 
     radarComponent = nullptr;
-    labelVersion = nullptr;
     btnSettings = nullptr;
     labelMessage = nullptr;
     btnHelp = nullptr;
@@ -152,8 +138,11 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 5 - 111, 4, 111, 24);
-    labelMessage->setBounds (64, 4, getWidth() - 188, 24);
+    btnSettings->setBounds (0, 0, 32, 32);
+    btnHelp->setBounds (32, 4, 24, 24);
+    btnAnimator->setBounds(getWidth() - 28, 4, 24, 24);
+    labelMessage->setBounds (64, 4, getWidth() - 32, 24);
+    
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -209,11 +198,10 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
         //[UserButtonCode_btnHelp] -- add your button handler code here..
 
         // CallOutBox zeigt ein neues TimelineWidgetMS
-        mainProcessor.debugLogHandler.logMessage("Animator has been opened");
-        timelineDialogManager.show(this, &mainProcessor, &pointSelection);
+        timelineDialogManager.show(this, &mainProcessor, &pointSelection, mainProcessor.getAnimatorEngine());
         //[/UserButtonCode_btnHelp]
     }
-
+    
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
 }
@@ -223,9 +211,16 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 
-void AmbisonicEncoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster*)
+void AmbisonicEncoderAudioProcessorEditor::changeListenerCallback(ChangeBroadcaster* source)
 {
-	mainProcessor.initializeOscSender();
+    if(source == mainProcessor.getAnimatorEngine())
+    {
+        repaint();
+    }
+    else
+    {
+        mainProcessor.initializeOscSender();
+    }
 }
 
 void AmbisonicEncoderAudioProcessorEditor::actionListenerCallback(const String& message)

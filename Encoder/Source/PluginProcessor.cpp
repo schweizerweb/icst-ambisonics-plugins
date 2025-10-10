@@ -168,9 +168,6 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     iirFilterSpec.numChannels = 1;
 	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
-    
-    debugLogHandler.logMessage("PrepareToPlayCalled");
-    animatorEngine.reset(getTimelines(), getSources(), getSampleRate());
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -239,7 +236,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
     {
         if (auto pos = ph->getPosition())
         {
-            if(pos->getTimeInSeconds().hasValue())
+            if(pos->getTimeInSeconds().hasValue() && encoderSettings.animatorSettings.on)
             {
                 // Process animator engine
                 animatorEngine.processAnimationAt((ms_t)(*pos->getTimeInSeconds() * 1000.0));
@@ -456,6 +453,7 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
 
     pOscHandler->initialize();
 	initializeOscSender();
+    animatorEngine.reset(getTimelines(), getSources(), getSampleRate(), &encoderSettings.animatorSettings);
 }
 
 static inline MovementClip makeMovementClip(juce::String id, ms_t start, ms_t length, juce::Colour col)
@@ -625,6 +623,11 @@ AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
     return &animatorDataset;
 }
 
+AnimatorEngine* AmbisonicEncoderAudioProcessor::getAnimatorEngine()
+{
+    return &animatorEngine;
+}
+
 RadarOptions* AmbisonicEncoderAudioProcessor::getRadarOptions()
 {
     return &radarOptions;
@@ -685,8 +688,11 @@ void AmbisonicEncoderAudioProcessor::actionListenerCallback(const juce::String &
 
 void AmbisonicEncoderAudioProcessor::reset()
 {
-    debugLogHandler.logMessage("Animator reset");
-    animatorEngine.reset(getTimelines(), getSources(), getSampleRate());
+    if(encoderSettings.animatorSettings.on)
+    {
+        debugLogHandler.logMessage("Animator reset");
+        animatorEngine.reset(getTimelines(), getSources(), getSampleRate(), &encoderSettings.animatorSettings);
+    }
 }
 
 //==============================================================================

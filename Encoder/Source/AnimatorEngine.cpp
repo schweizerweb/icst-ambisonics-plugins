@@ -4,11 +4,12 @@ AnimatorEngine::AnimatorEngine()
 {
 }
 
-void AnimatorEngine::reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourceSet* sourceSet, double sampleRate_)
+void AnimatorEngine::reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourceSet* sourceSet, double sampleRate_, AnimatorSettings* animatorSettings)
 {
     // Store references
     sampleRate = sampleRate_;
     pSourceSet = sourceSet;
+    pAnimatorSettings = animatorSettings;
     
     // Copy only valid timelines (up to groupCount)
     copyTimelines(timelines);
@@ -480,4 +481,28 @@ double AnimatorEngine::calculateDistance(const juce::Vector3D<double>& a, const 
 {
     auto diff = a - b;
     return std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+}
+
+void AnimatorEngine::setAnimatorState(bool enable)
+{
+    bool change = (enable != pAnimatorSettings->on);
+    if(change)
+    {
+        pAnimatorSettings->on = enable;
+        sendChangeMessage();
+        if(enable)
+        {
+            // TODO reset();
+        }
+    }
+}
+
+bool AnimatorEngine::getAnimatorState()
+{
+    if(pAnimatorSettings != nullptr)
+    {
+        return pAnimatorSettings->on;
+    }
+    
+    return false;
 }

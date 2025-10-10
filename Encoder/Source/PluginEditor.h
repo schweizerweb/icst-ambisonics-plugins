@@ -32,6 +32,7 @@
 #include "AnimatorDialogManager.h"
 #include "TimelineDialog.h"
 #include "../../Common/DebugLogWindow.h"
+#include "../../Common/ColorBorderButton.h"
 //[/Headers]
 
 
@@ -65,7 +66,8 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
-
+    void showInfoCallout();
+    
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& mainProcessor;
@@ -83,11 +85,10 @@ private:
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
-    std::unique_ptr<juce::Label> labelVersion;
     std::unique_ptr<juce::ImageButton> btnSettings;
     std::unique_ptr<juce::Label> labelMessage;
     std::unique_ptr<juce::ImageButton> btnHelp;
-    std::unique_ptr<juce::ImageButton> btnAnimator;
+    std::unique_ptr<ColorBorderButton> btnAnimator;
 
 
     //==============================================================================

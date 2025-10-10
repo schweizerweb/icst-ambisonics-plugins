@@ -1,8 +1,8 @@
 #include "TimelineWidgetMS.h"
 
-TimelineWidgetMS::TimelineWidgetMS()
+TimelineWidgetMS::TimelineWidgetMS(AnimatorEngine* pEngine)
 {
-    mainView = std::make_unique<AnimatorMainView>();
+    mainView = std::make_unique<AnimatorMainView>(pEngine);
     addAndMakeVisible(mainView.get());
     
     startTimerHz(30);
@@ -17,7 +17,6 @@ void TimelineWidgetMS::setModels(juce::OwnedArray<TimelineModel>* models)
 {
     mainView->setTimelines(models);
 }
-
 
 void TimelineWidgetMS::setSelectionControl(PointSelection* pPointSelection)
 {

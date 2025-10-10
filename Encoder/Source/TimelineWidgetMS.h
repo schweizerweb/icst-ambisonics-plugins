@@ -9,7 +9,7 @@ class TimelineWidgetMS : public juce::Component,
                          private juce::Timer
 {
 public:
-    TimelineWidgetMS();
+    TimelineWidgetMS(AnimatorEngine* pEngine);
     ~TimelineWidgetMS() override;
     
     void setModels(juce::OwnedArray<TimelineModel>* models);

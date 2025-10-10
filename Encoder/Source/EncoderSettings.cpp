@@ -29,6 +29,7 @@
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
 #define XML_TAG_DISPLAY "Display"
+#define XML_TAG_ANIMATOR "Animator"
 #define XML_TAG_OSC_SEND_EXT_XYZ "Xyz"
 #define XML_TAG_OSC_SEND_EXT_AED "Aed"
 #define XML_TAG_OSC_SEND_EXT_XYZ_INDEX "XyzIndex"
@@ -118,6 +119,10 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     XmlElement* hideWarningsXml = new XmlElement(XML_TAG_OSC_HIDE_WARNINGS);
     hideWarningsXml->setAttribute(XML_ATTRIBUTE_ENABLE, hideWarnings);
     element->addChildElement(hideWarningsXml);
+    
+    XmlElement* animatorXml = new XmlElement(XML_TAG_ANIMATOR);
+    animatorXml->setAttribute(XML_ATTRIBUTE_ENABLE, animatorSettings.on);
+    element->addChildElement(animatorXml);
 	
     XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
     distanceEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, distanceEncodingFlag);
@@ -204,6 +209,12 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     if(hideWarningsXml != nullptr)
     {
         hideWarnings = hideWarningsXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_HIDE_WARNINGS);
+    }
+    
+    XmlElement* animatorXml = element->getChildByName(XML_TAG_ANIMATOR);
+    if(animatorXml != nullptr)
+    {
+        animatorSettings.on = animatorXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_ANIMATOR_ON);
     }
     
     XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);

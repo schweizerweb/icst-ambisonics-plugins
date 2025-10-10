@@ -107,6 +107,7 @@ public:
     CustomOscTxPresetHelper* getCustomOscTxPresetHelper();
     ScalingInfo* getScalingInfo();
     AnimatorDataset* getAnimatorDataset();
+    AnimatorEngine* getAnimatorEngine();
     ZoomSettings* getZoomSettingsPointer();
     OSCHandlerEncoder* getOscHandler();
     RadarOptions* getRadarOptions();

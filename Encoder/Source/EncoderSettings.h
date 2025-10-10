@@ -41,8 +41,15 @@
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
+#define DEFAULT_ANIMATOR_ON         false
 #define MAXIMUM_NUMBER_OF_GROUPS    8
 #define MULTI_ENCODER_MODE (MAX_NUM_INPUT > 1)
+
+class AnimatorSettings
+{
+public:
+    bool on;
+};
 
 class EncoderSettings
 {
@@ -82,4 +89,6 @@ public:
 	bool dopplerEncodingFlag;
 
     bool hideWarnings;
+    
+    AnimatorSettings animatorSettings;
 };

@@ -3,13 +3,15 @@
 #include "JuceHeader.h"
 #include "TimelineViewport.h"
 #include "StatusBarComponent.h"
+#include "AnimatorEngine.h"
+#include "../../Common/ColorDrawableToggleButton.h"
 
 class AnimatorMainView : public juce::Component,
                         public juce::Timer,
                         public juce::ApplicationCommandTarget
 {
 public:
-    AnimatorMainView();
+    AnimatorMainView(AnimatorEngine* pEngine);
     ~AnimatorMainView() override;
 
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
@@ -48,7 +50,8 @@ public:
         CMD_addActionClip,
         CMD_toggleAutoFollow,
         CMD_undo,
-        CMD_redo
+        CMD_redo,
+        CMD_toggleOnOff
     };
     
 private:
@@ -79,7 +82,8 @@ private:
         AnimatorMainView& owner;
         std::unique_ptr<juce::DrawableButton> addMovementButton, addActionButton, deleteButton;
         std::unique_ptr<juce::DrawableButton> zoomInButton, zoomOutButton, resetZoomButton;
-        std::unique_ptr<juce::DrawableButton> autoFollowButton;
+        std::unique_ptr<ColorDrawableToggleButton> autoFollowButton;
+        std::unique_ptr<ColorDrawableToggleButton> animatorOnOff;
         
         juce::OwnedArray<juce::Drawable> drawables; // To maintain ownership of drawables
 
@@ -93,6 +97,7 @@ private:
 
     // Application state
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
+    AnimatorEngine* pAnimatorEngine = nullptr;
     bool autoFollowEnabled = true;
     
     // Zoom state
@@ -107,6 +112,7 @@ private:
     void selectAllClips();
     void deselectAllClips();
     void toggleAutoFollow();
+    void toggleOnOff();
     
     // Import/Export
     void importScene(int timelineIndex);

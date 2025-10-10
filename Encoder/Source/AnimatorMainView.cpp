@@ -1,8 +1,10 @@
 #include "AnimatorMainView.h"
 #include "../../Common/UTF8Helpers.h"
 
-AnimatorMainView::AnimatorMainView()
+AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
 {
+    pAnimatorEngine = pEngine;
+    
     // Create menu bar model with pointer
     menuBarModel = std::make_unique<MainMenuBarModel>(this);
     menuBar = std::make_unique<juce::MenuBarComponent>(menuBarModel.get());
@@ -377,9 +379,13 @@ void AnimatorMainView::exportScene(int timelineIndex)
 
 void AnimatorMainView::toggleAutoFollow()
 {
-    autoFollowEnabled = !autoFollowEnabled;
-    timelineViewport->getTimelineComponent()->setAutoFollow(autoFollowEnabled);
-    
+    setAutoFollow(!autoFollowEnabled);
+    toolbar->repaint();
+}
+
+void AnimatorMainView::toggleOnOff()
+{
+    pAnimatorEngine->setAnimatorState(!pAnimatorEngine->getAnimatorState());
     toolbar->repaint();
 }
 
@@ -412,7 +418,8 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     zoomInButton = std::make_unique<juce::DrawableButton>("Zoom In", juce::DrawableButton::ImageOnButtonBackground);
     zoomOutButton = std::make_unique<juce::DrawableButton>("Zoom Out", juce::DrawableButton::ImageOnButtonBackground);
     resetZoomButton = std::make_unique<juce::DrawableButton>("Reset Zoom", juce::DrawableButton::ImageOnButtonBackground);
-    autoFollowButton = std::make_unique<juce::DrawableButton>("Auto Follow", juce::DrawableButton::ImageOnButtonBackground);
+    autoFollowButton = std::make_unique<ColorDrawableToggleButton>("Auto Follow");
+    animatorOnOff = std::make_unique<ColorDrawableToggleButton>("Animator OnOff");
 
     loadSVGIcon(addMovementButton.get(), BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize, "Add Movement Clip");
     loadSVGIcon(addActionButton.get(), BinaryData::action_icon_svg, BinaryData::action_icon_svgSize, "Add Action Clip");
@@ -421,11 +428,23 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     loadSVGIcon(zoomOutButton.get(), BinaryData::zoom_out_icon_svg, BinaryData::zoom_out_icon_svgSize, "Zoom Out");
     loadSVGIcon(resetZoomButton.get(), BinaryData::reset_zoom_icon_svg, BinaryData::reset_zoom_icon_svgSize, "Reset Zoom");
     loadSVGIcon(autoFollowButton.get(), BinaryData::auto_follow_icon_svg, BinaryData::auto_follow_icon_svgSize, "Toggle Auto-follow");
+    loadSVGIcon(animatorOnOff.get(), BinaryData::play_icon_svg, BinaryData::play_icon_svgSize, "Turn Animator ON/OFF");
 
     // Auto-follow button should toggle state
     autoFollowButton->setClickingTogglesState(true);
     autoFollowButton->setToggleState(owner.autoFollowEnabled, juce::dontSendNotification);
-    
+    autoFollowButton->setToggleColors(
+        juce::Colour(0xff2d2d30),  // Off state: dark grey (matches toolbar)
+        juce::Colour(0xff4CAF50)  // On state: green
+    );
+
+    animatorOnOff->setClickingTogglesState(true);
+    animatorOnOff->setToggleState(owner.pAnimatorEngine->getAnimatorState(), juce::dontSendNotification);
+    animatorOnOff->setToggleColors(
+        juce::Colour(0xff2d2d30),  // Off state: dark grey (matches toolbar)
+        juce::Colour(0xff4CAF50)  // On state: green
+    );
+
     // Connect buttons to actions
     addMovementButton->onClick = [this] {
         owner.commandManager->invokeDirectly(AnimatorMainView::CMD_addMovementClip, true);
@@ -448,6 +467,10 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     autoFollowButton->onClick = [this] {
         owner.commandManager->invokeDirectly(AnimatorMainView::CMD_toggleAutoFollow, true);
     };
+    animatorOnOff->onClick = [this] {
+        owner.commandManager->invokeDirectly(AnimatorMainView::CMD_toggleOnOff, true);
+    };
+    
     
     // Add buttons to component
     addAndMakeVisible(addMovementButton.get());
@@ -457,6 +480,7 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
     addAndMakeVisible(zoomOutButton.get());
     addAndMakeVisible(resetZoomButton.get());
     addAndMakeVisible(autoFollowButton.get());
+    addAndMakeVisible(animatorOnOff.get());
 }
 
 void AnimatorMainView::ToolbarComponent::paint(juce::Graphics& g)
@@ -491,6 +515,8 @@ void AnimatorMainView::ToolbarComponent::resized()
     area.removeFromLeft(spacing * 2);
     
     autoFollowButton->setBounds(area.removeFromLeft(buttonSize));
+    
+    animatorOnOff->setBounds(area.removeFromRight(buttonSize));
 }
 
 // Status bar interface implementation
@@ -654,7 +680,7 @@ void AnimatorMainView::getAllCommands(juce::Array<juce::CommandID>& commands)
     const juce::CommandID commandList[] = {
         CMD_cut, CMD_copy, CMD_paste, CMD_deleteSelected, CMD_duplicate,
         CMD_selectAll, CMD_deselectAll, CMD_zoomIn, CMD_zoomOut, CMD_resetZoom,
-        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow, CMD_undo, CMD_redo
+        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow, CMD_undo, CMD_redo, CMD_toggleOnOff
     };
     
     commands.addArray(commandList, numElementsInArray(commandList));
@@ -748,7 +774,11 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
             result.addDefaultKeypress('Y', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
             result.setActive(false);
             break;
-            
+        case CMD_toggleOnOff:
+            result.setInfo("Toggle ON/OFF", "Toggles the Animator Engine", "View", 0);
+            break;
+        
+        
     }
 }
 
@@ -814,6 +844,10 @@ bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationI
                 setStatusMessage(msg);
             }
             return true;
+        case CMD_toggleOnOff:
+            toggleOnOff();
+            return true;
+        
     }
     return false;
 }

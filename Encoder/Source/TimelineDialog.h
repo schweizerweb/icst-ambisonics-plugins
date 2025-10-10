@@ -83,12 +83,12 @@ public:
     }
 
     // Dialog öffnen; pParent bestimmt Referenz-Position
-    void show(juce::Component* pParent, AmbisonicEncoderAudioProcessor* pProcessor, PointSelection* pPointSelection)
+    void show(juce::Component* pParent, AmbisonicEncoderAudioProcessor* pProcessor, PointSelection* pPointSelection, AnimatorEngine* pEngine)
     {
         if (window != nullptr)
             delete window;
 
-        auto* timeline = new TimelineWidgetMS();
+        auto* timeline = new TimelineWidgetMS(pEngine);
         timeline->setModels(pProcessor->getTimelines());
         timeline->setSourceSet(pProcessor->getSources());
         timeline->setSelectionControl(pPointSelection);

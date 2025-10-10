@@ -9,6 +9,7 @@ SET(BIN_FILES
 	../../Resources/svg/animator_icon.svg
 	../../Resources/svg/error_icon.svg
 	../../Resources/svg/ok_icon.svg
+	../../Resources/svg/play_icon.svg
 	
 	../../Resources/png/animator_icon.png
 	../../Resources/png/settings.png

@@ -3,14 +3,17 @@
 #include <JuceHeader.h>
 #include "TimelineModel.h"
 #include "../../Common/AmbiSourceSet.h"
+#include "EncoderSettings.h"
 
-class AnimatorEngine
+class AnimatorEngine: public ChangeBroadcaster
 {
 public:
     AnimatorEngine();
     
-    void reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourceSet* sourceSet, double sampleRate);
+    void reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourceSet* sourceSet, double sampleRate, AnimatorSettings* animatorSettings);
     void processAnimationAt(ms_t positionMs);
+    void setAnimatorState(bool enable);
+    bool getAnimatorState();
 
 private:
     struct ActiveMovement
@@ -68,6 +71,7 @@ private:
     ms_t lastPositionMs = 0;
     double sampleRate = 44100.0;
     AmbiSourceSet* pSourceSet = nullptr;
+    AnimatorSettings* pAnimatorSettings = nullptr;
     
     juce::OwnedArray<TimelineModel> copiedTimelines;
     juce::Array<ActiveMovement> activeMovements;
