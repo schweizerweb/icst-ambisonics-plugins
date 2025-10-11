@@ -16,6 +16,7 @@ void AnimatorEngine::reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourc
     
     // Reset state
     activeMovements.clear();
+    activeActions.clear();
     clipSchedule.clear();
     nextScheduledClipIndex = 0;
     lastPositionMs = 0;
@@ -31,6 +32,14 @@ void AnimatorEngine::reset(juce::OwnedArray<TimelineModel>* timelines, AmbiSourc
         {
             const auto& clip = timeline->movement.clips[clipIdx];
             ClipSchedule schedule{timelineIdx, clipIdx, clip.start, clip.end(), true};
+            clipSchedule.add(schedule);
+        }
+        
+        // Schedule action clips
+        for (int clipIdx = 0; clipIdx < timeline->actions.clips.size(); ++clipIdx)
+        {
+            const auto& clip = timeline->actions.clips[clipIdx];
+            ClipSchedule schedule{timelineIdx, clipIdx, clip.start, clip.end(), false};
             clipSchedule.add(schedule);
         }
     }
@@ -56,6 +65,7 @@ void AnimatorEngine::processAnimationAt(ms_t positionMs)
     
     // Process all active movements
     processActiveMovements(positionMs);
+    processActiveActions(positionMs);
     
     lastPositionMs = positionMs;
 }
@@ -129,42 +139,47 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
     {
         const auto& schedule = clipSchedule[nextScheduledClipIndex];
         
-        // Only start movement if timeline index is valid and group exists
-        if (schedule.isMovement &&
-            schedule.timelineIndex < (pSourceSet ? pSourceSet->groupCount() : 0) &&
+        if (schedule.timelineIndex < (pSourceSet ? pSourceSet->groupCount() : 0) &&
             pSourceSet->getActiveGroup(schedule.timelineIndex))
         {
             auto* timeline = copiedTimelines[schedule.timelineIndex];
-            const auto& clip = timeline->movement.clips[schedule.clipIndex];
             
-            // Calculate how much of the clip has already elapsed
-            ms_t elapsedTime = currentTimeMs - schedule.start;
-            
-            // Only start if the clip hasn't already ended
-            if (elapsedTime < clip.length)
+            if (schedule.isMovement)
             {
-                startMovementClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
+                const auto& clip = timeline->movement.clips[schedule.clipIndex];
+                ms_t elapsedTime = currentTimeMs - schedule.start;
+                
+                if (elapsedTime < clip.length)
+                {
+                    startMovementClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
+                }
+            }
+            else
+            {
+                // Handle action clips - NEW
+                const auto& clip = timeline->actions.clips[schedule.clipIndex];
+                ms_t elapsedTime = currentTimeMs - schedule.start;
+                
+                if (elapsedTime < clip.length)
+                {
+                    startActionClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
+                }
             }
         }
         
         nextScheduledClipIndex++;
     }
     
-    // Remove finished movements and movements for invalid groups
+    // Remove finished movements
     for (int i = activeMovements.size() - 1; i >= 0; --i)
     {
         const auto& movement = activeMovements[i];
         bool shouldRemove = false;
         
-        // Remove if movement is finished
-        if (currentTimeMs >= movement.actualStartTime + movement.clip.length)
-        {
-            shouldRemove = true;
-        }
-        // Remove if group no longer exists
-        else if (!pSourceSet ||
-                 movement.timelineIndex >= pSourceSet->groupCount() ||
-                 !pSourceSet->getActiveGroup(movement.timelineIndex))
+        if (currentTimeMs >= movement.actualStartTime + movement.clip.length ||
+            !pSourceSet ||
+            movement.timelineIndex >= pSourceSet->groupCount() ||
+            !pSourceSet->getActiveGroup(movement.timelineIndex))
         {
             shouldRemove = true;
         }
@@ -172,6 +187,26 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
         if (shouldRemove)
         {
             activeMovements.remove(i);
+        }
+    }
+    
+    // Remove finished actions - NEW
+    for (int i = activeActions.size() - 1; i >= 0; --i)
+    {
+        const auto& action = activeActions[i];
+        bool shouldRemove = false;
+        
+        if (currentTimeMs >= action.actualStartTime + action.clip.length ||
+            !pSourceSet ||
+            action.timelineIndex >= pSourceSet->groupCount() ||
+            !pSourceSet->getActiveGroup(action.timelineIndex))
+        {
+            shouldRemove = true;
+        }
+        
+        if (shouldRemove)
+        {
+            activeActions.remove(i);
         }
     }
 }
@@ -516,4 +551,212 @@ bool AnimatorEngine::getAnimatorState()
 bool AnimatorEngine::getAutoFollow()
 {
     return (pAnimatorSettings != nullptr && pAnimatorSettings->autoFollow);
+}
+
+void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, ms_t currentTimeMs, ms_t elapsedTime)
+{
+    // Remove any existing action for this timeline
+    for (int i = activeActions.size() - 1; i >= 0; --i)
+    {
+        if (activeActions[i].timelineIndex == timelineIndex)
+        {
+            activeActions.remove(i);
+        }
+    }
+    
+    // Start new action
+    ActiveAction newAction(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
+    
+    // Store initial state from the source set
+    if (pSourceSet && timelineIndex < pSourceSet->groupCount())
+    {
+        if (auto* group = pSourceSet->getActiveGroup(timelineIndex))
+        {
+            newAction.initialRotation = group->getRotation();
+            newAction.initialStretch = group->getStretch();
+            newAction.hasInitialState = true;
+        }
+    }
+    
+    activeActions.add(newAction);
+}
+
+// In processActiveActions, add more robust checking:
+void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
+{
+    if (!pSourceSet) return;
+    
+    for (auto& action : activeActions)
+    {
+        // Skip if timeline index is invalid or group doesn't exist
+        if (action.timelineIndex >= pSourceSet->groupCount() ||
+            !pSourceSet->getActiveGroup(action.timelineIndex))
+        {
+            continue;
+        }
+        
+        // Calculate progress with safety check
+        ms_t timeInAction = currentTimeMs - action.actualStartTime;
+        double progress = (action.clip.length > 0) ?
+            static_cast<double>(timeInAction) / action.clip.length : 0.0;
+        progress = juce::jlimit(0.0, 1.0, progress);
+        
+        // Process all actions in this clip
+        for (const auto& actionDef : action.clip.actions)
+        {
+            if (actionDef.getAction() != ActionType::None)
+            {
+                processSingleAction(action.timelineIndex, actionDef, progress, action);
+            }
+        }
+    }
+}
+
+void AnimatorEngine::processSingleAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
+{
+    switch (actionDef.getAction())
+    {
+        case ActionType::RotationX:
+        case ActionType::RotationY:
+        case ActionType::RotationZ:
+            processRotationAction(timelineIndex, actionDef, progress, activeAction);
+            break;
+            
+        case ActionType::Stretch:
+            processStretchAction(timelineIndex, actionDef, progress, activeAction);
+            break;
+            
+        case ActionType::None:
+        default:
+            break;
+    }
+}
+
+void AnimatorEngine::processRotationAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
+{
+    if (!pSourceSet || timelineIndex >= pSourceSet->groupCount()) return;
+    
+    double angle = 0.0;
+    
+    switch (actionDef.getTiming())
+    {
+        case TimingType::AbsoluteTarget:
+        {
+            if (actionDef.getUseStartValue() && activeAction.hasInitialState)
+            {
+                // Interpolate between start value and target value
+                angle = actionDef.getStartValue() + (actionDef.getValue() - actionDef.getStartValue()) * progress;
+            }
+            else
+            {
+                // Just progress toward target value
+                angle = actionDef.getValue() * progress;
+            }
+            break;
+        }
+            
+        case TimingType::RelativeDuringClip:
+        {
+            angle = actionDef.getValue() * progress;
+            if (actionDef.getUseStartValue())
+            {
+                angle += actionDef.getStartValue();
+            }
+            break;
+        }
+            
+        case TimingType::ConstantPerSecond:
+        {
+            double clipDurationSeconds = activeAction.clip.length / 1000.0;
+            angle = actionDef.getValue() * clipDurationSeconds * progress;
+            break;
+        }
+            
+        case TimingType::None:
+            return;
+    }
+    
+    // Apply the rotation using the simple rotateGroup function
+    double xAngle = 0.0, yAngle = 0.0, zAngle = 0.0;
+    
+    switch (actionDef.getAction())
+    {
+        case ActionType::RotationX: xAngle = angle; break;
+        case ActionType::RotationY: yAngle = angle; break;
+        case ActionType::RotationZ: zAngle = angle; break;
+        default: return;
+    }
+    
+    pSourceSet->rotateGroup(timelineIndex, xAngle, yAngle, zAngle);
+    
+    // Debug output
+    DBG("Rotation - Timeline: " << timelineIndex
+        << " | Action: " << (int)actionDef.getAction()
+        << " | Progress: " << progress
+        << " | Angle: " << angle << "°"
+        << " | Applied: X=" << xAngle << "°, Y=" << yAngle << "°, Z=" << zAngle << "°");
+}
+
+void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
+{
+    if (!pSourceSet || timelineIndex >= pSourceSet->groupCount()) return;
+    
+    double currentStretch = 1.0;
+    
+    switch (actionDef.getTiming())
+    {
+        case TimingType::AbsoluteTarget:
+        {
+            if (actionDef.getUseStartValue())
+            {
+                currentStretch = actionDef.getStartValue() +
+                                (actionDef.getValue() - actionDef.getStartValue()) * progress;
+            }
+            else if (activeAction.hasInitialState)
+            {
+                // Interpolate from initial stretch to target stretch
+                currentStretch = activeAction.initialStretch +
+                                (actionDef.getValue() - activeAction.initialStretch) * progress;
+            }
+            else
+            {
+                currentStretch = actionDef.getValue();
+            }
+            break;
+        }
+            
+        case TimingType::RelativeDuringClip:
+        {
+            currentStretch = 1.0 + actionDef.getValue() * progress;
+            if (actionDef.getUseStartValue())
+            {
+                currentStretch = actionDef.getStartValue() * (1.0 + actionDef.getValue() * progress);
+            }
+            else if (activeAction.hasInitialState)
+            {
+                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * progress);
+            }
+            break;
+        }
+            
+        case TimingType::ConstantPerSecond:
+        {
+            double clipDurationSeconds = activeAction.clip.length / 1000.0;
+            currentStretch = 1.0 + actionDef.getValue() * clipDurationSeconds * progress;
+            
+            if (activeAction.hasInitialState)
+            {
+                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * clipDurationSeconds * progress);
+            }
+            break;
+        }
+            
+        case TimingType::None:
+            return;
+    }
+    
+    // Ensure stretch doesn't go negative
+    if (currentStretch < 0.01) currentStretch = 0.01;
+    
+    pSourceSet->setGroupStretch(timelineIndex, currentStretch, true);
 }

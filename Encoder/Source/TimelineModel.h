@@ -64,12 +64,17 @@ class ActionDefinition
     ActionType action;
     TimingType timing;
     double value;
+    double startValue;
+    bool useStartValue;
 
 public:
     ActionDefinition(ActionType action_ = ActionType::None,
                     TimingType timing_ = TimingType::None,
-                    double value_ = 0.0)
-        : action(action_), timing(timing_), value(value_) {}
+                    double value_ = 0.0,
+                    double startValue_ = 0.0,
+                    bool useStartValue_ = false)
+        : action(action_), timing(timing_), value(value_),
+          startValue(startValue_), useStartValue(useStartValue_) {}
     
     // 1. Get unit based on action type
     std::string getUnit(bool verbose = false) const
@@ -130,7 +135,17 @@ public:
         valueStr.erase(valueStr.find_last_not_of('0') + 1, std::string::npos);
         if (valueStr.back() == '.') valueStr.pop_back();
         
-        return actionStr + timingSymbol + " " + valueStr + (unit.empty() ? "" : " " + unit);
+        // Add start value info if used
+        std::string startInfo = "";
+        if (useStartValue)
+        {
+            std::string startStr = std::to_string(startValue);
+            startStr.erase(startStr.find_last_not_of('0') + 1, std::string::npos);
+            if (startStr.back() == '.') startStr.pop_back();
+            startInfo = " from " + startStr + unit;
+        }
+        
+        return actionStr + timingSymbol + " " + valueStr + (unit.empty() ? "" : " " + unit) + startInfo;
     }
     
     // Getters and setters
@@ -142,6 +157,18 @@ public:
     
     double getValue() const { return value; }
     void setValue(double newValue) { value = newValue; }
+    
+    double getStartValue() const { return startValue; }
+    void setStartValue(double newStartValue) { startValue = newStartValue; }
+    
+    bool getUseStartValue() const { return useStartValue; }
+    void setUseStartValue(bool newUseStartValue) { useStartValue = newUseStartValue; }
+    
+    // Check if start value controls should be enabled
+    bool shouldEnableStartValueControls() const
+    {
+        return timing == TimingType::AbsoluteTarget || timing == TimingType::RelativeDuringClip;
+    }
 };
 
 struct ActionClip : public Clip
@@ -289,6 +316,8 @@ struct TimelineModel
                 xAction->setAttribute("actionType", static_cast<int>(action.getAction()));
                 xAction->setAttribute("timingType", static_cast<int>(action.getTiming()));
                 xAction->setAttribute("value", action.getValue());
+                xAction->setAttribute("startValue", action.getStartValue());
+                xAction->setAttribute("useStartValue", action.getUseStartValue() ? 1 : 0);
                 xActions->addChildElement(xAction);
             }
             xClip->addChildElement(xActions);
@@ -402,6 +431,8 @@ struct TimelineModel
                                 action.setAction(static_cast<ActionType>(xAction->getIntAttribute("actionType", 0)));
                                 action.setTiming(static_cast<TimingType>(xAction->getIntAttribute("timingType", 0)));
                                 action.setValue(xAction->getDoubleAttribute("value", 0.0));
+                                action.setStartValue(xAction->getDoubleAttribute("startValue", 0.0));
+                                action.setUseStartValue(xAction->getBoolAttribute("useStartValue", false));
                                 c.actions.add(action);
                             }
                         }

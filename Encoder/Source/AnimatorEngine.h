@@ -49,13 +49,42 @@ private:
         }
     };
 
+    struct ActiveAction
+    {
+        int timelineIndex;
+        ActionClip clip;
+        ms_t actualStartTime;
+        ms_t elapsedTime = 0;
+        
+        // Store initial state for actions that need it
+        juce::Quaternion<double> initialRotation;
+        double initialStretch = 1.0;
+        bool hasInitialState = false;
+        
+        // Default constructor
+        ActiveAction() = default;
+        
+        // Constructor without elapsed time
+        ActiveAction(int idx, const ActionClip& c, ms_t start)
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0) {}
+            
+        // Constructor with elapsed time
+        ActiveAction(int idx, const ActionClip& c, ms_t start, ms_t elapsed)
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed) {}
+    };
+    
     // Private methods
     void copyTimelines(juce::OwnedArray<TimelineModel>* sourceTimelines);
     void preRenderMovements();
     void preRenderMovementClip(int timelineIndex, const MovementClip& clip);
     void updateActiveMovements(ms_t currentTimeMs);
     void startMovementClip(int timelineIndex, const MovementClip& clip, ms_t currentTimeMs, ms_t elapsedTime);
+    void startActionClip(int timelineIndex, const ActionClip& clip, ms_t currentTimeMs, ms_t elapsedTime);
     void processActiveMovements(ms_t currentTimeMs);
+    void processActiveActions(ms_t currentTimeMs);
+    void processSingleAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
+    void processRotationAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
+    void processStretchAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
     
     // Movement calculation
     juce::Vector3D<double> calculateMovementPosition(const ActiveMovement& activeMovement, double progress);
@@ -79,6 +108,7 @@ private:
     
     juce::OwnedArray<TimelineModel> copiedTimelines;
     juce::Array<ActiveMovement> activeMovements;
+    juce::Array<ActiveAction> activeActions;
     
     // For efficient clip lookup
     struct ClipSchedule
@@ -104,4 +134,30 @@ private:
     
     juce::Array<ClipSchedule> clipSchedule;
     int nextScheduledClipIndex = 0;
+    
+    class QuaternionHelper
+    {
+    public:
+        static double vectorDot(const juce::Vector3D<double>& v1, const juce::Vector3D<double>& v2)
+        {
+            return v1.x * v2.x + v1.y * v2.y + v1.z * v2.z;
+        }
+        
+        static juce::Vector3D<double> vectorCross(const juce::Vector3D<double>& v1, const juce::Vector3D<double>& v2)
+        {
+            return juce::Vector3D<double>(
+                                          v1.y * v2.z - v1.z * v2.y,
+                                          v1.z * v2.x - v1.x * v2.z,
+                                          v1.x * v2.y - v1.y * v2.x
+                                          );
+        }
+        
+        static juce::Quaternion<double> multiplyQuaternions(const juce::Quaternion<double>& q1, const juce::Quaternion<double>& q2)
+        {
+            // Quaternion multiplication: q1 * q2
+            double w = q1.scalar * q2.scalar - vectorDot(q1.vector, q2.vector);
+            juce::Vector3D<double> v = q2.vector * q1.scalar + q1.vector * q2.scalar + vectorCross(q1.vector, q2.vector);
+            return juce::Quaternion<double>(v, w);
+        }
+    };
 };

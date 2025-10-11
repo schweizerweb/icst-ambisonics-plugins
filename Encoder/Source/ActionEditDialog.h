@@ -45,6 +45,20 @@ public:
         addAndMakeVisible(valueEditor);
         valueEditor.setText(juce::String(action.getValue()), juce::dontSendNotification);
         
+        // NEW: Use start value checkbox
+        addAndMakeVisible(useStartValueButton);
+        useStartValueButton.setButtonText("Use Start Value");
+        useStartValueButton.setToggleState(action.getUseStartValue(), juce::dontSendNotification);
+        useStartValueButton.addListener(this);
+        
+        // NEW: Start value editor
+        addAndMakeVisible(startValueLabel);
+        startValueLabel.setText("Start Value:", juce::dontSendNotification);
+        startValueLabel.setJustificationType(juce::Justification::left);
+        
+        addAndMakeVisible(startValueEditor);
+        startValueEditor.setText(juce::String(action.getStartValue()), juce::dontSendNotification);
+        
         // Buttons
         addAndMakeVisible(okButton);
         okButton.setButtonText("OK");
@@ -54,7 +68,10 @@ public:
         cancelButton.setButtonText("Cancel");
         cancelButton.addListener(this);
         
-        setSize(400, 190);
+        // Update initial state of start value controls
+        updateStartValueControls();
+        
+        setSize(400, 260); // Increased height to accommodate new controls
     }
     
     void resized() override
@@ -66,7 +83,7 @@ public:
         const int controlWidth = 200;
         const int verticalSpacing = 12;
         
-        // Type row - centered in available width
+        // Type row
         auto typeRow = area.removeFromTop(rowHeight);
         typeLabel.setBounds(typeRow.removeFromLeft(labelWidth));
         typeCombo.setBounds(typeRow.withWidth(controlWidth));
@@ -84,6 +101,19 @@ public:
         auto valueRow = area.removeFromTop(rowHeight);
         valueLabel.setBounds(valueRow.removeFromLeft(labelWidth));
         valueEditor.setBounds(valueRow.withWidth(controlWidth));
+        
+        area.removeFromTop(verticalSpacing);
+        
+        // NEW: Use start value checkbox row
+        auto useStartValueRow = area.removeFromTop(rowHeight);
+        useStartValueButton.setBounds(useStartValueRow.removeFromLeft(labelWidth + controlWidth));
+        
+        area.removeFromTop(verticalSpacing);
+        
+        // NEW: Start value row
+        auto startValueRow = area.removeFromTop(rowHeight);
+        startValueLabel.setBounds(startValueRow.removeFromLeft(labelWidth));
+        startValueEditor.setBounds(startValueRow.withWidth(controlWidth));
         
         area.removeFromTop(25);
         
@@ -109,11 +139,16 @@ public:
         {
             // Validate and apply changes
             auto valueText = valueEditor.getText();
-            if (valueText.containsOnly("-0123456789."))
+            auto startValueText = startValueEditor.getText();
+            
+            if (valueText.containsOnly("-0123456789.") &&
+                startValueText.containsOnly("-0123456789."))
             {
                 targetAction.setAction(static_cast<ActionType>(typeCombo.getSelectedId()));
                 targetAction.setTiming(static_cast<TimingType>(timingCombo.getSelectedId()));
                 targetAction.setValue(valueText.getDoubleValue());
+                targetAction.setStartValue(startValueText.getDoubleValue());
+                targetAction.setUseStartValue(useStartValueButton.getToggleState());
                 
                 if (auto* dw = findParentComponentOfClass<juce::DialogWindow>())
                     dw->exitModalState(1);
@@ -121,7 +156,7 @@ public:
             else
             {
                 juce::AlertWindow::showMessageBox(juce::AlertWindow::WarningIcon,
-                    "Invalid Value", "Please enter a valid number for the value.");
+                    "Invalid Value", "Please enter valid numbers for the values.");
             }
         }
         else if (button == &cancelButton)
@@ -129,10 +164,18 @@ public:
             if (auto* dw = findParentComponentOfClass<juce::DialogWindow>())
                 dw->exitModalState(0);
         }
+        else if (button == &useStartValueButton)
+        {
+            updateStartValueControls();
+        }
     }
     
-    void comboBoxChanged(juce::ComboBox* /*comboBoxThatHasChanged*/) override
+    void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
     {
+        if (comboBoxThatHasChanged == &timingCombo)
+        {
+            updateStartValueControls();
+        }
         updateValueLabel();
     }
     
@@ -140,10 +183,11 @@ private:
     ActionDefinition& targetAction;
     juce::String dialogTitle;
     
-    juce::Label typeLabel, timingLabel, valueLabel;
+    juce::Label typeLabel, timingLabel, valueLabel, startValueLabel;
     juce::ComboBox typeCombo, timingCombo;
-    juce::TextEditor valueEditor;
+    juce::TextEditor valueEditor, startValueEditor;
     juce::TextButton okButton, cancelButton;
+    juce::ToggleButton useStartValueButton;
     
     void updateValueLabel()
     {
@@ -162,7 +206,54 @@ private:
         
         valueLabel.setText(labelText, juce::dontSendNotification);
         
+        // Also update start value label if needed
+        juce::String startLabelText = "Start Value";
+        if (!unitWithTiming.isEmpty())
+        {
+            // For start value, we don't include the "/s" for ConstantPerSecond
+            juce::String baseUnit = tempAction.getUnit();
+            if (!baseUnit.isEmpty())
+            {
+                startLabelText += " (" + baseUnit + ")";
+            }
+        }
+        startLabelText += ":";
+        startValueLabel.setText(startLabelText, juce::dontSendNotification);
+        
         // Trigger a repaint to update the layout if needed
         repaint();
+    }
+    
+    void updateStartValueControls()
+    {
+        TimingType currentTiming = static_cast<TimingType>(timingCombo.getSelectedId());
+        bool shouldEnable = (currentTiming == TimingType::AbsoluteTarget ||
+                           currentTiming == TimingType::RelativeDuringClip);
+        
+        // Enable/disable the checkbox based on timing type
+        useStartValueButton.setEnabled(shouldEnable);
+        
+        // If timing type doesn't support start value, uncheck and disable
+        if (!shouldEnable)
+        {
+            useStartValueButton.setToggleState(false, juce::dontSendNotification);
+        }
+        
+        // Enable/disable start value controls based on checkbox state
+        bool startValueEnabled = shouldEnable && useStartValueButton.getToggleState();
+        startValueLabel.setEnabled(startValueEnabled);
+        startValueEditor.setEnabled(startValueEnabled);
+        
+        // Update start value label appearance based on enabled state
+        if (startValueEnabled)
+        {
+            startValueLabel.setColour(juce::Label::textColourId,
+                                    getLookAndFeel().findColour(juce::Label::textColourId));
+        }
+        else
+        {
+            startValueLabel.setColour(juce::Label::textColourId,
+                                    getLookAndFeel().findColour(juce::Label::textColourId).withAlpha(0.5f));
+        }
     }
 };
