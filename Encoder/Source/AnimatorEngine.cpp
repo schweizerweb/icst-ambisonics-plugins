@@ -1,4 +1,5 @@
 #include "AnimatorEngine.h"
+#include "../../Common/MathHelper.h"
 
 AnimatorEngine::AnimatorEngine()
 {
@@ -156,7 +157,7 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
             }
             else
             {
-                // Handle action clips - NEW
+                // Handle action clips
                 const auto& clip = timeline->actions.clips[schedule.clipIndex];
                 ms_t elapsedTime = currentTimeMs - schedule.start;
                 
@@ -190,7 +191,7 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
         }
     }
     
-    // Remove finished actions - NEW
+    // Remove finished actions
     for (int i = activeActions.size() - 1; i >= 0; --i)
     {
         const auto& action = activeActions[i];
@@ -486,7 +487,7 @@ juce::Vector3D<double> AnimatorEngine::calculateSpiral(const MovementClip& clip,
     );
 }
 
-// Coordinate conversion helpers (same as before)
+// Coordinate conversion helpers
 juce::Vector3D<double> AnimatorEngine::cartesianToSpherical(const juce::Vector3D<double>& cartesian)
 {
     double x = cartesian.x, y = cartesian.y, z = cartesian.z;
@@ -567,12 +568,11 @@ void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, 
     // Start new action
     ActiveAction newAction(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
     
-    // Store initial state from the source set
+    // Keep initial state capture for stretch functionality
     if (pSourceSet && timelineIndex < pSourceSet->groupCount())
     {
         if (auto* group = pSourceSet->getActiveGroup(timelineIndex))
         {
-            newAction.initialRotation = group->getRotation();
             newAction.initialStretch = group->getStretch();
             newAction.hasInitialState = true;
         }
@@ -581,7 +581,6 @@ void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, 
     activeActions.add(newAction);
 }
 
-// In processActiveActions, add more robust checking:
 void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
 {
     if (!pSourceSet) return;
@@ -595,106 +594,96 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
             continue;
         }
         
-        // Calculate progress with safety check
+        // Calculate time delta since last processing for THIS action
+        ms_t timeDelta = currentTimeMs - action.lastProcessTime;
+        if (timeDelta <= 0) continue;
+        
+        // Calculate progress for clip timing
         ms_t timeInAction = currentTimeMs - action.actualStartTime;
         double progress = (action.clip.length > 0) ?
             static_cast<double>(timeInAction) / action.clip.length : 0.0;
         progress = juce::jlimit(0.0, 1.0, progress);
+        
+        // Accumulate rotations for this timeline (in radians)
+        double xAngleRad = 0.0, yAngleRad = 0.0, zAngleRad = 0.0;
         
         // Process all actions in this clip
         for (const auto& actionDef : action.clip.actions)
         {
             if (actionDef.getAction() != ActionType::None)
             {
-                processSingleAction(action.timelineIndex, actionDef, progress, action);
+                if (actionDef.getAction() == ActionType::Stretch)
+                {
+                    // Keep full stretch functionality including initial state
+                    processStretchAction(action.timelineIndex, actionDef, progress, action);
+                }
+                else
+                {
+                    // Calculate angle based on time delta and timing type
+                    double angleDeg = 0.0;
+                    double timeDeltaSeconds = timeDelta / 1000.0;
+                    
+                    switch (actionDef.getTiming())
+                    {
+                        case TimingType::RelativeDuringClip:
+                        {
+                            // Calculate angle based on progress through clip
+                            double totalAngle = actionDef.getValue();
+                            double anglePerMs = totalAngle / action.clip.length;
+                            angleDeg = anglePerMs * timeDelta;
+                            break;
+                        }
+                            
+                        case TimingType::ConstantPerSecond:
+                        {
+                            // Angle per second * time delta in seconds
+                            angleDeg = actionDef.getValue() * timeDeltaSeconds;
+                            break;
+                        }
+                            
+                        case TimingType::AbsoluteTarget:
+                            // Skip absolute targets for rotations
+                            continue;
+                            
+                        case TimingType::None:
+                            continue;
+                    }
+                    
+                    // Convert to radians and accumulate
+                    double angleRad = juce::degreesToRadians(angleDeg);
+                    
+                    switch (actionDef.getAction())
+                    {
+                        case ActionType::RotationX: xAngleRad += angleRad; break;
+                        case ActionType::RotationY: yAngleRad += angleRad; break;
+                        case ActionType::RotationZ: zAngleRad += angleRad; break;
+                        default: break;
+                    }
+                    
+                    // Debug output
+                    DBG("Rotation Action - Timeline: " << action.timelineIndex
+                        << " | Type: " << (int)actionDef.getAction()
+                        << " | Timing: " << (int)actionDef.getTiming()
+                        << " | TimeDelta: " << timeDelta << "ms"
+                        << " | Angle: " << angleDeg << "° (" << angleRad << " rad)");
+                }
             }
         }
-    }
-}
-
-void AnimatorEngine::processSingleAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
-{
-    switch (actionDef.getAction())
-    {
-        case ActionType::RotationX:
-        case ActionType::RotationY:
-        case ActionType::RotationZ:
-            processRotationAction(timelineIndex, actionDef, progress, activeAction);
-            break;
-            
-        case ActionType::Stretch:
-            processStretchAction(timelineIndex, actionDef, progress, activeAction);
-            break;
-            
-        case ActionType::None:
-        default:
-            break;
-    }
-}
-
-void AnimatorEngine::processRotationAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
-{
-    if (!pSourceSet || timelineIndex >= pSourceSet->groupCount()) return;
-    
-    double angle = 0.0;
-    
-    switch (actionDef.getTiming())
-    {
-        case TimingType::AbsoluteTarget:
+        
+        // Apply all accumulated rotations in a single call
+        if (xAngleRad != 0.0 || yAngleRad != 0.0 || zAngleRad != 0.0)
         {
-            if (actionDef.getUseStartValue() && activeAction.hasInitialState)
-            {
-                // Interpolate between start value and target value
-                angle = actionDef.getStartValue() + (actionDef.getValue() - actionDef.getStartValue()) * progress;
-            }
-            else
-            {
-                // Just progress toward target value
-                angle = actionDef.getValue() * progress;
-            }
-            break;
-        }
+            pSourceSet->rotateGroup(action.timelineIndex, xAngleRad, yAngleRad, zAngleRad);
             
-        case TimingType::RelativeDuringClip:
-        {
-            angle = actionDef.getValue() * progress;
-            if (actionDef.getUseStartValue())
-            {
-                angle += actionDef.getStartValue();
-            }
-            break;
+            DBG("Applied Rotation - Timeline: " << action.timelineIndex
+                << " | X: " << juce::radiansToDegrees(xAngleRad) << "°"
+                << " | Y: " << juce::radiansToDegrees(yAngleRad) << "°"
+                << " | Z: " << juce::radiansToDegrees(zAngleRad) << "°");
         }
-            
-        case TimingType::ConstantPerSecond:
-        {
-            double clipDurationSeconds = activeAction.clip.length / 1000.0;
-            angle = actionDef.getValue() * clipDurationSeconds * progress;
-            break;
-        }
-            
-        case TimingType::None:
-            return;
+        
+        // Update last process time for THIS action
+        action.lastProcessTime = currentTimeMs;
     }
-    
-    // Apply the rotation using the simple rotateGroup function
-    double xAngle = 0.0, yAngle = 0.0, zAngle = 0.0;
-    
-    switch (actionDef.getAction())
-    {
-        case ActionType::RotationX: xAngle = angle; break;
-        case ActionType::RotationY: yAngle = angle; break;
-        case ActionType::RotationZ: zAngle = angle; break;
-        default: return;
-    }
-    
-    pSourceSet->rotateGroup(timelineIndex, xAngle, yAngle, zAngle);
-    
-    // Debug output
-    DBG("Rotation - Timeline: " << timelineIndex
-        << " | Action: " << (int)actionDef.getAction()
-        << " | Progress: " << progress
-        << " | Angle: " << angle << "°"
-        << " | Applied: X=" << xAngle << "°, Y=" << yAngle << "°, Z=" << zAngle << "°");
 }
 
 void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
@@ -759,4 +748,11 @@ void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinit
     if (currentStretch < 0.01) currentStretch = 0.01;
     
     pSourceSet->setGroupStretch(timelineIndex, currentStretch, true);
+    
+    // Debug output
+    DBG("Stretch - Timeline: " << timelineIndex
+        << " | Timing: " << (int)actionDef.getTiming()
+        << " | UseStart: " << (actionDef.getUseStartValue() ? "Yes" : "No")
+        << " | Progress: " << progress
+        << " | Stretch: " << currentStretch);
 }

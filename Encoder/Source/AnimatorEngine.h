@@ -55,9 +55,8 @@ private:
         ActionClip clip;
         ms_t actualStartTime;
         ms_t elapsedTime = 0;
+        ms_t lastProcessTime = 0;
         
-        // Store initial state for actions that need it
-        juce::Quaternion<double> initialRotation;
         double initialStretch = 1.0;
         bool hasInitialState = false;
         
@@ -66,11 +65,13 @@ private:
         
         // Constructor without elapsed time
         ActiveAction(int idx, const ActionClip& c, ms_t start)
-            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0) {}
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0),
+            lastProcessTime(start) {}
             
         // Constructor with elapsed time
         ActiveAction(int idx, const ActionClip& c, ms_t start, ms_t elapsed)
-            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed) {}
+            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed),
+            lastProcessTime(start) {}
     };
     
     // Private methods
