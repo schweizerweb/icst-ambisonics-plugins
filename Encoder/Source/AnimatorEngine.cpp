@@ -659,13 +659,6 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
                         case ActionType::RotationZ: zAngleRad += angleRad; break;
                         default: break;
                     }
-                    
-                    // Debug output
-                    DBG("Rotation Action - Timeline: " << action.timelineIndex
-                        << " | Type: " << (int)actionDef.getAction()
-                        << " | Timing: " << (int)actionDef.getTiming()
-                        << " | TimeDelta: " << timeDelta << "ms"
-                        << " | Angle: " << angleDeg << "° (" << angleRad << " rad)");
                 }
             }
         }
@@ -674,11 +667,6 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         if (xAngleRad != 0.0 || yAngleRad != 0.0 || zAngleRad != 0.0)
         {
             pSourceSet->rotateGroup(action.timelineIndex, xAngleRad, yAngleRad, zAngleRad);
-            
-            DBG("Applied Rotation - Timeline: " << action.timelineIndex
-                << " | X: " << juce::radiansToDegrees(xAngleRad) << "°"
-                << " | Y: " << juce::radiansToDegrees(yAngleRad) << "°"
-                << " | Z: " << juce::radiansToDegrees(zAngleRad) << "°");
         }
         
         // Update last process time for THIS action
@@ -748,11 +736,4 @@ void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinit
     if (currentStretch < 0.01) currentStretch = 0.01;
     
     pSourceSet->setGroupStretch(timelineIndex, currentStretch, true);
-    
-    // Debug output
-    DBG("Stretch - Timeline: " << timelineIndex
-        << " | Timing: " << (int)actionDef.getTiming()
-        << " | UseStart: " << (actionDef.getUseStartValue() ? "Yes" : "No")
-        << " | Progress: " << progress
-        << " | Stretch: " << currentStretch);
 }
