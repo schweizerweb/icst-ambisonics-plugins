@@ -45,13 +45,13 @@ public:
         addAndMakeVisible(valueEditor);
         valueEditor.setText(juce::String(action.getValue()), juce::dontSendNotification);
         
-        // NEW: Use start value checkbox
+        // Use start value checkbox
         addAndMakeVisible(useStartValueButton);
         useStartValueButton.setButtonText("Use Start Value");
         useStartValueButton.setToggleState(action.getUseStartValue(), juce::dontSendNotification);
         useStartValueButton.addListener(this);
         
-        // NEW: Start value editor
+        // Start value editor
         addAndMakeVisible(startValueLabel);
         startValueLabel.setText("Start Value:", juce::dontSendNotification);
         startValueLabel.setJustificationType(juce::Justification::left);
@@ -68,10 +68,10 @@ public:
         cancelButton.setButtonText("Cancel");
         cancelButton.addListener(this);
         
-        // Update initial state of start value controls
-        updateStartValueControls();
+        // Update initial state of all controls
+        updateControlStates();
         
-        setSize(400, 260); // Increased height to accommodate new controls
+        setSize(400, 260);
     }
     
     void resized() override
@@ -104,13 +104,13 @@ public:
         
         area.removeFromTop(verticalSpacing);
         
-        // NEW: Use start value checkbox row
+        // Use start value checkbox row
         auto useStartValueRow = area.removeFromTop(rowHeight);
         useStartValueButton.setBounds(useStartValueRow.removeFromLeft(labelWidth + controlWidth));
         
         area.removeFromTop(verticalSpacing);
         
-        // NEW: Start value row
+        // Start value row
         auto startValueRow = area.removeFromTop(rowHeight);
         startValueLabel.setBounds(startValueRow.removeFromLeft(labelWidth));
         startValueEditor.setBounds(startValueRow.withWidth(controlWidth));
@@ -144,8 +144,12 @@ public:
             if (valueText.containsOnly("-0123456789.") &&
                 startValueText.containsOnly("-0123456789."))
             {
-                targetAction.setAction(static_cast<ActionType>(typeCombo.getSelectedId()));
-                targetAction.setTiming(static_cast<TimingType>(timingCombo.getSelectedId()));
+                ActionType actionType = static_cast<ActionType>(typeCombo.getSelectedId());
+                TimingType timingType = static_cast<TimingType>(timingCombo.getSelectedId());
+                
+                // Apply the settings
+                targetAction.setAction(actionType);
+                targetAction.setTiming(timingType);
                 targetAction.setValue(valueText.getDoubleValue());
                 targetAction.setStartValue(startValueText.getDoubleValue());
                 targetAction.setUseStartValue(useStartValueButton.getToggleState());
@@ -166,17 +170,13 @@ public:
         }
         else if (button == &useStartValueButton)
         {
-            updateStartValueControls();
+            updateControlStates();
         }
     }
     
     void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
     {
-        if (comboBoxThatHasChanged == &timingCombo)
-        {
-            updateStartValueControls();
-        }
-        updateValueLabel();
+        updateControlStates();
     }
     
 private:
@@ -188,6 +188,59 @@ private:
     juce::TextEditor valueEditor, startValueEditor;
     juce::TextButton okButton, cancelButton;
     juce::ToggleButton useStartValueButton;
+    
+    void updateControlStates()
+    {
+        ActionType currentAction = static_cast<ActionType>(typeCombo.getSelectedId());
+        TimingType currentTiming = static_cast<TimingType>(timingCombo.getSelectedId());
+        
+        // Update value label first
+        updateValueLabel();
+        
+        // Handle rotation-specific restrictions
+        bool isRotation = (currentAction == ActionType::RotationX ||
+                          currentAction == ActionType::RotationY ||
+                          currentAction == ActionType::RotationZ);
+        
+        if (isRotation)
+        {
+            // For rotations: disable AbsoluteTarget timing and start values
+            if (currentTiming == TimingType::AbsoluteTarget)
+            {
+                // Auto-switch to Relative During Clip if Absolute Target is selected for rotation
+                timingCombo.setSelectedId((int)TimingType::RelativeDuringClip, juce::sendNotificationSync);
+                currentTiming = TimingType::RelativeDuringClip;
+            }
+            
+            // Disable start value controls for rotations
+            useStartValueButton.setEnabled(false);
+            useStartValueButton.setToggleState(false, juce::dontSendNotification);
+            startValueLabel.setEnabled(false);
+            startValueEditor.setEnabled(false);
+            
+            // Gray out AbsoluteTarget option in the combo box
+            timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, false);
+        }
+        else
+        {
+            // For stretch: enable all timing types and start values
+            useStartValueButton.setEnabled(true);
+            
+            // Re-enable AbsoluteTarget option for stretch
+            timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, true);
+            
+            // Enable start value controls only for valid timing types
+            bool startValueSupported = (currentTiming == TimingType::AbsoluteTarget ||
+                                      currentTiming == TimingType::RelativeDuringClip);
+            bool startValueEnabled = startValueSupported && useStartValueButton.getToggleState();
+            
+            startValueLabel.setEnabled(startValueEnabled);
+            startValueEditor.setEnabled(startValueEnabled);
+        }
+        
+        // Update visual appearance for disabled controls
+        updateControlAppearance();
+    }
     
     void updateValueLabel()
     {
@@ -208,52 +261,31 @@ private:
         
         // Also update start value label if needed
         juce::String startLabelText = "Start Value";
-        if (!unitWithTiming.isEmpty())
+        juce::String baseUnit = tempAction.getUnit();
+        if (!baseUnit.isEmpty())
         {
-            // For start value, we don't include the "/s" for ConstantPerSecond
-            juce::String baseUnit = tempAction.getUnit();
-            if (!baseUnit.isEmpty())
-            {
-                startLabelText += " (" + baseUnit + ")";
-            }
+            startLabelText += " (" + baseUnit + ")";
         }
         startLabelText += ":";
         startValueLabel.setText(startLabelText, juce::dontSendNotification);
-        
-        // Trigger a repaint to update the layout if needed
-        repaint();
     }
     
-    void updateStartValueControls()
+    void updateControlAppearance()
     {
-        TimingType currentTiming = static_cast<TimingType>(timingCombo.getSelectedId());
-        bool shouldEnable = (currentTiming == TimingType::AbsoluteTarget ||
-                           currentTiming == TimingType::RelativeDuringClip);
+        auto& lf = getLookAndFeel();
+        auto normalTextColour = lf.findColour(juce::Label::textColourId);
+        auto disabledTextColour = normalTextColour.withAlpha(0.4f);
         
-        // Enable/disable the checkbox based on timing type
-        useStartValueButton.setEnabled(shouldEnable);
+        // Update start value controls appearance
+        bool startValueEnabled = startValueLabel.isEnabled();
+        startValueLabel.setColour(juce::Label::textColourId,
+                                startValueEnabled ? normalTextColour : disabledTextColour);
         
-        // If timing type doesn't support start value, uncheck and disable
-        if (!shouldEnable)
-        {
-            useStartValueButton.setToggleState(false, juce::dontSendNotification);
-        }
+        // Update use start value button appearance
+        bool useStartEnabled = useStartValueButton.isEnabled();
+        useStartValueButton.setColour(juce::ToggleButton::textColourId,
+                                    useStartEnabled ? normalTextColour : disabledTextColour);
         
-        // Enable/disable start value controls based on checkbox state
-        bool startValueEnabled = shouldEnable && useStartValueButton.getToggleState();
-        startValueLabel.setEnabled(startValueEnabled);
-        startValueEditor.setEnabled(startValueEnabled);
-        
-        // Update start value label appearance based on enabled state
-        if (startValueEnabled)
-        {
-            startValueLabel.setColour(juce::Label::textColourId,
-                                    getLookAndFeel().findColour(juce::Label::textColourId));
-        }
-        else
-        {
-            startValueLabel.setColour(juce::Label::textColourId,
-                                    getLookAndFeel().findColour(juce::Label::textColourId).withAlpha(0.5f));
-        }
+        repaint();
     }
 };
