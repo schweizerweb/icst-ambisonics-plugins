@@ -51,7 +51,9 @@ public:
         CMD_toggleAutoFollow,
         CMD_undo,
         CMD_redo,
-        CMD_toggleOnOff
+        CMD_toggleOnOff,
+        CMD_addTimeline,
+        CMD_removeAllInvalid
     };
     
 private:
@@ -95,11 +97,14 @@ private:
     // Application state
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     AnimatorEngine* pAnimatorEngine = nullptr;
+    AmbiSourceSet* pSourceSet = nullptr;
     
     // Zoom state
     static constexpr float ZOOM_STEP = 1.2f;
 
     void handleMenuAction(int menuItemID);
+    bool hasInvalidTimelines() const;
+    juce::Array<int> getInvalidTimelineIndices() const;
     
     // Edit operations
     void cutSelectedClips();
@@ -110,7 +115,10 @@ private:
     void toggleAutoFollow();
     void toggleOnOff();
     
-    // Import/Export
+    // File
+    void addNewTimeline();
+    void removeAllInvalidTimelines();
+    void removeTimeline(int timelineIndex);
     void importScene(int timelineIndex);
     void exportScene(int timelineIndex);
     

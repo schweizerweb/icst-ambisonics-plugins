@@ -85,6 +85,7 @@ void AnimatorMainView::setSelectionControl(PointSelection* pPointSelection)
 
 void AnimatorMainView::setSourceSet(AmbiSourceSet *pSources)
 {
+    pSourceSet = pSources;
     timelineViewport->getTimelineComponent()->setSourceSet(pSources);
 }
 
@@ -129,6 +130,32 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
     {
         case 0: // File - Keep custom handling for import/export
             {
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addTimeline);
+                // Remove Timeline submenu
+                juce::PopupMenu removeSubMenu;
+                
+                // Add entries for each existing timeline
+                if (owner->timelines != nullptr && !owner->timelines->isEmpty())
+                {
+                    for (int i = 0; i < owner->timelines->size(); ++i)
+                    {
+                        juce::String timelineName = "Group " + juce::String(i + 1);
+                        removeSubMenu.addItem(300 + i, "Remove " + timelineName);
+                    }
+                    removeSubMenu.addSeparator();
+                }
+                
+                // Add "Remove all invalid timelines" entry
+                bool hasInvalidTimelines = owner->hasInvalidTimelines();
+                removeSubMenu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_removeAllInvalid);
+                
+                menu.addSubMenu("Remove Timeline...", removeSubMenu);
+                
+                menu.addSeparator();
+                menu.addItem(6, "Preferences", false); // not implemented yet
+        
+                menu.addSeparator();
+                
                 // Import submenu
                 juce::PopupMenu importSubMenu;
                 importSubMenu.addItem(100, "Append as new timeline");
@@ -214,7 +241,7 @@ void AnimatorMainView::MainMenuBarModel::menuItemSelected(int menuItemID, int /*
         // Command items are handled automatically by ApplicationCommandManager
         if (menuItemID == 10 || menuItemID == 11 || menuItemID == 6 ||
             menuItemID == 100 ||
-            (menuItemID >= 101 && menuItemID < 300))
+            (menuItemID >= 101 && menuItemID < 400))
         {
             owner->handleMenuAction(menuItemID);
         }
@@ -258,6 +285,12 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
                 // Export - menuItemID 200+ corresponds to timeline index 0+
                 int timelineIndex = menuItemID - 200;
                 exportScene(timelineIndex);
+            }
+            // Handle remove individual timeline
+            else if (menuItemID >= 300 && menuItemID < 400)
+            {
+                int timelineIndex = menuItemID - 300;
+                removeTimeline(timelineIndex);
             }
             break;
     }
@@ -695,7 +728,8 @@ void AnimatorMainView::getAllCommands(juce::Array<juce::CommandID>& commands)
     const juce::CommandID commandList[] = {
         CMD_cut, CMD_copy, CMD_paste, CMD_deleteSelected, CMD_duplicate,
         CMD_selectAll, CMD_deselectAll, CMD_zoomIn, CMD_zoomOut, CMD_resetZoom,
-        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow, CMD_undo, CMD_redo, CMD_toggleOnOff
+        CMD_addMovementClip, CMD_addActionClip, CMD_toggleAutoFollow, CMD_undo, CMD_redo, CMD_toggleOnOff,
+        CMD_addTimeline, CMD_removeAllInvalid
     };
     
     commands.addArray(commandList, numElementsInArray(commandList));
@@ -801,7 +835,16 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
             result.setActive(true);
             break;
         
-        
+        case CMD_addTimeline:
+            result.setInfo("Add Timeline", "Add a new empty timeline", "File", 0);
+            result.addDefaultKeypress('N', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(true);
+            break;
+            
+        case CMD_removeAllInvalid:
+            result.setInfo("Remove all invalid timelines", "Remove timelines exceeding group count", "File", 0);
+            result.setActive(hasInvalidTimelines()); // This will be grayed out if no invalid timelines
+            break;
     }
 }
 
@@ -870,7 +913,164 @@ bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationI
         case CMD_toggleOnOff:
             toggleOnOff();
             return true;
-        
+            
+        case CMD_addTimeline:
+            addNewTimeline();
+            return true;
+            
+        case CMD_removeAllInvalid:
+            removeAllInvalidTimelines();
+            return true;
     }
     return false;
+}
+
+bool AnimatorMainView::hasInvalidTimelines() const
+{
+    if (timelines == nullptr || pAnimatorEngine == nullptr || pSourceSet == nullptr)
+        return false;
+        
+    int groupCount = pSourceSet->activeGroupCount();
+    return timelines->size() > groupCount;
+}
+
+juce::Array<int> AnimatorMainView::getInvalidTimelineIndices() const
+{
+    juce::Array<int> invalidIndices;
+    
+    if (timelines == nullptr || pAnimatorEngine == nullptr || pSourceSet == nullptr)
+        return invalidIndices;
+        
+    int groupCount = pSourceSet->activeGroupCount();
+    
+    for (int i = groupCount; i < timelines->size(); ++i)
+    {
+        invalidIndices.add(i);
+    }
+    
+    return invalidIndices;
+}
+
+void AnimatorMainView::addNewTimeline()
+{
+    if (timelines == nullptr)
+        timelines = new juce::OwnedArray<TimelineModel>();
+    
+    auto* newTimeline = new TimelineModel();
+    timelines->add(newTimeline);
+    
+    // Update the timeline component
+    timelineViewport->setTimelines(timelines);
+    timelineViewport->repaint();
+    
+    // Refresh menus
+    if (menuBarModel != nullptr)
+        menuBarModel->menuItemsChanged();
+    if (commandManager != nullptr)
+        commandManager->commandStatusChanged();
+    
+    // Show status message
+    juce::AttributedString msg;
+    msg.append("Added new empty timeline",
+               juce::FontOptions(12.0f, juce::Font::bold),
+               juce::Colours::lightgreen);
+    setStatusMessage(msg);
+}
+    
+void AnimatorMainView::removeAllInvalidTimelines()
+{
+    auto invalidIndices = getInvalidTimelineIndices();
+    if (invalidIndices.isEmpty())
+        return;
+    
+    // Create confirmation message
+    juce::String message = "This will permanently delete the following timelines and all their clips:\n\n";
+    
+    for (auto index : invalidIndices)
+    {
+        message += "- Group " + juce::String(index + 1) + "\n";
+    }
+    
+    message += "\nThis action cannot be undone. Continue?";
+    
+    // Show confirmation dialog
+    juce::AlertWindow::showOkCancelBox(
+                                       juce::AlertWindow::WarningIcon,
+                                       "Confirm Deletion",
+                                       message,
+                                       "Delete",
+                                       "Cancel",
+                                       this,
+                                       juce::ModalCallbackFunction::create([this, invalidIndices](int result) {
+                                           if (result != 0) // User clicked "Delete"
+                                           {
+                                               // Remove timelines from highest index to lowest to avoid index issues
+                                               for (int i = invalidIndices.size() - 1; i >= 0; --i)
+                                               {
+                                                   int indexToRemove = invalidIndices[i];
+                                                   if (indexToRemove < timelines->size())
+                                                   {
+                                                       timelines->remove(indexToRemove);
+                                                   }
+                                               }
+                                               
+                                               // Update the timeline component
+                                               timelineViewport->setTimelines(timelines);
+                                               timelineViewport->repaint();
+                                               
+                                               // Refresh menus
+                                               if (menuBarModel != nullptr)
+                                                   menuBarModel->menuItemsChanged();
+                                               if (commandManager != nullptr)
+                                                   commandManager->commandStatusChanged();
+                                               
+                                               // Show status message
+                                               juce::AttributedString msg;
+                                               msg.append("Removed " + juce::String(invalidIndices.size()) + " invalid timelines",
+                                                          juce::FontOptions(12.0f, juce::Font::bold),
+                                                          juce::Colours::lightgreen);
+                                               setStatusMessage(msg);
+                                           }
+                                       })
+                                       );
+}
+
+void AnimatorMainView::removeTimeline(int timelineIndex)
+{
+    if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())
+        return;
+    
+    juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
+    
+    juce::AlertWindow::showOkCancelBox(
+                                       juce::AlertWindow::WarningIcon,
+                                       "Confirm Deletion",
+                                       "This will permanently delete " + timelineName + " and all its clips.\nThis action cannot be undone. Continue?",
+                                       "Delete",
+                                       "Cancel",
+                                       this,
+                                       juce::ModalCallbackFunction::create([this, timelineIndex, timelineName](int result) {
+                                           if (result != 0) // User clicked "Delete"
+                                           {
+                                               timelines->remove(timelineIndex);
+                                               
+                                               // Update the timeline component
+                                               timelineViewport->setTimelines(timelines);
+                                               timelineViewport->repaint();
+                                               
+                                               // Refresh menus
+                                               if (menuBarModel != nullptr)
+                                                   menuBarModel->menuItemsChanged();
+                                               if (commandManager != nullptr)
+                                                   commandManager->commandStatusChanged();
+                                               
+                                               // Show status message
+                                               juce::AttributedString msg;
+                                               msg.append("Removed " + timelineName,
+                                                          juce::FontOptions(12.0f, juce::Font::bold),
+                                                          juce::Colours::lightgreen);
+                                               setStatusMessage(msg);
+                                           }
+                                       })
+                                       );
 }
