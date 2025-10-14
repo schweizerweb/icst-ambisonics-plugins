@@ -146,7 +146,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 }
                 
                 // Add "Remove all invalid timelines" entry
-                bool hasInvalidTimelines = owner->hasInvalidTimelines();
                 removeSubMenu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_removeAllInvalid);
                 
                 menu.addSubMenu("Remove Timeline...", removeSubMenu);

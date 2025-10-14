@@ -174,7 +174,7 @@ public:
         }
     }
     
-    void comboBoxChanged(juce::ComboBox* comboBoxThatHasChanged) override
+    void comboBoxChanged(juce::ComboBox* /*comboBoxThatHasChanged*/) override
     {
         updateControlStates();
     }
