@@ -61,7 +61,7 @@ private:
     public:
         MainMenuBarModel(AnimatorMainView* ownerView) : owner(ownerView) {}
         
-        juce::StringArray getMenuBarNames() override { return { "File", "Edit", "View", "Insert" }; }
+        juce::StringArray getMenuBarNames() override { return { "File", "Edit", "View", "Playback" }; }
         juce::PopupMenu getMenuForIndex(int topLevelMenuIndex, const juce::String& menuName) override;
         void menuItemSelected(int menuItemID, int topLevelMenuIndex) override;
         
@@ -77,6 +77,7 @@ private:
         void paint(juce::Graphics& g) override;
         void drawButtonIcon(juce::Graphics& g, juce::Button* button, const juce::Path& icon, bool isToggled = false);
         void resized() override;
+        void refreshButtonStates();
         
     private:
         AnimatorMainView& owner;

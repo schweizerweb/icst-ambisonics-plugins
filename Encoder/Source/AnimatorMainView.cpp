@@ -38,10 +38,10 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
     welcomeMessage.append("Timeline Animator Ready",
                          juce::FontOptions(12.0f, juce::Font::bold),
                          juce::Colours::lightgreen);
-    welcomeMessage.append(" - Create or import timelines to begin",
-                         juce::FontOptions(12.0f),
-                         juce::Colours::lightgrey);
+    
     setStatusMessage(welcomeMessage);
+    
+    commandManager->commandStatusChanged();
     
     // Start validation timer (1Hz default)
     startTimerHz(1);
@@ -70,6 +70,11 @@ void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimeline
     if (menuBarModel != nullptr)
     {
         menuBarModel->menuItemsChanged();
+    }
+        
+    if (commandManager != nullptr)
+    {
+        commandManager->commandStatusChanged();
     }
 }
 
@@ -166,8 +171,6 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_undo);
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_redo);
                 menu.addSeparator();
-                
-                // Use command items for standard operations - these will show proper shortcuts!
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_cut);
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_copy);
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_paste);
@@ -177,6 +180,9 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addSeparator();
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_selectAll);
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_deselectAll);
+                menu.addSeparator();
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addMovementClip);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addActionClip);
             }
             break;
             
@@ -190,10 +196,9 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
             }
             break;
             
-        case 3: // Insert - Use command items
+        case 3: // Playback - Use command items
             {
-                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addMovementClip);
-                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addActionClip);
+                menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_toggleOnOff);
             }
             break;
     }
@@ -375,14 +380,42 @@ void AnimatorMainView::exportScene(int timelineIndex)
 
 void AnimatorMainView::toggleAutoFollow()
 {
-    pAnimatorEngine->setAutoFollow(!pAnimatorEngine->getAutoFollow());
-    timelineViewport->getTimelineComponent()->setAutoFollow(pAnimatorEngine->getAutoFollow());
+    bool newState = !pAnimatorEngine->getAutoFollow();
+    pAnimatorEngine->setAutoFollow(newState);
+    timelineViewport->getTimelineComponent()->setAutoFollow(newState);
+    
+    // Force toolbar to re-read the state from the engine
+    if (toolbar != nullptr)
+    {
+        toolbar->refreshButtonStates();
+    }
+    
+    // Update command manager to refresh menu checkmarks
+    if (commandManager != nullptr)
+    {
+        commandManager->commandStatusChanged();
+    }
+    
     toolbar->repaint();
 }
 
 void AnimatorMainView::toggleOnOff()
 {
-    pAnimatorEngine->setAnimatorState(!pAnimatorEngine->getAnimatorState());
+    bool newState = !pAnimatorEngine->getAnimatorState();
+    pAnimatorEngine->setAnimatorState(newState);
+    
+    // Update toolbar button states
+    if (toolbar != nullptr)
+    {
+        toolbar->refreshButtonStates();
+    }
+    
+    // Update command manager to refresh menu states
+    if (commandManager != nullptr)
+    {
+        commandManager->commandStatusChanged();
+    }
+    
     toolbar->repaint();
 }
 
@@ -487,6 +520,18 @@ void AnimatorMainView::ToolbarComponent::resized()
     autoFollowButton->setBounds(area.removeFromLeft(buttonSize));
     
     animatorOnOff->setBounds(area.removeFromRight(buttonSize));
+}
+
+void AnimatorMainView::ToolbarComponent::refreshButtonStates()
+{
+    if (autoFollowButton != nullptr)
+    {
+        autoFollowButton->setToggleState(owner.pAnimatorEngine->getAutoFollow(), juce::dontSendNotification);
+    }
+    if (animatorOnOff != nullptr)
+    {
+        animatorOnOff->setToggleState(owner.pAnimatorEngine->getAnimatorState(), juce::dontSendNotification);
+    }
 }
 
 // Status bar interface implementation
@@ -710,27 +755,32 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
         case CMD_zoomIn:
             result.setInfo("Zoom In", "Zoom in timeline", "View", 0);
             result.addDefaultKeypress('=', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(true);
             break;
             
         case CMD_zoomOut:
             result.setInfo("Zoom Out", "Zoom out timeline", "View", 0);
             result.addDefaultKeypress('-', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
+            result.setActive(true);
             break;
             
         case CMD_resetZoom:
             result.setInfo("Reset Zoom", "Reset zoom level", "View", 0);
+            result.setActive(true);
             break;
             
         case CMD_addMovementClip:
-            result.setInfo("Add Movement Clip", "Add a new movement clip", "Insert", 0);
+            result.setInfo("Add Movement Clip", "Add a new movement clip", "Edit", 0);
             break;
             
         case CMD_addActionClip:
-            result.setInfo("Add Action Clip", "Add a new action clip", "Insert", 0);
+            result.setInfo("Add Action Clip", "Add a new action clip", "Edit", 0);
             break;
             
         case CMD_toggleAutoFollow:
-            result.setInfo("Toggle Auto-follow", "Toggle auto-follow mode", "View", 0);
+            result.setInfo("Auto-follow", "Toggle auto-follow mode", "View", 0);
+            result.setTicked(pAnimatorEngine->getAutoFollow());
+            result.setActive(true);
             break;
         
         case CMD_undo:
@@ -744,8 +794,11 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
             result.addDefaultKeypress('Y', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
             result.setActive(false);
             break;
+            
         case CMD_toggleOnOff:
-            result.setInfo("Toggle ON/OFF", "Toggles the Animator Engine", "View", 0);
+            result.setInfo("Toggle ON/OFF", "Toggles the Animator Engine", "Playback", 0);
+            result.setTicked(pAnimatorEngine->getAnimatorState());
+            result.setActive(true);
             break;
         
         
