@@ -23,6 +23,7 @@
 #include "JuceHeader.h"
 #include "CsvImportExport.h"
 #include "ExternalImportExport.h"
+#include "ZyliaImport.h"
 
 #define MENU_IMPORTEXPORT_CSV_IMPORT    1
 #define MENU_IMPORTEXPORT_CSV_EXPORT    2
@@ -30,6 +31,8 @@
 #define MENU_IMPORTEXPORT_EXT_IMPORT    4
 #define MENU_IMPORTEXPORT_EXT_EXPORT    5
 #define MENU_IMPORTEXPORT_EXT_HELP      6
+#define MENU_IMPORTEXPORT_ZYLIA_IMPORT  7
+#define MENU_IMPORTEXPORT_ZYLIA_HELP    8
 
 class ImportExport
 {
@@ -39,7 +42,7 @@ public:
         return 6;
     }
 
-    static void appendSubMenu(PopupMenu* pMenu, int menuIdOffset = 0)
+    static void appendSubMenu(PopupMenu* pMenu, bool isEncoder = true, int menuIdOffset = 0)
     {
         PopupMenu mCsv;
         mCsv.addItem(menuIdOffset + MENU_IMPORTEXPORT_CSV_IMPORT, "Import");
@@ -52,6 +55,14 @@ public:
         mExt.addItem(menuIdOffset + MENU_IMPORTEXPORT_EXT_EXPORT, "Export");
         mExt.addItem(menuIdOffset + MENU_IMPORTEXPORT_EXT_HELP, "Help");
         pMenu->addSubMenu("ICST Ambisonics Externals (Max)", mExt);
+        
+        if(!isEncoder)
+        {
+            PopupMenu mExt;
+            mExt.addItem(menuIdOffset + MENU_IMPORTEXPORT_ZYLIA_IMPORT, "Import");
+            mExt.addItem(menuIdOffset + MENU_IMPORTEXPORT_ZYLIA_HELP, "Help");
+            pMenu->addSubMenu("ZYLIA Microphone measurement", mExt);
+        }
     }
 
     static bool handleImportExport(int menuId, int menuIdOffset, AmbiDataSet* pDataSet, Component* pBtn, bool keepExistingData)
@@ -127,6 +138,28 @@ public:
                 std::unique_ptr<Label> label = std::make_unique<Label>();
                 label->setSize(600, 140);
                 label->setText("ICST AmbiExternals (Max MSP) format:\n{index}, aed {index} {azimuth[degrees]} {elevation[degrees]} {distance[m]} {status};\n\nThe {status} parameter is currently not used. It is ignored at import and set to 1 at export.\n\nExample:\n1, aed 1 315 0 1 1;", dontSendNotification);
+                label->setJustificationType(Justification::left);
+                CallOutBox::launchAsynchronously(std::move(label), pBtn->getBounds(), pBtn);
+            }
+            break;
+        case MENU_IMPORTEXPORT_ZYLIA_IMPORT:
+            {
+                auto ret = ZyliaImport::importFromFile(pDataSet, keepExistingData);
+                if (ret == ZYLIA_IMPORT_SUCCESS)
+                {
+                    return true;
+                }
+                else if (ret == ZYLIA_IMPORT_FAIL)
+                {
+                    AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "ZYLIA format import", "Data import failed, please refer to file specification...");
+                }
+            }
+            break;
+        case MENU_IMPORTEXPORT_ZYLIA_HELP:
+            {
+                std::unique_ptr<Label> label = std::make_unique<Label>();
+                label->setSize(600, 140);
+                label->setText("ZYLIA proprietary speaker measurement.", dontSendNotification);
                 label->setJustificationType(Justification::left);
                 CallOutBox::launchAsynchronously(std::move(label), pBtn->getBounds(), pBtn);
             }

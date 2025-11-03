@@ -926,7 +926,7 @@ PopupMenu SpeakerSettingsComponent::getMenuForIndex(int menuIndex, const String&
         
         // import export
         PopupMenu m;
-        ImportExport::appendSubMenu(&m, MENU_CMD_IMPORTEXPORT_OFFSET);
+        ImportExport::appendSubMenu(&m, false, MENU_CMD_IMPORTEXPORT_OFFSET);
         menu.addSubMenu("Import/Export", m);
     }
     else if (menuIndex == 1)
