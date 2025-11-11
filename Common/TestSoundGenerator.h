@@ -41,8 +41,32 @@ public:
 private:
 	void timerCallback() override;
 
+    class PinkNoiseGenerator
+    {
+    public:
+        PinkNoiseGenerator() { std::fill(pink, pink + 7, 0.0f); }
+
+        float getNextSample(float white)
+        {
+            // Paul Kellet's IIR pinking filter
+            pink[0] = 0.99886f * pink[0] + white * 0.0555179f;
+            pink[1] = 0.99332f * pink[1] + white * 0.0750759f;
+            pink[2] = 0.96900f * pink[2] + white * 0.1538520f;
+            pink[3] = 0.86650f * pink[3] + white * 0.3104856f;
+            pink[4] = 0.55000f * pink[4] + white * 0.5329522f;
+            pink[5] = -0.7616f * pink[5] - white * 0.0168980f;
+            float pinkOut = pink[0] + pink[1] + pink[2] + pink[3] + pink[4] + pink[5] + pink[6] + white * 0.5362f;
+            pink[6] = white * 0.115926f;
+            return pinkOut * 0.11f; // Normalized to avoid clipping
+        }
+    private:
+        float pink[7];
+    };
+
+    
 private:
 	bool testSoundChannels[MAX_NUM_CHANNELS];
+    PinkNoiseGenerator pinkNoiseGenerators[MAX_NUM_CHANNELS];
 	Random random;
 	AmbiDataSet* pSpeakerSet;
 	int tempChannel;

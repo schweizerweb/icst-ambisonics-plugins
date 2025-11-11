@@ -40,7 +40,7 @@ jobs:
       # build on
       # Windows: cl
       # MacOS: clang/clang++
-      # Ubuntu: clang/clang++
+      # Ubuntu: gcc
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
         build_type: [Release]
@@ -49,11 +49,6 @@ jobs:
             c_compiler: cl
             cpp_compiler: cl
             name: Windows
-        #  currently clang is not working with github runner (Ubuntu 24.04)
-        #  - os: ubuntu-latest
-        #    c_compiler: clang
-        #    cpp_compiler: clang++
-        #    name: Linux
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
