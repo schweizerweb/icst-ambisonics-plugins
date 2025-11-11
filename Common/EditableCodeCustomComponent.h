@@ -84,7 +84,9 @@ private:
 	void mouseUp(const MouseEvent& /*event*/) override
     {
         localCode = owner.getTableText(columnId, row);
-        CallOutBox::launchAsynchronously(std::make_unique<JsEditorComponent>(&localCode, &localCloseFlag, this), getScreenBounds(), nullptr);
+        auto topComponent = owner.getTable()->getParentComponent();
+        auto relPos = topComponent->getScreenPosition();
+        CallOutBox::launchAsynchronously(std::make_unique<JsEditorComponent>(&localCode, &localCloseFlag, this), getScreenBounds().translated(-relPos.getX(), -relPos.getY()), topComponent);
     }
     
     void handleAsyncUpdate() override {

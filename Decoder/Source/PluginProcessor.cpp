@@ -255,7 +255,8 @@ void AmbisonicsDecoderAudioProcessor::checkSpeakerFilters()
 
 void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer&)
 {
-    const int totalNumInputChannels  = jmin(getTotalNumInputChannels(), ambiSettings.getMaxUsedChannelCount(), buffer.getNumChannels());
+    const int totalNumInputChannels = jmin(getTotalNumInputChannels(), buffer.getNumChannels());
+    const int totalNumUsedInputChannels = jmin(totalNumInputChannels, ambiSettings.getMaxUsedChannelCount());
     const int totalNumOutputChannels = getTotalNumOutputChannels();
     const bool isMultiDecoderMode = ambiSettings.getMultiDecoderFlag();
     double currentCoefficients[MAX_NUM_CHANNELS];
@@ -304,7 +305,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                 speakerMaskVector.push_back(ambiSettings.multiDecoderSections[iDec].speakerMask);
 
                 // get read pointers
-                for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+                for (iChannel = 0; iChannel < totalNumUsedInputChannels; iChannel++)
                     inputBufferPointers[bufferPointerIndex][iChannel] = inputBuffers[bufferPointerIndex]->getReadPointer(iChannel);
 
                 if (analyzer->isActive(FFT_INDEX_OFFSET_MULTIDECODER + iDec))
@@ -329,7 +330,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
         speakerMaskVector.push_back(0xffffffffffffffff);
 
         // get read pointers
-        for (iChannel = 0; iChannel < totalNumInputChannels; iChannel++)
+        for (iChannel = 0; iChannel < totalNumUsedInputChannels; iChannel++)
             inputBufferPointers[0][iChannel] = inputBuffers[0]->getReadPointer(iChannel);
     }
 
@@ -338,7 +339,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
     for(int iSpeaker = 0; iSpeaker < speakerSet->size() && iSpeaker < totalNumOutputChannels; iSpeaker++)
 	{
 		AmbiSpeaker* pt = speakerSet->get(iSpeaker);
-        if (pt == nullptr || ((pt->getMute() || soloOnly) && !pt->getSolo()))
+        if (pt == nullptr || !pt->getEnabled() || ((pt->getMute() || soloOnly) && !pt->getSolo()))
         {
             buffer.clear(iSpeaker, 0, buffer.getNumSamples());
             if (analyzer->isActive(iSpeaker))
@@ -363,7 +364,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
                 // calculate ambisonics coefficients
                 double speakerGain = pt->getGain();
                 int currentAmbisonicsOrder = pAmbi->getAmbiOrder();
-                int usedChannelCount = jmin(totalNumInputChannels, ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1)));
+                int usedChannelCount = jmin(totalNumUsedInputChannels, ((pAmbi->getAmbiOrder() + 1) * (pAmbi->getAmbiOrder() + 1)));
 
                 pt->getRawPoint()->getAmbisonicsCoefficients(channelLayout.getNumInputChannels(), &currentCoefficients[0], true, true);
 

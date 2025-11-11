@@ -358,15 +358,12 @@ void Radar2D::paintPointLabel(Graphics* g, Image labelImage, Point<float> screen
         int y = screenPt.getY() > offset + (float)scaledImageHeight
             ? int(screenPt.getY() - offset - (float)scaledImageHeight)
             : int(screenPt.getY() + offset);
-        if (screenPt.getX() > (float)getWidth() / 2.0f
-            && screenPt.getX() > ((float)getWidth() - (offset + (float)scaledImageWidth)))
-        {
-            g->drawImageWithin(labelImage, int(screenPt.getX() - offset - (float)scaledImageWidth), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-        }
-        else
-        {
-            g->drawImageWithin(labelImage, int(screenPt.getX() + offset), y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
-        }
+        int x = screenPt.getX() > (float)getWidth() / 2.0f
+            && screenPt.getX() > ((float)radarViewport.getRight() - (offset + (float)scaledImageWidth))
+            ? int(screenPt.getX() - offset - (float)scaledImageWidth)
+            : int(screenPt.getX() + offset);
+        
+        g->drawImageWithin(labelImage, x, y, scaledImageWidth, scaledImageHeight, RectanglePlacement::stretchToFit);
     }
 }
 
@@ -783,9 +780,9 @@ void Radar2D::resized()
             break;
     }
     
-    radarViewport = Rectangle<double>(x, y, w, h).toNearestInt();
     radarViewportWithBorder = Rectangle<double>(x-border, y-border, w+2*border, h+2*border).toNearestInt();
-	updateRadarBackground();
+    radarViewport = radarViewportWithBorder.reduced(border);
+    updateRadarBackground();
 }
 
 void Radar2D::mouseExit(const MouseEvent&)

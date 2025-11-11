@@ -633,7 +633,7 @@ bool AmbiDataSet::rotateGroupAroundOrigin(String groupName, double angleAroundXA
     return found;
 }
 
-void AmbiDataSet::setGroupName(int groupIndex, String name) const
+bool AmbiDataSet::setGroupName(int groupIndex, String name) const
 {
 	const ScopedLock lock(cs);
 
@@ -641,7 +641,10 @@ void AmbiDataSet::setGroupName(int groupIndex, String name) const
 	if (group != nullptr)
     {
 		group->setName(name);
+        return true;
     }
+
+    return false;
 }
 
 bool AmbiDataSet::setGroupAed(String groupName, double a, double e, double d, bool moveSubElements)

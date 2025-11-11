@@ -45,6 +45,7 @@ Access to current data:
   s.getE([index]); (*)
   s.getD([index]); (*)
   s.getName([index]);
+  s.getGain([index]);
   s.getAbsX([index]); (group mode only)
   s.getAbsY([index]); (group mode only)
   s.getAbsZ([index]); (group mode only)
@@ -57,6 +58,10 @@ Access to current data:
 (*) Note: in group mode, positions are relative to the attached group!
 
 Manipulation of data set:
+  s.setName([index]);
+    Sets the name of the specified source index.
+  s.setGain([index]);
+    Sets the gain of the specified source index.
   s.setXYZ([index], [x], [y], [z]);
     Sets XYZ coordinates of the specified source index.
     Example: s.setXYZ(1, 1.0, 0.5, 0.1);
@@ -68,6 +73,8 @@ Manipulation of data set:
     Same for AED coordinates.
 
 Group manipulations:
+  s.setGroupName([index]);
+    Sets the name of the specified group index.
   s.setGroupXYZ([index], [x], [y], [z], [optional: moveSub]);
     Sets XYZ coordinates of the specified group index.
     Example: s.setGroupXYZ(1, 1.0, 0.5, 0.1, 1);
