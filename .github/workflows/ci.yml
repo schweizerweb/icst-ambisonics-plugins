@@ -27,10 +27,6 @@ jobs:
           - os: ubuntu-latest
             c_compiler: gcc
             cpp_compiler: g++
-            name: Linux_GCC
-          - os: ubuntu-latest
-            c_compiler: clang
-            cpp_compiler: clang++
             name: Linux
           - os: macos-latest
             c_compiler: clang
@@ -43,6 +39,8 @@ jobs:
             c_compiler: clang
           - os: ubuntu-latest
             c_compiler: cl
+          - os: ubuntu-latest
+            c_compiler: clang
           - os: macos-latest
             c_compiler: cl
           - os: macos-latest
