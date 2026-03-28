@@ -31,7 +31,7 @@ Image LabelCreator::createNewLabel(String label, Colour newColor, float fontSize
 	if (width <= 0)
 		return Image();
 
-	Image img(Image::ARGB, width, int(fontSize+0.5), true);
+	Image img(Image::ARGB, width, int(fontSize*1.2+0.5), true);
 	Graphics g(img);
 	g.setColour(newColor);
 	g.setFont(fontSize);
