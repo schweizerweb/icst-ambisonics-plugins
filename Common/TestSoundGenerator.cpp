@@ -30,18 +30,19 @@ TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet): tempChannel(NO_
 
 void TestSoundGenerator::process(float* sampleData, int sampleCount, int speakerIndex)
 {
-	if(testSoundChannels[speakerIndex] || speakerIndex == tempChannel)
-	{
-		AmbiPoint* p = pSpeakerSet->get(speakerIndex);
-		if (p != nullptr)
-		{
-			double testSoundGain = p->getGain();
-			for (int i = 0; i < sampleCount; i++)
-			{
-				sampleData[i] = float((random.nextFloat() * 2.0f - 1.0f) * testSoundGain * testSoundBaseGain);
-			}
-		}
-	}
+    if(testSoundChannels[speakerIndex] || speakerIndex == tempChannel)
+    {
+        AmbiPoint* p = pSpeakerSet->get(speakerIndex);
+        if (p != nullptr)
+        {
+            double testSoundGain = p->getGain();
+            for (int i = 0; i < sampleCount; i++)
+            {
+                float white = random.nextFloat() * 2.0f - 1.0f;
+                sampleData[i] = pinkNoiseGenerators[speakerIndex].getNextSample(white) * float(testSoundGain * testSoundBaseGain);
+            }
+        }
+    }
 }
 
 void TestSoundGenerator::toggle(int speakerIndex)

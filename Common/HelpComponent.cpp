@@ -64,7 +64,7 @@ HelpComponent::HelpComponent (bool isEncoder)
     ? "https://github.com/schweizerweb/icst-ambisonics-plugins/wiki/ICST-AmbiEncoder"
     : "https://github.com/schweizerweb/icst-ambisonics-plugins/wiki/ICST-AmbiDecoder";
     tabHelp->addTab(TRANS("Documentation"), Colours::lightgrey, new HelpWebBrowserComponent(documentationUrl), true);
-    tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/page/icst-ambisonics-plugins"), true);
+    tabHelp->addTab(TRANS("Tutorials"), Colours::lightgrey, new HelpWebBrowserComponent("https://ambisonics.ch/icst-ambisonics-plugins"), true);
 
     label->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true) + " " + String::fromUTF8("\xc2\xa9 2024 Martin Neukom, Johannes Schuett & Christian Schweizer @ ICST"), dontSendNotification);
     label->setTooltip(Constants::getBuildInfo());
