@@ -44,7 +44,6 @@
 #define COLUMN_ID_D            12
 #define COLUMN_ID_GAIN        5
 #define COLUMN_ID_MUTE          14
-#define COLUMN_ID_SOLO          15
 #define COLUMN_ID_COLOR        13
 #define COLUMN_ID_ENABLED       1
 
@@ -72,7 +71,6 @@ public:
         tableListBox->getHeader().addColumn("E", COLUMN_ID_E, 50);
         tableListBox->getHeader().addColumn("D", COLUMN_ID_D, 50);
         tableListBox->getHeader().addColumn("M & S", COLUMN_ID_MUTE, 50);
-        tableListBox->getHeader().addColumn("Solo", COLUMN_ID_SOLO, 40);
         tableListBox->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
         tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
         tableListBox->getHeader().setStretchToFitActive(true);
