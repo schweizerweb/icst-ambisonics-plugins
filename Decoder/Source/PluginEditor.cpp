@@ -21,6 +21,7 @@
 
 //[Headers] You can add your own extra header files here...
 #include "SpeakerSettingsComponent.h"
+#include "../../Common/SvgHelper.h"
 //[/Headers]
 
 #include "PluginEditor.h"
@@ -49,37 +50,17 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
     addAndMakeVisible (radarComponent.get());
     radarComponent->setName ("radarComponent");
 
-    labelVersion.reset (new juce::Label ("labelVersion",
-                                         TRANS("Version")));
-    addAndMakeVisible (labelVersion.get());
-    labelVersion->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
-    labelVersion->setJustificationType (juce::Justification::centredRight);
-    labelVersion->setEditable (false, false, false);
-    labelVersion->setColour (juce::TextEditor::textColourId, juce::Colours::black);
-    labelVersion->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
-
-    btnSettings.reset (new juce::ImageButton ("btnSettings"));
+    btnSettings.reset (new DrawableButton ("btnSettings", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnSettings.get());
-    btnSettings->setButtonText (juce::String());
+    btnSettings->setButtonText (TRANS("Settings"));
     btnSettings->addListener (this);
+    SvgHelper::loadSVGIcon(btnSettings.get(), BinaryData::settings_icon_svg, BinaryData::settings_icon_svgSize, String("Settings"));
 
-    btnSettings->setImages (false, true, true,
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0x00000000),
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                            juce::ImageCache::getFromMemory (BinaryData::settings_png, BinaryData::settings_pngSize), 1.000f, juce::Colour (0xc0ee1010));
-    btnSettings->setBounds (0, 0, 32, 32);
-
-    btnHelp.reset (new juce::ImageButton ("btnHelp"));
+    btnHelp.reset (new DrawableButton ("btnHelp", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnHelp.get());
-    btnHelp->setButtonText (TRANS("new button"));
+    btnHelp->setButtonText (TRANS("Help"));
     btnHelp->addListener (this);
-
-    btnHelp->setImages (false, true, true,
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0x00000000),
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 0.400f, juce::Colour (0x6eee1010),
-                        juce::ImageCache::getFromMemory (BinaryData::help_png, BinaryData::help_pngSize), 1.000f, juce::Colour (0xc0ee1010));
-    btnHelp->setBounds (32, 4, 24, 24);
-
+    SvgHelper::loadSVGIcon(btnHelp.get(), BinaryData::help_icon_svg, BinaryData::help_icon_svgSize, String(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true)));
 
     //[UserPreSize]
 	setResizable(true, true);
@@ -90,7 +71,6 @@ AmbisonicsDecoderAudioProcessorEditor::AmbisonicsDecoderAudioProcessorEditor (Am
 
     //[Constructor] You can add your own custom stuff here..
 	setSize(pDecoderSettings->lastUIWidth, pDecoderSettings->lastUIHeight);
-	labelVersion->setText(String(JucePlugin_Name).upToFirstOccurrenceOf("_", false, false) + Constants::getUiVersionString(true), dontSendNotification);
 	updateRadarOptions();
     //[/Constructor]
 }
@@ -101,7 +81,6 @@ AmbisonicsDecoderAudioProcessorEditor::~AmbisonicsDecoderAudioProcessorEditor()
     //[/Destructor_pre]
 
     radarComponent = nullptr;
-    labelVersion = nullptr;
     btnSettings = nullptr;
     btnHelp = nullptr;
 
@@ -134,7 +113,8 @@ void AmbisonicsDecoderAudioProcessorEditor::resized()
     //[/UserPreResize]
 
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
-    labelVersion->setBounds (getWidth() - 5 - 111, 4, 111, 24);
+    btnSettings->setBounds (2, 2, 28, 28);
+    btnHelp->setBounds (34, 2, 28, 28);
     //[UserResized] Add your own custom resize handling here..
 	pDecoderSettings->lastUIWidth = getWidth();
 	pDecoderSettings->lastUIHeight = getHeight();

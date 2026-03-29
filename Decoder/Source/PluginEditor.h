@@ -82,9 +82,8 @@ private:
 
     //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
-    std::unique_ptr<juce::Label> labelVersion;
-    std::unique_ptr<juce::ImageButton> btnSettings;
-    std::unique_ptr<juce::ImageButton> btnHelp;
+    std::unique_ptr<DrawableButton> btnSettings;
+    std::unique_ptr<DrawableButton> btnHelp;
 
 
     //==============================================================================
