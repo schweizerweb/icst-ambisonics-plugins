@@ -17,24 +17,10 @@
 ================================================================================
 */
 
-
-
-//[Headers] You can add your own extra header files here...
-//[/Headers]
-
 #include "Radar3D.h"
 
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
-//[/MiscUserDefs]
-
-//==============================================================================
-Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions)
+Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions_) : pRadarOptions(pRadarOptions_)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-	fullRadarFlag = false;
-    //[/Constructor_pre]
-
     xzRadar.reset (new Radar2D (Radar2D::XZ_Half, pEditablePoints, pDisplayOnlyPoints, pPointSelection, pRadarOptions));
     addAndMakeVisible (xzRadar.get());
     xzRadar->setName ("xzRadar");
@@ -47,44 +33,22 @@ Radar3D::Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints,
 
     xyRadar->setBounds (0, 0, 336, 240);
 
-    btnFull.reset (new juce::ImageButton ("btnFull"));
-    addAndMakeVisible (btnFull.get());
-    btnFull->setButtonText (TRANS("Full"));
-    btnFull->addListener (this);
-
-    btnFull->setImages (false, true, false,
-                        juce::ImageCache::getFromMemory (BinaryData::flat_arrow_down_png, BinaryData::flat_arrow_down_pngSize), 1.000f, juce::Colour (0x00000000),
-                        juce::Image(), 1.000f, juce::Colour (0xffdd6060),
-                        juce::ImageCache::getFromMemory (BinaryData::flat_arrow_down_png, BinaryData::flat_arrow_down_pngSize), 1.000f, juce::Colour (0x00000000));
-    btnFull->setBounds (0, 360, 336, 6);
-
-
-    //[UserPreSize]
-    //[/UserPreSize]
-
     setSize (600, 400);
 
 
-    //[Constructor] You can add your own custom stuff here..
     xyRadar->addMouseListener(this, true);
     xzRadar->addMouseListener(this, true);
-    //[/Constructor]
+    pRadarOptions->zoomSettings->addChangeListener(this);
 }
 
 Radar3D::~Radar3D()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
+    pRadarOptions->zoomSettings->removeChangeListener(this);
     xyRadar->removeMouseListener(this);
     xzRadar->removeMouseListener(this);
-    //[/Destructor_pre]
 
     xzRadar = nullptr;
     xyRadar = nullptr;
-    btnFull = nullptr;
-
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
 //==============================================================================
@@ -112,41 +76,19 @@ void Radar3D::resized()
         xzRadar->setAnchor(Radar2D::X_Left, Radar2D::Y_Center);
         xyRadar->setBounds(0, 0, getWidth()/2, getHeight());
         xzRadar->setBounds(getWidth()/2, 0, getWidth()/2, getHeight());
-        btnFull->setVisible(false);
     }
     else
     {
+        bool fullRadarFlag = pRadarOptions->zoomSettings->fullSphere;
         xzRadar->setRadarMode(fullRadarFlag ? Radar2D::XZ_Full : Radar2D::XZ_Half);
-        int secondRadarHeight = int((getHeight() - 6) / (fullRadarFlag ? 2.0 : 3.0));
+        int secondRadarHeight = int((getHeight()) / (fullRadarFlag ? 2.0 : 3.0));
         int topRadarHeight = fullRadarFlag ? secondRadarHeight : secondRadarHeight * 2;
         xyRadar->setAnchor(Radar2D::X_Center, Radar2D::Y_Bottom);
         xzRadar->setAnchor(Radar2D::X_Center, Radar2D::Y_Top);
         xyRadar->setBounds(0, 0, getWidth(), topRadarHeight);
         xzRadar->setBounds(0, topRadarHeight, getWidth(), secondRadarHeight);
-        btnFull->setBounds(0, topRadarHeight + secondRadarHeight, getWidth(), getHeight() - topRadarHeight - secondRadarHeight);
-        btnFull->setVisible(true);
     }
     //[/UserResized]
-}
-
-void Radar3D::buttonClicked (juce::Button* buttonThatWasClicked)
-{
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
-    if (buttonThatWasClicked == btnFull.get())
-    {
-        //[UserButtonCode_btnFull] -- add your button handler code here..
-        setFullRadarFlag(!fullRadarFlag);
-        btnFull->setImages (false, true, false,
-            ImageCache::getFromMemory (fullRadarFlag ? BinaryData::flat_arrow_up_png : BinaryData::flat_arrow_down_png, fullRadarFlag ? BinaryData::flat_arrow_up_pngSize : BinaryData::flat_arrow_down_pngSize), 1.000f, Colour (0x00000000),
-            Image(), 1.000f, Colour (0xffdd6060),
-            ImageCache::getFromMemory (fullRadarFlag ? BinaryData::flat_arrow_up_png : BinaryData::flat_arrow_down_png, fullRadarFlag ? BinaryData::flat_arrow_up_pngSize : BinaryData::flat_arrow_down_pngSize), 1.000f, Colour (0x00000000));
-        //[/UserButtonCode_btnFull]
-    }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
 }
 
 void Radar3D::mouseEnter (const juce::MouseEvent& /*e*/)
@@ -168,16 +110,13 @@ void Radar3D::mouseExit (const juce::MouseEvent& /*e*/)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-bool Radar3D::getFullRadarFlag() const
+void Radar3D::changeListenerCallback(ChangeBroadcaster* /*source*/)
 {
-    return fullRadarFlag;
-}
-
-void Radar3D::setFullRadarFlag(bool flag)
-{
-    xzRadar->setRadarMode(flag ? Radar2D::XZ_Full : Radar2D::XZ_Half);
-    fullRadarFlag = flag;
-    resized();
+    if(xzRadar->isFullRadar() != pRadarOptions->zoomSettings->fullSphere)
+    {
+        xzRadar->setRadarMode(pRadarOptions->zoomSettings->fullSphere ? Radar2D::XZ_Full : Radar2D::XZ_Half);
+        resized();
+    }
 }
 //[/MiscUserCode]
 

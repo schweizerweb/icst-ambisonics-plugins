@@ -74,6 +74,7 @@ public:
     void mouseWheelMove(const MouseEvent &event, const MouseWheelDetails &wheel) override;
     void setAnchor(AnchorX x, AnchorY y);
     void setRefreshRate(int rateHz);
+    bool isFullRadar() const;
     
 private:
 	Point<float> getRelativeScreenPoint(Point<float> valuePoint) const;

@@ -711,6 +711,11 @@ void Radar2D::setRadarMode(RadarMode mode)
 	resized();
 }
 
+bool Radar2D::isFullRadar() const
+{
+    return this->radarMode == RadarMode::XZ_Full;
+}
+
 Point<float> Radar2D::getRelativeScreenPoint(Point<float> valuePoint) const
 {
 	Rectangle<float> currentViewValueRect = pRadarOptions->zoomSettings->getVisibleArea(radarMode != XY, radarMode != XZ_Half);
