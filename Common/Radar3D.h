@@ -47,6 +47,8 @@ public:
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
+    bool getFullRadarFlag() const;
+    void setFullRadarFlag(bool flag);
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -57,7 +59,6 @@ public:
 
 private:
     //[UserVariables]   -- You can add your own custom variables in this section.
-	void setRadarMode(bool fullRadar);
 	bool fullRadarFlag;
     //[/UserVariables]
 

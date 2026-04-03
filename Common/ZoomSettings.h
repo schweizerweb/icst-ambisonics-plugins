@@ -26,6 +26,8 @@
 #define DEFAULT_CENTER_Z 0.0
 #define DEFAULT_RADIUS 1.0
 #define DEFAULT_LABEL_IN_POINT_FLAG false
+#define DEFAULT_SHOW_AED false
+#define DEFAULT_FULL_SPHERE false
 
 #define MIN_ZOOM_RADIUS 0.001f
 #define XML_TAG_ZOOM_SETTINGS "ZoomSettings"
@@ -36,6 +38,9 @@
 #define XML_ATTRIBUTE_CENTER_POINT_Y "CenterY"
 #define XML_ATTRIBUTE_CENTER_POINT_Z "CenterZ"
 #define XML_ATTRIBUTE_RADIUS "Radius"
+#define XML_ATTRIBUTE_SHOW_AED "ShowAed"
+#define XML_ATTRIBUTE_FULL_SPHERE "FullSphere"
+
 
 #include "Point3D.h"
 #include "ScalingInfo.h"
@@ -50,7 +55,9 @@ public:
 	Point3D<float> getCurrentCenterPoint() const;
 	void setCurrentCenterPointXY(float x, float y);
 	void setCurrentCenterPointXZ(float x, float z);
-	
+    void setShowAed(bool show);
+    void setFullSphere(bool full);
+    
 	float getCurrentRadius() const;
 	void setCurrentRadius(float newRadius);
 	int getNumberOfRings() const;
@@ -71,6 +78,9 @@ public:
     
     void loadFromXml(XmlElement* xmlElement);
     void writeToXmlElement(XmlElement* xml) const;
+    
+    bool showAed;
+    bool fullSphere;
     
 private:
 	Point3D<float> currentCenterPoint;

@@ -60,6 +60,18 @@ void ZoomSettings::setCurrentCenterPointXZ(float x, float z)
 	sendChangeMessage();
 }
 
+void ZoomSettings::setShowAed(bool show)
+{
+    showAed = show;
+    sendChangeMessage();
+}
+
+void ZoomSettings::setFullSphere(bool full)
+{
+    fullSphere = full;
+    sendChangeMessage();
+}
+
 double ZoomSettings::getPointScaler()
 {
     return pointScaler;
@@ -184,6 +196,9 @@ void ZoomSettings::loadFromXml(XmlElement* xmlElement)
             (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, DEFAULT_CENTER_Y),
             (float)zoomSettingsXml->getDoubleAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, DEFAULT_CENTER_Z)
         );
+        
+        showAed = zoomSettingsXml->getBoolAttribute(XML_ATTRIBUTE_SHOW_AED, DEFAULT_SHOW_AED);
+        fullSphere = zoomSettingsXml->getBoolAttribute(XML_ATTRIBUTE_FULL_SPHERE, DEFAULT_FULL_SPHERE);
     }
 }
 
@@ -197,6 +212,8 @@ void ZoomSettings::writeToXmlElement(XmlElement* xml) const
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Y, currentCenterPoint.getY());
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_CENTER_POINT_Z, currentCenterPoint.getZ());
     zoomSettingsXml->setAttribute(XML_ATTRIBUTE_RADIUS, currentRadius);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_SHOW_AED, showAed);
+    zoomSettingsXml->setAttribute(XML_ATTRIBUTE_FULL_SPHERE, fullSphere);
     xml->addChildElement(zoomSettingsXml);
 }
     

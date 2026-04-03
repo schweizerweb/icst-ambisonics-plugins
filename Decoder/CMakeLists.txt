@@ -184,8 +184,13 @@ target_sources(AmbiDecoder
 juce_add_binary_data(AmbiDecoder_BinResources
     SOURCES
 	../Resources/svg/settings_icon.svg
-	../Resources/svg/help_icon.svg
-	
+	../Resources/svg/help_icon.svg		
+	../Resources/svg/sphere_icon.svg
+	../Resources/svg/angle_icon.svg
+	../Resources/svg/trash_icon.svg
+	../Resources/svg/group_icon.svg
+	../Resources/svg/ungroup_icon.svg
+
 	../Resources/png/animator_icon.png
 	../Resources/png/info.png
 	../Resources/png/save.png	

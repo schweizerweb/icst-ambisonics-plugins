@@ -11,8 +11,13 @@ SET(BIN_FILES
 	../../Resources/svg/ok_icon.svg
 	../../Resources/svg/play_icon.svg
 	../../Resources/svg/settings_icon.svg
-	../../Resources/svg/help_icon.svg
-	
+	../../Resources/svg/help_icon.svg	
+	../../Resources/svg/sphere_icon.svg
+	../../Resources/svg/angle_icon.svg
+	../../Resources/svg/trash_icon.svg
+	../../Resources/svg/group_icon.svg
+	../../Resources/svg/ungroup_icon.svg
+
 	../../Resources/png/animator_icon.png
 	../../Resources/png/settings.png
 	../../Resources/png/help.png

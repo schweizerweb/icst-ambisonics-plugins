@@ -21,78 +21,55 @@
 
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "AmbiDataSet.h"
 #include "PointSelection.h"
 #include "DawParameter.h"
+#include "ColorBorderDrawableButton.h"
 
-//[/Headers]
-
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class PointInfoControl  : public Component,
                           public ChangeListener,
                           public TextEditor::Listener,
                           public juce::Button::Listener
 {
 public:
-    //==============================================================================
     PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~PointInfoControl() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 	void updateSelectedPoint(String exceptField = "");
 	void changeListenerCallback(ChangeBroadcaster* source) override;
 	void textEditorTextChanged(TextEditor& source) override;
 	void disableListeners();
 	void enableListeners();
 	void setFieldsEnabled(bool enable) const;
-    //[/UserMethods]
+    int getRequiredHeight(int width) const;
+    void controlVisibility() const; 
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbiDataSet* pEditablePoints;
 	PointSelection* pPointSelection;
 	RadarOptions* pRadarOptions;
-    //[/UserVariables]
+    enum controlSize { narrow = 30, wide = 60 };
+    
+    std::unique_ptr<ColorBorderDrawableButton> btnSphere;
+    std::unique_ptr<DrawableButton> btnDelete;
+    std::unique_ptr<DrawableButton> btnGroup;
+    std::unique_ptr<DrawableButton> btnUngroup;
+    std::unique_ptr<ColorBorderDrawableButton> btnPolarCartesian;
 
-    //==============================================================================
-    std::unique_ptr<juce::Component> helperSlider;
-    std::unique_ptr<juce::Label> labelBackground;
     std::unique_ptr<juce::TextEditor> textName;
-    std::unique_ptr<juce::Label> labelName;
     std::unique_ptr<juce::TextEditor> textX;
     std::unique_ptr<juce::TextEditor> textY;
     std::unique_ptr<juce::TextEditor> textZ;
-    std::unique_ptr<juce::Label> labelCartesian;
     std::unique_ptr<juce::TextEditor> textA;
     std::unique_ptr<juce::TextEditor> textE;
     std::unique_ptr<juce::TextEditor> textD;
-    std::unique_ptr<juce::Label> labelPolar;
-    std::unique_ptr<juce::Label> labelCH;
     std::unique_ptr<juce::TextEditor> textCH;
-    std::unique_ptr<juce::ImageButton> btnUngroup;
-    std::unique_ptr<juce::ImageButton> btnGroup;
-    std::unique_ptr<juce::ImageButton> btnDelete;
+    
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PointInfoControl)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

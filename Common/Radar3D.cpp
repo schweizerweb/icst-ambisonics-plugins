@@ -137,7 +137,7 @@ void Radar3D::buttonClicked (juce::Button* buttonThatWasClicked)
     if (buttonThatWasClicked == btnFull.get())
     {
         //[UserButtonCode_btnFull] -- add your button handler code here..
-        setRadarMode(!fullRadarFlag);
+        setFullRadarFlag(!fullRadarFlag);
         btnFull->setImages (false, true, false,
             ImageCache::getFromMemory (fullRadarFlag ? BinaryData::flat_arrow_up_png : BinaryData::flat_arrow_down_png, fullRadarFlag ? BinaryData::flat_arrow_up_pngSize : BinaryData::flat_arrow_down_pngSize), 1.000f, Colour (0x00000000),
             Image(), 1.000f, Colour (0xffdd6060),
@@ -168,11 +168,16 @@ void Radar3D::mouseExit (const juce::MouseEvent& /*e*/)
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
-void Radar3D::setRadarMode(bool fullRadar)
+bool Radar3D::getFullRadarFlag() const
 {
-	xzRadar->setRadarMode(fullRadar ? Radar2D::XZ_Full : Radar2D::XZ_Half);
-	fullRadarFlag = fullRadar;
-	resized();
+    return fullRadarFlag;
+}
+
+void Radar3D::setFullRadarFlag(bool flag)
+{
+    xzRadar->setRadarMode(flag ? Radar2D::XZ_Full : Radar2D::XZ_Half);
+    fullRadarFlag = flag;
+    resized();
 }
 //[/MiscUserCode]
 

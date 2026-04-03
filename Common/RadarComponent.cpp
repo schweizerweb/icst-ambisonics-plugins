@@ -90,9 +90,9 @@ void RadarComponent::resized()
 	else
 	{
     //[/UserPreResize]
-
-    radar->setBounds (0, 0, getWidth() - 0, getHeight() - 100);
-    pointInfo->setBounds (0, getHeight() - 100, getWidth() - 0, 100);
+    int pointInfoHeight = pointInfo->getRequiredHeight(getWidth());
+    radar->setBounds (0, 0, getWidth() - 0, getHeight() - pointInfoHeight);
+    pointInfo->setBounds (0, getHeight() - pointInfoHeight, getWidth() - 0, pointInfoHeight);
     //[UserResized] Add your own custom resize handling here..
 	}
     //[/UserResized]
