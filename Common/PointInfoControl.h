@@ -29,17 +29,17 @@
 
 class PointInfoControl  : public Component,
                           public ChangeListener,
-                          public TextEditor::Listener,
+                          public Label::Listener,
                           public juce::Button::Listener
 {
 public:
     PointInfoControl (AmbiDataSet* pEditablePoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~PointInfoControl() override;
-
-	void updateSelectedPoint(String exceptField = "");
+    
+    void updateSelectedPoint(String exceptField = "");
 	void changeListenerCallback(ChangeBroadcaster* source) override;
-	void textEditorTextChanged(TextEditor& source) override;
-	void disableListeners();
+    void labelTextChanged(Label *labelThatHasChanged) override;
+    void disableListeners();
 	void enableListeners();
 	void setFieldsEnabled(bool enable) const;
     int getRequiredHeight(int width) const;
@@ -54,6 +54,33 @@ private:
 	PointSelection* pPointSelection;
 	RadarOptions* pRadarOptions;
     enum controlSize { narrow = 30, wide = 60 };
+    bool shiftWasDownWhenEditingStarted = false;
+
+    void setupLabel(juce::Label* l, bool editable = true);
+    
+    struct CoorLabel : public juce::Label
+        {
+            juce::String prefix = "", postfix = "";
+
+            void paint(juce::Graphics& g) override
+            {
+                if (isBeingEdited()) { juce::Label::paint(g); return; }
+
+                if(getText().isNotEmpty())
+                {
+                    // Draw background via LookAndFeel, then custom text
+                    g.fillAll(findColour(juce::Label::backgroundColourId));
+                    
+                    g.setColour(findColour(juce::Label::textColourId));
+                    g.setFont(getFont());
+                    g.drawFittedText(prefix + getText() + postfix,
+                                     getLocalBounds().reduced(4, 0),
+                                     getJustificationType(), 1);
+                }
+            }
+            
+            CoorLabel(String name, String prefix_, String postfix_): Label(name), prefix(prefix_), postfix(postfix_) {}
+        };
     
     std::unique_ptr<ColorBorderDrawableButton> btnSphere;
     std::unique_ptr<DrawableButton> btnDelete;
@@ -61,14 +88,15 @@ private:
     std::unique_ptr<DrawableButton> btnUngroup;
     std::unique_ptr<ColorBorderDrawableButton> btnPolarCartesian;
 
-    std::unique_ptr<juce::TextEditor> textName;
-    std::unique_ptr<juce::TextEditor> textX;
-    std::unique_ptr<juce::TextEditor> textY;
-    std::unique_ptr<juce::TextEditor> textZ;
-    std::unique_ptr<juce::TextEditor> textA;
-    std::unique_ptr<juce::TextEditor> textE;
-    std::unique_ptr<juce::TextEditor> textD;
-    std::unique_ptr<juce::TextEditor> textCH;
+    std::unique_ptr<CoorLabel> textName;
+    std::unique_ptr<CoorLabel> textX;
+    std::unique_ptr<CoorLabel> textY;
+    std::unique_ptr<CoorLabel> textZ;
+    std::unique_ptr<CoorLabel> textA;
+    std::unique_ptr<CoorLabel> textE;
+    std::unique_ptr<CoorLabel> textD;
+    std::unique_ptr<CoorLabel> textCH;
+    
     
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PointInfoControl)

@@ -36,142 +36,91 @@
 PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions)
     : pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)
 {
-    textName.reset (new juce::TextEditor ("textName"));
-    addAndMakeVisible (textName.get());
-    textName->setMultiLine (false);
-    textName->setReturnKeyStartsNewLine (false);
-    textName->setReadOnly (true);
-    textName->setScrollbarsShown (true);
-    textName->setCaretVisible (false);
-    textName->setPopupMenuEnabled (true);
-    textName->setText (juce::String());
-    textName->setTextToShowWhenEmpty("Name", Colours::grey);
+    textName.reset (new CoorLabel ("textName", "Name: ", ""));
+    setupLabel(textName.get(), false);
 
-    textX.reset (new juce::TextEditor ("textX"));
-    addAndMakeVisible (textX.get());
-    textX->setMultiLine (false);
-    textX->setReturnKeyStartsNewLine (false);
-    textX->setReadOnly (false);
-    textX->setScrollbarsShown (true);
-    textX->setCaretVisible (true);
-    textX->setPopupMenuEnabled (true);
-    textX->setText (juce::String());
+    textX.reset (new CoorLabel("textX", "X: ", ""));
+    setupLabel(textX.get());
 
-    textY.reset (new juce::TextEditor ("textY"));
-    addAndMakeVisible (textY.get());
-    textY->setMultiLine (false);
-    textY->setReturnKeyStartsNewLine (false);
-    textY->setReadOnly (false);
-    textY->setScrollbarsShown (true);
-    textY->setCaretVisible (true);
-    textY->setPopupMenuEnabled (true);
-    textY->setText (juce::String());
+    textY.reset (new CoorLabel("textY", "Y: ", ""));
+    setupLabel(textY.get());
 
-    textZ.reset (new juce::TextEditor ("textZ"));
-    addAndMakeVisible (textZ.get());
-    textZ->setMultiLine (false);
-    textZ->setReturnKeyStartsNewLine (false);
-    textZ->setReadOnly (false);
-    textZ->setScrollbarsShown (true);
-    textZ->setCaretVisible (true);
-    textZ->setPopupMenuEnabled (true);
-    textZ->setText (juce::String());
+    textZ.reset (new CoorLabel("textZ", "Z: ", ""));
+    setupLabel(textZ.get());
 
-    textA.reset (new juce::TextEditor ("textA"));
-    addAndMakeVisible (textA.get());
-    textA->setMultiLine (false);
-    textA->setReturnKeyStartsNewLine (false);
-    textA->setReadOnly (false);
-    textA->setScrollbarsShown (true);
-    textA->setCaretVisible (true);
-    textA->setPopupMenuEnabled (true);
-    textA->setText (juce::String());
+    textA.reset (new CoorLabel("textA", "A: ", juce::String::fromUTF8 (u8"\u00B0")));
+    setupLabel(textA.get());
 
-    textE.reset (new juce::TextEditor ("textE"));
-    addAndMakeVisible (textE.get());
-    textE->setMultiLine (false);
-    textE->setReturnKeyStartsNewLine (false);
-    textE->setReadOnly (false);
-    textE->setScrollbarsShown (true);
-    textE->setCaretVisible (true);
-    textE->setPopupMenuEnabled (true);
-    textE->setText (juce::String());
+    textE.reset (new CoorLabel("textE", "E: ", juce::String::fromUTF8 (u8"\u00B0")));
+    setupLabel(textE.get());
 
-    textD.reset (new juce::TextEditor ("textD"));
-    addAndMakeVisible (textD.get());
-    textD->setMultiLine (false);
-    textD->setReturnKeyStartsNewLine (false);
-    textD->setReadOnly (false);
-    textD->setScrollbarsShown (true);
-    textD->setCaretVisible (true);
-    textD->setPopupMenuEnabled (true);
-    textD->setText (juce::String());
+    textD.reset (new CoorLabel("textD", "D: ", ""));
+    setupLabel(textD.get());
 
-    textCH.reset (new juce::TextEditor ("labelCH"));
+    textCH.reset (new CoorLabel ("labelCH", "CH", ""));
     addAndMakeVisible (textCH.get());
-    textCH->setReadOnly(true);
-    textCH->setMultiLine (false);
-    textCH->setReturnKeyStartsNewLine (false);
-    textCH->setScrollbarsShown (true);
-    textCH->setCaretVisible (true);
-    textCH->setPopupMenuEnabled (true);
-    textCH->setText (juce::String());
+    textCH->setEditable(false);
+    textCH->setText (juce::String(), dontSendNotification);
 
     btnUngroup.reset (new DrawableButton ("btnUngroup", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnUngroup.get());
     btnUngroup->setButtonText (TRANS("Ungroup"));
     btnUngroup->addListener (this);
-    btnUngroup->setTooltip("Ungroup sources (remove group point)");
     SvgHelper::loadSVGIcon(btnUngroup.get(), BinaryData::ungroup_icon_svg, BinaryData::ungroup_icon_svgSize, "");
     
     btnGroup.reset (new DrawableButton ("btnGroup", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnGroup.get());
     btnGroup->setButtonText (TRANS("Group"));
     btnGroup->addListener (this);
-    btnGroup->setTooltip("Group selected sources");
     SvgHelper::loadSVGIcon(btnGroup.get(), BinaryData::group_icon_svg, BinaryData::group_icon_svgSize, "");
     
     btnDelete.reset (new DrawableButton ("btnDelete", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnDelete.get());
     btnDelete->setButtonText (TRANS("Delete"));
     btnDelete->addListener (this);
-    btnDelete->setTooltip("Delete");
     SvgHelper::loadSVGIcon(btnDelete.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "");
     
     btnSphere.reset (new ColorBorderDrawableButton ("btnSphere", pRadarOptions->zoomSettings->fullSphere));
     addAndMakeVisible (btnSphere.get());
     btnSphere->setButtonText (TRANS("Sphere"));
     btnSphere->addListener (this);
-    btnSphere->setTooltip("Toggle full/half sphere");
-    SvgHelper::loadSVGIcon(btnSphere.get(), BinaryData::sphere_icon_svg, BinaryData::sphere_icon_svgSize, "");
+    SvgHelper::loadSVGIcon(btnSphere.get(), BinaryData::sphere_icon_svg, BinaryData::sphere_icon_svgSize, "Toggle full/half sphere");
 
     btnPolarCartesian.reset (new ColorBorderDrawableButton ("btnPolarCartesian", pRadarOptions->zoomSettings->showAed));
     addAndMakeVisible (btnPolarCartesian.get());
     btnPolarCartesian->setButtonText (TRANS("PolarCartesian"));
     btnPolarCartesian->addListener (this);
-    btnPolarCartesian->setTooltip("Toggle XYZ/AED");
-    SvgHelper::loadSVGIcon(btnPolarCartesian.get(), BinaryData::angle_icon_svg, BinaryData::angle_icon_svgSize, "");
+    SvgHelper::loadSVGIcon(btnPolarCartesian.get(), BinaryData::angle_icon_svg, BinaryData::angle_icon_svgSize, "Toggle XYZ/AED");
 
-    textCH->setJustification(Justification::centredLeft);
-    textName->setJustification(Justification::centredLeft);
-    textX->setJustification(Justification::centredRight);
-    textY->setJustification(Justification::centredRight);
-    textZ->setJustification(Justification::centredRight);
-    textA->setJustification(Justification::centredRight);
-    textE->setJustification(Justification::centredRight);
-    textD->setJustification(Justification::centredRight);
-    textName->setSelectAllWhenFocused(true);
-    textX->setSelectAllWhenFocused(true);
-    textY->setSelectAllWhenFocused(true);
-    textZ->setSelectAllWhenFocused(true);
-    textA->setSelectAllWhenFocused(true);
-    textE->setSelectAllWhenFocused(true);
-    textD->setSelectAllWhenFocused(true);
+    textCH->setJustificationType(Justification::centredLeft);
+    textName->setJustificationType(Justification::centredLeft);
+    textX->setJustificationType(Justification::centredRight);
+    textY->setJustificationType(Justification::centredRight);
+    textZ->setJustificationType(Justification::centredRight);
+    textA->setJustificationType(Justification::centredRight);
+    textE->setJustificationType(Justification::centredRight);
+    textD->setJustificationType(Justification::centredRight);
 
     setSize (390, 100);
 
 	updateSelectedPoint();
 	pPointSelection->addChangeListener(this);
+}
+
+void PointInfoControl::setupLabel(juce::Label* l, bool editable)
+{
+    addAndMakeVisible(l);
+    l->setEditable(editable);
+    l->setText("", dontSendNotification);
+    
+    if(editable)
+    {
+        l->onEditorShow = [this]
+        {
+            shiftWasDownWhenEditingStarted =
+            juce::ModifierKeys::getCurrentModifiersRealtime().isShiftDown();
+        };
+    }
 }
 
 PointInfoControl::~PointInfoControl()
@@ -324,37 +273,55 @@ void PointInfoControl::buttonClicked (juce::Button* buttonThatWasClicked)
 }
 
 
-
 void PointInfoControl::updateSelectedPoint(String exceptField)
 {
 	disableListeners();
 
 	int selection = pPointSelection->getMainSelectedPointIndex();
+    int multiSelection = pPointSelection->getSelectedIndices().size() > 1;
 	if (pPointSelection->getSelectionMode() != PointSelection::None && selection >= 0 && selection < pEditablePoints->size())
 	{
+        String commonText = multiSelection ? " (Click to change; Shift+Click to change all selected points)" : " (Click to change)";
+        
 		AmbiPoint* point = pPointSelection->getSelectionMode() == PointSelection::Group ? pEditablePoints->getGroup(selection) : pEditablePoints->get(selection);
 
 		setFieldsEnabled(true);
-		textName->setText(point->getName());
-        textCH->setText("CH " + String(selection + 1));
-		if (exceptField != textX->getName()) textX->setText(String(point->getRawPoint()->getX(), 3));
-		if (exceptField != textY->getName()) textY->setText(String(point->getRawPoint()->getY(), 3));
-		if (exceptField != textZ->getName()) textZ->setText(String(point->getRawPoint()->getZ(), 3));
-		if (exceptField != textA->getName()) textA->setText(String(Constants::RadToGrad(point->getRawPoint()->getAzimuth()), 2));
-		if (exceptField != textE->getName()) textE->setText(String(Constants::RadToGrad(point->getRawPoint()->getElevation()), 2));
-		if (exceptField != textD->getName()) textD->setText(String(point->getRawPoint()->getDistance(), 3));
+		textName->setText(point->getName(), dontSendNotification);
+        textName->setTooltip("Channel Name " + commonText);
+        textCH->setText(String(selection + 1), dontSendNotification);
+        textCH->setTooltip("Channel index (1-based)");
+        if (exceptField != textX->getName()) textX->setText(String(point->getRawPoint()->getX(), 3), dontSendNotification);
+        textX->setTooltip("X-Coordinate" + commonText);
+		if (exceptField != textY->getName()) textY->setText(String(point->getRawPoint()->getY(), 3), dontSendNotification);
+        textY->setTooltip("Y-Coordinate" + commonText);
+		if (exceptField != textZ->getName()) textZ->setText(String(point->getRawPoint()->getZ(), 3), dontSendNotification);
+        textZ->setTooltip("Z-Coordinate" + commonText);
+		if (exceptField != textA->getName()) textA->setText(String(Constants::RadToGrad(point->getRawPoint()->getAzimuth()), 2), dontSendNotification);
+        textA->setTooltip("Azimuth" + commonText);
+		if (exceptField != textE->getName()) textE->setText(String(Constants::RadToGrad(point->getRawPoint()->getElevation()), 2), dontSendNotification);
+        textE->setTooltip("Elevation" + commonText);
+		if (exceptField != textD->getName()) textD->setText(String(point->getRawPoint()->getDistance(), 3), dontSendNotification);
+        textD->setTooltip("Distance" + commonText);
 	}
 	else
 	{
 		setFieldsEnabled(false);
-		textName->setText("");
-        textCH->setText("");
-		textX->setText("");
-		textY->setText("");
-		textZ->setText("");
-		textA->setText("");
-		textE->setText("");
-		textD->setText("");
+		textName->setText("", dontSendNotification);
+        textName->setTooltip("");
+        textCH->setText("", dontSendNotification);
+        textCH->setTooltip("");
+		textX->setText("", dontSendNotification);
+        textX->setTooltip("");
+		textY->setText("", dontSendNotification);
+        textY->setTooltip("");
+		textZ->setText("", dontSendNotification);
+        textZ->setTooltip("");
+		textA->setText("", dontSendNotification);
+        textA->setTooltip("");
+		textE->setText("", dontSendNotification);
+        textE->setTooltip("");
+		textD->setText("", dontSendNotification);
+        textD->setTooltip("");
 	}
 
     bool enGroup = pRadarOptions->allowGroup && pPointSelection->getSelectionMode() == PointSelection::Point && pPointSelection->getSelectedIndices().size() > 1
@@ -362,20 +329,23 @@ void PointInfoControl::updateSelectedPoint(String exceptField)
     bool enUngroup = pRadarOptions->allowGroup && pPointSelection->getSelectionMode() == PointSelection::Group && pPointSelection->getSelectedIndices().size() == 1;
     bool enDelete = pRadarOptions->allowDelete && pPointSelection->getSelectedIndices().size() > 0;
 	btnGroup->setEnabled(enGroup);
-	btnUngroup->setEnabled(enUngroup);
+    btnGroup->setTooltip(enGroup ? "Group selected sources" : "");
+    btnUngroup->setEnabled(enUngroup);
+    btnUngroup->setTooltip(enUngroup ? "Ungroup sources (remove group point)" : "");
     btnDelete->setEnabled(enDelete);
+    btnDelete->setTooltip(enDelete ? "Delete selected point(s)/group(s)" : "");
     bool makeReadOnly = pPointSelection->getSelectionMode() == PointSelection::None;
-	textX->setReadOnly(makeReadOnly);
-	textY->setReadOnly(makeReadOnly);
-	textZ->setReadOnly(makeReadOnly);
-	textA->setReadOnly(makeReadOnly);
-	textE->setReadOnly(makeReadOnly);
-	textD->setReadOnly(makeReadOnly);
+	textX->setEditable(!makeReadOnly);
+    textY->setEditable(!makeReadOnly);
+    textZ->setEditable(!makeReadOnly);
+    textA->setEditable(!makeReadOnly);
+    textE->setEditable(!makeReadOnly);
+    textD->setEditable(!makeReadOnly);
     if(pRadarOptions->checkNameFieldEditable)
     {
         makeReadOnly = pRadarOptions->dawParameter->updateTrackPropertiesWorking;
     }
-    textName->setReadOnly(makeReadOnly);
+    textName->setEditable(!makeReadOnly);
 	enableListeners();
 }
 
@@ -385,82 +355,98 @@ void PointInfoControl::changeListenerCallback(ChangeBroadcaster* source)
 		updateSelectedPoint();
 }
 
-void PointInfoControl::textEditorTextChanged(TextEditor& source)
+void PointInfoControl::labelTextChanged(Label *source)
 {
-	int selection = pPointSelection->getMainSelectedPointIndex();
-
+	Array<int> selectedIndices = shiftWasDownWhenEditingStarted ? pPointSelection->getSelectedIndices() : Array<int>( pPointSelection->getMainSelectedPointIndex());
+    
 	if(pPointSelection->getSelectionMode() == PointSelection::Group)
 	{
-		if (source.getName() == textName->getName())
+		if (source->getName() == textName->getName())
 		{
-			pEditablePoints->setGroupName(selection, textName->getText());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupName(selection, textName->getText());
 		}
         
-        if (source.getName() == textX->getName())
+        if (source->getName() == textX->getName())
         {
-            pEditablePoints->setGroupX(selection, textX->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupX(selection, textX->getText().getFloatValue());
         }
-        if (source.getName() == textY->getName())
+        if (source->getName() == textY->getName())
         {
-            pEditablePoints->setGroupY(selection, textY->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupY(selection, textY->getText().getFloatValue());
         }
-        if (source.getName() == textZ->getName())
+        if (source->getName() == textZ->getName())
         {
-            pEditablePoints->setGroupZ(selection, textZ->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupZ(selection, textZ->getText().getFloatValue());
         }
 
-        if (source.getName() == textA->getName())
+        if (source->getName() == textA->getName())
         {
-            pEditablePoints->setGroupAed(selection, Constants::GradToRad(textA->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupAed(selection, Constants::GradToRad(textA->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
         }
-        if (source.getName() == textE->getName())
+        if (source->getName() == textE->getName())
         {
-            pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), Constants::GradToRad(textE->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), Constants::GradToRad(textE->getText().getFloatValue()), pEditablePoints->getGroup(selection)->getRawPoint()->getDistance(), pEditablePoints->getGroupModeFlag());
         }
-        if (source.getName() == textD->getName())
+        if (source->getName() == textD->getName())
         {
-            pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), textD->getText().getFloatValue(), pEditablePoints->getGroupModeFlag());
+            for(int selection : selectedIndices)
+                pEditablePoints->setGroupAed(selection, pEditablePoints->getGroup(selection)->getRawPoint()->getAzimuth(), pEditablePoints->getGroup(selection)->getRawPoint()->getElevation(), textD->getText().getFloatValue(), pEditablePoints->getGroupModeFlag());
         }
 	}
 	else
 	{
-		if (source.getName() == textName->getName())
+		if (source->getName() == textName->getName())
 		{
-			pEditablePoints->setChannelName(selection, textName->getText());
-			if (pRadarOptions->setTrackColorAccordingToName)
-			{
-				pEditablePoints->setChannelColor(selection, TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
-			}
+            for(int selection : selectedIndices)
+            {
+                pEditablePoints->setChannelName(selection, textName->getText());
+                if (pRadarOptions->setTrackColorAccordingToName)
+                {
+                    pEditablePoints->setChannelColor(selection, TrackColors::getColor(textName->getText().initialSectionContainingOnly("0123456789").getIntValue()));
+                }
+            }
 		}
 
-		if (source.getName() == textX->getName())
+		if (source->getName() == textX->getName())
 		{
-			pEditablePoints->setX(selection, textX->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setX(selection, textX->getText().getFloatValue());
 		}
-		if (source.getName() == textY->getName())
+		if (source->getName() == textY->getName())
 		{
-			pEditablePoints->setY(selection, textY->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setY(selection, textY->getText().getFloatValue());
 		}
-		if (source.getName() == textZ->getName())
+		if (source->getName() == textZ->getName())
 		{
-			pEditablePoints->setZ(selection, textZ->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setZ(selection, textZ->getText().getFloatValue());
 		}
 
-		if (source.getName() == textA->getName())
+		if (source->getName() == textA->getName())
 		{
-			pEditablePoints->setAzimuth(selection, Constants::GradToRad(textA->getText().getFloatValue()));
+            for(int selection : selectedIndices)
+                pEditablePoints->setAzimuth(selection, Constants::GradToRad(textA->getText().getFloatValue()));
 		}
-		if (source.getName() == textE->getName())
+		if (source->getName() == textE->getName())
 		{
-			pEditablePoints->setElevation(selection, Constants::GradToRad(textE->getText().getFloatValue()));
+            for(int selection : selectedIndices)
+                pEditablePoints->setElevation(selection, Constants::GradToRad(textE->getText().getFloatValue()));
 		}
-		if (source.getName() == textD->getName())
+		if (source->getName() == textD->getName())
 		{
-			pEditablePoints->setDistance(selection, textD->getText().getFloatValue());
+            for(int selection : selectedIndices)
+                pEditablePoints->setDistance(selection, textD->getText().getFloatValue());
 		}
 	}
 
-	updateSelectedPoint(source.getName());
+	updateSelectedPoint(source->getName());
 }
 
 void PointInfoControl::disableListeners()
