@@ -281,7 +281,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
     {
         updateBFormatFilters();
         int nbDec = ambiSettings.getUsedDecoderCount();
-        int bufferPointerIndex = 0;
+        size_t bufferPointerIndex = 0;
         for (int iDec = 0; iDec < nbDec; iDec++)
         {
             if (!ambiSettings.multiDecoderSections[iDec].mute)
@@ -355,7 +355,7 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
             sumBuf.clear();
 
             float* sumData = sumBuf.getWritePointer(0);
-            for (int iDec = 0; iDec < inputBuffers.size(); iDec++)
+            for (size_t iDec = 0; iDec < inputBuffers.size(); iDec++)
             {
                 AmbiSettings* pAmbi = ambiSettingsVector[iDec];
                 if (!(speakerMaskVector[iDec] & (static_cast<unsigned long long>(1) << (iSpeaker))))

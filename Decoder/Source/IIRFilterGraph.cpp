@@ -24,7 +24,7 @@
 
 //==============================================================================
 
-IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors): pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0), usedFilterCount(1)
+IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors): usedFilterCount(1), pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
 {
     sampleRate = pFilterSpecification->sampleRate;
 	double currentFrequency = MIN_FREQUENCY;
@@ -63,7 +63,7 @@ void IIRFilterGraph::paintData(Graphics& g)
 {
 	// draw curve
 	
-	for (int iFilter = 0; iFilter < pFilterInfo.size() && iFilter < usedFilterCount; iFilter++)
+	for (size_t iFilter = 0; iFilter < pFilterInfo.size() && iFilter < (size_t)usedFilterCount; iFilter++)
 	{
 		FilterBankInfo* pFilter = pFilterInfo[iFilter];
 		Path path;

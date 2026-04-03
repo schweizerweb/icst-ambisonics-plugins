@@ -657,7 +657,10 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
                         case ActionType::RotationX: xAngleRad += angleRad; break;
                         case ActionType::RotationY: yAngleRad += angleRad; break;
                         case ActionType::RotationZ: zAngleRad += angleRad; break;
-                        default: break;
+                        case ActionType::Stretch:
+                        case ActionType::None:
+                        default:
+                            break;
                     }
                 }
             }

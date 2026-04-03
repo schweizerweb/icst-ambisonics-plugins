@@ -120,7 +120,7 @@ double DecoderSectionControlComponent::getValue(int /*columnId*/, int /*rowNumbe
 
 void DecoderSectionControlComponent::setValue(int /*columnId*/, int /*rowNumber*/, double newValue)
 {
-    if (newValue == -1)
+    if (newValue < 0)
     {
         for (int i = 0; i < pSpeakerSet->size(); i++)
         {

@@ -467,7 +467,7 @@ AnimatorMainView::ToolbarComponent::ToolbarComponent(AnimatorMainView& ownerRef)
 
     SvgHelper::loadSVGIcon(addMovementButton.get(), BinaryData::movement_icon_svg, BinaryData::movement_icon_svgSize, "Add Movement Clip");
     SvgHelper::loadSVGIcon(addActionButton.get(), BinaryData::action_icon_svg, BinaryData::action_icon_svgSize, "Add Action Clip");
-    SvgHelper::loadSVGIcon(deleteButton.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "Delete Selected Clips");
+    SvgHelper::loadSVGIcon(deleteButton.get(), BinaryData::trash_icon_svg, BinaryData::trash_icon_svgSize, "Delete Selected Clips");
     SvgHelper::loadSVGIcon(zoomInButton.get(), BinaryData::zoom_in_icon_svg, BinaryData::zoom_in_icon_svgSize, "Zoom In");
     SvgHelper::loadSVGIcon(zoomOutButton.get(), BinaryData::zoom_out_icon_svg, BinaryData::zoom_out_icon_svgSize, "Zoom Out");
     SvgHelper::loadSVGIcon(resetZoomButton.get(), BinaryData::reset_zoom_icon_svg, BinaryData::reset_zoom_icon_svgSize, "Reset Zoom");

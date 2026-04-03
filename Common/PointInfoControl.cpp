@@ -67,18 +67,21 @@ PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelectio
     btnUngroup->setButtonText (TRANS("Ungroup"));
     btnUngroup->addListener (this);
     SvgHelper::loadSVGIcon(btnUngroup.get(), BinaryData::ungroup_icon_svg, BinaryData::ungroup_icon_svgSize, "");
+    btnUngroup->setVisible(pRadarOptions->allowGroup);
     
     btnGroup.reset (new DrawableButton ("btnGroup", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnGroup.get());
     btnGroup->setButtonText (TRANS("Group"));
     btnGroup->addListener (this);
     SvgHelper::loadSVGIcon(btnGroup.get(), BinaryData::group_icon_svg, BinaryData::group_icon_svgSize, "");
+    btnGroup->setVisible(pRadarOptions->allowGroup);
     
     btnDelete.reset (new DrawableButton ("btnDelete", juce::DrawableButton::ImageOnButtonBackground));
     addAndMakeVisible (btnDelete.get());
     btnDelete->setButtonText (TRANS("Delete"));
     btnDelete->addListener (this);
-    SvgHelper::loadSVGIcon(btnDelete.get(), BinaryData::delete_icon_svg, BinaryData::delete_icon_svgSize, "");
+    SvgHelper::loadSVGIcon(btnDelete.get(), BinaryData::trash_icon_svg, BinaryData::trash_icon_svgSize, "");
+    btnDelete->setVisible(pRadarOptions->allowDelete);
     
     btnSphere.reset (new ColorBorderDrawableButton ("btnSphere", pRadarOptions->zoomSettings->fullSphere));
     addAndMakeVisible (btnSphere.get());

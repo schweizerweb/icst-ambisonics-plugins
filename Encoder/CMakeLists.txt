@@ -1,7 +1,6 @@
 SET(BIN_FILES
 	../../Resources/svg/movement_icon.svg
 	../../Resources/svg/action_icon.svg
-	../../Resources/svg/delete_icon.svg
 	../../Resources/svg/zoom_in_icon.svg
 	../../Resources/svg/zoom_out_icon.svg
 	../../Resources/svg/reset_zoom_icon.svg

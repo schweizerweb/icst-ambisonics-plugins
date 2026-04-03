@@ -34,7 +34,7 @@ bool AmbiSettingsSection::loadFromPresetXml(XmlElement *xmlElement, String defau
     mute = xmlElement->getBoolAttribute(XML_ATTRIBUTE_SECTION_MUTE, false);
     gain = xmlElement->getDoubleAttribute(XML_ATTRIBUTE_SECTION_GAIN, 1.0);
     color = Colour::fromString(xmlElement->getStringAttribute(XML_ATTRIBUTE_SECTION_COLOR, ""));
-    speakerMask = String(xmlElement->getStringAttribute(XML_ATTRIBUTE_SECTION_SPEAKERMASK)).getLargeIntValue();
+    speakerMask = (uint64_t)String(xmlElement->getStringAttribute(XML_ATTRIBUTE_SECTION_SPEAKERMASK)).getLargeIntValue();
     XmlElement* filterElement = xmlElement->getChildByName(XML_TAG_SECTION_FILTER);
     if (filterElement != nullptr)
     {
