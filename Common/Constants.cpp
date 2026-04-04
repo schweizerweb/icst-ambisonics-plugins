@@ -34,6 +34,8 @@ const double Constants::ElevationGradMin = -90.0;
 const double Constants::ElevationGradMax = 90.0;
 const double Constants::GainDbMin = -88.0;
 const double Constants::GainDbMax = 12.0;
+const double Constants::FilterGainDbMin = -50.0;
+const double Constants::FilterGainDbMax = 50.0;
 
 const float Constants::CompressedMin = -1.0f;
 const float Constants::CompressedMax = 1.0f;

@@ -43,12 +43,13 @@ class SingleFilterSettingsComponent  : public juce::Component,
 {
 public:
     //==============================================================================
-    SingleFilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener);
+    SingleFilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, Colour color_ = Colours::transparentBlack);
     ~SingleFilterSettingsComponent() override;
 
     //==============================================================================
     //[UserMethods]     -- You can add your own custom methods in this section.
     void updateUi();
+    Colour getColor() const;
     //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
@@ -62,6 +63,7 @@ private:
     //[UserVariables]   -- You can add your own custom variables in this section.
     FilterInfo* pFilterInfo;
     AmbiLookAndFeel ambiLookAndFeel;
+    Colour color;
     //[/UserVariables]
 
     //==============================================================================

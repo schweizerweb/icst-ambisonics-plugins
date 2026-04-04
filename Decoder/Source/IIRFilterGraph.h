@@ -24,6 +24,8 @@
 #include "JuceHeader.h"
 #include "../../Common/FilterBankInfo.h"
 #include "../../Common/SimpleGraph.h"
+#include "FilterHandleComponent.h"
+#include "SingleFilterSettingsComponent.h"
 
 #define MIN_FREQUENCY	1
 #define FREQUENCY_STEP 1.01
@@ -31,22 +33,34 @@
 //==============================================================================
 /*
 */
+
+
 class IIRFilterGraph    : public SimpleGraph
 {
 public:
-    IIRFilterGraph(std::vector<FilterBankInfo*> pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> pColors = std::vector<juce::Colour*>());
+    IIRFilterGraph(std::vector<FilterBankInfo*> pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> pColors = std::vector<juce::Colour*>(), OwnedArray<SingleFilterSettingsComponent>* pSingleFilterControls = nullptr);
     ~IIRFilterGraph() override;
 
 	void paintData(Graphics&) override;
     void setFFTResult(float* data, int size, int newFftSize);
     void setFFTParams(bool enable, double scaler = 0);
     void setUsedFiltersCount(int filterCount);
-
+    
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (IIRFilterGraph)
 
+public:
+    void rebuildHandles();
+    void updateHandlePositions();
+    void dragHandleTo (FilterBankInfo& bank, int filterIndex, juce::Point<float> localPoint);
+
 private:
+    float yToGainDb (float y) const;
+    float xToFrequency (float x) const;
+    juce::Point<float> valueToPoint (float frequencyHz, float gainDb) const;
+    
     int usedFilterCount;
+    OwnedArray<SingleFilterSettingsComponent>* pFilterControls;
 	std::vector<FilterBankInfo*> pFilterInfo;
 	std::vector<juce::Colour*> pColors;
 	Array<double> frequencies;
@@ -56,4 +70,5 @@ private:
     int fftResultDataSize;
     int fftSize;
     double fftScaler;
+    std::vector<std::unique_ptr<FilterHandleComponent>> handles;
 };

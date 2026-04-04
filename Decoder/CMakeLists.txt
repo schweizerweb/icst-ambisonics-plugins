@@ -29,6 +29,8 @@ target_sources(AmbiDecoder
 	Source/FilterSettingsComponent.h
 	Source/IIRFilterGraph.cpp
 	Source/IIRFilterGraph.h
+	Source/FilterHandleComponent.cpp
+	Source/FilterHandleComponent.h
 	Source/MultiDecoderComponent.cpp
 	Source/MultiDecoderComponent.h
 	Source/OSCHandlerDecoder.cpp

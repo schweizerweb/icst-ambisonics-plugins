@@ -186,7 +186,10 @@ void SimpleGraph::getStepSize(double minValue, double maxValue, int maxNbOfSteps
 
 Point<double> SimpleGraph::mapValues(double x, double y) const
 {
-	double mx = graphArea->getX() 
+    if(graphArea == nullptr)
+        return Point<double>(0,0);
+    
+	double mx = graphArea->getX()
 		+ graphArea->getWidth() / displayRangeX->getLength() * ((scalingModeX == Linear ? x : log10(x)) - displayRangeX->getStart());
 	double my = graphArea->getBottom() 
 		- graphArea->getHeight() / displayRangeY->getLength() * ((scalingModeY == Linear ? y : log10(y)) - displayRangeY->getStart());
@@ -201,4 +204,15 @@ void SimpleGraph::setDisplayRange(ScalingMode modeX, Range<double> xRange, Scali
 
 	displayRangeX.reset(modeX == Linear ? new Range<double>(xRange) : new Range<double>(log10(xRange.getStart()), log10(xRange.getEnd())));
 	displayRangeY.reset(modeY == Linear ? new Range<double>(yRange) : new Range<double>(log10(yRange.getStart()), log10(yRange.getEnd())));
+}
+
+SimpleGraph::ScalingMode SimpleGraph::getScalingModeX() const
+{
+    return scalingModeX;
+}
+
+
+SimpleGraph::ScalingMode SimpleGraph::getScalingModeY() const
+{
+    return scalingModeY;
 }

@@ -17,29 +17,15 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "IIRFilterGraph.h"
 #include "FilterPresetHelper.h"
 #include "SingleFilterSettingsComponent.h"
 
 #define INITIAL_FFT_SCALER 10.0
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class FilterSettingsComponent  : public Component,
                                  public ChangeBroadcaster,
                                  public ActionListener,
@@ -50,17 +36,13 @@ class FilterSettingsComponent  : public Component,
                                  public juce::Slider::Listener
 {
 public:
-    //==============================================================================
     FilterSettingsComponent (FilterBankInfo* pFilterBankInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, FilterPresetHelper* pPresetHelper, int channelIndex);
     ~FilterSettingsComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void updatePresetComboBox();
     void actionListenerCallback(const String &message) override;
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void timerCallback() override;
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -68,16 +50,11 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     FilterPresetHelper* pPresetHelper;
     FilterBankInfo* pFilterBankInfo;
     int channelIndex;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<IIRFilterGraph> filterGraph;
     std::unique_ptr<juce::ComboBox> comboBoxFilterPreset;
     std::unique_ptr<juce::Label> labelPresets;
@@ -89,9 +66,5 @@ private:
     std::unique_ptr<juce::Label> labelFFTScaler;
 
 
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (FilterSettingsComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

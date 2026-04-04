@@ -35,8 +35,8 @@
 //[/MiscUserDefs]
 
 //==============================================================================
-SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener)
-    : pFilterInfo(_pFilterInfo)
+SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, Colour color_)
+    : pFilterInfo(_pFilterInfo), color(color_)
 {
     //[Constructor_pre] You can add your own custom stuff here..
     //[/Constructor_pre]
@@ -47,7 +47,7 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
 
     sliderGain.reset (new juce::Slider ("sliderGain"));
     addAndMakeVisible (sliderGain.get());
-    sliderGain->setRange (Constants::GainDbMin, Constants::GainDbMax, 0.1);
+    sliderGain->setRange (Constants::FilterGainDbMin, Constants::FilterGainDbMax, 0.1);
     sliderGain->setSliderStyle(juce::Slider::LinearBar);
     sliderGain->setTextBoxStyle (juce::Slider::TextBoxBelow, false, 80, 20);
     sliderGain->addListener (this);
@@ -105,6 +105,11 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     
 
     //[UserPreSize]
+    if(color != Colours::transparentBlack)
+    {
+        groupMain->setColour(GroupComponent::outlineColourId, color);
+    }
+    
     sliderFrequency->setTextValueSuffix(" Hz");
     //[/UserPreSize]
 
@@ -248,13 +253,18 @@ void SingleFilterSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxTha
 void SingleFilterSettingsComponent::updateUi()
 {
     comboBoxType->setSelectedId(1 + pFilterInfo->filterType, dontSendNotification);
-    sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz);
-    sliderQ->setValue(pFilterInfo->qValue);
-    sliderGain->setValue(Decibels::gainToDecibels(pFilterInfo->gainFactor));
+    sliderFrequency->setValue(pFilterInfo->cutOffFrequencyHz, dontSendNotification);
+    sliderQ->setValue(pFilterInfo->qValue, dontSendNotification);
+    sliderGain->setValue(Decibels::gainToDecibels(pFilterInfo->gainFactor), dontSendNotification);
 
     sliderFrequency->setEnabled(pFilterInfo->frequencyRequired());
     sliderQ->setEnabled(pFilterInfo->qRequired());
     sliderGain->setEnabled(pFilterInfo->gainRequired());
+}
+
+Colour SingleFilterSettingsComponent::getColor() const
+{
+    return color;
 }
 
 //[/MiscUserCode]

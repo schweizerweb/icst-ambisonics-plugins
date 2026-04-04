@@ -41,7 +41,9 @@ public:
 	const static double ElevationGradMax;
 	const static double GainDbMin;
 	const static double GainDbMax;
-	
+    const static double FilterGainDbMin;
+    const static double FilterGainDbMax;
+    
     const static float CompressedMin;
     const static float CompressedMax;
     

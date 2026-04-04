@@ -43,6 +43,8 @@ protected:
 	void setDisplayRange(ScalingMode modeX, Range<double> xRange, ScalingMode modeY, Range<double> yRange);
 	void drawYAxis(Graphics&) const;
 	void drawXAxis(Graphics&) const;
+    ScalingMode getScalingModeX() const;
+    ScalingMode getScalingModeY() const;
 
 private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SimpleGraph)
