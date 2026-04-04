@@ -39,6 +39,8 @@
 #define DEFAULT_SEND_EXT_CONTINUOUS_FLAG    false
 #define DEFAULT_DIST_ENC_FLAG		true
 #define DEFAULT_DOPPLER_ENC_FLAG	false
+#define DEFAULT_BYPASS_BLAUERT_FLAG false
+#define DEFAULT_BLAUERT_INTENSITY   0.5
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
 #define DEFAULT_ANIMATOR_ON         false
@@ -86,8 +88,11 @@ public:
     int ambiOrder;
     
 	bool distanceEncodingFlag;
-	DistanceEncodingParams distanceEncodingParams;
+    DistanceEncodingParams distanceEncodingParams;
 	
+    bool bypassBlauertFlag;
+    double blauertIntensity;
+    
 	bool dopplerEncodingFlag;
 
     bool hideWarnings;

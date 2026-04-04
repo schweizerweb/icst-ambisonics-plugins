@@ -27,6 +27,7 @@
 #define XML_TAG_OSC_SEND "OscSend"
 #define XML_TAG_OSC_SEND_EXT "OscSendExt"
 #define XML_TAG_DISTANCE_ENCODING "DistanceEncoding"
+#define XML_TAG_BLAUERT_ENCODING "BlauertEncoding"
 #define XML_TAG_DOPPLER_ENCODING "DopplerEncoding"
 #define XML_TAG_DISPLAY "Display"
 #define XML_TAG_ANIMATOR "Animator"
@@ -35,12 +36,14 @@
 #define XML_TAG_OSC_SEND_EXT_XYZ_INDEX "XyzIndex"
 #define XML_TAG_OSC_SEND_EXT_AED_INDEX "AedIndex"
 #define XML_ATTRIBUTE_ENABLE "Enable"
+#define XML_ATTRIBUTE_BYPASS "Bypass"
 #define XML_ATTRIBUTE_PORT "Port"
 #define XML_ATTRIBUTE_HOST "Host"
 #define XML_ATTRIBUTE_INTERVAL "Interval"
 #define XML_ATTRIBUTE_CONTINUOUS "Continuous"
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 #define XML_ATTRIBUTE_VALUE "Value"
+#define XML_ATTRIBUTE_INTENSITY "Intensity"
 #define XML_ATTRIBUTE_AUTO_FOLLOW "AutoFollow"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
@@ -65,6 +68,8 @@ EncoderSettings::EncoderSettings():
     oscSendExtAedIndex(new StandardOscTarget()),
     ambiOrder(DEFAULT_AMBI_ORDER),
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
+    bypassBlauertFlag(DEFAULT_BYPASS_BLAUERT_FLAG),
+    blauertIntensity(DEFAULT_BLAUERT_INTENSITY),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
     hideWarnings(DEFAULT_HIDE_WARNINGS)
 {
@@ -133,6 +138,11 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     distanceEncodingParams.writeToXmlElement(distanceEncoding);
     element->addChildElement(distanceEncoding);
 
+    XmlElement* blauertEncoding = new XmlElement(XML_TAG_BLAUERT_ENCODING);
+    blauertEncoding->setAttribute(XML_ATTRIBUTE_BYPASS, bypassBlauertFlag);
+    blauertEncoding->setAttribute(XML_ATTRIBUTE_INTENSITY, blauertIntensity);
+    element->addChildElement(blauertEncoding);
+    
     XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
     dopplerEncoding->setAttribute(XML_ATTRIBUTE_ENABLE, dopplerEncodingFlag);
     element->addChildElement(dopplerEncoding);
@@ -229,6 +239,13 @@ void EncoderSettings::loadFromXml(XmlElement* element)
         distanceEncodingParams.loadFromXmlElement(distanceEncoding);
     }
 
+    XmlElement* blauertEncoding = element->getChildByName(XML_TAG_BLAUERT_ENCODING);
+    if (blauertEncoding != nullptr)
+    {
+        bypassBlauertFlag = blauertEncoding->getBoolAttribute(XML_ATTRIBUTE_BYPASS, DEFAULT_BYPASS_BLAUERT_FLAG);
+        blauertIntensity = blauertEncoding->getDoubleAttribute(XML_ATTRIBUTE_INTENSITY, DEFAULT_BLAUERT_INTENSITY);
+    }
+    
     XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);
     if (dopplerEncoding != nullptr)
     {

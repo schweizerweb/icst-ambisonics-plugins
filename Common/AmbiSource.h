@@ -34,6 +34,9 @@ public:
 
 	void setRms(float newRmsLevel, bool onlyIfGreater = false);
 	float getRms() const;
+    
+    void setBlauertFlag(bool en);
+    bool getBlauertFlag() const;
 
 	float getDisplayScaler() override;
 	XmlElement* getAsXmlElement(String tagName) override;
@@ -43,4 +46,5 @@ public:
     
 private:
 	float rms;
+    bool blauertFlag;
 };

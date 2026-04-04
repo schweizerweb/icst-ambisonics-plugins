@@ -53,6 +53,26 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
 
     toggleDoppler->setBounds (6, 8, 199, 24);
 
+    toggleBypassBlauert.reset (new juce::ToggleButton ("toggleBypassBlauert"));
+    addAndMakeVisible (toggleBypassBlauert.get());
+    toggleBypassBlauert->setButtonText (TRANS("Bypass"));
+    toggleBypassBlauert->addListener (this);
+
+    labelIntensity.reset (new juce::Label ("labelIntensity",
+                                           TRANS("Blauert Intensity")));
+    addAndMakeVisible (labelIntensity.get());
+    labelIntensity->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
+    labelIntensity->setJustificationType (juce::Justification::centredLeft);
+    labelIntensity->setEditable (false, false, false);
+    labelIntensity->setColour (juce::TextEditor::textColourId, juce::Colours::black);
+    labelIntensity->setColour (juce::TextEditor::backgroundColourId, juce::Colour (0x00000000));
+    
+    sliderBlauertIntensity.reset(new Slider("sliderBlauertIntensity"));
+    addAndMakeVisible (sliderBlauertIntensity.get());
+    sliderBlauertIntensity->addListener(this);
+    sliderBlauertIntensity->setRange(0.0, 1.0);
+    sliderBlauertIntensity->setNumDecimalPlacesToDisplay(3);
+
     distanceEncodingComponent.reset (new DistanceEncodingComponent (&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings));
     addAndMakeVisible (distanceEncodingComponent.get());
     distanceEncodingComponent->setName ("distanceEncodingComponent");
@@ -77,6 +97,9 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
     groupDistanceEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
     toggleDoppler = nullptr;
+    toggleBypassBlauert = nullptr;
+    labelIntensity = nullptr;
+    sliderBlauertIntensity = nullptr;
     distanceEncodingComponent = nullptr;
 
 
@@ -104,6 +127,11 @@ void EncodingSettingsComponent::resized()
     groupDistanceEncoding->setBounds (8, 40, getWidth() - 14, getHeight() - 46);
     toggleDistanceEncoding->setBounds (8 + 14, 40 + 24, 199, 24);
     distanceEncodingComponent->setBounds (8 + 14, 40 + 56, (getWidth() - 14) - 28, (getHeight() - 46) - 70);
+    
+    toggleBypassBlauert->setBounds (getWidth()-80, 8, 76, 24);
+    sliderBlauertIntensity->setBounds(getWidth()-280, 8, 196, 24);
+    labelIntensity->setBounds(getWidth()-380, 8, 96, 24);
+    
     //[UserResized] Add your own custom resize handling here..
     //[/UserResized]
 }
@@ -128,11 +156,29 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
         sendChangeMessage();
         //[/UserButtonCode_toggleDoppler]
     }
+    else if (buttonThatWasClicked == toggleBypassBlauert.get())
+    {
+        //[UserButtonCode_toggleDoppler] -- add your button handler code here..
+        m_args.pSettings->bypassBlauertFlag = toggleBypassBlauert->getToggleState();
+        sendChangeMessage();
+        controlDimming();
+        //[/UserButtonCode_toggleDoppler]
+    }
 
     //[UserbuttonClicked_Post]
     //[/UserbuttonClicked_Post]
 }
 
+void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
+{
+    if (sliderThatWasMoved == sliderBlauertIntensity.get())
+    {
+        //[UserButtonCode_toggleDoppler] -- add your button handler code here..
+        m_args.pSettings->blauertIntensity = sliderBlauertIntensity->getValue();
+        sendChangeMessage();
+        //[/UserButtonCode_toggleDoppler]
+    }
+}
 
 
 //[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
@@ -141,13 +187,16 @@ void EncodingSettingsComponent::updateEncodingUiElements()
     toggleDistanceEncoding->setToggleState(m_args.pSettings->distanceEncodingFlag, dontSendNotification);
 
     toggleDoppler->setToggleState(m_args.pSettings->dopplerEncodingFlag, dontSendNotification);
+    toggleBypassBlauert->setToggleState(m_args.pSettings->bypassBlauertFlag, dontSendNotification);
     
+    sliderBlauertIntensity->setValue(m_args.pSettings->blauertIntensity, dontSendNotification);
     controlDimming();
 }
 
 void EncodingSettingsComponent::controlDimming()
 {
     distanceEncodingComponent->setEnabled(toggleDistanceEncoding->getToggleState());
+    sliderBlauertIntensity->setEnabled(!toggleBypassBlauert->getToggleState());
 }
 
 //[/MiscUserCode]

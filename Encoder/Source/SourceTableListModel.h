@@ -44,6 +44,7 @@
 #define COLUMN_ID_D            12
 #define COLUMN_ID_GAIN        5
 #define COLUMN_ID_MUTE          14
+#define COLUMN_ID_BLAUERT       15
 #define COLUMN_ID_COLOR        13
 #define COLUMN_ID_ENABLED       1
 
@@ -71,6 +72,7 @@ public:
         tableListBox->getHeader().addColumn("E", COLUMN_ID_E, 50);
         tableListBox->getHeader().addColumn("D", COLUMN_ID_D, 50);
         tableListBox->getHeader().addColumn("M & S", COLUMN_ID_MUTE, 50);
+        tableListBox->getHeader().addColumn("Blauert", COLUMN_ID_BLAUERT, 50);
         tableListBox->getHeader().addColumn("Gain [dB]", COLUMN_ID_GAIN, 80);
         tableListBox->getHeader().addColumn("Color", COLUMN_ID_COLOR, 60);
         tableListBox->getHeader().setStretchToFitActive(true);
@@ -190,7 +192,7 @@ private:
             colorBox->setRowAndColumn(rowNumber, columnId);
             return colorBox;
         }
-        else if (columnId == COLUMN_ID_ENABLED)
+        else if (columnId == COLUMN_ID_ENABLED || columnId == COLUMN_ID_BLAUERT)
         {
             CheckBoxCustomComponent* checkBox = static_cast<CheckBoxCustomComponent*>(existingComponentToUpdate);
             if(checkBox == nullptr)
@@ -214,7 +216,7 @@ private:
 
     double getValue(int columnId, int rowNumber) override
     {
-        AmbiPoint* pt = pSources->get(rowNumber);
+        AmbiSource* pt = pSources->get(rowNumber);
         if (pt == nullptr)
             return 0.0;
 
@@ -228,6 +230,7 @@ private:
         case COLUMN_ID_E: return Constants::RadToGrad(pt->getRawPoint()->getElevation());
         case COLUMN_ID_D: return pt->getRawPoint()->getDistance();
         case COLUMN_ID_COLOR: return pt->getColor().getARGB();
+        case COLUMN_ID_BLAUERT: return pt->getEnabled() && pt->getBlauertFlag();
         case COLUMN_ID_ENABLED: return pt->getEnabled() ? 1 : 0;
         default: return 0.0;
         }
@@ -284,6 +287,7 @@ private:
         case COLUMN_ID_D: pSources->setDistance(rowNumber, newValue); break;
         case COLUMN_ID_COLOR: pSources->setChannelColor(rowNumber, Colour(uint32(newValue))); break;
         case COLUMN_ID_ENABLED: pSources->setEnabled(rowNumber, !exactlyEqual(newValue, 0.0) && rowNumber < pChannelLayout->getNumInputChannels()); break;
+        case COLUMN_ID_BLAUERT: pSources->setBlauertFlag(rowNumber, !exactlyEqual(newValue, 0.0)); break;
         default: throw;
         }
 

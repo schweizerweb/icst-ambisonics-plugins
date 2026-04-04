@@ -168,6 +168,11 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     iirFilterSpec.numChannels = 1;
 	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
+    
+    for(int i = 0; i < 64; i++)
+    {
+        blauertFilters[i].prepare(sampleRate);
+    }
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()
@@ -342,6 +347,19 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 			}
 		}
 
+        // blauert filter
+        if (!encoderSettings.bypassBlauertFlag && source->getBlauertFlag())
+        {
+            blauertFilters[iSource].setValues((float)sourcePoint.getY(), (float)sourcePoint.getZ(), (float)encoderSettings.blauertIntensity);
+            float* writePointer = inputBuffer.getWritePointer(iSource);
+            BlauertDirectionalFilter* filter = &blauertFilters[iSource];
+            for (int iSample = 0; iSample < inputBuffer.getNumSamples(); iSample++)
+            {
+                writePointer[iSample] = filter->processSample(writePointer[iSample]);
+            }
+        }
+
+        
 		// keep RMS
 		sources->setRms(iSource, inputBuffer.getRMSLevel(iSource, 0, inputBuffer.getNumSamples()), encoderSettings.oscSendFlag);
 

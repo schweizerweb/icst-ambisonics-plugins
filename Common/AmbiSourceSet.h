@@ -57,7 +57,8 @@ public:
 
 	void setChannelXYZExt(String id, String name, double x, double y, double z, float rms, Colour color);
 	void setRms(int channel, float rms, bool onlyIfGreater) const;
-
+    void setBlauertFlag(int channel, bool flag) const;
+    
 	void addNew(String id, Point3D<double> point, String name, Colour color) override;
 	void loadFromXml(XmlElement* xmlElement, AudioParams* pAudioParams);
 	void writeToXmlElement(XmlElement* xml) const;

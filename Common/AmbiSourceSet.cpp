@@ -138,11 +138,20 @@ void AmbiSourceSet::setChannelXYZExt(String id, String name, double x, double y,
 
 void AmbiSourceSet::setRms(int channel, float rms, bool onlyIfGreater) const
 {
+    AmbiSource* pt = elements[channel];
+
+    if (pt != nullptr)
+        pt->setRms(rms, onlyIfGreater);
+}
+
+void AmbiSourceSet::setBlauertFlag(int channel, bool flag) const
+{
 	AmbiSource* pt = elements[channel];
 
 	if (pt != nullptr)
-		pt->setRms(rms, onlyIfGreater);
+		pt->setBlauertFlag(flag);
 }
+
 
 void AmbiSourceSet::addNew(String id, Point3D<double> point, String name, Colour color)
 {

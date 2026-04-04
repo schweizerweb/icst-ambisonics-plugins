@@ -20,6 +20,8 @@
 
 
 #include "AmbiSource.h"
+#define XML_ATTRIBUTE_BLAUERT_FLAG "EnableBlauert"
+#define DEFAULT_BLAUERT_FLAG true
 
 AmbiSource::~AmbiSource()
 {
@@ -39,6 +41,7 @@ AmbiSource::AmbiSource(String _id, Point3D<double> _point, String _name, Colour 
 
 AmbiSource::AmbiSource(XmlElement* _element, AudioParameterSet _audioParams) : AmbiPoint(_element, _audioParams), rms(0.0f)
 {
+    blauertFlag = _element->getBoolAttribute(XML_ATTRIBUTE_BLAUERT_FLAG, DEFAULT_BLAUERT_FLAG);
 }
 
 AmbiSource::AmbiSource(AudioParameterSet _audioParams, String _name) : AmbiPoint(_audioParams), rms(0.0f)
@@ -57,6 +60,16 @@ float AmbiSource::getRms() const
 	return rms;
 }
 
+void AmbiSource::setBlauertFlag(bool en)
+{
+    blauertFlag = en;
+}
+
+bool AmbiSource::getBlauertFlag() const
+{
+    return blauertFlag;
+}
+
 float AmbiSource::getDisplayScaler()
 {
 	return 1.0f + 10.0f * rms;
@@ -64,5 +77,7 @@ float AmbiSource::getDisplayScaler()
 
 XmlElement* AmbiSource::getAsXmlElement(String tagName)
 {
-	return getBaseXmlElement(tagName);
+	XmlElement* xml = getBaseXmlElement(tagName);
+    xml->setAttribute(XML_ATTRIBUTE_BLAUERT_FLAG, blauertFlag);
+    return xml;
 }

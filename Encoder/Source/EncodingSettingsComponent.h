@@ -42,7 +42,8 @@
 */
 class EncodingSettingsComponent  : public Component,
                                    public ChangeBroadcaster,
-                                   public juce::Button::Listener
+                                   public juce::Button::Listener,
+                                   public juce::Slider::Listener
 {
 public:
     //==============================================================================
@@ -58,6 +59,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
+    void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
 
 
@@ -72,6 +74,9 @@ private:
     std::unique_ptr<juce::GroupComponent> groupDistanceEncoding;
     std::unique_ptr<juce::ToggleButton> toggleDistanceEncoding;
     std::unique_ptr<juce::ToggleButton> toggleDoppler;
+    std::unique_ptr<juce::ToggleButton> toggleBypassBlauert;
+    std::unique_ptr<juce::Label> labelIntensity;
+    std::unique_ptr<juce::Slider> sliderBlauertIntensity;
     std::unique_ptr<juce::TextButton> btnManageDistanceEncodingPresets;
     std::unique_ptr<DistanceEncodingComponent> distanceEncodingComponent;
 

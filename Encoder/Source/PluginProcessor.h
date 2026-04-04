@@ -44,6 +44,7 @@
 #include "TimelineComponent.h"
 #include "AnimatorEngine.h"
 #include "../../Common/DebugLogHandler.h"
+#include "../../Common/BlauertDirectionalFilter.h"
 
 //==============================================================================
 /**
@@ -153,6 +154,7 @@ private:
 	double lastCoefficients[64][64];
 	VarDelayBuffer delayBuffers[64];
     AirAbsorbtionFilter airAbsorbtionFilters[64];
+    BlauertDirectionalFilter blauertFilters[64];
     dsp::ProcessSpec iirFilterSpec;
     ScalingInfo scalingInfo;
     std::unique_ptr<ZoomSettings> zoomSettings;
