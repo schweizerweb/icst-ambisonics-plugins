@@ -17,10 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
 #include "JuceHeader.h"
 #include "../../Common/FilterBankInfo.h"
 #include "../../Common/SimpleGraph.h"
@@ -29,11 +26,6 @@
 
 #define MIN_FREQUENCY	1
 #define FREQUENCY_STEP 1.01
-
-//==============================================================================
-/*
-*/
-
 
 class IIRFilterGraph    : public SimpleGraph
 {

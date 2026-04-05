@@ -25,7 +25,6 @@
 #include "TrackColors.h"
 #include "LabelCreator.h"
 
-//==============================================================================
 Radar2D::Radar2D(RadarMode mode, AmbiDataSet* _pEditablePoints, AmbiDataSet* _pDisplayOnlyPoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions):
 	pEditablePoints(_pEditablePoints),
 	pDisplayOnlyPoints(_pDisplayOnlyPoints),

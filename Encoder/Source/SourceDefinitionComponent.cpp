@@ -24,12 +24,6 @@
 #include "../../Common/ImportExport.h"
 #include "SourceDefinitionComponent.h"
 
-
-#if JUCE_CLANG
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
-#endif
-
 SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentArgs args)
     : m_args(args)
 {

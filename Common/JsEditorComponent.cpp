@@ -135,7 +135,6 @@ Error handling:
 
 Note: all 'index' parameters are 1-based, except for the 'Local Buffer' methods)";
 
-//==============================================================================
 JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpdater* _pCallback) : pCallback(_pCallback), pCode(_pCode), pCloseFlag(_pCloseFlag)
 {
     codeDocument.replaceAllContent(*pCode);

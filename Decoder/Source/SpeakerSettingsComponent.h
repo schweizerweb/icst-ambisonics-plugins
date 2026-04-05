@@ -17,11 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSettingsCollection.h"
@@ -42,18 +38,6 @@
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/FilterControlCallback.h"
-//[/Headers]
-
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 
 class SpeakerSettingsComponent  : public Component,
                                   public TableListBoxModel,
@@ -70,12 +54,8 @@ class SpeakerSettingsComponent  : public Component,
                                   public MenuBarModel
 {
 public:
-    //==============================================================================
     SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout);
     ~SpeakerSettingsComponent() override;
-
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 
     // table overrides
 	int getNumRows() override;
@@ -95,7 +75,6 @@ public:
 	TableListBox* getTable() override;
     SliderRange getSliderRange(int columnId) override;
     bool getEnabled(const int columnId, const int rowNumber) override;
-
 
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     void actionListenerCallback(const String &message) override;
@@ -124,17 +103,12 @@ public:
     bool getSolo(int rowNumber) override;
     void setSolo(int rowNumber, bool newValue) override;
 
-    //[/UserMethods]
-
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     std::unique_ptr<MenuBarComponent> menuBar;
     ApplicationCommandManager commandManager;
 	AmbiSpeakerSet* pSpeakerSet;
@@ -164,10 +138,6 @@ private:
         about
     };
 
-
-    //[/UserVariables]
-
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupOsc;
     std::unique_ptr<juce::GroupComponent> groupAmbisonics;
     std::unique_ptr<juce::GroupComponent> groupSpeakers;
@@ -188,11 +158,5 @@ private:
     std::unique_ptr<MultiDecoderComponent> multiDecoderControl;
     std::unique_ptr<AmbiSettingsComponent> ambiSettingsControl;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SpeakerSettingsComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

@@ -20,7 +20,6 @@
 #include "JuceHeader.h"
 #include "SimpleGraph.h"
 
-//==============================================================================
 SimpleGraph::SimpleGraph(): fullGridFlag(false)
 {
 	scalingModeX = Linear;

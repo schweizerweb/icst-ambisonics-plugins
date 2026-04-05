@@ -19,11 +19,6 @@
 
 #include "RadarSettingsComponent.h"
 
-#if JUCE_CLANG
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
-#endif
-
 RadarSettingsComponent::RadarSettingsComponent (ChangeListener* pChangeListener, ZoomSettings* _pZoomSettings)
     : pZoomSettings(_pZoomSettings)
 {

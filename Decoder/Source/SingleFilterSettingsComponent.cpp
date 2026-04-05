@@ -17,30 +17,13 @@
 ================================================================================
 */
 
-
-
-//[Headers] You can add your own extra header files here...
 #include "../../Common/FilterInfo.h"
 #include "../../Common/Constants.h"
-//[/Headers]
-
 #include "SingleFilterSettingsComponent.h"
 
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
-#if JUCE_CLANG
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
-#endif
-//[/MiscUserDefs]
-
-//==============================================================================
 SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, Colour color_)
     : pFilterInfo(_pFilterInfo), color(color_)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
-    //[/Constructor_pre]
-
     groupMain.reset (new juce::GroupComponent ("groupMain",
                                                juce::String()));
     addAndMakeVisible (groupMain.get());
@@ -103,20 +86,16 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     labelGain->setColour (juce::TextEditor::textColourId, juce::Colours::black);
     labelGain->setColour (juce::TextEditor::backgroundColourId, Colours::darkgreen);
     
-
-    //[UserPreSize]
     if(color != Colours::transparentBlack)
     {
         groupMain->setColour(GroupComponent::outlineColourId, color);
     }
     
     sliderFrequency->setTextValueSuffix(" Hz");
-    //[/UserPreSize]
 
     setSize (600, 400);
 
 
-    //[Constructor] You can add your own custom stuff here..
     comboBoxType->addItem("Off", 1 + FilterInfo::FilterType::None);
     comboBoxType->addItem("Low-Pass", 1 + FilterInfo::FilterType::LowPass);
     comboBoxType->addItem("Band-Pass", 1 + FilterInfo::FilterType::BandPass);
@@ -128,7 +107,6 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     comboBoxType->addItem("High Shelf", 1 + FilterInfo::FilterType::HighShelf);
     comboBoxType->addItem("Peak", 1 + FilterInfo::FilterType::Peak);
 
-
     sliderFrequency->setSkewFactorFromMidPoint(500);
     sliderFrequency->setRange(20, jmin(int(pFilterSpecification->sampleRate / 2.0), 22000));
     sliderFrequency->setNumDecimalPlacesToDisplay(0);
@@ -138,15 +116,12 @@ SingleFilterSettingsComponent::SingleFilterSettingsComponent (FilterInfo* _pFilt
     updateUi();
 
     addChangeListener(pChangeListener);
-    //[/Constructor]
 }
 
 SingleFilterSettingsComponent::~SingleFilterSettingsComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
     setLookAndFeel(nullptr);
     removeAllChangeListeners();
-    //[/Destructor_pre]
 
     groupMain = nullptr;
     sliderGain = nullptr;
@@ -155,29 +130,15 @@ SingleFilterSettingsComponent::~SingleFilterSettingsComponent()
     sliderFrequency = nullptr;
     labelQ = nullptr;
     labelGain = nullptr;
-
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
-//==============================================================================
 void SingleFilterSettingsComponent::paint (juce::Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (juce::Colour (0xff323e44));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void SingleFilterSettingsComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
     int horizBorder = 4;
     int vertBorder = 0;
     int offset = 10;
@@ -187,68 +148,38 @@ void SingleFilterSettingsComponent::resized()
     sliderFrequency->setBounds(horizBorder, offset + height + 3*vertBorder, getWidth() - 2 * horizBorder, height);
     sliderGain->setBounds(horizBorder, offset + 2*height + 5*vertBorder, getWidth() - 2 * horizBorder, height);
     sliderQ->setBounds(horizBorder, offset + 3*height + 7*vertBorder, getWidth() - 2*horizBorder, getHeight() - (4 + offset+ 3*height + 7*vertBorder));
-
-    /*sliderGain->setBounds (proportionOfWidth (0.5000f) + 2, 88, proportionOfWidth (0.5000f) - 2, getHeight() - 70);
-    sliderQ->setBounds (2, 88, proportionOfWidth (0.5000f) - 2, getHeight() - 70);*/
-    //labelQ->setBounds (2, getHeight() - 24, proportionOfWidth(0.5f) - 4, 22);
-    //labelGain->setBounds (proportionOfWidth (0.5000f) +2, getHeight() - 24, proportionOfWidth(0.5) - 4, 22);
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
 void SingleFilterSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
     if (sliderThatWasMoved == sliderGain.get())
     {
-        //[UserSliderCode_sliderGain] -- add your slider handling code here..
         pFilterInfo->gainFactor = Decibels::decibelsToGain(float(sliderGain->getValue()));
-        //[/UserSliderCode_sliderGain]
     }
     else if (sliderThatWasMoved == sliderQ.get())
     {
-        //[UserSliderCode_sliderQ] -- add your slider handling code here..
         pFilterInfo->qValue = float(sliderQ->getValue());
-        //[/UserSliderCode_sliderQ]
     }
     else if (sliderThatWasMoved == sliderFrequency.get())
     {
-        //[UserSliderCode_sliderFrequency] -- add your slider handling code here..
         pFilterInfo->cutOffFrequencyHz = float(sliderFrequency->getValue());
-        //[/UserSliderCode_sliderFrequency]
     }
 
-    //[UsersliderValueChanged_Post]
     sendChangeMessage();
-    //[/UsersliderValueChanged_Post]
 }
 
 void SingleFilterSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 {
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
     if (comboBoxThatHasChanged == comboBoxType.get())
     {
-        //[UserComboBoxCode_comboBoxType] -- add your combo box handling code here..
         pFilterInfo->filterType = FilterInfo::FilterType(comboBoxType->getSelectedId() - 1);
         pFilterInfo->cutOffFrequencyHz = pFilterInfo->defaultFrequency();
         pFilterInfo->qValue = pFilterInfo->defaultQ();
         pFilterInfo->gainFactor = pFilterInfo->defaultGainFactor();
         updateUi();
         sendChangeMessage();
-        //[/UserComboBoxCode_comboBoxType]
     }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
-
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 void SingleFilterSettingsComponent::updateUi()
 {
@@ -266,63 +197,3 @@ Colour SingleFilterSettingsComponent::getColor() const
 {
     return color;
 }
-
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="SingleFilterSettingsComponent"
-                 componentName="" parentClasses="public juce::Component, public ChangeBroadcaster"
-                 constructorParams="FilterInfo* _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener"
-                 variableInitialisers="pFilterInfo(_pFilterInfo)" snapPixels="8"
-                 snapActive="1" snapShown="1" overlayOpacity="0.330" fixedSize="0"
-                 initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <GROUPCOMPONENT name="groupMain" id="8ef5d6310f4a0551" memberName="groupMain"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 0M" title=""/>
-  <SLIDER name="sliderGain" id="6dc6c3b4f1230227" memberName="sliderGain"
-          virtualName="" explicitFocusOrder="0" pos="0Rr 88 50% 96M" min="0.001"
-          max="20.0" int="0.001" style="Rotary" textBoxPos="TextBoxBelow"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <SLIDER name="sliderQ" id="d75dd45147568a5" memberName="sliderQ" virtualName=""
-          explicitFocusOrder="0" pos="0 88 50% 96M" min="0.001" max="100.0"
-          int="0.0" style="Rotary" textBoxPos="TextBoxBelow" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <COMBOBOX name="comboBoxType" id="8896d80d8503e534" memberName="comboBoxType"
-            virtualName="" explicitFocusOrder="0" pos="16 24 32M 24" editable="0"
-            layout="33" items="" textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-  <SLIDER name="sliderFrequency" id="f23e9b966efc9df5" memberName="sliderFrequency"
-          virtualName="" explicitFocusOrder="0" pos="16 56 32M 24" min="20.0"
-          max="15000.0" int="1.0" style="LinearBar" textBoxPos="TextBoxRight"
-          textBoxEditable="1" textBoxWidth="80" textBoxHeight="20" skewFactor="1.0"
-          needsCallback="1"/>
-  <LABEL name="labelQ" id="c59d0be17b74b579" memberName="labelQ" virtualName=""
-         explicitFocusOrder="0" pos="50.173%c 50.182%c 24 24" posRelativeX="d75dd45147568a5"
-         posRelativeY="d75dd45147568a5" edTextCol="ff000000" edBkgCol="0"
-         labelText="Q" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="36"/>
-  <LABEL name="labelGain" id="5e0ece6555401094" memberName="labelGain"
-         virtualName="" explicitFocusOrder="0" pos="49.827%c 50.182%c 48 24"
-         posRelativeX="6dc6c3b4f1230227" posRelativeY="6dc6c3b4f1230227"
-         edTextCol="ff000000" edBkgCol="0" labelText="Gain" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="36"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

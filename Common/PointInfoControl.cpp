@@ -22,14 +22,7 @@
 #include "Constants.h"
 #include "ColorDefinition.h"
 #include "SvgHelper.h"
-
 #include "PointInfoControl.h"
-
-
-#if JUCE_CLANG
-#pragma GCC diagnostic push
-#pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
-#endif
 
 PointInfoControl::PointInfoControl (AmbiDataSet* _pEditablePoints, PointSelection* _pPointSelection, RadarOptions* _pRadarOptions)
     : pEditablePoints(_pEditablePoints), pPointSelection(_pPointSelection), pRadarOptions(_pRadarOptions)

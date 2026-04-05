@@ -20,7 +20,6 @@
 #include "JuceHeader.h"
 #include "MultiSliderControl.h"
 
-//==============================================================================
 MultiSliderControl::MultiSliderControl(int numberOfSliders, double* values, OwnedArray<String>* columnNames, double minVal, double maxVal, double interval)
 {
     // initially make all sliders visible

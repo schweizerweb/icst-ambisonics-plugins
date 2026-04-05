@@ -17,11 +17,8 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
 #include "DecoderSettings.h"
@@ -30,43 +27,27 @@
 #include "../../Common/RadarOptions.h"
 #include "OSCHandlerDecoder.h"
 #include "../../Common/HelpDialogManager.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class AmbisonicsDecoderAudioProcessorEditor  : public AudioProcessorEditor,
                                                public ChangeListener,
                                                public ActionListener,
                                                public juce::Button::Listener
 {
 public:
-    //==============================================================================
     AmbisonicsDecoderAudioProcessorEditor (AmbisonicsDecoderAudioProcessor& ownerProc);
     ~AmbisonicsDecoderAudioProcessorEditor() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 	void initializeOscHandler();
 	void updateRadarOptions();
 	void actionListenerCallback(const String& message) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     SharedResourcePointer<TooltipWindow> tooltipWindow;
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
 	AmbisonicsDecoderAudioProcessor& mainProcessor;
 	AmbiSpeakerSet* pSpeakerSet;
 	AmbiSourceSet* pMovingPoints;
@@ -78,17 +59,10 @@ private:
 	dsp::ProcessSpec* pFilterSpecification;
     HelpDialogManager helpDialogManager;
     RadarOptions* pRadarOptions;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<DrawableButton> btnSettings;
     std::unique_ptr<DrawableButton> btnHelp;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicsDecoderAudioProcessorEditor)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

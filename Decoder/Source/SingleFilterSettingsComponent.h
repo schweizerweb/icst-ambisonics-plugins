@@ -20,53 +20,31 @@
 
 
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "../../Common/AmbiLookAndFeel.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class SingleFilterSettingsComponent  : public juce::Component,
                                        public ChangeBroadcaster,
                                        public juce::Slider::Listener,
                                        public juce::ComboBox::Listener
 {
 public:
-    //==============================================================================
     SingleFilterSettingsComponent (FilterInfo* pFilterInfo, dsp::ProcessSpec* pFilterSpecification, ChangeListener* pChangeListener, Colour color_ = Colours::transparentBlack);
     ~SingleFilterSettingsComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void updateUi();
     Colour getColor() const;
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     FilterInfo* pFilterInfo;
     AmbiLookAndFeel ambiLookAndFeel;
     Colour color;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupMain;
     std::unique_ptr<juce::Slider> sliderGain;
     std::unique_ptr<juce::Slider> sliderQ;
@@ -75,10 +53,5 @@ private:
     std::unique_ptr<juce::Label> labelQ;
     std::unique_ptr<juce::Label> labelGain;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SingleFilterSettingsComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

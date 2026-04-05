@@ -28,8 +28,6 @@
 #define XML_TAG_GENERAL "General"
 #define XML_TAG_AMBISONICS_PRESET "AmbisonicsPreset"
 
-
-//==============================================================================
 AmbisonicsDecoderAudioProcessor::AmbisonicsDecoderAudioProcessor()
      : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
                        .withInput  ("Input",  ((PluginHostType::getPluginLoadedAs() == AudioProcessor::wrapperType_VST3) ? AudioChannelSet::discreteChannels(4) : AudioChannelSet::discreteChannels(64)), true)
@@ -65,7 +63,6 @@ AmbisonicsDecoderAudioProcessor::~AmbisonicsDecoderAudioProcessor()
     FFTAnalyzer::deleteInstance();
 }
 
-//==============================================================================
 const String AmbisonicsDecoderAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -118,7 +115,6 @@ void AmbisonicsDecoderAudioProcessor::changeProgramName (int /*index*/, const St
 {
 }
 
-//==============================================================================
 void AmbisonicsDecoderAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
     // Use this method as the place to do any pre-playback
@@ -424,7 +420,6 @@ void AmbisonicsDecoderAudioProcessor::processBlock (AudioBuffer<float>& buffer, 
 	}
 }
 
-//==============================================================================
 bool AmbisonicsDecoderAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
@@ -435,7 +430,6 @@ AudioProcessorEditor* AmbisonicsDecoderAudioProcessor::createEditor()
     return new AmbisonicsDecoderAudioProcessorEditor (*this);
 }
 
-//==============================================================================
 void AmbisonicsDecoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
     XmlElement* xml = new XmlElement(XML_ROOT_TAG);
@@ -580,15 +574,8 @@ void AmbisonicsDecoderAudioProcessor::numChannelsChanged()
     
     int maxAmbiOrder = channelLayout.getMaxAmbiOrder(false);
     ambiSettings.ensureMaxAmbiOrder(maxAmbiOrder);
-    
-    // handle output channels
-    // while(channelLayout.getNumOutputChannels() < speakerSet->size())
-    //     speakerSet->remove(speakerSet->size() - 1);
-    
-    // radarOptions.maxNumberEditablePoints = channelLayout.getNumOutputChannels();
 }
 
-//==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

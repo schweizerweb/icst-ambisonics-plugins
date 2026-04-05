@@ -17,9 +17,6 @@
 ================================================================================
 */
 
-
-
-//[Headers] You can add your own extra header files here...
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/SoloMuteCustomComponent.h"
@@ -33,12 +30,8 @@
 #include "FilterSettingsComponent.h"
 #include "../../Common/ImportExport.h"
 #include "ScalingComponent.h"
-//[/Headers]
-
 #include "SpeakerSettingsComponent.h"
 
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
 #define COLUMN_ID_NB		1
 #define COLUMN_ID_NAME		2
 #define	COLUMN_ID_X			7
@@ -56,13 +49,10 @@
 #define COLUMN_ID_FILTER    14
 
 #define MENU_CMD_IMPORTEXPORT_OFFSET 100
-//[/MiscUserDefs]
 
-//==============================================================================
 SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout)
     : pSpeakerSet(_pSpeakerSet), pSpeakerPresetHelper(_pSpeakerPresetHelper), pDecodingPresetHelper(_pDecodingPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
 	OwnedArray<String> ambiChannelNames;
 	for (int i = 0; i < MAX_NB_OF_AMBISONICS_GAINS; i++)
 		ambiChannelNames.add(new String("m = " + String(i)));
@@ -82,7 +72,6 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     setApplicationCommandManagerToWatch(&commandManager);
     commandManager.registerAllCommandsForTarget(this);
     addKeyListener(commandManager.getKeyMappings());
-    //[/Constructor_pre]
 
     groupOsc.reset (new juce::GroupComponent ("groupOsc",
                                               TRANS ("OSC")));
@@ -192,16 +181,11 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
     addAndMakeVisible (ambiSettingsControl.get());
     ambiSettingsControl->setName ("ambiSettingsControl");
 
-
-    //[UserPreSize]
     multiDecoderControl->toBehind(toggleMultiDecoder.get());
     ambiSettingsControl->toBehind(toggleMultiDecoder.get());
-    //[/UserPreSize]
 
     setSize (900, 700);
 
-
-    //[Constructor] You can add your own custom stuff here..
     labelDevelopmentVersion->setVisible(Constants::isDevelopmentVersion() && !Constants::isNonVisibleVersionPrerelease());
 
     // speaker list elements
@@ -237,12 +221,10 @@ SpeakerSettingsComponent::SpeakerSettingsComponent (AmbiSpeakerSet* _pSpeakerSet
 	sliderTimeout->setValue(pDecoderSettings->oscReceiveTimeoutMs);
 
 	controlDimming();
-    //[/Constructor]
 }
 
 SpeakerSettingsComponent::~SpeakerSettingsComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
     pTestSoundGenerator->reset();
 	pPointSelection->removeChangeListener(this);
     pSpeakerPresetHelper->removeActionListener(this);
@@ -250,7 +232,6 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     pChannelLayout->removeActionListener(this);
     commandManager.setFirstCommandTarget(nullptr);
     speakerList->setModel(nullptr);
-    //[/Destructor_pre]
 
     groupOsc = nullptr;
     groupAmbisonics = nullptr;
@@ -271,31 +252,19 @@ SpeakerSettingsComponent::~SpeakerSettingsComponent()
     toggleMultiDecoder = nullptr;
     multiDecoderControl = nullptr;
     ambiSettingsControl = nullptr;
-
-    //[Destructor]. You can add your own custom destruction code here..
-    //[/Destructor]
 }
 
-//==============================================================================
 void SpeakerSettingsComponent::paint (juce::Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (juce::Colour (0xff505050));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void SpeakerSettingsComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
     auto b = getLocalBounds();
 
     menuBar->setBounds(b.removeFromTop(LookAndFeel::getDefaultLookAndFeel()
             .getDefaultMenuBarHeight()));
-    //[/UserPreResize]
 
     groupOsc->setBounds ((8 + 0) + 0, (0 + (getHeight() - 317)) + 249, ((getWidth() - 16) - 0) - 0, 60);
     groupAmbisonics->setBounds (8 + 0, 0 + (getHeight() - 317), (getWidth() - 16) - 0, 249);
@@ -316,18 +285,12 @@ void SpeakerSettingsComponent::resized()
     toggleMultiDecoder->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, 150, 24);
     multiDecoderControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
     ambiSettingsControl->setBounds ((8 + 0) + 8, (0 + (getHeight() - 317)) + 20, ((getWidth() - 16) - 0) - 16, 249 - 30);
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
 void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
     if (buttonThatWasClicked == buttonAdd.get())
     {
-        //[UserButtonCode_buttonAdd] -- add your button handler code here..
         if(pSpeakerSet->size() < pChannelLayout->getNumOutputChannels())
         {
             Uuid newId = Uuid();
@@ -336,11 +299,9 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
             speakerList->updateContent();
             speakerList->repaint();
         }
-        //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonRemove.get())
     {
-        //[UserButtonCode_buttonRemove] -- add your button handler code here..
         auto selection = pPointSelection->getSelectedIndices();
         if(!pPointSelection->getSelectedIndices().isEmpty())
         {
@@ -354,11 +315,9 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
 			speakerList->updateContent();
 			speakerList->repaint();
 		}
-        //[/UserButtonCode_buttonRemove]
     }
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
-        //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
 		int selection = pPointSelection->getMainSelectedPointIndex();
 		if(selection >= 0 && selection < pSpeakerSet->size() - 1)
 		{
@@ -366,11 +325,9 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
 			pSpeakerSet->swap(selection, selection + 1);
 			pPointSelection->selectPoint(selection + 1);
 		}
-        //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
-        //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
 		int selection = pPointSelection->getMainSelectedPointIndex();
 		if (selection >= 1 && selection < pSpeakerSet->size())
 		{
@@ -378,61 +335,39 @@ void SpeakerSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked
 			pSpeakerSet->swap(selection, selection - 1);
 			pPointSelection->selectPoint(selection - 1);
 		}
-        //[/UserButtonCode_buttonMoveUp]
     }
     else if (buttonThatWasClicked == toggleOsc.get())
     {
-        //[UserButtonCode_toggleOsc] -- add your button handler code here..
 		pDecoderSettings->oscReceive = toggleOsc->getToggleState();
 		sendChangeMessage();
-        //[/UserButtonCode_toggleOsc]
     }
     else if (buttonThatWasClicked == buttonSpeakerTest.get())
     {
-        //[UserButtonCode_buttonSpeakerTest] -- add your button handler code here..
 		pTestSoundGenerator->toggleAutoTest();
-        //[/UserButtonCode_buttonSpeakerTest]
     }
     else if (buttonThatWasClicked == buttonScaling.get())
     {
-        //[UserButtonCode_buttonScaling] -- add your button handler code here..
         CallOutBox::launchAsynchronously(std::make_unique<ScalingComponent>(this, pSpeakerSet, pZoomSettings), buttonScaling->getBounds(), this);
-        //[/UserButtonCode_buttonScaling]
     }
     else if (buttonThatWasClicked == toggleMultiDecoder.get())
     {
-        //[UserButtonCode_toggleMultiDecoder] -- add your button handler code here..
         pAmbiSettings->setMultiDecoderFlag(toggleMultiDecoder->getToggleState());
         controlDimming();
-        //[/UserButtonCode_toggleMultiDecoder]
     }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
 }
 
 void SpeakerSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
     if (sliderThatWasMoved == sliderPort.get())
     {
-        //[UserSliderCode_sliderPort] -- add your slider handling code here..
         pDecoderSettings->oscReceivePort = (int)sliderPort->getValue();
         sendChangeMessage();
-        //[/UserSliderCode_sliderPort]
     }
     else if (sliderThatWasMoved == sliderTimeout.get())
     {
-        //[UserSliderCode_sliderTimeout] -- add your slider handling code here..
         pDecoderSettings->oscReceiveTimeoutMs = (int)sliderTimeout->getValue();
         sendChangeMessage();
-        //[/UserSliderCode_sliderTimeout]
     }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 bool SpeakerSettingsComponent::getMute(int rowNumber)
@@ -455,9 +390,6 @@ void SpeakerSettingsComponent::setSolo(int rowNumber, bool newValue)
     pSpeakerSet->setSolo(rowNumber, newValue);
 }
 
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 int SpeakerSettingsComponent::getNumRows()
 {
 	return pSpeakerSet->size();
@@ -896,7 +828,6 @@ void SpeakerSettingsComponent::mouseUp(const MouseEvent &event)
     }
 }
 
-//==============================================================================
 StringArray SpeakerSettingsComponent::getMenuBarNames()
 {
     return { "Speaker", "Decoding", "Filter", "Options", "?"};
@@ -974,11 +905,6 @@ void SpeakerSettingsComponent::menuItemSelected(int menuItemID, int /*topLevelMe
         }
     }
 }
-
-//==============================================================================
-// The following methods implement the ApplicationCommandTarget interface, allowing
-// this window to publish a set of actions it can perform, and which can be mapped
-// onto menus, keypresses, etc.
 
 ApplicationCommandTarget* SpeakerSettingsComponent::getNextCommandTarget()
 {
@@ -1190,120 +1116,3 @@ bool SpeakerSettingsComponent::doRestoreAllPresets()
 
     return false;
 }
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="SpeakerSettingsComponent"
-                 componentName="" parentClasses="public Component, public TableListBoxModel, public ChangeListener, public ActionBroadcaster, public ChangeBroadcaster, public TableColumnCallback, ActionListener"
-                 constructorParams="AmbiSpeakerSet* _pSpeakerSet, SpeakerPresetHelper* _pSpeakerPresetHelper, DecodingPresetHelper* _pDecodingPresetHelper, PointSelection* _pPointSelection, AmbiSettingsCollection* _pAmbiSettings, DecoderSettings* _pDecoderSettings, TestSoundGenerator* pTestSoundListener, ChangeListener* pCallback, dsp::ProcessSpec* _pFilterSpecification, ZoomSettings* _pZoomSettings, ChannelLayout* _pChannelLayout"
-                 variableInitialisers="pSpeakerSet(_pSpeakerSet), pSpeakerPresetHelper(_pSpeakerPresetHelper), pDecodingPresetHelper(_pDecodingPresetHelper), pPointSelection(_pPointSelection), pAmbiSettings(_pAmbiSettings),pDecoderSettings(_pDecoderSettings), pFilterSpecification(_pFilterSpecification), pZoomSettings(_pZoomSettings), pChannelLayout(_pChannelLayout)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="900" initialHeight="700">
-  <BACKGROUND backgroundColour="ff505050"/>
-  <GROUPCOMPONENT name="groupOsc" id="f4cf3a53a6ef0d87" memberName="groupOsc" virtualName=""
-                  explicitFocusOrder="0" pos="0 0R 0M 60" posRelativeX="17eb4b418501687a"
-                  posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                  title="OSC"/>
-  <GROUPCOMPONENT name="groupAmbisonics" id="17eb4b418501687a" memberName="groupAmbisonics"
-                  virtualName="" explicitFocusOrder="0" pos="0 0R 0M 249" posRelativeX="450188aa0f332e78"
-                  posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
-                  title="Ambisonics"/>
-  <GROUPCOMPONENT name="groupSpeakers" id="450188aa0f332e78" memberName="groupSpeakers"
-                  virtualName="" explicitFocusOrder="0" pos="8 0 16M 317M" title="Speakers"/>
-  <GENERICCOMPONENT name="speakerList" id="34ae3e87c64e62da" memberName="speakerList"
-                    virtualName="" explicitFocusOrder="0" pos="8 56 16M 96M" posRelativeX="450188aa0f332e78"
-                    posRelativeY="450188aa0f332e78" posRelativeW="450188aa0f332e78"
-                    posRelativeH="450188aa0f332e78" class="TableListBox" params=""/>
-  <TEXTBUTTON name="buttonAdd" id="e1290b9a1a32d249" memberName="buttonAdd"
-              virtualName="" explicitFocusOrder="0" pos="0 -8R 64 24" posRelativeX="34ae3e87c64e62da"
-              posRelativeY="34ae3e87c64e62da" buttonText="add" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonAdd" id="49c8de1156e72d8c" memberName="buttonRemove"
-              virtualName="" explicitFocusOrder="0" pos="72 -8R 64 24" posRelativeX="34ae3e87c64e62da"
-              posRelativeY="34ae3e87c64e62da" buttonText="remove" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveDown" id="7291297cb3544d01" memberName="buttonMoveDown"
-              virtualName="" explicitFocusOrder="0" pos="64R -8R 64 24" posRelativeX="34ae3e87c64e62da"
-              posRelativeY="34ae3e87c64e62da" buttonText="down" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
-              virtualName="" explicitFocusOrder="0" pos="136R -8R 64 24" posRelativeX="34ae3e87c64e62da"
-              posRelativeY="34ae3e87c64e62da" buttonText="up" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <LABEL name="labelOscPort" id="646c42f30e7e37d7" memberName="labelOscPort"
-         virtualName="" explicitFocusOrder="0" pos="408Rr 20 85 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="OSC-Port:&#10;" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <LABEL name="labelTimeout" id="628a0500d66bc466" memberName="labelTimeout"
-         virtualName="" explicitFocusOrder="0" pos="186Rr 20 105 24" posRelativeX="f4cf3a53a6ef0d87"
-         posRelativeY="f4cf3a53a6ef0d87" edTextCol="ff000000" edBkgCol="0"
-         labelText="Timeout [ms]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="toggleOsc" id="1b103b47888e742b" memberName="toggleOsc"
-                virtualName="" explicitFocusOrder="0" pos="8 20 180 24" posRelativeX="f4cf3a53a6ef0d87"
-                posRelativeY="f4cf3a53a6ef0d87" buttonText="Receive OSC messages"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <TEXTBUTTON name="buttonSpeakerTest" id="5fad387b688247bf" memberName="buttonSpeakerTest"
-              virtualName="" explicitFocusOrder="0" pos="49.817%c -8R 120 24"
-              posRelativeY="34ae3e87c64e62da" buttonText="test all speakers"
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <LABEL name="labelDevelopmentVersion" id="c41821090201078b" memberName="labelDevelopmentVersion"
-         virtualName="" explicitFocusOrder="0" pos="49.939%c 0 39.805% 24"
-         bkgCol="bded0d0d" textCol="ffffff00" outlineCol="ffffff00" edTextCol="ff000000"
-         edBkgCol="0" labelText="Unofficial Pre-Release" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="25.0" kerning="0.0" bold="0" italic="0" justification="36"/>
-  <TEXTBUTTON name="buttonMenu" id="5b471faa99c7496b" memberName="buttonMenu"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 24 40 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="..."
-              connectedEdges="0" needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonScaling" id="d872dac34b0e60ef" memberName="buttonScaling"
-              virtualName="" explicitFocusOrder="0" pos="-80r 0 64 24" posRelativeX="5fad387b688247bf"
-              posRelativeY="5fad387b688247bf" buttonText="scaling" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="sliderPort" id="32291ecaacc9e3c0" memberName="sliderPort"
-          virtualName="" explicitFocusOrder="0" pos="300Rr 20 100 24" posRelativeX="f4cf3a53a6ef0d87"
-          posRelativeY="f4cf3a53a6ef0d87" min="0.0" max="65535.0" int="1.0"
-          style="IncDecButtons" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="60" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <SLIDER name="sliderTimeout" id="781da96f4673e99c" memberName="sliderTimeout"
-          virtualName="" explicitFocusOrder="0" pos="8Rr 20 170 24" posRelativeX="f4cf3a53a6ef0d87"
-          posRelativeY="f4cf3a53a6ef0d87" min="10.0" max="10000.0" int="1.0"
-          style="LinearHorizontal" textBoxPos="TextBoxLeft" textBoxEditable="1"
-          textBoxWidth="70" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <TOGGLEBUTTON name="toggleMultiDecoder" id="d25afde82619da9f" memberName="toggleMultiDecoder"
-                virtualName="" explicitFocusOrder="0" pos="8 20 150 24" posRelativeX="17eb4b418501687a"
-                posRelativeY="17eb4b418501687a" buttonText="Multi-Decoder mode"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <GENERICCOMPONENT name="multiDecoderControl" id="bb0e70808f450c14" memberName="multiDecoderControl"
-                    virtualName="" explicitFocusOrder="0" pos="8 20 16M 30M" posRelativeX="17eb4b418501687a"
-                    posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="MultiDecoderComponent"
-                    params="pAmbiSettings, pSpeakerSet, getFilterPresetHelper(), pFilterSpecification, this, pChannelLayout"/>
-  <GENERICCOMPONENT name="ambiSettingsControl" id="bb0e706735450c14" memberName="ambiSettingsControl"
-                    virtualName="" explicitFocusOrder="0" pos="8 20 16M 30M" posRelativeX="17eb4b418501687a"
-                    posRelativeY="17eb4b418501687a" posRelativeW="17eb4b418501687a"
-                    posRelativeH="17eb4b418501687a" class="AmbiSettingsComponent"
-                    params="pAmbiSettings->singleDecoder.get(), this, pChannelLayout"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

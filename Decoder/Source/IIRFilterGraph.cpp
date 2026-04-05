@@ -17,13 +17,9 @@
 ================================================================================
 */
 
-
-
 #include "../JuceLibraryCode/JuceHeader.h"
 #include "IIRFilterGraph.h"
 #include "../../Common/Constants.h"
-
-//==============================================================================
 
 IIRFilterGraph::IIRFilterGraph(std::vector<FilterBankInfo*> _pFilterInfo, dsp::ProcessSpec* pFilterSpecification, std::vector<juce::Colour*> _pColors, OwnedArray<SingleFilterSettingsComponent>* pSingleFilterControls): usedFilterCount(1), pFilterControls(pSingleFilterControls), pFilterInfo(_pFilterInfo), pColors(_pColors), fftResultData(nullptr), fftResultDataSize(0), fftSize(0), fftScaler(0)
 {

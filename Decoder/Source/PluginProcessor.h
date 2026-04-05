@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
 #include "JuceHeader.h"
@@ -35,23 +33,18 @@
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
 
-//==============================================================================
-/**
-*/
 class AmbisonicsDecoderAudioProcessor  : public AudioProcessor, ActionListener
 {
 public:
-    //==============================================================================
     AmbisonicsDecoderAudioProcessor();
     ~AmbisonicsDecoderAudioProcessor() override;
 
-    //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
 
-   #ifndef JucePlugin_PreferredChannelConfigurations
+#ifndef JucePlugin_PreferredChannelConfigurations
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   #endif
+#endif
 
 	void checkDelayBuffers();
     void checkSpeakerFilters();
@@ -59,11 +52,9 @@ public:
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
     using AudioProcessor::processBlock;
     
-    //==============================================================================
     AudioProcessorEditor* createEditor() override;
     bool hasEditor() const override;
 
-    //==============================================================================
     const String getName() const override;
 
     bool acceptsMidi() const override;

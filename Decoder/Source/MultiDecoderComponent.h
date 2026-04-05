@@ -18,7 +18,6 @@
 */
 
 #pragma once
-
 #include <JuceHeader.h>
 #include "IIRFilterGraph.h"
 #include "DecoderSectionControlComponent.h"
@@ -39,6 +38,7 @@ public:
     void paint (juce::Graphics& g) override;
     void resized() override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
+    void changeListenerCallback(ChangeBroadcaster* source) override;
     void refresh();
 
 private:
@@ -58,11 +58,4 @@ private:
     ChannelLayout* pChannelLayout;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (MultiDecoderComponent)
-
-        // Inherited via ChangeListener
-        void changeListenerCallback(ChangeBroadcaster* source) override;
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

@@ -130,21 +130,17 @@ void AmbiSettingsComponent::comboBoxChanged(ComboBox* comboBoxThatHasChanged)
 {
     if (comboBoxThatHasChanged == comboBoxChannelWeightingMode.get())
     {
-        //[UserComboBoxCode_comboBoxChannelWeightingMode] -- add your combo box handling code here..
         pAmbiSettings->setWeightMode(AmbiSettings::AmbiWeightMode(comboBoxChannelWeightingMode->getSelectedId()));
         ambiChannelControl->updateValues();
         controlDimming();
         sendChangeMessage();
-        //[/UserComboBoxCode_comboBoxChannelWeightingMode]
     }
     else if (comboBoxThatHasChanged == comboAmbiOrder.get())
     {
-        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
         pAmbiSettings->setAmbiOrder(comboAmbiOrder->getSelectedId());
         ambiChannelControl->setVisibleSliderCount(pAmbiSettings->getGainCount());
         ambiChannelControl->updateValues();
         sendChangeMessage();
-        //[/UserComboBoxCode_comboAmbiOrder]
     }
 }
 
@@ -176,4 +172,3 @@ void AmbiSettingsComponent::resized()
     labelAmbiOrder->setBounds(width - 293, border, 136, 24);
     comboAmbiOrder->setBounds(width - 157, border, 142, 24);
 }
-
