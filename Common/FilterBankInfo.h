@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #define MAX_FILTER_COUNT 8
 #define XML_ATTRIBUTE_POINT_FILTER_BYPASS "ByPass"

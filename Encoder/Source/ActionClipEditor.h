@@ -15,10 +15,8 @@ public:
     int getTotalRequiredHeight() const;
     bool applyChanges();
     
-    // ListBoxModel implementation
     int getNumRows() override;
-    void paintListBoxItem(int rowNumber, juce::Graphics& g,
-                         int width, int height, bool rowIsSelected) override;
+    void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
 
 private:
@@ -28,10 +26,9 @@ private:
     
     CommonClipSettings commonSettings;
     
-    juce::GroupComponent clipGroup{"Clip", "Clip Properties"};
-    juce::GroupComponent actionsGroup{"Actions", "Action Properties"};
-    
-    juce::TextButton applyButton{"Apply"}, cancelButton{"Cancel"};
+    GroupComponent clipGroup{"Clip", "Clip Properties"};
+    GroupComponent actionsGroup{"Actions", "Action Properties"};
+    TextButton applyButton{"Apply"}, cancelButton{"Cancel"};
     
     juce::ListBox actionsList;
     juce::TextButton addActionButton{"Add"}, removeActionButton{"Remove"};

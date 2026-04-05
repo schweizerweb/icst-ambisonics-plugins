@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
 #include "JuceHeader.h"
@@ -97,7 +95,5 @@ private:
     std::unique_ptr<CoorLabel> textD;
     std::unique_ptr<CoorLabel> textCH;
     
-    
-
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (PointInfoControl)
 };

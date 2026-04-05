@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "CustomOscReceiver.h"
 
 CustomOscReceiver::CustomOscReceiver(CustomOscInput* pInput, ScalingInfo* pScaling) : CustomOscBase(pScaling)

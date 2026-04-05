@@ -90,8 +90,6 @@ SET(SRC_FILES
 	../Source/EncoderSettingsDialog.h
 	../Source/EncodingSettingsComponent.cpp
 	../Source/EncodingSettingsComponent.h
-	../Source/GroupAnimator.cpp
-	../Source/GroupAnimator.h
 	../Source/GroupTableListModel.h
 	../Source/OSCHandlerEncoder.cpp
 	../Source/OSCHandlerEncoder.h

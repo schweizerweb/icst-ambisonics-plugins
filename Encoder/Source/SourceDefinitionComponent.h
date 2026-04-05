@@ -17,11 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "GroupTableListModel.h"
 #include "SourceTableListModel.h"
@@ -33,18 +29,7 @@
 #include "ComponentArguments.h"
 #include "EncoderPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class SourceDefinitionComponent  : public Component,
                                    public ChangeListener,
                                    public ActionListener,
@@ -54,16 +39,12 @@ class SourceDefinitionComponent  : public Component,
                                    public juce::ComboBox::Listener
 {
 public:
-    //==============================================================================
     SourceDefinitionComponent (EncoderSettingsComponentArgs args);
     ~SourceDefinitionComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void changeListenerCallback(ChangeBroadcaster* source) override;
     void controlDimming() const;
     void refresh() const;
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -71,10 +52,7 @@ public:
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     EncoderSettingsComponentArgs m_args;
     std::unique_ptr<GroupTableListModel> groupModel;
     std::unique_ptr<SourceTableListModel> sourceModel;
@@ -85,9 +63,7 @@ private:
     void handleAmbiOrders();
     void actionListenerCallback(const String &message) override;
     void mouseUp(const MouseEvent &event) override;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupGroups;
     std::unique_ptr<TableListBox> groupList;
     std::unique_ptr<juce::TextButton> buttonAddGroup;
@@ -112,11 +88,5 @@ private:
     std::unique_ptr<juce::Label> labelAmbiOrder;
     std::unique_ptr<juce::ComboBox> comboAmbiOrder;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (SourceDefinitionComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

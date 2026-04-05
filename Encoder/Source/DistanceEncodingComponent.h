@@ -17,29 +17,14 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "DistanceEncodingParams.h"
 #include "DistanceEncodingGraph.h"
 #include "DistanceEncodingPresetHelper.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/PresetManagerDialog.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class DistanceEncodingComponent  : public Component,
                                    ChangeListener,
                                    ActionListener,
@@ -48,18 +33,14 @@ class DistanceEncodingComponent  : public Component,
                                    public juce::Button::Listener
 {
 public:
-    //==============================================================================
     DistanceEncodingComponent (DistanceEncodingParams* _pParams, DistanceEncodingPresetHelper* _pPresetHelper, ZoomSettings* _pZoomSettings);
     ~DistanceEncodingComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void updatePresetComboBox();
     void controlDimming() const;
     void setUiValues(DistanceEncodingParams *pEncodingParams);
     void changeListenerCallback(ChangeBroadcaster *source) override;
     void actionListenerCallback(const String &message) override;
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -67,17 +48,12 @@ public:
     void comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged) override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
 	DistanceEncodingParams* pParams;
     DistanceEncodingPresetHelper* pPresetHelper;
     ZoomSettings* pZoomSettings;
     PresetManagerDialog presetManagerDialog;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupAirAbsorbtion;
     std::unique_ptr<juce::GroupComponent> groupAttenuation;
     std::unique_ptr<DistanceEncodingGraph> distanceEncodingGraph;
@@ -104,11 +80,5 @@ private:
     std::unique_ptr<juce::Label> labelIntensity;
     std::unique_ptr<juce::TextButton> buttonManagePresets;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (DistanceEncodingComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

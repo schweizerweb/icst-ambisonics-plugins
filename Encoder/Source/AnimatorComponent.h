@@ -17,11 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PresetManagerDialog.h"
@@ -33,43 +29,24 @@
 
 #define STEP_TIMER_ID       1
 #define STEP_TIMER_INTERVAL 50
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class AnimatorComponent  : public juce::Component,
                            public MultiTimer,
                            public ActionListener,
                            public TextButton::Listener
 {
 public:
-    //==============================================================================
     AnimatorComponent (AmbiSourceSet* pSourceSet, AnimatorDataset* pAnimatorDataset);
     ~AnimatorComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void timerCallback(int timerID) override;
     void actionListenerCallback(const juce::String &message) override;
-    //[/UserMethods]
+    void buttonClicked(Button*) override;
 
     void paint (juce::Graphics& g) override;
     void resized() override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-
-
     void calculateStepsTo(Point3D<double> origin, Point3D<double> target, OwnedArray<Point3D<float>>* pStepArray, bool isPolar, int stepCount);
     void setPreset(PositionSet* pSet, int groupIndex);
     void performAction(AnimatorAction* pAction);
@@ -84,9 +61,7 @@ private:
     OwnedArray<Point3D<float>> groupSteps[MAXIMUM_NUMBER_OF_GROUPS];
     int currentStep[MAXIMUM_NUMBER_OF_GROUPS];
 #endif
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<AnimatorActionComponent> action1;
     std::unique_ptr<AnimatorActionComponent> action2;
     std::unique_ptr<AnimatorMovementComponent> preset1;
@@ -95,14 +70,5 @@ private:
     std::unique_ptr<AnimatorMovementComponent> preset4;
     std::unique_ptr<TextButton> btnPresets;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnimatorComponent)
-
-        // Inherited via Listener
-        void buttonClicked(Button*) override;
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

@@ -17,35 +17,25 @@
 ================================================================================
 */
 
-
-
-//[Headers] You can add your own extra header files here...
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/LabelCreator.h"
 #include "../../Common/ImportExport.h"
-//[/Headers]
-
 #include "SourceDefinitionComponent.h"
 
 
-//[MiscUserDefs] You can add your own user definitions and misc code here...
 #if JUCE_CLANG
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wimplicit-int-float-conversion"
 #endif
-//[/MiscUserDefs]
 
-//==============================================================================
 SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentArgs args)
     : m_args(args)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
     addChangeListener(m_args.pChangeListener);
     groupModel.reset(new GroupTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo()));
     sourceModel.reset(new SourceTableListModel(m_args.pSourceSet, m_args.pPointSelection, this, m_args.pZoomSettings->getScalingInfo(), m_args.pChannelLayout));
-    //[/Constructor_pre]
 
     groupGroups.reset (new juce::GroupComponent ("groupGroups",
                                                  TRANS("Groups")));
@@ -196,14 +186,8 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     comboAmbiOrder->addItem (TRANS("7th (64 ch)"), 7);
     comboAmbiOrder->addListener (this);
 
-
-    //[UserPreSize]
-    //[/UserPreSize]
-
     setSize (600, 400);
 
-
-    //[Constructor] You can add your own custom stuff here..
     groupSources->setVisible(MULTI_ENCODER_MODE);
     buttonMoveUp->setVisible(MULTI_ENCODER_MODE);
     buttonMoveDown->setVisible(MULTI_ENCODER_MODE);
@@ -247,17 +231,14 @@ SourceDefinitionComponent::SourceDefinitionComponent (EncoderSettingsComponentAr
     m_args.pChannelLayout->addActionListener(this);
 
     controlDimming();
-    //[/Constructor]
 }
 
 SourceDefinitionComponent::~SourceDefinitionComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
     m_args.pChannelLayout->removeActionListener(this);
     m_args.pPointSelection->removeChangeListener(this);
     m_args.pSourceSet->removeChangeListener(this);
     m_args.pPresetHelper->removeActionListener(this);
-    //[/Destructor_pre]
 
     groupGroups = nullptr;
     groupList = nullptr;
@@ -283,29 +264,16 @@ SourceDefinitionComponent::~SourceDefinitionComponent()
     labelAmbiOrder = nullptr;
     comboAmbiOrder = nullptr;
 
-
-    //[Destructor]. You can add your own custom destruction code here..
     groupModel = nullptr;
-    //[/Destructor]
 }
 
-//==============================================================================
 void SourceDefinitionComponent::paint (juce::Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (juce::Colour (0xff323e44));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void SourceDefinitionComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
     groupGroups->setBounds (0, 72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f)), getWidth() - 0, juce::roundToInt ((getHeight() - 110) * 0.4349f));
     groupList->setBounds (0 + 16, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + 19, (getWidth() - 0) - 31, (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 67);
     buttonAddGroup->setBounds (0 + 17, (72 + (getHeight() - 110) - (juce::roundToInt ((getHeight() - 110) * 0.4349f))) + (juce::roundToInt ((getHeight() - 110) * 0.4349f)) - 40, 64, 24);
@@ -326,18 +294,12 @@ void SourceDefinitionComponent::resized()
     buttonManagePresets->setBounds (getWidth() - 8 - 90, getHeight() - 8 - 24, 90, 24);
     dummyHeight->setBounds (0, 72, 24, getHeight() - 110);
     comboAmbiOrder->setBounds (280 - 144, 8, 144, 24);
-    //[UserResized] Add your own custom resize handling here..
-    //[/UserResized]
 }
 
 void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicked)
 {
-    //[UserbuttonClicked_Pre]
-    //[/UserbuttonClicked_Pre]
-
     if (buttonThatWasClicked == buttonAddGroup.get())
     {
-        //[UserButtonCode_buttonAddGroup] -- add your button handler code here..
         if(m_args.pAudioParams != nullptr && m_args.pSourceSet->activeGroupCount() < m_args.pAudioParams->groupParams.size())
         {
             Uuid newId = Uuid();
@@ -350,11 +312,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
         {
             AlertWindow::showMessageBoxAsync(AlertWindow::WarningIcon, "Error", "No more groups allowed!");
         }
-        //[/UserButtonCode_buttonAddGroup]
     }
     else if (buttonThatWasClicked == buttonRemoveGroup.get())
     {
-        //[UserButtonCode_buttonRemoveGroup] -- add your button handler code here..
         int selection = m_args.pPointSelection->getMainSelectedPointIndex();
         if (m_args.pPointSelection->getSelectionMode() == PointSelection::Group && selection >= 0 && selection < m_args.pSourceSet->size())
         {
@@ -363,12 +323,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
             groupList->updateContent();
             groupList->repaint();
         }
-
-        //[/UserButtonCode_buttonRemoveGroup]
     }
     else if (buttonThatWasClicked == buttonImportExport.get())
     {
-        //[UserButtonCode_buttonAdd] -- add your button handler code here..
         PopupMenu m;
         ImportExport::appendSubMenu(&m);
         int ret = m.show();
@@ -380,11 +337,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
             sourceList->updateContent();
             sourceList->repaint();
         }
-        //[/UserButtonCode_buttonAdd]
     }
     else if (buttonThatWasClicked == buttonMoveDown.get())
     {
-        //[UserButtonCode_buttonMoveDown] -- add your button handler code here..
         int selection = m_args.pPointSelection->getMainSelectedPointIndex();
         if (selection >= 0 && selection < m_args.pSourceSet->size() - 1)
         {
@@ -392,11 +347,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
             m_args.pSourceSet->swap(selection, selection + 1);
             m_args.pPointSelection->selectPoint(selection + 1);
         }
-        //[/UserButtonCode_buttonMoveDown]
     }
     else if (buttonThatWasClicked == buttonMoveUp.get())
     {
-        //[UserButtonCode_buttonMoveUp] -- add your button handler code here..
         int selection = m_args.pPointSelection->getMainSelectedPointIndex();
         if (selection >= 1 && selection < m_args.pSourceSet->size())
         {
@@ -404,11 +357,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
             m_args.pSourceSet->swap(selection, selection - 1);
             m_args.pPointSelection->selectPoint(selection - 1);
         }
-        //[/UserButtonCode_buttonMoveUp]
     }
     else if (buttonThatWasClicked == buttonMoveGroupDown.get())
     {
-        //[UserButtonCode_buttonMoveGroupDown] -- add your button handler code here..
         if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
             int selection = m_args.pPointSelection->getMainSelectedPointIndex();
@@ -419,11 +370,9 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
                 m_args.pPointSelection->selectGroup(selection + 1, false);
             }
         }
-        //[/UserButtonCode_buttonMoveGroupDown]
     }
     else if (buttonThatWasClicked == buttonMoveGroupUp.get())
     {
-        //[UserButtonCode_buttonMoveGroupUp] -- add your button handler code here..
         if(m_args.pPointSelection->getSelectionMode() == PointSelection::Group)
         {
             int selection = m_args.pPointSelection->getMainSelectedPointIndex();
@@ -434,20 +383,16 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
                 m_args.pPointSelection->selectGroup(selection - 1, false);
             }
         }
-        //[/UserButtonCode_buttonMoveGroupUp]
     }
     else if (buttonThatWasClicked == toggleInfiniteDistance.get())
     {
-        //[UserButtonCode_toggleInfiniteDistance] -- add your button handler code here..
         m_args.pSourceSet->setDistanceScaler(toggleInfiniteDistance->getToggleState() ? ScalingInfo::Infinite : sliderDistanceScaler->getValue());
         m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSourceSet->getDistanceScaler());
         refresh();
         updateEncodingUiElements();
-        //[/UserButtonCode_toggleInfiniteDistance]
     }
     else if (buttonThatWasClicked == buttonSave.get())
     {
-        //[UserButtonCode_buttonSave] -- add your button handler code here..
         m_args.pPresetHelper->tryCreateNewPreset([&](File* newFile){
             if (newFile != nullptr)
             {
@@ -455,71 +400,42 @@ void SourceDefinitionComponent::buttonClicked (juce::Button* buttonThatWasClicke
                 comboBoxPresets->setText("", dontSendNotification);
             }
         });
-        //[/UserButtonCode_buttonSave]
     }
     else if (buttonThatWasClicked == buttonManagePresets.get())
     {
-        //[UserButtonCode_buttonManagePresets] -- add your button handler code here..
         presetManagerDialog.show(this, m_args.pPresetHelper);
-        //[/UserButtonCode_buttonManagePresets]
     }
-
-    //[UserbuttonClicked_Post]
-    //[/UserbuttonClicked_Post]
 }
 
 void SourceDefinitionComponent::sliderValueChanged (juce::Slider* sliderThatWasMoved)
 {
-    //[UsersliderValueChanged_Pre]
-    //[/UsersliderValueChanged_Pre]
-
     if (sliderThatWasMoved == sliderDistanceScaler.get())
     {
-        //[UserSliderCode_sliderDistanceScaler] -- add your slider handling code here..
         m_args.pSourceSet->setDistanceScaler(sliderDistanceScaler->getValue());
         m_args.pZoomSettings->getScalingInfo()->SetScaler(m_args.pSourceSet->getDistanceScaler());
         m_args.pZoomSettings->Reset();
         sendChangeMessage();
         refresh();
-        //[/UserSliderCode_sliderDistanceScaler]
     }
     else if (sliderThatWasMoved == sliderMasterGain.get())
     {
-        //[UserSliderCode_sliderMasterGain] -- add your slider handling code here..
         m_args.pSourceSet->setMasterGain((float)sliderMasterGain->getValue());
-        //[/UserSliderCode_sliderMasterGain]
     }
-
-    //[UsersliderValueChanged_Post]
-    //[/UsersliderValueChanged_Post]
 }
 
 void SourceDefinitionComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
 {
-    //[UsercomboBoxChanged_Pre]
-    //[/UsercomboBoxChanged_Pre]
-
     if (comboBoxThatHasChanged == comboBoxPresets.get())
     {
-        //[UserComboBoxCode_comboBoxPresets] -- add your combo box handling code here..
         m_args.pPresetHelper->selectPresetName(comboBoxPresets->getText());
         comboBoxPresets->setText("", dontSendNotification);
-        //[/UserComboBoxCode_comboBoxPresets]
     }
     else if (comboBoxThatHasChanged == comboAmbiOrder.get())
     {
-        //[UserComboBoxCode_comboAmbiOrder] -- add your combo box handling code here..
         m_args.pSettings->ambiOrder = comboAmbiOrder->getSelectedId();
-        //[/UserComboBoxCode_comboAmbiOrder]
     }
-
-    //[UsercomboBoxChanged_Post]
-    //[/UsercomboBoxChanged_Post]
 }
 
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 void SourceDefinitionComponent::changeListenerCallback(ChangeBroadcaster* source)
 {
     refresh();
@@ -621,7 +537,6 @@ void SourceDefinitionComponent::actionListenerCallback(const String &message)
         refresh();
     }
 }
-
 
 void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
 {
@@ -840,133 +755,3 @@ void SourceDefinitionComponent::mouseUp(const MouseEvent &event)
         }
     }
 }
-
-
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="SourceDefinitionComponent"
-                 componentName="" parentClasses="public Component, public ChangeListener, public ActionListener, public ChangeBroadcaster"
-                 constructorParams="EncoderSettingsComponentArgs args" variableInitialisers="m_args(args)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="600" initialHeight="400">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <GROUPCOMPONENT name="groupGroups" id="983b0a3b2c5c945a" memberName="groupGroups"
-                  virtualName="" explicitFocusOrder="0" pos="0 0Rr 0M 43.495%"
-                  posRelativeX="73249ab85d6bba3a" posRelativeY="862016958b331dfc"
-                  posRelativeW="73249ab85d6bba3a" posRelativeH="862016958b331dfc"
-                  title="Groups"/>
-  <GENERICCOMPONENT name="groupList" id="df462ef21c261681" memberName="groupList"
-                    virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="983b0a3b2c5c945a"
-                    posRelativeY="983b0a3b2c5c945a" posRelativeW="983b0a3b2c5c945a"
-                    posRelativeH="983b0a3b2c5c945a" class="TableListBox" params=""/>
-  <TEXTBUTTON name="buttonAddGroup" id="84fdb7fb0d342ca6" memberName="buttonAddGroup"
-              virtualName="" explicitFocusOrder="0" pos="17 40R 64 24" posRelativeX="983b0a3b2c5c945a"
-              posRelativeY="983b0a3b2c5c945a" buttonText="add" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonRemoveGroup" id="4b7306753c54f44c" memberName="buttonRemoveGroup"
-              virtualName="" explicitFocusOrder="0" pos="89 40R 64 24" posRelativeX="983b0a3b2c5c945a"
-              posRelativeY="983b0a3b2c5c945a" buttonText="remove" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <GROUPCOMPONENT name="groupSources" id="da4e7711e3fff0be" memberName="groupSources"
-                  virtualName="" explicitFocusOrder="0" pos="0 0 0M 56.505%" posRelativeX="73249ab85d6bba3a"
-                  posRelativeY="862016958b331dfc" posRelativeW="73249ab85d6bba3a"
-                  posRelativeH="862016958b331dfc" title="Sources"/>
-  <GENERICCOMPONENT name="sourceList" id="54cde0d0bf4f7a53" memberName="sourceList"
-                    virtualName="" explicitFocusOrder="0" pos="16 19 31M 67M" posRelativeX="da4e7711e3fff0be"
-                    posRelativeY="da4e7711e3fff0be" posRelativeW="da4e7711e3fff0be"
-                    posRelativeH="da4e7711e3fff0be" class="TableListBox" params=""/>
-  <TEXTBUTTON name="buttonImportExport" id="e1290b9a1a32d249" memberName="buttonImportExport"
-              virtualName="" explicitFocusOrder="0" pos="17 40R 104 24" posRelativeX="da4e7711e3fff0be"
-              posRelativeY="da4e7711e3fff0be" buttonText="import/export" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveDown" id="7291297cb3544d01" memberName="buttonMoveDown"
-              virtualName="" explicitFocusOrder="0" pos="80R 40R 64 24" posRelativeX="da4e7711e3fff0be"
-              posRelativeY="da4e7711e3fff0be" buttonText="down" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveUp" id="e2d399b90fa42e97" memberName="buttonMoveUp"
-              virtualName="" explicitFocusOrder="0" pos="152R 40R 64 24" posRelativeX="da4e7711e3fff0be"
-              posRelativeY="da4e7711e3fff0be" buttonText="up" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveGroupDown" id="9952d6c7fdf6c103" memberName="buttonMoveGroupDown"
-              virtualName="" explicitFocusOrder="0" pos="80R 40R 64 24" posRelativeX="983b0a3b2c5c945a"
-              posRelativeY="983b0a3b2c5c945a" buttonText="down" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonMoveGroupUp" id="a7a2e7a9aeab456c" memberName="buttonMoveGroupUp"
-              virtualName="" explicitFocusOrder="0" pos="152R 40R 64 24" posRelativeX="983b0a3b2c5c945a"
-              posRelativeY="983b0a3b2c5c945a" buttonText="up" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <SLIDER name="sliderDistanceScaler" id="86549d5794437a4a" memberName="sliderDistanceScaler"
-          virtualName="" explicitFocusOrder="0" pos="93Rr 8 525M 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="1.0" max="1000.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <LABEL name="labelDistanceScaler" id="3db2cd25c7d2d40f" memberName="labelDistanceScaler"
-         virtualName="" explicitFocusOrder="0" pos="312 8 109 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Distance Scaler:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TOGGLEBUTTON name="toggleInfiniteDistance" id="6a3353481b4b5310" memberName="toggleInfiniteDistance"
-                virtualName="" explicitFocusOrder="0" pos="81R 8 72 24" buttonText="Infinite"
-                connectedEdges="0" needsCallback="1" radioGroupId="0" state="0"/>
-  <LABEL name="labelMasterGain" id="5a6c2906ed7799ee" memberName="labelMasterGain"
-         virtualName="" explicitFocusOrder="0" pos="8 40 109 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Master Gain [dB]:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <SLIDER name="sliderMasterGain" id="48f17ace33ebcbca" memberName="sliderMasterGain"
-          virtualName="" explicitFocusOrder="0" pos="5Rr 40 141M 24" posRelativeX="b72378bdfe4e130"
-          posRelativeY="b72378bdfe4e130" min="0.0" max="36.0" int="0.1"
-          style="LinearHorizontal" textBoxPos="TextBoxRight" textBoxEditable="1"
-          textBoxWidth="80" textBoxHeight="20" skewFactor="1.0" needsCallback="1"/>
-  <COMBOBOX name="comboBoxPresets" id="4b25adf5b07e9492" memberName="comboBoxPresets"
-            virtualName="" explicitFocusOrder="0" pos="83 8Rr 290M 24" posRelativeX="450188aa0f332e78"
-            posRelativeY="450188aa0f332e78" editable="0" layout="33" items=""
-            textWhenNonSelected="-" textWhenNoItems="(no choices)"/>
-  <LABEL name="labelPresets" id="107b43efebb2a5c8" memberName="labelPresets"
-         virtualName="" explicitFocusOrder="0" pos="8 8Rr 64 24" posRelativeY="450188aa0f332e78"
-         edTextCol="ff000000" edBkgCol="0" labelText="Presets:" editableSingleClick="0"
-         editableDoubleClick="0" focusDiscardsChanges="0" fontname="Default font"
-         fontsize="15.0" kerning="0.0" bold="0" italic="0" justification="33"/>
-  <TEXTBUTTON name="buttonSave" id="80fd69347fffe9b6" memberName="buttonSave"
-              virtualName="" explicitFocusOrder="0" pos="110Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="save" connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <TEXTBUTTON name="buttonManagePresets" id="47314282f0cb05bc" memberName="buttonManagePresets"
-              virtualName="" explicitFocusOrder="0" pos="8Rr 8Rr 90 24" posRelativeX="450188aa0f332e78"
-              posRelativeY="450188aa0f332e78" buttonText="manage..." connectedEdges="0"
-              needsCallback="1" radioGroupId="0"/>
-  <GENERICCOMPONENT name="dummyHeight" id="862016958b331dfc" memberName="dummyHeight"
-                    virtualName="" explicitFocusOrder="0" pos="0 72 24 110M" class="juce::Component"
-                    params=""/>
-  <LABEL name="labelAmbiOrder" id="2bcfcb77cb1da104" memberName="labelAmbiOrder"
-         virtualName="" explicitFocusOrder="0" pos="6 8 136 24" posRelativeX="b72378bdfe4e130"
-         posRelativeY="b72378bdfe4e130" edTextCol="ff000000" edBkgCol="0"
-         labelText="Ambisonics order:" editableSingleClick="0" editableDoubleClick="0"
-         focusDiscardsChanges="0" fontname="Default font" fontsize="15.0"
-         kerning="0.0" bold="0" italic="0" justification="33"/>
-  <COMBOBOX name="comboAmbiOrder" id="c5142a4672d3a6b3" memberName="comboAmbiOrder"
-            virtualName="" explicitFocusOrder="0" pos="280r 8 144 24" editable="0"
-            layout="33" items="1st (4 ch)&#10;2nd (9 ch)&#10;3rd (16 ch)&#10;4th (25 ch)&#10;5th (36 ch)&#10;6th (49 ch)&#10;7th (64 ch)"
-            textWhenNonSelected="" textWhenNoItems="(no choices)"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

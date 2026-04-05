@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AirAbsorbtionFilter.h"
 
 AirAbsorbtionFilter::AirAbsorbtionFilter(): currentMode(EncoderConstants::Off), currentIntensity(1),

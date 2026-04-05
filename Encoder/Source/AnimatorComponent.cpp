@@ -17,22 +17,10 @@
 ================================================================================
 */
 
-
-
-//[Headers] You can add your own extra header files here...
-//[/Headers]
-
 #include "AnimatorComponent.h"
-
-
-//[MiscUserDefs] You can add your own user definitions and misc code here...
-//[/MiscUserDefs]
-
-//==============================================================================
 AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset)
     : pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)
 {
-    //[Constructor_pre] You can add your own custom stuff here..
     while(pAnimatorDataset->actions.size() < 2)
     {
         auto a = new AnimatorAction();
@@ -48,8 +36,6 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDatase
 
     animatorPresetHelper.reset(new AnimatorPresetHelper(File(Constants::getBasePresetsDirectory() + "/AnimationDemo"), this));
     animatorPresetHelper->initialize();
-
-    //[/Constructor_pre]
 
     action1.reset (new AnimatorActionComponent (pSourceSet, pAnimatorDataset->actions[0]));
     addAndMakeVisible (action1.get());
@@ -75,27 +61,20 @@ AnimatorComponent::AnimatorComponent (AmbiSourceSet* _pSourceSet, AnimatorDatase
     addAndMakeVisible (preset4.get());
     preset4->setName ("preset4");
 
-    //[UserPreSize]
     btnPresets.reset(new TextButton("btnPreset"));
     addAndMakeVisible(btnPresets.get());
     btnPresets->setButtonText("Presets");
     btnPresets->addListener(this);
-    //[/UserPreSize]
 
     setSize (700, 300);
 
-
-    //[Constructor] You can add your own custom stuff here..
     setData();
     startTimer(STEP_TIMER_ID, STEP_TIMER_INTERVAL);
-    //[/Constructor]
 }
 
 AnimatorComponent::~AnimatorComponent()
 {
-    //[Destructor_pre]. You can add your own custom destruction code here..
     stopTimer(STEP_TIMER_ID);
-    //[/Destructor_pre]
 
     action1 = nullptr;
     action2 = nullptr;
@@ -103,44 +82,24 @@ AnimatorComponent::~AnimatorComponent()
     preset2 = nullptr;
     preset3 = nullptr;
     preset4 = nullptr;
-
-
-    //[Destructor]. You can add your own custom destruction code here..
     btnPresets = nullptr;
-    //[/Destructor]
 }
 
-//==============================================================================
 void AnimatorComponent::paint (juce::Graphics& g)
 {
-    //[UserPrePaint] Add your own custom painting code here..
-    //[/UserPrePaint]
-
     g.fillAll (juce::Colour (0xff323e44));
-
-    //[UserPaint] Add your own custom painting code here..
-    //[/UserPaint]
 }
 
 void AnimatorComponent::resized()
 {
-    //[UserPreResize] Add your own custom resize code here..
-    //[/UserPreResize]
-
     action1->setBounds (0, 200, proportionOfWidth (0.5000f), 340);
     action2->setBounds (getWidth() - proportionOfWidth (0.5000f), 200, proportionOfWidth (0.5000f), 340);
     preset1->setBounds (0, 0, getWidth() - 0, 48);
     preset2->setBounds (0, 48, getWidth() - 0, 48);
     preset3->setBounds (0, 96, getWidth() - 0, 48);
     preset4->setBounds (0, 144, getWidth() - 0, 48);
-    //[UserResized] Add your own custom resize handling here..
     btnPresets->setBounds(0, 540, getWidth(), 24);
-    //[/UserResized]
 }
-
-
-
-//[MiscUserCode] You can add your own definitions of your custom methods or any other code here...
 
 void AnimatorComponent::setData()
 {
@@ -325,50 +284,3 @@ void AnimatorComponent::setPreset(PositionSet *pSet, int groupIndex)
      */
     pSet->groups.add(new Point3D<double>(*pSourceSet->getGroup(groupIndex)->getRawPoint()));
 }
-//[/MiscUserCode]
-
-
-//==============================================================================
-#if 0
-/*  -- Projucer information section --
-
-    This is where the Projucer stores the metadata that describe this GUI layout, so
-    make changes in here at your peril!
-
-BEGIN_JUCER_METADATA
-
-<JUCER_COMPONENT documentType="Component" className="AnimatorComponent" componentName=""
-                 parentClasses="public juce::Component, public MultiTimer, public ActionListener"
-                 constructorParams="AmbiSourceSet* _pSourceSet, AnimatorDataset* _pAnimatorDataset"
-                 variableInitialisers="pSourceSet(_pSourceSet), pAnimatorDataset(_pAnimatorDataset)"
-                 snapPixels="8" snapActive="1" snapShown="1" overlayOpacity="0.330"
-                 fixedSize="0" initialWidth="700" initialHeight="300">
-  <BACKGROUND backgroundColour="ff323e44"/>
-  <GENERICCOMPONENT name="new component" id="99e58b8d05f9c746" memberName="action1"
-                    virtualName="" explicitFocusOrder="0" pos="0 200 50% 340" class="AnimatorActionComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;actions[0]"/>
-  <GENERICCOMPONENT name="new component" id="658f4eddb6e6b401" memberName="action2"
-                    virtualName="" explicitFocusOrder="0" pos="0Rr 200 50% 340" class="AnimatorActionComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;actions[1]"/>
-  <GENERICCOMPONENT name="preset1" id="4b1fefe0b208f633" memberName="preset1" virtualName=""
-                    explicitFocusOrder="0" pos="0 0 0M 48" class="AnimatorMovementComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;movements[0], this"/>
-  <GENERICCOMPONENT name="preset2" id="cbf853ccee5a58c5" memberName="preset2" virtualName=""
-                    explicitFocusOrder="0" pos="0 48 0M 48" class="AnimatorMovementComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;movements[1], this"/>
-  <GENERICCOMPONENT name="preset3" id="de661489792c3777" memberName="preset3" virtualName=""
-                    explicitFocusOrder="0" pos="0 96 0M 48" class="AnimatorMovementComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;movements[2], this"/>
-  <GENERICCOMPONENT name="preset4" id="8250d85fe0faebe7" memberName="preset4" virtualName=""
-                    explicitFocusOrder="0" pos="0 144 0M 48" class="AnimatorMovementComponent"
-                    params="pSourceSet, pAnimatorDataset-&gt;movements[3], this"/>
-</JUCER_COMPONENT>
-
-END_JUCER_METADATA
-*/
-#endif
-
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

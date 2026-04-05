@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "JuceHeader.h"
 #include "NumericColumnCustomComponent.h"
@@ -160,21 +158,6 @@ private:
         
         pPresetHelper->notifyPresetListChanged();
     }
-    
-    /*
-    String getTableText(const int columnId, const int rowNumber) override
-    {
-        AmbiPoint* pt = pSources->get(rowNumber);
-        if (pt == nullptr)
-            return "";
-
-        switch (columnId)
-        {
-        case COLUMN_ID_NAME: return pt->getName();
-        default: return "";
-        }
-    }
-*/
     
 private:
     PresetHelper* pPresetHelper;

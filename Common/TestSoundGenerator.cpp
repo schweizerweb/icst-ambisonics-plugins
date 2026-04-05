@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "TestSoundGenerator.h"
 
 TestSoundGenerator::TestSoundGenerator(AmbiDataSet* speakerSet): tempChannel(NO_TEST_SOUND)

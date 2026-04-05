@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiGroup.h"
 
 AmbiGroup::AmbiGroup(XmlElement* _xmlElement, Array<AmbiPoint*>* _pSources, AudioParameterSet _audioParameterSet, ScalingInfo* _pScaling) : AmbiPoint(_xmlElement, _audioParameterSet), pScalingInfo(_pScaling), rotationQuaternion(Quaternion<double>(0, 0, 0, 1)), stretchFactor(1.0)

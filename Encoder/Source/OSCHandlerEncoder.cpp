@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "OSCHandlerEncoder.h"
 #include "../../Common/MathHelper.h"
 
@@ -982,4 +980,3 @@ bool OSCHandlerEncoder::checkName(String name, String *errorString) const
     
     return true;
 }
-       

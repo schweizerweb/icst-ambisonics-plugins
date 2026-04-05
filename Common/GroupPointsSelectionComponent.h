@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
 #include "../JuceLibraryCode/JuceHeader.h"
@@ -33,10 +31,7 @@ class GroupPointsSelectionComponent    : public Component, public ToggleButton::
 public:
     GroupPointsSelectionComponent(AmbiDataSet* _pSources, int _groupIndex, ChangeListener* pListener): pSources(_pSources), groupIndex(_groupIndex)
     {
-	    // In your constructor, you should add any child components, and
-	    // initialise any special settings that your component needs.
-		
-    	this->addChangeListener(pListener);
+	    this->addChangeListener(pListener);
 		
         columnCount = (int)std::ceil(pSources->size() / 16.0);
         rowCount = columnCount > 0 ?  (int)(std::ceil(pSources->size() / (double)columnCount)) : 0;

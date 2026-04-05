@@ -1,7 +1,7 @@
 #pragma once
 
 #include "JuceHeader.h"
-#include "AnimatorMainView.h"  // Include the new main view
+#include "AnimatorMainView.h"
 #include "TimelineModel.h"
 #include "TimelineTypes.h"
 
@@ -21,7 +21,7 @@ public:
     void resized() override;
 
 private:
-    std::unique_ptr<AnimatorMainView> mainView;  // Use main view instead of timeline component
+    std::unique_ptr<AnimatorMainView> mainView;
     std::function<PlayheadSnapshot()> playheadProvider;
     
     void timerCallback() override;

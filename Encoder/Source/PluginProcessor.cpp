@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 #include "../../Common/TrackColors.h"
@@ -29,7 +27,6 @@
 #define XML_TAG_ENCODER_ANIMATOR "Animator"
 #define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
 
-//==============================================================================
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
      : AudioProcessor (BusesProperties() // workaround for VST3 (for some strange reason, 64 channels are only allowed if not initialized with 64)
 #if MULTI_ENCODER_MODE
@@ -106,7 +103,6 @@ void AmbisonicEncoderAudioProcessor::initializeAudioParameter()
     audioParams.initialize(this, getScalingInfo(), sources.get(), MAXIMUM_NUMBER_OF_GROUPS);
 }
 
-//==============================================================================
 const String AmbisonicEncoderAudioProcessor::getName() const
 {
     return JucePlugin_Name;
@@ -159,12 +155,8 @@ void AmbisonicEncoderAudioProcessor::changeProgramName (int /*index*/, const Str
 {
 }
 
-//==============================================================================
 void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int samplesPerBlock)
 {
-    // Use this method as the place to do any pre-playback
-    // initialisation that you need..
-
     iirFilterSpec.numChannels = 1;
 	iirFilterSpec.maximumBlockSize = (uint32_t)samplesPerBlock;
 	iirFilterSpec.sampleRate = sampleRate;
@@ -183,8 +175,6 @@ void AmbisonicEncoderAudioProcessor::releaseResources()
 
 void AmbisonicEncoderAudioProcessor::numChannelsChanged()
 {
-//    AlertWindow::showMessageBoxAsync(MessageBoxIconType::InfoIcon, "Num channels changed", "New channel count: " + String(getBusesLayout().getMainInputChannels()) + "/" + String(getBusesLayout().getMainOutputChannels()) + " ---- can change layout: ");
-
     // handle output channels
     channelLayout.setNumChannels(getBusesLayout().getMainInputChannels(), getBusesLayout().getMainOutputChannels());
     
@@ -395,7 +385,6 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
 	}
 }
 
-//==============================================================================
 bool AmbisonicEncoderAudioProcessor::hasEditor() const
 {
     return true; // (change this to false if you choose to not supply an editor)
@@ -406,7 +395,6 @@ AudioProcessorEditor* AmbisonicEncoderAudioProcessor::createEditor()
 	return new AmbisonicEncoderAudioProcessorEditor(*this);
 }
 
-//==============================================================================
 void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 {
 	XmlElement* xml = new XmlElement(XML_ROOT_TAG);
@@ -572,8 +560,6 @@ void AmbisonicEncoderAudioProcessor::populateDefaultTimelineModels()
         
         timelines.add(t);
     }
-
-    //listeners.call (&Listener::timelineListChanged);
 }
 
 ChannelLayout* AmbisonicEncoderAudioProcessor::getChannelLayout()
@@ -713,7 +699,6 @@ void AmbisonicEncoderAudioProcessor::reset()
     }
 }
 
-//==============================================================================
 // This creates new instances of the plugin..
 AudioProcessor* JUCE_CALLTYPE createPluginFilter()
 {

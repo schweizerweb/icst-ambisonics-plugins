@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #define DEFAULT_POINT_SCALER 1.0
 #define DEFAULT_CENTER_X 0.0

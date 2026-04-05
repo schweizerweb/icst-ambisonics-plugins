@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "StatusMessageHandler.h"
 
 StatusMessageHandler::StatusMessageHandler()

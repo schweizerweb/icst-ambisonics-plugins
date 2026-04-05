@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "EncoderSettings.h"
 
 #define XML_TAG_OSC_RECEIVE	"OscReceive"

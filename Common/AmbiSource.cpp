@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiSource.h"
 #define XML_ATTRIBUTE_BLAUERT_FLAG "EnableBlauert"
 #define DEFAULT_BLAUERT_FLAG true

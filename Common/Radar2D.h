@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
 #include "JuceHeader.h"
@@ -34,9 +32,6 @@
 #define NUDGE_VALUE 0.01
 #define SIN45 0.70710678118f
 
-//==============================================================================
-/*
-*/
 class Radar2D    : public Component, OpenGLRenderer, ChangeListener, Timer
 {
 public:

@@ -17,15 +17,9 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
 #include "JuceHeader.h"
 
-//==============================================================================
-/*
-*/
 class MultiSliderControl    : public Component, public Slider::Listener
 {
 public:

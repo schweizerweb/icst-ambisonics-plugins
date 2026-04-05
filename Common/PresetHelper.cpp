@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "PresetHelper.h"
 
 PresetHelper::PresetHelper(File _presetDirectory, ActionListener* pActionListener): presetDirectory(_presetDirectory)

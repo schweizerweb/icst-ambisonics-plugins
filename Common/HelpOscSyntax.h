@@ -17,35 +17,16 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class HelpOscSyntax  : public Component
 {
 public:
-    //==============================================================================
     HelpOscSyntax ();
     ~HelpOscSyntax() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void showInfo(String info);
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -53,19 +34,10 @@ public:
     void mouseUp (const juce::MouseEvent& e) override;
 
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     std::unique_ptr<XmlElement> treeXml;
     std::unique_ptr<TreeViewItem> rootItem;
-    //[/UserVariables]
-
-    //==============================================================================
     std::unique_ptr<juce::TreeView> treeViewOscSyntax;
 
 
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelpOscSyntax)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AudioParameterFloatAmbiAbs.h"
 #include "AudioParameterBoolAmbiAbs.h"

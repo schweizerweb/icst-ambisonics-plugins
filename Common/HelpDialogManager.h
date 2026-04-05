@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "HelpDialog.h"
 #include "HelpComponent.h"

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "SliderRange.h"
 #include "EnablementCallback.h"

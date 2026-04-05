@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "ChannelLayout.h"
 
 ChannelLayout::ChannelLayout()

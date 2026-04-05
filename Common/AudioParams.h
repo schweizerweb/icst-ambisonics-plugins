@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AudioParameterSet.h"
 #include "AudioParameterFloatAmbi.h"
@@ -126,7 +124,6 @@ public:
     void parameterGestureChanged(int /*parameterIndex*/, bool /*gestureIsStarting*/) override {
         // currently nothing to do
     }
-    
     
     Array<AudioParameterSet> sourceParams;
     Array<AudioParameterSet> groupParams;

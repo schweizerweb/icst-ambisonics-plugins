@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "PointSelection.h"
 
 PointSelection::PointSelection() : selectionMode(None)

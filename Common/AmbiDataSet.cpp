@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiDataSet.h"
 
 AmbiDataSet::AmbiDataSet(ScalingInfo* pScaling, bool _groupModeFlag) : pScalingInfo(pScaling), groupModeFlag(_groupModeFlag)

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiSourceSet.h"
 #include "EncoderConstants.h"
 
@@ -279,7 +277,6 @@ void AmbiSourceSet::resetIds()
     for (AmbiGroup* g : groups)
         g->resetId();
 }
-
 
 void AmbiSourceSet::setDistanceScaler(double newDistanceScaler)
 {

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "TrackColors.h"
 
@@ -36,21 +34,13 @@ public:
   
   ~TrackColorSelector() {}
   
-  // ---------------------------------------------------------------------------
-  
-  
   int getNumSwatches() const override { return TrackColors::numColors; }
-  
   Colour getSwatchColour(int index) const override { return colours[index]; }
-  
   void setSwatchColour (int index, const Colour &newColour) override
   {
     colours[index] = newColour;
   }
        
-  
 private:
-  
   Array<Colour> colours;
-    
 };

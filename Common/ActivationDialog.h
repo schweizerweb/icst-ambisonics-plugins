@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "JuceHeader.h"
 
@@ -97,10 +95,8 @@ private:
 private:
     std::unique_ptr<Label> comboLabel;
     std::unique_ptr<ComboBox> combo;
-
     std::unique_ptr<Label> textLabel;
     std::unique_ptr<TextEditor> text;
-
     std::unique_ptr<TextButton> btn;
     
     AmbiDataSet* pData;

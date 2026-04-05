@@ -17,40 +17,21 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "AnimatorAction.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class AnimatorActionComponent  : public juce::Component,
                                  public juce::ComboBox::Listener,
                                  public juce::Button::Listener,
                                  public juce::Slider::Listener
 {
 public:
-    //==============================================================================
     AnimatorActionComponent (AmbiSourceSet* pSourceSet, AnimatorAction* pAnimatorAction);
     ~AnimatorActionComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void refreshControls();
     void setData(AnimatorAction* pAction);
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -58,16 +39,10 @@ public:
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-    
     AmbiSourceSet* pSourceSet;
     AnimatorAction* pAnimatorAction;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> groupMain;
     std::unique_ptr<juce::ComboBox> comboBoxGroup;
     std::unique_ptr<juce::Label> labelGroup;
@@ -92,10 +67,5 @@ private:
     std::unique_ptr<juce::TextButton> buttonReset;
 
 
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnimatorActionComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

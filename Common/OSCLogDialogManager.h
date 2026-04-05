@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "OSCLogDialog.h"
 #include "OSCLogComponent.h"

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include <JuceHeader.h>
 #include "AnimatorAction.h"
@@ -28,8 +26,6 @@
 #define XML_TAG_ACTION "Action"
 #define XML_TAG_MOVEMENTS "Movements"
 #define XML_TAG_MOVEMENT "Movement"
-
-
 
 class AnimatorDataset
 {

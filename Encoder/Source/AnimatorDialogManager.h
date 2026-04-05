@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AnimatorDialog.h"
 #include "AnimatorComponent.h"

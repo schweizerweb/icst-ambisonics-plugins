@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "FFTAnalyzer.h"
 
 juce_ImplementSingleton(FFTAnalyzer)

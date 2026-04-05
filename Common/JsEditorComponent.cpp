@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include <JuceHeader.h>
 #include "JsEditorComponent.h"
 
@@ -140,9 +138,6 @@ Note: all 'index' parameters are 1-based, except for the 'Local Buffer' methods)
 //==============================================================================
 JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpdater* _pCallback) : pCallback(_pCallback), pCode(_pCode), pCloseFlag(_pCloseFlag)
 {
-    // In your constructor, you should add any child components, and
-    // initialise any special settings that your component needs.
-
     codeDocument.replaceAllContent(*pCode);
     
     helpFlag = false;
@@ -172,7 +167,6 @@ JsEditorComponent::JsEditorComponent(String* _pCode, bool* _pCloseFlag, AsyncUpd
     help->setMultiLine(true);
     help->setText(helpText, dontSendNotification);
     help->setReadOnly(true);
-    //help->setJustificationType(Justification::topLeft);
     help->setFont(Font(FontOptions(Font::getDefaultMonospacedFontName(), 12.0f, 0)));
     setSize(JS_EDITOR_COMPONENT_WIDTH, JS_EDITOR_COMPONENT_HEIGHT);
 }
@@ -188,29 +182,14 @@ JsEditorComponent::~JsEditorComponent()
 
 void JsEditorComponent::paint (juce::Graphics& g)
 {
-    /* This demo code just fills the component's background and
-       draws some placeholder text to get you started.
-
-       You should replace everything in this method with your own
-       drawing code..
-    */
-
     g.fillAll (getLookAndFeel().findColour (juce::ResizableWindow::backgroundColourId));   // clear the background
 
     g.setColour (juce::Colours::grey);
     g.drawRect (getLocalBounds(), 1);   // draw an outline around the component
-
-    //g.setColour (juce::Colours::white);
-    //g.setFont (14.0f);
-    //g.drawText ("JsEditorComponent", getLocalBounds(),
-    //            juce::Justification::centred, true);   // draw some placeholder text
 }
 
 void JsEditorComponent::resized()
 {
-    // This method is where you should set the bounds of any child
-    // components that your component contains..
-
     label->setBounds(0, 0, JS_EDITOR_COMPONENT_WIDTH - 60, 25);
     btnHelp->setBounds(JS_EDITOR_COMPONENT_WIDTH - 60, 0, 60, 25);
     btnHelp->setColour(TextButton::buttonColourId, helpFlag ? Colours::darkred : Colours::darkgreen);

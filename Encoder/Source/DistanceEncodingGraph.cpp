@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "DistanceEncodingGraph.h"
 
 DistanceEncodingGraph::DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* _pZoomSettings) : pParams(params), pZoomSettings(_pZoomSettings)

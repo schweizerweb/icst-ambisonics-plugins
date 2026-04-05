@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiOSCSenderExt.h"
 #include "OSCHandlerEncoder.h"
 

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AmbiDataSet.h"
 #include "AmbiSource.h"

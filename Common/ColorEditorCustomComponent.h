@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "TableColumnCallback.h"
 #include "ColorSelectionComponent.h"

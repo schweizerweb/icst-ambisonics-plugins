@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "FilterBankInfo.h"
 #include "JuceHeader.h"

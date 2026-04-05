@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "DelayBuffer.h"
 
 void DelayBuffer::checkAndAdjustSize(int requiredDelay)

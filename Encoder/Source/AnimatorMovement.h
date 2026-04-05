@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #define XML_ATTRIBUTE_MOVEMENT_NAME "Name"
 #define XML_ATTRIBUTE_MOVEMENT_POLAR "PolarFlag"

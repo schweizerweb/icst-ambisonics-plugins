@@ -2,7 +2,6 @@
 #include "../../Common/Point3D.h"
 #include "TimelineTypes.h"
 
-// Add this enum before MovementClip definition
 enum class MovementType
 {
     MoveToCartesian,
@@ -257,7 +256,7 @@ struct TimelineModel
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
             
             // Serialize MovementClip specific data
-            xClip->setAttribute("movementType", static_cast<int>(c.movementType));  // Add this
+            xClip->setAttribute("movementType", static_cast<int>(c.movementType));
             xClip->setAttribute("startPointGroupX", c.startPointGroup.getX());
             xClip->setAttribute("startPointGroupY", c.startPointGroup.getY());
             xClip->setAttribute("startPointGroupZ", c.startPointGroup.getZ());

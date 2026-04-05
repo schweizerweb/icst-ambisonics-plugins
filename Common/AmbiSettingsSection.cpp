@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiSettingsSection.h"
 #include "MultiDecoderColors.h"
 

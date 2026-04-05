@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "EncoderConstants.h"
 
 const float EncoderConstants::UnitCircleRadiusMin = 0.01f;

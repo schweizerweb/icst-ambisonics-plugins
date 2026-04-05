@@ -17,11 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
 #include "AnimatorMovement.h"
 struct PositionSet
@@ -29,50 +25,29 @@ struct PositionSet
     OwnedArray<Point3D<double>> sources;
     OwnedArray<Point3D<double>> groups;
 };
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class AnimatorMovementComponent  : public juce::Component,
                                    ActionBroadcaster,
                                    public juce::Button::Listener,
                                    public juce::Slider::Listener
 {
 public:
-    //==============================================================================
     AnimatorMovementComponent (AmbiSourceSet* pSourceSet, AnimatorMovement* pAnimatorMovement, ActionListener* pActionListener);
     ~AnimatorMovementComponent() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
     void controlDimming();
     void refreshControls();
     void setData(AnimatorMovement* pMovement);
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
     void buttonClicked (juce::Button* buttonThatWasClicked) override;
     void sliderValueChanged (juce::Slider* sliderThatWasMoved) override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
-
     AmbiSourceSet* pSourceSet;
     AnimatorMovement* pAnimatorMovement;
-    //[/UserVariables]
 
-    //==============================================================================
     std::unique_ptr<juce::GroupComponent> group1;
     std::unique_ptr<juce::TextButton> buttonSet;
     std::unique_ptr<juce::Slider> sliderTime;
@@ -81,11 +56,5 @@ private:
     std::unique_ptr<juce::Label> labelG;
     std::unique_ptr<juce::Slider> sliderGroup;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AnimatorMovementComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
-

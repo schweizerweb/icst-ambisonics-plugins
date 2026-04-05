@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AmbiPoint.h"
 #include "FilterBankInfo.h"

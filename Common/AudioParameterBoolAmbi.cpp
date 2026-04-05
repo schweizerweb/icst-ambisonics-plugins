@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AudioParameterBoolAmbi.h"
 
 AudioParameterBoolAmbi::AudioParameterBoolAmbi(const String& idToUse, const int versionToUse, const String& nameToUse, const String& labelToUse, bool def, AmbiDataSet* pPointArray, int pointIndex, ParamType paramType)

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
 #define COLOR_DEFINITION_SELECTED_ROW           Colours::blueviolet

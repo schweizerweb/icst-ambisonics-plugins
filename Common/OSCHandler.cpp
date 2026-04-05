@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "OSCHandler.h"
 #include "TrackColors.h"
 #include "Constants.h"

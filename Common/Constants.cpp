@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "Constants.h"
 #include "BuildInfo.h"
 #include "JuceHeader.h"

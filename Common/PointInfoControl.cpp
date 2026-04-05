@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "RadarOptions.h"
 #include "TrackColors.h"
 #include "Constants.h"

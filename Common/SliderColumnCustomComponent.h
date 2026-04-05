@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "TableColumnCallback.h"
 
@@ -57,7 +55,6 @@ public:
 		owner.setValue(columnId, row, changedSlider->getValue());
 	}
 
-	
 private:
 	TableColumnCallback& owner;
 	Slider slider;

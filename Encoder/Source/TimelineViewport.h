@@ -12,7 +12,7 @@ public:
     
     TimelineComponent* getTimelineComponent() { return timelineComponent.get(); }
     
-    void resized() override; // Add this!
+    void resized() override;
 
 private:
     std::unique_ptr<TimelineComponent> timelineComponent;

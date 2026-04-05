@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "../../Common/Constants.h"
 #include "../../Common/EncoderConstants.h"

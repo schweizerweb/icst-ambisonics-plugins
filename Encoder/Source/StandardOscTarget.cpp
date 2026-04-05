@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "StandardOscTarget.h"
 
 StandardOscTarget::StandardOscTarget()

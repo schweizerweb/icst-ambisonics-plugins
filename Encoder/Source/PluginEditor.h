@@ -17,11 +17,7 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "PluginProcessor.h"
 #include "../../Common/PointSelection.h"
@@ -33,35 +29,20 @@
 #include "TimelineDialog.h"
 #include "../../Common/DebugLogWindow.h"
 #include "../../Common/ColorBorderDrawableButton.h"
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class AmbisonicEncoderAudioProcessorEditor  : public AudioProcessorEditor,
                                               public ChangeListener,
                                               public ActionListener,
                                               public juce::Button::Listener
 {
 public:
-    //==============================================================================
     AmbisonicEncoderAudioProcessorEditor (AmbisonicEncoderAudioProcessor& ownerProc);
     ~AmbisonicEncoderAudioProcessorEditor() override;
 
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
 	void actionListenerCallback(const String& message) override;
 	void changeListenerCallback(ChangeBroadcaster* source) override;
     bool keyPressed(const juce::KeyPress& key) override;
     void toggleDebugLogWindow();
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
@@ -69,7 +50,6 @@ public:
     void showInfoCallout();
     
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     AmbisonicEncoderAudioProcessor& mainProcessor;
 	AmbiSourceSet* pSources;
 	PointSelection pointSelection;
@@ -80,20 +60,13 @@ private:
     AnimatorDialogManager animatorDialogManager;
     SharedResourcePointer<TooltipWindow> tooltipWindow;
     TimelineDialogManager timelineDialogManager;
-    std::unique_ptr<DebugLogWindow> debugLogWindow;
-    //[/UserVariables]
 
-    //==============================================================================
+    std::unique_ptr<DebugLogWindow> debugLogWindow;
     std::unique_ptr<RadarComponent> radarComponent;
     std::unique_ptr<DrawableButton> btnSettings;
     std::unique_ptr<juce::Label> labelMessage;
     std::unique_ptr<DrawableButton> btnHelp;
     std::unique_ptr<ColorBorderDrawableButton> btnAnimator;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessorEditor)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]

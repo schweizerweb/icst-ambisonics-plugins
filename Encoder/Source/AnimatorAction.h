@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #define XML_ATTRIBUTE_ACTION_NAME   "Name"
 #define XML_ATTRIBUTE_ACTION_ENABLED    "Enabled"

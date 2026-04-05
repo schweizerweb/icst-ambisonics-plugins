@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "JuceHeader.h"
 
@@ -32,7 +30,6 @@ public:
     
     void updatePosition (const Rectangle<int>& newAreaToPointTo)
     {
-        // based on juce CallOutBox
         Rectangle<int> targetArea = newAreaToPointTo;
         const Displays::Display* d = Desktop::getInstance().getDisplays().getDisplayForRect(newAreaToPointTo);
         if(d == nullptr)

@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "VarDelayBuffer.h"
 
 VarDelayBuffer::VarDelayBuffer(): audioBuffer(nullptr), bufferLength(0), iWrite(0), lastDelayInSamples(0)

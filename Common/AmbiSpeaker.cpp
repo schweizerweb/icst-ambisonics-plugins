@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "AmbiSpeaker.h"
 
 AmbiSpeaker::AmbiSpeaker(AmbiSpeaker* other, bool copyImage) : 

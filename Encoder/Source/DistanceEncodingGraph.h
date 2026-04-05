@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "../../Common/SimpleGraph.h"
 #include "../../Common/ZoomSettings.h"
@@ -29,12 +27,12 @@
 class DistanceEncodingGraph : public SimpleGraph
 {
 public:
-	DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings);
+    DistanceEncodingGraph(DistanceEncodingParams* params, ZoomSettings* pZoomSettings);
 	~DistanceEncodingGraph() override;
 
 	void paintData(Graphics&) override;
 
 private:
 	DistanceEncodingParams* pParams;
-  ZoomSettings* pZoomSettings;
+    ZoomSettings* pZoomSettings;
 };

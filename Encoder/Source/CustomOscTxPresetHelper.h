@@ -17,12 +17,9 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/PresetHelper.h"
-
 
 class CustomOscTxPresetHelper : public PresetHelper
 {

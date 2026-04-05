@@ -17,11 +17,8 @@
 ================================================================================
 */
 
-
-
 #pragma once
 
-//[Headers]     -- You can add your own extra header files here --
 #include "JuceHeader.h"
 #include "Radar2D.h"
 
@@ -29,7 +26,6 @@ class Radar3D  : public Component,
                  public ChangeListener
 {
 public:
-    //==============================================================================
     Radar3D (AmbiDataSet* pEditablePoints, AmbiDataSet* pDisplayOnlyPoints, PointSelection* pPointSelection, RadarOptions* pRadarOptions);
     ~Radar3D() override;
     

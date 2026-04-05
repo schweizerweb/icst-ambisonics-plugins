@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #include "HelpWebBrowserComponent.h"
 
 HelpWebBrowserComponent::HelpWebBrowserComponent(String url)

@@ -17,54 +17,24 @@
 ================================================================================
 */
 
-
-
 #pragma once
-
-//[Headers]     -- You can add your own extra header files here --
 #include <JuceHeader.h>
-//[/Headers]
 
-
-
-//==============================================================================
-/**
-                                                                    //[Comments]
-    An auto-generated component, created by the Projucer.
-
-    Describe your class and how it works here!
-                                                                    //[/Comments]
-*/
 class HelpComponent  : public Component
 {
 public:
-    //==============================================================================
     HelpComponent (bool isEncoder);
     ~HelpComponent() override;
-
-    //==============================================================================
-    //[UserMethods]     -- You can add your own custom methods in this section.
-    //[/UserMethods]
 
     void paint (juce::Graphics& g) override;
     void resized() override;
 
-
-
 private:
-    //[UserVariables]   -- You can add your own custom variables in this section.
     SharedResourcePointer<TooltipWindow> tooltipWindow;
-    //[/UserVariables]
-
-    //==============================================================================
+    
     std::unique_ptr<juce::TabbedComponent> tabHelp;
     std::unique_ptr<juce::Label> label;
 
-
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (HelpComponent)
 };
-
-//[EndFile] You can add extra defines here...
-//[/EndFile]
 

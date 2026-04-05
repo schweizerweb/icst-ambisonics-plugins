@@ -17,8 +17,6 @@
 ================================================================================
 */
 
-
-
 #pragma once
 #include "AirAbsorbtionFilter.h"
 #include "JuceHeader.h"
@@ -33,7 +31,6 @@
 #include "../../Common/DelayHelper.h"
 #include "EncoderPresetHelper.h"
 #include "../../Common/AudioParams.h"
-#include "GroupAnimator.h"
 #include "../../Common/ScalingInfo.h"
 #include "CustomOscRxPresetHelper.h"
 #include "CustomOscTxPresetHelper.h"
@@ -46,24 +43,16 @@
 #include "../../Common/DebugLogHandler.h"
 #include "../../Common/BlauertDirectionalFilter.h"
 
-//==============================================================================
-/**
-*/
 class AmbisonicEncoderAudioProcessor  : public AudioProcessor, ActionListener
 {
 public:
-    //==============================================================================
     AmbisonicEncoderAudioProcessor();
     ~AmbisonicEncoderAudioProcessor() override;
 
-    //==============================================================================
     void prepareToPlay (double sampleRate, int samplesPerBlock) override;
     void releaseResources() override;
-
     bool isBusesLayoutSupported (const BusesLayout& layouts) const override;
-   
-    // channel handling
-    void numChannelsChanged() override;
+   void numChannelsChanged() override;
     
 	void applyDistanceGain(double* pCoefficientArray, int arraySize, double distance) const;
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
@@ -166,6 +155,5 @@ private:
     AnimatorEngine animatorEngine;
     bool wasPlaying = false;
     
-    //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessor)
 };
