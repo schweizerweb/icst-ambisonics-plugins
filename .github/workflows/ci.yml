@@ -47,7 +47,7 @@ jobs:
             c_compiler: gcc
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -108,7 +108,7 @@ jobs:
       run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "0.0.0.${{github.run_id}}" -n "ICST_AmbiPlugins_dev_${{ matrix.name }}_cibuild_${{github.run_number}}"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.name }}
         path: ${{ steps.strings.outputs.build-output-dir }}/packages/*

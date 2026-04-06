@@ -15,7 +15,7 @@ jobs:
       contents: read
     steps:
       - name: Checkout private action from zhdk-icst
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
         with:
           repository: zhdk-icst/mirror-to-gitlab
           ref: v1

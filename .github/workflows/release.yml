@@ -59,7 +59,7 @@ jobs:
             name: macOS
 
     steps:
-    - uses: actions/checkout@v4
+    - uses: actions/checkout@v6
       with:
         submodules: recursive
 
@@ -125,7 +125,7 @@ jobs:
       run: ../Setup/build_installer.sh -p ${{ matrix.name }} -t "${{ needs.prepare.outputs.version }}" -n "ICST_AmbiPlugins_${{ matrix.name }}_${{ needs.prepare.outputs.version }}"
 
     - name: Upload artifact
-      uses: actions/upload-artifact@v4
+      uses: actions/upload-artifact@v6
       with:
         name: ${{ matrix.name }}
         path: ${{ steps.strings.outputs.build-output-dir }}/packages/*
