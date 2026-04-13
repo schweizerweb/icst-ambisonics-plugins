@@ -34,6 +34,7 @@ public:
         addAndMakeVisible(toggle);
         toggle.addListener(this);
         toggle.setWantsKeyboardFocus(false);
+	    toggle.setMouseCursor(juce::MouseCursor::NormalCursor);
         
         strokeType.reset(new PathStrokeType(1.0f, PathStrokeType::JointStyle::curved));
         
@@ -54,6 +55,8 @@ public:
         displayRangeX.reset(new Range<double>(log10(20), log10(sampleRate / 2.0)));
         displayRangeY.reset(new Range<double>(-30, 30));
         graphArea.reset(new Rectangle<int>(0, 0, 150, 40));
+	    setInterceptsMouseClicks (true, true);
+	    setMouseCursor (juce::MouseCursor::PointingHandCursor);
 	}
 
     ~CheckBoxFilterCustomComponent() override
