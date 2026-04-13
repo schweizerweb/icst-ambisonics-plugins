@@ -52,7 +52,7 @@ void FilterHandleComponent::mouseDrag (const juce::MouseEvent& e)
     graph.dragHandleTo (bank, filterIndex, e.getEventRelativeTo (&graph).position);
 }
 
-void FilterHandleComponent::mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel)
+void FilterHandleComponent::mouseWheelMove(const MouseEvent& /*event*/, const MouseWheelDetails& wheel)
 {
     graph.handleMouseWheel ( bank, filterIndex, wheel.deltaY);
 }
