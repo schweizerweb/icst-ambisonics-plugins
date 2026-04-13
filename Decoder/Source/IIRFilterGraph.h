@@ -45,6 +45,7 @@ public:
     void rebuildHandles();
     void updateHandlePositions();
     void dragHandleTo (FilterBankInfo& bank, int filterIndex, juce::Point<float> localPoint);
+    void handleMouseWheel (FilterBankInfo& bank, int filterIndex, float delta);
 
 private:
     float yToGainDb (float y) const;

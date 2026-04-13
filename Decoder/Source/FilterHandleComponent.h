@@ -34,6 +34,7 @@ public:
     void setFilterComponent(SingleFilterSettingsComponent* pFilterComponent);
     void paint (juce::Graphics& g) override;
     void mouseDrag (const juce::MouseEvent& e) override;
+    void mouseWheelMove(const MouseEvent& event, const MouseWheelDetails& wheel) override;
 
 private:
     IIRFilterGraph& graph;

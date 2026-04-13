@@ -240,6 +240,20 @@ void IIRFilterGraph::dragHandleTo (FilterBankInfo& bank, int filterIndex, juce::
     repaint();
 }
 
+void IIRFilterGraph::handleMouseWheel(FilterBankInfo& bank, int filterIndex, float delta)
+{
+	auto* f = bank.get (filterIndex);
+	if (f == nullptr)
+		return;
+
+	f->qValue = juce::jlimit(0.001f, 100.0f, f->qRequired() ? f->qValue *= (1 + delta) : f->defaultQ());
+
+	if(pFilterControls != nullptr && filterIndex < pFilterControls->size())
+		pFilterControls->getUnchecked(filterIndex)->updateUi();
+
+	repaint();
+}
+
 void IIRFilterGraph::updateHandlePositions()
 {
     int handleIdx = 0;
