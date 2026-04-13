@@ -58,7 +58,7 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     sliderBlauertIntensity.reset(new Slider("sliderBlauertIntensity"));
     addAndMakeVisible (sliderBlauertIntensity.get());
     sliderBlauertIntensity->addListener(this);
-    sliderBlauertIntensity->setRange(0.0, 1.0);
+    sliderBlauertIntensity->setRange(0.0, 5.0);
     sliderBlauertIntensity->setNumDecimalPlacesToDisplay(3);
 
     distanceEncodingComponent.reset (new DistanceEncodingComponent (&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings));
@@ -94,7 +94,7 @@ void EncodingSettingsComponent::resized()
     
     toggleBypassBlauert->setBounds (getWidth()-80, 8, 76, 24);
     sliderBlauertIntensity->setBounds(getWidth()-280, 8, 196, 24);
-    labelIntensity->setBounds(getWidth()-380, 8, 96, 24);
+    labelIntensity->setBounds(getWidth()-400, 8, 116, 24);
 }
 
 void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)

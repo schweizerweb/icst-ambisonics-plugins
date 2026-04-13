@@ -54,7 +54,7 @@ public:
     {
         newY = juce::jlimit (-1.0f, 1.0f, newY);
         newZ = juce::jlimit (-1.0f, 1.0f, newZ);
-        newAmount = juce::jlimit (0.0f, 1.0f, newAmount);
+        newAmount = juce::jlimit (0.0f, 5.0f, newAmount);
 
         if (hasLastValues
             && approximatelyEqual (y, newY)
