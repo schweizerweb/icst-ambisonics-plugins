@@ -25,7 +25,6 @@
 #include "EncoderSettingsDialog.h"
 #include "../../Common/HelpDialogManager.h"
 #include "../../Common/OSCLogDialogManager.h"
-#include "AnimatorDialogManager.h"
 #include "TimelineDialog.h"
 #include "../../Common/DebugLogWindow.h"
 #include "../../Common/ColorBorderDrawableButton.h"
@@ -57,7 +56,6 @@ private:
 	EncoderSettingsDialog* settingsWindow;
     HelpDialogManager helpDialogManager;
     OSCLogDialogManager oscLogDialogManager;
-    AnimatorDialogManager animatorDialogManager;
     SharedResourcePointer<TooltipWindow> tooltipWindow;
     TimelineDialogManager timelineDialogManager;
 

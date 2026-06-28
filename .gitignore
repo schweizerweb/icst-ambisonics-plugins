@@ -7,3 +7,4 @@ packages/
 build*/
 *AutoGen.jucer
 .vscode/
+.idea/

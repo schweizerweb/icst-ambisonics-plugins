@@ -39,21 +39,10 @@ SET(SRC_FILES
 	../Source/AmbiOSCSender.h
 	../Source/AmbiOSCSenderExt.cpp
 	../Source/AmbiOSCSenderExt.h
-	../Source/AnimatorAction.h
-	../Source/AnimatorActionComponent.cpp
-	../Source/AnimatorActionComponent.h
 	../Source/AnimatorEngine.h
 	../Source/AnimatorEngine.cpp
 	../Source/AnimatorMainView.h
 	../Source/AnimatorMainView.cpp
-	../Source/AnimatorComponent.cpp
-	../Source/AnimatorComponent.h
-	../Source/AnimatorDataset.h
-	../Source/AnimatorDialog.h
-	../Source/AnimatorDialogManager.h
-	../Source/AnimatorMovement.h
-	../Source/AnimatorMovementComponent.cpp
-	../Source/AnimatorMovementComponent.h
 	../Source/AnimatorPresetHelper.h
 	../Source/ActionEditDialog.h
 	../Source/CommonClipSettings.h

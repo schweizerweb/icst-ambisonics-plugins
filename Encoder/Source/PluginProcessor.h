@@ -34,7 +34,6 @@
 #include "../../Common/ScalingInfo.h"
 #include "CustomOscRxPresetHelper.h"
 #include "CustomOscTxPresetHelper.h"
-#include "AnimatorDataset.h"
 #include "../../Common/ZoomSettings.h"
 #include "../../Common/ChannelLayout.h"
 #include "../../Common/RadarOptions.h"
@@ -96,7 +95,6 @@ public:
     CustomOscRxPresetHelper* getCustomOscRxPresetHelper();
     CustomOscTxPresetHelper* getCustomOscTxPresetHelper();
     ScalingInfo* getScalingInfo();
-    AnimatorDataset* getAnimatorDataset();
     AnimatorEngine* getAnimatorEngine();
     ZoomSettings* getZoomSettingsPointer();
     OSCHandlerEncoder* getOscHandler();
@@ -148,7 +146,6 @@ private:
     ScalingInfo scalingInfo;
     std::unique_ptr<ZoomSettings> zoomSettings;
     double lastScaler;
-    AnimatorDataset animatorDataset;
     ChannelLayout channelLayout;
     RadarOptions radarOptions;
     

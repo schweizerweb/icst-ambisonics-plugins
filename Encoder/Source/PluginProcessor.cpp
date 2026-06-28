@@ -24,7 +24,6 @@
 
 #define XML_ROOT_TAG "AMBISONICENCODERPLUGINSETTINGS"
 #define XML_TAG_ENCODER_SETTINGS "EncoderSettings"
-#define XML_TAG_ENCODER_ANIMATOR "Animator"
 #define XML_ATTRIBUTE_VERSION "AmbiPluginVersion"
 
 AmbisonicEncoderAudioProcessor::AmbisonicEncoderAudioProcessor()
@@ -404,8 +403,7 @@ void AmbisonicEncoderAudioProcessor::getStateInformation (MemoryBlock& destData)
 	xml->addChildElement(encoderSettings.getAsXmlElement(XML_TAG_ENCODER_SETTINGS));
 	sources->writeToXmlElement(xml);
     zoomSettings->writeToXmlElement(xml);
-    xml->addChildElement(animatorDataset.getAsXmlElement(XML_TAG_ENCODER_ANIMATOR));
-    
+
     auto* xTimelines = xml->createNewChildElement("Timelines");
     for (auto* tm : timelines)
         xTimelines->addChildElement (tm->toXml().release());
@@ -438,7 +436,6 @@ void AmbisonicEncoderAudioProcessor::setStateInformation (const void* data, int 
             sources->resetIds();
             scalingInfo.SetScaler(sources->getDistanceScaler());
             zoomSettings->loadFromXml(xmlState.get());
-            animatorDataset.loadFromXml(xmlState->getChildByName(XML_TAG_ENCODER_ANIMATOR));
             if (auto* xTimelines = xmlState->getChildByName("Timelines"))
             {
                 timelines.clear(true);
@@ -620,11 +617,6 @@ ZoomSettings* AmbisonicEncoderAudioProcessor::getZoomSettingsPointer()
 OSCHandlerEncoder* AmbisonicEncoderAudioProcessor::getOscHandler()
 {
     return pOscHandler;
-}
-
-AnimatorDataset* AmbisonicEncoderAudioProcessor::getAnimatorDataset()
-{
-    return &animatorDataset;
 }
 
 AnimatorEngine* AmbisonicEncoderAudioProcessor::getAnimatorEngine()

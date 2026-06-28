@@ -130,12 +130,6 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
     }
     else if (buttonThatWasClicked == btnHelp.get())
     {
-        if(ModifierKeys::currentModifiers.isCommandDown() && ModifierKeys::currentModifiers.isCtrlDown() && ModifierKeys::currentModifiers.isAltDown() && ModifierKeys::currentModifiers.isShiftDown())
-        {
-            animatorDialogManager.show(pSources, mainProcessor.getAnimatorDataset(), this);
-            return;
-        }
-
         helpDialogManager.show(true, this);
     }
 
