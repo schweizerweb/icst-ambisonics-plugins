@@ -1,10 +1,47 @@
-USER_HOME_DIR=$(getent passwd $SUDO_USER | cut -d: -f6)
-mkdir -p $USER_HOME_DIR/.vst3
-mkdir -p $USER_HOME_DIR/.lv2
-mkdir -p $USER_HOME_DIR/.config/REAPER/ProjectTemplates
-mkdir -p $USER_HOME_DIR/.config/REAPER/TrackTemplates
-ln -sf /usr/lib/vst3/Ambi* $USER_HOME_DIR/.vst3/ || exit 1
-ln -sf /usr/lib/lv2/Ambi* $USER_HOME_DIR/.lv2/ || exit 1
-cp -f /usr/lib/icst.templates/ProjectTemplates/* $USER_HOME_DIR/.config/REAPER/ProjectTemplates || exit 1
-ln -sf /usr/lib/icst.templates/TrackTemplates/* $USER_HOME_DIR/.config/REAPER/TrackTemplates || exit 1
+#!/bin/sh
+set -eu
+
+TARGET_USER="${SUDO_USER:-}"
+
+if [ -z "$TARGET_USER" ]; then
+  echo "postinst: SUDO_USER not set, skipping per-user REAPER template/plugin setup."
+  exit 0
+fi
+
+USER_HOME_DIR=$(getent passwd "$TARGET_USER" | cut -d: -f6)
+
+if [ -z "$USER_HOME_DIR" ] || [ ! -d "$USER_HOME_DIR" ]; then
+  echo "postinst: could not determine home directory for $TARGET_USER, skipping per-user setup."
+  exit 0
+fi
+
+VST3_DIR="$USER_HOME_DIR/.vst3"
+LV2_DIR="$USER_HOME_DIR/.lv2"
+PROJECT_TPL_DIR="$USER_HOME_DIR/.config/REAPER/ProjectTemplates"
+TRACK_TPL_DIR="$USER_HOME_DIR/.config/REAPER/TrackTemplates"
+
+mkdir -p "$VST3_DIR" "$LV2_DIR" "$PROJECT_TPL_DIR" "$TRACK_TPL_DIR"
+
+for f in /usr/lib/vst3/Ambi*; do
+  [ -e "$f" ] || continue
+  ln -sfn "$f" "$VST3_DIR/$(basename "$f")"
+done
+
+for f in /usr/lib/lv2/Ambi*; do
+  [ -e "$f" ] || continue
+  ln -sfn "$f" "$LV2_DIR/$(basename "$f")"
+done
+
+if [ -d /usr/lib/icst.templates/ProjectTemplates ]; then
+  cp -a /usr/lib/icst.templates/ProjectTemplates/. "$PROJECT_TPL_DIR/"
+fi
+
+if [ -d /usr/lib/icst.templates/TrackTemplates ]; then
+  cp -a /usr/lib/icst.templates/TrackTemplates/. "$TRACK_TPL_DIR/"
+fi
+
+chown -R "$TARGET_USER":"$(id -gn "$TARGET_USER")" \
+  "$VST3_DIR" "$LV2_DIR" "$USER_HOME_DIR/.config/REAPER"
+
 echo "install complete"
+exit 0
