@@ -23,7 +23,7 @@ generate_file_section()
         exit
     fi
 
-    local fileList=$(find ${basePath} -mindepth 2 -type f)
+    local fileList=$(find ${basePath} -mindepth 1 -type f)
     local str=""
     for f in $fileList; do
         local localBasePath="$(dirname $f)"
