@@ -31,7 +31,6 @@ void TimelineWidgetMS::setSourceSet(AmbiSourceSet *pSources)
 void TimelineWidgetMS::setPlayheadProvider(std::function<PlayheadSnapshot()> provider)
 {
     playheadProvider = provider;
-    mainView->setPlayheadProvider(provider);
 }
 
 void TimelineWidgetMS::paint(juce::Graphics& g)

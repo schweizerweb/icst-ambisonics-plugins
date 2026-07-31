@@ -39,6 +39,7 @@ public:
     
     // MouseListener
     void mouseDown(const juce::MouseEvent& event) override;
+    void mouseDoubleClick(const juce::MouseEvent& event) override;
     void mouseDrag(const juce::MouseEvent& event) override;
     void mouseEnter(const juce::MouseEvent& event) override;
     void mouseExit(const juce::MouseEvent& event) override;
@@ -121,13 +122,13 @@ public:
 private:
     struct ClipBounds
     {
-        int timelineIndex;
-        int layerIndex;
-        int clipIndex;
-        bool isMovementClip;
+        int timelineIndex = -1;
+        int layerIndex = -1;
+        int clipIndex = -1;
+        bool isMovementClip = false;
         juce::Rectangle<float> bounds;
-        bool isResizeLeft;
-        bool isResizeRight;
+        bool isResizeLeft = false;
+        bool isResizeRight = false;
         
         // Clip information for tooltips
         juce::String displayName;
@@ -169,6 +170,10 @@ private:
     // Selection state
     juce::Array<SelectedClip> selectedClips;
     DragState dragState;
+
+    // Click-cycling state, for stepping through a stack of overlapping clips (see pickClipAtPositionForClick)
+    juce::Point<int> clickCyclePosition { -1, -1 };
+    int clickCycleIndex = 0;
     
     // Coordinate conversion methods
     float timeToX(ms_t time) const;
@@ -205,7 +210,16 @@ private:
     void repositionScrollBars();
     ClipBounds findClipAtPosition(const juce::Point<int>& position);
     juce::Array<ClipBounds> findAllClipsAtPosition(const juce::Point<int>& position) const;
-    ClipBounds findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& position) const;
+
+    // Like findClipAtPosition, but repeated clicks at (approximately) the same spot step
+    // through overlapping clips one at a time instead of always returning the topmost one.
+    // Used for click-driven clip selection only (not hover/double-click).
+    ClipBounds pickClipAtPositionForClick(const juce::Point<int>& position);
+
+    // Computes the on-screen bounds of a single clip, accounting for the current visible time range.
+    // Returns false if the clip doesn't exist or isn't currently visible (in which case outClip/outBounds are untouched).
+    bool getClipAndBounds(const TimelineModel* timeline, int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip,
+                          const Clip*& outClip, juce::Rectangle<float>& outBounds) const;
     void timelineSelectionChanged();
     
     // Rendering helpers
@@ -252,6 +266,7 @@ private:
     juce::String generateDuplicateClipId(const juce::String& originalId);
     juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId);
     juce::String generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId);
+    static juce::String makeUniqueClipId(const juce::Array<juce::String>& existingIds, const juce::String& baseId, const juce::String& defaultLabel);
     std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
     PointSelection* pPointSelectionControl = nullptr;
     AmbiSourceSet* pSourceSet = nullptr;

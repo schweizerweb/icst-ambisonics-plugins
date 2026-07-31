@@ -471,38 +471,15 @@ void TimelineComponent::paint(juce::Graphics& g)
             
             // Draw clips for this track
             bool isMovementClip = (layerIndex == 0);
-            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
-            
+            int numClips = timeline->getNumClips(layerIndex);
+
             for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
             {
-                const Clip* clip = isMovementClip ?
-                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
-                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
-                
-                if (!clip) continue;
-                
-                // Check if clip is visible in current view
-                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                const Clip* clip = nullptr;
+                juce::Rectangle<float> bounds;
+                if (!getClipAndBounds(timeline, timelineIndex, layerIndex, clipIndex, isMovementClip, clip, bounds))
                     continue;
-                
-                // Calculate the visible portion of the clip
-                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
-                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
-                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
-                
-                // Ensure we have at least some visible portion
-                if (visibleClipLength <= 0)
-                    continue;
-                
-                const float x = timeToX(visibleClipStart);
-                const float width = visibleClipLength * pixelsPerMillisecond;
-                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
-                
-                // Ensure minimum width for visibility and interaction
-                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
-                
-                // Only draw if clip is vertically visible
-                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight())
+
                 {
                     // Check if this clip is selected
                     const bool isSelected = isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip);
@@ -764,7 +741,9 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             int groupCount = pSourceSet->activeGroupCount();
             isValid = (clickedTimelineIndex < groupCount);
         }
-        
+
+        // TODO: disable auto follow on click
+
         if (isValid)
         {
             setCurrentTimeline(clickedTimelineIndex);
@@ -772,22 +751,24 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             // Set cursor at click position in the timeline
             ms_t clickTime = xToTime(static_cast<float>(pos.x));
             setCursorTime(clickTime);
-            
             repaint();
         }
         // If not valid, don't allow selection but still set cursor time
         else
         {
             ms_t clickTime = xToTime(static_cast<float>(pos.x));
+
             setCursorTime(clickTime);
             repaint();
         }
+
         return;
     }
     
-    // Check if click is on a clip
-    auto clipBounds = findClipAtPosition(pos);
-    
+    // Check if click is on a clip (cycling through any others stacked at the same spot
+    // on repeated clicks, so clips hidden behind another one stay reachable)
+    auto clipBounds = pickClipAtPositionForClick(pos);
+
     if (clipBounds.timelineIndex != -1)
     {
         // Check if the timeline containing this clip is disabled
@@ -863,21 +844,6 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             dragState.originalLength = clip->length;
         }
         
-        // Check if menu button was clicked (only for current timeline)
-        if (clipBounds.timelineIndex == currentTimelineIndex)
-        {
-            const auto bounds = clipBounds.bounds;
-            auto iconArea = getIconBoundsWithinClip(bounds);
-            
-            if (iconArea.contains(pos.toFloat()))
-            {
-                showClipEditor(clipBounds.timelineIndex,
-                              clipBounds.clipIndex, clipBounds.isMovementClip);
-                dragState.isDragging = false;
-                return;
-            }
-        }
-
         // Switch to clicked timeline (if it's valid)
         if (!isTimelineDisabled)
         {
@@ -899,6 +865,24 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             repaint();
         }
     }
+}
+
+void TimelineComponent::mouseDoubleClick(const juce::MouseEvent& event)
+{
+    auto clipBounds = findClipAtPosition(event.getPosition());
+
+    if (clipBounds.timelineIndex == -1)
+        return;
+
+    // Don't open the editor for clips on disabled (invalid) timelines
+    if (pSourceSet != nullptr)
+    {
+        int groupCount = pSourceSet->activeGroupCount();
+        if (clipBounds.timelineIndex >= groupCount)
+            return;
+    }
+
+    showClipEditor(clipBounds.timelineIndex, clipBounds.clipIndex, clipBounds.isMovementClip);
 }
 
 void TimelineComponent::mouseEnter(const juce::MouseEvent& event)
@@ -1459,128 +1443,101 @@ void TimelineComponent::toggleClipSelection(int timelineIndex, int layerIndex, i
     }
 }
 
+bool TimelineComponent::getClipAndBounds(const TimelineModel* timeline, int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip,
+                                         const Clip*& outClip, juce::Rectangle<float>& outBounds) const
+{
+    const Clip* clip = isMovementClip ?
+        static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
+        static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
+
+    if (!clip) return false;
+
+    // Check if clip is visible in the current time range
+    if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+        return false;
+
+    // Calculate the visible portion of the clip
+    ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
+    ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
+    ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
+
+    if (visibleClipLength <= 0) return false;
+
+    const float timelineY = timelineIndexToY(timelineIndex);
+    const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
+    const float x = timeToX(visibleClipStart);
+    const float width = visibleClipLength * pixelsPerMillisecond;
+    const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
+
+    juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
+
+    // Only report if clip is vertically visible
+    if (bounds.getBottom() < 0 || bounds.getY() > getHeight())
+        return false;
+
+    outClip = clip;
+    outBounds = bounds;
+    return true;
+}
+
 juce::Array<TimelineComponent::ClipBounds> TimelineComponent::findAllClipsAtPosition(const juce::Point<int>& position) const
 {
     juce::Array<ClipBounds> clipsAtPos;
 
     if (timelines == nullptr) return clipsAtPos;
 
-    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+    // Iterate back-to-front (matching paint(), which draws later indices on top), so the
+    // results come out ordered topmost-first. This keeps hit-testing consistent with what's
+    // actually visible: the clip you see on top is the one findAllClipsAtPosition[0] returns.
+    for (int timelineIndex = timelines->size() - 1; timelineIndex >= 0; --timelineIndex)
     {
         auto* timeline = timelines->getUnchecked(timelineIndex);
         if (timeline == nullptr) continue;
-        
-        const float timelineY = timelineIndexToY(timelineIndex);
-        
-        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
+
+        for (int layerIndex = timeline->getNumLayers() - 1; layerIndex >= 0; --layerIndex)
         {
             bool isMovementClip = (layerIndex == 0);
-            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
-            
-            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
-            {
-                const Clip* clip = isMovementClip ?
-                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
-                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
-                
-                if (!clip) continue;
-                
-                // Check if clip is visible
-                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
-                    continue;
-                
-                // Calculate clip bounds
-                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
-                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
-                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
-                
-                if (visibleClipLength <= 0) continue;
-                
-                const float x = timeToX(visibleClipStart);
-                const float width = visibleClipLength * pixelsPerMillisecond;
-                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
-                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
-                
-                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
-                
-                // Only add if clip is vertically visible
-                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight() &&
-                    bounds.contains(position.toFloat()))
-                {
-                    ClipBounds clipBounds;
-                    clipBounds.timelineIndex = timelineIndex;
-                    clipBounds.layerIndex = layerIndex;
-                    clipBounds.clipIndex = clipIndex;
-                    clipBounds.isMovementClip = isMovementClip;
-                    clipBounds.bounds = bounds;
-                    
-                    // Populate clip information
-                    clipBounds.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                    clipBounds.timeInfo = getClipTimeInfo(*clip);
-                    
-                    clipsAtPos.add(clipBounds);
-                }
-            }
-        }
-    }
-    
-    return clipsAtPos;
-}
+            int numClips = timeline->getNumClips(layerIndex);
 
-TimelineComponent::ClipBounds TimelineComponent::findMostHiddenClip(const juce::Array<ClipBounds>& clips, const juce::Point<int>& /*position*/) const
-{
-    if (clips.size() == 1)
-        return clips.getFirst();
-    
-    // Sort clips by selection status and coverage
-    struct ClipCoverage
-    {
-        ClipBounds bounds;
-        int coverageCount = 0;
-        bool isSelected = false;
-        int priorityScore = 0; // Higher score = higher priority
-    };
-    
-    juce::Array<ClipCoverage> coverage;
-    
-    for (const auto& clip : clips)
-    {
-        ClipCoverage item;
-        item.bounds = clip;
-        item.isSelected = isClipSelected(clip.timelineIndex, clip.layerIndex,
-                                       clip.clipIndex, clip.isMovementClip);
-        
-        // Count how many other clips cover this one
-        for (const auto& other : clips)
-        {
-            if (&clip != &other && other.bounds.contains(clip.bounds.getCentre()))
+            for (int clipIndex = numClips - 1; clipIndex >= 0; --clipIndex)
             {
-                item.coverageCount++;
+                const Clip* clip = nullptr;
+                juce::Rectangle<float> bounds;
+                if (!getClipAndBounds(timeline, timelineIndex, layerIndex, clipIndex, isMovementClip, clip, bounds))
+                    continue;
+
+                if (!bounds.contains(position.toFloat()))
+                    continue;
+
+                ClipBounds clipBounds;
+                clipBounds.timelineIndex = timelineIndex;
+                clipBounds.layerIndex = layerIndex;
+                clipBounds.clipIndex = clipIndex;
+                clipBounds.isMovementClip = isMovementClip;
+                clipBounds.bounds = bounds;
+
+                // Populate clip information
+                clipBounds.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                clipBounds.timeInfo = getClipTimeInfo(*clip);
+
+                // Check resize handles (only for current timeline and selected clips)
+                if (timelineIndex == currentTimelineIndex &&
+                    isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip))
+                {
+                    const auto posX = static_cast<float>(position.x);
+
+                    if (posX >= bounds.getX() && posX <= bounds.getX() + resizeHandleWidth)
+                        clipBounds.isResizeLeft = true;
+                    else if (posX >= bounds.getRight() - resizeHandleWidth && posX <= bounds.getRight())
+                        clipBounds.isResizeRight = true;
+                }
+
+                clipsAtPos.add(clipBounds);
             }
         }
-        
-        // Calculate priority score: selected clips get high priority
-        // Selected clips: 1000 + coverage count (so most hidden selected clips are prioritized)
-        // Non-selected clips: coverage count only
-        item.priorityScore = item.isSelected ? (1000 + item.coverageCount) : item.coverageCount;
-        
-        coverage.add(item);
     }
-    
-    // Find the clip with the highest priority score
-    int maxPriorityScore = -1;
-    ClipBounds mostHidden = clips.getFirst();
-    
-    for (const auto& item : coverage)
-    {
-        if (item.priorityScore > maxPriorityScore)
-        {
-            maxPriorityScore = item.priorityScore;
-            mostHidden = item.bounds;
-        }
-    }
-    
-    return mostHidden;
+
+    return clipsAtPos;
 }
 
 void TimelineComponent::clearSelection()
@@ -1613,43 +1570,20 @@ void TimelineComponent::selectClipsInRectangle(const juce::Rectangle<int>& rect,
     {
         auto* timeline = timelines->getUnchecked(timelineIndex);
         if (timeline == nullptr) continue;
-        
-        const float timelineY = timelineIndexToY(timelineIndex);
-        
+
         for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
         {
             bool isMovementClip = (layerIndex == 0);
-            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
-            
+            int numClips = timeline->getNumClips(layerIndex);
+
             for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
             {
-                const Clip* clip = isMovementClip ?
-                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
-                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
-                
-                if (!clip) continue;
-                
-                // Check if clip is visible
-                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
+                const Clip* clip = nullptr;
+                juce::Rectangle<float> bounds;
+                if (!getClipAndBounds(timeline, timelineIndex, layerIndex, clipIndex, isMovementClip, clip, bounds))
                     continue;
-                
-                // Calculate clip bounds
-                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
-                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
-                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
-                
-                if (visibleClipLength <= 0) continue;
-                
-                const float x = timeToX(visibleClipStart);
-                const float width = visibleClipLength * pixelsPerMillisecond;
-                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
-                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
-                
-                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
-                
-                // Only select if clip is vertically visible and intersects rectangle
-                if (bounds.getBottom() >= 0 && bounds.getY() <= getHeight() &&
-                    rect.intersects(bounds.toNearestInt()))
+
+                if (rect.intersects(bounds.toNearestInt()))
                 {
                     selectClip(timelineIndex, layerIndex, clipIndex, isMovementClip, true);
                 }
@@ -1660,91 +1594,33 @@ void TimelineComponent::selectClipsInRectangle(const juce::Rectangle<int>& rect,
 
 TimelineComponent::ClipBounds TimelineComponent::findClipAtPosition(const juce::Point<int>& position)
 {
-    ClipBounds result;
-    result.timelineIndex = -1;
-    result.layerIndex = -1;
-    result.clipIndex = -1;
-    result.isMovementClip = false;
-    result.isResizeLeft = false;
-    result.isResizeRight = false;
+    // findAllClipsAtPosition returns candidates topmost-first, so the first one is
+    // exactly the clip that's actually visible (and thus clickable) at this position.
+    auto candidates = findAllClipsAtPosition(position);
+    return candidates.isEmpty() ? ClipBounds() : candidates.getReference(0);
+}
 
-    if (timelines == nullptr) return result;
+TimelineComponent::ClipBounds TimelineComponent::pickClipAtPositionForClick(const juce::Point<int>& position)
+{
+    auto candidates = findAllClipsAtPosition(position);
 
-    for (int timelineIndex = 0; timelineIndex < timelines->size(); ++timelineIndex)
+    if (candidates.isEmpty())
     {
-        auto* timeline = timelines->getUnchecked(timelineIndex);
-        if (timeline == nullptr) continue;
-        
-        const float timelineY = timelineIndexToY(timelineIndex);
-        
-        for (int layerIndex = 0; layerIndex < timeline->getNumLayers(); ++layerIndex)
-        {
-            bool isMovementClip = (layerIndex == 0);
-            int numClips = isMovementClip ? timeline->movement.clips.size() : timeline->actions.clips.size();
-            
-            for (int clipIndex = 0; clipIndex < numClips; ++clipIndex)
-            {
-                const Clip* clip = isMovementClip ?
-                    static_cast<const Clip*>(&timeline->movement.clips.getReference(clipIndex)) :
-                    static_cast<const Clip*>(&timeline->actions.clips.getReference(clipIndex));
-                
-                if (!clip) continue;
-                
-                // Check if clip is visible
-                if (clip->end() < visibleStartTime || clip->start > visibleEndTime)
-                    continue;
-                
-                // Calculate clip bounds
-                ms_t visibleClipStart = juce::jmax(clip->start, visibleStartTime);
-                ms_t visibleClipEnd = juce::jmin(clip->end(), visibleEndTime);
-                ms_t visibleClipLength = visibleClipEnd - visibleClipStart;
-                
-                if (visibleClipLength <= 0) continue;
-                
-                const float x = timeToX(visibleClipStart);
-                const float width = visibleClipLength * pixelsPerMillisecond;
-                const float trackY = timelineY + timelineHeaderHeight + layerIndexToY(layerIndex);
-                const float clipY = trackY + (trackHeight - clipHeight) * 0.5f;
-                
-                juce::Rectangle<float> bounds(x, clipY, juce::jmax(10.0f, width), clipHeight);
-                
-                if (bounds.contains(position.toFloat()))
-                {
-                    result.timelineIndex = timelineIndex;
-                    result.layerIndex = layerIndex;
-                    result.clipIndex = clipIndex;
-                    result.isMovementClip = isMovementClip;
-                    result.bounds = bounds;
-                    
-                    // Populate clip information
-                    result.displayName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                    result.timeInfo = getClipTimeInfo(*clip);
-                    
-                    // Check resize handles (only for current timeline and selected clips)
-                    if (timelineIndex == currentTimelineIndex &&
-                        isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip))
-                    {
-                        const auto posX = static_cast<float>(position.x);
-                        
-                        // Check left resize handle
-                        if (posX >= bounds.getX() && posX <= bounds.getX() + resizeHandleWidth)
-                        {
-                            result.isResizeLeft = true;
-                        }
-                        // Check right resize handle
-                        else if (posX >= bounds.getRight() - resizeHandleWidth && posX <= bounds.getRight())
-                        {
-                            result.isResizeRight = true;
-                        }
-                    }
-                    
-                    return result; // Return first found clip
-                }
-            }
-        }
+        clickCyclePosition = { -1, -1 };
+        clickCycleIndex = 0;
+        return ClipBounds();
     }
-    
-    return result;
+
+    // Repeated clicks at (roughly) the same spot step to the next clip underneath;
+    // a click anywhere else starts back at the topmost one.
+    constexpr int clickCycleTolerancePx = 3;
+    const bool sameSpotAsLastClick = std::abs(position.x - clickCyclePosition.x) <= clickCycleTolerancePx
+                                   && std::abs(position.y - clickCyclePosition.y) <= clickCycleTolerancePx;
+
+    clickCycleIndex = sameSpotAsLastClick ? (clickCycleIndex + 1) % candidates.size() : 0;
+    clickCyclePosition = position;
+
+    return candidates.getReference(clickCycleIndex);
 }
 
 juce::Colour TimelineComponent::getClipColour(const Clip& clip) const
@@ -2605,45 +2481,37 @@ void TimelineComponent::deselectAllClips()
 
 juce::String TimelineComponent::generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId)
 {
-    if (baseId.isEmpty())
-        return "Movement Clip";
-    
-    juce::String newId = baseId;
-    int copyNumber = 1;
-    
-    // Check if this ID already exists
-    bool idExists = false;
-    do {
-        idExists = false;
-        for (const auto& clip : existingClips)
-        {
-            if (clip.id == newId)
-            {
-                idExists = true;
-                newId = baseId + " (" + juce::String(copyNumber++) + ")";
-                break;
-            }
-        }
-    } while (idExists);
-    
-    return newId;
+    juce::Array<juce::String> existingIds;
+    for (const auto& clip : existingClips)
+        existingIds.add(clip.id);
+
+    return makeUniqueClipId(existingIds, baseId, "Movement Clip");
 }
 
 juce::String TimelineComponent::generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId)
 {
+    juce::Array<juce::String> existingIds;
+    for (const auto& clip : existingClips)
+        existingIds.add(clip.id);
+
+    return makeUniqueClipId(existingIds, baseId, "Action Clip");
+}
+
+juce::String TimelineComponent::makeUniqueClipId(const juce::Array<juce::String>& existingIds, const juce::String& baseId, const juce::String& defaultLabel)
+{
     if (baseId.isEmpty())
-        return "Action Clip";
-    
+        return defaultLabel;
+
     juce::String newId = baseId;
     int copyNumber = 1;
-    
+
     // Check if this ID already exists
     bool idExists = false;
     do {
         idExists = false;
-        for (const auto& clip : existingClips)
+        for (const auto& id : existingIds)
         {
-            if (clip.id == newId)
+            if (id == newId)
             {
                 idExists = true;
                 newId = baseId + " (" + juce::String(copyNumber++) + ")";
@@ -2651,6 +2519,6 @@ juce::String TimelineComponent::generateUniqueClipId(const juce::Array<ActionCli
             }
         }
     } while (idExists);
-    
+
     return newId;
 }

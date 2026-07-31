@@ -94,11 +94,6 @@ void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
     timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);
 }
 
-void AnimatorMainView::setPlayheadProvider(std::function<PlayheadSnapshot()> /*provider*/)
-{
-    // Store if needed
-}
-
 void AnimatorMainView::paint(juce::Graphics& g)
 {
     g.fillAll(juce::Colour(0xff1e1e1e));

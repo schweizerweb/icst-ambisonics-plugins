@@ -28,10 +28,8 @@ struct MovementClip : public Clip
         // MoveToCartesian/MoveToPolar: the target position, where the group point shall be at the end of the clip, since the data is always stored as XYZ in the background, there's no difference between the two MoveTo-Types regarding the targetPoint, but the movement between will be different.
         // Circle/Spiral: The center point, around which the group point will rotate.
     
-    bool useStartPoint;
-    Array<Point3D<double>> startPointsRel; // to be implemented later
-    Array<Point3D<double>> targetPointsRel; // to be implemented later
-    
+    bool useStartPoint = false;
+
     double count = 1.0;           // For Circle and Spiral: number of full rounds
     double radiusChange = 0.0;    // For Spiral only: change of the radius per round, with which the group point will rotate around the target point. for now it's the absolute radius change per round.
 };
@@ -266,31 +264,7 @@ struct TimelineModel
             xClip->setAttribute("useStartPoint", c.useStartPoint ? 1 : 0);
             xClip->setAttribute("count", c.count);
             xClip->setAttribute("radiusChange", c.radiusChange);
-            
-            // Serialize startPointsRel array
-            auto* xStartPoints = new juce::XmlElement("StartPointsRel");
-            for (const auto& point : c.startPointsRel)
-            {
-                auto* xPoint = new juce::XmlElement("Point");
-                xPoint->setAttribute("x", point.getX());
-                xPoint->setAttribute("y", point.getY());
-                xPoint->setAttribute("z", point.getZ());
-                xStartPoints->addChildElement(xPoint);
-            }
-            xClip->addChildElement(xStartPoints);
-            
-            // Serialize targetPointsRel array
-            auto* xTargetPoints = new juce::XmlElement("TargetPointsRel");
-            for (const auto& point : c.targetPointsRel)
-            {
-                auto* xPoint = new juce::XmlElement("Point");
-                xPoint->setAttribute("x", point.getX());
-                xPoint->setAttribute("y", point.getY());
-                xPoint->setAttribute("z", point.getZ());
-                xTargetPoints->addChildElement(xPoint);
-            }
-            xClip->addChildElement(xTargetPoints);
-            
+
             xMovement->addChildElement(xClip);
         }
         xml->addChildElement(xMovement);
@@ -367,38 +341,6 @@ struct TimelineModel
                     c.useStartPoint = xClip->getBoolAttribute("useStartPoint", false);
                     c.count = xClip->getDoubleAttribute("count", 1.0);
                     c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0);
-
-                    // Deserialize startPointsRel array
-                    if (auto* xStartPoints = xClip->getChildByName("StartPointsRel"))
-                    {
-                        for (auto* xPoint = xStartPoints->getFirstChildElement(); xPoint != nullptr; xPoint = xPoint->getNextElement())
-                        {
-                            if (xPoint->hasTagName("Point"))
-                            {
-                                Point3D<double> point(
-                                                      xPoint->getDoubleAttribute("x", 0.0),
-                                                      xPoint->getDoubleAttribute("y", 0.0),
-                                                      xPoint->getDoubleAttribute("z", 0.0));
-                                c.startPointsRel.add(point);
-                            }
-                        }
-                    }
-
-                    // Deserialize targetPointsRel array
-                    if (auto* xTargetPoints = xClip->getChildByName("TargetPointsRel"))
-                    {
-                        for (auto* xPoint = xTargetPoints->getFirstChildElement(); xPoint != nullptr; xPoint = xPoint->getNextElement())
-                        {
-                            if (xPoint->hasTagName("Point"))
-                            {
-                                Point3D<double> point(
-                                                      xPoint->getDoubleAttribute("x", 0.0),
-                                                      xPoint->getDoubleAttribute("y", 0.0),
-                                                      xPoint->getDoubleAttribute("z", 0.0));
-                                c.targetPointsRel.add(point);
-                            }
-                        }
-                    }
 
                     movement.clips.add(c);
                 }

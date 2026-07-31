@@ -22,26 +22,19 @@ public:
 private:
     struct ActiveMovement
     {
-        int timelineIndex;
+        int timelineIndex = 0;
         MovementClip clip;
-        ms_t actualStartTime; // The actual time when this movement should have started
+        ms_t actualStartTime = 0; // The actual time when this movement should have started
         ms_t elapsedTime = 0; // How much time has already elapsed when starting
-        
+
         juce::Vector3D<double> initialPosition;
         double startAngle = 0.0;
         double startRadius = 0.0;
-        
-        // Original constructor (for when no elapsed time)
-        ActiveMovement(int idx, const MovementClip& c, ms_t start)
-            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0) {}
-        
-        // New constructor with elapsed time
-        ActiveMovement(int idx, const MovementClip& c, ms_t start, ms_t elapsed)
+
+        ActiveMovement() = default;
+        ActiveMovement(int idx, const MovementClip& c, ms_t start, ms_t elapsed = 0)
             : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed) {}
-        
-        ActiveMovement()
-            : timelineIndex(0), actualStartTime(0), elapsedTime(0)
-                {}
+
         double getProgress(ms_t currentTimeMs) const
         {
             ms_t timeInMovement = currentTimeMs - actualStartTime;
@@ -51,25 +44,17 @@ private:
 
     struct ActiveAction
     {
-        int timelineIndex;
+        int timelineIndex = 0;
         ActionClip clip;
-        ms_t actualStartTime;
+        ms_t actualStartTime = 0;
         ms_t elapsedTime = 0;
         ms_t lastProcessTime = 0;
-        
+
         double initialStretch = 1.0;
         bool hasInitialState = false;
-        
-        // Default constructor
+
         ActiveAction() = default;
-        
-        // Constructor without elapsed time
-        ActiveAction(int idx, const ActionClip& c, ms_t start)
-            : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(0),
-            lastProcessTime(start) {}
-            
-        // Constructor with elapsed time
-        ActiveAction(int idx, const ActionClip& c, ms_t start, ms_t elapsed)
+        ActiveAction(int idx, const ActionClip& c, ms_t start, ms_t elapsed = 0)
             : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed),
             lastProcessTime(start) {}
     };
