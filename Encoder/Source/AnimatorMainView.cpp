@@ -50,7 +50,8 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
 AnimatorMainView::~AnimatorMainView()
 {
     stopTimer();
-    
+    closeImportSceneDialog();
+
     if (menuBar != nullptr)
     {
         removeChildComponent(menuBar.get());
@@ -128,7 +129,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_addTimeline);
                 // Remove Timeline submenu
                 juce::PopupMenu removeSubMenu;
-                
+
                 // Add entries for each existing timeline
                 if (owner->timelines != nullptr && !owner->timelines->isEmpty())
                 {
@@ -139,34 +140,18 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                     }
                     removeSubMenu.addSeparator();
                 }
-                
+
                 // Add "Remove all invalid timelines" entry
                 removeSubMenu.addCommandItem(owner->commandManager.get(), AnimatorMainView::CMD_removeAllInvalid);
-                
+
                 menu.addSubMenu("Remove Timeline...", removeSubMenu);
-                
+
                 menu.addSeparator();
-                menu.addItem(6, "Preferences", false); // not implemented yet
-        
-                menu.addSeparator();
-                
-                // Import submenu
-                juce::PopupMenu importSubMenu;
-                importSubMenu.addItem(100, "Append as new timeline");
-                
-                // Add overwrite options for existing timelines
-                if (owner->timelines != nullptr && !owner->timelines->isEmpty())
-                {
-                    importSubMenu.addSeparator();
-                    for (int i = 0; i < owner->timelines->size(); ++i)
-                    {
-                        juce::String timelineName = "Group " + juce::String(i + 1);
-                        importSubMenu.addItem(101 + i, "Overwrite " + timelineName);
-                    }
-                }
-                menu.addSubMenu("Import Scene...", importSubMenu);
-                
-                // Export submenu
+
+                // Import: no submenu - goes straight to the file chooser, then asks what to do with it
+                menu.addItem(100, "Import");
+
+                // Export submenu: one entry per existing group, plus "All Groups"
                 juce::PopupMenu exportSubMenu;
                 if (owner->timelines != nullptr && !owner->timelines->isEmpty())
                 {
@@ -175,13 +160,15 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                         juce::String timelineName = "Group " + juce::String(i + 1);
                         exportSubMenu.addItem(200 + i, timelineName);
                     }
+                    exportSubMenu.addSeparator();
+                    exportSubMenu.addItem(199, "All Groups");
                 }
                 else
                 {
                     exportSubMenu.addItem(1, "No timelines available", false);
                 }
-                menu.addSubMenu("Export Scene...", exportSubMenu);
-                
+                menu.addSubMenu("Export", exportSubMenu);
+
                 menu.addSeparator();
                 menu.addItem(6, "Preferences", false); // not implemented yet
             }
@@ -250,31 +237,28 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
     
     switch (menuItemID)
     {
-        case 100: // Import - Append as new timeline
-            importScene(-1); // -1 means append
+        case 100: // Import
+            importScene();
             break;
-            
+
         case 6: // Preferences
             // Handle preferences
             break;
-            
+
         case 10: // Undo
             // Handle undo (not implemented yet)
             break;
-            
+
         case 11: // Redo
             // Handle redo (not implemented yet)
             break;
-            
+
+        case 199: // Export - All Groups
+            exportAllScenes();
+            break;
+
         default:
-            // Handle import overwrite and export menu items
-            if (menuItemID >= 101 && menuItemID < 200)
-            {
-                // Import overwrite - menuItemID 101+ corresponds to timeline index 0+
-                int timelineIndex = menuItemID - 101;
-                importScene(timelineIndex);
-            }
-            else if (menuItemID >= 200 && menuItemID < 300)
+            if (menuItemID >= 200 && menuItemID < 300)
             {
                 // Export - menuItemID 200+ corresponds to timeline index 0+
                 int timelineIndex = menuItemID - 200;
@@ -290,75 +274,152 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
     }
 }
 
-void AnimatorMainView::importScene(int targetTimelineIndex)
+static bool readTimelinesFromXml(const juce::XmlElement& xml, juce::OwnedArray<TimelineModel>& outTimelines)
+{
+    if (xml.hasTagName("Timeline"))
+    {
+        auto tm = std::make_unique<TimelineModel>();
+        if (!tm->fromXml(xml))
+            return false;
+
+        outTimelines.add(tm.release());
+        return true;
+    }
+
+    if (xml.hasTagName("AnimatorTimelines"))
+    {
+        for (auto* xTimeline : xml.getChildWithTagNameIterator("Timeline"))
+        {
+            auto tm = std::make_unique<TimelineModel>();
+            if (tm->fromXml(*xTimeline))
+                outTimelines.add(tm.release());
+        }
+        return !outTimelines.isEmpty();
+    }
+
+    return false;
+}
+
+void AnimatorMainView::importScene()
 {
     juce::FileChooser chooser("Import Scene...",
                              juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
                              "*.xml");
-    
-    if (chooser.browseForFileToOpen())
+
+    if (!chooser.browseForFileToOpen())
+        return;
+
+    auto file = chooser.getResult();
+    auto xml = juce::XmlDocument::parse(file);
+
+    juce::OwnedArray<TimelineModel> importedGroups;
+    if (xml == nullptr || !readTimelinesFromXml(*xml, importedGroups))
     {
-        auto file = chooser.getResult();
-        auto xml = juce::XmlDocument::parse(file);
-        
-        if (xml != nullptr && xml->hasTagName("Timeline"))
-        {
-            auto* newTimeline = new TimelineModel();
-            if (newTimeline->fromXml(*xml))
-            {
-                if (targetTimelineIndex == -1)
-                {
-                    // Append as new timeline
-                    if (timelines == nullptr)
-                        timelines = new juce::OwnedArray<TimelineModel>();
-                        
-                    timelines->add(newTimeline);
-                    
-                    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
-                                                          "Import Successful",
-                                                          "Timeline imported and appended successfully.");
-                }
-                else
-                {
-                    // Overwrite existing timeline
-                    if (timelines != nullptr && targetTimelineIndex < timelines->size())
-                    {
-                        timelines->set(targetTimelineIndex, newTimeline);
-                        
-                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
-                                                              "Import Successful",
-                                                              "Timeline imported and overwritten successfully.");
-                    }
-                    else
-                    {
-                        delete newTimeline;
-                        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                                              "Import Error",
-                                                              "Invalid timeline index for overwrite.");
-                        return;
-                    }
-                }
-                
-                // Update the timeline component
-                timelineViewport->setTimelines(timelines);
-                timelineViewport->repaint();
-            }
-            else
-            {
-                delete newTimeline;
-                juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                                      "Import Error",
-                                                      "Failed to import timeline file.");
-            }
-        }
-        else
-        {
-            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
-                                                  "Import Error",
-                                                  "Invalid timeline file format.");
-        }
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Import Error",
+                                              "Invalid scene file format.");
+        return;
+    }
+
+    showImportOptionsDialog(std::move(importedGroups));
+}
+
+void AnimatorMainView::closeImportSceneDialog()
+{
+    if (importSceneWindow != nullptr)
+    {
+        auto* w = importSceneWindow;
+        importSceneWindow = nullptr;
+        delete w;
     }
 }
+
+void AnimatorMainView::showImportOptionsDialog(juce::OwnedArray<TimelineModel>&& importedGroups)
+{
+    closeImportSceneDialog();
+
+    auto sharedGroups = std::make_shared<juce::OwnedArray<TimelineModel>>(std::move(importedGroups));
+    const int importedCount = sharedGroups->size();
+    const int existingCount = (timelines != nullptr) ? timelines->size() : 0;
+    const bool cursorIsSet = timelineViewport->getTimelineComponent()->isCursorSet();
+
+    // These callbacks already run on a fresh call stack (deferred via MessageManager::callAsync
+    // by ImportSceneOptionsComponent/ImportSceneDialog), but AnimatorMainView could still have
+    // been closed in the meantime, so guard "this" the same way TimelineDialog does.
+    juce::Component::SafePointer<AnimatorMainView> safeThis(this);
+
+    auto content = std::make_unique<ImportSceneOptionsComponent>(importedCount, existingCount, cursorIsSet,
+        [safeThis, sharedGroups](bool confirmed, ImportSceneResult result)
+        {
+            if (safeThis == nullptr)
+                return;
+
+            safeThis->closeImportSceneDialog();
+
+            if (confirmed)
+                safeThis->applyImportedGroups(*sharedGroups, result);
+        });
+
+    importSceneWindow = new ImportSceneDialog(std::move(content), [safeThis]
+    {
+        if (safeThis != nullptr)
+            safeThis->closeImportSceneDialog();
+    });
+
+    importSceneWindow->setVisible(true);
+}
+
+void AnimatorMainView::applyImportedGroups(const juce::OwnedArray<TimelineModel>& importedGroups, const ImportSceneResult& result)
+{
+    if (timelines == nullptr)
+        timelines = new juce::OwnedArray<TimelineModel>();
+
+    auto* timelineComp = timelineViewport->getTimelineComponent();
+
+    for (int i = 0; i < importedGroups.size(); ++i)
+    {
+        const auto& decision = result.groupDecisions[i];
+
+        switch (decision.mode)
+        {
+            case ImportSceneMode::Ignore:
+                break;
+
+            case ImportSceneMode::AppendAsNew:
+                timelines->add(new TimelineModel(*importedGroups[i]));
+                break;
+
+            case ImportSceneMode::AppendAtCursor:
+            {
+                // Insert into a freshly-added empty group, so the same cursor-offset logic used
+                // for existing targets shifts these clips too, instead of keeping their raw
+                // from-the-file timing (which starts at/near 0).
+                timelines->add(new TimelineModel());
+                const int newIndex = timelines->size() - 1;
+                timelineComp->insertTimelineAtCursor(newIndex, *importedGroups[i]);
+                break;
+            }
+
+            case ImportSceneMode::Replace:
+                if (decision.targetIndex >= 0 && decision.targetIndex < timelines->size())
+                    timelines->set(decision.targetIndex, new TimelineModel(*importedGroups[i]), true);
+                break;
+
+            case ImportSceneMode::InsertAtCursor:
+                if (decision.targetIndex >= 0 && decision.targetIndex < timelines->size())
+                    timelineComp->insertTimelineAtCursor(decision.targetIndex, *importedGroups[i]);
+                break;
+        }
+    }
+
+    timelineViewport->setTimelines(timelines);
+    timelineViewport->repaint();
+
+    juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
+                                          "Import Successful",
+                                          "Scene data imported successfully.");
+}
+
 
 void AnimatorMainView::exportScene(int timelineIndex)
 {
@@ -401,6 +462,43 @@ void AnimatorMainView::exportScene(int timelineIndex)
             juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
                                                   "Export Error",
                                                   "Failed to export timeline file.");
+        }
+    }
+}
+
+void AnimatorMainView::exportAllScenes()
+{
+    if (timelines == nullptr || timelines->isEmpty())
+    {
+        juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                              "Export Error",
+                                              "No timeline data to export.");
+        return;
+    }
+
+    juce::FileChooser chooser("Export All Groups...",
+                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             "*.xml");
+
+    if (chooser.browseForFileToSave(true))
+    {
+        auto file = chooser.getResult().withFileExtension("xml");
+
+        juce::XmlElement root("AnimatorTimelines");
+        for (auto* tm : *timelines)
+            root.addChildElement(tm->toXml().release());
+
+        if (root.writeTo(file))
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
+                                                  "Export Successful",
+                                                  "All groups exported successfully to: " + file.getFullPathName());
+        }
+        else
+        {
+            juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
+                                                  "Export Error",
+                                                  "Failed to export scene file.");
         }
     }
 }

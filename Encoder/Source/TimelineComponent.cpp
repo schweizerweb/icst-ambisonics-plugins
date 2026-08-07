@@ -2342,61 +2342,67 @@ void TimelineComponent::pasteClips()
 {
     if (!clipboard.hasData || clipboard.timelineData.isEmpty())
         return;
-        
+
     if (auto* currentTimeline = getCurrentTimeline())
     {
         if (auto* sourceTimeline = clipboard.timelineData.getFirst())
         {
-            // Clear current selection
             clearSelection();
-            
-            // Calculate time offset based on cursor position
-            ms_t timeOffset = getCursorTime();
-            
-            // Find the earliest clip time in the clipboard to maintain relative timing
-            ms_t earliestTime = std::numeric_limits<ms_t>::max();
-            for (const auto& clip : sourceTimeline->movement.clips)
-                earliestTime = juce::jmin(earliestTime, clip.start);
-            for (const auto& clip : sourceTimeline->actions.clips)
-                earliestTime = juce::jmin(earliestTime, clip.start);
-            
-            if (earliestTime == std::numeric_limits<ms_t>::max())
-                earliestTime = 0;
-            
-            // Paste movement clips with time offset
-            for (const auto& clip : sourceTimeline->movement.clips)
-            {
-                MovementClip newClip = clip;
-                newClip.start = timeOffset + (clip.start - earliestTime);
-                
-                // Generate unique ID to avoid conflicts
-                newClip.id = generateUniqueClipId(currentTimeline->movement.clips, clip.id);
-                
-                int newClipIndex = currentTimeline->movement.clips.size();
-                currentTimeline->movement.clips.add(newClip);
-                
-                // Select the newly pasted clip
-                selectClip(getCurrentTimelineIndex(), 0, newClipIndex, true, true);
-            }
-            
-            // Paste action clips with time offset
-            for (const auto& clip : sourceTimeline->actions.clips)
-            {
-                ActionClip newClip = clip;
-                newClip.start = timeOffset + (clip.start - earliestTime);
-                
-                // Generate unique ID to avoid conflicts
-                newClip.id = generateUniqueClipId(currentTimeline->actions.clips, clip.id);
-                
-                int newClipIndex = currentTimeline->actions.clips.size();
-                currentTimeline->actions.clips.add(newClip);
-                
-                // Select the newly pasted clip
-                selectClip(getCurrentTimelineIndex(), 1, newClipIndex, false, true);
-            }
-            
+            insertClipsIntoTimeline(getCurrentTimelineIndex(), currentTimeline, *sourceTimeline, getCursorTime(), true);
             repaint();
         }
+    }
+}
+
+void TimelineComponent::insertTimelineAtCursor(int targetTimelineIndex, const TimelineModel& source)
+{
+    if (timelines == nullptr || targetTimelineIndex < 0 || targetTimelineIndex >= timelines->size())
+        return;
+
+    if (auto* targetTimeline = timelines->getUnchecked(targetTimelineIndex))
+    {
+        insertClipsIntoTimeline(targetTimelineIndex, targetTimeline, source, getCursorTime(), false);
+        repaint();
+    }
+}
+
+void TimelineComponent::insertClipsIntoTimeline(int targetTimelineIndex, TimelineModel* targetTimeline, const TimelineModel& source,
+                                                ms_t timeOffset, bool selectInserted)
+{
+    // Find the earliest clip time in the source to maintain relative timing
+    ms_t earliestTime = std::numeric_limits<ms_t>::max();
+    for (const auto& clip : source.movement.clips)
+        earliestTime = juce::jmin(earliestTime, clip.start);
+    for (const auto& clip : source.actions.clips)
+        earliestTime = juce::jmin(earliestTime, clip.start);
+
+    if (earliestTime == std::numeric_limits<ms_t>::max())
+        earliestTime = 0;
+
+    for (const auto& clip : source.movement.clips)
+    {
+        MovementClip newClip = clip;
+        newClip.start = timeOffset + (clip.start - earliestTime);
+        newClip.id = generateUniqueClipId(targetTimeline->movement.clips, clip.id);
+
+        int newClipIndex = targetTimeline->movement.clips.size();
+        targetTimeline->movement.clips.add(newClip);
+
+        if (selectInserted)
+            selectClip(targetTimelineIndex, 0, newClipIndex, true, true);
+    }
+
+    for (const auto& clip : source.actions.clips)
+    {
+        ActionClip newClip = clip;
+        newClip.start = timeOffset + (clip.start - earliestTime);
+        newClip.id = generateUniqueClipId(targetTimeline->actions.clips, clip.id);
+
+        int newClipIndex = targetTimeline->actions.clips.size();
+        targetTimeline->actions.clips.add(newClip);
+
+        if (selectInserted)
+            selectClip(targetTimelineIndex, 1, newClipIndex, false, true);
     }
 }
 

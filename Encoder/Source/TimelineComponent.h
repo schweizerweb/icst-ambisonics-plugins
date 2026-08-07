@@ -101,6 +101,7 @@ public:
     // Cursor control methods
     void setCursorTime(ms_t time);
     ms_t getCursorTime() const;
+    bool isCursorSet() const { return cursorVisible; }
     void updatePreviewCursor(const juce::Point<int>& mousePos);
     void hidePreviewCursor();
     
@@ -113,6 +114,12 @@ public:
     void cutSelectedClips();
     void copySelectedClips();
     void pasteClips();
+
+    // Merges a source timeline's clips into an existing target timeline, offsetting clip
+    // start times so the earliest clip lands on the current cursor position (like pasteClips,
+    // but for an arbitrary target timeline rather than the current one/clipboard).
+    void insertTimelineAtCursor(int targetTimelineIndex, const TimelineModel& source);
+
     void duplicateSelectedClips();
     void selectAllClips();
     void deselectAllClips();
@@ -267,6 +274,12 @@ private:
     juce::String generateUniqueClipId(const juce::Array<MovementClip>& existingClips, const juce::String& baseId);
     juce::String generateUniqueClipId(const juce::Array<ActionClip>& existingClips, const juce::String& baseId);
     static juce::String makeUniqueClipId(const juce::Array<juce::String>& existingIds, const juce::String& baseId, const juce::String& defaultLabel);
+
+    // Shared by pasteClips and insertTimelineAtCursor: offsets source's clips so their earliest
+    // start lands on timeOffset, assigns collision-free ids, and adds them into targetTimeline.
+    void insertClipsIntoTimeline(int targetTimelineIndex, TimelineModel* targetTimeline, const TimelineModel& source,
+                                 ms_t timeOffset, bool selectInserted);
+
     std::unique_ptr<ClipEditorDialogManager> clipEditorManager;
     PointSelection* pPointSelectionControl = nullptr;
     AmbiSourceSet* pSourceSet = nullptr;

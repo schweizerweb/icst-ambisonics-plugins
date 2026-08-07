@@ -4,6 +4,7 @@
 #include "TimelineViewport.h"
 #include "StatusBarComponent.h"
 #include "AnimatorEngine.h"
+#include "ImportSceneDialog.h"
 #include "../../Common/ColorDrawableToggleButton.h"
 
 class AnimatorMainView : public juce::Component,
@@ -118,9 +119,16 @@ private:
     void addNewTimeline();
     void removeAllInvalidTimelines();
     void removeTimeline(int timelineIndex);
-    void importScene(int timelineIndex);
+    void importScene();
     void exportScene(int timelineIndex);
-    
+    void exportAllScenes();
+
+    void showImportOptionsDialog(juce::OwnedArray<TimelineModel>&& importedGroups);
+    void applyImportedGroups(const juce::OwnedArray<TimelineModel>& importedGroups, const ImportSceneResult& result);
+    void closeImportSceneDialog();
+    ImportSceneDialog* importSceneWindow = nullptr;
+
+
     // Status bar
     std::unique_ptr<StatusBarComponent> statusBar;
     void updateStatusBarValidation();
