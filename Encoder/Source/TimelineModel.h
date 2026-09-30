@@ -164,7 +164,8 @@ public:
     // Check if start value controls should be enabled
     bool shouldEnableStartValueControls() const
     {
-        return timing == TimingType::AbsoluteTarget || timing == TimingType::RelativeDuringClip;
+        return timing == TimingType::AbsoluteTarget || timing == TimingType::RelativeDuringClip
+            || timing == TimingType::ConstantPerSecond;
     }
 };
 

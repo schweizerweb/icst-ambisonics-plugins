@@ -170,6 +170,9 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addSubMenu("Export", exportSubMenu);
 
                 menu.addSeparator();
+                menu.addItem(150, "Load Demo");
+
+                menu.addSeparator();
                 menu.addItem(6, "Preferences", false); // not implemented yet
             }
             break;
@@ -239,6 +242,10 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
     {
         case 100: // Import
             importScene();
+            break;
+
+        case 150: // Load Demo
+            confirmLoadDemo();
             break;
 
         case 6: // Preferences
@@ -503,6 +510,170 @@ void AnimatorMainView::exportAllScenes()
     }
 }
 
+static inline MovementClip makeDemoMovementClip(juce::String id, ms_t start, ms_t length, juce::Colour col,
+                                                 MovementType type, bool useStart,
+                                                 Point3D<double> startPt, Point3D<double> targetPt,
+                                                 double count = 1.0, double radiusChange = 0.0)
+{
+    MovementClip c;
+    c.id = std::move(id);
+    c.start = start;
+    c.length = length;
+    c.colour = col;
+    c.movementType = type;
+    c.useStartPoint = useStart;
+    c.startPointGroup = startPt;
+    c.targetPointGroup = targetPt;
+    c.count = count;
+    c.radiusChange = radiusChange;
+    return c;
+}
+
+static inline ActionClip makeDemoActionClip(juce::String id, ms_t start, ms_t length, juce::Colour col)
+{
+    ActionClip c;
+    c.id = std::move(id);
+    c.start = start;
+    c.length = length;
+    c.colour = col;
+    return c;
+}
+
+static inline ActionClip makeDemoActionClip(juce::String id, ms_t start, ms_t length, juce::Colour col, ActionDefinition action)
+{
+    ActionClip c = makeDemoActionClip(std::move(id), start, length, col);
+    c.actions.add(action);
+    return c;
+}
+
+void AnimatorMainView::confirmLoadDemo()
+{
+    // Non-blocking: showOkCancelBox with a callback returns immediately rather than running a
+    // nested modal loop, so it can't stall audio processing while the user decides.
+    juce::Component::SafePointer<AnimatorMainView> safeThis(this);
+
+    juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
+                                       "Load Demo",
+                                       "This will replace all existing timeline data with demo content. "
+                                       "This action cannot be undone. Continue?",
+                                       "Load Demo",
+                                       "Cancel",
+                                       this,
+                                       juce::ModalCallbackFunction::create([safeThis](int result)
+                                       {
+                                           if (safeThis != nullptr && result != 0)
+                                               safeThis->loadDemoContent();
+                                       }));
+}
+
+void AnimatorMainView::loadDemoContent()
+{
+    if (timelines == nullptr)
+        timelines = new juce::OwnedArray<TimelineModel>();
+
+    timelines->clear(true);
+
+    // Timeline 1: Linear Path - straight-line moves plus a full rotation and a grow/shrink
+    {
+        auto* t = new TimelineModel();
+
+        t->movement.clips.add(makeDemoMovementClip("Move Right", 0, 1200, juce::Colours::orange,
+            MovementType::MoveToCartesian, true, Point3D<double>(0.0, 0.0, 0.0), Point3D<double>(4.0, 0.0, 0.0)));
+        t->movement.clips.add(makeDemoMovementClip("Move Left", 1400, 1400, juce::Colours::orangered,
+            MovementType::MoveToCartesian, false, Point3D<double>(), Point3D<double>(-4.0, 0.0, 0.0)));
+        t->movement.clips.add(makeDemoMovementClip("Return Center", 3000, 1000, juce::Colours::goldenrod,
+            MovementType::MoveToCartesian, false, Point3D<double>(), Point3D<double>(0.0, 0.0, 0.0)));
+
+        // 360 degrees over 2s at 180 deg/s
+        t->actions.clips.add(makeDemoActionClip("Rotate Full Circle", 0, 2000, juce::Colours::slateblue,
+            ActionDefinition{ActionType::RotationZ, TimingType::ConstantPerSecond, 180.0}));
+        // doubles in size by the end of the clip
+        t->actions.clips.add(makeDemoActionClip("Grow", 2200, 1000, juce::Colours::mediumseagreen,
+            ActionDefinition{ActionType::Stretch, TimingType::RelativeDuringClip, 1.0}));
+        // shrinks back to half size by the end of the clip
+        t->actions.clips.add(makeDemoActionClip("Shrink", 3300, 900, juce::Colours::seagreen,
+            ActionDefinition{ActionType::Stretch, TimingType::RelativeDuringClip, -0.5}));
+
+        timelines->add(t);
+    }
+
+    // Timeline 2: Orbit & Spiral - showcases the Circle and Spiral movement types
+    {
+        auto* t = new TimelineModel();
+
+        // one full revolution, radius 3, around the origin
+        t->movement.clips.add(makeDemoMovementClip("Circle Orbit", 0, 3000, juce::Colours::cornflowerblue,
+            MovementType::Circle, true, Point3D<double>(3.0, 0.0, 0.0), Point3D<double>(0.0, 0.0, 0.0), 1.0));
+        // continues from wherever the orbit ended, spiraling outward over 2 rounds
+        t->movement.clips.add(makeDemoMovementClip("Spiral Outward", 3200, 3000, juce::Colours::royalblue,
+            MovementType::Spiral, false, Point3D<double>(), Point3D<double>(0.0, 0.0, 0.0), 2.0, 1.0));
+
+        // tilts up by 45 degrees over the clip
+        t->actions.clips.add(makeDemoActionClip("Tilt Up", 0, 3000, juce::Colours::mediumseagreen,
+            ActionDefinition{ActionType::RotationX, TimingType::RelativeDuringClip, 45.0}));
+        // grows at a constant rate of 0.3/s starting from a baseline of 1.0 (demonstrates a start value with
+        // Constant per Second timing)
+        t->actions.clips.add(makeDemoActionClip("Grow While Spiraling", 3200, 3000, juce::Colours::seagreen,
+            ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 0.3, 1.0, true}));
+
+        timelines->add(t);
+    }
+
+    // Timeline 3: Timing Types - contrasts Absolute Target vs Relative During Clip timing, and a polar
+    // (arcing) move vs a straight-line Cartesian move
+    {
+        auto* t = new TimelineModel();
+
+        // arcs from the front position to the right, moving through polar (azimuth/elevation/distance) space
+        t->movement.clips.add(makeDemoMovementClip("Arc Move (Polar)", 0, 2000, juce::Colours::purple,
+            MovementType::MoveToPolar, true, Point3D<double>(0.0, 3.0, 0.0), Point3D<double>(3.0, 0.0, 0.0)));
+        // returns to the front position in a straight line
+        t->movement.clips.add(makeDemoMovementClip("Return (Cartesian)", 2200, 1500, juce::Colours::darkorchid,
+            MovementType::MoveToCartesian, false, Point3D<double>(), Point3D<double>(0.0, 3.0, 0.0)));
+
+        // rotates to an absolute 90 degree orientation by the end of the clip
+        t->actions.clips.add(makeDemoActionClip("Rotate To 90 (Absolute)", 0, 2000, juce::Colours::gold,
+            ActionDefinition{ActionType::RotationY, TimingType::AbsoluteTarget, 90.0}));
+        // rotates by a further 45 degrees relative to wherever it started the clip
+        t->actions.clips.add(makeDemoActionClip("Rotate 45 More (Relative)", 2200, 1500, juce::Colours::darkkhaki,
+            ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 45.0}));
+        // grows at a constant rate of 0.4/s
+        t->actions.clips.add(makeDemoActionClip("Stretch (Constant/s)", 3800, 1500, juce::Colours::lightblue,
+            ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 0.4}));
+
+        timelines->add(t);
+    }
+
+    // Timeline 4: Complex Example - a Spiral move combined with a two-axis rotation and a stretch
+    {
+        auto* t = new TimelineModel();
+
+        // spirals inward toward the origin while completing 1.5 rounds
+        t->movement.clips.add(makeDemoMovementClip("Complex Spiral", 0, 3000, juce::Colours::teal,
+            MovementType::Spiral, true, Point3D<double>(2.0, 0.0, 0.0), Point3D<double>(0.0, 0.0, 0.0), 1.5, -0.5));
+
+        ActionClip rotationClip = makeDemoActionClip("3D Rotation", 500, 1000, juce::Colours::orange);
+        rotationClip.actions.add(ActionDefinition{ActionType::RotationX, TimingType::AbsoluteTarget, 45.0});
+        rotationClip.actions.add(ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 90.0});
+        t->actions.clips.add(rotationClip);
+
+        ActionClip stretchClip = makeDemoActionClip("Dynamic Stretch", 1600, 800, juce::Colours::red);
+        stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 2.0});
+        t->actions.clips.add(stretchClip);
+
+        timelines->add(t);
+    }
+
+    timelineViewport->setTimelines(timelines);
+    timelineViewport->repaint();
+
+    juce::AttributedString msg;
+    msg.append("Demo content loaded",
+               juce::FontOptions(12.0f, juce::Font::bold),
+               juce::Colours::lightgreen);
+    setStatusMessage(msg);
+}
+
 void AnimatorMainView::toggleAutoFollow()
 {
     bool newState = !pAnimatorEngine->getAutoFollow();
@@ -513,35 +684,33 @@ void AnimatorMainView::toggleAutoFollow()
     if (toolbar != nullptr)
     {
         toolbar->refreshButtonStates();
+        toolbar->repaint();
     }
-    
+
     // Update command manager to refresh menu checkmarks
     if (commandManager != nullptr)
     {
         commandManager->commandStatusChanged();
     }
-    
-    toolbar->repaint();
 }
 
 void AnimatorMainView::toggleOnOff()
 {
     bool newState = !pAnimatorEngine->getAnimatorState();
     pAnimatorEngine->setAnimatorState(newState);
-    
+
     // Update toolbar button states
     if (toolbar != nullptr)
     {
         toolbar->refreshButtonStates();
+        toolbar->repaint();
     }
-    
+
     // Update command manager to refresh menu states
     if (commandManager != nullptr)
     {
         commandManager->commandStatusChanged();
     }
-    
-    toolbar->repaint();
 }
 
 // In ToolbarComponent constructor

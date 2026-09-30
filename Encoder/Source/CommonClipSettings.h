@@ -177,14 +177,17 @@ private:
         
         addAndMakeVisible(startEditor);
         startEditor.setTooltip("Start Time in milliseconds");
+        startEditor.setJustification(juce::Justification::centredRight);
         startEditor.onTextChange = [this] { onStartChanged(); };
-        
+
         addAndMakeVisible(durationEditor);
         durationEditor.setTooltip("Duration in milliseconds");
+        durationEditor.setJustification(juce::Justification::centredRight);
         durationEditor.onTextChange = [this] { onDurationChanged(); };
-        
+
         addAndMakeVisible(endEditor);
         endEditor.setTooltip("End Time - Editing will adjust duration");
+        endEditor.setJustification(juce::Justification::centredRight);
         endEditor.onTextChange = [this] { onEndChanged(); };
         
         // Colour button that will stretch to fill available width

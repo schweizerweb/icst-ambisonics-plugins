@@ -230,8 +230,9 @@ private:
             timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, true);
             
             // Enable start value controls only for valid timing types
-            bool startValueSupported = (currentTiming == TimingType::AbsoluteTarget ||
-                                      currentTiming == TimingType::RelativeDuringClip);
+            ActionDefinition tempAction;
+            tempAction.setTiming(currentTiming);
+            bool startValueSupported = tempAction.shouldEnableStartValueControls();
             bool startValueEnabled = startValueSupported && useStartValueButton.getToggleState();
             
             startValueLabel.setEnabled(startValueEnabled);

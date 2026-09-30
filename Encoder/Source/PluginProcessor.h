@@ -100,7 +100,6 @@ public:
     OSCHandlerEncoder* getOscHandler();
     RadarOptions* getRadarOptions();
     juce::OwnedArray<TimelineModel>* getTimelines();
-    void populateDefaultTimelineModels();
     DebugLogHandler debugLogHandler;
     
     void updateTrackProperties(const TrackProperties& properties) override;

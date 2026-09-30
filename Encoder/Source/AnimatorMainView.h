@@ -122,6 +122,8 @@ private:
     void importScene();
     void exportScene(int timelineIndex);
     void exportAllScenes();
+    void confirmLoadDemo();
+    void loadDemoContent();
 
     void showImportOptionsDialog(juce::OwnedArray<TimelineModel>&& importedGroups);
     void applyImportedGroups(const juce::OwnedArray<TimelineModel>& importedGroups, const ImportSceneResult& result);

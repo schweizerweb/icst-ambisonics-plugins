@@ -188,8 +188,8 @@ void MovementClipEditor::createControls()
     createCoordinateSlider(targetYSlider, targetYLabel, "Target Y:", -10.0, 10.0, 0.0);
     createCoordinateSlider(targetZSlider, targetZLabel, "Target Z:", -10.0, 10.0, 0.0);
     
-    createStandardSlider(countSlider, countLabel, "Count:", currentClip.count);
-    createStandardSlider(radiusChangeSlider, radiusChangeLabel, "Radius change:", currentClip.radiusChange);
+    createStandardSlider(countSlider, countLabel, "Rotations:", currentClip.count);
+    createStandardSlider(radiusChangeSlider, radiusChangeLabel, "Radius change / rotation:", currentClip.radiusChange);
     
     // Create apply current position buttons
     createApplyCurrentPositionButton(applyCurrentStartButton, startXSlider, startYSlider, startZSlider);
@@ -201,33 +201,31 @@ void MovementClipEditor::createControls()
     updateCurrentPosition();
 }
 
-void MovementClipEditor::createCoordinateSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name,
+void MovementClipEditor::createCoordinateSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name,
                            double min, double max, double defaultValue)
 {
     addAndMakeVisible(slider);
     slider.setRange(min, max, 0.01);
     slider.setValue(defaultValue);
-    slider.setTextBoxStyle(juce::Slider::TextBoxRight, false, 70, 22);
-    
+
     addAndMakeVisible(label);
     label.setText(name, juce::dontSendNotification);
     label.setJustificationType(juce::Justification::centredLeft);
 }
 
-void MovementClipEditor::createStandardSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name, double defaultValue)
+void MovementClipEditor::createStandardSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name, double defaultValue)
 {
     addAndMakeVisible(slider);
+    slider.setUpDownStyle(true); // always a compact updown spinner, same footprint as Start/Target X/Y/Z
     slider.setRange(-1000, 1000, 0.1);
     slider.setValue(defaultValue);
-    slider.setSliderStyle(juce::Slider::IncDecButtons);
-    slider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
-    
+
     addAndMakeVisible(label);
     label.setText(name, juce::dontSendNotification);
     label.setJustificationType(juce::Justification::centredLeft);
 }
 
-void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, PrecisionSlider& xSlider, PrecisionSlider& ySlider, PrecisionSlider& zSlider)
+void MovementClipEditor::createApplyCurrentPositionButton(juce::TextButton& button, CoordinateValueControl& xSlider, CoordinateValueControl& ySlider, CoordinateValueControl& zSlider)
 {
     addAndMakeVisible(button);
     button.onClick = [this, &xSlider, &ySlider, &zSlider] {
@@ -300,33 +298,51 @@ void MovementClipEditor::updateSliderLabelsAndRanges()
     if (usePolar)
     {
         // Polar coordinates (Azimuth, Elevation, Distance)
-        startXLabel.setText("Start Azimuth:", juce::dontSendNotification);
-        startYLabel.setText("Start Elevation:", juce::dontSendNotification);
+        // juce::String's implicit const char* constructor assumes ASCII and asserts/crashes on
+        // bytes >= 128 (which "°" always has in UTF-8) - CharPointer_UTF8 is the safe wrapper.
+        startXLabel.setText(juce::String(juce::CharPointer_UTF8("Start Azimuth [°]:")), juce::dontSendNotification);
+        startYLabel.setText(juce::String(juce::CharPointer_UTF8("Start Elevation [°]:")), juce::dontSendNotification);
         startZLabel.setText("Start Distance:", juce::dontSendNotification);
-        
+
         // Update target label based on movement type
         MovementType currentType = static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
         juce::String targetLabel = "Target ";
         if (currentType == MovementType::Circle || currentType == MovementType::Spiral)
             targetLabel = "Center ";
-        
-        targetXLabel.setText(targetLabel + "Azimuth:", juce::dontSendNotification);
-        targetYLabel.setText(targetLabel + "Elevation:", juce::dontSendNotification);
+
+        // targetLabel is already a juce::String here, so appending the degree symbol via operator+
+        // goes through the UTF-8-safe path (unlike constructing a String directly from a raw
+        // literal containing it).
+        targetXLabel.setText(targetLabel + "Azimuth [°]:", juce::dontSendNotification);
+        targetYLabel.setText(targetLabel + "Elevation [°]:", juce::dontSendNotification);
         targetZLabel.setText(targetLabel + "Distance:", juce::dontSendNotification);
-        
-        // Set polar ranges in degrees for UI
+
+        // Azimuth/Elevation are angles - always sliders, always the same fixed range regardless
+        // of the distance scaler.
+        startXSlider.setUpDownStyle(false);
+        startYSlider.setUpDownStyle(false);
+        targetXSlider.setUpDownStyle(false);
+        targetYSlider.setUpDownStyle(false);
+
+        startXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
+        startYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+        targetXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
+        targetYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
+
+        // Distance is scaler-dependent: a bounded slider (matching the real scaler, like X/Y/Z
+        // in Cartesian mode) when finite, an unbounded updown spinner when infinite - a
+        // draggable slider whose range spans an unbounded scaler doesn't give meaningful control.
+        // CartesianMax() already substitutes a large-but-finite bound when infinite, so this
+        // doesn't need (and must not add) its own separate finite/infinite branch.
         ScalingInfo* scaling = pSourceSet->getScalingInfo();
-        if (scaling != nullptr)
-        {
-            startXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
-            startYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
-            startZSlider.setRange(Constants::DistanceMin, scaling->IsInfinite() ? scaling->DistanceMax() : 15.0, 0.01);
-            
-            targetXSlider.setRange(Constants::AzimuthGradMin, Constants::AzimuthGradMax, 0.1);
-            targetYSlider.setRange(Constants::ElevationGradMin, Constants::ElevationGradMax, 0.1);
-            targetZSlider.setRange(Constants::DistanceMin, scaling->IsInfinite() ? scaling->DistanceMax() : 15.0, 0.01);
-        }
-        
+        bool infinite = scaling != nullptr && scaling->IsInfinite();
+        double distanceMax = scaling != nullptr ? scaling->CartesianMax() : 15.0;
+
+        startZSlider.setUpDownStyle(infinite);
+        targetZSlider.setUpDownStyle(infinite);
+        startZSlider.setRange(Constants::DistanceMin, distanceMax, 0.01);
+        targetZSlider.setRange(Constants::DistanceMin, distanceMax, 0.01);
+
         // Convert current values for display
         startXSlider.setValue(Constants::RadToGrad(currentClip.startPointGroup.getAzimuth()));
         startYSlider.setValue(Constants::RadToGrad(currentClip.startPointGroup.getElevation()));
@@ -353,23 +369,30 @@ void MovementClipEditor::updateSliderLabelsAndRanges()
         targetYLabel.setText(targetLabel + "Y:", juce::dontSendNotification);
         targetZLabel.setText(targetLabel + "Z:", juce::dontSendNotification);
         
-        // Set Cartesian ranges
+        // Set Cartesian ranges: CartesianMin/Max already substitute a large-but-finite bound when
+        // infinite, so this must not gate on IsInfinite() itself - doing so is what previously
+        // left X/Y/Z clamped to a hardcoded +/-10 in infinite mode instead of the real bound.
         double minVal = -10.0;
         double maxVal = 10.0;
-        if (pSourceSet != nullptr)
+        ScalingInfo* scaling = (pSourceSet != nullptr) ? pSourceSet->getScalingInfo() : nullptr;
+        if (scaling != nullptr)
         {
-            ScalingInfo* scaling = pSourceSet->getScalingInfo();
-            if (scaling != nullptr && !scaling->IsInfinite())
-            {
-                minVal = scaling->CartesianMin();
-                maxVal = scaling->CartesianMax();
-            }
+            minVal = scaling->CartesianMin();
+            maxVal = scaling->CartesianMax();
         }
-        
+
+        bool infinite = scaling != nullptr && scaling->IsInfinite();
+        startXSlider.setUpDownStyle(infinite);
+        startYSlider.setUpDownStyle(infinite);
+        startZSlider.setUpDownStyle(infinite);
+        targetXSlider.setUpDownStyle(infinite);
+        targetYSlider.setUpDownStyle(infinite);
+        targetZSlider.setUpDownStyle(infinite);
+
         startXSlider.setRange(minVal, maxVal, 0.01);
         startYSlider.setRange(minVal, maxVal, 0.01);
         startZSlider.setRange(minVal, maxVal, 0.01);
-        
+
         targetXSlider.setRange(minVal, maxVal, 0.01);
         targetYSlider.setRange(minVal, maxVal, 0.01);
         targetZSlider.setRange(minVal, maxVal, 0.01);
@@ -542,7 +565,7 @@ int MovementClipEditor::getMovementControlsHeight() const
 void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
 {
     const int rowHeight = 28;
-    const int labelWidth = 120;
+    const int labelWidth = 170; // wide enough for "Radius change / rotation:"
     const int verticalSpacing = 8;
     const int buttonSpacing = 4;
     const int rightMargin = 10;

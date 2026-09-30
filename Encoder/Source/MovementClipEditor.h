@@ -10,32 +10,143 @@ class TimelineComponent;
 class PrecisionSlider : public juce::Slider
 {
 public:
-    PrecisionSlider() = default;
-    
+    PrecisionSlider()
+    {
+        // juce::Slider has no direct API to right-align its value text box, so this goes through
+        // a LookAndFeel override instead. Scoped to a dedicated shared instance (not the app's
+        // default LookAndFeel), so it only affects PrecisionSliders, not every slider in the app.
+        setLookAndFeel(&getRightAlignedLookAndFeel());
+    }
+
+    ~PrecisionSlider() override
+    {
+        setLookAndFeel(nullptr);
+    }
+
     double getPreciseValue()
     {
         return normalizeNearZero(Slider::getValue());
     }
-    
+
     double getValue() const
     {
         return normalizeNearZero(Slider::getValue());
     }
-    
+
     void setPrecisionThreshold(double newThreshold) { threshold = newThreshold; }
     double getPrecisionThreshold() const { return threshold; }
 
 private:
+    class RightAlignedTextBoxLookAndFeel : public juce::LookAndFeel_V4
+    {
+    public:
+        juce::Label* createSliderTextBox(juce::Slider& slider) override
+        {
+            auto* label = juce::LookAndFeel_V4::createSliderTextBox(slider);
+            label->setJustificationType(juce::Justification::centredRight);
+            return label;
+        }
+    };
+
+    static RightAlignedTextBoxLookAndFeel& getRightAlignedLookAndFeel()
+    {
+        static RightAlignedTextBoxLookAndFeel lookAndFeel;
+        return lookAndFeel;
+    }
+
     double threshold = 0.001;
-    
+
     double normalizeNearZero(double value) const
     {
         if (std::abs(value) < threshold)
             return 0.0;
         return value;
     }
-    
+
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(PrecisionSlider)
+};
+
+// A coordinate field that behaves as a draggable slider for bounded (finite-scaled) values, or
+// as an IncDecButtons "updown" spinner (same style as the Count/Radius change fields) for
+// unbounded ones - a draggable slider whose range spans an "infinite" scaler makes little sense,
+// since almost its entire travel would represent values near zero. The updown style has no drag
+// track to misrepresent, so it stays usable no matter how large the range is.
+class CoordinateValueControl : public juce::Component
+{
+public:
+    CoordinateValueControl()
+    {
+        addAndMakeVisible(slider);
+        applyStyle();
+    }
+
+    void setRange(double min, double max, double step)
+    {
+        slider.setRange(min, max, step);
+    }
+
+    void setValue(double value)
+    {
+        slider.setValue(value, juce::dontSendNotification);
+    }
+
+    double getPreciseValue() const
+    {
+        return slider.getValue();
+    }
+
+    double getValue() const
+    {
+        return getPreciseValue();
+    }
+
+    void setUpDownStyle(bool shouldUseUpDown)
+    {
+        if (useUpDown == shouldUseUpDown)
+            return;
+
+        useUpDown = shouldUseUpDown;
+        applyStyle();
+        resized();
+    }
+
+private:
+    void applyStyle()
+    {
+        if (useUpDown)
+        {
+            slider.setSliderStyle(juce::Slider::IncDecButtons);
+            slider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, textBoxWidth, 22);
+        }
+        else
+        {
+            slider.setSliderStyle(juce::Slider::LinearHorizontal);
+            slider.setTextBoxStyle(juce::Slider::TextBoxRight, false, textBoxWidth, 22);
+        }
+    }
+
+    void resized() override
+    {
+        if (useUpDown)
+        {
+            // The +/- buttons fill whatever's left of the slider's own bounds once the text box
+            // is subtracted, so without an explicit width they stretch to fill the whole row.
+            // Cap the total at the same width as the text box, matching the draggable slider's
+            // footprint, and anchor it to the right of whatever space is available so it lines up
+            // under the label column's right edge rather than trailing off with empty space after it.
+            slider.setBounds(getLocalBounds().removeFromRight(textBoxWidth * 2));
+        }
+        else
+        {
+            slider.setBounds(getLocalBounds());
+        }
+    }
+
+    static constexpr int textBoxWidth = 70;
+    bool useUpDown = false;
+    PrecisionSlider slider;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CoordinateValueControl)
 };
 
 class MovementClipEditor : public juce::Component, public juce::ChangeListener
@@ -77,22 +188,22 @@ private:
     juce::ComboBox movementTypeCombo;
     juce::Label movementTypeLabel;
 
-    PrecisionSlider startXSlider, startYSlider, startZSlider;
-    PrecisionSlider targetXSlider, targetYSlider, targetZSlider;
+    CoordinateValueControl startXSlider, startYSlider, startZSlider;
+    CoordinateValueControl targetXSlider, targetYSlider, targetZSlider;
     juce::Label startXLabel, startYLabel, startZLabel;
     juce::Label targetXLabel, targetYLabel, targetZLabel;
-    
+
     // New properties
-    PrecisionSlider countSlider;
+    CoordinateValueControl countSlider;
     juce::Label countLabel;
-    PrecisionSlider radiusChangeSlider;
+    CoordinateValueControl radiusChangeSlider;
     juce::Label radiusChangeLabel;
 
     void createControls();
-    void createCoordinateSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name,
+    void createCoordinateSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name,
                                double min, double max, double defaultValue);
-    void createStandardSlider(PrecisionSlider& slider, juce::Label& label, const juce::String& name, double defaultValue);
-    void createApplyCurrentPositionButton(juce::TextButton& button, PrecisionSlider& xSlider, PrecisionSlider& ySlider, PrecisionSlider& zSlider);
+    void createStandardSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name, double defaultValue);
+    void createApplyCurrentPositionButton(juce::TextButton& button, CoordinateValueControl& xSlider, CoordinateValueControl& ySlider, CoordinateValueControl& zSlider);
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
     void updateCurrentPosition(bool force = false);
     int getMovementControlsHeight() const;

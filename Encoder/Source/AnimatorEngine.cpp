@@ -722,11 +722,19 @@ void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinit
         case TimingType::ConstantPerSecond:
         {
             double clipDurationSeconds = activeAction.clip.length / 1000.0;
-            currentStretch = 1.0 + actionDef.getValue() * clipDurationSeconds * progress;
-            
-            if (activeAction.hasInitialState)
+            double elapsedSeconds = clipDurationSeconds * progress;
+
+            if (actionDef.getUseStartValue())
             {
-                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * clipDurationSeconds * progress);
+                currentStretch = actionDef.getStartValue() * (1.0 + actionDef.getValue() * elapsedSeconds);
+            }
+            else if (activeAction.hasInitialState)
+            {
+                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * elapsedSeconds);
+            }
+            else
+            {
+                currentStretch = 1.0 + actionDef.getValue() * elapsedSeconds;
             }
             break;
         }
