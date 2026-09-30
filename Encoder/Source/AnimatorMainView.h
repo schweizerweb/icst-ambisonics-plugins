@@ -125,6 +125,7 @@ private:
     void confirmLoadDemo();
     void loadDemoContent();
 
+    void confirmRescaleOnImport(juce::OwnedArray<TimelineModel>&& importedGroups, double fileScaler, double currentScaler);
     void showImportOptionsDialog(juce::OwnedArray<TimelineModel>&& importedGroups);
     void applyImportedGroups(const juce::OwnedArray<TimelineModel>& importedGroups, const ImportSceneResult& result);
     void closeImportSceneDialog();

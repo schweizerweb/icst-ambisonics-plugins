@@ -1,6 +1,37 @@
 #include "AnimatorMainView.h"
 #include "../../Common/UTF8Helpers.h"
 #include "../../Common/SvgHelper.h"
+#include "../../Common/ScalingInfo.h"
+
+namespace
+{
+    constexpr const char* xmlAttributeDistanceScaler = "distanceScaler";
+
+    double getCurrentDistanceScaler(AmbiSourceSet* pSourceSet)
+    {
+        return (pSourceSet != nullptr) ? pSourceSet->getDistanceScaler() : ScalingInfo::Infinite;
+    }
+
+    // Scales every spatial (i.e. distance-based) quantity in each imported group's movement clips
+    // by ratio. Rotation/stretch actions are deliberately untouched: rotation angles and stretch
+    // factors are dimensionless, not room-relative, so they mean the same thing at any scale.
+    void rescaleMovementClips(juce::OwnedArray<TimelineModel>& groups, double ratio)
+    {
+        for (auto* group : groups)
+        {
+            for (auto& clip : group->movement.clips)
+            {
+                clip.startPointGroup.setXYZ(clip.startPointGroup.getX() * ratio,
+                                            clip.startPointGroup.getY() * ratio,
+                                            clip.startPointGroup.getZ() * ratio);
+                clip.targetPointGroup.setXYZ(clip.targetPointGroup.getX() * ratio,
+                                             clip.targetPointGroup.getY() * ratio,
+                                             clip.targetPointGroup.getZ() * ratio);
+                clip.radiusChange *= ratio; // Spiral: absolute radius change per round
+            }
+        }
+    }
+}
 
 AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
 {
@@ -281,8 +312,12 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
     }
 }
 
-static bool readTimelinesFromXml(const juce::XmlElement& xml, juce::OwnedArray<TimelineModel>& outTimelines)
+static bool readTimelinesFromXml(const juce::XmlElement& xml, juce::OwnedArray<TimelineModel>& outTimelines,
+                                 bool& outHasScaler, double& outScaler)
 {
+    outHasScaler = xml.hasAttribute(xmlAttributeDistanceScaler);
+    outScaler = xml.getDoubleAttribute(xmlAttributeDistanceScaler, ScalingInfo::Infinite);
+
     if (xml.hasTagName("Timeline"))
     {
         auto tm = std::make_unique<TimelineModel>();
@@ -320,7 +355,9 @@ void AnimatorMainView::importScene()
     auto xml = juce::XmlDocument::parse(file);
 
     juce::OwnedArray<TimelineModel> importedGroups;
-    if (xml == nullptr || !readTimelinesFromXml(*xml, importedGroups))
+    bool fileHasScaler = false;
+    double fileScaler = ScalingInfo::Infinite;
+    if (xml == nullptr || !readTimelinesFromXml(*xml, importedGroups, fileHasScaler, fileScaler))
     {
         juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::WarningIcon,
                                               "Import Error",
@@ -328,7 +365,50 @@ void AnimatorMainView::importScene()
         return;
     }
 
-    showImportOptionsDialog(std::move(importedGroups));
+    const double currentScaler = getCurrentDistanceScaler(pSourceSet);
+    const bool fileIsInfinite = juce::exactlyEqual(fileScaler, ScalingInfo::Infinite);
+    const bool currentIsInfinite = juce::exactlyEqual(currentScaler, ScalingInfo::Infinite);
+
+    // Only offer a choice when we actually know the file's original scaler, it differs from the
+    // current project's, and both are finite - there's no meaningful size ratio to offer
+    // otherwise (an unrecorded/older file, or infinite scaling on either side).
+    const bool offerRescale = fileHasScaler && !fileIsInfinite && !currentIsInfinite
+                            && !juce::exactlyEqual(fileScaler, currentScaler);
+
+    if (offerRescale)
+        confirmRescaleOnImport(std::move(importedGroups), fileScaler, currentScaler);
+    else
+        showImportOptionsDialog(std::move(importedGroups));
+}
+
+void AnimatorMainView::confirmRescaleOnImport(juce::OwnedArray<TimelineModel>&& importedGroups, double fileScaler, double currentScaler)
+{
+    auto sharedGroups = std::make_shared<juce::OwnedArray<TimelineModel>>(std::move(importedGroups));
+
+    // Non-blocking for the same reason as the other confirmation dialogs in this file: a callback
+    // form returns immediately instead of running a nested modal loop.
+    juce::Component::SafePointer<AnimatorMainView> safeThis(this);
+
+    juce::String message = "This scene was exported with a different global scaling factor than "
+        "the current project (file: " + juce::String(fileScaler, 2) + ", current: " + juce::String(currentScaler, 2) + ").\n\n"
+        "Keep the original coordinates, or rescale them to match the current project's size?";
+
+    juce::AlertWindow::showOkCancelBox(juce::AlertWindow::QuestionIcon,
+                                       "Different Scaling Factor",
+                                       message,
+                                       "Rescale",
+                                       "Keep Original",
+                                       this,
+                                       juce::ModalCallbackFunction::create([safeThis, sharedGroups, fileScaler, currentScaler](int result)
+                                       {
+                                           if (safeThis == nullptr)
+                                               return;
+
+                                           if (result != 0) // "Rescale" clicked
+                                               rescaleMovementClips(*sharedGroups, currentScaler / fileScaler);
+
+                                           safeThis->showImportOptionsDialog(std::move(*sharedGroups));
+                                       }));
 }
 
 void AnimatorMainView::closeImportSceneDialog()
@@ -457,7 +537,9 @@ void AnimatorMainView::exportScene(int timelineIndex)
     {
         auto file = chooser.getResult().withFileExtension("xml");
         auto xml = timelineToExport->toXml();
-        
+        if (xml != nullptr)
+            xml->setAttribute(xmlAttributeDistanceScaler, getCurrentDistanceScaler(pSourceSet));
+
         if (xml != nullptr && xml->writeTo(file))
         {
             juce::AlertWindow::showMessageBoxAsync(juce::AlertWindow::InfoIcon,
@@ -492,6 +574,7 @@ void AnimatorMainView::exportAllScenes()
         auto file = chooser.getResult().withFileExtension("xml");
 
         juce::XmlElement root("AnimatorTimelines");
+        root.setAttribute(xmlAttributeDistanceScaler, getCurrentDistanceScaler(pSourceSet));
         for (auto* tm : *timelines)
             root.addChildElement(tm->toXml().release());
 
