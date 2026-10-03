@@ -202,6 +202,7 @@ private:
     float clipHeight = 40.0f;
     float clipCornerSize = 4.0f;
     float resizeHandleWidth = 6.0f;
+    float snapThresholdPixels = 8.0f; // screen-space, so the snap "feel" stays constant across zoom levels
     const int scrollBarSize = 16;
     
     // constants for nudge amounts
@@ -238,6 +239,27 @@ private:
     juce::String getClipTimeInfo(const Clip& clip) const;
     juce::Colour getTimelineColour(int timelineIndex) const;
     juce::Rectangle<float> getIconBoundsWithinClip(const juce::Rectangle<float>& clipBounds);
+
+    // True if this clip's time range overlaps another clip in the same timeline/layer - same rule
+    // as AnimatorMainView::validateTimelines(), but scoped to a single clip so it can be drawn as a
+    // clear visual warning rather than only surfaced as a status bar message.
+    bool isClipOverlappingSiblings(int timelineIndex, int layerIndex, int clipIndex) const;
+
+    // Snapping support, so clips can easily be placed exactly touching (not overlapping) without
+    // pixel-perfect dragging. Collects the start/end times of every clip in the given layer except
+    // the ones being dragged (excludeClipIndices), to snap against.
+    juce::Array<ms_t> getSnapTargetsForLayer(int timelineIndex, int layerIndex, const juce::Array<int>& excludeClipIndices) const;
+    ms_t getSnapThresholdMs() const;
+
+    // Returns candidateStart unchanged, unless either edge of a clip of the given length starting
+    // there lands within the snap threshold of one of the targets - in which case that edge is
+    // snapped exactly onto the target.
+    ms_t snapClipStart(ms_t candidateStart, ms_t length, const juce::Array<ms_t>& targets, ms_t thresholdMs) const;
+
+    // Returns candidateTime unchanged unless it lands within the snap threshold of one of the
+    // targets, in which case it's snapped exactly onto the nearest one. Used when only one edge of
+    // the clip (e.g. a resize handle) is moving.
+    ms_t snapTimeToTargets(ms_t candidateTime, const juce::Array<ms_t>& targets, ms_t thresholdMs) const;
     
     std::unique_ptr<juce::Drawable> movementIcon;
     std::unique_ptr<juce::Drawable> actionIcon;

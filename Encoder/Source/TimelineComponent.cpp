@@ -492,7 +492,8 @@ void TimelineComponent::paint(juce::Graphics& g)
                 {
                     // Check if this clip is selected
                     const bool isSelected = isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip);
-                    
+                    const bool isOverlapping = isClipOverlappingSiblings(timelineIndex, layerIndex, clipIndex);
+
                     // Clip background with disabled state
                     juce::Colour clipColour = getClipColour(*clip);
                     if (!isValid)
@@ -510,9 +511,21 @@ void TimelineComponent::paint(juce::Graphics& g)
                     
                     g.setColour(clipColour);
                     g.fillRoundedRectangle(bounds, clipCornerSize);
-                    
-                    // Clip border
-                    if (isSelected)
+
+                    // Overlap warning tint, drawn under the border so the border reads crisply on top
+                    if (isOverlapping)
+                    {
+                        g.setColour(juce::Colours::red.withAlpha(isValid ? 0.3f : 0.15f));
+                        g.fillRoundedRectangle(bounds, clipCornerSize);
+                    }
+
+                    // Clip border - an overlap warning takes priority over the normal selection/validity border
+                    if (isOverlapping)
+                    {
+                        g.setColour(juce::Colours::red.withAlpha(isValid ? 1.0f : 0.5f));
+                        g.drawRoundedRectangle(bounds, clipCornerSize, isSelected ? 3.0f : 2.5f);
+                    }
+                    else if (isSelected)
                     {
                         g.setColour(juce::Colours::white.withAlpha(isValid ? 1.0f : 0.4f));
                         g.drawRoundedRectangle(bounds, clipCornerSize, isCurrentTimeline ? 3.0f : 2.0f);
@@ -955,11 +968,15 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
         auto* clip = getClip(dragState.timelineIndex, dragState.layerIndex, dragState.clipIndex, isMovementClip);
         if (!clip) return;
         
+        const auto snapTargets = getSnapTargetsForLayer(dragState.timelineIndex, dragState.layerIndex, { dragState.clipIndex });
+        const ms_t snapThresholdMs = getSnapThresholdMs();
+
         if (dragState.isResizingLeft)
         {
-            const ms_t newStart = juce::jmax<ms_t>(0, dragState.originalStart + timeDelta);
+            ms_t newStart = juce::jmax<ms_t>(0, dragState.originalStart + timeDelta);
+            newStart = snapTimeToTargets(newStart, snapTargets, snapThresholdMs);
             const ms_t newLength = juce::jmax<ms_t>(10, dragState.originalLength - (newStart - dragState.originalStart));
-            
+
             if (newLength > 10)
             {
                 clip->start = newStart;
@@ -968,7 +985,8 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
         }
         else if (dragState.isResizingRight)
         {
-            const ms_t newLength = juce::jmax<ms_t>(10, dragState.originalLength + timeDelta);
+            const ms_t newEnd = snapTimeToTargets(dragState.originalStart + dragState.originalLength + timeDelta, snapTargets, snapThresholdMs);
+            const ms_t newLength = juce::jmax<ms_t>(10, newEnd - dragState.originalStart);
             clip->length = newLength;
         }
     }
@@ -978,16 +996,33 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
         // If multiple clips are selected, move all of them
         if (selectedClips.size() > 1)
         {
+            // Snap based on the clip actually being dragged, then apply the resulting extra
+            // correction uniformly to the whole selection so their relative spacing is preserved.
+            ms_t snapCorrection = 0;
+            bool isMovementClip = dragState.isMovementClip;
+            if (auto* primaryClip = getClip(dragState.timelineIndex, dragState.layerIndex, dragState.clipIndex, isMovementClip))
+            {
+                juce::Array<int> excluded;
+                for (const auto& selected : selectedClips)
+                    if (selected.timelineIndex == dragState.timelineIndex && selected.layerIndex == dragState.layerIndex)
+                        excluded.add(selected.clipIndex);
+
+                const ms_t candidateStart = juce::jmax<ms_t>(0, primaryClip->start + timeDelta);
+                const auto snapTargets = getSnapTargetsForLayer(dragState.timelineIndex, dragState.layerIndex, excluded);
+                const ms_t snappedStart = snapClipStart(candidateStart, primaryClip->length, snapTargets, getSnapThresholdMs());
+                snapCorrection = snappedStart - candidateStart;
+            }
+
             for (const auto& selected : selectedClips)
             {
-                bool isMovementClip = selected.isMovementClip;
-                auto* clip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, isMovementClip);
+                bool selectedIsMovementClip = selected.isMovementClip;
+                auto* clip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, selectedIsMovementClip);
                 if (clip)
                 {
-                    clip->start = juce::jmax<ms_t>(0, clip->start + timeDelta);
+                    clip->start = juce::jmax<ms_t>(0, clip->start + timeDelta + snapCorrection);
                 }
             }
-            
+
             // Update drag start time for next movement
             dragState.dragStartTime = currentTime;
         }
@@ -998,7 +1033,9 @@ void TimelineComponent::mouseDrag(const juce::MouseEvent& event)
             auto* clip = getClip(dragState.timelineIndex, dragState.layerIndex, dragState.clipIndex, isMovementClip);
             if (clip)
             {
-                clip->start = juce::jmax<ms_t>(0, dragState.originalStart + timeDelta);
+                const ms_t candidateStart = juce::jmax<ms_t>(0, dragState.originalStart + timeDelta);
+                const auto snapTargets = getSnapTargetsForLayer(dragState.timelineIndex, dragState.layerIndex, { dragState.clipIndex });
+                clip->start = snapClipStart(candidateStart, clip->length, snapTargets, getSnapThresholdMs());
             }
         }
     }
@@ -1470,6 +1507,110 @@ bool TimelineComponent::getClipAndBounds(const TimelineModel* timeline, int time
     outClip = clip;
     outBounds = bounds;
     return true;
+}
+
+bool TimelineComponent::isClipOverlappingSiblings(int timelineIndex, int layerIndex, int clipIndex) const
+{
+    if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())
+        return false;
+
+    auto* timeline = (*timelines)[timelineIndex];
+    if (timeline == nullptr) return false;
+
+    const Clip* clip = timeline->getClip(layerIndex, clipIndex);
+    if (clip == nullptr) return false;
+
+    const int numClips = timeline->getNumClips(layerIndex);
+    for (int i = 0; i < numClips; ++i)
+    {
+        if (i == clipIndex) continue;
+
+        const Clip* other = timeline->getClip(layerIndex, i);
+        if (other == nullptr) continue;
+
+        if (clip->start < other->end() && other->start < clip->end())
+            return true;
+    }
+
+    return false;
+}
+
+juce::Array<ms_t> TimelineComponent::getSnapTargetsForLayer(int timelineIndex, int layerIndex, const juce::Array<int>& excludeClipIndices) const
+{
+    juce::Array<ms_t> targets;
+
+    if (timelines == nullptr || timelineIndex < 0 || timelineIndex >= timelines->size())
+        return targets;
+
+    auto* timeline = (*timelines)[timelineIndex];
+    if (timeline == nullptr) return targets;
+
+    const int numClips = timeline->getNumClips(layerIndex);
+    for (int i = 0; i < numClips; ++i)
+    {
+        if (excludeClipIndices.contains(i)) continue;
+
+        if (const Clip* other = timeline->getClip(layerIndex, i))
+        {
+            targets.add(other->start);
+            targets.add(other->end());
+        }
+    }
+
+    return targets;
+}
+
+ms_t TimelineComponent::getSnapThresholdMs() const
+{
+    return pixelsPerMillisecond > 0.0f
+        ? juce::jmax<ms_t>(1, static_cast<ms_t>(snapThresholdPixels / pixelsPerMillisecond))
+        : 0;
+}
+
+ms_t TimelineComponent::snapTimeToTargets(ms_t candidateTime, const juce::Array<ms_t>& targets, ms_t thresholdMs) const
+{
+    ms_t best = candidateTime;
+    ms_t bestDist = thresholdMs + 1;
+
+    for (auto t : targets)
+    {
+        const ms_t dist = std::abs(static_cast<int64_t>(t - candidateTime));
+        if (dist <= thresholdMs && dist < bestDist)
+        {
+            bestDist = dist;
+            best = t;
+        }
+    }
+
+    return best;
+}
+
+ms_t TimelineComponent::snapClipStart(ms_t candidateStart, ms_t length, const juce::Array<ms_t>& targets, ms_t thresholdMs) const
+{
+    ms_t bestStart = candidateStart;
+    ms_t bestDist = thresholdMs + 1;
+    const ms_t candidateEnd = candidateStart + length;
+
+    for (auto t : targets)
+    {
+        // Snap the clip's left edge onto this target.
+        const ms_t distStart = std::abs(static_cast<int64_t>(t - candidateStart));
+        if (distStart <= thresholdMs && distStart < bestDist)
+        {
+            bestDist = distStart;
+            bestStart = t;
+        }
+
+        // Snap the clip's right edge onto this target.
+        const ms_t distEnd = std::abs(static_cast<int64_t>(t - candidateEnd));
+        if (distEnd <= thresholdMs && distEnd < bestDist)
+        {
+            bestDist = distEnd;
+            bestStart = t - length;
+        }
+    }
+
+    return bestStart;
 }
 
 juce::Array<TimelineComponent::ClipBounds> TimelineComponent::findAllClipsAtPosition(const juce::Point<int>& position) const
