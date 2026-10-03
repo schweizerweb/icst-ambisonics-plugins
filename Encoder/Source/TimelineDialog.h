@@ -8,8 +8,7 @@ static const juce::String ACTION_CLOSE_TIMELINE = "ACTION_CLOSE_TIMELINE";
 
 // ---------------------------------- Dialog -----------------------------------
 class TimelineDialog  : public juce::DocumentWindow,
-                        public juce::ActionBroadcaster,
-                        private juce::Timer
+                        public juce::ActionBroadcaster
 {
 public:
     TimelineDialog(juce::ActionListener* listener, juce::Component* content)
@@ -25,8 +24,6 @@ public:
 
         if (listener != nullptr)
             addActionListener(listener);
-
-        startIntroWarning();
     }
 
     ~TimelineDialog() override = default;
@@ -48,110 +45,6 @@ public:
     void closeButtonPressed() override
     {
         sendActionMessage(ACTION_CLOSE_TIMELINE);
-    }
-
-    void paintOverChildren(juce::Graphics& g) override
-    {
-        // permanent compact badge
-        auto badge = getCompactWarningBounds().toFloat();
-
-        g.setColour(juce::Colour(0xffc46a1a).withAlpha(0.72f));
-        g.fillRoundedRectangle(badge, 10.0f);
-
-        g.setColour(juce::Colours::white.withAlpha(0.82f));
-        g.drawRoundedRectangle(badge, 10.0f, 1.0f);
-
-        g.setColour(juce::Colours::white);
-        g.setFont(juce::Font(14.0f, juce::Font::bold));
-        g.drawFittedText("Experimental - compatibility not guaranteed",
-                         badge.reduced(10.0f, 5.0f).toNearestInt(),
-                         juce::Justification::centred, 1);
-
-        // large intro overlay fades out completely
-        if (showLargeOverlay)
-        {
-            const float a = overlayAlpha;
-
-            g.setColour(juce::Colours::black.withAlpha(0.50f * a));
-            g.fillAll();
-
-            auto full = getLocalBounds().toFloat();
-            juce::Rectangle<float> panel(
-                full.getCentreX() - 280.0f,
-                full.getCentreY() - 85.0f,
-                560.0f, 170.0f);
-
-            g.setColour(juce::Colour(0xffc46a1a).withAlpha(0.93f * a));
-            g.fillRoundedRectangle(panel, 12.0f);
-
-            g.setColour(juce::Colours::white.withAlpha(0.88f * a));
-            g.drawRoundedRectangle(panel, 12.0f, 1.5f);
-
-            auto text = panel.reduced(16.0f).toNearestInt();
-
-            g.setColour(juce::Colours::white.withAlpha(a));
-            g.setFont(juce::Font(22.0f, juce::Font::bold));
-            g.drawFittedText("Experimental Animator", text.removeFromTop(34),
-                             juce::Justification::centredTop, 1);
-
-            g.setFont(juce::Font(15.5f));
-            g.drawFittedText(
-                "This version is still experimental.\n"
-                "Future compatibility of animations created with it\n"
-                "is not guaranteed.",
-                text, juce::Justification::centredTop, 3);
-        }
-    }
-
-private:
-    bool showLargeOverlay = true;
-    float overlayAlpha = 1.0f;
-    bool fadeStarted = false;
-
-    void startIntroWarning()
-    {
-        showLargeOverlay = true;
-        overlayAlpha = 1.0f;
-        fadeStarted = false;
-
-        juce::Timer::callAfterDelay(5000, [safe = juce::Component::SafePointer<TimelineDialog>(this)]()
-        {
-            if (safe != nullptr)
-                safe->beginFadeOut();
-        });
-    }
-
-    void beginFadeOut()
-    {
-        if (fadeStarted)
-            return;
-
-        fadeStarted = true;
-        startTimerHz(30);
-    }
-
-    void timerCallback() override
-    {
-        overlayAlpha -= 0.07f;
-
-        if (overlayAlpha <= 0.0f)
-        {
-            overlayAlpha = 0.0f;
-            showLargeOverlay = false;
-            stopTimer();
-        }
-
-        repaint();
-    }
-
-    juce::Rectangle<int> getCompactWarningBounds() const
-    {
-        const int margin = 6;
-        const int titleBarOffset = 24;
-        const int w = 300;
-        const int h = 32;
-
-        return { getWidth() - w - margin, titleBarOffset + margin, w, h };
     }
 };
 
