@@ -60,7 +60,21 @@ void AnimatorEngine::processAnimationAt(ms_t positionMs)
         preRenderMovements();
         needsPreRender = false;
     }
-    
+
+    // A backward jump means the host (or the Animator's own cursor) seeked - e.g. a loop restart,
+    // or clicking earlier on the timeline while playing. nextScheduledClipIndex only ever advances
+    // forward (see updateActiveMovements()), so without this, any clip that starts earlier than the
+    // current scan position would simply never be re-triggered after a seek. Clearing and rescanning
+    // the whole (sorted) schedule re-evaluates every clip against the new position, correctly
+    // restarting whichever ones should be active - startMovementClip()/startActionClip() already
+    // recapture whatever initial state they need per clip.
+    if (positionMs < lastPositionMs)
+    {
+        activeMovements.clear();
+        activeActions.clear();
+        nextScheduledClipIndex = 0;
+    }
+
     // Update active movements based on current position
     updateActiveMovements(positionMs);
     
