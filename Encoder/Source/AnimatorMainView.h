@@ -5,6 +5,7 @@
 #include "StatusBarComponent.h"
 #include "AnimatorEngine.h"
 #include "ImportSceneDialog.h"
+#include "PreferencesDialog.h"
 #include "../../Common/ColorDrawableToggleButton.h"
 
 class AnimatorMainView : public juce::Component,
@@ -131,6 +132,11 @@ private:
     void closeImportSceneDialog();
     ImportSceneDialog* importSceneWindow = nullptr;
 
+    // Preferences
+    void showPreferencesDialog();
+    void closePreferencesDialog();
+    void setDisplayTimeInSeconds(bool useSeconds);
+    PreferencesDialog* preferencesWindow = nullptr;
 
     // Status bar
     std::unique_ptr<StatusBarComponent> statusBar;

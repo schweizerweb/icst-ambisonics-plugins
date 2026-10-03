@@ -284,6 +284,15 @@ void TimelineComponent::setAutoFollow(bool shouldAutoFollow)
     autoFollow = shouldAutoFollow;
 }
 
+void TimelineComponent::setDisplayTimeInSeconds(bool shouldUseSeconds)
+{
+    if (displayTimeInSeconds == shouldUseSeconds)
+        return;
+
+    displayTimeInSeconds = shouldUseSeconds; // renderHeaderToCache() rebuilds the cached ruler bitmap itself, since its tick labels depend on this flag too
+    repaint();
+}
+
 void TimelineComponent::scrollBarMoved(juce::ScrollBar* scrollBar, double newRangeStart)
 {
     if (scrollBar == horizontalScrollBar.get())
@@ -1136,7 +1145,7 @@ void TimelineComponent::mouseMove(const juce::MouseEvent& event)
                           juce::FontOptions(12.0f),
                           juce::Colours::lightgrey);
             
-            message.append(formatTimeWithSeparators(currentTime) + " ms",
+            message.append(formatTimeValueWithUnit(currentTime, displayTimeInSeconds),
                           juce::FontOptions(12.0f, juce::Font::bold),
                           juce::Colours::white);
             
@@ -1360,10 +1369,10 @@ juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int laye
     info << (layerIndex == 0 ? "Movement" : "Action") << " Clip\n";
     info << "Name: " << (clip.id.isNotEmpty() ? clip.id : "Unnamed") << "\n";
     
-    // Time information with formatted numbers
-    info << "Start: " << formatTimeWithSeparators(clip.start) << " ms\n";
-    info << "End: " << formatTimeWithSeparators(clip.end()) << " ms\n";
-    info << "Duration: " << formatTimeWithSeparators(clip.length) << " ms\n";
+    // Time information
+    info << "Start: " << formatTimeValueWithUnit(clip.start, displayTimeInSeconds) << "\n";
+    info << "End: " << formatTimeValueWithUnit(clip.end(), displayTimeInSeconds) << "\n";
+    info << "Duration: " << formatTimeValueWithUnit(clip.length, displayTimeInSeconds) << "\n";
     
     // Additional clip-specific information
     if (isMovementClip)
@@ -1379,23 +1388,6 @@ juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int laye
     }
     
     return info;
-}
-
-juce::String TimelineComponent::formatTimeWithSeparators(ms_t timeMs) const
-{
-    juce::String timeStr = juce::String(timeMs);
-    juce::String result;
-    
-    // Add thousands separators for readability
-    int length = timeStr.length();
-    for (int i = 0; i < length; ++i)
-    {
-        if (i > 0 && (length - i) % 3 == 0)
-            result << ",";
-        result << timeStr[i];
-    }
-    
-    return result;
 }
 
 // Selection methods implementation
@@ -1644,7 +1636,7 @@ juce::String TimelineComponent::getClipDisplayName(int timelineIndex, int layerI
 
 juce::String TimelineComponent::getClipTimeInfo(const Clip& clip) const
 {
-    return juce::String(clip.start) + " - " + juce::String(clip.end()) + "ms";
+    return formatTimeValue(clip.start, displayTimeInSeconds) + " - " + formatTimeValueWithUnit(clip.end(), displayTimeInSeconds);
 }
 
 juce::Colour TimelineComponent::getTimelineColour(int timelineIndex) const
@@ -1819,17 +1811,19 @@ void TimelineComponent::renderHeaderToCache()
         cachedHeaderVisibleEndTime == visibleEndTime &&
         approximatelyEqual(cachedHeaderPixelsPerMillisecond, pixelsPerMillisecond) &&
         cachedHeaderWidth == getWidth() &&
-        cachedHeaderHeight == headerAreaHeight)
+        cachedHeaderHeight == headerAreaHeight &&
+        cachedHeaderDisplayTimeInSeconds == displayTimeInSeconds)
     {
         return; // Cache is still valid
     }
-    
+
     // Update cache dimensions
     cachedHeaderVisibleStartTime = visibleStartTime;
     cachedHeaderVisibleEndTime = visibleEndTime;
     cachedHeaderPixelsPerMillisecond = pixelsPerMillisecond;
     cachedHeaderWidth = getWidth();
     cachedHeaderHeight = headerAreaHeight;
+    cachedHeaderDisplayTimeInSeconds = displayTimeInSeconds;
     
     // Create or update the cache image
     if (!headerCache || headerCache->getWidth() != cachedHeaderWidth || headerCache->getHeight() != cachedHeaderHeight)
@@ -1917,28 +1911,11 @@ void TimelineComponent::renderHeaderToCache()
             // Draw major tick line in header only
             g.drawVerticalLine(static_cast<int>(x), 0, headerHeight);
             
-            // Format time text
-            juce::String timeText;
-            if (useMilliseconds) {
-                // Always show milliseconds when full span < 2s
-                timeText = juce::String(currentTime) + "ms";
-            } else {
-                // Show seconds for longer durations
-                double seconds = currentTime / 1000.0;
-                
-                if (timeStep >= 2000 || seconds >= 5) {
-                    // For 2s+ steps or times >= 5s, show integer seconds
-                    timeText = juce::String(static_cast<int>(seconds)) + "s";
-                } else {
-                    // For smaller steps and times < 5s, show one decimal
-                    timeText = juce::String(seconds, 1) + "s";
-                    // Remove trailing .0 but keep .1, .2, etc.
-                    if (timeText.endsWith(".0s")) {
-                        timeText = juce::String(static_cast<int>(seconds)) + "s";
-                    }
-                }
-            }
-            
+            // Format time text - the unit shown here always follows the user's display
+            // preference; useMilliseconds (above) only governs the tick step granularity,
+            // which stays zoom-driven regardless of which unit is being displayed.
+            juce::String timeText = formatTimeValueWithUnit(currentTime, displayTimeInSeconds);
+
             // Draw time text
             g.setColour(juce::Colours::lightgrey);
             g.drawText(timeText,

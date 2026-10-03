@@ -43,6 +43,7 @@
 #define XML_ATTRIBUTE_VALUE "Value"
 #define XML_ATTRIBUTE_INTENSITY "Intensity"
 #define XML_ATTRIBUTE_AUTO_FOLLOW "AutoFollow"
+#define XML_ATTRIBUTE_DISPLAY_TIME_IN_SECONDS "DisplayTimeInSeconds"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
 #define XML_TAG_CUSTOM_OSC_TARGET "CustomOscTarget"
 #define XML_TAG_CUSTOM_OSC_INPUTS "CustomOscInputs"
@@ -73,6 +74,7 @@ EncoderSettings::EncoderSettings():
 {
     animatorSettings.enable = DEFAULT_ANIMATOR_ON;
     animatorSettings.autoFollow = DEFAULT_ANIMATOR_AUTOFOLLOW;
+    animatorSettings.displayTimeInSeconds = DEFAULT_ANIMATOR_DISPLAY_TIME_IN_SECONDS;
 }
 
 EncoderSettings::~EncoderSettings()
@@ -129,6 +131,7 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     XmlElement* animatorXml = new XmlElement(XML_TAG_ANIMATOR);
     animatorXml->setAttribute(XML_ATTRIBUTE_ENABLE, animatorSettings.enable);
     animatorXml->setAttribute(XML_ATTRIBUTE_AUTO_FOLLOW, animatorSettings.autoFollow);
+    animatorXml->setAttribute(XML_ATTRIBUTE_DISPLAY_TIME_IN_SECONDS, animatorSettings.displayTimeInSeconds);
     element->addChildElement(animatorXml);
 	
     XmlElement* distanceEncoding = new XmlElement(XML_TAG_DISTANCE_ENCODING);
@@ -228,6 +231,7 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         animatorSettings.enable = animatorXml->getBoolAttribute(XML_ATTRIBUTE_ENABLE, DEFAULT_ANIMATOR_ON);
         animatorSettings.autoFollow = animatorXml->getBoolAttribute(XML_ATTRIBUTE_AUTO_FOLLOW, DEFAULT_ANIMATOR_AUTOFOLLOW);
+        animatorSettings.displayTimeInSeconds = animatorXml->getBoolAttribute(XML_ATTRIBUTE_DISPLAY_TIME_IN_SECONDS, DEFAULT_ANIMATOR_DISPLAY_TIME_IN_SECONDS);
     }
     
     XmlElement* distanceEncoding = element->getChildByName(XML_TAG_DISTANCE_ENCODING);

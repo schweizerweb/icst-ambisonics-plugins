@@ -554,6 +554,24 @@ bool AnimatorEngine::getAutoFollow()
     return (pAnimatorSettings != nullptr && pAnimatorSettings->autoFollow);
 }
 
+void AnimatorEngine::setDisplayTimeInSeconds(bool enable)
+{
+    if (pAnimatorSettings == nullptr)
+        return;
+
+    bool change = (enable != pAnimatorSettings->displayTimeInSeconds);
+    if (change)
+    {
+        pAnimatorSettings->displayTimeInSeconds = enable;
+        sendChangeMessage();
+    }
+}
+
+bool AnimatorEngine::getDisplayTimeInSeconds()
+{
+    return (pAnimatorSettings != nullptr && pAnimatorSettings->displayTimeInSeconds);
+}
+
 void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, ms_t currentTimeMs, ms_t elapsedTime)
 {
     // Remove any existing action for this timeline

@@ -15,9 +15,11 @@ public:
     
     void setAnimatorState(bool enable);
     void setAutoFollow(bool enable);
-    
+    void setDisplayTimeInSeconds(bool enable);
+
     bool getAnimatorState();
     bool getAutoFollow();
+    bool getDisplayTimeInSeconds();
 
 private:
     struct ActiveMovement

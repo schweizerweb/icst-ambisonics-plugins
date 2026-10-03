@@ -133,6 +133,7 @@ void MovementClipEditor::createControls()
     addAndMakeVisible(movementGroup);
     
     addAndMakeVisible(commonSettings);
+    commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
     
     addAndMakeVisible(applyButton);

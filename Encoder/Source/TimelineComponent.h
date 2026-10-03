@@ -23,6 +23,8 @@ public:
     void setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
+    void setDisplayTimeInSeconds(bool shouldUseSeconds);
+    bool isDisplayTimeInSeconds() const { return displayTimeInSeconds; }
     void autoResizeBasedOnContent();
     void setCurrentTimeline(int index);
     int getCurrentTimelineIndex() const { return currentTimelineIndex; }
@@ -173,6 +175,7 @@ private:
     
     ms_t playheadPosition = 0;
     bool autoFollow = true;
+    bool displayTimeInSeconds = true;
     
     // Selection state
     juce::Array<SelectedClip> selectedClips;
@@ -252,6 +255,7 @@ private:
     float cachedHeaderPixelsPerMillisecond = 0.0f;
     int cachedHeaderWidth = 0;
     int cachedHeaderHeight = 0;
+    bool cachedHeaderDisplayTimeInSeconds = true;
     
     void renderHeaderToCache();
     void drawHeader(juce::Graphics& g);
@@ -287,7 +291,6 @@ private:
     void syncPointSelectionToTimelineSelection();
     
     std::function<void(const juce::AttributedString&)> statusMessageFunction;
-    juce::String formatTimeWithSeparators(ms_t timeMs) const;
     juce::String generateClipFullInfo(int timelineIndex, int layerIndex, int clipIndex, bool isMovementClip, const Clip& clip) const;
     juce::Colour getClipColourFromTimeline(int timelineIndex) const;
     

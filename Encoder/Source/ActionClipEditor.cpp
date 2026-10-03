@@ -122,6 +122,7 @@ void ActionClipEditor::createControls()
     addAndMakeVisible(actionsGroup);
     
     addAndMakeVisible(commonSettings);
+    commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
     
     // Buttons

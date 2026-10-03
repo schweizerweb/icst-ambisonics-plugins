@@ -47,6 +47,7 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
     // Create timeline component
     timelineViewport = std::make_unique<TimelineViewport>();
     timelineViewport->getTimelineComponent()->setAutoFollow(pAnimatorEngine->getAutoFollow());
+    timelineViewport->getTimelineComponent()->setDisplayTimeInSeconds(pAnimatorEngine->getDisplayTimeInSeconds());
     
     // Create status bar
     statusBar = std::make_unique<StatusBarComponent>(*this);
@@ -82,6 +83,7 @@ AnimatorMainView::~AnimatorMainView()
 {
     stopTimer();
     closeImportSceneDialog();
+    closePreferencesDialog();
 
     if (menuBar != nullptr)
     {
@@ -204,7 +206,7 @@ juce::PopupMenu AnimatorMainView::MainMenuBarModel::getMenuForIndex(int topLevel
                 menu.addItem(150, "Load Demo");
 
                 menu.addSeparator();
-                menu.addItem(6, "Preferences", false); // not implemented yet
+                menu.addItem(6, "Preferences");
             }
             break;
             
@@ -280,7 +282,7 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
             break;
 
         case 6: // Preferences
-            // Handle preferences
+            showPreferencesDialog();
             break;
 
         case 10: // Undo
@@ -507,6 +509,54 @@ void AnimatorMainView::applyImportedGroups(const juce::OwnedArray<TimelineModel>
                                           "Scene data imported successfully.");
 }
 
+void AnimatorMainView::closePreferencesDialog()
+{
+    if (preferencesWindow != nullptr)
+    {
+        auto* w = preferencesWindow;
+        preferencesWindow = nullptr;
+        delete w;
+    }
+}
+
+void AnimatorMainView::showPreferencesDialog()
+{
+    closePreferencesDialog();
+
+    juce::Component::SafePointer<AnimatorMainView> safeThis(this);
+    const bool initialDisplayInSeconds = timelineViewport->getTimelineComponent()->isDisplayTimeInSeconds();
+
+    auto content = std::make_unique<PreferencesOptionsComponent>(initialDisplayInSeconds,
+        [safeThis](bool displayInSeconds)
+        {
+            if (safeThis != nullptr)
+                safeThis->setDisplayTimeInSeconds(displayInSeconds);
+        },
+        [safeThis]
+        {
+            if (safeThis != nullptr)
+                safeThis->closePreferencesDialog();
+        });
+
+    preferencesWindow = new PreferencesDialog(std::move(content), [safeThis]
+    {
+        if (safeThis != nullptr)
+            safeThis->closePreferencesDialog();
+    });
+
+    preferencesWindow->setVisible(true);
+}
+
+void AnimatorMainView::setDisplayTimeInSeconds(bool useSeconds)
+{
+    // Persisted like the rest of AnimatorSettings (per plugin instance, via EncoderSettings), and
+    // mirrored into TimelineComponent's own cached copy so it can reformat immediately without
+    // going through the engine.
+    if (pAnimatorEngine != nullptr)
+        pAnimatorEngine->setDisplayTimeInSeconds(useSeconds);
+
+    timelineViewport->getTimelineComponent()->setDisplayTimeInSeconds(useSeconds);
+}
 
 void AnimatorMainView::exportScene(int timelineIndex)
 {

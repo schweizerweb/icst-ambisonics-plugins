@@ -43,6 +43,7 @@
 #define DEFAULT_AMBI_ORDER          1
 #define DEFAULT_ANIMATOR_ON         false
 #define DEFAULT_ANIMATOR_AUTOFOLLOW true
+#define DEFAULT_ANIMATOR_DISPLAY_TIME_IN_SECONDS true
 #define MAXIMUM_NUMBER_OF_GROUPS    8
 #define MULTI_ENCODER_MODE (MAX_NUM_INPUT > 1)
 
@@ -51,6 +52,7 @@ class AnimatorSettings
 public:
     bool enable;
     bool autoFollow;
+    bool displayTimeInSeconds; // UI display only - stored clip/timeline data always stays in milliseconds
 };
 
 class EncoderSettings
