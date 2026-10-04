@@ -42,6 +42,7 @@
 #define XML_ATTRIBUTE_DISTANCE_SCALER "DistanceScaler"
 #define XML_ATTRIBUTE_VALUE "Value"
 #define XML_ATTRIBUTE_INTENSITY "Intensity"
+#define XML_ATTRIBUTE_HEIGHT_ONLY_MODE "HeightOnlyMode"
 #define XML_ATTRIBUTE_AUTO_FOLLOW "AutoFollow"
 #define XML_ATTRIBUTE_DISPLAY_TIME_IN_SECONDS "DisplayTimeInSeconds"
 #define XML_TAG_CUSTOM_OSC_TARGETS "CustomOscTargets"
@@ -69,6 +70,7 @@ EncoderSettings::EncoderSettings():
     distanceEncodingFlag(DEFAULT_DIST_ENC_FLAG),
     bypassBlauertFlag(DEFAULT_BYPASS_BLAUERT_FLAG),
     blauertIntensity(DEFAULT_BLAUERT_INTENSITY),
+    blauertHeightOnlyMode(DEFAULT_BLAUERT_HEIGHT_ONLY_MODE),
     dopplerEncodingFlag(DEFAULT_DOPPLER_ENC_FLAG),
     hideWarnings(DEFAULT_HIDE_WARNINGS)
 {
@@ -142,6 +144,7 @@ XmlElement* EncoderSettings::getAsXmlElement(String tagName) const
     XmlElement* blauertEncoding = new XmlElement(XML_TAG_BLAUERT_ENCODING);
     blauertEncoding->setAttribute(XML_ATTRIBUTE_BYPASS, bypassBlauertFlag);
     blauertEncoding->setAttribute(XML_ATTRIBUTE_INTENSITY, blauertIntensity);
+    blauertEncoding->setAttribute(XML_ATTRIBUTE_HEIGHT_ONLY_MODE, blauertHeightOnlyMode);
     element->addChildElement(blauertEncoding);
     
     XmlElement* dopplerEncoding = new XmlElement(XML_TAG_DOPPLER_ENCODING);
@@ -246,6 +249,7 @@ void EncoderSettings::loadFromXml(XmlElement* element)
     {
         bypassBlauertFlag = blauertEncoding->getBoolAttribute(XML_ATTRIBUTE_BYPASS, DEFAULT_BYPASS_BLAUERT_FLAG);
         blauertIntensity = blauertEncoding->getDoubleAttribute(XML_ATTRIBUTE_INTENSITY, DEFAULT_BLAUERT_INTENSITY);
+        blauertHeightOnlyMode = blauertEncoding->getBoolAttribute(XML_ATTRIBUTE_HEIGHT_ONLY_MODE, DEFAULT_BLAUERT_HEIGHT_ONLY_MODE);
     }
     
     XmlElement* dopplerEncoding = element->getChildByName(XML_TAG_DOPPLER_ENCODING);

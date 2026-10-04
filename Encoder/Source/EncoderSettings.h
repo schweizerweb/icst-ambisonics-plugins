@@ -39,6 +39,7 @@
 #define DEFAULT_DOPPLER_ENC_FLAG	false
 #define DEFAULT_BYPASS_BLAUERT_FLAG false
 #define DEFAULT_BLAUERT_INTENSITY   0.5
+#define DEFAULT_BLAUERT_HEIGHT_ONLY_MODE false
 #define DEFAULT_HIDE_WARNINGS       false
 #define DEFAULT_AMBI_ORDER          1
 #define DEFAULT_ANIMATOR_ON         false
@@ -92,6 +93,7 @@ public:
 	
     bool bypassBlauertFlag;
     double blauertIntensity;
+    bool blauertHeightOnlyMode;
     
 	bool dopplerEncodingFlag;
 

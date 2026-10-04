@@ -19,6 +19,12 @@
 #pragma once
 #include <JuceHeader.h>
 
+enum class BlauertMode
+{
+    Standard = 0,
+    HeightOnly
+};
+
 class BlauertDirectionalFilter
 {
 public:
@@ -50,11 +56,20 @@ public:
         setValues (y, z, newAmount);
     }
 
+    void setMode (BlauertMode newMode)
+    {
+        if (mode == newMode)
+            return;
+
+        mode = newMode;
+        update();
+    }
+
     void setValues (float newY, float newZ, float newAmount)
     {
         newY = juce::jlimit (-1.0f, 1.0f, newY);
         newZ = juce::jlimit (-1.0f, 1.0f, newZ);
-        newAmount = juce::jlimit (0.0f, 5.0f, newAmount);
+        newAmount = juce::jlimit (0.1f, 5.0f, newAmount);
 
         if (hasLastValues
             && approximatelyEqual (y, newY)
@@ -88,11 +103,13 @@ private:
     float y = 0.0f;
     float z = 0.0f;
     float amount = 1.0f;
+    BlauertMode mode = BlauertMode::Standard;
 
     bool hasLastValues = false;
     float lastY = 0.0f;
     float lastZ = 0.0f;
     float lastAmount = 1.0f;
+    BlauertMode lastMode = BlauertMode::Standard;
 
     IIR rear1k;
     IIR front350;
@@ -111,16 +128,19 @@ private:
         if (hasLastValues
             && approximatelyEqual (lastY, y)
             && approximatelyEqual (lastZ, z)
-            && approximatelyEqual (lastAmount, amount))
+            && approximatelyEqual (lastAmount, amount)
+            && lastMode == mode)
             return;
 
         lastY = y;
         lastZ = z;
         lastAmount = amount;
+        lastMode = mode;
         hasLastValues = true;
 
-        const auto rearWeight  = juce::jmax (0.0f, -y);
-        const auto frontWeight = juce::jmax (0.0f,  y);
+        // Height Only mode ignores front/rear entirely, colouring purely by elevation.
+        const auto rearWeight  = (mode == BlauertMode::HeightOnly) ? 0.0f : juce::jmax (0.0f, -y);
+        const auto frontWeight = (mode == BlauertMode::HeightOnly) ? 0.0f : juce::jmax (0.0f,  y);
         const auto belowWeight = juce::jmax (0.0f, -z);
         const auto aboveWeight = juce::jmax (0.0f,  z);
 

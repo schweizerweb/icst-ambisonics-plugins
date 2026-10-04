@@ -34,20 +34,26 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     toggleDistanceEncoding->setButtonText (TRANS("Enable"));
     toggleDistanceEncoding->addListener (this);
 
+    groupDoppler.reset (new juce::GroupComponent ("groupDoppler",
+                                                  TRANS("Doppler effect")));
+    addAndMakeVisible (groupDoppler.get());
+
     toggleDoppler.reset (new juce::ToggleButton ("toggleDoppler"));
     addAndMakeVisible (toggleDoppler.get());
-    toggleDoppler->setButtonText (TRANS("Enable Doppler"));
+    toggleDoppler->setButtonText (TRANS("Enable"));
     toggleDoppler->addListener (this);
 
-    toggleDoppler->setBounds (6, 8, 199, 24);
+    groupBlauert.reset (new juce::GroupComponent ("groupBlauert",
+                                                  TRANS("Blauert filter")));
+    addAndMakeVisible (groupBlauert.get());
 
-    toggleBypassBlauert.reset (new juce::ToggleButton ("toggleBypassBlauert"));
-    addAndMakeVisible (toggleBypassBlauert.get());
-    toggleBypassBlauert->setButtonText (TRANS("Bypass"));
-    toggleBypassBlauert->addListener (this);
+    toggleEnableBlauert.reset (new juce::ToggleButton ("toggleEnableBlauert"));
+    addAndMakeVisible (toggleEnableBlauert.get());
+    toggleEnableBlauert->setButtonText (TRANS("Enable"));
+    toggleEnableBlauert->addListener (this);
 
     labelIntensity.reset (new juce::Label ("labelIntensity",
-                                           TRANS("Blauert Intensity")));
+                                           TRANS("Intensity Factor")));
     addAndMakeVisible (labelIntensity.get());
     labelIntensity->setFont (juce::Font (juce::FontOptions(15.00f, juce::Font::plain)));
     labelIntensity->setJustificationType (juce::Justification::centredLeft);
@@ -58,8 +64,14 @@ EncodingSettingsComponent::EncodingSettingsComponent (EncoderSettingsComponentAr
     sliderBlauertIntensity.reset(new Slider("sliderBlauertIntensity"));
     addAndMakeVisible (sliderBlauertIntensity.get());
     sliderBlauertIntensity->addListener(this);
-    sliderBlauertIntensity->setRange(0.0, 5.0);
+    sliderBlauertIntensity->setRange(0.1, 5.0);
     sliderBlauertIntensity->setNumDecimalPlacesToDisplay(3);
+
+    comboBlauertMode.reset(new ComboBox("comboBlauertMode"));
+    addAndMakeVisible (comboBlauertMode.get());
+    comboBlauertMode->addItem(TRANS("Standard"), 1);
+    comboBlauertMode->addItem(TRANS("Height Only"), 2);
+    comboBlauertMode->addListener(this);
 
     distanceEncodingComponent.reset (new DistanceEncodingComponent (&m_args.pSettings->distanceEncodingParams, m_args.pDistanceEncodingPresetHelper, m_args.pZoomSettings));
     addAndMakeVisible (distanceEncodingComponent.get());
@@ -74,10 +86,13 @@ EncodingSettingsComponent::~EncodingSettingsComponent()
 {
     groupDistanceEncoding = nullptr;
     toggleDistanceEncoding = nullptr;
+    groupDoppler = nullptr;
     toggleDoppler = nullptr;
-    toggleBypassBlauert = nullptr;
+    groupBlauert = nullptr;
+    toggleEnableBlauert = nullptr;
     labelIntensity = nullptr;
     sliderBlauertIntensity = nullptr;
+    comboBlauertMode = nullptr;
     distanceEncodingComponent = nullptr;
 }
 
@@ -88,13 +103,21 @@ void EncodingSettingsComponent::paint (juce::Graphics& g)
 
 void EncodingSettingsComponent::resized()
 {
-    groupDistanceEncoding->setBounds (8, 40, getWidth() - 14, getHeight() - 46);
-    toggleDistanceEncoding->setBounds (8 + 14, 40 + 24, 199, 24);
-    distanceEncodingComponent->setBounds (8 + 14, 40 + 56, (getWidth() - 14) - 28, (getHeight() - 46) - 70);
-    
-    toggleBypassBlauert->setBounds (getWidth()-80, 8, 76, 24);
-    sliderBlauertIntensity->setBounds(getWidth()-280, 8, 196, 24);
-    labelIntensity->setBounds(getWidth()-400, 8, 116, 24);
+    const int groupWidth = getWidth() - 14;
+    const int contentX = 8 + 14;
+
+    groupDoppler->setBounds (8, 8, groupWidth, 56);
+    toggleDoppler->setBounds (contentX, 8 + 24, 150, 24);
+
+    groupBlauert->setBounds (8, 72, groupWidth, 56);
+    toggleEnableBlauert->setBounds (contentX, 72 + 24, 76, 24);
+    comboBlauertMode->setBounds (contentX + 76 + 10, 72 + 24, 110, 24);
+    labelIntensity->setBounds (contentX + 76 + 10 + 110 + 14, 72 + 24, 116, 24);
+    sliderBlauertIntensity->setBounds (contentX + 76 + 10 + 110 + 14 + 116 + 4, 72 + 24, 196, 24);
+
+    groupDistanceEncoding->setBounds (8, 136, groupWidth, getHeight() - 142);
+    toggleDistanceEncoding->setBounds (contentX, 136 + 24, 199, 24);
+    distanceEncodingComponent->setBounds (contentX, 136 + 56, groupWidth - 28, (getHeight() - 142) - 70);
 }
 
 void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicked)
@@ -110,9 +133,9 @@ void EncodingSettingsComponent::buttonClicked (juce::Button* buttonThatWasClicke
         m_args.pSettings->dopplerEncodingFlag = toggleDoppler->getToggleState();
         sendChangeMessage();
     }
-    else if (buttonThatWasClicked == toggleBypassBlauert.get())
+    else if (buttonThatWasClicked == toggleEnableBlauert.get())
     {
-        m_args.pSettings->bypassBlauertFlag = toggleBypassBlauert->getToggleState();
+        m_args.pSettings->bypassBlauertFlag = !toggleEnableBlauert->getToggleState();
         sendChangeMessage();
         controlDimming();
     }
@@ -127,19 +150,30 @@ void EncodingSettingsComponent::sliderValueChanged (juce::Slider* sliderThatWasM
     }
 }
 
+void EncodingSettingsComponent::comboBoxChanged (juce::ComboBox* comboBoxThatHasChanged)
+{
+    if (comboBoxThatHasChanged == comboBlauertMode.get())
+    {
+        m_args.pSettings->blauertHeightOnlyMode = (comboBlauertMode->getSelectedId() == 2);
+        sendChangeMessage();
+    }
+}
+
 void EncodingSettingsComponent::updateEncodingUiElements()
 {
     toggleDistanceEncoding->setToggleState(m_args.pSettings->distanceEncodingFlag, dontSendNotification);
 
     toggleDoppler->setToggleState(m_args.pSettings->dopplerEncodingFlag, dontSendNotification);
-    toggleBypassBlauert->setToggleState(m_args.pSettings->bypassBlauertFlag, dontSendNotification);
+    toggleEnableBlauert->setToggleState(!m_args.pSettings->bypassBlauertFlag, dontSendNotification);
     
     sliderBlauertIntensity->setValue(m_args.pSettings->blauertIntensity, dontSendNotification);
+    comboBlauertMode->setSelectedId(m_args.pSettings->blauertHeightOnlyMode ? 2 : 1, dontSendNotification);
     controlDimming();
 }
 
 void EncodingSettingsComponent::controlDimming()
 {
     distanceEncodingComponent->setEnabled(toggleDistanceEncoding->getToggleState());
-    sliderBlauertIntensity->setEnabled(!toggleBypassBlauert->getToggleState());
+    sliderBlauertIntensity->setEnabled(toggleEnableBlauert->getToggleState());
+    comboBlauertMode->setEnabled(toggleEnableBlauert->getToggleState());
 }

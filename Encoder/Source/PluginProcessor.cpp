@@ -339,6 +339,7 @@ void AmbisonicEncoderAudioProcessor::processBlock (AudioSampleBuffer& buffer, Mi
         // blauert filter
         if (!encoderSettings.bypassBlauertFlag && source->getBlauertFlag())
         {
+            blauertFilters[iSource].setMode(encoderSettings.blauertHeightOnlyMode ? BlauertMode::HeightOnly : BlauertMode::Standard);
             blauertFilters[iSource].setValues((float)sourcePoint.getY(), (float)sourcePoint.getZ(), (float)encoderSettings.blauertIntensity);
             float* writePointer = inputBuffer.getWritePointer(iSource);
             BlauertDirectionalFilter* filter = &blauertFilters[iSource];
