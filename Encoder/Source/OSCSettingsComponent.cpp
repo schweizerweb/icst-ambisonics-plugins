@@ -19,7 +19,7 @@
 
 #include "OSCSettingsComponent.h"
 
-OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper)
+OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper, AmbiSourceSet* pSourceSet)
     : pSettings(_pSettings)
 {
     addChangeListener(pChangeListener);
@@ -93,7 +93,7 @@ OSCSettingsComponent::OSCSettingsComponent (ChangeListener* pChangeListener, Enc
     sliderInterval->setTextBoxStyle (juce::Slider::TextBoxLeft, false, 80, 20);
     sliderInterval->addListener (this);
 
-    oscTargets.reset (new OSCTargetsComponent (this, pSettings, pCustomOscTxPresetHelper));
+    oscTargets.reset (new OSCTargetsComponent (this, pSettings, pCustomOscTxPresetHelper, pSourceSet));
     addAndMakeVisible (oscTargets.get());
     oscTargets->setName ("oscTargets");
 

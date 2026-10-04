@@ -20,6 +20,23 @@
 #include "AmbiOSCSenderExt.h"
 #include "OSCHandlerEncoder.h"
 
+namespace
+{
+    bool scopeIncludesSources(OscPointScope scope, const OscPointSelection& selection)
+    {
+        return scope == OscPointScope::AllSources
+            || scope == OscPointScope::AllSourcesAndGroups
+            || (scope == OscPointScope::Select && !selection.sourceIndices.isEmpty());
+    }
+
+    bool scopeIncludesGroups(OscPointScope scope, const OscPointSelection& selection)
+    {
+        return scope == OscPointScope::AllGroups
+            || scope == OscPointScope::AllSourcesAndGroups
+            || (scope == OscPointScope::Select && !selection.groupIndices.isEmpty());
+    }
+}
+
 AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* _pStatusMessageHandler, ScalingInfo* _pScalingInfo): pPoints(ambiPoints), pStatusMessageHandler(_pStatusMessageHandler), pScalingInfo(_pScalingInfo)
 {
 }
@@ -27,18 +44,22 @@ AmbiOSCSenderExt::AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler
 AmbiOSCSenderExt::~AmbiOSCSenderExt()
 {
 	stop();
-	oscSender.clear();
 }
 
-OSCSenderInstance* AmbiOSCSenderExt::getOrCreateInstance(int index)
+OSCSenderInstance* AmbiOSCSenderExt::addBoundInstance(bool sendsSources, bool sendsGroups, OscPointScope scope, const OscPointSelection& selection)
 {
-	while(index >= oscSender.size())
-	{
-		auto newInstance = new OSCSenderInstance(pScalingInfo);
-		oscSender.add(newInstance);
-	}
+    auto* instance = new OSCSenderInstance(pScalingInfo);
+    oscSenderInstances.add(instance);
 
-	return oscSender[index];
+    auto* binding = new OscSenderBinding();
+    binding->instance = instance;
+    binding->sendsSources = sendsSources;
+    binding->sendsGroups = sendsGroups;
+    binding->allowedSourceIndices = (scope == OscPointScope::Select) ? &selection.sourceIndices : nullptr;
+    binding->allowedGroupIndices = (scope == OscPointScope::Select) ? &selection.groupIndices : nullptr;
+    senderBindings.add(binding);
+
+    return instance;
 }
 
 bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
@@ -47,23 +68,37 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 
     if(!pSettings->oscSendExtMasterFlag)
         return true;
-    
-    int successfulCount = 0;
-	int index = 0;
 
-    successfulCount += connectStandardSender(&index, pSettings->oscSendExtXyz.get(), String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ) + " {n} {x} {y} {z}", "XYZ", pMessage);
-	
-    successfulCount += connectStandardSender(&index, pSettings->oscSendExtAed.get(), String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED) + " {n} {a} {e} {d}", "AED", pMessage);
-    
-    successfulCount += connectStandardSender(&index, pSettings->oscSendExtXyzIndex.get(), String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ) + " {i} {x} {y} {z}", "XYZ (Index)", pMessage);
-    
-    successfulCount += connectStandardSender(&index, pSettings->oscSendExtAedIndex.get(), String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED) + " {i} {a} {e} {d}", "AED (Index)", pMessage);
-    
+    int successfulCount = 0;
+
+    successfulCount += connectStandardSender(pSettings->oscSendExtXyz.get(),
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_XYZ) + " {n} {x} {y} {z}",
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_XYZ) + " {n} {x} {y} {z}",
+        "XYZ", pMessage);
+
+    successfulCount += connectStandardSender(pSettings->oscSendExtAed.get(),
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_AED) + " {n} {a} {e} {d}",
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_AED) + " {n} {a} {e} {d}",
+        "AED", pMessage);
+
+    successfulCount += connectStandardSender(pSettings->oscSendExtXyzIndex.get(),
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ) + " {i} {x} {y} {z}",
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUPINDEX_XYZ) + " {i} {x} {y} {z}",
+        "XYZ (Index)", pMessage);
+
+    successfulCount += connectStandardSender(pSettings->oscSendExtAedIndex.get(),
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_AED) + " {i} {a} {e} {d}",
+        String(OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUPINDEX_AED) + " {i} {a} {e} {d}",
+        "AED (Index)", pMessage);
+
 	for (auto target : pSettings->customOscTargets)
 	{
 		if (target->enabledFlag)
 		{
-			OSCSenderInstance* pInstance = getOrCreateInstance(index++);
+            bool sendsSources = scopeIncludesSources(target->scope, target->selection);
+            bool sendsGroups = scopeIncludesGroups(target->scope, target->selection);
+            OSCSenderInstance* pInstance = addBoundInstance(sendsSources, sendsGroups, target->scope, target->selection);
+
             String errorStringBase = "- custom OSC sender @ " + target->targetHost + ":" + String(target->targetPort) + NewLine::getDefault()  + "  --> ";
             String localErrorString;
             if(!pInstance->setOscPath(target->oscString, &localErrorString))
@@ -76,7 +111,7 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
             	pMessage->append(errorStringBase + "connection failed" + NewLine::getDefault(), 1000);
                 continue;
 			}
-			
+
             successfulCount++;
 		}
         else
@@ -97,11 +132,56 @@ bool AmbiOSCSenderExt::start(EncoderSettings* pSettings, String* pMessage)
 void AmbiOSCSenderExt::stop()
 {
 	stopTimer();
-	for (auto sender : oscSender)
-	{
-		sender->disconnect();
-	}
+	for (auto* binding : senderBindings)
+		binding->instance->disconnect();
 
+    senderBindings.clear();
+    oscSenderInstances.clear();
+}
+
+int AmbiOSCSenderExt::connectStandardSender(StandardOscTarget* pTarget, String sourceOscPath, String groupOscPath, String description, String* pMessage)
+{
+    if (!pTarget->enabledFlag)
+        return 1;
+
+    bool wantsSources = scopeIncludesSources(pTarget->scope, pTarget->selection);
+    bool wantsGroups = scopeIncludesGroups(pTarget->scope, pTarget->selection);
+    String errorStringBase = "- standard " + description + " sender @ " + pTarget->targetHost + ":" + String(pTarget->targetPort) + NewLine::getDefault();
+    bool ok = true;
+
+    if (wantsSources)
+    {
+        OSCSenderInstance* pInstance = addBoundInstance(true, false, pTarget->scope, pTarget->selection);
+        String localErrorMessage;
+        if (!pInstance->setOscPath(sourceOscPath, &localErrorMessage))
+        {
+            pMessage->append("- Program error for standard sender (" + description + "): " + localErrorMessage + NewLine::getDefault(), 1000);
+            ok = false;
+        }
+        else if (!pInstance->connect(pTarget->targetHost, pTarget->targetPort))
+        {
+            pMessage->append(errorStringBase, 500);
+            ok = false;
+        }
+    }
+
+    if (wantsGroups)
+    {
+        OSCSenderInstance* pInstance = addBoundInstance(false, true, pTarget->scope, pTarget->selection);
+        String localErrorMessage;
+        if (!pInstance->setOscPath(groupOscPath, &localErrorMessage))
+        {
+            pMessage->append("- Program error for standard sender (" + description + ", groups): " + localErrorMessage + NewLine::getDefault(), 1000);
+            ok = false;
+        }
+        else if (!pInstance->connect(pTarget->targetHost, pTarget->targetPort))
+        {
+            pMessage->append(errorStringBase, 500);
+            ok = false;
+        }
+    }
+
+    return ok ? 1 : 0;
 }
 
 void AmbiOSCSenderExt::timerCallback()
@@ -115,51 +195,66 @@ void AmbiOSCSenderExt::timerCallback()
 	// create history elements if required
 	while (pPoints->size() > history.size())
 		history.add(new PointHistoryEntry());
-		
+	while (pPoints->groupCount() > groupHistory.size())
+		groupHistory.add(new PointHistoryEntry());
+
+	// Sources: "changed" is computed once per point per tick, then fanned out to every binding
+	// that wants sources - computing it per-binding instead would make PointHistoryEntry::update()'s
+	// side effect (it stores the new value once it reports a change) hide the same change from
+	// whichever binding is checked second.
 	for (int i = 0; i < pPoints->size(); i++)
 	{
 		AmbiPoint* pt = pPoints->get(i);
         Vector3D<double> absPt = pPoints->getAbsSourcePoint(i);
 		if (pt != nullptr && pt->getEnabled())
 		{
-			if (doContinuousUpdate || history[i]->update(absPt, pt))
-			{
-				for (auto sender : oscSender)
-				{
-                    try
-                    {
-						sender->sendMessage(absPt, pt, i);
-                    }
-                    catch (...)
-                    {
-						pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + sender->getOscPath(), StatusMessage::Error);
-                    }
-					
-				}
-			}
+            bool changed = doContinuousUpdate || history[i]->update(absPt, pt);
+            if (!changed)
+                continue;
+
+            for (auto* binding : senderBindings)
+            {
+                if (!binding->sendsSources) continue;
+                if (binding->allowedSourceIndices != nullptr && !binding->allowedSourceIndices->contains(i)) continue;
+
+                try
+                {
+                    binding->instance->sendMessage(absPt, pt, i);
+                }
+                catch (...)
+                {
+                    pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + binding->instance->getOscPath(), StatusMessage::Error);
+                }
+            }
 		}
 	}
-}
 
-int AmbiOSCSenderExt::connectStandardSender(int *pIndex, StandardOscTarget *pTarget, String oscString, String description, String* pMessage)
-{
-    if (pTarget->enabledFlag)
-    {
-        OSCSenderInstance* pInstance = getOrCreateInstance((*pIndex)++);
-        String localErrorMessage;
-        bool ret = pInstance->setOscPath(oscString, &localErrorMessage);
-        if(!ret)
-        {
-            pMessage->append("- Program error for standard sender (" + description + "): " + localErrorMessage + NewLine::getDefault(), 1000);
-            return 0;
-        }
-        
-        ret = pInstance->connect(pTarget->targetHost, pTarget->targetPort);
-        if (!ret) {
-            pMessage->append("- standard " + description + " sender @ " + pTarget->targetHost + ":" + String(pTarget->targetPort) + NewLine::getDefault(), 500);
-            return 0;
-        }
-    }
-    
-    return 1;
+	// Groups: same pattern, separate history/index space (group indices and source indices are
+	// unrelated, so they must not share one history array).
+	for (int i = 0; i < pPoints->groupCount(); i++)
+	{
+		AmbiGroup* grp = pPoints->getGroup(i);
+		if (grp != nullptr && grp->getEnabled())
+		{
+            Vector3D<double> absPt = grp->getVector3D();
+            bool changed = doContinuousUpdate || groupHistory[i]->update(absPt, grp);
+            if (!changed)
+                continue;
+
+            for (auto* binding : senderBindings)
+            {
+                if (!binding->sendsGroups) continue;
+                if (binding->allowedGroupIndices != nullptr && !binding->allowedGroupIndices->contains(i)) continue;
+
+                try
+                {
+                    binding->instance->sendMessage(absPt, grp, i);
+                }
+                catch (...)
+                {
+                    pStatusMessageHandler->showMessage("Error sending message", "Error creating message for sender " + binding->instance->getOscPath(), StatusMessage::Error);
+                }
+            }
+		}
+	}
 }

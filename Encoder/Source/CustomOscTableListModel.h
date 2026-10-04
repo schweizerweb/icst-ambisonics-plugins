@@ -25,20 +25,55 @@
 #include "../../Common/EditableTextCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
 #include "../../Common/ColorDefinition.h"
+#include "../../Common/AmbiSourceSet.h"
+#include "OscPointScope.h"
+#include "OscPointSelectionComponent.h"
 
 #define COLUMN_ID_ENABLE		201
 #define COLUMN_ID_HOST			202
 #define	COLUMN_ID_PORT			203
 #define	COLUMN_ID_PATH			204
 #define COLUMN_ID_SAVE_AS_PRESET    206
+#define COLUMN_ID_SCOPE			207
+#define COLUMN_ID_SELECT		208
 #define ACTION_MESSAGE_DATA_CHANGED "data"
 #define ACTION_MESSAGE_SEL_CHANGED "sel"
+
+// "Type" column cell: picks the OscPointScope for a row (standard or custom target alike).
+class OscScopeColumnCustomComponent : public ComboBox, private ComboBox::Listener
+{
+public:
+    OscScopeColumnCustomComponent(TableColumnCallback& td) : owner(td)
+    {
+        addItem(getOscPointScopeDisplayName(OscPointScope::AllSources), (int)OscPointScope::AllSources + 1);
+        addItem(getOscPointScopeDisplayName(OscPointScope::AllGroups), (int)OscPointScope::AllGroups + 1);
+        addItem(getOscPointScopeDisplayName(OscPointScope::AllSourcesAndGroups), (int)OscPointScope::AllSourcesAndGroups + 1);
+        addItem(getOscPointScopeDisplayName(OscPointScope::Select), (int)OscPointScope::Select + 1);
+        addListener(this);
+    }
+
+    void setRowAndColumn(const int newRow, const int newColumn)
+    {
+        row = newRow;
+        columnId = newColumn;
+        setSelectedId((int)owner.getValue(columnId, row) + 1, dontSendNotification);
+    }
+
+private:
+    void comboBoxChanged(ComboBox*) override
+    {
+        owner.setValue(columnId, row, (double)(getSelectedId() - 1));
+    }
+
+    TableColumnCallback& owner;
+    int row = 0, columnId = 0;
+};
 
 
 class CustomOscTableListModel : public TableListBoxModel, public TableColumnCallback, public ActionBroadcaster, ImageButton::Listener
 {
 public:
-	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener, CustomOscTxPresetHelper* _pPresetHelper): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr), pPresetHelper(_pPresetHelper)
+	CustomOscTableListModel(EncoderSettings* _pSettings, Component* _pParentComponent, ActionListener* pActionListener, CustomOscTxPresetHelper* _pPresetHelper, AmbiSourceSet* _pSourceSet): pSettings(_pSettings), pParentComponent(_pParentComponent), pTableListBox(nullptr), pPresetHelper(_pPresetHelper), pSourceSet(_pSourceSet)
 	{
 		addActionListener(pActionListener);
         standardTargets.add(new StandardTarget("ICST AmbiPlugins Standard XYZ Name", pSettings->oscSendExtXyz.get()));
@@ -53,7 +88,14 @@ public:
 	}
 
     void buttonClicked(juce::Button *b) override {
-        int rowIndex = b->getComponentID().getIntValue();
+        String componentId = b->getComponentID();
+        if (componentId.startsWith("select_"))
+        {
+            openSelectionCallout(componentId.fromFirstOccurrenceOf("select_", false, false).getIntValue(), b);
+            return;
+        }
+
+        int rowIndex = componentId.getIntValue();
         sendActionMessage(pPresetHelper->UniqueActionMessageSavePreset() + " " + String(rowIndex));
     }
     
@@ -126,7 +168,29 @@ public:
                 return btn;
             }
         }
-        
+        else if (columnId == COLUMN_ID_SCOPE)
+        {
+            OscScopeColumnCustomComponent* combo = static_cast<OscScopeColumnCustomComponent*> (existingComponentToUpdate);
+            if (combo == nullptr)
+                combo = new OscScopeColumnCustomComponent(*this);
+
+            combo->setRowAndColumn(rowNumber, columnId);
+            return combo;
+        }
+        else if (columnId == COLUMN_ID_SELECT)
+        {
+            TextButton* btn = static_cast<TextButton*>(existingComponentToUpdate);
+            if (btn == nullptr)
+            {
+                btn = new TextButton("...");
+                btn->addListener(this);
+            }
+            btn->setComponentID("select_" + String(rowNumber));
+            btn->setEnabled(getScopeForRow(rowNumber) == OscPointScope::Select);
+            btn->setTooltip(getScopeForRow(rowNumber) == OscPointScope::Select ? getSelectionTooltip(rowNumber) : "");
+            return btn;
+        }
+
 		return nullptr;
 	}
 
@@ -143,6 +207,7 @@ public:
             {
                 case COLUMN_ID_PORT: return standardTargets[rowNumber]->pTarget->targetPort;
                 case COLUMN_ID_ENABLE: return standardTargets[rowNumber]->pTarget->enabledFlag;
+                case COLUMN_ID_SCOPE: return (double)standardTargets[rowNumber]->pTarget->scope;
                 default: return 0.0;
             }
         }
@@ -155,6 +220,7 @@ public:
 		{
 		case COLUMN_ID_PORT: return t->targetPort;
 		case COLUMN_ID_ENABLE: return t->enabledFlag;
+		case COLUMN_ID_SCOPE: return (double)t->scope;
 		default: return 0.0;
 		}
 	}
@@ -167,6 +233,7 @@ public:
             {
                 case COLUMN_ID_PORT: standardTargets[rowNumber]->pTarget->targetPort = (int)newValue; break;
                 case COLUMN_ID_ENABLE: standardTargets[rowNumber]->pTarget->enabledFlag = !exactlyEqual(newValue, 0.0); break;
+                case COLUMN_ID_SCOPE: standardTargets[rowNumber]->pTarget->scope = (OscPointScope)(int)newValue; break;
                 default: ;
             }
         }
@@ -177,6 +244,7 @@ public:
             {
                 case COLUMN_ID_PORT: pSettings->customOscTargets[rowNumber]->targetPort = (int)newValue; break;
                 case COLUMN_ID_ENABLE: pSettings->customOscTargets[rowNumber]->enabledFlag = !exactlyEqual(newValue, 0.0); break;
+                case COLUMN_ID_SCOPE: pSettings->customOscTargets[rowNumber]->scope = (OscPointScope)(int)newValue; break;
                 default: ;
             }
         }
@@ -257,6 +325,8 @@ public:
 		tableListBox->getHeader().addColumn("Host", COLUMN_ID_HOST, 70);
 		tableListBox->getHeader().addColumn("Port", COLUMN_ID_PORT, 50);
 		tableListBox->getHeader().addColumn("OSC-Message", COLUMN_ID_PATH, 300);
+        tableListBox->getHeader().addColumn("Type", COLUMN_ID_SCOPE, 120);
+        tableListBox->getHeader().addColumn("", COLUMN_ID_SELECT, 24);
         tableListBox->getHeader().addColumn("", COLUMN_ID_SAVE_AS_PRESET, 20);
         tableListBox->getHeader().setStretchToFitActive(true);
 		tableListBox->getHeader().resizeAllColumnsToFit(tableListBox->getWidth());
@@ -272,16 +342,67 @@ public:
         return jmax(-1, selectedIndex - standardTargets.size());
     }
 
+    OscPointScope getScopeForRow(int rowNumber)
+    {
+        return (OscPointScope)(int)getValue(COLUMN_ID_SCOPE, rowNumber);
+    }
+
+    OscPointSelection* getSelectionForRow(int rowNumber)
+    {
+        if (rowNumber < standardTargets.size())
+            return &standardTargets[rowNumber]->pTarget->selection;
+
+        int row = rowNumber - standardTargets.size();
+        if (row >= 0 && row < pSettings->customOscTargets.size())
+            return &pSettings->customOscTargets[row]->selection;
+
+        return nullptr;
+    }
+
+    String getSelectionTooltip(int rowNumber)
+    {
+        auto* selection = getSelectionForRow(rowNumber);
+        if (selection == nullptr || pSourceSet == nullptr)
+            return "";
+
+        StringArray parts;
+        for (auto i : selection->sourceIndices)
+            if (auto* s = pSourceSet->get(i))
+                parts.add("Source " + String(i + 1) + ": " + s->getName());
+        for (auto i : selection->groupIndices)
+            if (auto* g = pSourceSet->getGroup(i))
+                parts.add("Group " + String(i + 1) + ": " + g->getName());
+
+        return parts.isEmpty() ? "No sources/groups selected" : parts.joinIntoString("\n");
+    }
+
+    void openSelectionCallout(int row, Component* anchor)
+    {
+        OscPointSelection* pSelection = getSelectionForRow(row);
+        if (pSelection == nullptr || pSourceSet == nullptr)
+            return;
+
+        auto component = std::make_unique<OscPointSelectionComponent>(pSourceSet, pSelection, [this]
+        {
+            sendActionMessage(ACTION_MESSAGE_DATA_CHANGED);
+            if (getTable() != nullptr)
+                getTable()->repaint();
+        });
+
+        CallOutBox::launchAsynchronously(std::move(component), anchor->getScreenBounds(), nullptr);
+    }
+
 private:
     struct StandardTarget {
         StandardTarget(String _name, StandardOscTarget* _pTarget) : name(_name), pTarget(_pTarget) {}
         String name;
         StandardOscTarget* pTarget;
     };
-    
+
 	EncoderSettings* pSettings;
 	Component* pParentComponent;
 	TableListBox* pTableListBox;
     CustomOscTxPresetHelper* pPresetHelper;
+    AmbiSourceSet* pSourceSet;
     OwnedArray<StandardTarget> standardTargets;
 };

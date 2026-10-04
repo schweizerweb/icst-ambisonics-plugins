@@ -28,7 +28,7 @@ EncoderSettingsComponent::EncoderSettingsComponent (EncoderSettingsComponentArgs
     tabbedComponent->addTab (TRANS("Encoding"), juce::Colours::lightgrey, new EncodingSettingsComponent (args), true);
     tabbedComponent->addTab (TRANS("Radar"), juce::Colours::lightgrey, new RadarSettingsComponent (args.pChangeListener, args.pZoomSettings), true);
     tabbedComponent->addTab (TRANS("OSC In"), juce::Colours::lightgrey, new OSCRxSettingsComponent (args.pSettings, args.pStatusMessageHandler, args.pCustomOscRxPresetHelper, args.pOscLogManager, args.pOscHandler), true);
-    tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper), true);
+    tabbedComponent->addTab (TRANS("OSC Out"), juce::Colours::lightgrey, new OSCSettingsComponent (args.pChangeListener, args.pSettings, args.pCustomOscTxPresetHelper, args.pSourceSet), true);
     tabbedComponent->setCurrentTabIndex (0);
 
     labelDevelopmentVersion.reset (new juce::Label ("labelDevelopmentVersion",

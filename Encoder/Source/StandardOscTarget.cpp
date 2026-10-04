@@ -33,6 +33,9 @@ StandardOscTarget::StandardOscTarget(XmlElement* xmlElement) : StandardOscTarget
         enabledFlag = xmlElement->getBoolAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_ENABLE, DEFAULT_SEND_EXT_STANDARD_FLAG);
         targetHost = xmlElement->getStringAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_HOST, DEFAULT_SEND_EXT_STANDARD_HOST);
         targetPort = xmlElement->getIntAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_PORT, DEFAULT_SEND_EXT_STANDARD_PORT);
+        scope = static_cast<OscPointScope>(xmlElement->getIntAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SCOPE, (int)OscPointScope::AllSources));
+        selection.sourceIndices = OscPointSelection::parseIndices(xmlElement->getStringAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_SOURCES, ""));
+        selection.groupIndices = OscPointSelection::parseIndices(xmlElement->getStringAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_GROUPS, ""));
     }
 }
 
@@ -46,6 +49,9 @@ XmlElement* StandardOscTarget::getAsXmlElement(String tagName)
     e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_ENABLE, enabledFlag);
     e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_HOST, targetHost);
     e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_PORT, targetPort);
-    
+    e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SCOPE, (int)scope);
+    e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_SOURCES, OscPointSelection::joinIndices(selection.sourceIndices));
+    e->setAttribute(XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_GROUPS, OscPointSelection::joinIndices(selection.groupIndices));
+
     return e;
 }

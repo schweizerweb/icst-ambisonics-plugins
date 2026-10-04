@@ -19,22 +19,28 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "OscPointScope.h"
 
 #define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_ENABLED "Enabled"
 #define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_HOST "Host"
 #define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_PORT "Port"
 #define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_STRING "OscString"
+#define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SCOPE "Scope"
+#define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_SOURCES "SelectedSources"
+#define XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_GROUPS "SelectedGroups"
 
 class CustomOscTarget
 {
 public:
     CustomOscTarget();
     CustomOscTarget(XmlElement* xmlElement);
-    
+
     XmlElement* getAsXmlElement(String tagName);
 
     bool enabledFlag;
     String oscString;
     String targetHost;
     int targetPort;
+    OscPointScope scope = OscPointScope::AllSources;
+    OscPointSelection selection;
 };

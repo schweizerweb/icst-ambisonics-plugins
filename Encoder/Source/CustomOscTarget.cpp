@@ -33,6 +33,9 @@ CustomOscTarget::CustomOscTarget(XmlElement* xmlElement)
     targetHost = xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_HOST, "");
     targetPort = xmlElement->getIntAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_PORT, 0);
     oscString = xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_STRING, "");
+    scope = static_cast<OscPointScope>(xmlElement->getIntAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SCOPE, (int)OscPointScope::AllSources));
+    selection.sourceIndices = OscPointSelection::parseIndices(xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_SOURCES, ""));
+    selection.groupIndices = OscPointSelection::parseIndices(xmlElement->getStringAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_GROUPS, ""));
 }
 
 XmlElement* CustomOscTarget::getAsXmlElement(String tagName)
@@ -42,6 +45,9 @@ XmlElement* CustomOscTarget::getAsXmlElement(String tagName)
     e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_HOST, targetHost);
     e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_PORT, targetPort);
     e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_STRING, oscString);
+    e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SCOPE, (int)scope);
+    e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_SOURCES, OscPointSelection::joinIndices(selection.sourceIndices));
+    e->setAttribute(XML_ATTRIBUTE_CUSTOM_OSC_TARGET_SELECTED_GROUPS, OscPointSelection::joinIndices(selection.groupIndices));
 
     return e;
 }

@@ -37,6 +37,8 @@
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_XYZ "/icst/ambi/sourceindex/xyz"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_GAIN "/icst/ambi/sourceindex/gain"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_INDEX_NAME "/icst/ambi/sourceindex/name"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUPINDEX_AED "/icst/ambi/groupindex/aed"
+#define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUPINDEX_XYZ "/icst/ambi/groupindex/xyz"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_ROTATE "/icst/ambi/group/rotate"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_QUATERNION "/icst/ambi/group/setrotation/quaternion"
 #define OSC_ADDRESS_AMBISONIC_PLUGINS_EXTERN_GROUP_SETROTATION_EULER "/icst/ambi/group/setrotation/euler"

@@ -87,6 +87,8 @@ SET(SRC_FILES
 	../Source/OSCRxSettingsComponent.h
 	../Source/OSCSenderInstance.cpp
 	../Source/OSCSenderInstance.h
+	../Source/OscPointScope.h
+	../Source/OscPointSelectionComponent.h
 	../Source/OSCSettingsComponent.cpp
 	../Source/OSCSettingsComponent.h
 	../Source/OSCTargetsComponent.cpp

@@ -23,6 +23,7 @@
 #include "CustomOscTableListModel.h"
 #include "CustomOscTxPresetHelper.h"
 #include "../../Common/PresetManagerDialog.h"
+#include "../../Common/AmbiSourceSet.h"
 
 #define COMMON_OSC_INFO_STRING "Allowed objects:\n{x}, {y}, {z} = Real X/Y/Z-Coordinates\n{a}, {e}, {d} = Real A/E/D-Coordinates\n{sx}, {sy}, {sz} = Scaled X/Y/Z-Coordinates (0..1)\n{sa}, {se}, {sd} = Scaled A/E/D-Coordinates (0..1)\n{i} = index\n{n} = name\n{g} = gain\n{c} = color\n\nUser defined scaling available for sx, sy, sz, sa, se, sd:\nSyntax: {s*,[lowLimit],[highLimit]}\nExample: {sx,-0.5,0.5}\n\nDual-Scaling for sx, sy, sz, se:\nSyntax: {s*,[lowLimit],[zeroValue],[highLimit]}\nExample: {sz, 1.0, 0.1, 1.0}\n\nConstant values:\n{ci,[int]} = Constant integer value\n{cf,[float]} = Constant float value\n{cs,[string]} = Constant string"
 
@@ -34,7 +35,7 @@ class OSCTargetsComponent  : public juce::Component,
                              public juce::Button::Listener
 {
 public:
-    OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper);
+    OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper* pCustomOscTxPresetHelper, AmbiSourceSet* pSourceSet);
     ~OSCTargetsComponent() override;
 
     void textEditorTextChanged(TextEditor&) override;

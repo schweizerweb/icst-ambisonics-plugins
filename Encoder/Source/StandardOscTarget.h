@@ -19,10 +19,14 @@
 
 #pragma once
 #include "JuceHeader.h"
+#include "OscPointScope.h"
 
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_ENABLE "Enable"
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_HOST "Host"
 #define XML_ATTRIBUTE_STANDARD_OSC_TARGET_PORT "Port"
+#define XML_ATTRIBUTE_STANDARD_OSC_TARGET_SCOPE "Scope"
+#define XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_SOURCES "SelectedSources"
+#define XML_ATTRIBUTE_STANDARD_OSC_TARGET_SELECTED_GROUPS "SelectedGroups"
 
 #define DEFAULT_SEND_EXT_STANDARD_FLAG       false
 #define DEFAULT_SEND_EXT_STANDARD_PORT       50002
@@ -39,4 +43,6 @@ public:
     bool enabledFlag;
     String targetHost;
     int targetPort;
+    OscPointScope scope = OscPointScope::AllSources;
+    OscPointSelection selection;
 };

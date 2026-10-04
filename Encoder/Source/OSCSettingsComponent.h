@@ -21,6 +21,7 @@
 #include "JuceHeader.h"
 #include "EncoderSettings.h"
 #include "OSCTargetsComponent.h"
+#include "../../Common/AmbiSourceSet.h"
 
 class OSCSettingsComponent  : public Component,
                               public TextEditor::Listener,
@@ -30,7 +31,7 @@ class OSCSettingsComponent  : public Component,
                               public juce::Slider::Listener
 {
 public:
-    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper);
+    OSCSettingsComponent (ChangeListener* pChangeListener, EncoderSettings* pSettings, CustomOscTxPresetHelper*  pCustomOscTxPresetHelper, AmbiSourceSet* pSourceSet);
     ~OSCSettingsComponent() override;
 
     void paint (juce::Graphics& g) override;

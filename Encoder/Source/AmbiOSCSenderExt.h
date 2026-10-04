@@ -22,6 +22,7 @@
 #include "../../Common/AmbiDataSet.h"
 #include "EncoderSettings.h"
 #include "OSCSenderInstance.h"
+#include "OscPointScope.h"
 #include "../../Common/StatusMessageHandler.h"
 #include "../../Common/ScalingInfo.h"
 
@@ -61,26 +62,43 @@ public:
 	double gain;
 };
 
+// One connected OSCSenderInstance, plus which point collection(s) it should receive and - for the
+// "Select..." scope - which specific indices. Standard targets whose scope includes groups get a
+// second binding with the source/sourceindex address swapped to group/groupindex (connectStandardSender()),
+// since one OSCSenderInstance only ever holds a single address template; custom targets always get
+// exactly one binding regardless of scope, since their template is free-form user text with no
+// "source"/"group" substring we could reliably swap.
+struct OscSenderBinding
+{
+    OSCSenderInstance* instance = nullptr;
+    bool sendsSources = false;
+    bool sendsGroups = false;
+    const Array<int>* allowedSourceIndices = nullptr; // non-null => only these indices (Select scope)
+    const Array<int>* allowedGroupIndices = nullptr;  // non-null => only these indices (Select scope)
+};
+
 class AmbiOSCSenderExt : public Timer
 {
 public:
 	AmbiOSCSenderExt(AmbiDataSet* ambiPoints, StatusMessageHandler* pStatusMessageHandler, ScalingInfo* pScaling);
     virtual ~AmbiOSCSenderExt() override;
 
-    OSCSenderInstance* getOrCreateInstance(int index);
 	bool start(EncoderSettings* pSettings, String* pMessage);
 	void stop();
 
 private:
 	void timerCallback() override;
-    int connectStandardSender(int* pIndex, StandardOscTarget* pTarget, String oscString, String description, String* pMessage);
-    
+    int connectStandardSender(StandardOscTarget* pTarget, String sourceOscPath, String groupOscPath, String description, String* pMessage);
+    OSCSenderInstance* addBoundInstance(bool sendsSources, bool sendsGroups, OscPointScope scope, const OscPointSelection& selection);
+
 private:
 	CriticalSection cs;
 	AmbiDataSet* pPoints;
 	StatusMessageHandler* pStatusMessageHandler;
 	OwnedArray<PointHistoryEntry> history;
-	OwnedArray<OSCSenderInstance> oscSender;
+	OwnedArray<PointHistoryEntry> groupHistory;
+	OwnedArray<OSCSenderInstance> oscSenderInstances;
+	OwnedArray<OscSenderBinding> senderBindings;
     ScalingInfo* pScalingInfo;
     bool doContinuousUpdate;
 };

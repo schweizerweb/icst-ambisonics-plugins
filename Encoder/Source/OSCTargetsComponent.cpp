@@ -19,10 +19,10 @@
 
 #include "OSCTargetsComponent.h"
 
-OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper)
+OSCTargetsComponent::OSCTargetsComponent (ChangeListener* pChangeListener, EncoderSettings* _pSettings, CustomOscTxPresetHelper* _pCustomOscTxPresetHelper, AmbiSourceSet* pSourceSet)
     : pSettings(_pSettings), pCustomOscTxPresetHelper(_pCustomOscTxPresetHelper)
 {
-    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this, pCustomOscTxPresetHelper));
+    customOscTableModel.reset(new CustomOscTableListModel(pSettings, this, this, pCustomOscTxPresetHelper, pSourceSet));
     addChangeListener(pChangeListener);
     pCustomOscTxPresetHelper->addActionListener(this);
 
