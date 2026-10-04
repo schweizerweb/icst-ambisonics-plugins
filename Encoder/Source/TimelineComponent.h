@@ -52,6 +52,7 @@ public:
     // Keyboard
     bool keyPressed(const juce::KeyPress& key) override;
     void nudgeSelectedClips(ms_t nudgeAmount);
+    void toggleMuteSelectedClips();
     
     // ChangeListener method
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;

@@ -163,8 +163,8 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
             {
                 const auto& clip = timeline->movement.clips[schedule.clipIndex];
                 ms_t elapsedTime = currentTimeMs - schedule.start;
-                
-                if (elapsedTime < clip.length)
+
+                if (elapsedTime < clip.length && !clip.muted)
                 {
                     startMovementClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
                 }
@@ -174,8 +174,8 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
                 // Handle action clips
                 const auto& clip = timeline->actions.clips[schedule.clipIndex];
                 ms_t elapsedTime = currentTimeMs - schedule.start;
-                
-                if (elapsedTime < clip.length)
+
+                if (elapsedTime < clip.length && !clip.muted)
                 {
                     startActionClip(schedule.timelineIndex, clip, currentTimeMs, elapsedTime);
                 }
@@ -289,6 +289,11 @@ void AnimatorEngine::processActiveMovements(ms_t currentTimeMs)
         {
             continue;
         }
+
+        // Muting can be toggled while this clip is already playing - check live rather than
+        // only at scheduling time, so it takes effect immediately.
+        if (movement.clip.muted)
+            continue;
         
         // Calculate progress based on the actual start time and current time
         ms_t timeInMovement = currentTimeMs - movement.actualStartTime;
@@ -629,7 +634,16 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         // Calculate time delta since last processing for THIS action
         ms_t timeDelta = currentTimeMs - action.lastProcessTime;
         if (timeDelta <= 0) continue;
-        
+
+        // Muting can be toggled while this clip is already playing - check live rather than only
+        // at scheduling time. Still advance lastProcessTime so an eventual unmute doesn't apply a
+        // huge backlogged timeDelta all at once (rotation is accumulated incrementally).
+        if (action.clip.muted)
+        {
+            action.lastProcessTime = currentTimeMs;
+            continue;
+        }
+
         // Calculate progress for clip timing
         ms_t timeInAction = currentTimeMs - action.actualStartTime;
         double progress = (action.clip.length > 0) ?

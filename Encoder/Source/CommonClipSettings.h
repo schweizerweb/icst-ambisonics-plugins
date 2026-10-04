@@ -108,16 +108,21 @@ public:
         auto colourRow = area.removeFromTop(rowHeight);
         colourLabel.setBounds(colourRow.removeFromLeft(labelWidth));
         colourButton.setBounds(colourRow); // Takes remaining width
+
+        area.removeFromTop(verticalSpacing);
+
+        // Muted row - self-labelled toggle, no separate label needed
+        mutedToggle.setBounds(area.removeFromTop(rowHeight));
     }
-    
+
     int getRequiredHeight() const
     {
         const int rowHeight = 28;
         const int verticalSpacing = 8;
         const int topBottomMargin = 10;
-        
-        // 5 rows (name, start, duration, end, colour) + margins
-        return topBottomMargin * 2 + (rowHeight * 5) + (verticalSpacing * 4);
+
+        // 6 rows (name, start, duration, end, colour, muted) + margins
+        return topBottomMargin * 2 + (rowHeight * 6) + (verticalSpacing * 5);
     }
 
     void setClipData(const Clip& clip)
@@ -128,6 +133,7 @@ public:
         updateEndTimeDisplay();
         currentColour = clip.colour;
         updateColourButton();
+        mutedToggle.setToggleState(clip.muted, juce::dontSendNotification);
     }
 
     void applyToClip(Clip& clip)
@@ -136,6 +142,7 @@ public:
         clip.start = parseTimeValue(startEditor.getText(), displayInSeconds);
         clip.length = parseTimeValue(durationEditor.getText(), displayInSeconds);
         clip.colour = currentColour;
+        clip.muted = mutedToggle.getToggleState();
     }
 
     // Display only - re-renders whatever is currently shown in the new unit, the underlying
@@ -264,6 +271,10 @@ private:
         addAndMakeVisible(colourButton);
         colourButton.setTooltip("Click to choose colour");
         colourButton.onClick = [this] { showColourSelector(); };
+
+        addAndMakeVisible(mutedToggle);
+        mutedToggle.setButtonText("Muted (excluded from playback)");
+        mutedToggle.setTooltip("Keeps the clip's data but skips it during playback - toggle with the 'M' key on the timeline too");
     }
     
     void onStartChanged()
@@ -357,6 +368,7 @@ private:
     juce::Label nameLabel, startLabel, durationLabel, endLabel, colourLabel;
     juce::TextEditor nameEditor, startEditor, durationEditor, endEditor;
     juce::TextButton colourButton;
+    juce::ToggleButton mutedToggle;
     
     juce::Colour currentColour = juce::Colours::cornflowerblue;
     std::unique_ptr<juce::ColourSelector> colourSelectorPtr;

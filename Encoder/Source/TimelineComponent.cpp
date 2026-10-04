@@ -493,9 +493,15 @@ void TimelineComponent::paint(juce::Graphics& g)
                     // Check if this clip is selected
                     const bool isSelected = isClipSelected(timelineIndex, layerIndex, clipIndex, isMovementClip);
                     const bool isOverlapping = isClipOverlappingSiblings(timelineIndex, layerIndex, clipIndex);
+                    const bool isMuted = clip->muted;
 
                     // Clip background with disabled state
                     juce::Colour clipColour = getClipColour(*clip);
+                    if (isMuted)
+                    {
+                        // Desaturated regardless of other states, so muted always reads clearly
+                        clipColour = clipColour.withMultipliedSaturation(0.15f).withMultipliedBrightness(0.55f);
+                    }
                     if (!isValid)
                     {
                         clipColour = clipColour.withMultipliedBrightness(0.6f).withMultipliedSaturation(0.5f);
@@ -508,9 +514,17 @@ void TimelineComponent::paint(juce::Graphics& g)
                     {
                         clipColour = clipColour.withAlpha(isSelected ? 0.6f : 0.3f);
                     }
-                    
+
                     g.setColour(clipColour);
                     g.fillRoundedRectangle(bounds, clipCornerSize);
+
+                    // Mute indicator: a single diagonal strike across the clip, same metaphor as a
+                    // muted track/clip in most DAWs
+                    if (isMuted)
+                    {
+                        g.setColour(juce::Colours::white.withAlpha(isValid ? 0.35f : 0.15f));
+                        g.drawLine(bounds.getX(), bounds.getBottom(), bounds.getRight(), bounds.getY(), 1.5f);
+                    }
 
                     // Overlap warning tint, drawn under the border so the border reads crisply on top
                     if (isOverlapping)
@@ -549,6 +563,8 @@ void TimelineComponent::paint(juce::Graphics& g)
                     updateScaledIcons(iconBounds.getWidth());
 
                     float iconAlpha = isValid ? (isCurrentTimeline ? 1.0f : 0.5f) : 0.3f;
+                    if (isMuted)
+                        iconAlpha *= 0.5f;
                     g.setColour(juce::Colours::white.withAlpha(iconAlpha));
 
                     juce::Drawable* iconDrawable = nullptr;
@@ -574,6 +590,8 @@ void TimelineComponent::paint(juce::Graphics& g)
                         const float availableTextWidth = bounds.getWidth() - (iconBounds.getWidth() + 10.0f);
                         
                         juce::String clipName = getClipDisplayName(timelineIndex, layerIndex, clipIndex, isMovementClip);
+                        if (isMuted)
+                            clipName = "[Muted] " + clipName;
                         juce::String timeInfo = getClipTimeInfo(*clip);
                         
                         g.setFont(juce::FontOptions(12.0f, juce::Font::bold));
@@ -1276,8 +1294,39 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
         repaint();
         return true;
     }
-    
+
+    if (keyCode == 'M' && selectedClips.size() > 0)
+    {
+        toggleMuteSelectedClips();
+        repaint();
+        return true;
+    }
+
     return false;
+}
+
+void TimelineComponent::toggleMuteSelectedClips()
+{
+    if (selectedClips.isEmpty())
+        return;
+
+    // If any selected clip is currently unmuted, mute the whole selection; otherwise unmute it -
+    // avoids a confusing per-clip toggle that leaves a mixed mute state after one keypress.
+    bool anyUnmuted = false;
+    for (const auto& selected : selectedClips)
+    {
+        bool isMovementClip = selected.isMovementClip;
+        if (auto* clip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, isMovementClip))
+            if (!clip->muted)
+                anyUnmuted = true;
+    }
+
+    for (const auto& selected : selectedClips)
+    {
+        bool isMovementClip = selected.isMovementClip;
+        if (auto* clip = getClip(selected.timelineIndex, selected.layerIndex, selected.clipIndex, isMovementClip))
+            clip->muted = anyUnmuted;
+    }
 }
 
 void TimelineComponent::nudgeSelectedClips(ms_t nudgeAmount)
@@ -1405,7 +1454,9 @@ juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int laye
     info << "Group " << (timelineIndex + 1) << " - ";
     info << (layerIndex == 0 ? "Movement" : "Action") << " Clip\n";
     info << "Name: " << (clip.id.isNotEmpty() ? clip.id : "Unnamed") << "\n";
-    
+    if (clip.muted)
+        info << "Muted\n";
+
     // Time information
     info << "Start: " << formatTimeValueWithUnit(clip.start, displayTimeInSeconds) << "\n";
     info << "End: " << formatTimeValueWithUnit(clip.end(), displayTimeInSeconds) << "\n";

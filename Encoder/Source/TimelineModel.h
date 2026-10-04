@@ -16,7 +16,8 @@ struct Clip
     ms_t start = 0;      // ms
     ms_t length = 250;    // ms
     juce::Colour colour = juce::Colours::cornflowerblue;
-    
+    bool muted = false;  // excluded from playback, but keeps its data - toggled via the clip editor or the 'M' key
+
     ms_t end() const { return start + length; }
 };
 
@@ -103,46 +104,65 @@ public:
         return unit;
     }
     
-    // 3. Get descriptive string of all settings
+    // 3. Get descriptive string of all settings, as a natural-language sentence rather than a
+    // symbol-and-unit soup - e.g. "Increase stretch factor by 0.3 per second, starting at 1".
     std::string getDescription() const
     {
-        std::string actionStr;
-        switch (action)
+        if (action == ActionType::None)
+            return "No action";
+
+        auto fmt = [](double v)
         {
-            case ActionType::None: actionStr = "None"; break;
-            case ActionType::RotationX: actionStr = "Rotation X"; break;
-            case ActionType::RotationY: actionStr = "Rotation Y"; break;
-            case ActionType::RotationZ: actionStr = "Rotation Z"; break;
-            case ActionType::Stretch: actionStr = "Stretch"; break;
-        }
-        
-        std::string timingSymbol;
+            std::string s = std::to_string(v);
+            s.erase(s.find_last_not_of('0') + 1, std::string::npos);
+            if (!s.empty() && s.back() == '.') s.pop_back();
+            return s;
+        };
+
+        const bool isRotation = (action == ActionType::RotationX || action == ActionType::RotationY || action == ActionType::RotationZ);
+        const std::string axis = (action == ActionType::RotationX) ? "X" : (action == ActionType::RotationY) ? "Y" : "Z";
+
+        // Degrees matter for rotation and are shown on every value; a stretch factor is already
+        // named by the noun below, so repeating "factor" after each number would just be noise.
+        const std::string unit = isRotation ? "\xC2\xB0" : "";
+        const std::string noun = isRotation ? (axis + " rotation") : "stretch factor";
+        const std::string toVerb = isRotation ? ("Rotate " + axis + " to") : "Set stretch factor to";
+
+        auto withUnit = [&](double v) { return fmt(v) + unit; };
+
         switch (timing)
         {
-            case TimingType::None: timingSymbol = ""; break;
-            case TimingType::AbsoluteTarget: timingSymbol = " →"; break;
-            case TimingType::RelativeDuringClip: timingSymbol = " |▷|"; break;
-            case TimingType::ConstantPerSecond: timingSymbol = ""; break;
+            case TimingType::None:
+                return noun + ": inactive (no timing selected)";
+
+            case TimingType::AbsoluteTarget:
+            {
+                std::string result = toVerb + " " + withUnit(value);
+                if (useStartValue)
+                    result += ", starting from " + withUnit(startValue);
+                return result;
+            }
+
+            case TimingType::RelativeDuringClip:
+            {
+                const bool increase = value >= 0.0;
+                std::string result = std::string(increase ? "Increase " : "Decrease ") + noun + " by " + withUnit(std::abs(value)) + " over the clip";
+                if (useStartValue)
+                    result += ", starting at " + withUnit(startValue);
+                return result;
+            }
+
+            case TimingType::ConstantPerSecond:
+            {
+                const bool increase = value >= 0.0;
+                std::string result = std::string(increase ? "Increase " : "Decrease ") + noun + " by " + withUnit(std::abs(value)) + " per second";
+                if (useStartValue)
+                    result += ", starting at " + withUnit(startValue);
+                return result;
+            }
         }
-        
-        std::string unit = getUnitWithTiming(true);
-        std::string valueStr = std::to_string(value);
-        
-        // Remove trailing zeros for cleaner display
-        valueStr.erase(valueStr.find_last_not_of('0') + 1, std::string::npos);
-        if (valueStr.back() == '.') valueStr.pop_back();
-        
-        // Add start value info if used
-        std::string startInfo = "";
-        if (useStartValue)
-        {
-            std::string startStr = std::to_string(startValue);
-            startStr.erase(startStr.find_last_not_of('0') + 1, std::string::npos);
-            if (startStr.back() == '.') startStr.pop_back();
-            startInfo = " from " + startStr + unit;
-        }
-        
-        return actionStr + timingSymbol + " " + valueStr + (unit.empty() ? "" : " " + unit) + startInfo;
+
+        return noun;
     }
     
     // Getters and setters
@@ -253,7 +273,8 @@ struct TimelineModel
             xClip->setAttribute("start", juce::String((juce::int64)c.start));
             xClip->setAttribute("length", juce::String((juce::int64)c.length));
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
-            
+            xClip->setAttribute("muted", c.muted ? 1 : 0);
+
             // Serialize MovementClip specific data
             xClip->setAttribute("movementType", static_cast<int>(c.movementType));
             xClip->setAttribute("startPointGroupX", c.startPointGroup.getX());
@@ -281,7 +302,8 @@ struct TimelineModel
             xClip->setAttribute("start", juce::String((juce::int64)c.start));
             xClip->setAttribute("length", juce::String((juce::int64)c.length));
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
-            
+            xClip->setAttribute("muted", c.muted ? 1 : 0);
+
             // Serialize ActionClip actions
             auto* xActions = new juce::XmlElement("Actions");
             for (const auto& action : c.actions)
@@ -328,6 +350,7 @@ struct TimelineModel
                     c.colour = colourHex.isNotEmpty()
                              ? juce::Colour((juce::uint32)colourHex.getHexValue32())
                              : juce::Colours::cornflowerblue;
+                    c.muted = xClip->getBoolAttribute("muted", false);
 
                     // Deserialize MovementClip specific data
                     c.movementType = static_cast<MovementType>(xClip->getIntAttribute("movementType", 0));  // Add this
@@ -361,6 +384,7 @@ struct TimelineModel
                     c.colour = colourHex.isNotEmpty()
                              ? juce::Colour((juce::uint32)colourHex.getHexValue32())
                              : juce::Colours::cornflowerblue;
+                    c.muted = xClip->getBoolAttribute("muted", false);
 
                     // Deserialize ActionClip actions
                     if (auto* xActions = xClip->getChildByName("Actions"))
