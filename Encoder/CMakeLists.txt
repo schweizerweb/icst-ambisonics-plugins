@@ -210,6 +210,7 @@ SET(SRC_FILES
 	../../Common/OSCLogComponent.h
 	../../Common/OSCLogDialog.h
 	../../Common/OSCLogDialogManager.h
+	../../Common/PerlinNoise.h
 	../../Common/Point3D.h
 	../../Common/PointInfoControl.cpp
 	../../Common/PointInfoControl.h

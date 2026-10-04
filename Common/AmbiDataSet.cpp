@@ -818,16 +818,21 @@ Vector3D<double> AmbiDataSet::getAbsSourcePoint(int index) const
             pt += grpPoint->getVector3D();
         }
 
-        return pt;
+        return pt + p->getJitterOffset();
     }
     else
     {
-        return get(index)->getVector3D();
+        return get(index)->getVector3D() + get(index)->getJitterOffset();
     }
 }
 
 void AmbiDataSet::setAbsSourcePoint(int index, Vector3D<double> absPoint)
 {
+    // Strip out whatever jitter offset is currently active, so a manual position edit (e.g.
+    // dragging in the Radar view) sets the clean base position rather than getting polluted by
+    // whatever instantaneous jitter happened to be active during the write.
+    absPoint -= get(index)->getJitterOffset();
+
     if(groupModeFlag)
     {
         auto grpPoint = get(index)->getGroup();
@@ -837,6 +842,6 @@ void AmbiDataSet::setAbsSourcePoint(int index, Vector3D<double> absPoint)
             grpPoint->applyInverseTransform(&absPoint);
         }
     }
-    
+
     get(index)->getRawPoint()->setXYZ(absPoint.x, absPoint.y, absPoint.z);
 }

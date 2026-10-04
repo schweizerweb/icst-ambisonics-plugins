@@ -81,7 +81,12 @@ public:
     
     void setGroup(AmbiGroup* pG);
     AmbiGroup* getGroup();
-	
+
+    // Transient, animation-time-only offset added on top of this point's own configured position
+    // (see AmbiDataSet::getAbsSourcePoint/setAbsSourcePoint) - not persisted, not baked into `point`.
+    Vector3D<double> getJitterOffset() const { return jitterOffset; }
+    void setJitterOffset(Vector3D<double> offset) { jitterOffset = offset; }
+
     virtual float getDisplayScaler() = 0;
 	virtual XmlElement* getAsXmlElement(String tagName) = 0;
 
@@ -106,4 +111,5 @@ private:
 	Image labelImage;
     bool enabled = true;
     AmbiGroup* pGroup;
+    Vector3D<double> jitterOffset;
 };

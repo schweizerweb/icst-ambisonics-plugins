@@ -1,5 +1,20 @@
 #include "AnimatorEngine.h"
 #include "../../Common/MathHelper.h"
+#include "../../Common/PerlinNoise.h"
+
+namespace
+{
+    // Deterministic per-(clip, source, axis) seed. clip.id is a user-editable but save-stable
+    // name (unlike AmbiPoint's id, which is a UUID regenerated on every project load) so the same
+    // clip reproduces the same wobble pattern across sessions, as long as source ordering is
+    // unchanged - the same accepted limitation as the index-based OSC target selection elsewhere.
+    uint32_t jitterSeed(const juce::String& clipId, int sourceIndex, int axis)
+    {
+        return (uint32_t)clipId.hashCode()
+             ^ (uint32_t)(sourceIndex * 2654435761u)
+             ^ (uint32_t)(axis * 0x9E3779B9u);
+    }
+}
 
 AnimatorEngine::AnimatorEngine()
 {
@@ -221,6 +236,7 @@ void AnimatorEngine::updateActiveMovements(ms_t currentTimeMs)
         
         if (shouldRemove)
         {
+            clearJitterOffsets(action);
             activeActions.remove(i);
         }
     }
@@ -593,18 +609,21 @@ bool AnimatorEngine::getDisplayTimeInSeconds()
 
 void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, ms_t currentTimeMs, ms_t elapsedTime)
 {
-    // Remove any existing action for this timeline
+    // Remove any existing action for this timeline, clearing any jitter it left active first -
+    // otherwise a source could be left stuck at a stray random offset if the replacing clip
+    // doesn't also use Jitter.
     for (int i = activeActions.size() - 1; i >= 0; --i)
     {
         if (activeActions[i].timelineIndex == timelineIndex)
         {
+            clearJitterOffsets(activeActions[i]);
             activeActions.remove(i);
         }
     }
-    
+
     // Start new action
     ActiveAction newAction(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
-    
+
     // Keep initial state capture for stretch functionality
     if (pSourceSet && timelineIndex < pSourceSet->groupCount())
     {
@@ -614,8 +633,41 @@ void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, 
             newAction.hasInitialState = true;
         }
     }
-    
+
+    // Jitter: cache which sources belong to this group now, once, so processJitterAction() doesn't
+    // need to rescan pSourceSet every call. There's no public "get group member at index" API - the
+    // established pattern (GroupPointsSelectionComponent) is this reverse lookup instead.
+    bool clipHasJitter = false;
+    for (const auto& actionDef : clip.actions)
+        if (actionDef.getAction() == ActionType::Jitter)
+            clipHasJitter = true;
+
+    if (clipHasJitter && pSourceSet)
+    {
+        if (auto* targetGroup = (timelineIndex < pSourceSet->groupCount()) ? pSourceSet->getActiveGroup(timelineIndex) : nullptr)
+        {
+            for (int i = 0; i < pSourceSet->size(); ++i)
+            {
+                if (auto* source = pSourceSet->get(i))
+                {
+                    if (source->getGroup() == targetGroup)
+                        newAction.jitterSourceIndices.add(i);
+                }
+            }
+            newAction.hasJitterState = true;
+        }
+    }
+
     activeActions.add(newAction);
+}
+
+void AnimatorEngine::clearJitterOffsets(const ActiveAction& activeAction)
+{
+    if (!pSourceSet || !activeAction.hasJitterState) return;
+
+    for (int srcIndex : activeAction.jitterSourceIndices)
+        if (auto* source = pSourceSet->get(srcIndex))
+            source->setJitterOffset(juce::Vector3D<double>());
 }
 
 void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
@@ -641,6 +693,7 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         if (action.clip.muted)
         {
             action.lastProcessTime = currentTimeMs;
+            clearJitterOffsets(action);
             continue;
         }
 
@@ -662,6 +715,10 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
                 {
                     // Keep full stretch functionality including initial state
                     processStretchAction(action.timelineIndex, actionDef, progress, action);
+                }
+                else if (actionDef.getAction() == ActionType::Jitter)
+                {
+                    processJitterAction(action.timelineIndex, actionDef, action, currentTimeMs);
                 }
                 else
                 {
@@ -791,6 +848,31 @@ void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinit
     
     // Ensure stretch doesn't go negative
     if (currentStretch < 0.01) currentStretch = 0.01;
-    
+
     pSourceSet->setGroupStretch(timelineIndex, currentStretch, true);
+}
+
+void AnimatorEngine::processJitterAction(int /*timelineIndex*/, const ActionDefinition& actionDef, const ActiveAction& activeAction, ms_t currentTimeMs)
+{
+    if (!pSourceSet || !activeAction.hasJitterState) return;
+
+    const double elapsedSeconds = (currentTimeMs - activeAction.actualStartTime) / 1000.0;
+    const double t = elapsedSeconds * actionDef.getJitterSpeed();
+    const double intensity = actionDef.getValue();
+
+    for (int srcIndex : activeAction.jitterSourceIndices)
+    {
+        auto* source = pSourceSet->get(srcIndex);
+        if (source == nullptr) continue;
+
+        const double nx = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 0), t);
+        const double ny = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 1), t);
+        const double nz = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 2), t);
+
+        // Recomputed fresh from (seed, t) every call - never incremented - so this is automatically
+        // seek/loop-safe, and stays a constant-amplitude wobble regardless of whatever the group's
+        // own rotation/stretch/movement happen to be doing concurrently (getAbsSourcePoint() adds
+        // this on top of that, rather than it being baked into the source's own stored position).
+        source->setJitterOffset(juce::Vector3D<double>(nx, ny, nz) * intensity);
+    }
 }

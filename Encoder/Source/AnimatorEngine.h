@@ -55,6 +55,11 @@ private:
         double initialStretch = 1.0;
         bool hasInitialState = false;
 
+        // Jitter: global pSourceSet indices of this group's members as of clip start, cached once
+        // so processJitterAction() doesn't need to rescan all sources every call.
+        juce::Array<int> jitterSourceIndices;
+        bool hasJitterState = false;
+
         ActiveAction() = default;
         ActiveAction(int idx, const ActionClip& c, ms_t start, ms_t elapsed = 0)
             : timelineIndex(idx), clip(c), actualStartTime(start), elapsedTime(elapsed),
@@ -73,6 +78,8 @@ private:
     void processSingleAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
     void processRotationAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
     void processStretchAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction);
+    void processJitterAction(int timelineIndex, const ActionDefinition& actionDef, const ActiveAction& activeAction, ms_t currentTimeMs);
+    void clearJitterOffsets(const ActiveAction& activeAction);
     
     // Movement calculation
     juce::Vector3D<double> calculateMovementPosition(const ActiveMovement& activeMovement, double progress);

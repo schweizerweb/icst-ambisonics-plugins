@@ -23,6 +23,7 @@ public:
         typeCombo.addItem("Rotation Y", (int)ActionType::RotationY);
         typeCombo.addItem("Rotation Z", (int)ActionType::RotationZ);
         typeCombo.addItem("Stretch", (int)ActionType::Stretch);
+        typeCombo.addItem("Jitter", (int)ActionType::Jitter);
         typeCombo.setSelectedId((int)action.getAction(), juce::dontSendNotification);
         typeCombo.addListener(this);
         
@@ -58,7 +59,15 @@ public:
         
         addAndMakeVisible(startValueEditor);
         startValueEditor.setText(juce::String(action.getStartValue()), juce::dontSendNotification);
-        
+
+        // Jitter speed editor (only shown/enabled when ActionType == Jitter)
+        addAndMakeVisible(jitterSpeedLabel);
+        jitterSpeedLabel.setText("Speed (cycles/s):", juce::dontSendNotification);
+        jitterSpeedLabel.setJustificationType(juce::Justification::left);
+
+        addAndMakeVisible(jitterSpeedEditor);
+        jitterSpeedEditor.setText(juce::String(action.getJitterSpeed()), juce::dontSendNotification);
+
         // Buttons
         addAndMakeVisible(okButton);
         okButton.setButtonText("OK");
@@ -70,8 +79,8 @@ public:
         
         // Update initial state of all controls
         updateControlStates();
-        
-        setSize(400, 260);
+
+        setSize(400, 300);
     }
     
     void resized() override
@@ -114,7 +123,14 @@ public:
         auto startValueRow = area.removeFromTop(rowHeight);
         startValueLabel.setBounds(startValueRow.removeFromLeft(labelWidth));
         startValueEditor.setBounds(startValueRow.withWidth(controlWidth));
-        
+
+        area.removeFromTop(verticalSpacing);
+
+        // Jitter speed row
+        auto jitterSpeedRow = area.removeFromTop(rowHeight);
+        jitterSpeedLabel.setBounds(jitterSpeedRow.removeFromLeft(labelWidth));
+        jitterSpeedEditor.setBounds(jitterSpeedRow.withWidth(controlWidth));
+
         area.removeFromTop(25);
         
         // Buttons - centered at bottom
@@ -140,20 +156,23 @@ public:
             // Validate and apply changes
             auto valueText = valueEditor.getText();
             auto startValueText = startValueEditor.getText();
-            
+            auto jitterSpeedText = jitterSpeedEditor.getText();
+
             if (valueText.containsOnly("-0123456789.") &&
-                startValueText.containsOnly("-0123456789."))
+                startValueText.containsOnly("-0123456789.") &&
+                jitterSpeedText.containsOnly("-0123456789."))
             {
                 ActionType actionType = static_cast<ActionType>(typeCombo.getSelectedId());
                 TimingType timingType = static_cast<TimingType>(timingCombo.getSelectedId());
-                
+
                 // Apply the settings
                 targetAction.setAction(actionType);
                 targetAction.setTiming(timingType);
                 targetAction.setValue(valueText.getDoubleValue());
                 targetAction.setStartValue(startValueText.getDoubleValue());
                 targetAction.setUseStartValue(useStartValueButton.getToggleState());
-                
+                targetAction.setJitterSpeed(jitterSpeedText.getDoubleValue());
+
                 if (auto* dw = findParentComponentOfClass<juce::DialogWindow>())
                     dw->exitModalState(1);
             }
@@ -183,9 +202,9 @@ private:
     ActionDefinition& targetAction;
     juce::String dialogTitle;
     
-    juce::Label typeLabel, timingLabel, valueLabel, startValueLabel;
+    juce::Label typeLabel, timingLabel, valueLabel, startValueLabel, jitterSpeedLabel;
     juce::ComboBox typeCombo, timingCombo;
-    juce::TextEditor valueEditor, startValueEditor;
+    juce::TextEditor valueEditor, startValueEditor, jitterSpeedEditor;
     juce::TextButton okButton, cancelButton;
     juce::ToggleButton useStartValueButton;
     
@@ -201,9 +220,34 @@ private:
         bool isRotation = (currentAction == ActionType::RotationX ||
                           currentAction == ActionType::RotationY ||
                           currentAction == ActionType::RotationZ);
-        
-        if (isRotation)
+        bool isJitter = (currentAction == ActionType::Jitter);
+
+        if (isJitter)
         {
+            // Jitter is continuous random wobble for the whole clip - it ignores TimingType and
+            // has no start value concept, but needs its own Speed parameter instead.
+            timingCombo.setEnabled(false);
+
+            useStartValueButton.setEnabled(false);
+            useStartValueButton.setToggleState(false, juce::dontSendNotification);
+            startValueLabel.setEnabled(false);
+            startValueEditor.setEnabled(false);
+            startValueLabel.setVisible(false);
+            startValueEditor.setVisible(false);
+
+            jitterSpeedLabel.setVisible(true);
+            jitterSpeedEditor.setVisible(true);
+            jitterSpeedLabel.setEnabled(true);
+            jitterSpeedEditor.setEnabled(true);
+        }
+        else if (isRotation)
+        {
+            timingCombo.setEnabled(true);
+            jitterSpeedLabel.setVisible(false);
+            jitterSpeedEditor.setVisible(false);
+            startValueLabel.setVisible(true);
+            startValueEditor.setVisible(true);
+
             // For rotations: disable AbsoluteTarget timing and start values
             if (currentTiming == TimingType::AbsoluteTarget)
             {
@@ -211,34 +255,40 @@ private:
                 timingCombo.setSelectedId((int)TimingType::RelativeDuringClip, juce::sendNotificationSync);
                 currentTiming = TimingType::RelativeDuringClip;
             }
-            
+
             // Disable start value controls for rotations
             useStartValueButton.setEnabled(false);
             useStartValueButton.setToggleState(false, juce::dontSendNotification);
             startValueLabel.setEnabled(false);
             startValueEditor.setEnabled(false);
-            
+
             // Gray out AbsoluteTarget option in the combo box
             timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, false);
         }
         else
         {
+            timingCombo.setEnabled(true);
+            jitterSpeedLabel.setVisible(false);
+            jitterSpeedEditor.setVisible(false);
+            startValueLabel.setVisible(true);
+            startValueEditor.setVisible(true);
+
             // For stretch: enable all timing types and start values
             useStartValueButton.setEnabled(true);
-            
+
             // Re-enable AbsoluteTarget option for stretch
             timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, true);
-            
+
             // Enable start value controls only for valid timing types
             ActionDefinition tempAction;
             tempAction.setTiming(currentTiming);
             bool startValueSupported = tempAction.shouldEnableStartValueControls();
             bool startValueEnabled = startValueSupported && useStartValueButton.getToggleState();
-            
+
             startValueLabel.setEnabled(startValueEnabled);
             startValueEditor.setEnabled(startValueEnabled);
         }
-        
+
         // Update visual appearance for disabled controls
         updateControlAppearance();
     }
@@ -250,8 +300,9 @@ private:
         tempAction.setAction(static_cast<ActionType>(typeCombo.getSelectedId()));
         tempAction.setTiming(static_cast<TimingType>(timingCombo.getSelectedId()));
         
+        bool isJitter = (static_cast<ActionType>(typeCombo.getSelectedId()) == ActionType::Jitter);
         juce::String unitWithTiming = tempAction.getUnitWithTiming();
-        juce::String labelText = "Value";
+        juce::String labelText = isJitter ? "Intensity" : "Value";
         if (!unitWithTiming.isEmpty())
         {
             labelText += " (" + unitWithTiming + ")";

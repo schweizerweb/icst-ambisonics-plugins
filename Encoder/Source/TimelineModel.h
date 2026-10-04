@@ -46,7 +46,8 @@ enum class ActionType
     RotationX,
     RotationY,
     RotationZ,
-    Stretch
+    Stretch,
+    Jitter
 };
 
 enum class TimingType
@@ -64,16 +65,18 @@ class ActionDefinition
     double value;
     double startValue;
     bool useStartValue;
+    double jitterSpeed;
 
 public:
     ActionDefinition(ActionType action_ = ActionType::None,
                     TimingType timing_ = TimingType::None,
                     double value_ = 0.0,
                     double startValue_ = 0.0,
-                    bool useStartValue_ = false)
+                    bool useStartValue_ = false,
+                    double jitterSpeed_ = 1.0)
         : action(action_), timing(timing_), value(value_),
-          startValue(startValue_), useStartValue(useStartValue_) {}
-    
+          startValue(startValue_), useStartValue(useStartValue_), jitterSpeed(jitterSpeed_) {}
+
     // 1. Get unit based on action type
     std::string getUnit(bool verbose = false) const
     {
@@ -85,22 +88,28 @@ public:
                 return "°";  // degrees
             case ActionType::Stretch:
                 return verbose?"factor":"";     // unitless (ratio or factor)
+            case ActionType::Jitter:
             case ActionType::None:
             default:
-                return "";
+                return "";   // unitless (same scene-position units used everywhere else, no suffix)
         }
     }
-    
+
     // 2. Get unit with timing consideration
     std::string getUnitWithTiming(bool verbose = false) const
     {
+        // Jitter ignores TimingType entirely (it's continuous for the whole clip, with its own
+        // separate Speed parameter) so it never gets the "/s" rate suffix.
+        if (action == ActionType::Jitter)
+            return getUnit(verbose);
+
         std::string unit = getUnit(verbose);
-        
+
         if (timing == TimingType::ConstantPerSecond && !unit.empty())
         {
             return unit + "/s";
         }
-        
+
         return unit;
     }
     
@@ -118,6 +127,11 @@ public:
             if (!s.empty() && s.back() == '.') s.pop_back();
             return s;
         };
+
+        // Jitter ignores TimingType/startValue entirely - it's continuous random wobble for the
+        // whole clip, described purely by its own Intensity/Speed pair.
+        if (action == ActionType::Jitter)
+            return "Jitter \xC2\xB1" + fmt(value) + " at speed " + fmt(jitterSpeed);
 
         const bool isRotation = (action == ActionType::RotationX || action == ActionType::RotationY || action == ActionType::RotationZ);
         const std::string axis = (action == ActionType::RotationX) ? "X" : (action == ActionType::RotationY) ? "Y" : "Z";
@@ -180,10 +194,16 @@ public:
     
     bool getUseStartValue() const { return useStartValue; }
     void setUseStartValue(bool newUseStartValue) { useStartValue = newUseStartValue; }
-    
+
+    double getJitterSpeed() const { return jitterSpeed; }
+    void setJitterSpeed(double newJitterSpeed) { jitterSpeed = newJitterSpeed; }
+
     // Check if start value controls should be enabled
     bool shouldEnableStartValueControls() const
     {
+        if (action == ActionType::Jitter)
+            return false; // Jitter wobbles around its live position, there's no start value concept
+
         return timing == TimingType::AbsoluteTarget || timing == TimingType::RelativeDuringClip
             || timing == TimingType::ConstantPerSecond;
     }
@@ -314,6 +334,7 @@ struct TimelineModel
                 xAction->setAttribute("value", action.getValue());
                 xAction->setAttribute("startValue", action.getStartValue());
                 xAction->setAttribute("useStartValue", action.getUseStartValue() ? 1 : 0);
+                xAction->setAttribute("jitterSpeed", action.getJitterSpeed());
                 xActions->addChildElement(xAction);
             }
             xClip->addChildElement(xActions);
@@ -399,6 +420,7 @@ struct TimelineModel
                                 action.setValue(xAction->getDoubleAttribute("value", 0.0));
                                 action.setStartValue(xAction->getDoubleAttribute("startValue", 0.0));
                                 action.setUseStartValue(xAction->getBoolAttribute("useStartValue", false));
+                                action.setJitterSpeed(xAction->getDoubleAttribute("jitterSpeed", 1.0));
                                 c.actions.add(action);
                             }
                         }
