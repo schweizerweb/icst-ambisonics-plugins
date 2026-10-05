@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "CommonClipSettings.h"
+#include "ClipPreviewComponent.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
 
@@ -149,18 +150,19 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CoordinateValueControl)
 };
 
-class MovementClipEditor : public juce::Component, public juce::ChangeListener
+class MovementClipEditor : public juce::Component, public juce::ChangeListener, private juce::Timer
 {
 public:
     MovementClipEditor(TimelineComponent& timeline, int timelineIdx, int clipIdx);
     ~MovementClipEditor() override;
-    
+
     void resized() override;
     void paint(juce::Graphics& g) override;
-    
+
     int getTotalRequiredHeight() const;
+    int getTotalRequiredWidth() const;
     bool applyChanges();
-    
+
     void changeListenerCallback(ChangeBroadcaster* source) override;
 
 private:
@@ -174,9 +176,11 @@ private:
     bool currentPositionValid = false;
     
     CommonClipSettings commonSettings;
-    
+    ClipPreviewComponent preview;
+
     juce::GroupComponent clipGroup{"Clip", "Clip Properties"};
     juce::GroupComponent movementGroup{"Movement", "Movement Properties"};
+    juce::GroupComponent previewGroup{"Preview", "Preview"};
     
     juce::TextButton applyButton{"Apply"}, cancelButton{"Cancel"};
     juce::TextButton applyCurrentStartButton, applyCurrentTargetButton;
@@ -207,6 +211,11 @@ private:
     void updateApplyCurrentPositionButtonText(juce::TextButton& button, const juce::Vector3D<double>& vector, bool isValid);
     void updateCurrentPosition(bool force = false);
     int getMovementControlsHeight() const;
+    // Preview sits beside (not below) the Clip Properties group, in portrait orientation (two
+    // square panels stacked) - narrower but taller than the old side-by-side layout.
+    int getClipPropertiesWidth() const { return 280; }
+    int getPreviewWidth() const { return 190; }
+    int getPreviewHeight() const { return 320; }
     void layoutMovementControls(juce::Rectangle<int> area);
     void updateControlVisibility();
     void updateCoordinateSystem();
@@ -214,4 +223,9 @@ private:
     juce::Vector3D<double> getCurrentPositionInSelectedSystem() const;  // New method to get position in current coordinate system
     juce::String getCoordinateDisplayText(const juce::Vector3D<double>& vector, bool isValid) const;  // New method for coordinate display
     void onMovementTypeChanged();
+
+    // Clip editors have no per-control change notification, so the preview is kept live by
+    // polling the controls instead of wiring ~12 individual callbacks - see ClipPreviewComponent.
+    MovementClip buildClipFromControls();
+    void timerCallback() override { preview.setMovementClip(buildClipFromControls()); }
 };

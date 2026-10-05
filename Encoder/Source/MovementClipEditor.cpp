@@ -20,12 +20,15 @@ MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timeline
     {
         pPointSelection->addChangeListener(this);
     }
-    
+
     createControls();
+    startTimer(150);
 }
 
 MovementClipEditor::~MovementClipEditor()
 {
+    stopTimer();
+
     if (pPointSelection != nullptr)
     {
         pPointSelection->removeChangeListener(this);
@@ -35,26 +38,35 @@ MovementClipEditor::~MovementClipEditor()
 void MovementClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
-    
+
     // Calculate group heights
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
+    const int previewGroupHeight = getPreviewHeight();
+    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
     const int movementGroupHeight = getMovementControlsHeight();
     const int buttonHeight = 28;
-    
-    // Clip settings group
-    auto clipGroupArea = area.removeFromTop(clipGroupHeight);
+
+    // Clip properties and preview side by side, sharing one row
+    auto topRowArea = area.removeFromTop(topRowHeight);
+
+    auto clipGroupArea = topRowArea.removeFromLeft(getClipPropertiesWidth());
     clipGroup.setBounds(clipGroupArea);
     commonSettings.setBounds(clipGroupArea.reduced(8, 20));
-    
-    area.removeFromTop(8); // Spacing between groups
-    
+
+    topRowArea.removeFromLeft(8); // spacing between the two top-row groups
+
+    previewGroup.setBounds(topRowArea);
+    preview.setBounds(topRowArea.reduced(8, 20));
+
+    area.removeFromTop(8); // Spacing between rows
+
     // Movement settings group
     auto movementGroupArea = area.removeFromTop(movementGroupHeight);
     movementGroup.setBounds(movementGroupArea);
-    
+
     auto movementContentArea = movementGroupArea.reduced(8, 20);
     layoutMovementControls(movementContentArea);
-    
+
     // Buttons at bottom
     auto buttonArea = area.removeFromBottom(buttonHeight).reduced(10, 0);
     cancelButton.setBounds(buttonArea.removeFromRight(80));
@@ -71,48 +83,33 @@ int MovementClipEditor::getTotalRequiredHeight() const
 {
     const int margins = 10 * 2;
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
+    const int previewGroupHeight = getPreviewHeight();
+    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
     const int movementGroupHeight = getMovementControlsHeight();
     const int buttonHeight = 28;
-    const int groupSpacing = 2 * 8;
-    
-    return margins + clipGroupHeight + groupSpacing + movementGroupHeight + buttonHeight;
+    const int rowSpacing = 8; // one gap: top row -> movement group
+
+    return margins + topRowHeight + rowSpacing + movementGroupHeight + buttonHeight;
+}
+
+int MovementClipEditor::getTotalRequiredWidth() const
+{
+    // Clip properties and the (now portrait) preview share one row - floored at 450 so this never
+    // shrinks the dialog relative to its previous fixed width.
+    return juce::jmax(450, getClipPropertiesWidth() + 8 + getPreviewWidth() + 20);
 }
 
 bool MovementClipEditor::applyChanges()
 {
     if (!commonSettings.validate())
         return false;
-        
-    commonSettings.applyToClip(currentClip);
-    
-    currentClip.useStartPoint = useStartPosition.getToggleState();
-    currentClip.movementType = static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
-    
-    // Store count and radiusChange
-    currentClip.count = countSlider.getValue();
-    currentClip.radiusChange = radiusChangeSlider.getValue();
-    
-    // Convert coordinates based on display mode for storage
-    if (usePolarDisplay.getToggleState())
-    {
-        // Convert from degrees (UI) to radians (storage)
-        double startAzimuthRad = Constants::GradToRad(startXSlider.getPreciseValue());
-        double startElevationRad = Constants::GradToRad(startYSlider.getPreciseValue());
-        double startDistance = startZSlider.getPreciseValue();
-        
-        double targetAzimuthRad = Constants::GradToRad(targetXSlider.getPreciseValue());
-        double targetElevationRad = Constants::GradToRad(targetYSlider.getPreciseValue());
-        double targetDistance = targetZSlider.getPreciseValue();
-        
-        currentClip.startPointGroup.setAed(startAzimuthRad, startElevationRad, startDistance);
-        currentClip.targetPointGroup.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
-    }
-    else
-    {
-        currentClip.startPointGroup.setXYZ(startXSlider.getPreciseValue(), startYSlider.getPreciseValue(), startZSlider.getPreciseValue());
-        currentClip.targetPointGroup.setXYZ(targetXSlider.getPreciseValue(), targetYSlider.getPreciseValue(), targetZSlider.getPreciseValue());
-    }
-    
+
+    // Point3D's operator= only accepts a non-const lvalue (a pre-existing quirk, not something
+    // introduced here), so assigning directly from the temporary buildClipFromControls() returns
+    // won't compile - go through a named local first.
+    MovementClip built = buildClipFromControls();
+    currentClip = built;
+
     if (auto* timelineModel = timelineComp.getTimelineModel(timelineIndex))
     {
         if (clipIndex >= 0 && clipIndex < timelineModel->movement.clips.size())
@@ -121,8 +118,44 @@ bool MovementClipEditor::applyChanges()
             return true;
         }
     }
-    
+
     return false;
+}
+
+MovementClip MovementClipEditor::buildClipFromControls()
+{
+    MovementClip clip = currentClip;
+
+    commonSettings.applyToClip(clip);
+
+    clip.useStartPoint = useStartPosition.getToggleState();
+    clip.movementType = static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
+
+    clip.count = countSlider.getValue();
+    clip.radiusChange = radiusChangeSlider.getValue();
+
+    // Convert coordinates based on display mode for storage
+    if (usePolarDisplay.getToggleState())
+    {
+        // Convert from degrees (UI) to radians (storage)
+        double startAzimuthRad = Constants::GradToRad(startXSlider.getPreciseValue());
+        double startElevationRad = Constants::GradToRad(startYSlider.getPreciseValue());
+        double startDistance = startZSlider.getPreciseValue();
+
+        double targetAzimuthRad = Constants::GradToRad(targetXSlider.getPreciseValue());
+        double targetElevationRad = Constants::GradToRad(targetYSlider.getPreciseValue());
+        double targetDistance = targetZSlider.getPreciseValue();
+
+        clip.startPointGroup.setAed(startAzimuthRad, startElevationRad, startDistance);
+        clip.targetPointGroup.setAed(targetAzimuthRad, targetElevationRad, targetDistance);
+    }
+    else
+    {
+        clip.startPointGroup.setXYZ(startXSlider.getPreciseValue(), startYSlider.getPreciseValue(), startZSlider.getPreciseValue());
+        clip.targetPointGroup.setXYZ(targetXSlider.getPreciseValue(), targetYSlider.getPreciseValue(), targetZSlider.getPreciseValue());
+    }
+
+    return clip;
 }
 
 void MovementClipEditor::createControls()
@@ -131,10 +164,14 @@ void MovementClipEditor::createControls()
     
     addAndMakeVisible(clipGroup);
     addAndMakeVisible(movementGroup);
-    
+    addAndMakeVisible(previewGroup);
+
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+
+    addAndMakeVisible(preview);
+    preview.setMovementClip(currentClip);
     
     addAndMakeVisible(applyButton);
     applyButton.onClick = [this] {
@@ -666,6 +703,9 @@ void MovementClipEditor::updateCurrentPosition(bool force)
             currentPositionValid = false;
         }
     }
+
+    if (currentPositionValid)
+        preview.setReferencePosition(currentPosition);
 
     if(force || lastPositionValid != currentPositionValid || !approximatelyEqual(lastPosition.x, currentPosition.x) || !approximatelyEqual(lastPosition.y, currentPosition.y) || !approximatelyEqual(lastPosition.z, currentPosition.z))
     {

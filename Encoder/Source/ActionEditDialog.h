@@ -39,13 +39,23 @@ public:
         timingCombo.setSelectedId((int)action.getTiming(), juce::dontSendNotification);
         timingCombo.addListener(this);
         
-        // Value editor
+        // Value slider - a compact +/- spinner (matching the "Count"/"Radius change" fields in
+        // MovementClipEditor) rather than free-text entry, for both the generic "Value" (Rotation/
+        // Stretch) and "Intensity" (Jitter) roles this one control plays.
         addAndMakeVisible(valueLabel);
         updateValueLabel();
-        
-        addAndMakeVisible(valueEditor);
-        valueEditor.setText(juce::String(action.getValue()), juce::dontSendNotification);
-        
+
+        addAndMakeVisible(valueSlider);
+        valueSlider.setSliderStyle(juce::Slider::IncDecButtons);
+        valueSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
+        valueSlider.setRange(-1000.0, 1000.0, 0.1);
+        // Jitter has no meaningful "zero" intensity (that's what Mute is for) - default a freshly
+        // selected Jitter action to a visible 1.0 instead of inheriting the generic 0.0 default
+        // every other action type starts from.
+        valueSlider.setValue(action.getAction() == ActionType::Jitter && action.getValue() == 0.0
+                                 ? 1.0 : action.getValue(), juce::dontSendNotification);
+        valueSlider.onValueChange = [this] { pushLiveChange(); };
+
         // Use start value checkbox
         addAndMakeVisible(useStartValueButton);
         useStartValueButton.setButtonText("Use Start Value");
@@ -59,14 +69,20 @@ public:
         
         addAndMakeVisible(startValueEditor);
         startValueEditor.setText(juce::String(action.getStartValue()), juce::dontSendNotification);
+        startValueEditor.onTextChange = [this] { pushLiveChange(); };
 
-        // Jitter speed editor (only shown/enabled when ActionType == Jitter)
+        // Jitter speed slider (only shown/enabled when ActionType == Jitter) - same +/- spinner
+        // style as the Intensity field above.
         addAndMakeVisible(jitterSpeedLabel);
         jitterSpeedLabel.setText("Speed (cycles/s):", juce::dontSendNotification);
         jitterSpeedLabel.setJustificationType(juce::Justification::left);
 
-        addAndMakeVisible(jitterSpeedEditor);
-        jitterSpeedEditor.setText(juce::String(action.getJitterSpeed()), juce::dontSendNotification);
+        addAndMakeVisible(jitterSpeedSlider);
+        jitterSpeedSlider.setSliderStyle(juce::Slider::IncDecButtons);
+        jitterSpeedSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
+        jitterSpeedSlider.setRange(-1000.0, 1000.0, 0.1);
+        jitterSpeedSlider.setValue(action.getJitterSpeed(), juce::dontSendNotification);
+        jitterSpeedSlider.onValueChange = [this] { pushLiveChange(); };
 
         // Buttons
         addAndMakeVisible(okButton);
@@ -109,7 +125,7 @@ public:
         // Value row
         auto valueRow = area.removeFromTop(rowHeight);
         valueLabel.setBounds(valueRow.removeFromLeft(labelWidth));
-        valueEditor.setBounds(valueRow.withWidth(controlWidth));
+        valueSlider.setBounds(valueRow.withWidth(controlWidth));
         
         area.removeFromTop(verticalSpacing);
         
@@ -129,7 +145,7 @@ public:
         // Jitter speed row
         auto jitterSpeedRow = area.removeFromTop(rowHeight);
         jitterSpeedLabel.setBounds(jitterSpeedRow.removeFromLeft(labelWidth));
-        jitterSpeedEditor.setBounds(jitterSpeedRow.withWidth(controlWidth));
+        jitterSpeedSlider.setBounds(jitterSpeedRow.withWidth(controlWidth));
 
         area.removeFromTop(25);
         
@@ -153,25 +169,14 @@ public:
     {
         if (button == &okButton)
         {
-            // Validate and apply changes
-            auto valueText = valueEditor.getText();
+            // Validate and apply changes - the Value/Speed sliders can only ever hold valid
+            // numbers (they're sliders, not free text), so only the Start Value text field needs
+            // checking here.
             auto startValueText = startValueEditor.getText();
-            auto jitterSpeedText = jitterSpeedEditor.getText();
 
-            if (valueText.containsOnly("-0123456789.") &&
-                startValueText.containsOnly("-0123456789.") &&
-                jitterSpeedText.containsOnly("-0123456789."))
+            if (startValueText.containsOnly("-0123456789."))
             {
-                ActionType actionType = static_cast<ActionType>(typeCombo.getSelectedId());
-                TimingType timingType = static_cast<TimingType>(timingCombo.getSelectedId());
-
-                // Apply the settings
-                targetAction.setAction(actionType);
-                targetAction.setTiming(timingType);
-                targetAction.setValue(valueText.getDoubleValue());
-                targetAction.setStartValue(startValueText.getDoubleValue());
-                targetAction.setUseStartValue(useStartValueButton.getToggleState());
-                targetAction.setJitterSpeed(jitterSpeedText.getDoubleValue());
+                pushLiveChange();
 
                 if (auto* dw = findParentComponentOfClass<juce::DialogWindow>())
                     dw->exitModalState(1);
@@ -190,13 +195,24 @@ public:
         else if (button == &useStartValueButton)
         {
             updateControlStates();
+            pushLiveChange();
         }
     }
-    
+
     void comboBoxChanged(juce::ComboBox* /*comboBoxThatHasChanged*/) override
     {
         updateControlStates();
+        pushLiveChange();
     }
+
+    // Invoked by the host editor (ActionClipEditor) immediately after construction, so every
+    // control change here - not just the final OK click - feeds back into the Clip preview while
+    // this modal dialog is still open. Safe to apply straight to targetAction on every change:
+    // targetAction is always a local working copy (a freshly-constructed ActionDefinition for
+    // "Add", or a copy read out of the clip for "Edit" - see ActionClipEditor::addAction/
+    // editAction), only written back into the real clip by the caller if this dialog's modal
+    // result is non-zero (OK, not Cancel).
+    std::function<void()> onLiveChange;
     
 private:
     ActionDefinition& targetAction;
@@ -204,10 +220,27 @@ private:
     
     juce::Label typeLabel, timingLabel, valueLabel, startValueLabel, jitterSpeedLabel;
     juce::ComboBox typeCombo, timingCombo;
-    juce::TextEditor valueEditor, startValueEditor, jitterSpeedEditor;
+    juce::TextEditor startValueEditor;
+    juce::Slider valueSlider, jitterSpeedSlider;
     juce::TextButton okButton, cancelButton;
     juce::ToggleButton useStartValueButton;
-    
+
+    // Applies every control's current value onto targetAction and notifies the host editor, so
+    // the Clip preview stays live while this dialog is open. See onLiveChange's own comment.
+    void pushLiveChange()
+    {
+        targetAction.setAction(static_cast<ActionType>(typeCombo.getSelectedId()));
+        targetAction.setTiming(static_cast<TimingType>(timingCombo.getSelectedId()));
+        targetAction.setValue(valueSlider.getValue());
+        if (startValueEditor.getText().containsOnly("-0123456789."))
+            targetAction.setStartValue(startValueEditor.getText().getDoubleValue());
+        targetAction.setUseStartValue(useStartValueButton.getToggleState());
+        targetAction.setJitterSpeed(jitterSpeedSlider.getValue());
+
+        if (onLiveChange)
+            onLiveChange();
+    }
+
     void updateControlStates()
     {
         ActionType currentAction = static_cast<ActionType>(typeCombo.getSelectedId());
@@ -236,15 +269,20 @@ private:
             startValueEditor.setVisible(false);
 
             jitterSpeedLabel.setVisible(true);
-            jitterSpeedEditor.setVisible(true);
+            jitterSpeedSlider.setVisible(true);
             jitterSpeedLabel.setEnabled(true);
-            jitterSpeedEditor.setEnabled(true);
+            jitterSpeedSlider.setEnabled(true);
+
+            // Default a freshly selected Jitter action to a visible intensity of 1.0 rather than
+            // leaving whatever generic 0.0 the previous action type started from.
+            if (valueSlider.getValue() == 0.0)
+                valueSlider.setValue(1.0, juce::dontSendNotification);
         }
         else if (isRotation)
         {
             timingCombo.setEnabled(true);
             jitterSpeedLabel.setVisible(false);
-            jitterSpeedEditor.setVisible(false);
+            jitterSpeedSlider.setVisible(false);
             startValueLabel.setVisible(true);
             startValueEditor.setVisible(true);
 
@@ -269,7 +307,7 @@ private:
         {
             timingCombo.setEnabled(true);
             jitterSpeedLabel.setVisible(false);
-            jitterSpeedEditor.setVisible(false);
+            jitterSpeedSlider.setVisible(false);
             startValueLabel.setVisible(true);
             startValueEditor.setVisible(true);
 

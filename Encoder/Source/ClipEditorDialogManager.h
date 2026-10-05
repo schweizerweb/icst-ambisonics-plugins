@@ -43,23 +43,25 @@ public:
             delete window;
             
         auto editor = std::make_unique<MovementClipEditor>(*timelineComp, timelineIndex, clipIndex);
+        int width = editor->getTotalRequiredWidth();
         int height = editor->getTotalRequiredHeight();
-        editor->setSize(450, height);
-        
-        window = new ClipEditorDialog(this, "Edit Movement Clip", std::move(editor), 450, height);
+        editor->setSize(width, height);
+
+        window = new ClipEditorDialog(this, "Edit Movement Clip", std::move(editor), width, height);
         window->setVisible(true);
     }
-    
+
     void showActionEditor(TimelineComponent* timelineComp, int timelineIndex, int clipIndex)
     {
         if (window)
             delete window;
-            
+
         auto editor = std::make_unique<ActionClipEditor>(*timelineComp, timelineIndex, clipIndex);
+        int width = editor->getTotalRequiredWidth();
         int height = editor->getTotalRequiredHeight();
-        editor->setSize(450, height);
-        
-        window = new ClipEditorDialog(this, "Edit Action Clip", std::move(editor), 450, height);
+        editor->setSize(width, height);
+
+        window = new ClipEditorDialog(this, "Edit Action Clip", std::move(editor), width, height);
         window->setVisible(true);
     }
 

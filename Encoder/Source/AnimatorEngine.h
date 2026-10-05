@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "TimelineModel.h"
+#include "AnimatorMath.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "EncoderSettings.h"
 
@@ -81,18 +82,10 @@ private:
     void processJitterAction(int timelineIndex, const ActionDefinition& actionDef, const ActiveAction& activeAction, ms_t currentTimeMs);
     void clearJitterOffsets(const ActiveAction& activeAction);
     
-    // Movement calculation
+    // Movement calculation - the per-type math lives in AnimatorMath.h (shared with the clip
+    // editors' preview); this just adapts an ActiveMovement's cached state to that interface.
     juce::Vector3D<double> calculateMovementPosition(const ActiveMovement& activeMovement, double progress);
-    juce::Vector3D<double> calculateLinearCartesian(const MovementClip& clip, double progress, int timelineIndex);
-    juce::Vector3D<double> calculateLinearPolar(const MovementClip& clip, double progress, int timelineIndex);
-    juce::Vector3D<double> calculateCircle(const MovementClip& clip, double progress, int timelineIndex);
-    juce::Vector3D<double> calculateSpiral(const MovementClip& clip, double progress, int timelineIndex);
     juce::Vector3D<double> getGroupPosition(int timelineIndex);
-    
-    // Coordinate conversion
-    juce::Vector3D<double> cartesianToSpherical(const juce::Vector3D<double>& cartesian);
-    juce::Vector3D<double> sphericalToCartesian(const juce::Vector3D<double>& spherical);
-    double calculateDistance(const juce::Vector3D<double>& a, const juce::Vector3D<double>& b) const;
 
     // Member variables
     bool needsPreRender = false;

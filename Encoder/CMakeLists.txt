@@ -41,9 +41,11 @@ SET(SRC_FILES
 	../Source/AmbiOSCSenderExt.h
 	../Source/AnimatorEngine.h
 	../Source/AnimatorEngine.cpp
+	../Source/AnimatorMath.h
 	../Source/AnimatorMainView.h
 	../Source/AnimatorMainView.cpp
 	../Source/ActionEditDialog.h
+	../Source/ClipPreviewComponent.h
 	../Source/CommonClipSettings.h
 	../Source/MovementClipEditor.h
 	../Source/MovementClipEditor.cpp

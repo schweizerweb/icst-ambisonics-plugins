@@ -13,33 +13,79 @@ ActionClipEditor::ActionClipEditor(TimelineComponent& timeline, int timelineIdx,
             currentClip = timelineModel->actions.clips.getReference(clipIndex);
         }
     }
-    
+
+    pSourceSet = timelineComp.getSources();
+    pPointSelection = timelineComp.getPointSelection();
+    if (pPointSelection != nullptr)
+        pPointSelection->addChangeListener(this);
+
     createControls();
+    startTimer(150);
+}
+
+ActionClipEditor::~ActionClipEditor()
+{
+    stopTimer();
+
+    if (pPointSelection != nullptr)
+        pPointSelection->removeChangeListener(this);
+}
+
+void ActionClipEditor::changeListenerCallback(juce::ChangeBroadcaster* /*source*/)
+{
+    updateReferenceFromGroup();
+}
+
+void ActionClipEditor::updateReferenceFromGroup()
+{
+    if (pSourceSet == nullptr) return;
+
+    if (auto* group = pSourceSet->getGroup(timelineIndex))
+    {
+        preview.setReferencePosition(group->getVector3D());
+        preview.setReferenceStretch(group->getStretch(), true);
+    }
+}
+
+void ActionClipEditor::timerCallback()
+{
+    ActionClip clip = currentClip;
+    clip.length = commonSettings.getLiveLength();
+    preview.setActionClip(clip);
 }
 
 void ActionClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
-    
+
     // Calculate heights
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
+    const int previewGroupHeight = getPreviewHeight();
+    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
     const int actionsGroupHeight = getActionsControlsHeight() + 40;
     const int buttonHeight = 28;
-    
-    // Clip settings group
-    auto clipGroupArea = area.removeFromTop(clipGroupHeight);
+
+    // Clip properties and preview side by side, sharing one row
+    auto topRowArea = area.removeFromTop(topRowHeight);
+
+    auto clipGroupArea = topRowArea.removeFromLeft(getClipPropertiesWidth());
     clipGroup.setBounds(clipGroupArea);
     commonSettings.setBounds(clipGroupArea.reduced(8, 20));
-    
-    area.removeFromTop(8); // Spacing between groups
-    
+
+    topRowArea.removeFromLeft(8); // spacing between the two top-row groups
+
+    previewGroup.setBounds(topRowArea);
+    preview.setBounds(topRowArea.reduced(8, 20));
+
+    area.removeFromTop(8); // Spacing between rows
+
     // Actions group
     auto actionsGroupArea = area.removeFromTop(actionsGroupHeight);
     actionsGroup.setBounds(actionsGroupArea);
-    
+
     auto actionsContentArea = actionsGroupArea.reduced(8, 20);
     layoutActionControls(actionsContentArea);
-    
+
     // Buttons at bottom
     auto buttonArea = area.removeFromBottom(buttonHeight).reduced(10, 0);
     cancelButton.setBounds(buttonArea.removeFromRight(80));
@@ -56,11 +102,20 @@ int ActionClipEditor::getTotalRequiredHeight() const
 {
     const int margins = 10 * 2;
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 30;
+    const int previewGroupHeight = getPreviewHeight();
+    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
     const int actionsGroupHeight = getActionsControlsHeight() + 40;
     const int buttonHeight = 28;
-    const int groupSpacing = 3 * 8;
-    
-    return margins + clipGroupHeight + groupSpacing + actionsGroupHeight + buttonHeight;
+    const int rowSpacing = 2 * 8; // top row -> actions group, actions group -> buttons
+
+    return margins + topRowHeight + rowSpacing + actionsGroupHeight + buttonHeight;
+}
+
+int ActionClipEditor::getTotalRequiredWidth() const
+{
+    // Clip properties and the (now portrait) preview share one row - floored at 450 so this never
+    // shrinks the dialog relative to its previous fixed width.
+    return juce::jmax(450, getClipPropertiesWidth() + 8 + getPreviewWidth() + 20);
 }
 
 bool ActionClipEditor::applyChanges()
@@ -120,10 +175,15 @@ void ActionClipEditor::createControls()
     
     addAndMakeVisible(clipGroup);
     addAndMakeVisible(actionsGroup);
-    
+    addAndMakeVisible(previewGroup);
+
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+
+    addAndMakeVisible(preview);
+    preview.setActionClip(currentClip);
+    updateReferenceFromGroup();
     
     // Buttons
     addAndMakeVisible(applyButton);
@@ -190,10 +250,11 @@ void ActionClipEditor::addAction()
     newAction.setTiming(TimingType::AbsoluteTarget);
     newAction.setValue(0.0);
     
-    if (editActionDialog(newAction, "Add New Action"))
+    if (editActionDialog(newAction, "Add New Action", -1))
     {
         currentClip.actions.add(newAction);
         actionsList.updateContent();
+        preview.setActionClip(currentClip);
     }
 }
 
@@ -204,6 +265,7 @@ void ActionClipEditor::removeSelectedAction()
     {
         currentClip.actions.remove(selected);
         actionsList.updateContent();
+        preview.setActionClip(currentClip);
     }
 }
 
@@ -212,20 +274,36 @@ void ActionClipEditor::editAction(int index)
     if (index >= 0 && index < currentClip.actions.size())
     {
         auto action = currentClip.actions.getReference(index);
-        
-        if (editActionDialog(action, "Edit Action"))
+
+        if (editActionDialog(action, "Edit Action", index))
         {
             currentClip.actions.getReference(index) = action;
             actionsList.updateContent();
+            preview.setActionClip(currentClip);
         }
     }
 }
 
-bool ActionClipEditor::editActionDialog(ActionDefinition& action, const juce::String& title)
+bool ActionClipEditor::editActionDialog(ActionDefinition& action, const juce::String& title, int editingIndex)
 {
     // Create the dialog component
     auto* dialogComponent = new ActionEditDialog(action, title);
-    
+
+    // Keep the preview live while the dialog is open: merge the in-progress edit into a copy of
+    // the real clip (rather than previewing the single action in isolation) so other actions'
+    // combined effect - e.g. an existing Jitter while editing a Rotation - keeps showing too.
+    dialogComponent->onLiveChange = [this, &action, editingIndex]
+    {
+        ActionClip previewClip = currentClip;
+        if (editingIndex >= 0 && editingIndex < previewClip.actions.size())
+            previewClip.actions.getReference(editingIndex) = action;
+        else
+            previewClip.actions.add(action);
+        previewClip.length = commonSettings.getLiveLength();
+        preview.setActionClip(previewClip);
+    };
+    dialogComponent->onLiveChange();
+
     juce::DialogWindow::LaunchOptions options;
     options.content.setOwned(dialogComponent);
     options.dialogTitle = title;
@@ -233,6 +311,12 @@ bool ActionClipEditor::editActionDialog(ActionDefinition& action, const juce::St
     options.escapeKeyTriggersCloseButton = true;
     options.useNativeTitleBar = true;
     options.resizable = false;
-    
-    return options.runModal() != 0;
+
+    const bool accepted = options.runModal() != 0;
+
+    // Whether accepted or cancelled, the dialog's live edits are gone now - restore the preview
+    // to the clip's actual (unedited, or already-committed-by-the-caller) state.
+    preview.setActionClip(currentClip);
+
+    return accepted;
 }

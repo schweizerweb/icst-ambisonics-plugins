@@ -125,6 +125,13 @@ public:
         return topBottomMargin * 2 + (rowHeight * 6) + (verticalSpacing * 5);
     }
 
+    // Read-only live value of the Duration field, independent of applyToClip()/Apply - for callers
+    // (the clip preview) that need to react to edits as they happen rather than only once applied.
+    ms_t getLiveLength() const
+    {
+        return parseTimeValue(durationEditor.getText(), displayInSeconds);
+    }
+
     void setClipData(const Clip& clip)
     {
         nameEditor.setText(clip.id, false);

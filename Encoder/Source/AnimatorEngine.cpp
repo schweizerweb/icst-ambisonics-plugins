@@ -2,20 +2,6 @@
 #include "../../Common/MathHelper.h"
 #include "../../Common/PerlinNoise.h"
 
-namespace
-{
-    // Deterministic per-(clip, source, axis) seed. clip.id is a user-editable but save-stable
-    // name (unlike AmbiPoint's id, which is a UUID regenerated on every project load) so the same
-    // clip reproduces the same wobble pattern across sessions, as long as source ordering is
-    // unchanged - the same accepted limitation as the index-based OSC target selection elsewhere.
-    uint32_t jitterSeed(const juce::String& clipId, int sourceIndex, int axis)
-    {
-        return (uint32_t)clipId.hashCode()
-             ^ (uint32_t)(sourceIndex * 2654435761u)
-             ^ (uint32_t)(axis * 0x9E3779B9u);
-    }
-}
-
 AnimatorEngine::AnimatorEngine()
 {
 }
@@ -255,41 +241,13 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
     
     // Start new movement with adjusted start time - use the constructor with elapsedTime
     ActiveMovement newMovement(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
-    
-    // Store the initial position for MoveTo operations
-    if (clip.movementType == MovementType::MoveToCartesian || clip.movementType == MovementType::MoveToPolar)
-    {
-        if (clip.useStartPoint)
-        {
-            newMovement.initialPosition = juce::Vector3D<double>(
-                clip.startPointGroup.getX(),
-                clip.startPointGroup.getY(),
-                clip.startPointGroup.getZ());
-        }
-        else
-        {
-            newMovement.initialPosition = getGroupPosition(timelineIndex);
-        }
-    }
-    
-    // Store start angle for circle/spiral
-    if (clip.movementType == MovementType::Circle || clip.movementType == MovementType::Spiral)
-    {
-        auto centerPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-        juce::Vector3D<double> startPos = clip.useStartPoint ?
-            juce::Vector3D<double>(clip.startPointGroup.getX(), clip.startPointGroup.getY(), clip.startPointGroup.getZ()) :
-            getGroupPosition(timelineIndex);
-        
-        double relX = startPos.x - centerPos.x;
-        double relY = startPos.y - centerPos.y;
-        newMovement.startAngle = std::atan2(relY, relX);
-        
-        if(clip.movementType == MovementType::Spiral)
-        {
-            newMovement.startRadius = std::sqrt(relX * relX + relY * relY);
-        }
-    }
-    
+
+    // Capture the one-time start state (see AnimatorMath.h - shared with the clip editors' preview)
+    const auto start = AnimatorMath::computeMovementStartState(clip, getGroupPosition(timelineIndex));
+    newMovement.initialPosition = start.initialPosition;
+    newMovement.startAngle = start.startAngle;
+    newMovement.startRadius = start.startRadius;
+
     activeMovements.add(newMovement);
 }
 
@@ -339,220 +297,20 @@ juce::Vector3D<double> AnimatorEngine::getGroupPosition(int timelineIndex)
 juce::Vector3D<double> AnimatorEngine::calculateMovementPosition(const ActiveMovement& activeMovement, double progress)
 {
     const auto& clip = activeMovement.clip;
-    
-    switch (clip.movementType)
-    {
-        case MovementType::MoveToCartesian:
-            return calculateLinearCartesian(clip, progress, activeMovement.timelineIndex);
-            
-        case MovementType::MoveToPolar:
-            return calculateLinearPolar(clip, progress, activeMovement.timelineIndex);
-            
-        case MovementType::Circle:
-            return calculateCircle(clip, progress, activeMovement.timelineIndex);
-            
-        case MovementType::Spiral:
-            return calculateSpiral(clip, progress, activeMovement.timelineIndex);
-            
-        default:
-            return juce::Vector3D<double>(0.0, 0.0, 0.0);
-    }
-}
 
-juce::Vector3D<double> AnimatorEngine::calculateLinearCartesian(const MovementClip& clip, double progress, int timelineIndex)
-{
-    juce::Vector3D<double> startPos;
-    
-    // Find the active movement to get the stored initial position
-    for (auto& movement : activeMovements)
-    {
-        if (movement.timelineIndex == timelineIndex &&
-            (movement.clip.movementType == MovementType::MoveToCartesian || movement.clip.movementType == MovementType::MoveToPolar))
-        {
-            startPos = movement.initialPosition; // Use the stored initial position
-            break;
-        }
-    }
-    
-    // Fallback if no active movement found (shouldn't happen)
-    if (approximatelyEqual(startPos.x, 0.0) && approximatelyEqual(startPos.y, 0.0) && approximatelyEqual(startPos.z, 0.0))
-    {
-        if (clip.useStartPoint)
-        {
-            startPos = juce::Vector3D<double>(clip.startPointGroup.getX(), clip.startPointGroup.getY(), clip.startPointGroup.getZ());
-        }
-        else
-        {
-            startPos = getGroupPosition(timelineIndex);
-        }
-    }
-    
-    auto targetPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
+    AnimatorMath::MovementStartState start;
+    start.initialPosition = activeMovement.initialPosition;
+    start.startAngle = activeMovement.startAngle;
+    start.startRadius = activeMovement.startRadius;
 
-    return startPos + (targetPos - startPos) * progress;
-}
+    // Circle recomputes its radius live on every call when !useStartPoint (a pre-existing quirk,
+    // see AnimatorMath.h) - only that case needs a fresh reference position; everything else
+    // already has what it needs cached in `start` above.
+    juce::Vector3D<double> currentReferencePosition;
+    if (clip.movementType == MovementType::Circle && !clip.useStartPoint)
+        currentReferencePosition = getGroupPosition(activeMovement.timelineIndex);
 
-juce::Vector3D<double> AnimatorEngine::calculateLinearPolar(const MovementClip& clip, double progress, int timelineIndex)
-{
-    juce::Vector3D<double> startPos;
-    
-    // Find the active movement to get the stored initial position
-    for (auto& movement : activeMovements)
-    {
-        if (movement.timelineIndex == timelineIndex &&
-            (movement.clip.movementType == MovementType::MoveToCartesian || movement.clip.movementType == MovementType::MoveToPolar))
-        {
-            startPos = movement.initialPosition; // Use the stored initial position
-            break;
-        }
-    }
-    
-    // Fallback if no active movement found (shouldn't happen)
-    if (approximatelyEqual(startPos.x, 0.0) && approximatelyEqual(startPos.y, 0.0) && approximatelyEqual(startPos.z, 0.0))
-    {
-        if (clip.useStartPoint)
-        {
-            startPos = juce::Vector3D<double>(clip.startPointGroup.getX(), clip.startPointGroup.getY(), clip.startPointGroup.getZ());
-        }
-        else
-        {
-            startPos = getGroupPosition(timelineIndex);
-        }
-    }
-    
-    auto targetPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-    
-    // Convert to spherical coordinates
-    auto startSpherical = cartesianToSpherical(startPos);
-    auto targetSpherical = cartesianToSpherical(targetPos);
-    
-    // Handle azimuth wrapping for shortest path
-    double startAzimuth = startSpherical.x;
-    double targetAzimuth = targetSpherical.x;
-    double angularDist = targetAzimuth - startAzimuth;
-    
-    if (angularDist > juce::MathConstants<double>::pi)
-        angularDist -= 2.0 * juce::MathConstants<double>::pi;
-    else if (angularDist < -juce::MathConstants<double>::pi)
-        angularDist += 2.0 * juce::MathConstants<double>::pi;
-    
-    // Linear interpolation in spherical space
-    double interpAzimuth = startAzimuth + angularDist * progress;
-    double interpElevation = startSpherical.y + (targetSpherical.y - startSpherical.y) * progress;
-    double interpDistance = startSpherical.z + (targetSpherical.z - startSpherical.z) * progress;
-    
-    return sphericalToCartesian(juce::Vector3D<double>(interpAzimuth, interpElevation, interpDistance));
-}
-
-juce::Vector3D<double> AnimatorEngine::calculateCircle(const MovementClip& clip, double progress, int timelineIndex)
-{
-    auto centerPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-    
-    double radius;
-    if (clip.useStartPoint)
-    {
-        auto startPos = juce::Vector3D<double>(clip.startPointGroup.getX(), clip.startPointGroup.getY(), clip.startPointGroup.getZ());
-        radius = calculateDistance(startPos, centerPos);
-    }
-    else
-    {
-        auto currentPos = getGroupPosition(timelineIndex);
-        radius = calculateDistance(currentPos, centerPos);
-    }
-    
-    // Find the active movement to get the stored start angle
-    double startAngle = 0.0;
-    for (auto& movement : activeMovements)
-    {
-        if (movement.timelineIndex == timelineIndex && movement.clip.movementType == MovementType::Circle)
-        {
-            startAngle = movement.startAngle;
-            break;
-        }
-    }
-    
-    // Calculate the motion: positive count = clockwise, so we subtract from start angle
-    double angle = startAngle - (2.0 * juce::MathConstants<double>::pi * clip.count * progress);
-    
-    // Circular motion in XY plane around center
-    return juce::Vector3D<double>(
-        centerPos.x + radius * std::cos(angle),
-        centerPos.y + radius * std::sin(angle),
-        centerPos.z
-    );
-}
-
-juce::Vector3D<double> AnimatorEngine::calculateSpiral(const MovementClip& clip, double progress, int timelineIndex)
-{
-    auto centerPos = juce::Vector3D<double>(clip.targetPointGroup.getX(), clip.targetPointGroup.getY(), clip.targetPointGroup.getZ());
-    
-    // Get stored start values
-    double startRadius = 0.0;
-    double startAngle = 0.0;
-    for (auto& movement : activeMovements)
-    {
-        if (movement.timelineIndex == timelineIndex && movement.clip.movementType == MovementType::Spiral)
-        {
-            startRadius = movement.startRadius;
-            startAngle = movement.startAngle;
-            break;
-        }
-    }
-    
-    // FIX: Use count for direction, but absolute value for radius calculations
-    double direction = (clip.count >= 0) ? -1.0 : 1.0; // Negative for clockwise, positive for counter-clockwise
-    double absoluteCount = std::abs(clip.count);
-    
-    // Calculate the motion using direction
-    double angle = startAngle + (2.0 * juce::MathConstants<double>::pi * absoluteCount * progress * direction);
-    
-    // Calculate current radius with spiral change - use absolute count
-    double totalRadiusChange = clip.radiusChange * absoluteCount;
-    double currentRadius = startRadius + (totalRadiusChange * progress);
-    
-    // Prevent negative radius
-    if (currentRadius < 0.0)
-        currentRadius = 0.0;
-    
-    // Spiral motion in XY plane
-    return juce::Vector3D<double>(
-        centerPos.x + currentRadius * std::cos(angle),
-        centerPos.y + currentRadius * std::sin(angle),
-        centerPos.z
-    );
-}
-
-// Coordinate conversion helpers
-juce::Vector3D<double> AnimatorEngine::cartesianToSpherical(const juce::Vector3D<double>& cartesian)
-{
-    double x = cartesian.x, y = cartesian.y, z = cartesian.z;
-    double distance = std::sqrt(x*x + y*y + z*z);
-    
-    if (distance < 1e-12) return juce::Vector3D<double>(0.0, 0.0, 0.0);
-    
-    double azimuth = std::atan2(y, x);
-    double elevation = std::asin(z / distance);
-    
-    return juce::Vector3D<double>(azimuth, elevation, distance);
-}
-
-juce::Vector3D<double> AnimatorEngine::sphericalToCartesian(const juce::Vector3D<double>& spherical)
-{
-    double azimuth = spherical.x, elevation = spherical.y, distance = spherical.z;
-    
-    if (distance < 1e-12) return juce::Vector3D<double>(0.0, 0.0, 0.0);
-    
-    double x = distance * std::cos(elevation) * std::cos(azimuth);
-    double y = distance * std::cos(elevation) * std::sin(azimuth);
-    double z = distance * std::sin(elevation);
-    
-    return juce::Vector3D<double>(x, y, z);
-}
-
-double AnimatorEngine::calculateDistance(const juce::Vector3D<double>& a, const juce::Vector3D<double>& b) const
-{
-    auto diff = a - b;
-    return std::sqrt(diff.x * diff.x + diff.y * diff.y + diff.z * diff.z);
+    return AnimatorMath::calculatePosition(clip, progress, start, currentReferencePosition);
 }
 
 void AnimatorEngine::setAnimatorState(bool enable)
@@ -783,71 +541,10 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
 void AnimatorEngine::processStretchAction(int timelineIndex, const ActionDefinition& actionDef, double progress, const ActiveAction& activeAction)
 {
     if (!pSourceSet || timelineIndex >= pSourceSet->groupCount()) return;
-    
-    double currentStretch = 1.0;
-    
-    switch (actionDef.getTiming())
-    {
-        case TimingType::AbsoluteTarget:
-        {
-            if (actionDef.getUseStartValue())
-            {
-                currentStretch = actionDef.getStartValue() +
-                                (actionDef.getValue() - actionDef.getStartValue()) * progress;
-            }
-            else if (activeAction.hasInitialState)
-            {
-                // Interpolate from initial stretch to target stretch
-                currentStretch = activeAction.initialStretch +
-                                (actionDef.getValue() - activeAction.initialStretch) * progress;
-            }
-            else
-            {
-                currentStretch = actionDef.getValue();
-            }
-            break;
-        }
-            
-        case TimingType::RelativeDuringClip:
-        {
-            currentStretch = 1.0 + actionDef.getValue() * progress;
-            if (actionDef.getUseStartValue())
-            {
-                currentStretch = actionDef.getStartValue() * (1.0 + actionDef.getValue() * progress);
-            }
-            else if (activeAction.hasInitialState)
-            {
-                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * progress);
-            }
-            break;
-        }
-            
-        case TimingType::ConstantPerSecond:
-        {
-            double clipDurationSeconds = activeAction.clip.length / 1000.0;
-            double elapsedSeconds = clipDurationSeconds * progress;
+    if (actionDef.getTiming() == TimingType::None) return; // matches the original: "leave stretch untouched", not "set it to 1.0"
 
-            if (actionDef.getUseStartValue())
-            {
-                currentStretch = actionDef.getStartValue() * (1.0 + actionDef.getValue() * elapsedSeconds);
-            }
-            else if (activeAction.hasInitialState)
-            {
-                currentStretch = activeAction.initialStretch * (1.0 + actionDef.getValue() * elapsedSeconds);
-            }
-            else
-            {
-                currentStretch = 1.0 + actionDef.getValue() * elapsedSeconds;
-            }
-            break;
-        }
-            
-        case TimingType::None:
-            return;
-    }
-    
-    // Ensure stretch doesn't go negative
-    if (currentStretch < 0.01) currentStretch = 0.01;
+    const double currentStretch = AnimatorMath::calculateStretch(actionDef, progress, activeAction.clip.length,
+                                                                   activeAction.initialStretch, activeAction.hasInitialState);
 
     pSourceSet->setGroupStretch(timelineIndex, currentStretch, true);
 }
@@ -865,9 +562,9 @@ void AnimatorEngine::processJitterAction(int /*timelineIndex*/, const ActionDefi
         auto* source = pSourceSet->get(srcIndex);
         if (source == nullptr) continue;
 
-        const double nx = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 0), t);
-        const double ny = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 1), t);
-        const double nz = PerlinNoise::noise1D(jitterSeed(activeAction.clip.id, srcIndex, 2), t);
+        const double nx = PerlinNoise::noise1D(AnimatorMath::jitterSeed(activeAction.clip.id, srcIndex, 0), t);
+        const double ny = PerlinNoise::noise1D(AnimatorMath::jitterSeed(activeAction.clip.id, srcIndex, 1), t);
+        const double nz = PerlinNoise::noise1D(AnimatorMath::jitterSeed(activeAction.clip.id, srcIndex, 2), t);
 
         // Recomputed fresh from (seed, t) every call - never incremented - so this is automatically
         // seek/loop-safe, and stays a constant-amplitude wobble regardless of whatever the group's
