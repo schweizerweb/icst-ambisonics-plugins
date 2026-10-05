@@ -167,9 +167,25 @@ bool ActionClipEditor::confirmDiscardIfDirty()
     if (!isDirty())
         return true;
 
-    return juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
-        "Discard Changes?", "This clip has unsaved changes. Discard them?",
-        "Discard", "Keep Editing");
+    // showYesNoCancelBox returns 1 for the first button, 2 for the second, 0 for the third
+    // (or if the box is dismissed) - mapped here to Save & Close / Discard / Keep Editing.
+    const int result = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::WarningIcon,
+        "Unsaved Changes", "This clip has unsaved changes.",
+        "Save & Close", "Discard", "Keep Editing");
+
+    if (result == 1) // Save & Close
+    {
+        if (!applyChanges())
+            return false; // validation failed (e.g. invalid Start/Duration/End) - stay open, same as the Apply button would
+
+        timelineComp.repaint();
+        return true;
+    }
+
+    if (result == 2) // Discard
+        return true;
+
+    return false; // Keep Editing, or the box was dismissed
 }
 
 // ListBoxModel implementation
@@ -215,9 +231,10 @@ void ActionClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
-    commonSettings.setRotationConstraintActive(currentClipHasRotation());
+    commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
 
     addAndMakeVisible(preview);
+    preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
     preview.setActionClip(currentClip);
     updateReferenceFromGroup();
     
@@ -294,7 +311,7 @@ void ActionClipEditor::addAction()
         currentClip.actions.add(newAction);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
-        commonSettings.setRotationConstraintActive(currentClipHasRotation());
+        commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
     }
 }
 
@@ -306,7 +323,7 @@ void ActionClipEditor::removeSelectedAction()
         currentClip.actions.remove(selected);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
-        commonSettings.setRotationConstraintActive(currentClipHasRotation());
+        commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
     }
 }
 
@@ -321,7 +338,7 @@ void ActionClipEditor::editAction(int index)
             currentClip.actions.getReference(index) = action;
             actionsList.updateContent();
             preview.setActionClip(currentClip);
-            commonSettings.setRotationConstraintActive(currentClipHasRotation());
+            commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
         }
     }
 }

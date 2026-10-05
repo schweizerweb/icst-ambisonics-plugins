@@ -128,7 +128,7 @@ bool MovementClipEditor::isDirty()
     // applyChanges()), so comparing directly against the temporary buildClipFromControls() return
     // won't compile - go through a named local first.
     MovementClip built = buildClipFromControls();
-    return built != currentClip;
+    return built != dirtyBaseline;
 }
 
 bool MovementClipEditor::confirmDiscardIfDirty()
@@ -136,9 +136,25 @@ bool MovementClipEditor::confirmDiscardIfDirty()
     if (!isDirty())
         return true;
 
-    return juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
-        "Discard Changes?", "This clip has unsaved changes. Discard them?",
-        "Discard", "Keep Editing");
+    // showYesNoCancelBox returns 1 for the first button, 2 for the second, 0 for the third
+    // (or if the box is dismissed) - mapped here to Save & Close / Discard / Keep Editing.
+    const int result = juce::AlertWindow::showYesNoCancelBox(juce::AlertWindow::WarningIcon,
+        "Unsaved Changes", "This clip has unsaved changes.",
+        "Save & Close", "Discard", "Keep Editing");
+
+    if (result == 1) // Save & Close
+    {
+        if (!applyChanges())
+            return false; // validation failed (e.g. invalid Start/Duration/End) - stay open, same as the Apply button would
+
+        timelineComp.repaint();
+        return true;
+    }
+
+    if (result == 2) // Discard
+        return true;
+
+    return false; // Keep Editing, or the box was dismissed
 }
 
 MovementClip MovementClipEditor::buildClipFromControls()
@@ -188,8 +204,10 @@ void MovementClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+    commonSettings.setPalindromeRequiredForRepeat(isMoveToType(currentClip.movementType));
 
     addAndMakeVisible(preview);
+    preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
     preview.setMovementClip(currentClip);
     
     addAndMakeVisible(applyButton);
@@ -259,6 +277,28 @@ void MovementClipEditor::createControls()
     updateSliderLabelsAndRanges();
     updateControlVisibility();
     updateCurrentPosition();
+
+    // Dragging a Start/Target handle in the preview writes straight into the same sliders a typed
+    // edit would, respecting the current Polar/Cartesian display mode - so Apply/Cancel/dirty-
+    // detection/buildClipFromControls() all treat a drag exactly like any other slider edit.
+    preview.onPointDragged = [this](bool isStartHandle, juce::Vector3D<double> newWorldPos)
+    {
+        const auto converted = convertCartesianToSelectedSystem(newWorldPos);
+        auto& xSlider = isStartHandle ? startXSlider : targetXSlider;
+        auto& ySlider = isStartHandle ? startYSlider : targetYSlider;
+        auto& zSlider = isStartHandle ? startZSlider : targetZSlider;
+        xSlider.setValue(converted.x);
+        ySlider.setValue(converted.y);
+        zSlider.setValue(converted.z);
+        preview.setMovementClip(buildClipFromControls());
+    };
+
+    // Captured last, after every control above has been populated from currentClip - see
+    // dirtyBaseline's own comment on why this must be the slider-quantized build, not currentClip
+    // itself. Point3D's operator= only accepts a non-const lvalue, so assigning directly from the
+    // temporary buildClipFromControls() return won't compile - go through a named local first.
+    MovementClip baseline = buildClipFromControls();
+    dirtyBaseline = baseline;
 }
 
 void MovementClipEditor::createCoordinateSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name,
@@ -333,11 +373,19 @@ juce::Vector3D<double> MovementClipEditor::getCurrentPositionInSelectedSystem() 
 {
     if (!currentPositionValid)
         return juce::Vector3D<double>();
-    
+
+    return convertCartesianToSelectedSystem(currentPosition);
+}
+
+// Shared by getCurrentPositionInSelectedSystem() (the live group position, for the "Apply Current
+// Position" buttons) and preview.onPointDragged (an arbitrary dragged position) - both need the
+// same Cartesian->Polar conversion before writing into the Start/Target sliders.
+juce::Vector3D<double> MovementClipEditor::convertCartesianToSelectedSystem(juce::Vector3D<double> cartesian) const
+{
     if (usePolarDisplay.getToggleState())
     {
         // Convert Cartesian to polar (AED) and return in degrees for UI
-        Point3D<double> point(currentPosition.x, currentPosition.y, currentPosition.z);
+        Point3D<double> point(cartesian.x, cartesian.y, cartesian.z);
         return juce::Vector3D<double>(
             Constants::RadToGrad(point.getAzimuth()),  // Convert to degrees
             Constants::RadToGrad(point.getElevation()), // Convert to degrees
@@ -347,7 +395,7 @@ juce::Vector3D<double> MovementClipEditor::getCurrentPositionInSelectedSystem() 
     else
     {
         // Use Cartesian directly
-        return currentPosition;
+        return cartesian;
     }
 }
 
@@ -549,7 +597,13 @@ void MovementClipEditor::onMovementTypeChanged()
     {
         radiusChangeSlider.setValue(0.0f);
     }
-    
+
+    // A MoveTo clip ends at a different point than it started (that's the whole point of it) - a
+    // non-palindrome repeat would snap instantly from the target back to the start at every repeat
+    // boundary, so Repetitions > 1 requires Palindrome for this type, same mechanism as the
+    // Rotation-action constraint in CommonClipSettings.
+    commonSettings.setPalindromeRequiredForRepeat(isMoveToType(newType));
+
     updateControlVisibility();
 }
 

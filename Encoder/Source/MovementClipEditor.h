@@ -167,10 +167,7 @@ public:
 
     void changeListenerCallback(ChangeBroadcaster* source) override;
 
-    // True if the live UI state differs from currentClip (the last-applied/originally-loaded
-    // state) - currentClip is never mutated outside applyChanges(), so it already IS the "original"
-    // snapshot to compare against (unlike ActionClipEditor, which needs a separate snapshot since
-    // its currentClip.actions is mutated live by add/remove/edit).
+    // True if the live UI state differs from dirtyBaseline (see its own comment below).
     bool isDirty();
     bool confirmDiscardIfDirty() override;
 
@@ -180,6 +177,16 @@ private:
     TimelineComponent& timelineComp;
     int timelineIndex, clipIndex;
     MovementClip currentClip;
+    // What buildClipFromControls() produced right after the controls were first populated from
+    // currentClip, before any user interaction - NOT simply a copy of currentClip itself. The
+    // coordinate sliders snap to their configured interval (0.01 for X/Y/Z, 0.1 for Azimuth/
+    // Elevation - see juce::Slider::setValue()/NormalisableRange::snapToLegalValue()), so loading
+    // currentClip's full-precision values into them already quantizes away anything finer than that
+    // grid. Comparing a later buildClipFromControls() against raw currentClip would then see that
+    // quantization itself as a "change" and report dirty on a freshly opened, untouched dialog -
+    // comparing against this already-quantized baseline instead makes it an apples-to-apples
+    // comparison, so only a genuine edit moves it off the grid point it started on.
+    MovementClip dirtyBaseline;
     
     juce::Vector3D<double> currentPosition;
     bool currentPositionValid = false;
@@ -212,6 +219,12 @@ private:
     CoordinateValueControl radiusChangeSlider;
     juce::Label radiusChangeLabel;
 
+    // MoveTo (Cartesian/Polar) ends at a different point than it started, so a non-palindrome
+    // repeat always jumps at the repeat boundary - unlike Circle/Spiral, which stay at least close
+    // to their start angle/radius every pass. Shared by createControls() (initial state) and
+    // onMovementTypeChanged() (live updates).
+    static bool isMoveToType(MovementType type) { return type == MovementType::MoveToCartesian || type == MovementType::MoveToPolar; }
+
     void createControls();
     void createCoordinateSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name,
                                double min, double max, double defaultValue);
@@ -230,6 +243,9 @@ private:
     void updateCoordinateSystem();
     void updateSliderLabelsAndRanges();  // New method to update UI based on coordinate system
     juce::Vector3D<double> getCurrentPositionInSelectedSystem() const;  // New method to get position in current coordinate system
+    // Shared Cartesian->Polar conversion used by both getCurrentPositionInSelectedSystem() and the
+    // preview's onPointDragged callback - see MovementClipEditor.cpp.
+    juce::Vector3D<double> convertCartesianToSelectedSystem(juce::Vector3D<double> cartesian) const;
     juce::String getCoordinateDisplayText(const juce::Vector3D<double>& vector, bool isValid) const;  // New method for coordinate display
     void onMovementTypeChanged();
 

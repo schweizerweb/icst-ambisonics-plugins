@@ -148,15 +148,15 @@ public:
     bool getLivePalindrome() const { return palindromeToggle.getToggleState(); }
     int getLiveRepeatCount() const { return juce::jmax(1, (int)repeatCountSlider.getValue()); }
 
-    // Called by ActionClipEditor (which alone knows currentClip.actions) whenever the action list
-    // changes or the clip is first loaded, so Repetitions > 1 can never be combined with Palindrome
-    // off while a Rotation action is present - see enforceRotationConstraint()'s comment for why.
-    // Movement clips never contain a Rotation action, so MovementClipEditor never calls this; it
-    // stays at its default false there.
-    void setRotationConstraintActive(bool hasRotationAction)
+    // Called by the host editor whenever something that determines whether a non-palindrome repeat
+    // would visibly jump changes - ActionClipEditor calls this whenever its action list changes
+    // (true if it contains a Rotation action), MovementClipEditor calls it whenever the movement
+    // type changes (true for MoveTo, which always jumps from target back to start between repeats
+    // unless Palindrome is on) - see enforcePalindromeConstraint()'s comment for why both need this.
+    void setPalindromeRequiredForRepeat(bool required)
     {
-        rotationConstraintActive = hasRotationAction;
-        enforceRotationConstraint();
+        palindromeRequiredForRepeat = required;
+        enforcePalindromeConstraint();
     }
 
     void setClipData(const Clip& clip)
@@ -170,7 +170,7 @@ public:
         mutedToggle.setToggleState(clip.muted, juce::dontSendNotification);
         palindromeToggle.setToggleState(clip.palindrome, juce::dontSendNotification);
         repeatCountSlider.setValue(clip.repetitions, juce::dontSendNotification);
-        enforceRotationConstraint();
+        enforcePalindromeConstraint();
     }
 
     void applyToClip(Clip& clip)
@@ -182,8 +182,8 @@ public:
         clip.muted = mutedToggle.getToggleState();
         clip.repetitions = juce::jmax(1, (int)repeatCountSlider.getValue());
         clip.palindrome = palindromeToggle.getToggleState();
-        if (rotationConstraintActive && clip.repetitions > 1)
-            clip.palindrome = true; // defensive re-clamp - enforceRotationConstraint() already makes this unreachable through the UI
+        if (palindromeRequiredForRepeat && clip.repetitions > 1)
+            clip.palindrome = true; // defensive re-clamp - enforcePalindromeConstraint() already makes this unreachable through the UI
     }
 
     // Display only - re-renders whatever is currently shown in the new unit, the underlying
@@ -319,7 +319,7 @@ private:
 
         addAndMakeVisible(palindromeToggle);
         palindromeToggle.setButtonText("Palindrome (play forward then backward)");
-        palindromeToggle.onClick = [this] { enforceRotationConstraint(); };
+        palindromeToggle.onClick = [this] { enforcePalindromeConstraint(); };
 
         addAndMakeVisible(repeatCountLabel);
         repeatCountLabel.setText("Repetitions:", juce::dontSendNotification);
@@ -330,21 +330,29 @@ private:
         repeatCountSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
         repeatCountSlider.setRange(1, 100, 1); // 100 is a generous practical ceiling, not an engine limit
         repeatCountSlider.setValue(1, juce::dontSendNotification);
-        repeatCountSlider.onValueChange = [this] { enforceRotationConstraint(); };
+        repeatCountSlider.onValueChange = [this] { enforcePalindromeConstraint(); };
 
-        enforceRotationConstraint();
+        enforcePalindromeConstraint();
     }
 
-    // Rotation accumulates its angle as a RELATIVE rotation of the group's current orientation
-    // (see AnimatorMath::computeCycleState's comment), not an absolute set - unlike Movement/
-    // Stretch, repeating it without Palindrome would need a dedicated "undo the accumulated
-    // rotation" correction at each repeat boundary, which this feature deliberately does not
-    // implement. So whenever the host clip contains a Rotation action and Repetitions is above 1,
-    // Palindrome is locked on - disabled rather than merely warned, so an invalid combination can
-    // never be created through the UI at all.
-    void enforceRotationConstraint()
+    // Two unrelated reasons a non-palindrome repeat would visibly jump at each repeat boundary,
+    // both reported through the same flag (setPalindromeRequiredForRepeat()):
+    //  - A Rotation action accumulates its angle as a RELATIVE rotation of the group's current
+    //    orientation (see AnimatorMath::computeCycleState's comment), not an absolute set - unlike
+    //    Movement/Stretch, repeating it without Palindrome would need a dedicated "undo the
+    //    accumulated rotation" correction at each repeat boundary, which this feature deliberately
+    //    does not implement.
+    //  - A MoveTo movement (Cartesian or Polar) ends at a different point than it started (that's
+    //    the whole point of it) - repeating it without Palindrome snaps instantly from the target
+    //    back to the start at every repeat boundary, a jump Circle/Spiral don't have the same way
+    //    (they return at least close to their start angle/radius every pass) and Stretch/Rotation
+    //    don't need Palindrome to avoid (Stretch is a pure function of progress, so its own
+    //    non-palindrome repeat is a deliberate, expected sawtooth, not a bug).
+    // Either way, whenever Repetitions is above 1, Palindrome is locked on - disabled rather than
+    // merely warned, so an invalid combination can never be created through the UI at all.
+    void enforcePalindromeConstraint()
     {
-        const bool mustForcePalindrome = rotationConstraintActive && repeatCountSlider.getValue() > 1;
+        const bool mustForcePalindrome = palindromeRequiredForRepeat && repeatCountSlider.getValue() > 1;
 
         if (mustForcePalindrome && !palindromeToggle.getToggleState())
             palindromeToggle.setToggleState(true, juce::dontSendNotification);
@@ -352,7 +360,7 @@ private:
         palindromeToggle.setEnabled(!mustForcePalindrome);
         palindromeToggle.setAlpha(mustForcePalindrome ? 0.7f : 1.0f);
         palindromeToggle.setTooltip(mustForcePalindrome
-            ? "Locked on: a Rotation action is present and Repetitions is greater than 1"
+            ? "Locked on: this clip's content would jump at each repeat boundary without Palindrome"
             : "Each repetition plays the clip's motion forward, then backward, instead of just forward");
     }
     
@@ -451,7 +459,7 @@ private:
     juce::ToggleButton palindromeToggle;
     juce::Label repeatCountLabel;
     juce::Slider repeatCountSlider;
-    bool rotationConstraintActive = false;
+    bool palindromeRequiredForRepeat = false;
 
     juce::Colour currentColour = juce::Colours::cornflowerblue;
     std::unique_ptr<juce::ColourSelector> colourSelectorPtr;
