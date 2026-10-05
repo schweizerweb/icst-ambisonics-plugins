@@ -17,8 +17,20 @@ struct Clip
     ms_t length = 250;    // ms
     juce::Colour colour = juce::Colours::cornflowerblue;
     bool muted = false;  // excluded from playback, but keeps its data - toggled via the clip editor or the 'M' key
+    bool palindrome = false;  // play the clip's progress curve forward then backward instead of just forward
+    int repetitions = 1;      // number of forward (or forward+backward, if palindrome) cycles compressed into this clip's existing length - orthogonal to MovementClip::count
 
     ms_t end() const { return start + length; }
+
+    // Used by the clip editors' dirty detection (is the clip being edited different from what's
+    // actually stored). Subclasses extend this with their own fields - see MovementClip/ActionClip.
+    bool operator==(const Clip& other) const
+    {
+        return id == other.id && start == other.start && length == other.length &&
+               colour == other.colour && muted == other.muted &&
+               palindrome == other.palindrome && repetitions == other.repetitions;
+    }
+    bool operator!=(const Clip& other) const { return !(*this == other); }
 };
 
 struct MovementClip : public Clip
@@ -33,6 +45,24 @@ struct MovementClip : public Clip
 
     double count = 1.0;           // For Circle and Spiral: number of full rounds
     double radiusChange = 0.0;    // For Spiral only: change of the radius per round, with which the group point will rotate around the target point. for now it's the absolute radius change per round.
+
+    // Point3D's own operator== is not const-qualified (can't be called on a const Point3D), so its
+    // coordinates are compared directly via their (const-qualified) getters instead.
+    bool operator==(const MovementClip& other) const
+    {
+        return static_cast<const Clip&>(*this) == static_cast<const Clip&>(other) &&
+               movementType == other.movementType &&
+               juce::exactlyEqual(startPointGroup.getX(), other.startPointGroup.getX()) &&
+               juce::exactlyEqual(startPointGroup.getY(), other.startPointGroup.getY()) &&
+               juce::exactlyEqual(startPointGroup.getZ(), other.startPointGroup.getZ()) &&
+               juce::exactlyEqual(targetPointGroup.getX(), other.targetPointGroup.getX()) &&
+               juce::exactlyEqual(targetPointGroup.getY(), other.targetPointGroup.getY()) &&
+               juce::exactlyEqual(targetPointGroup.getZ(), other.targetPointGroup.getZ()) &&
+               useStartPoint == other.useStartPoint &&
+               juce::exactlyEqual(count, other.count) &&
+               juce::exactlyEqual(radiusChange, other.radiusChange);
+    }
+    bool operator!=(const MovementClip& other) const { return !(*this == other); }
 };
 
 struct MovementLayer
@@ -76,6 +106,16 @@ public:
                     double jitterSpeed_ = 1.0)
         : action(action_), timing(timing_), value(value_),
           startValue(startValue_), useStartValue(useStartValue_), jitterSpeed(jitterSpeed_) {}
+
+    // Value equality of every field - used by ActionClip::operator== (via juce::Array<ActionDefinition>'s
+    // own element-wise operator==) for clip-editor dirty detection.
+    bool operator==(const ActionDefinition& other) const
+    {
+        return action == other.action && timing == other.timing &&
+               juce::exactlyEqual(value, other.value) && juce::exactlyEqual(startValue, other.startValue) &&
+               useStartValue == other.useStartValue && juce::exactlyEqual(jitterSpeed, other.jitterSpeed);
+    }
+    bool operator!=(const ActionDefinition& other) const { return !(*this == other); }
 
     // 1. Get unit based on action type
     std::string getUnit(bool verbose = false) const
@@ -212,6 +252,13 @@ public:
 struct ActionClip : public Clip
 {
     Array<ActionDefinition> actions;
+
+    bool operator==(const ActionClip& other) const
+    {
+        return static_cast<const Clip&>(*this) == static_cast<const Clip&>(other) &&
+               actions == other.actions;
+    }
+    bool operator!=(const ActionClip& other) const { return !(*this == other); }
 };
 
 struct ActionLayer
@@ -294,6 +341,8 @@ struct TimelineModel
             xClip->setAttribute("length", juce::String((juce::int64)c.length));
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
             xClip->setAttribute("muted", c.muted ? 1 : 0);
+            xClip->setAttribute("palindrome", c.palindrome ? 1 : 0);
+            xClip->setAttribute("repetitions", c.repetitions);
 
             // Serialize MovementClip specific data
             xClip->setAttribute("movementType", static_cast<int>(c.movementType));
@@ -323,6 +372,8 @@ struct TimelineModel
             xClip->setAttribute("length", juce::String((juce::int64)c.length));
             xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
             xClip->setAttribute("muted", c.muted ? 1 : 0);
+            xClip->setAttribute("palindrome", c.palindrome ? 1 : 0);
+            xClip->setAttribute("repetitions", c.repetitions);
 
             // Serialize ActionClip actions
             auto* xActions = new juce::XmlElement("Actions");
@@ -372,6 +423,8 @@ struct TimelineModel
                              ? juce::Colour((juce::uint32)colourHex.getHexValue32())
                              : juce::Colours::cornflowerblue;
                     c.muted = xClip->getBoolAttribute("muted", false);
+                    c.palindrome = xClip->getBoolAttribute("palindrome", false);
+                    c.repetitions = juce::jmax(1, xClip->getIntAttribute("repetitions", 1));
 
                     // Deserialize MovementClip specific data
                     c.movementType = static_cast<MovementType>(xClip->getIntAttribute("movementType", 0));  // Add this
@@ -406,6 +459,8 @@ struct TimelineModel
                              ? juce::Colour((juce::uint32)colourHex.getHexValue32())
                              : juce::Colours::cornflowerblue;
                     c.muted = xClip->getBoolAttribute("muted", false);
+                    c.palindrome = xClip->getBoolAttribute("palindrome", false);
+                    c.repetitions = juce::jmax(1, xClip->getIntAttribute("repetitions", 1));
 
                     // Deserialize ActionClip actions
                     if (auto* xActions = xClip->getChildByName("Actions"))

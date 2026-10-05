@@ -51,6 +51,61 @@ namespace AnimatorMath
         return state;
     }
 
+    // One clip-relative instant's state within its repeat/palindrome cycle, given the clip's own
+    // clamped-[0,1] progress (time-in-clip / clip.length - the same value every caller in this file
+    // already computes). repeatCount is defensively re-clamped to >=1 here even though the UI and
+    // XML loader already enforce that, so a hand-edited/corrupt value can never read out of bounds.
+    //
+    // When palindrome is false this is an N-fold sawtooth: repeatCount equal-duration segments,
+    // each replaying cycleProgress 0->1 forward. When palindrome is true there are 2*repeatCount
+    // equal-duration segments alternating forward/backward (a triangle wave): even-indexed segments
+    // run cycleProgress 0->1 forward, odd-indexed segments run cycleProgress 1->0 backward.
+    //
+    // Used two different ways by the two different kinds of math in this file:
+    //  - Movement (calculatePosition, which applies this to its own progress on every call) and
+    //    Stretch (calculateStretch's callers transform progress before calling it) are pure
+    //    functions of progress: feeding .cycleProgress in place of the raw clip progress
+    //    replays/palindromes the curve with zero changes to either function's own internal math,
+    //    and every segment boundary has matching cycleProgress on both sides, so there's never a
+    //    visible glitch at a boundary (e.g. repeatCount=2, palindrome=true: progress 0.5 sits at
+    //    the end of segment 1 - backward, local=1.0, cycleProgress=0.0 - and the start of segment 2
+    //    - forward, local=0.0, cycleProgress=0.0 - matching exactly).
+    //  - Rotation is NOT a pure function of progress (see calculateRotationTickRadians) - it
+    //    accumulates a per-tick delta applied as a RELATIVE rotation onto the group's current
+    //    orientation, not an absolute set. Multiply that per-tick delta by .direction instead:
+    //    every forward/backward segment pair has identical duration and rate, so the backward half
+    //    exactly cancels the forward half - flipping the sign at each boundary is seamless at any
+    //    repeatCount, landing back on the exact starting angle, with no "undo" correction needed.
+    //    This is why Rotation only ever supports Palindrome, never a bare repeatCount > 1 without
+    //    it - a bare repeat would need exactly that kind of undo, deliberately not implemented here.
+    //
+    // At repeatCount==1, palindrome==false (every clip that predates this feature, via XML
+    // defaults), this is an exact no-op: cycleProgress==progress, direction==1.0 always.
+    struct CycleState
+    {
+        double cycleProgress = 0.0; // in [0,1] - feed straight into calculatePosition/calculateStretch
+        double direction = 1.0;     // +1.0 forward, -1.0 backward - multiply Rotation's per-tick delta by this
+    };
+
+    inline CycleState computeCycleState(double progress, int repeatCount, bool palindrome)
+    {
+        repeatCount = juce::jmax(1, repeatCount);
+        const int totalSegments = palindrome ? (2 * repeatCount) : repeatCount;
+
+        progress = juce::jlimit(0.0, 1.0, progress);
+        const double scaled = progress * (double)totalSegments;
+        // progress==1.0 (and float error landing exactly on a boundary) must resolve to the end of
+        // the last segment, not the start of a (totalSegments)-th segment that doesn't exist.
+        int segmentIndex = juce::jlimit(0, totalSegments - 1, (int)std::floor(scaled));
+        const double segmentLocalProgress = juce::jlimit(0.0, 1.0, scaled - (double)segmentIndex);
+        const bool isBackward = palindrome && ((segmentIndex % 2) == 1);
+
+        CycleState state;
+        state.cycleProgress = isBackward ? (1.0 - segmentLocalProgress) : segmentLocalProgress;
+        state.direction = isBackward ? -1.0 : 1.0;
+        return state;
+    }
+
     inline juce::Vector3D<double> cartesianToSpherical(const juce::Vector3D<double>& cartesian)
     {
         const double x = cartesian.x, y = cartesian.y, z = cartesian.z;
@@ -84,6 +139,11 @@ namespace AnimatorMath
     inline juce::Vector3D<double> calculatePosition(const MovementClip& clip, double progress,
                                                       const MovementStartState& start, juce::Vector3D<double> currentReferencePosition)
     {
+        // Repetitions/Palindrome compress N (or 2N, if palindrome) replays of this progress-driven
+        // curve into the clip's existing length - orthogonal to clip.count (Circle/Spiral's own
+        // windings-per-pass), which still multiplies within each replay below.
+        progress = computeCycleState(progress, clip.repetitions, clip.palindrome).cycleProgress;
+
         switch (clip.movementType)
         {
             case MovementType::MoveToCartesian:

@@ -122,6 +122,25 @@ bool MovementClipEditor::applyChanges()
     return false;
 }
 
+bool MovementClipEditor::isDirty()
+{
+    // Point3D's operator= only accepts a non-const lvalue (the same pre-existing quirk noted in
+    // applyChanges()), so comparing directly against the temporary buildClipFromControls() return
+    // won't compile - go through a named local first.
+    MovementClip built = buildClipFromControls();
+    return built != currentClip;
+}
+
+bool MovementClipEditor::confirmDiscardIfDirty()
+{
+    if (!isDirty())
+        return true;
+
+    return juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
+        "Discard Changes?", "This clip has unsaved changes. Discard them?",
+        "Discard", "Keep Editing");
+}
+
 MovementClip MovementClipEditor::buildClipFromControls()
 {
     MovementClip clip = currentClip;
@@ -186,6 +205,9 @@ void MovementClipEditor::createControls()
     
     addAndMakeVisible(cancelButton);
     cancelButton.onClick = [this] {
+        if (!confirmDiscardIfDirty())
+            return;
+
         // Send action message to close the window
         if (auto* broadcaster = findParentComponentOfClass<juce::ActionBroadcaster>())
             broadcaster->sendActionMessage(ACTION_CLOSE_CLIP_EDITOR);

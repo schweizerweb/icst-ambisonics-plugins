@@ -3,6 +3,7 @@
 #include <JuceHeader.h>
 #include "CommonClipSettings.h"
 #include "ClipPreviewComponent.h"
+#include "ClipEditorCloseGuard.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
 
@@ -150,7 +151,8 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CoordinateValueControl)
 };
 
-class MovementClipEditor : public juce::Component, public juce::ChangeListener, private juce::Timer
+class MovementClipEditor : public juce::Component, public juce::ChangeListener,
+                            public ClipEditorCloseGuard, private juce::Timer
 {
 public:
     MovementClipEditor(TimelineComponent& timeline, int timelineIdx, int clipIdx);
@@ -164,6 +166,13 @@ public:
     bool applyChanges();
 
     void changeListenerCallback(ChangeBroadcaster* source) override;
+
+    // True if the live UI state differs from currentClip (the last-applied/originally-loaded
+    // state) - currentClip is never mutated outside applyChanges(), so it already IS the "original"
+    // snapshot to compare against (unlike ActionClipEditor, which needs a separate snapshot since
+    // its currentClip.actions is mutated live by add/remove/edit).
+    bool isDirty();
+    bool confirmDiscardIfDirty() override;
 
 private:
     AmbiSourceSet* pSourceSet;

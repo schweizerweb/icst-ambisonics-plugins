@@ -141,13 +141,19 @@ private:
                 recomputeSceneScale();
             }
 
+            // Shared with computeCurrentFormation()'s Stretch handling below - both read from the
+            // same wrapping stretchProgress clock, matching how a real ActionClip's Repetitions/
+            // Palindrome apply uniformly to every action within it (AnimatorEngine::processActiveActions
+            // computes exactly one cycleState per clip too, not one per action).
+            const auto actionCycle = AnimatorMath::computeCycleState(stretchProgress, actionClip.repetitions, actionClip.palindrome);
+
             for (const auto& actionDef : actionClip.actions)
             {
                 if (actionDef.getAction() == ActionType::RotationX ||
                     actionDef.getAction() == ActionType::RotationY ||
                     actionDef.getAction() == ActionType::RotationZ)
                 {
-                    accumulatedRotation += AnimatorMath::calculateRotationTickRadians(actionDef, tickMs, actionClip.length);
+                    accumulatedRotation += AnimatorMath::calculateRotationTickRadians(actionDef, tickMs, actionClip.length) * actionCycle.direction;
                 }
             }
 
@@ -285,11 +291,13 @@ private:
         double stretch = 1.0;
         if (hasActionClip)
         {
+            const auto actionCycle = AnimatorMath::computeCycleState(stretchProgress, actionClip.repetitions, actionClip.palindrome);
+
             for (const auto& actionDef : actionClip.actions)
             {
                 if (actionDef.getAction() == ActionType::Stretch && actionDef.getTiming() != TimingType::None)
                 {
-                    stretch = AnimatorMath::calculateStretch(actionDef, stretchProgress, actionClip.length, stretchInitial, hasReferenceStretchFlag);
+                    stretch = AnimatorMath::calculateStretch(actionDef, actionCycle.cycleProgress, actionClip.length, stretchInitial, hasReferenceStretchFlag);
                     break;
                 }
             }

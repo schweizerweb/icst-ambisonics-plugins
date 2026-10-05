@@ -460,10 +460,17 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         double progress = (action.clip.length > 0) ?
             static_cast<double>(timeInAction) / action.clip.length : 0.0;
         progress = juce::jlimit(0.0, 1.0, progress);
-        
+
+        // One clip-wide cycle state, shared by every action in this clip - Stretch gets its
+        // progress remapped to replay/palindrome; Rotation gets its per-tick delta sign-flipped
+        // during the "backward" half (see AnimatorMath::computeCycleState for why these need
+        // different treatment). Jitter deliberately ignores this entirely - continuous noise has
+        // no forward/backward notion, so it's left untouched below.
+        const auto cycleState = AnimatorMath::computeCycleState(progress, action.clip.repetitions, action.clip.palindrome);
+
         // Accumulate rotations for this timeline (in radians)
         double xAngleRad = 0.0, yAngleRad = 0.0, zAngleRad = 0.0;
-        
+
         // Process all actions in this clip
         for (const auto& actionDef : action.clip.actions)
         {
@@ -472,7 +479,7 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
                 if (actionDef.getAction() == ActionType::Stretch)
                 {
                     // Keep full stretch functionality including initial state
-                    processStretchAction(action.timelineIndex, actionDef, progress, action);
+                    processStretchAction(action.timelineIndex, actionDef, cycleState.cycleProgress, action);
                 }
                 else if (actionDef.getAction() == ActionType::Jitter)
                 {
@@ -480,49 +487,14 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
                 }
                 else
                 {
-                    // Calculate angle based on time delta and timing type
-                    double angleDeg = 0.0;
-                    double timeDeltaSeconds = timeDelta / 1000.0;
-                    
-                    switch (actionDef.getTiming())
-                    {
-                        case TimingType::RelativeDuringClip:
-                        {
-                            // Calculate angle based on progress through clip
-                            double totalAngle = actionDef.getValue();
-                            double anglePerMs = totalAngle / action.clip.length;
-                            angleDeg = anglePerMs * timeDelta;
-                            break;
-                        }
-                            
-                        case TimingType::ConstantPerSecond:
-                        {
-                            // Angle per second * time delta in seconds
-                            angleDeg = actionDef.getValue() * timeDeltaSeconds;
-                            break;
-                        }
-                            
-                        case TimingType::AbsoluteTarget:
-                            // Skip absolute targets for rotations
-                            continue;
-                            
-                        case TimingType::None:
-                            continue;
-                    }
-                    
-                    // Convert to radians and accumulate
-                    double angleRad = juce::degreesToRadians(angleDeg);
-                    
-                    switch (actionDef.getAction())
-                    {
-                        case ActionType::RotationX: xAngleRad += angleRad; break;
-                        case ActionType::RotationY: yAngleRad += angleRad; break;
-                        case ActionType::RotationZ: zAngleRad += angleRad; break;
-                        case ActionType::Stretch:
-                        case ActionType::None:
-                        default:
-                            break;
-                    }
+                    // Rotation accumulates a per-tick delta rather than computing an absolute angle
+                    // from progress (see AnimatorMath::calculateRotationTickRadians's own comment),
+                    // so repeats/palindrome apply as a sign flip on that delta instead of a progress
+                    // remap - .direction is +1 during a forward half, -1 during a backward half.
+                    const auto tick = AnimatorMath::calculateRotationTickRadians(actionDef, timeDelta, action.clip.length);
+                    xAngleRad += tick.x * cycleState.direction;
+                    yAngleRad += tick.y * cycleState.direction;
+                    zAngleRad += tick.z * cycleState.direction;
                 }
             }
         }

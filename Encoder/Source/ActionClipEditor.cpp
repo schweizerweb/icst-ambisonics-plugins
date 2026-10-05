@@ -14,6 +14,8 @@ ActionClipEditor::ActionClipEditor(TimelineComponent& timeline, int timelineIdx,
         }
     }
 
+    originalClip = currentClip;
+
     pSourceSet = timelineComp.getSources();
     pPointSelection = timelineComp.getPointSelection();
     if (pPointSelection != nullptr)
@@ -51,7 +53,19 @@ void ActionClipEditor::timerCallback()
 {
     ActionClip clip = currentClip;
     clip.length = commonSettings.getLiveLength();
+    clip.palindrome = commonSettings.getLivePalindrome();
+    clip.repetitions = commonSettings.getLiveRepeatCount();
     preview.setActionClip(clip);
+}
+
+bool ActionClipEditor::currentClipHasRotation() const
+{
+    for (const auto& actionDef : currentClip.actions)
+        if (actionDef.getAction() == ActionType::RotationX ||
+            actionDef.getAction() == ActionType::RotationY ||
+            actionDef.getAction() == ActionType::RotationZ)
+            return true;
+    return false;
 }
 
 void ActionClipEditor::resized()
@@ -137,6 +151,27 @@ bool ActionClipEditor::applyChanges()
     return false;
 }
 
+bool ActionClipEditor::isDirty()
+{
+    // currentClip.actions is already kept live by addAction()/removeSelectedAction()/editAction(),
+    // but its base Clip fields (length/palindrome/repetitions/etc.) only get pulled from
+    // CommonClipSettings' controls on Apply - applyToClip() onto a scratch copy pulls them live
+    // for comparison here too, the same way timerCallback() already does for the live preview.
+    ActionClip liveClip = currentClip;
+    commonSettings.applyToClip(liveClip);
+    return liveClip != originalClip;
+}
+
+bool ActionClipEditor::confirmDiscardIfDirty()
+{
+    if (!isDirty())
+        return true;
+
+    return juce::AlertWindow::showOkCancelBox(juce::AlertWindow::WarningIcon,
+        "Discard Changes?", "This clip has unsaved changes. Discard them?",
+        "Discard", "Keep Editing");
+}
+
 // ListBoxModel implementation
 int ActionClipEditor::getNumRows()
 {
@@ -180,6 +215,7 @@ void ActionClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+    commonSettings.setRotationConstraintActive(currentClipHasRotation());
 
     addAndMakeVisible(preview);
     preview.setActionClip(currentClip);
@@ -199,6 +235,9 @@ void ActionClipEditor::createControls()
     
     addAndMakeVisible(cancelButton);
     cancelButton.onClick = [this] {
+        if (!confirmDiscardIfDirty())
+            return;
+
         // Send action message to close the window
         if (auto* broadcaster = findParentComponentOfClass<juce::ActionBroadcaster>())
             broadcaster->sendActionMessage(ACTION_CLOSE_CLIP_EDITOR);
@@ -255,6 +294,7 @@ void ActionClipEditor::addAction()
         currentClip.actions.add(newAction);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
+        commonSettings.setRotationConstraintActive(currentClipHasRotation());
     }
 }
 
@@ -266,6 +306,7 @@ void ActionClipEditor::removeSelectedAction()
         currentClip.actions.remove(selected);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
+        commonSettings.setRotationConstraintActive(currentClipHasRotation());
     }
 }
 
@@ -280,6 +321,7 @@ void ActionClipEditor::editAction(int index)
             currentClip.actions.getReference(index) = action;
             actionsList.updateContent();
             preview.setActionClip(currentClip);
+            commonSettings.setRotationConstraintActive(currentClipHasRotation());
         }
     }
 }

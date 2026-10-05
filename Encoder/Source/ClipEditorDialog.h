@@ -1,6 +1,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AdditionalWindow.h"
+#include "ClipEditorCloseGuard.h"
 #include "MovementClipEditor.h"
 #include "ActionClipEditor.h"
 
@@ -28,6 +29,13 @@ public:
 
     void closeButtonPressed() override
     {
+        // Same dirty check the Cancel button now runs (both are "discard without applying" paths) -
+        // getContentComponent() is the hosted MovementClipEditor/ActionClipEditor, both of which
+        // implement ClipEditorCloseGuard.
+        if (auto* guard = dynamic_cast<ClipEditorCloseGuard*>(getContentComponent()))
+            if (!guard->confirmDiscardIfDirty())
+                return;
+
         sendActionMessage(ACTION_CLOSE_CLIP_EDITOR);
     }
 };

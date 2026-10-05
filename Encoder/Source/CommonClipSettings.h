@@ -113,6 +113,18 @@ public:
 
         // Muted row - self-labelled toggle, no separate label needed
         mutedToggle.setBounds(area.removeFromTop(rowHeight));
+
+        area.removeFromTop(verticalSpacing);
+
+        // Palindrome row - self-labelled toggle, no separate label needed
+        palindromeToggle.setBounds(area.removeFromTop(rowHeight));
+
+        area.removeFromTop(verticalSpacing);
+
+        // Repetitions row - field stretches to right edge
+        auto repeatRow = area.removeFromTop(rowHeight);
+        repeatCountLabel.setBounds(repeatRow.removeFromLeft(labelWidth));
+        repeatCountSlider.setBounds(repeatRow);
     }
 
     int getRequiredHeight() const
@@ -121,8 +133,8 @@ public:
         const int verticalSpacing = 8;
         const int topBottomMargin = 10;
 
-        // 6 rows (name, start, duration, end, colour, muted) + margins
-        return topBottomMargin * 2 + (rowHeight * 6) + (verticalSpacing * 5);
+        // 8 rows (name, start, duration, end, colour, muted, palindrome, repetitions) + margins
+        return topBottomMargin * 2 + (rowHeight * 8) + (verticalSpacing * 7);
     }
 
     // Read-only live value of the Duration field, independent of applyToClip()/Apply - for callers
@@ -130,6 +142,21 @@ public:
     ms_t getLiveLength() const
     {
         return parseTimeValue(durationEditor.getText(), displayInSeconds);
+    }
+
+    // Same contract as getLiveLength(), for the clip preview's live polling.
+    bool getLivePalindrome() const { return palindromeToggle.getToggleState(); }
+    int getLiveRepeatCount() const { return juce::jmax(1, (int)repeatCountSlider.getValue()); }
+
+    // Called by ActionClipEditor (which alone knows currentClip.actions) whenever the action list
+    // changes or the clip is first loaded, so Repetitions > 1 can never be combined with Palindrome
+    // off while a Rotation action is present - see enforceRotationConstraint()'s comment for why.
+    // Movement clips never contain a Rotation action, so MovementClipEditor never calls this; it
+    // stays at its default false there.
+    void setRotationConstraintActive(bool hasRotationAction)
+    {
+        rotationConstraintActive = hasRotationAction;
+        enforceRotationConstraint();
     }
 
     void setClipData(const Clip& clip)
@@ -141,6 +168,9 @@ public:
         currentColour = clip.colour;
         updateColourButton();
         mutedToggle.setToggleState(clip.muted, juce::dontSendNotification);
+        palindromeToggle.setToggleState(clip.palindrome, juce::dontSendNotification);
+        repeatCountSlider.setValue(clip.repetitions, juce::dontSendNotification);
+        enforceRotationConstraint();
     }
 
     void applyToClip(Clip& clip)
@@ -150,6 +180,10 @@ public:
         clip.length = parseTimeValue(durationEditor.getText(), displayInSeconds);
         clip.colour = currentColour;
         clip.muted = mutedToggle.getToggleState();
+        clip.repetitions = juce::jmax(1, (int)repeatCountSlider.getValue());
+        clip.palindrome = palindromeToggle.getToggleState();
+        if (rotationConstraintActive && clip.repetitions > 1)
+            clip.palindrome = true; // defensive re-clamp - enforceRotationConstraint() already makes this unreachable through the UI
     }
 
     // Display only - re-renders whatever is currently shown in the new unit, the underlying
@@ -282,6 +316,44 @@ private:
         addAndMakeVisible(mutedToggle);
         mutedToggle.setButtonText("Muted (excluded from playback)");
         mutedToggle.setTooltip("Keeps the clip's data but skips it during playback - toggle with the 'M' key on the timeline too");
+
+        addAndMakeVisible(palindromeToggle);
+        palindromeToggle.setButtonText("Palindrome (play forward then backward)");
+        palindromeToggle.onClick = [this] { enforceRotationConstraint(); };
+
+        addAndMakeVisible(repeatCountLabel);
+        repeatCountLabel.setText("Repetitions:", juce::dontSendNotification);
+        repeatCountLabel.setJustificationType(juce::Justification::centredLeft);
+
+        addAndMakeVisible(repeatCountSlider);
+        repeatCountSlider.setSliderStyle(juce::Slider::IncDecButtons);
+        repeatCountSlider.setTextBoxStyle(juce::Slider::TextBoxLeft, false, 70, 22);
+        repeatCountSlider.setRange(1, 100, 1); // 100 is a generous practical ceiling, not an engine limit
+        repeatCountSlider.setValue(1, juce::dontSendNotification);
+        repeatCountSlider.onValueChange = [this] { enforceRotationConstraint(); };
+
+        enforceRotationConstraint();
+    }
+
+    // Rotation accumulates its angle as a RELATIVE rotation of the group's current orientation
+    // (see AnimatorMath::computeCycleState's comment), not an absolute set - unlike Movement/
+    // Stretch, repeating it without Palindrome would need a dedicated "undo the accumulated
+    // rotation" correction at each repeat boundary, which this feature deliberately does not
+    // implement. So whenever the host clip contains a Rotation action and Repetitions is above 1,
+    // Palindrome is locked on - disabled rather than merely warned, so an invalid combination can
+    // never be created through the UI at all.
+    void enforceRotationConstraint()
+    {
+        const bool mustForcePalindrome = rotationConstraintActive && repeatCountSlider.getValue() > 1;
+
+        if (mustForcePalindrome && !palindromeToggle.getToggleState())
+            palindromeToggle.setToggleState(true, juce::dontSendNotification);
+
+        palindromeToggle.setEnabled(!mustForcePalindrome);
+        palindromeToggle.setAlpha(mustForcePalindrome ? 0.7f : 1.0f);
+        palindromeToggle.setTooltip(mustForcePalindrome
+            ? "Locked on: a Rotation action is present and Repetitions is greater than 1"
+            : "Each repetition plays the clip's motion forward, then backward, instead of just forward");
     }
     
     void onStartChanged()
@@ -376,7 +448,11 @@ private:
     juce::TextEditor nameEditor, startEditor, durationEditor, endEditor;
     juce::TextButton colourButton;
     juce::ToggleButton mutedToggle;
-    
+    juce::ToggleButton palindromeToggle;
+    juce::Label repeatCountLabel;
+    juce::Slider repeatCountSlider;
+    bool rotationConstraintActive = false;
+
     juce::Colour currentColour = juce::Colours::cornflowerblue;
     std::unique_ptr<juce::ColourSelector> colourSelectorPtr;
     bool displayInSeconds = true;

@@ -3,13 +3,14 @@
 #include "ActionEditDialog.h"
 #include "CommonClipSettings.h"
 #include "ClipPreviewComponent.h"
+#include "ClipEditorCloseGuard.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
 
 class TimelineComponent;
 
 class ActionClipEditor : public juce::Component, public juce::ListBoxModel,
-                         public juce::ChangeListener, private juce::Timer
+                         public juce::ChangeListener, public ClipEditorCloseGuard, private juce::Timer
 {
 public:
     ActionClipEditor(TimelineComponent& timeline, int timelineIdx, int clipIdx);
@@ -21,6 +22,12 @@ public:
     int getTotalRequiredWidth() const;
     bool applyChanges();
 
+    // True if the live UI state (currentClip.actions, already kept live by add/remove/edit, plus
+    // CommonClipSettings' fields, pulled live the same way the preview's own timerCallback() does)
+    // differs from originalClip, the pristine snapshot captured at construction.
+    bool isDirty();
+    bool confirmDiscardIfDirty() override;
+
     int getNumRows() override;
     void paintListBoxItem(int rowNumber, juce::Graphics& g, int width, int height, bool rowIsSelected) override;
     void listBoxItemDoubleClicked(int row, const juce::MouseEvent&) override;
@@ -31,6 +38,11 @@ private:
     TimelineComponent& timelineComp;
     int timelineIndex, clipIndex;
     ActionClip currentClip;
+    // Pristine snapshot of currentClip as loaded at construction, before any edits - unlike
+    // MovementClipEditor (whose currentClip stays untouched until Apply), this editor's
+    // currentClip.actions is mutated live by addAction()/removeSelectedAction()/editAction(), so a
+    // separate copy is needed to detect unsaved changes.
+    ActionClip originalClip;
 
     AmbiSourceSet* pSourceSet = nullptr;
     PointSelection* pPointSelection = nullptr;
@@ -62,6 +74,10 @@ private:
     // edit merged into the rest of the clip) before OK is pressed.
     bool editActionDialog(ActionDefinition& action, const juce::String& title, int editingIndex);
     void updateReferenceFromGroup();
+    // Whether currentClip.actions contains a Rotation action - drives
+    // commonSettings.setRotationConstraintActive(), since only ActionClipEditor (not
+    // CommonClipSettings itself) knows what's in the clip.
+    bool currentClipHasRotation() const;
 
     // Clip editors have no per-control change notification, so the preview is kept live by
     // polling the Duration field instead - currentClip.actions is already kept live by

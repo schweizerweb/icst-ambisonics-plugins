@@ -46,6 +46,7 @@ SET(SRC_FILES
 	../Source/AnimatorMainView.cpp
 	../Source/ActionEditDialog.h
 	../Source/ClipPreviewComponent.h
+	../Source/ClipEditorCloseGuard.h
 	../Source/CommonClipSettings.h
 	../Source/MovementClipEditor.h
 	../Source/MovementClipEditor.cpp
