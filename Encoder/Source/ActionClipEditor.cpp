@@ -131,6 +131,11 @@ bool ActionClipEditor::applyChanges()
     {
         if (clipIndex >= 0 && clipIndex < timelineModel->actions.clips.size())
         {
+            // See MovementClipEditor::applyChanges - one step per Apply, only when it changes
+            // something.
+            if (!(timelineModel->actions.clips.getReference(clipIndex) == currentClip))
+                timelineComp.pushUndoStep("Edit Action Clip");
+
             timelineModel->actions.clips.getReference(clipIndex) = currentClip;
             return true;
         }

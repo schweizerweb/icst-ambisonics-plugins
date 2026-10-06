@@ -129,8 +129,74 @@ void AnimatorMainView::changeListenerCallback(juce::ChangeBroadcaster* source)
         commandManager->commandStatusChanged();
 }
 
+AnimatorUndoManager* AnimatorMainView::getUndoManager() const
+{
+    if (timelineViewport == nullptr)
+        return nullptr;
+
+    if (auto* tc = timelineViewport->getTimelineComponent())
+        return &tc->getUndoManager();
+
+    return nullptr;
+}
+
+void AnimatorMainView::pushUndoStep(const juce::String& name)
+{
+    if (auto* undo = getUndoManager())
+        if (timelines != nullptr)
+            undo->pushStep(name, *timelines);
+}
+
+void AnimatorMainView::performUndo()
+{
+    applyUndoRedo(true);
+}
+
+void AnimatorMainView::performRedo()
+{
+    applyUndoRedo(false);
+}
+
+void AnimatorMainView::applyUndoRedo(bool isUndo)
+{
+    auto* undo = getUndoManager();
+    if (undo == nullptr || timelines == nullptr)
+        return;
+
+    const auto name = isUndo ? undo->getUndoName() : undo->getRedoName();
+
+    if (!(isUndo ? undo->undo(*timelines) : undo->redo(*timelines)))
+        return;
+
+    // The timelines array has been rebuilt, so anything addressing it by index has to be reset -
+    // open clip editors, the selection, the current timeline. TimelineComponent handles its own.
+    if (auto* tc = timelineViewport->getTimelineComponent())
+        tc->refreshAfterUndoRedo();
+
+    timelineViewport->setTimelines(timelines);
+    timelineViewport->repaint();
+
+    if (menuBarModel != nullptr)
+        menuBarModel->menuItemsChanged();
+    if (commandManager != nullptr)
+        commandManager->commandStatusChanged();
+
+    juce::AttributedString msg;
+    msg.append((isUndo ? "Undid " : "Redid ") + (name.isNotEmpty() ? name : juce::String("last change")),
+               juce::FontOptions(12.0f, juce::Font::bold),
+               juce::Colours::lightgreen);
+    setStatusMessage(msg);
+}
+
 void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)
 {
+    // A different scene is being shown, so the existing history describes clips that are no longer
+    // here. Deliberately only on THIS setTimelines, not TimelineComponent's - that one is also
+    // called by applyUndoRedo(), which must not wipe the history it is walking.
+    if (newTimelines != timelines)
+        if (auto* undo = getUndoManager())
+            undo->clear();
+
     timelines = newTimelines;
     timelineViewport->setTimelines(timelines);
     timelineViewport->getTimelineComponent()->setStatusMessageFunction(getStatusMessageFunction());
@@ -321,11 +387,11 @@ void AnimatorMainView::handleMenuAction(int menuItemID)
             break;
 
         case 10: // Undo
-            // Handle undo (not implemented yet)
+            performUndo();
             break;
 
         case 11: // Redo
-            // Handle redo (not implemented yet)
+            performRedo();
             break;
 
         case 199: // Export - All Groups
@@ -501,6 +567,14 @@ void AnimatorMainView::applyImportedGroups(const juce::OwnedArray<TimelineModel>
         timelines = new juce::OwnedArray<TimelineModel>();
 
     auto* timelineComp = timelineViewport->getTimelineComponent();
+
+    pushUndoStep("Import Scene");
+
+    // insertTimelineAtCursor() pushes a step of its own; without suppressing it here, importing N
+    // groups would leave N+1 entries in the history instead of the single "Import Scene" above.
+    std::unique_ptr<AnimatorUndoManager::ScopedSuppressor> undoSuppressor;
+    if (auto* undo = getUndoManager())
+        undoSuppressor = std::make_unique<AnimatorUndoManager::ScopedSuppressor>(*undo);
 
     for (int i = 0; i < importedGroups.size(); ++i)
     {
@@ -744,6 +818,8 @@ void AnimatorMainView::loadDemoContent()
 {
     if (timelines == nullptr)
         timelines = new juce::OwnedArray<TimelineModel>();
+
+    pushUndoStep("Load Demo Scene");
 
     timelines->clear(true);
 
@@ -1275,16 +1351,24 @@ void AnimatorMainView::getCommandInfo(juce::CommandID commandID, juce::Applicati
             break;
         
         case CMD_undo:
-            result.setInfo("Undo", "Undo last manipulation", "Edit", 0);
+        {
+            // Naming the step ("Undo Move Clip") makes it obvious what is about to be reversed,
+            // which matters when the history spans several different kinds of edit.
+            const auto name = getUndoManager() != nullptr ? getUndoManager()->getUndoName() : juce::String();
+            result.setInfo(name.isNotEmpty() ? "Undo " + name : "Undo", "Undo last manipulation", "Edit", 0);
             result.addDefaultKeypress('Z', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
-            result.setActive(false);
+            result.setActive(getUndoManager() != nullptr && getUndoManager()->canUndo());
             break;
+        }
             
         case CMD_redo:
-            result.setInfo("Redo", "Redo last undone manipulation", "Edit", 0);
+        {
+            const auto name = getUndoManager() != nullptr ? getUndoManager()->getRedoName() : juce::String();
+            result.setInfo(name.isNotEmpty() ? "Redo " + name : "Redo", "Redo last undone manipulation", "Edit", 0);
             result.addDefaultKeypress('Y', isMac ? juce::ModifierKeys::commandModifier : juce::ModifierKeys::ctrlModifier);
-            result.setActive(false);
+            result.setActive(getUndoManager() != nullptr && getUndoManager()->canRedo());
             break;
+        }
             
         case CMD_toggleOnOff:
             result.setInfo("Toggle ON/OFF", "Toggles the Animator Engine", "Playback", 0);
@@ -1351,21 +1435,10 @@ bool AnimatorMainView::perform(const juce::ApplicationCommandTarget::InvocationI
             toggleAutoFollow();
             return true;
         case CMD_undo:
-            {
-                juce::AttributedString msg;
-                msg.append("Undo is not implemented yet!",
-                           juce::FontOptions(12.0f, juce::Font::bold),
-                           juce::Colours::orangered);
-                setStatusMessage(msg);
-            }
+            performUndo();
             return true;
         case CMD_redo:
-            { juce::AttributedString msg;
-                msg.append("Redo is not implemented yet!",
-                           juce::FontOptions(12.0f, juce::Font::bold),
-                           juce::Colours::orangered);
-                setStatusMessage(msg);
-            }
+            performRedo();
             return true;
         case CMD_toggleOnOff:
             toggleOnOff();
@@ -1412,7 +1485,9 @@ void AnimatorMainView::addNewTimeline()
 {
     if (timelines == nullptr)
         timelines = new juce::OwnedArray<TimelineModel>();
-    
+
+    pushUndoStep("Add Timeline");
+
     auto* newTimeline = new TimelineModel();
     timelines->add(newTimeline);
     
@@ -1461,6 +1536,8 @@ void AnimatorMainView::removeAllInvalidTimelines()
                                        juce::ModalCallbackFunction::create([this, invalidIndices](int result) {
                                            if (result != 0) // User clicked "Delete"
                                            {
+                                               pushUndoStep("Remove Timelines");
+
                                                // Remove timelines from highest index to lowest to avoid index issues
                                                for (int i = invalidIndices.size() - 1; i >= 0; --i)
                                                {
@@ -1509,6 +1586,7 @@ void AnimatorMainView::removeTimeline(int timelineIndex)
                                        juce::ModalCallbackFunction::create([this, timelineIndex, timelineName](int result) {
                                            if (result != 0) // User clicked "Delete"
                                            {
+                                               pushUndoStep("Remove Timeline");
                                                timelines->remove(timelineIndex);
                                                
                                                // Update the timeline component

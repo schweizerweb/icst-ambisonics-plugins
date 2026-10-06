@@ -31,6 +31,13 @@ public:
     void timerCallback() override;
     void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
+    // Undo/redo. The history itself lives on TimelineComponent (where the clip mutations are);
+    // these reach it through the viewport and handle the UI refresh afterwards.
+    class AnimatorUndoManager* getUndoManager() const;
+    void pushUndoStep(const juce::String& name);
+    void performUndo();
+    void performRedo();
+
     // Status bar functionality
     void setStatusMessage(const juce::AttributedString& message);
     void clearStatusMessage();
@@ -123,6 +130,8 @@ private:
     
     // File
     void addNewTimeline();
+    // Shared body of performUndo()/performRedo() - the two differ only in direction.
+    void applyUndoRedo(bool isUndo);
     void removeAllInvalidTimelines();
     void removeTimeline(int timelineIndex);
     void importScene();

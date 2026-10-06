@@ -2,6 +2,7 @@
 
 #include "JuceHeader.h"
 #include "TimelineModel.h"
+#include "AnimatorUndoManager.h"
 #include "TimelineTypes.h"
 #include "../../Common/PointSelection.h"
 #include "../../Common/AmbiSourceSet.h"
@@ -128,6 +129,17 @@ public:
     void deselectAllClips();
     void addMovementClip();
     void addActionClip();
+
+    // ---- Undo/redo ----
+    // The history lives here because this is where almost every clip mutation happens; the animator
+    // window reaches it for the Edit menu, and the clip editors use it for their Apply.
+    AnimatorUndoManager& getUndoManager() { return undoManager; }
+
+    // Snapshots the CURRENT state as the point undo returns to. Call before mutating.
+    void pushUndoStep(const juce::String& name);
+
+    // Puts the UI back in a consistent state after the timelines array has been replaced wholesale.
+    void refreshAfterUndoRedo();
     
 private:
     struct ClipBounds
@@ -181,6 +193,7 @@ private:
     // Selection state
     juce::Array<SelectedClip> selectedClips;
     DragState dragState;
+    AnimatorUndoManager undoManager;
 
     // Click-cycling state, for stepping through a stack of overlapping clips (see pickClipAtPositionForClick)
     juce::Point<int> clickCyclePosition { -1, -1 };

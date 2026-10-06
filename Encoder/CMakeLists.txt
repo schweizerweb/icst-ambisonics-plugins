@@ -42,6 +42,7 @@ SET(SRC_FILES
 	../Source/AnimatorEngine.h
 	../Source/AnimatorEngine.cpp
 	../Source/AnimatorMath.h
+	../Source/AnimatorUndoManager.h
 	../Source/AnimatorMainView.h
 	../Source/AnimatorMainView.cpp
 	../Source/ActionEditDialog.h

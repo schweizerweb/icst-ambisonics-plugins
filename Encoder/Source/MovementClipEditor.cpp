@@ -111,6 +111,12 @@ bool MovementClipEditor::applyChanges()
     {
         if (clipIndex >= 0 && clipIndex < timelineModel->movement.clips.size())
         {
+            // One undo step per Apply - but only when the stored clip genuinely differs, so pressing
+            // Apply twice, or applying after an edit that was typed and then reverted, doesn't bury
+            // the real change behind no-op steps.
+            if (!(timelineModel->movement.clips.getReference(clipIndex) == currentClip))
+                timelineComp.pushUndoStep("Edit Movement Clip");
+
             timelineModel->movement.clips.getReference(clipIndex) = currentClip;
             return true;
         }

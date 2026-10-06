@@ -832,6 +832,14 @@ void TimelineComponent::mouseDown(const juce::MouseEvent& event)
             return;
         }
         
+        // One undo step per gesture, not per mouse-move. Pending rather than pushed outright, so a
+        // plain click that only selects a clip - or a drag that ends where it started - leaves no
+        // step behind (see commitPendingIfChanged).
+        if (timelines != nullptr)
+            undoManager.beginPending(clipBounds.isResizeLeft || clipBounds.isResizeRight
+                                         ? "Resize Clip" : "Move Clip",
+                                     *timelines);
+
         // Normal clip interaction for valid timelines
         dragState.isDragging = true;
         dragState.timelineIndex = clipBounds.timelineIndex;
@@ -1070,6 +1078,13 @@ void TimelineComponent::mouseUp(const juce::MouseEvent& event)
         selectClipsInRectangle(dragState.selectionRectangle, addToSelection);
     }
     
+    // Commits the gesture started in mouseDown, and only if the clip actually ended up somewhere
+    // different - a click-to-select adds nothing to the history.
+    if (timelines != nullptr)
+        undoManager.commitPendingIfChanged(*timelines);
+    else
+        undoManager.abandonPending();
+
     // Reset all drag state
     dragState = DragState();
     
@@ -1307,6 +1322,9 @@ bool TimelineComponent::keyPressed(const juce::KeyPress& key)
 
 void TimelineComponent::toggleMuteSelectedClips()
 {
+    if (!selectedClips.isEmpty())
+        pushUndoStep(selectedClips.size() > 1 ? "Mute Clips" : "Mute Clip");
+
     if (selectedClips.isEmpty())
         return;
 
@@ -1331,6 +1349,9 @@ void TimelineComponent::toggleMuteSelectedClips()
 
 void TimelineComponent::nudgeSelectedClips(ms_t nudgeAmount)
 {
+    if (!selectedClips.isEmpty())
+        pushUndoStep("Nudge Clips");
+
     if (selectedClips.isEmpty() || nudgeAmount == 0)
         return;
     
@@ -2448,8 +2469,40 @@ juce::Colour TimelineComponent::getClipColourFromTimeline(int timelineIndex) con
     return getTimelineColour(timelineIndex).brighter(0.3f);
 }
 
+void TimelineComponent::pushUndoStep(const juce::String& name)
+{
+    if (timelines != nullptr)
+        undoManager.pushStep(name, *timelines);
+}
+
+void TimelineComponent::refreshAfterUndoRedo()
+{
+    // Every clip editor is addressed by (timeline, clip) index into an array that has just been
+    // replaced wholesale, so any open one may now point at a different clip or past the end.
+    if (clipEditorManager != nullptr)
+        clipEditorManager->closeAllWindows();
+
+    // Same reasoning for the selection, which is a list of those same indices.
+    selectedClips.clear();
+    dragState = DragState();
+    undoManager.abandonPending();
+
+    // The restored state may hold fewer timelines than before.
+    if (timelines != nullptr)
+        currentTimelineIndex = juce::jlimit(0, juce::jmax(0, timelines->size() - 1), currentTimelineIndex);
+
+    autoResizeBasedOnContent();
+    updateScrollBars();
+    repaint();
+}
+
 void TimelineComponent::deleteSelectedClips()
 {
+    if (selectedClips.isEmpty())
+        return;
+
+    pushUndoStep(selectedClips.size() > 1 ? "Delete Clips" : "Delete Clip");
+
     // Delete all selected clips
     for (int i = selectedClips.size() - 1; i >= 0; --i)
     {
@@ -2463,6 +2516,11 @@ void TimelineComponent::deleteSelectedClips()
 
 void TimelineComponent::cutSelectedClips()
 {
+    if (selectedClips.isEmpty())
+        return;
+
+    pushUndoStep(selectedClips.size() > 1 ? "Cut Clips" : "Cut Clip");
+
     copySelectedClips();
     
     // Delete all selected clips after copying
@@ -2512,6 +2570,9 @@ void TimelineComponent::copySelectedClips()
 
 void TimelineComponent::pasteClips()
 {
+    if (clipboard.hasData)
+        pushUndoStep("Paste Clips");
+
     if (!clipboard.hasData || clipboard.timelineData.isEmpty())
         return;
 
@@ -2528,6 +2589,8 @@ void TimelineComponent::pasteClips()
 
 void TimelineComponent::insertTimelineAtCursor(int targetTimelineIndex, const TimelineModel& source)
 {
+    pushUndoStep("Insert Clips");
+
     if (timelines == nullptr || targetTimelineIndex < 0 || targetTimelineIndex >= timelines->size())
         return;
 
@@ -2581,6 +2644,9 @@ void TimelineComponent::insertClipsIntoTimeline(int targetTimelineIndex, Timelin
 void TimelineComponent::duplicateSelectedClips()
 {
     if (!selectedClips.isEmpty())
+        pushUndoStep(selectedClips.size() > 1 ? "Duplicate Clips" : "Duplicate Clip");
+
+    if (!selectedClips.isEmpty())
     {
         // Store current selection since it will change during duplication
         auto currentSelection = selectedClips;
@@ -2601,6 +2667,8 @@ void TimelineComponent::duplicateSelectedClips()
 
 void TimelineComponent::addMovementClip()
 {
+    pushUndoStep("Add Movement Clip");
+
     if (auto* currentTimeline = getCurrentTimeline())
     {
         MovementClip newClip;
@@ -2616,6 +2684,8 @@ void TimelineComponent::addMovementClip()
 
 void TimelineComponent::addActionClip()
 {
+    pushUndoStep("Add Action Clip");
+
     if (auto* currentTimeline = getCurrentTimeline())
     {
         ActionClip newClip;
