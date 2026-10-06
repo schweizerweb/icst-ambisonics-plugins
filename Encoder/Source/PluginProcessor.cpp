@@ -164,6 +164,12 @@ void AmbisonicEncoderAudioProcessor::prepareToPlay (double sampleRate, int sampl
     {
         blauertFilters[i].prepare(sampleRate);
     }
+
+    // Arm the animator unconditionally - NOT gated on animatorSettings.enable the way reset() is.
+    // The enable flag defaults to false, so a plugin instance that was never handed saved state
+    // (a freshly inserted one) would otherwise leave the engine holding no settings pointer at all,
+    // and the enable toggle would have nothing to switch.
+    animatorEngine.reset(getTimelines(), getSources(), sampleRate, &encoderSettings.animatorSettings);
 }
 
 void AmbisonicEncoderAudioProcessor::releaseResources()

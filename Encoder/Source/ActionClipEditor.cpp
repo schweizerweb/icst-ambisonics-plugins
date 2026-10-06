@@ -52,10 +52,13 @@ void ActionClipEditor::updateReferenceFromGroup()
 
 void ActionClipEditor::timerCallback()
 {
+    // applyToClip() rather than hand-copying individual fields: this used to pull only length,
+    // palindrome and repetitions, so the speed curve never reached the preview and action clips
+    // looked as though easing did nothing (it worked in playback, where the applied clip carries
+    // it). Pulling the whole base clip the way isDirty() already does also means the next base
+    // field added works here automatically instead of needing this list extended again.
     ActionClip clip = currentClip;
-    clip.length = commonSettings.getLiveLength();
-    clip.palindrome = commonSettings.getLivePalindrome();
-    clip.repetitions = commonSettings.getLiveRepeatCount();
+    commonSettings.applyToClip(clip);
     preview.setActionClip(clip);
 }
 
@@ -63,39 +66,33 @@ void ActionClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
 
-    // Calculate heights
-    const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
-    const int previewGroupHeight = getPreviewHeight();
-    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    const int actionsGroupHeight = getActionsControlsHeight() + 40;
     const int buttonHeight = 28;
 
-    // Clip properties and preview side by side, sharing one row
-    auto topRowArea = area.removeFromTop(topRowHeight);
-
-    auto clipGroupArea = topRowArea.removeFromLeft(getClipPropertiesWidth());
-    clipGroup.setBounds(clipGroupArea);
-    commonSettings.setBounds(clipGroupArea.reduced(8, 20));
-
-    topRowArea.removeFromLeft(8); // spacing between the two top-row groups
-
-    previewGroup.setBounds(topRowArea);
-    preview.setBounds(topRowArea.reduced(8, 20));
-
-    area.removeFromTop(8); // Spacing between rows
-
-    // Actions group
-    auto actionsGroupArea = area.removeFromTop(actionsGroupHeight);
-    actionsGroup.setBounds(actionsGroupArea);
-
-    auto actionsContentArea = actionsGroupArea.reduced(8, 20);
-    layoutActionControls(actionsContentArea);
-
-    // Buttons at bottom
+    // Buttons come off the bottom first, so the three columns share whatever is left and each ends
+    // up the same height.
     auto buttonArea = area.removeFromBottom(buttonHeight).reduced(10, 0);
     cancelButton.setBounds(buttonArea.removeFromRight(80));
     buttonArea.removeFromRight(8); // Button spacing
     applyButton.setBounds(buttonArea.removeFromRight(80));
+
+    area.removeFromBottom(8);
+
+    // Landscape: Clip Properties | Preview | Actions, side by side - see MovementClipEditor, which
+    // needed this once the speed curve made the clip panel taller.
+    auto clipGroupArea = area.removeFromLeft(getClipPropertiesWidth());
+    clipGroup.setBounds(clipGroupArea);
+    commonSettings.setBounds(clipGroupArea.reduced(8, 20));
+
+    area.removeFromLeft(8); // spacing between columns
+
+    auto previewArea = area.removeFromLeft(getPreviewWidth());
+    previewGroup.setBounds(previewArea);
+    preview.setBounds(previewArea.reduced(8, 20));
+
+    area.removeFromLeft(8);
+
+    actionsGroup.setBounds(area);
+    layoutActionControls(area.reduced(8, 20));
 }
 
 void ActionClipEditor::paint(juce::Graphics& g)
@@ -106,21 +103,21 @@ void ActionClipEditor::paint(juce::Graphics& g)
 int ActionClipEditor::getTotalRequiredHeight() const
 {
     const int margins = 10 * 2;
-    const int clipGroupHeight = commonSettings.getRequiredHeight() + 30;
-    const int previewGroupHeight = getPreviewHeight();
-    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    const int actionsGroupHeight = getActionsControlsHeight() + 40;
     const int buttonHeight = 28;
-    const int rowSpacing = 2 * 8; // top row -> actions group, actions group -> buttons
+    const int rowSpacing = 8; // columns -> buttons
 
-    return margins + topRowHeight + rowSpacing + actionsGroupHeight + buttonHeight;
+    // As tall as the tallest column, not the clip panel PLUS the actions panel. The + 40 on each is
+    // the GroupComponent inset, since resized() hands out each content area already reduced(8, 20).
+    const int columnHeight = juce::jmax(commonSettings.getRequiredHeight() + 40,
+                                        juce::jmax(getPreviewHeight(),
+                                                   getActionsControlsHeight() + 40));
+
+    return margins + columnHeight + rowSpacing + buttonHeight;
 }
 
 int ActionClipEditor::getTotalRequiredWidth() const
 {
-    // Clip properties and the (now portrait) preview share one row - floored at 450 so this never
-    // shrinks the dialog relative to its previous fixed width.
-    return juce::jmax(450, getClipPropertiesWidth() + 8 + getPreviewWidth() + 20);
+    return 10 * 2 + getClipPropertiesWidth() + 8 + getPreviewWidth() + 8 + getActionsWidth();
 }
 
 bool ActionClipEditor::applyChanges()
@@ -222,6 +219,9 @@ void ActionClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+    // The curve is dragged continuously, so wait for the 150ms poll and it is impossible to
+    // judge what the curve is doing - push it to the preview on every change instead.
+    commonSettings.onCurveEdited = [this] { timerCallback(); };
     // No palindrome constraint here (it stays at its default of false, unlike MovementClipEditor's):
     // rotation used to need Palindrome for any repeat because an incremental sweep had no way to undo
     // itself at a cycle boundary. AnimatorMath::rotationPhase now ramps continuously for a bare

@@ -66,6 +66,136 @@ namespace AnimatorMath
         return h;
     }
 
+    // --- Speed curves (easing) -----------------------------------------------------------------
+    //
+    // A user-designed cubic Bezier mapping elapsed time (x) to distance covered (y), with the ends
+    // pinned at (0,0) and (1,1) and two draggable control handles - the CSS / After Effects model.
+    //
+    // Two properties are guaranteed by clamping all four coordinates to [0,1], and both matter:
+    //  - x(t) is monotonically non-decreasing, so TIME CAN NEVER RUN BACKWARDS. Worst case x1=1,
+    //    x2=0 gives x'(t) = 3(1-2t)^2 >= 0. This is exactly the hazard that ruled out a free
+    //    multi-point spline, where an ordered set of points can still bulge backwards in x.
+    //  - y(t) stays inside [0,1], since a Bezier lies within the convex hull of its control points.
+    //    So overshoot/anticipation curves are deliberately NOT expressible: computeCycleState()
+    //    clamps progress to [0,1], and an overshoot would be silently clipped rather than rendered.
+    struct EasingCurve
+    {
+        // Defaults are the exact diagonal - y(x) == x - so an untouched curve is a true no-op and
+        // every project that predates this feature plays bit-for-bit as before.
+        double x1 = 1.0 / 3.0, y1 = 1.0 / 3.0;
+        double x2 = 2.0 / 3.0, y2 = 2.0 / 3.0;
+        bool enabled = false;
+        bool perRepetition = true;
+    };
+
+    // Distance covered at elapsed fraction x. The curve is parametric, so this first solves
+    // x(t) = x for t (Newton-Raphson, falling back to bisection where the derivative is flat - the
+    // standard WebKit UnitBezier approach), then evaluates y(t).
+    inline double bezierEase(const EasingCurve& curve, double x)
+    {
+        const double x1 = juce::jlimit(0.0, 1.0, curve.x1);
+        const double y1 = juce::jlimit(0.0, 1.0, curve.y1);
+        const double x2 = juce::jlimit(0.0, 1.0, curve.x2);
+        const double y2 = juce::jlimit(0.0, 1.0, curve.y2);
+
+        x = juce::jlimit(0.0, 1.0, x);
+
+        // Endpoints are pinned, and resolving them exactly (rather than via the solver) is what
+        // keeps a clip starting and finishing precisely on its own endpoints.
+        if (x <= 0.0) return 0.0;
+        if (x >= 1.0) return 1.0;
+
+        // Polynomial form of a cubic Bezier with P0=(0,0), P3=(1,1).
+        const double cx = 3.0 * x1, bx = 3.0 * (x2 - x1) - cx, ax = 1.0 - cx - bx;
+        const double cy = 3.0 * y1, by = 3.0 * (y2 - y1) - cy, ay = 1.0 - cy - by;
+
+        auto sampleX = [&](double t) { return ((ax * t + bx) * t + cx) * t; };
+        auto sampleY = [&](double t) { return ((ay * t + by) * t + cy) * t; };
+        auto sampledX = [&](double t) { return (3.0 * ax * t + 2.0 * bx) * t + cx; };
+
+        double t = x; // x is a good first guess, since the curve never strays far from the diagonal
+
+        for (int i = 0; i < 8; ++i)
+        {
+            const double error = sampleX(t) - x;
+            if (std::abs(error) < 1e-9)
+                return sampleY(t);
+
+            const double derivative = sampledX(t);
+            if (std::abs(derivative) < 1e-9)
+                break; // flat spot - Newton would diverge, hand over to bisection
+
+            t -= error / derivative;
+        }
+
+        double low = 0.0, high = 1.0;
+        t = juce::jlimit(0.0, 1.0, t);
+
+        for (int i = 0; i < 32; ++i)
+        {
+            const double value = sampleX(t);
+            if (std::abs(value - x) < 1e-9)
+                break;
+
+            if (value < x) low = t; else high = t;
+            t = 0.5 * (low + high);
+        }
+
+        return sampleY(t);
+    }
+
+    // Warps RAW clip progress and returns RAW clip progress, which is the whole trick: everything
+    // downstream (computeCycleState, rotationPhase, calculatePosition's own internal cycle handling)
+    // then works completely unchanged, and both scopes are just two different warps.
+    //
+    //  - Whole clip:      y(progress). Time is warped across all repetitions, so the repetitions
+    //                     themselves speed up or slow down over the clip.
+    //  - Per repetition:  the warp is applied inside each segment. This is EXACT, not an
+    //                     approximation: computeCycleState() recovers the same segment index k and
+    //                     the same direction from the warped value, and simply sees local progress
+    //                     y(f) where it would have seen f. Palindrome therefore keeps working - a
+    //                     backward segment yields 1 - y(f), i.e. the return leg eases too.
+    inline double applyEasing(const EasingCurve& curve, double progress, int repeatCount, bool palindrome)
+    {
+        if (!curve.enabled)
+            return progress;
+
+        progress = juce::jlimit(0.0, 1.0, progress);
+
+        if (!curve.perRepetition)
+            return bezierEase(curve, progress);
+
+        const int totalSegments = juce::jmax(1, repeatCount) * (palindrome ? 2 : 1);
+        if (totalSegments <= 1)
+            return bezierEase(curve, progress);
+
+        const double scaled = progress * (double)totalSegments;
+
+        // Matching computeCycleState's own clamp, so progress == 1.0 resolves to the END of the last
+        // segment rather than the start of one that doesn't exist.
+        const double segmentIndex = juce::jlimit(0.0, (double)(totalSegments - 1), std::floor(scaled));
+        const double local = juce::jlimit(0.0, 1.0, scaled - segmentIndex);
+
+        return (segmentIndex + bezierEase(curve, local)) / (double)totalSegments;
+    }
+
+    // The form every caller actually uses: the clip carries both the curve and the repeat/palindrome
+    // settings the per-repetition scope needs, so warping a clip's progress is a single call. The
+    // four-argument version above stays separate because the curve editor needs to evaluate a curve
+    // that isn't attached to a clip yet.
+    inline double applyEasing(const Clip& clip, double progress)
+    {
+        EasingCurve curve;
+        curve.x1 = clip.easeX1;
+        curve.y1 = clip.easeY1;
+        curve.x2 = clip.easeX2;
+        curve.y2 = clip.easeY2;
+        curve.enabled = clip.easingEnabled;
+        curve.perRepetition = clip.easePerRepetition;
+
+        return applyEasing(curve, progress, clip.repetitions, clip.palindrome);
+    }
+
     // One clip-relative instant's state within its repeat/palindrome cycle, given the clip's own
     // clamped-[0,1] progress (time-in-clip / clip.length - the same value every caller in this file
     // already computes). repeatCount is defensively re-clamped to >=1 here even though the UI and

@@ -272,7 +272,12 @@ void AnimatorEngine::processActiveMovements(ms_t currentTimeMs)
         
         // Clamp progress to [0, 1] to handle edge cases
         progress = juce::jlimit(0.0, 1.0, progress);
-        
+
+        // The clip's speed curve warps progress in place, so everything downstream - repetitions,
+        // palindrome, the movement curve itself - is untouched by easing. A clip with no curve
+        // returns progress unchanged.
+        progress = AnimatorMath::applyEasing(movement.clip, progress);
+
         auto position = calculateMovementPosition(movement, progress);
         pSourceSet->setGroupXyz(movement.timelineIndex, position.x, position.y, position.z, true);
     }
@@ -313,6 +318,11 @@ juce::Vector3D<double> AnimatorEngine::calculateMovementPosition(const ActiveMov
 
 void AnimatorEngine::setAnimatorState(bool enable)
 {
+    // getAnimatorState() already guards this; without the same check here a caller reaching the
+    // toggle before the engine has been armed would dereference null.
+    if (pAnimatorSettings == nullptr)
+        return;
+
     bool change = (enable != pAnimatorSettings->enable);
     if(change)
     {
@@ -465,6 +475,11 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         double progress = (action.clip.length > 0) ?
             static_cast<double>(timeInAction) / action.clip.length : 0.0;
         progress = juce::jlimit(0.0, 1.0, progress);
+
+        // Warped once here, so Stretch and Rotation below both inherit the clip's speed curve from
+        // a single call. Jitter is deliberately unaffected: it reads wall-clock elapsed time, not
+        // progress, so there is nothing to warp (the same reason it ignores cycleState).
+        progress = AnimatorMath::applyEasing(action.clip, progress);
 
         // One clip-wide cycle state, shared by every action in this clip - Stretch gets its
         // progress remapped to replay/palindrome. Rotation uses AnimatorMath::rotationPhase()

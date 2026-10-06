@@ -105,6 +105,7 @@ SET(SRC_FILES
 	../Source/SourceDefinitionComponent.cpp
 	../Source/SourceDefinitionComponent.h
 	../Source/SourceTableListModel.h
+	../Source/SpeedCurveComponent.h
 	../Source/StandardOscTarget.cpp
 	../Source/StandardOscTarget.h
 	../Source/StatusBarComponent.cpp

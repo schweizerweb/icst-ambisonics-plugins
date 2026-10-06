@@ -2,6 +2,7 @@
 
 #include <JuceHeader.h>
 #include "TimelineModel.h"
+#include "SpeedCurveComponent.h"
 
 // Restricts typed input to what the underlying ms_t storage can actually represent, so the field
 // doesn't invite precision it will silently round away: digits only in milliseconds mode, and
@@ -125,6 +126,14 @@ public:
         auto repeatRow = area.removeFromTop(rowHeight);
         repeatCountLabel.setBounds(repeatRow.removeFromLeft(labelWidth));
         repeatCountSlider.setBounds(repeatRow);
+
+        area.removeFromTop(verticalSpacing);
+
+        // Speed curve row - a label above a clickable thumbnail of the clip's own curve. Only a
+        // thumbnail here: the full editor needs a square canvas with room for handles and presets,
+        // which would make the (already tall) movement clip editor overflow a laptop screen.
+        speedCurveLabel.setBounds(area.removeFromTop(20));
+        speedCurveThumb.setBounds(area.removeFromTop(speedCurveThumbHeight));
     }
 
     int getRequiredHeight() const
@@ -133,9 +142,16 @@ public:
         const int verticalSpacing = 8;
         const int topBottomMargin = 10;
 
-        // 8 rows (name, start, duration, end, colour, muted, palindrome, repetitions) + margins
-        return topBottomMargin * 2 + (rowHeight * 8) + (verticalSpacing * 7);
+        // 8 rows (name, start, duration, end, colour, muted, palindrome, repetitions) + margins,
+        // plus the speed curve label and thumbnail.
+        return topBottomMargin * 2 + (rowHeight * 8) + (verticalSpacing * 8)
+             + 20 + speedCurveThumbHeight;
     }
+
+    // Fired when the speed curve is edited in its popup, so the host editor can push the change
+    // into its clip preview immediately instead of waiting for the next 150ms poll - the curve is
+    // dragged continuously, and a lagging preview makes it impossible to judge.
+    std::function<void()> onCurveEdited;
 
     // Read-only live value of the Duration field, independent of applyToClip()/Apply - for callers
     // (the clip preview) that need to react to edits as they happen rather than only once applied.
@@ -147,6 +163,7 @@ public:
     // Same contract as getLiveLength(), for the clip preview's live polling.
     bool getLivePalindrome() const { return palindromeToggle.getToggleState(); }
     int getLiveRepeatCount() const { return juce::jmax(1, (int)repeatCountSlider.getValue()); }
+    AnimatorMath::EasingCurve getLiveEasing() const { return speedCurveThumb.getCurve(); }
 
     // Called by the host editor whenever something that determines whether a non-palindrome repeat
     // would visibly jump changes - ActionClipEditor calls this whenever its action list changes
@@ -170,6 +187,14 @@ public:
         mutedToggle.setToggleState(clip.muted, juce::dontSendNotification);
         palindromeToggle.setToggleState(clip.palindrome, juce::dontSendNotification);
         repeatCountSlider.setValue(clip.repetitions, juce::dontSendNotification);
+
+        AnimatorMath::EasingCurve curve;
+        curve.x1 = clip.easeX1; curve.y1 = clip.easeY1;
+        curve.x2 = clip.easeX2; curve.y2 = clip.easeY2;
+        curve.enabled = clip.easingEnabled;
+        curve.perRepetition = clip.easePerRepetition;
+        speedCurveThumb.setCurve(curve);
+
         enforcePalindromeConstraint();
     }
 
@@ -184,6 +209,12 @@ public:
         clip.palindrome = palindromeToggle.getToggleState();
         if (palindromeRequiredForRepeat && clip.repetitions > 1)
             clip.palindrome = true; // defensive re-clamp - enforcePalindromeConstraint() already makes this unreachable through the UI
+
+        const auto curve = speedCurveThumb.getCurve();
+        clip.easeX1 = curve.x1; clip.easeY1 = curve.y1;
+        clip.easeX2 = curve.x2; clip.easeY2 = curve.y2;
+        clip.easingEnabled = curve.enabled;
+        clip.easePerRepetition = curve.perRepetition;
     }
 
     // Display only - re-renders whatever is currently shown in the new unit, the underlying
@@ -332,7 +363,50 @@ private:
         repeatCountSlider.setValue(1, juce::dontSendNotification);
         repeatCountSlider.onValueChange = [this] { enforcePalindromeConstraint(); };
 
+        addAndMakeVisible(speedCurveLabel);
+        speedCurveLabel.setText("Speed curve (click to edit):", juce::dontSendNotification);
+        speedCurveLabel.setJustificationType(juce::Justification::centredLeft);
+
+        addAndMakeVisible(speedCurveThumb);
+        speedCurveThumb.setTooltip("Shape how the clip's progress runs over its length - "
+                                   "the diagonal is constant speed.");
+        speedCurveThumb.onClicked = [this] { openSpeedCurveEditor(); };
+
         enforcePalindromeConstraint();
+    }
+
+    // The editor is a popup rather than inline: it needs a square canvas plus presets, which would
+    // push the (already tall) movement clip editor past what fits on a laptop screen.
+    void openSpeedCurveEditor()
+    {
+        if (speedCurveWindow != nullptr)
+        {
+            speedCurveWindow->toFront(true);
+            return;
+        }
+
+        auto content = std::make_unique<SpeedCurveEditorComponent>();
+        auto* raw = content.get();
+        raw->setCurve(speedCurveThumb.getCurve());
+
+        // The scope choice does nothing with a single forward cycle, so it is hidden there rather
+        // than left as a control that silently has no effect.
+        raw->setScopeRelevant(getLiveRepeatCount() > 1 || getLivePalindrome());
+
+        raw->onCurveChanged = [this](const AnimatorMath::EasingCurve& c)
+        {
+            speedCurveThumb.setCurve(c);
+            if (onCurveEdited)
+                onCurveEdited();
+        };
+
+        // The close is dispatched asynchronously (the callback destroys the window, which must not
+        // happen inside its own close-button dispatch), so this must survive the editor being torn
+        // down in the meantime.
+        juce::Component::SafePointer<CommonClipSettings> safeThis(this);
+        speedCurveWindow = std::make_unique<SpeedCurveDialog>(std::move(content),
+            [safeThis]() mutable { if (safeThis != nullptr) safeThis->speedCurveWindow.reset(); });
+        speedCurveWindow->setVisible(true);
     }
 
     // Two unrelated reasons a non-palindrome repeat would visibly jump at each repeat boundary,
@@ -460,6 +534,11 @@ private:
     juce::Label repeatCountLabel;
     juce::Slider repeatCountSlider;
     bool palindromeRequiredForRepeat = false;
+
+    static constexpr int speedCurveThumbHeight = 44;
+    juce::Label speedCurveLabel;
+    SpeedCurveComponent speedCurveThumb { SpeedCurveComponent::Mode::Thumbnail };
+    std::unique_ptr<SpeedCurveDialog> speedCurveWindow;
 
     juce::Colour currentColour = juce::Colours::cornflowerblue;
     std::unique_ptr<juce::ColourSelector> colourSelectorPtr;

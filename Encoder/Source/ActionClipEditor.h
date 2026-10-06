@@ -65,6 +65,10 @@ private:
     int getClipPropertiesWidth() const { return 280; }
     int getPreviewWidth() const { return 190; }
     int getPreviewHeight() const { return 320; }
+    // Actions sit in a third column rather than underneath, matching MovementClipEditor so the
+    // two clip dialogs are shaped alike. Wider than the movement column because the action
+    // descriptions are full sentences.
+    int getActionsWidth() const { return 460; }
     void layoutActionControls(juce::Rectangle<int> area);
     void addAction();
     void removeSelectedAction();

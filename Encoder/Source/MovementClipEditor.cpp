@@ -40,42 +40,34 @@ void MovementClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
 
-    // Calculate group heights
-    const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
-    const int previewGroupHeight = getPreviewHeight();
-    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    // + 40 for the GroupComponent's own inset - movementGroupArea is handed to layoutMovementControls
-    // already reduced(8, 20), i.e. 40px shorter. Without this the last row laid out (the waypoint
-    // Add/Remove buttons, for Spline/Polygon) absorbs the entire shortfall and renders squashed.
-    const int movementGroupHeight = getMovementControlsHeight() + 40;
     const int buttonHeight = 28;
 
-    // Clip properties and preview side by side, sharing one row
-    auto topRowArea = area.removeFromTop(topRowHeight);
-
-    auto clipGroupArea = topRowArea.removeFromLeft(getClipPropertiesWidth());
-    clipGroup.setBounds(clipGroupArea);
-    commonSettings.setBounds(clipGroupArea.reduced(8, 20));
-
-    topRowArea.removeFromLeft(8); // spacing between the two top-row groups
-
-    previewGroup.setBounds(topRowArea);
-    preview.setBounds(topRowArea.reduced(8, 20));
-
-    area.removeFromTop(8); // Spacing between rows
-
-    // Movement settings group
-    auto movementGroupArea = area.removeFromTop(movementGroupHeight);
-    movementGroup.setBounds(movementGroupArea);
-
-    auto movementContentArea = movementGroupArea.reduced(8, 20);
-    layoutMovementControls(movementContentArea);
-
-    // Buttons at bottom
+    // Buttons come off the bottom first, so the three columns simply share whatever is left and
+    // each ends up the same height - no column can be squashed by a mis-estimated row.
     auto buttonArea = area.removeFromBottom(buttonHeight).reduced(10, 0);
     cancelButton.setBounds(buttonArea.removeFromRight(80));
     buttonArea.removeFromRight(8); // Button spacing
     applyButton.setBounds(buttonArea.removeFromRight(80));
+
+    area.removeFromBottom(8);
+
+    // Landscape: Clip Properties | Preview | Movement Properties, side by side. Stacking Movement
+    // Properties underneath made the dialog ~980px tall for a Spiral once the speed curve was added
+    // to the clip panel, which no longer fits a laptop screen.
+    auto clipGroupArea = area.removeFromLeft(getClipPropertiesWidth());
+    clipGroup.setBounds(clipGroupArea);
+    commonSettings.setBounds(clipGroupArea.reduced(8, 20));
+
+    area.removeFromLeft(8); // spacing between columns
+
+    auto previewArea = area.removeFromLeft(getPreviewWidth());
+    previewGroup.setBounds(previewArea);
+    preview.setBounds(previewArea.reduced(8, 20));
+
+    area.removeFromLeft(8);
+
+    movementGroup.setBounds(area);
+    layoutMovementControls(area.reduced(8, 20));
 }
 
 void MovementClipEditor::paint(juce::Graphics& g)
@@ -86,21 +78,22 @@ void MovementClipEditor::paint(juce::Graphics& g)
 int MovementClipEditor::getTotalRequiredHeight() const
 {
     const int margins = 10 * 2;
-    const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
-    const int previewGroupHeight = getPreviewHeight();
-    const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    const int movementGroupHeight = getMovementControlsHeight() + 40; // + GroupComponent inset, see resized()
     const int buttonHeight = 28;
-    const int rowSpacing = 8; // one gap: top row -> movement group
+    const int rowSpacing = 8; // columns -> buttons
 
-    return margins + topRowHeight + rowSpacing + movementGroupHeight + buttonHeight;
+    // All three groups are columns now, so the dialog is as tall as the tallest one rather than as
+    // tall as the clip panel PLUS the movement panel. The + 40 on each is the GroupComponent's own
+    // inset, since resized() hands each group's content area out already reduced(8, 20).
+    const int columnHeight = juce::jmax(commonSettings.getRequiredHeight() + 40,
+                                        juce::jmax(getPreviewHeight(),
+                                                   getMovementControlsHeight() + 40));
+
+    return margins + columnHeight + rowSpacing + buttonHeight;
 }
 
 int MovementClipEditor::getTotalRequiredWidth() const
 {
-    // Clip properties and the (now portrait) preview share one row - floored at 450 so this never
-    // shrinks the dialog relative to its previous fixed width.
-    return juce::jmax(450, getClipPropertiesWidth() + 8 + getPreviewWidth() + 20);
+    return 10 * 2 + getClipPropertiesWidth() + 8 + getPreviewWidth() + 8 + getMovementPropertiesWidth();
 }
 
 bool MovementClipEditor::applyChanges()
@@ -216,6 +209,8 @@ void MovementClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
+    // See ActionClipEditor: the curve needs sub-poll feedback while being dragged.
+    commonSettings.onCurveEdited = [this] { preview.setMovementClip(buildClipFromControls()); };
     commonSettings.setPalindromeRequiredForRepeat(movementTypeRequiresPalindromeForRepeat(currentClip.movementType));
 
     addAndMakeVisible(preview);
@@ -910,28 +905,33 @@ int MovementClipEditor::getMovementControlsHeight() const
 {
     const int rowHeight = 28;
     const int verticalSpacing = 8;
+    const int buttonSpacing = 4;
 
-    // Only the rows this type actually shows - must stay in lockstep with layoutMovementControls().
-    int rows = 1 +  // movement type combo
-               1 +  // use start position checkbox
-               3 +  // start sliders
-               1;   // start button
+    // Mirrors layoutMovementControls() BLOCK FOR BLOCK, not control by control. Charging every
+    // control rowHeight+verticalSpacing over-reports: the three coordinate sliders are packed with
+    // no gaps between them, and their Apply button sits on the smaller buttonSpacing. That came to
+    // 20px per coordinate block - 40px for a type with both Start and Target - which showed up as
+    // dead space at the bottom of the column, since the dialog is sized from this number.
+    const int row = rowHeight + verticalSpacing;
+    const int coordinateBlock = (3 * rowHeight) + buttonSpacing + rowHeight + verticalSpacing;
 
-    if (showsPolarToggle())   rows += 1;
-    if (showsTargetRows())    rows += 3 + 1; // target sliders + apply button
-    if (showsCount())         rows += 1;
-    if (showsRadiusChange())  rows += 1;
-    if (showsTension())       rows += 1;
-    if (showsHeightRise())    rows += 1;
-    if (showsFreqA())         rows += 1;
-    if (showsFreqB())         rows += 1;
-    if (showsPhase())         rows += 1;
-    if (showsRandomSeed())    rows += 1;
+    int height = row;                              // movement type combo
+    if (showsPolarToggle())   height += row;
+    height += row;                                 // use start position checkbox
+    height += coordinateBlock;                     // start X/Y/Z + "apply current"
+    if (showsTargetRows())    height += coordinateBlock;
 
-    int height = (rows * rowHeight) + (rows * verticalSpacing);
+    if (showsCount())         height += row;
+    if (showsRadiusChange())  height += row;
+    if (showsTension())       height += row;
+    if (showsHeightRise())    height += row;
+    if (showsFreqA())         height += row;
+    if (showsFreqB())         height += row;
+    if (showsPhase())         height += row;
+    if (showsRandomSeed())    height += row;
 
     if (showsWaypointTable())
-        height += getWaypointTableHeight() + rowHeight + verticalSpacing; // table + Add/Remove row
+        height += getWaypointTableHeight() + verticalSpacing + rowHeight; // table + Add/Remove row
 
     return height;
 }

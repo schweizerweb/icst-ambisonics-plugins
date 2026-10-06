@@ -62,6 +62,14 @@ AmbisonicEncoderAudioProcessorEditor::AmbisonicEncoderAudioProcessorEditor (Ambi
     btnAnimator->setButtonText (TRANS("new button"));
     btnAnimator->addListener (this);
     SvgHelper::loadSVGIcon(btnAnimator.get(), BinaryData::animator_icon_svg, BinaryData::animator_icon_svgSize, String("Animator"));
+
+    // Bound to the same bool as btnAnimator, so both light up together - the icon shows that the
+    // animator is live, this one switches it.
+    btnAnimatorEnable.reset (new ColorBorderDrawableButton("AnimatorEnable", pEncoderSettings->animatorSettings.enable));
+    addAndMakeVisible (btnAnimatorEnable.get());
+    btnAnimatorEnable->addListener (this);
+    SvgHelper::loadSVGIcon(btnAnimatorEnable.get(), BinaryData::play_icon_svg, BinaryData::play_icon_svgSize,
+                           String("Activate / deactivate the animator"));
     
 	setResizable(true, true);
     setSize (400, 700);
@@ -97,6 +105,7 @@ void AmbisonicEncoderAudioProcessorEditor::resized()
     radarComponent->setBounds (0, 32, getWidth() - 0, getHeight() - 32);
     btnSettings->setBounds (2, 2, 28, 28);
     btnHelp->setBounds (34, 2, 28, 28);
+    btnAnimatorEnable->setBounds(getWidth() - 62, 2, 28, 28);
     btnAnimator->setBounds(getWidth() - 30, 2, 28, 28);
     labelMessage->setBounds (64, 4, getWidth() - 32, 24);
 }
@@ -136,6 +145,15 @@ void AmbisonicEncoderAudioProcessorEditor::buttonClicked (juce::Button* buttonTh
     else if (buttonThatWasClicked == btnAnimator.get())
     {
         timelineDialogManager.show(this, &mainProcessor, &pointSelection, mainProcessor.getAnimatorEngine());
+    }
+
+    else if (buttonThatWasClicked == btnAnimatorEnable.get())
+    {
+        // Goes through the engine rather than writing encoderSettings directly: setAnimatorState()
+        // broadcasts a change, which is what keeps the animator window's own On/Off toggle, its menu
+        // item and these buttons in agreement no matter which one was used.
+        auto* engine = mainProcessor.getAnimatorEngine();
+        engine->setAnimatorState(!engine->getAnimatorState());
     }
 }
 

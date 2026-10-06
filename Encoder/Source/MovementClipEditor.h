@@ -410,6 +410,9 @@ private:
     int getClipPropertiesWidth() const { return 280; }
     int getPreviewWidth() const { return 190; }
     int getPreviewHeight() const { return 320; }
+    // Movement Properties sits in a third column rather than underneath, so the dialog stays
+    // landscape. Wide enough for the waypoint table's 358px of columns plus margins.
+    int getMovementPropertiesWidth() const { return 430; }
     void layoutMovementControls(juce::Rectangle<int> area);
     void updateControlVisibility();
     void updateCoordinateSystem();

@@ -66,6 +66,10 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
     // Create command manager
     commandManager = std::make_unique<juce::ApplicationCommandManager>();
     commandManager->registerAllCommandsForTarget(this);
+
+    // The animator's enable state can also be toggled from the plugin's main UI, so follow the
+    // engine rather than only updating the toolbar from this window's own button.
+    pAnimatorEngine->addChangeListener(this);
     
     // Add as key listener to handle shortcuts globally
     addKeyListener(commandManager->getKeyMappings());
@@ -93,6 +97,9 @@ AnimatorMainView::AnimatorMainView(AnimatorEngine* pEngine)
 AnimatorMainView::~AnimatorMainView()
 {
     stopTimer();
+
+    if (pAnimatorEngine != nullptr)
+        pAnimatorEngine->removeChangeListener(this);
     closeImportSceneDialog();
     closePreferencesDialog();
 
@@ -103,6 +110,23 @@ AnimatorMainView::~AnimatorMainView()
     }
     
     menuBarModel.reset();
+}
+
+void AnimatorMainView::changeListenerCallback(juce::ChangeBroadcaster* source)
+{
+    if (source != pAnimatorEngine)
+        return;
+
+    // Covers every state the engine broadcasts, not just On/Off - refreshButtonStates() also
+    // re-reads auto-follow, and the menu carries a ticked "Animator On" item of its own.
+    if (toolbar != nullptr)
+    {
+        toolbar->refreshButtonStates();
+        toolbar->repaint();
+    }
+
+    if (commandManager != nullptr)
+        commandManager->commandStatusChanged();
 }
 
 void AnimatorMainView::setTimelines(juce::OwnedArray<TimelineModel>* newTimelines)

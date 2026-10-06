@@ -65,6 +65,9 @@ private:
     std::unique_ptr<juce::Label> labelMessage;
     std::unique_ptr<DrawableButton> btnHelp;
     std::unique_ptr<ColorBorderDrawableButton> btnAnimator;
+    // Activates/deactivates the animator without having to open its window. Shares the engine's
+    // enable flag with the in-window toggle, so the two can never disagree.
+    std::unique_ptr<ColorBorderDrawableButton> btnAnimatorEnable;
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (AmbisonicEncoderAudioProcessorEditor)
 };

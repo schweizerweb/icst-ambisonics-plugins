@@ -95,6 +95,19 @@ struct Clip
     bool palindrome = false;  // play the clip's progress curve forward then backward instead of just forward
     int repetitions = 1;      // number of forward (or forward+backward, if palindrome) cycles compressed into this clip's existing length - orthogonal to MovementClip::count
 
+    // Speed curve: a cubic Bezier mapping elapsed time to distance covered, so a clip can accelerate
+    // out of its start or decelerate into its target instead of running at a constant rate. The
+    // defaults are the exact diagonal (y == x), so an untouched clip is a true no-op and every
+    // project predating this feature plays exactly as before. See AnimatorMath::EasingCurve, which
+    // these mirror, for the guarantees that come from clamping the handles to [0,1].
+    bool easingEnabled = false;
+    double easeX1 = 1.0 / 3.0, easeY1 = 1.0 / 3.0;
+    double easeX2 = 2.0 / 3.0, easeY2 = 2.0 / 3.0;
+    // true: the curve shapes each repetition identically. false: it warps time across the whole
+    // clip, so the repetitions themselves speed up/slow down. Meaningless at repetitions == 1
+    // without palindrome, where the editor hides the control.
+    bool easePerRepetition = true;
+
     ms_t end() const { return start + length; }
 
     // Used by the clip editors' dirty detection (is the clip being edited different from what's
@@ -103,10 +116,61 @@ struct Clip
     {
         return id == other.id && start == other.start && length == other.length &&
                colour == other.colour && muted == other.muted &&
-               palindrome == other.palindrome && repetitions == other.repetitions;
+               palindrome == other.palindrome && repetitions == other.repetitions &&
+               easingEnabled == other.easingEnabled &&
+               juce::exactlyEqual(easeX1, other.easeX1) && juce::exactlyEqual(easeY1, other.easeY1) &&
+               juce::exactlyEqual(easeX2, other.easeX2) && juce::exactlyEqual(easeY2, other.easeY2) &&
+               easePerRepetition == other.easePerRepetition;
     }
     bool operator!=(const Clip& other) const { return !(*this == other); }
 };
+
+// The Clip base's own XML, shared by MovementClip and ActionClip. Deliberately factored out rather
+// than copy-pasted into each: the two clip types previously repeated this block verbatim, so adding
+// a base field meant editing four places, and missing one would leave (say) action clips silently
+// losing it on reload while movement clips kept it.
+inline void writeClipBase(juce::XmlElement& x, const Clip& c)
+{
+    x.setAttribute("id", c.id);
+    x.setAttribute("start", juce::String((juce::int64)c.start));
+    x.setAttribute("length", juce::String((juce::int64)c.length));
+    x.setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
+    x.setAttribute("muted", c.muted ? 1 : 0);
+    x.setAttribute("palindrome", c.palindrome ? 1 : 0);
+    x.setAttribute("repetitions", c.repetitions);
+
+    x.setAttribute("easingEnabled", c.easingEnabled ? 1 : 0);
+    x.setAttribute("easeX1", c.easeX1);
+    x.setAttribute("easeY1", c.easeY1);
+    x.setAttribute("easeX2", c.easeX2);
+    x.setAttribute("easeY2", c.easeY2);
+    x.setAttribute("easePerRepetition", c.easePerRepetition ? 1 : 0);
+}
+
+inline void readClipBase(Clip& c, const juce::XmlElement& x)
+{
+    c.id = x.getStringAttribute("id");
+    c.start = (ms_t)x.getStringAttribute("start").getLargeIntValue();
+    c.length = (ms_t)x.getStringAttribute("length").getLargeIntValue();
+
+    const auto colourHex = x.getStringAttribute("colour");
+    c.colour = colourHex.isNotEmpty()
+             ? juce::Colour((juce::uint32)colourHex.getHexValue32())
+             : juce::Colours::cornflowerblue;
+    c.muted = x.getBoolAttribute("muted", false);
+    c.palindrome = x.getBoolAttribute("palindrome", false);
+    c.repetitions = juce::jmax(1, x.getIntAttribute("repetitions", 1));
+
+    // Missing attributes fall back to the exact-diagonal defaults, so a file written before speed
+    // curves existed loads as an unmodified linear clip. The handles are clamped here and not only
+    // in the editor: a hand-edited file must not be able to make time run backwards.
+    c.easingEnabled = x.getBoolAttribute("easingEnabled", false);
+    c.easeX1 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeX1", 1.0 / 3.0));
+    c.easeY1 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeY1", 1.0 / 3.0));
+    c.easeX2 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeX2", 2.0 / 3.0));
+    c.easeY2 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeY2", 2.0 / 3.0));
+    c.easePerRepetition = x.getBoolAttribute("easePerRepetition", true);
+}
 
 struct MovementClip : public Clip
 {
@@ -428,13 +492,7 @@ struct TimelineModel
         for (const auto& c : movement.clips)
         {
             auto* xClip = new juce::XmlElement("MovementClip");
-            xClip->setAttribute("id", c.id);
-            xClip->setAttribute("start", juce::String((juce::int64)c.start));
-            xClip->setAttribute("length", juce::String((juce::int64)c.length));
-            xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
-            xClip->setAttribute("muted", c.muted ? 1 : 0);
-            xClip->setAttribute("palindrome", c.palindrome ? 1 : 0);
-            xClip->setAttribute("repetitions", c.repetitions);
+            writeClipBase(*xClip, c);
 
             // Serialize MovementClip specific data
             xClip->setAttribute("movementType", static_cast<int>(c.movementType));
@@ -483,13 +541,7 @@ struct TimelineModel
         for (const auto& c : actions.clips)
         {
             auto* xClip = new juce::XmlElement("ActionClip");
-            xClip->setAttribute("id", c.id);
-            xClip->setAttribute("start", juce::String((juce::int64)c.start));
-            xClip->setAttribute("length", juce::String((juce::int64)c.length));
-            xClip->setAttribute("colour", juce::String::toHexString((juce::uint32)c.colour.getARGB()).paddedLeft('0', 8));
-            xClip->setAttribute("muted", c.muted ? 1 : 0);
-            xClip->setAttribute("palindrome", c.palindrome ? 1 : 0);
-            xClip->setAttribute("repetitions", c.repetitions);
+            writeClipBase(*xClip, c);
 
             // Serialize ActionClip actions
             auto* xActions = new juce::XmlElement("Actions");
@@ -530,17 +582,7 @@ struct TimelineModel
                     if (!xClip->hasTagName("MovementClip")) continue;
 
                     MovementClip c;
-                    c.id = xClip->getStringAttribute("id");
-                    c.start = (ms_t)xClip->getStringAttribute("start").getLargeIntValue();
-                    c.length = (ms_t)xClip->getStringAttribute("length").getLargeIntValue();
-
-                    const auto colourHex = xClip->getStringAttribute("colour");
-                    c.colour = colourHex.isNotEmpty()
-                             ? juce::Colour((juce::uint32)colourHex.getHexValue32())
-                             : juce::Colours::cornflowerblue;
-                    c.muted = xClip->getBoolAttribute("muted", false);
-                    c.palindrome = xClip->getBoolAttribute("palindrome", false);
-                    c.repetitions = juce::jmax(1, xClip->getIntAttribute("repetitions", 1));
+                    readClipBase(c, *xClip);
 
                     // Deserialize MovementClip specific data. The type is clamped to the range this
                     // build knows: a file written by a newer version would otherwise produce an
@@ -596,17 +638,7 @@ struct TimelineModel
                     if (!xClip->hasTagName("ActionClip")) continue;
 
                     ActionClip c;
-                    c.id = xClip->getStringAttribute("id");
-                    c.start = (ms_t)xClip->getStringAttribute("start").getLargeIntValue();
-                    c.length = (ms_t)xClip->getStringAttribute("length").getLargeIntValue();
-
-                    const auto colourHex = xClip->getStringAttribute("colour");
-                    c.colour = colourHex.isNotEmpty()
-                             ? juce::Colour((juce::uint32)colourHex.getHexValue32())
-                             : juce::Colours::cornflowerblue;
-                    c.muted = xClip->getBoolAttribute("muted", false);
-                    c.palindrome = xClip->getBoolAttribute("palindrome", false);
-                    c.repetitions = juce::jmax(1, xClip->getIntAttribute("repetitions", 1));
+                    readClipBase(c, *xClip);
 
                     // Deserialize ActionClip actions
                     if (auto* xActions = xClip->getChildByName("Actions"))

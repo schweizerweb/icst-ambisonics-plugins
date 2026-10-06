@@ -261,6 +261,11 @@ private:
         return 1.0;
     }
 
+    // Deliberately NOT eased, unlike the moving dot in computeCurrentFormation(). This samples the
+    // GEOMETRIC path, and easing only redistributes sample density along an identical shape - so
+    // applying it here would change nothing except to leave the drawn polyline faceted wherever the
+    // curve runs fast. An unchanging path under a dot whose speed visibly varies is also what makes
+    // the speed curve readable at a glance.
     void rebuildMovementTrace()
     {
         fullTrace.clearQuick();
@@ -361,8 +366,15 @@ private:
 
     void computeCurrentFormation()
     {
+        // The MOVING DOT is eased, exactly as the engine eases it. The drawn trace deliberately is
+        // not (see rebuildMovementTrace) - the contrast between an unchanged path and a changing
+        // dot is what makes the speed curve legible here.
+        const double easedMovement = hasMovementClip
+            ? AnimatorMath::applyEasing(movementClip, movementProgress)
+            : movementProgress;
+
         currentAnchor = hasMovementClip
-            ? AnimatorMath::calculatePosition(movementClip, movementProgress, movementStart, referencePosition)
+            ? AnimatorMath::calculatePosition(movementClip, easedMovement, movementStart, referencePosition)
             : referencePosition;
 
         double stretch = 1.0;
@@ -371,9 +383,12 @@ private:
 
         if (hasActionClip)
         {
+            // Warped once for the whole clip, mirroring AnimatorEngine::processActiveActions.
+            const double easedAction = AnimatorMath::applyEasing(actionClip, stretchProgress);
+
             if (auto* stretchAction = findAction(ActionType::Stretch))
             {
-                const auto actionCycle = AnimatorMath::computeCycleState(stretchProgress, actionClip.repetitions, actionClip.palindrome);
+                const auto actionCycle = AnimatorMath::computeCycleState(easedAction, actionClip.repetitions, actionClip.palindrome);
                 stretch = AnimatorMath::calculateStretch(*stretchAction, actionCycle.cycleProgress, actionClip.length, stretchInitial, hasReferenceStretchFlag);
             }
 
@@ -381,7 +396,7 @@ private:
             // and relative sweeps start from identity. A clip with a defined start angle is
             // world-absolute anyway, so it previews exactly as it will play.
             rotation = AnimatorMath::computeClipRotation(actionClip,
-                                                         AnimatorMath::rotationPhase(stretchProgress, actionClip.repetitions, actionClip.palindrome),
+                                                         AnimatorMath::rotationPhase(easedAction, actionClip.repetitions, actionClip.palindrome),
                                                          juce::Quaternion<double>(juce::Vector3D<double>(0.0, 0.0, 0.0), 1.0),
                                                          false);
         }

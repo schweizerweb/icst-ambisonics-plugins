@@ -10,7 +10,11 @@
 
 class AnimatorMainView : public juce::Component,
                         public juce::Timer,
-                        public juce::ApplicationCommandTarget
+                        public juce::ApplicationCommandTarget,
+                        // Listens to the engine so the toolbar's On/Off button and the menu tick
+                        // follow the animator's state whoever changed it - including the toggle in
+                        // the plugin's main UI, which is outside this window entirely.
+                        public juce::ChangeListener
 {
 public:
     AnimatorMainView(AnimatorEngine* pEngine);
@@ -25,6 +29,7 @@ public:
     void paint(juce::Graphics& g) override;
     void resized() override;
     void timerCallback() override;
+    void changeListenerCallback(juce::ChangeBroadcaster* source) override;
 
     // Status bar functionality
     void setStatusMessage(const juce::AttributedString& message);
