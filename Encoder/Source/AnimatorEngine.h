@@ -30,9 +30,11 @@ private:
         ms_t actualStartTime = 0; // The actual time when this movement should have started
         ms_t elapsedTime = 0; // How much time has already elapsed when starting
 
-        juce::Vector3D<double> initialPosition;
-        double startAngle = 0.0;
-        double startRadius = 0.0;
+        // The whole captured start state, not loose copies of its fields - calculateMovementPosition()
+        // then passes it straight through to AnimatorMath, so a field added to MovementStartState can
+        // never be silently dropped on the way to the engine (the preview stores the whole struct, so
+        // dropping one here would make a clip look right in the preview and wrong during playback).
+        AnimatorMath::MovementStartState startState;
 
         ActiveMovement() = default;
         ActiveMovement(int idx, const MovementClip& c, ms_t start, ms_t elapsed = 0)
@@ -55,6 +57,12 @@ private:
 
         double initialStretch = 1.0;
         bool hasInitialState = false;
+
+        // The group's orientation when this clip started, for rotation actions that don't define an
+        // absolute start angle (they sweep relative to this). Spelled out rather than default-
+        // constructed because juce::Quaternion<double>() is the ZERO quaternion, not identity.
+        juce::Quaternion<double> initialRotation { juce::Vector3D<double>(0.0, 0.0, 0.0), 1.0 };
+        bool hasInitialRotation = false;
 
         // Jitter: global pSourceSet indices of this group's members as of clip start, cached once
         // so processJitterAction() doesn't need to rescan all sources every call.

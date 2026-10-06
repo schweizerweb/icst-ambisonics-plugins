@@ -263,6 +263,7 @@ private:
 
             useStartValueButton.setEnabled(false);
             useStartValueButton.setToggleState(false, juce::dontSendNotification);
+            useStartValueButton.setTooltip({}); // don't keep a previous action type's explanation
             startValueLabel.setEnabled(false);
             startValueEditor.setEnabled(false);
             startValueLabel.setVisible(false);
@@ -278,47 +279,34 @@ private:
             if (valueSlider.getValue() == 0.0)
                 valueSlider.setValue(1.0, juce::dontSendNotification);
         }
-        else if (isRotation)
-        {
-            timingCombo.setEnabled(true);
-            jitterSpeedLabel.setVisible(false);
-            jitterSpeedSlider.setVisible(false);
-            startValueLabel.setVisible(true);
-            startValueEditor.setVisible(true);
-
-            // For rotations: disable AbsoluteTarget timing and start values
-            if (currentTiming == TimingType::AbsoluteTarget)
-            {
-                // Auto-switch to Relative During Clip if Absolute Target is selected for rotation
-                timingCombo.setSelectedId((int)TimingType::RelativeDuringClip, juce::sendNotificationSync);
-                currentTiming = TimingType::RelativeDuringClip;
-            }
-
-            // Disable start value controls for rotations
-            useStartValueButton.setEnabled(false);
-            useStartValueButton.setToggleState(false, juce::dontSendNotification);
-            startValueLabel.setEnabled(false);
-            startValueEditor.setEnabled(false);
-
-            // Gray out AbsoluteTarget option in the combo box
-            timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, false);
-        }
         else
         {
+            // Stretch and all three Rotation axes behave identically here. Rotation used to be a
+            // special case that greyed out AbsoluteTarget and force-cleared the start value, because
+            // the engine accumulated rotation incrementally and had nowhere to put an absolute
+            // angle. It now computes an absolute orientation from progress
+            // (AnimatorMath::computeClipRotation), so rotation supports every timing and start
+            // values just like stretch does.
             timingCombo.setEnabled(true);
             jitterSpeedLabel.setVisible(false);
             jitterSpeedSlider.setVisible(false);
             startValueLabel.setVisible(true);
             startValueEditor.setVisible(true);
 
-            // For stretch: enable all timing types and start values
             useStartValueButton.setEnabled(true);
-
-            // Re-enable AbsoluteTarget option for stretch
             timingCombo.setItemEnabled((int)TimingType::AbsoluteTarget, true);
+
+            // A rotation start angle is absolute and clip-wide, which is worth saying explicitly:
+            // it's the one place the semantics differ from stretch's start value.
+            useStartValueButton.setTooltip(isRotation
+                ? "Rotate from a defined angle, making playback reproducible. The group snaps to it "
+                  "when the clip starts, discarding its current rotation. Setting it on any axis makes "
+                  "every axis in this clip absolute - axes without a start angle begin at 0."
+                : "Start from a defined value instead of the group's current one, making playback reproducible.");
 
             // Enable start value controls only for valid timing types
             ActionDefinition tempAction;
+            tempAction.setAction(currentAction);
             tempAction.setTiming(currentTiming);
             bool startValueSupported = tempAction.shouldEnableStartValueControls();
             bool startValueEnabled = startValueSupported && useStartValueButton.getToggleState();

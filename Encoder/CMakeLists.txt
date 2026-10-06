@@ -255,6 +255,7 @@ SET(SRC_FILES
 	../../Common/TrackColorSelector.h
 	../../Common/TreeViewItemHelp.h
 	../../Common/UTF8Helpers.h
+	../../Common/UiState.h
 	../../Common/VarDelayBuffer.cpp
 	../../Common/VarDelayBuffer.h
 	../../Common/ZoomSettings.cpp

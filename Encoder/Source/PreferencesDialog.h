@@ -1,6 +1,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AdditionalWindow.h"
+#include "../../Common/UiState.h"
 
 // Content shown inside PreferencesDialog. Each setting applies immediately when changed (there's
 // no separate Apply/OK step) since these are simple display preferences, not destructive actions.
@@ -118,7 +119,12 @@ public:
         // setUsingNativeTitleBar(false) has already taken effect - must be queried after it.
         const int titleBarHeight = getTitleBarHeight();
         setSize(w, h + titleBarHeight);
-        centreWithSize(getWidth(), getHeight());
+        UiState::restorePosition(*this, UiState::Windows::preferences);
+    }
+
+    ~PreferencesDialog() override
+    {
+        UiState::rememberPosition(*this, UiState::Windows::preferences);
     }
 
     void closeButtonPressed() override

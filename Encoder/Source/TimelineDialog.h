@@ -2,6 +2,7 @@
 #include "JuceHeader.h"
 #include "TimelineComponent.h"
 #include "TimelineWidgetMS.h"
+#include "../../Common/UiState.h"
 
 // Action-String analog zu ACTION_CLOSE_ANIMATOR
 static const juce::String ACTION_CLOSE_TIMELINE = "ACTION_CLOSE_TIMELINE";
@@ -26,11 +27,23 @@ public:
             addActionListener(listener);
     }
 
-    ~TimelineDialog() override = default;
+    ~TimelineDialog() override
+    {
+        UiState::rememberPosition(*this, UiState::Windows::animatorTimeline);
+    }
 
     void updatePosition(juce::Rectangle<int> parentScreenBounds,
                         int w = 900, int h = 500)
     {
+        // This window IS resizable, so unlike the fixed-size dialogs it restores the user's own
+        // size as well as position.
+        setSize(w, h);
+
+        if (UiState::restorePosition(*this, UiState::Windows::animatorTimeline,
+                                     /*centreIfUnknown*/ false, /*restoreSize*/ true))
+            return;
+
+        // Nothing remembered yet: fall back to sitting just right of the plugin window.
         auto display = juce::Desktop::getInstance()
                            .getDisplays().getPrimaryDisplay()->userArea;
 

@@ -26,6 +26,7 @@
 #include "SpeakerTestCustomComponent.h"
 #include "../../Common/TrackColors.h"
 #include "../../Common/Constants.h"
+#include "../../Common/UiState.h"
 #include "../../Common/ColorDefinition.h"
 #include "FilterSettingsComponent.h"
 #include "../../Common/ImportExport.h"
@@ -1052,12 +1053,14 @@ bool SpeakerSettingsComponent::perform(const InvocationInfo& info)
 
 bool SpeakerSettingsComponent::doBackupAllPresets()
 {
-    FileChooser chooser("Backup to ZIP", File(), "*.zip");
+    FileChooser chooser("Backup to ZIP", UiState::startingFile(UiState::Folders::speakerBackup), "*.zip");
     bool ok = chooser.browseForFileToSave(true);
     if (!ok)
     {
         return false;
     }
+
+    UiState::rememberFolder(UiState::Folders::speakerBackup, chooser.getResult());
 
     if (chooser.getResult().exists())
     {
@@ -1079,12 +1082,14 @@ bool SpeakerSettingsComponent::doBackupAllPresets()
 
 bool SpeakerSettingsComponent::doRestoreAllPresets()
 {
-    FileChooser chooser("Restore from ZIP", File(), "*.zip");
+    FileChooser chooser("Restore from ZIP", UiState::startingFile(UiState::Folders::speakerBackup), "*.zip");
     bool ok = chooser.browseForFileToOpen();
     if (!ok)
     {
         return false;
     }
+
+    UiState::rememberFolder(UiState::Folders::speakerBackup, chooser.getResult());
 
     if (!chooser.getResult().exists())
     {

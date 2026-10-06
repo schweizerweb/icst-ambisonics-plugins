@@ -243,10 +243,7 @@ void AnimatorEngine::startMovementClip(int timelineIndex, const MovementClip& cl
     ActiveMovement newMovement(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
 
     // Capture the one-time start state (see AnimatorMath.h - shared with the clip editors' preview)
-    const auto start = AnimatorMath::computeMovementStartState(clip, getGroupPosition(timelineIndex));
-    newMovement.initialPosition = start.initialPosition;
-    newMovement.startAngle = start.startAngle;
-    newMovement.startRadius = start.startRadius;
+    newMovement.startState = AnimatorMath::computeMovementStartState(clip, getGroupPosition(timelineIndex));
 
     activeMovements.add(newMovement);
 }
@@ -298,19 +295,20 @@ juce::Vector3D<double> AnimatorEngine::calculateMovementPosition(const ActiveMov
 {
     const auto& clip = activeMovement.clip;
 
-    AnimatorMath::MovementStartState start;
-    start.initialPosition = activeMovement.initialPosition;
-    start.startAngle = activeMovement.startAngle;
-    start.startRadius = activeMovement.startRadius;
-
     // Circle recomputes its radius live on every call when !useStartPoint (a pre-existing quirk,
     // see AnimatorMath.h) - only that case needs a fresh reference position; everything else
-    // already has what it needs cached in `start` above.
+    // already has what it needs cached in activeMovement.startState.
+    //
+    // Deliberately NOT generalised to the other centre-relative types (Lissajous/Rose/Helix/
+    // RandomWalk): they all read startState.startOffset, captured once. A live recompute works for
+    // Circle only because the group is already on the circle, so the recomputed radius is self-
+    // consistent; for the others the clip is itself setting the group position, so recomputing from
+    // it every tick would be a feedback loop and the amplitude would drift.
     juce::Vector3D<double> currentReferencePosition;
     if (clip.movementType == MovementType::Circle && !clip.useStartPoint)
         currentReferencePosition = getGroupPosition(activeMovement.timelineIndex);
 
-    return AnimatorMath::calculatePosition(clip, progress, start, currentReferencePosition);
+    return AnimatorMath::calculatePosition(clip, progress, activeMovement.startState, currentReferencePosition);
 }
 
 void AnimatorEngine::setAnimatorState(bool enable)
@@ -382,13 +380,18 @@ void AnimatorEngine::startActionClip(int timelineIndex, const ActionClip& clip, 
     // Start new action
     ActiveAction newAction(timelineIndex, clip, currentTimeMs - elapsedTime, elapsedTime);
 
-    // Keep initial state capture for stretch functionality
+    // Capture the group's state once, at clip start - both stretch and orientation. Rotation actions
+    // that don't define an absolute start angle sweep relative to this captured orientation, so that
+    // a clip rotating "by 90 degrees" adds to whatever the user/OSC had set rather than overriding it.
     if (pSourceSet && timelineIndex < pSourceSet->groupCount())
     {
         if (auto* group = pSourceSet->getActiveGroup(timelineIndex))
         {
             newAction.initialStretch = group->getStretch();
             newAction.hasInitialState = true;
+
+            newAction.initialRotation = group->getRotation();
+            newAction.hasInitialRotation = true;
         }
     }
 
@@ -446,8 +449,10 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         if (timeDelta <= 0) continue;
 
         // Muting can be toggled while this clip is already playing - check live rather than only
-        // at scheduling time. Still advance lastProcessTime so an eventual unmute doesn't apply a
-        // huge backlogged timeDelta all at once (rotation is accumulated incrementally).
+        // at scheduling time. Still advance lastProcessTime so an eventual unmute doesn't hand
+        // Jitter a huge backlogged timeDelta all at once. Rotation and Stretch need no such care:
+        // both are absolute functions of progress, so they simply snap back to correct on the first
+        // tick after an unmute.
         if (action.clip.muted)
         {
             action.lastProcessTime = currentTimeMs;
@@ -462,49 +467,42 @@ void AnimatorEngine::processActiveActions(ms_t currentTimeMs)
         progress = juce::jlimit(0.0, 1.0, progress);
 
         // One clip-wide cycle state, shared by every action in this clip - Stretch gets its
-        // progress remapped to replay/palindrome; Rotation gets its per-tick delta sign-flipped
-        // during the "backward" half (see AnimatorMath::computeCycleState for why these need
-        // different treatment). Jitter deliberately ignores this entirely - continuous noise has
-        // no forward/backward notion, so it's left untouched below.
+        // progress remapped to replay/palindrome. Rotation uses AnimatorMath::rotationPhase()
+        // instead, because a repeated rotation should CONTINUE turning rather than restart (see
+        // that function's comment). Jitter deliberately ignores both - continuous noise has no
+        // forward/backward notion, so it's left untouched below.
         const auto cycleState = AnimatorMath::computeCycleState(progress, action.clip.repetitions, action.clip.palindrome);
 
-        // Accumulate rotations for this timeline (in radians)
-        double xAngleRad = 0.0, yAngleRad = 0.0, zAngleRad = 0.0;
-
-        // Process all actions in this clip
+        // Process all non-rotation actions in this clip. Rotation is handled once for the whole
+        // clip below, since all three axes combine into a single orientation.
         for (const auto& actionDef : action.clip.actions)
         {
-            if (actionDef.getAction() != ActionType::None)
+            if (actionDef.getAction() == ActionType::Stretch)
             {
-                if (actionDef.getAction() == ActionType::Stretch)
-                {
-                    // Keep full stretch functionality including initial state
-                    processStretchAction(action.timelineIndex, actionDef, cycleState.cycleProgress, action);
-                }
-                else if (actionDef.getAction() == ActionType::Jitter)
-                {
-                    processJitterAction(action.timelineIndex, actionDef, action, currentTimeMs);
-                }
-                else
-                {
-                    // Rotation accumulates a per-tick delta rather than computing an absolute angle
-                    // from progress (see AnimatorMath::calculateRotationTickRadians's own comment),
-                    // so repeats/palindrome apply as a sign flip on that delta instead of a progress
-                    // remap - .direction is +1 during a forward half, -1 during a backward half.
-                    const auto tick = AnimatorMath::calculateRotationTickRadians(actionDef, timeDelta, action.clip.length);
-                    xAngleRad += tick.x * cycleState.direction;
-                    yAngleRad += tick.y * cycleState.direction;
-                    zAngleRad += tick.z * cycleState.direction;
-                }
+                // Keep full stretch functionality including initial state
+                processStretchAction(action.timelineIndex, actionDef, cycleState.cycleProgress, action);
+            }
+            else if (actionDef.getAction() == ActionType::Jitter)
+            {
+                processJitterAction(action.timelineIndex, actionDef, action, currentTimeMs);
             }
         }
-        
-        // Apply all accumulated rotations in a single call
-        if (xAngleRad != 0.0 || yAngleRad != 0.0 || zAngleRad != 0.0)
+
+        // Rotation: one absolute orientation computed from progress, applied in a single call. This
+        // replaces an incremental per-tick rotateGroup(), which is what used to make seeking,
+        // muting and clip-end overshoot each land on the wrong angle.
+        const auto rotation = AnimatorMath::computeClipRotation(
+            action.clip,
+            AnimatorMath::rotationPhase(progress, action.clip.repetitions, action.clip.palindrome),
+            action.initialRotation, action.hasInitialRotation);
+
+        // hasRotation == false means "leave the orientation alone", not "reset it to identity" -
+        // mirroring how processStretchAction() leaves stretch untouched for TimingType::None.
+        if (rotation.hasRotation)
         {
-            pSourceSet->rotateGroup(action.timelineIndex, xAngleRad, yAngleRad, zAngleRad);
+            pSourceSet->setGroupRotation(action.timelineIndex, rotation.orientation, true);
         }
-        
+
         // Update last process time for THIS action
         action.lastProcessTime = currentTimeMs;
     }

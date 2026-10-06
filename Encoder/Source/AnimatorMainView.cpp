@@ -2,6 +2,7 @@
 #include "../../Common/UTF8Helpers.h"
 #include "../../Common/SvgHelper.h"
 #include "../../Common/ScalingInfo.h"
+#include "../../Common/UiState.h"
 
 namespace
 {
@@ -27,7 +28,17 @@ namespace
                 clip.targetPointGroup.setXYZ(clip.targetPointGroup.getX() * ratio,
                                              clip.targetPointGroup.getY() * ratio,
                                              clip.targetPointGroup.getZ() * ratio);
-                clip.radiusChange *= ratio; // Spiral: absolute radius change per round
+                clip.radiusChange *= ratio; // Spiral/Helix: absolute radius change per round
+                clip.heightRise *= ratio;   // Helix: total Z travel over the clip
+
+                // Spline/Polygon path points. tension/freqRatioA/freqRatioB/phaseDeg/randomSeed are
+                // deliberately NOT scaled - they're dimensionless, like the action parameters above.
+                for (auto& wp : clip.waypoints)
+                {
+                    wp.x *= ratio;
+                    wp.y *= ratio;
+                    wp.z *= ratio;
+                }
             }
         }
     }
@@ -347,13 +358,15 @@ static bool readTimelinesFromXml(const juce::XmlElement& xml, juce::OwnedArray<T
 void AnimatorMainView::importScene()
 {
     juce::FileChooser chooser("Import Scene...",
-                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             UiState::startingFile(UiState::Folders::animatorScene, {},
+                                                   juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)),
                              "*.xml");
 
     if (!chooser.browseForFileToOpen())
         return;
 
     auto file = chooser.getResult();
+    UiState::rememberFolder(UiState::Folders::animatorScene, file);
     auto xml = juce::XmlDocument::parse(file);
 
     juce::OwnedArray<TimelineModel> importedGroups;
@@ -580,12 +593,14 @@ void AnimatorMainView::exportScene(int timelineIndex)
     juce::String timelineName = "Group " + juce::String(timelineIndex + 1);
     
     juce::FileChooser chooser("Export Scene: " + timelineName,
-                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             UiState::startingFile(UiState::Folders::animatorScene, {},
+                                                   juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)),
                              "*.xml");
-    
+
     if (chooser.browseForFileToSave(true))
     {
         auto file = chooser.getResult().withFileExtension("xml");
+        UiState::rememberFolder(UiState::Folders::animatorScene, file);
         auto xml = timelineToExport->toXml();
         if (xml != nullptr)
             xml->setAttribute(xmlAttributeDistanceScaler, getCurrentDistanceScaler(pSourceSet));
@@ -616,12 +631,14 @@ void AnimatorMainView::exportAllScenes()
     }
 
     juce::FileChooser chooser("Export All Groups...",
-                             juce::File::getSpecialLocation(juce::File::userDocumentsDirectory),
+                             UiState::startingFile(UiState::Folders::animatorScene, {},
+                                                   juce::File::getSpecialLocation(juce::File::userDocumentsDirectory)),
                              "*.xml");
 
     if (chooser.browseForFileToSave(true))
     {
         auto file = chooser.getResult().withFileExtension("xml");
+        UiState::rememberFolder(UiState::Folders::animatorScene, file);
 
         juce::XmlElement root("AnimatorTimelines");
         root.setAttribute(xmlAttributeDistanceScaler, getCurrentDistanceScaler(pSourceSet));
@@ -706,6 +723,23 @@ void AnimatorMainView::loadDemoContent()
 
     timelines->clear(true);
 
+    // Reproducibility: the FIRST movement clip and the FIRST stretch action of each timeline pin
+    // their own starting state explicitly (useStartPoint / useStartValue with a real value), which
+    // is what the rest of the chain hangs off. Later clips deliberately keep starting from the live
+    // position/stretch - that's both how the demo shows off the "undefined start" mode and what
+    // keeps it malleable, since editing one clip's target then flows into the next instead of
+    // leaving a jump.
+    //
+    // So the demo replays identically when played from the beginning. It can still diverge if you
+    // scrub straight into the middle of a timeline, or mute an upstream clip, because the chained
+    // clips then capture whatever the group happens to be at. Pin the individual clip if you need
+    // that case to be exact too.
+    //
+    // ROTATION pins the same way, via useStartValue - the start value is an absolute angle the group
+    // snaps to when the clip starts (AnimatorMath::computeClipRotation). Note that a start angle set
+    // on any one axis makes every axis of that clip absolute, with unset axes starting at 0 degrees,
+    // so the first rotation clip of a timeline pins all the axes it actually uses.
+
     // Timeline 1: Linear Path - straight-line moves plus a full rotation and a grow/shrink
     {
         auto* t = new TimelineModel();
@@ -717,13 +751,13 @@ void AnimatorMainView::loadDemoContent()
         t->movement.clips.add(makeDemoMovementClip("Return Center", 3000, 1000, juce::Colours::goldenrod,
             MovementType::MoveToCartesian, false, Point3D<double>(), Point3D<double>(0.0, 0.0, 0.0)));
 
-        // 360 degrees over 2s at 180 deg/s
+        // 360 degrees over 2s at 180 deg/s, from an explicit 0 degree start orientation
         t->actions.clips.add(makeDemoActionClip("Rotate Full Circle", 0, 2000, juce::Colours::slateblue,
-            ActionDefinition{ActionType::RotationZ, TimingType::ConstantPerSecond, 180.0}));
-        // doubles in size by the end of the clip
+            ActionDefinition{ActionType::RotationZ, TimingType::ConstantPerSecond, 180.0, 0.0, true}));
+        // doubles in size by the end of the clip, from an explicit baseline of 1.0
         t->actions.clips.add(makeDemoActionClip("Grow", 2200, 1000, juce::Colours::mediumseagreen,
-            ActionDefinition{ActionType::Stretch, TimingType::RelativeDuringClip, 1.0}));
-        // shrinks back to half size by the end of the clip
+            ActionDefinition{ActionType::Stretch, TimingType::RelativeDuringClip, 1.0, 1.0, true}));
+        // halves whatever the Grow clip above left behind, i.e. back to the original size
         t->actions.clips.add(makeDemoActionClip("Shrink", 3300, 900, juce::Colours::seagreen,
             ActionDefinition{ActionType::Stretch, TimingType::RelativeDuringClip, -0.5}));
 
@@ -741,9 +775,9 @@ void AnimatorMainView::loadDemoContent()
         t->movement.clips.add(makeDemoMovementClip("Spiral Outward", 3200, 3000, juce::Colours::royalblue,
             MovementType::Spiral, false, Point3D<double>(), Point3D<double>(0.0, 0.0, 0.0), 2.0, 1.0));
 
-        // tilts up by 45 degrees over the clip
+        // tilts up by 45 degrees over the clip, from an explicit 0 degree start orientation
         t->actions.clips.add(makeDemoActionClip("Tilt Up", 0, 3000, juce::Colours::mediumseagreen,
-            ActionDefinition{ActionType::RotationX, TimingType::RelativeDuringClip, 45.0}));
+            ActionDefinition{ActionType::RotationX, TimingType::RelativeDuringClip, 45.0, 0.0, true}));
         // grows at a constant rate of 0.3/s starting from a baseline of 1.0 (demonstrates a start value with
         // Constant per Second timing)
         t->actions.clips.add(makeDemoActionClip("Grow While Spiraling", 3200, 3000, juce::Colours::seagreen,
@@ -764,15 +798,16 @@ void AnimatorMainView::loadDemoContent()
         t->movement.clips.add(makeDemoMovementClip("Return (Cartesian)", 2200, 1500, juce::Colours::darkorchid,
             MovementType::MoveToCartesian, false, Point3D<double>(), Point3D<double>(0.0, 3.0, 0.0)));
 
-        // rotates to an absolute 90 degree orientation by the end of the clip
+        // rotates from an explicit 0 to an absolute 90 degree orientation by the end of the clip
         t->actions.clips.add(makeDemoActionClip("Rotate To 90 (Absolute)", 0, 2000, juce::Colours::gold,
-            ActionDefinition{ActionType::RotationY, TimingType::AbsoluteTarget, 90.0}));
+            ActionDefinition{ActionType::RotationY, TimingType::AbsoluteTarget, 90.0, 0.0, true}));
         // rotates by a further 45 degrees relative to wherever it started the clip
         t->actions.clips.add(makeDemoActionClip("Rotate 45 More (Relative)", 2200, 1500, juce::Colours::darkkhaki,
             ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 45.0}));
-        // grows at a constant rate of 0.4/s
+        // grows at a constant rate of 0.4/s from an explicit baseline of 1.0 (first stretch of this
+        // timeline, so it pins the baseline the rest of the timeline builds on)
         t->actions.clips.add(makeDemoActionClip("Stretch (Constant/s)", 3800, 1500, juce::Colours::lightblue,
-            ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 0.4}));
+            ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 0.4, 1.0, true}));
 
         timelines->add(t);
     }
@@ -785,13 +820,17 @@ void AnimatorMainView::loadDemoContent()
         t->movement.clips.add(makeDemoMovementClip("Complex Spiral", 0, 3000, juce::Colours::teal,
             MovementType::Spiral, true, Point3D<double>(2.0, 0.0, 0.0), Point3D<double>(0.0, 0.0, 0.0), 1.5, -0.5));
 
+        // First rotation of this timeline, so both axes pin their own start angle. Pinning either one
+        // would already make the whole clip absolute (and leave the other starting from 0 anyway) -
+        // spelling out both is what makes that intentional rather than incidental.
         ActionClip rotationClip = makeDemoActionClip("3D Rotation", 500, 1000, juce::Colours::orange);
-        rotationClip.actions.add(ActionDefinition{ActionType::RotationX, TimingType::AbsoluteTarget, 45.0});
-        rotationClip.actions.add(ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 90.0});
+        rotationClip.actions.add(ActionDefinition{ActionType::RotationX, TimingType::AbsoluteTarget, 45.0, 0.0, true});
+        rotationClip.actions.add(ActionDefinition{ActionType::RotationY, TimingType::RelativeDuringClip, 90.0, 0.0, true});
         t->actions.clips.add(rotationClip);
 
+        // first stretch of this timeline, so it pins its own baseline rather than inheriting one
         ActionClip stretchClip = makeDemoActionClip("Dynamic Stretch", 1600, 800, juce::Colours::red);
-        stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 2.0});
+        stretchClip.actions.add(ActionDefinition{ActionType::Stretch, TimingType::ConstantPerSecond, 2.0, 1.0, true});
         t->actions.clips.add(stretchClip);
 
         timelines->add(t);

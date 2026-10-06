@@ -2,12 +2,87 @@
 #include "../../Common/Point3D.h"
 #include "TimelineTypes.h"
 
+// Only ever APPEND to this enum - the value is persisted as a raw int in XML, so reordering would
+// silently reinterpret existing projects. RandomWalk must stay last (the XML reader clamps against it).
 enum class MovementType
 {
     MoveToCartesian,
     MoveToPolar,
     Circle,
-    Spiral
+    Spiral,
+    Spline,
+    Polygon,
+    Lissajous,
+    Rose,
+    Helix,
+    RandomWalk
+};
+
+// Single source of truth for the user-visible type name - used by the editor's combo box and the
+// timeline's clip tooltip, so they can't drift apart.
+inline juce::String movementTypeToString(MovementType type)
+{
+    switch (type)
+    {
+        case MovementType::MoveToCartesian: return "MoveTo (Cartesian)";
+        case MovementType::MoveToPolar:     return "MoveTo (Polar)";
+        case MovementType::Circle:          return "Circle";
+        case MovementType::Spiral:          return "Spiral";
+        case MovementType::Spline:          return "Spline";
+        case MovementType::Polygon:         return "Polygon";
+        case MovementType::Lissajous:       return "Lissajous";
+        case MovementType::Rose:            return "Rose";
+        case MovementType::Helix:           return "Helix";
+        case MovementType::RandomWalk:      return "Random Walk";
+    }
+    return "Unknown";
+}
+
+// Types whose targetPointGroup is the CENTRE of a figure rather than a destination to travel to -
+// drives both the "Center X/Y/Z" vs "Target X/Y/Z" labelling and which types read startOffset.
+inline bool movementTypeUsesTargetAsCentre(MovementType type)
+{
+    return type == MovementType::Circle || type == MovementType::Spiral
+        || type == MovementType::Lissajous || type == MovementType::Rose
+        || type == MovementType::Helix || type == MovementType::RandomWalk;
+}
+
+// Types driven by the clip's waypoint list rather than by start/target points.
+inline bool movementTypeUsesWaypoints(MovementType type)
+{
+    return type == MovementType::Spline || type == MovementType::Polygon;
+}
+
+// Open-ended paths that end somewhere other than where they started, so repeating them without
+// Palindrome snaps visibly at every repeat boundary. Circle/Spiral/Lissajous/Rose/Helix are left
+// out deliberately: the first four genuinely close at integer parameters, and Spiral has never been
+// constrained despite ending at a different radius - staying consistent with that precedent.
+inline bool movementTypeRequiresPalindromeForRepeat(MovementType type)
+{
+    return type == MovementType::MoveToCartesian || type == MovementType::MoveToPolar
+        || type == MovementType::Spline || type == MovementType::Polygon
+        || type == MovementType::RandomWalk;
+}
+
+// One point on a Spline/Polygon path. Deliberately a plain struct rather than Point3D: Point3D's
+// operator=/operator== only accept a non-const lvalue (Common/Point3D.h), which is what forces the
+// assignment workarounds elsewhere in the Animator - and juce::Array::operator== compares through
+// const refs, so a non-const operator== here would reproduce exactly that trap.
+struct MovementWaypoint
+{
+    double x = 0.0;
+    double y = 0.0;
+    double z = 0.0;
+    bool startsNewSegment = false; // begins a new disjoint sub-path, jumped to instantly
+
+    bool operator==(const MovementWaypoint& other) const
+    {
+        return juce::exactlyEqual(x, other.x)
+            && juce::exactlyEqual(y, other.y)
+            && juce::exactlyEqual(z, other.z)
+            && startsNewSegment == other.startsNewSegment;
+    }
+    bool operator!=(const MovementWaypoint& other) const { return !(*this == other); }
 };
 
 struct Clip
@@ -43,8 +118,18 @@ struct MovementClip : public Clip
     
     bool useStartPoint = false;
 
-    double count = 1.0;           // For Circle and Spiral: number of full rounds
-    double radiusChange = 0.0;    // For Spiral only: change of the radius per round, with which the group point will rotate around the target point. for now it's the absolute radius change per round.
+    double count = 1.0;           // Number of full rounds/cycles - Circle, Spiral, Helix, Lissajous, Rose, RandomWalk
+    double radiusChange = 0.0;    // Spiral and Helix: absolute radius change per round
+
+    // Spline/Polygon: the path's own points. Empty for every other type.
+    juce::Array<MovementWaypoint> waypoints;
+
+    double tension = 0.0;         // Spline only: 0 = roundest Catmull-Rom, 1 = straight (matches Polygon)
+    double heightRise = 0.0;      // Helix only: total Z travel over the clip (a distance - rescaled on import)
+    double freqRatioA = 3.0;      // Lissajous: X frequency. Rose: petal count k
+    double freqRatioB = 2.0;      // Lissajous only: Y frequency
+    double phaseDeg = 0.0;        // Lissajous and Rose: phase offset in degrees
+    int randomSeed = 1;           // RandomWalk only: reproducible noise seed
 
     // Point3D's own operator== is not const-qualified (can't be called on a const Point3D), so its
     // coordinates are compared directly via their (const-qualified) getters instead.
@@ -60,7 +145,14 @@ struct MovementClip : public Clip
                juce::exactlyEqual(targetPointGroup.getZ(), other.targetPointGroup.getZ()) &&
                useStartPoint == other.useStartPoint &&
                juce::exactlyEqual(count, other.count) &&
-               juce::exactlyEqual(radiusChange, other.radiusChange);
+               juce::exactlyEqual(radiusChange, other.radiusChange) &&
+               waypoints == other.waypoints &&
+               juce::exactlyEqual(tension, other.tension) &&
+               juce::exactlyEqual(heightRise, other.heightRise) &&
+               juce::exactlyEqual(freqRatioA, other.freqRatioA) &&
+               juce::exactlyEqual(freqRatioB, other.freqRatioB) &&
+               juce::exactlyEqual(phaseDeg, other.phaseDeg) &&
+               randomSeed == other.randomSeed;
     }
     bool operator!=(const MovementClip& other) const { return !(*this == other); }
 };
@@ -355,6 +447,30 @@ struct TimelineModel
             xClip->setAttribute("useStartPoint", c.useStartPoint ? 1 : 0);
             xClip->setAttribute("count", c.count);
             xClip->setAttribute("radiusChange", c.radiusChange);
+            xClip->setAttribute("tension", c.tension);
+            xClip->setAttribute("heightRise", c.heightRise);
+            xClip->setAttribute("freqRatioA", c.freqRatioA);
+            xClip->setAttribute("freqRatioB", c.freqRatioB);
+            xClip->setAttribute("phaseDeg", c.phaseDeg);
+            xClip->setAttribute("randomSeed", c.randomSeed);
+
+            // Spline/Polygon waypoints - same child-element pattern as ActionClip's <Actions>, and
+            // additive-safe for the same reason: an older file simply has no <Waypoints> child and
+            // loads with an empty list.
+            if (!c.waypoints.isEmpty())
+            {
+                auto* xWaypoints = new juce::XmlElement("Waypoints");
+                for (const auto& wp : c.waypoints)
+                {
+                    auto* xWaypoint = new juce::XmlElement("Waypoint");
+                    xWaypoint->setAttribute("x", wp.x);
+                    xWaypoint->setAttribute("y", wp.y);
+                    xWaypoint->setAttribute("z", wp.z);
+                    xWaypoint->setAttribute("newSegment", wp.startsNewSegment ? 1 : 0);
+                    xWaypoints->addChildElement(xWaypoint);
+                }
+                xClip->addChildElement(xWaypoints);
+            }
 
             xMovement->addChildElement(xClip);
         }
@@ -426,8 +542,13 @@ struct TimelineModel
                     c.palindrome = xClip->getBoolAttribute("palindrome", false);
                     c.repetitions = juce::jmax(1, xClip->getIntAttribute("repetitions", 1));
 
-                    // Deserialize MovementClip specific data
-                    c.movementType = static_cast<MovementType>(xClip->getIntAttribute("movementType", 0));  // Add this
+                    // Deserialize MovementClip specific data. The type is clamped to the range this
+                    // build knows: a file written by a newer version would otherwise produce an
+                    // invalid enum, which falls through calculatePosition()'s default case and
+                    // teleports the group to the origin for the clip's whole duration.
+                    c.movementType = static_cast<MovementType>(
+                        juce::jlimit(0, static_cast<int>(MovementType::RandomWalk),
+                                     xClip->getIntAttribute("movementType", 0)));
                     c.startPointGroup.setXYZ(
                                              xClip->getDoubleAttribute("startPointGroupX", 0.0),
                                              xClip->getDoubleAttribute("startPointGroupY", 0.0),
@@ -439,6 +560,31 @@ struct TimelineModel
                     c.useStartPoint = xClip->getBoolAttribute("useStartPoint", false);
                     c.count = xClip->getDoubleAttribute("count", 1.0);
                     c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0);
+                    c.tension = juce::jlimit(0.0, 1.0, xClip->getDoubleAttribute("tension", 0.0));
+                    c.heightRise = xClip->getDoubleAttribute("heightRise", 0.0);
+                    c.freqRatioA = xClip->getDoubleAttribute("freqRatioA", 3.0);
+                    c.freqRatioB = xClip->getDoubleAttribute("freqRatioB", 2.0);
+                    c.phaseDeg = xClip->getDoubleAttribute("phaseDeg", 0.0);
+                    c.randomSeed = xClip->getIntAttribute("randomSeed", 1);
+
+                    if (auto* xWaypoints = xClip->getChildByName("Waypoints"))
+                    {
+                        for (auto* xWaypoint = xWaypoints->getFirstChildElement(); xWaypoint != nullptr; xWaypoint = xWaypoint->getNextElement())
+                        {
+                            if (!xWaypoint->hasTagName("Waypoint")) continue;
+
+                            MovementWaypoint wp;
+                            wp.x = xWaypoint->getDoubleAttribute("x", 0.0);
+                            wp.y = xWaypoint->getDoubleAttribute("y", 0.0);
+                            wp.z = xWaypoint->getDoubleAttribute("z", 0.0);
+                            wp.startsNewSegment = xWaypoint->getBoolAttribute("newSegment", false);
+
+                            // A hand-edited or corrupted file could carry inf/NaN, which would
+                            // poison the arc-length table and every position derived from it.
+                            if (std::isfinite(wp.x) && std::isfinite(wp.y) && std::isfinite(wp.z))
+                                c.waypoints.add(wp);
+                        }
+                    }
 
                     movement.clips.add(c);
                 }

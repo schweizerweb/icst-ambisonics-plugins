@@ -18,6 +18,7 @@
 */
 
 #include "PresetManagerComponent.h"
+#include "UiState.h"
 
 PresetManagerComponent::PresetManagerComponent (PresetHelper* _pPresetHelper, bool allowApply)
     : pPresetHelper(_pPresetHelper)
@@ -118,17 +119,19 @@ void PresetManagerComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == btnExportAll.get())
     {
-        FileChooser chooser("Select directory to export...", File::getSpecialLocation(File::userHomeDirectory));
+        FileChooser chooser("Select directory to export...", UiState::startingFile(UiState::Folders::presetImportExport, {}, File::getSpecialLocation(File::userHomeDirectory)));
         if (chooser.browseForDirectory())
         {
+            UiState::rememberFolder(UiState::Folders::presetImportExport, chooser.getResult());
             exportToFolder(pPresetHelper->presetFiles, chooser.getResult().getFullPathName());
         }
     }
     else if (buttonThatWasClicked == btnImport.get())
     {
-        FileChooser chooser("Select preset XML to import...", File::getSpecialLocation(File::userHomeDirectory), "*.xml");
+        FileChooser chooser("Select preset XML to import...", UiState::startingFile(UiState::Folders::presetImportExport, {}, File::getSpecialLocation(File::userHomeDirectory)), "*.xml");
         if (chooser.browseForMultipleFilesToOpen())
         {
+            UiState::rememberFolder(UiState::Folders::presetImportExport, chooser.getResult());
             pPresetHelper->tryImportFiles(chooser.getResults());
         }
     }
@@ -141,9 +144,10 @@ void PresetManagerComponent::buttonClicked (juce::Button* buttonThatWasClicked)
     }
     else if (buttonThatWasClicked == btnExport.get())
     {
-        FileChooser chooser("Select directory to export...", File::getSpecialLocation(File::userHomeDirectory));
+        FileChooser chooser("Select directory to export...", UiState::startingFile(UiState::Folders::presetImportExport, {}, File::getSpecialLocation(File::userHomeDirectory)));
         if (chooser.browseForDirectory())
         {
+            UiState::rememberFolder(UiState::Folders::presetImportExport, chooser.getResult());
             Array<File> presetsToExport;
             SparseSet<int> selectedRows = presetTable->getSelectedRows();
             for (int i = 0; i < presetTable->getNumRows(); i++)

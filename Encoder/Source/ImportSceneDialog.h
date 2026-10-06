@@ -1,6 +1,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AdditionalWindow.h"
+#include "../../Common/UiState.h"
 
 enum class ImportSceneMode
 {
@@ -204,7 +205,12 @@ public:
         // setUsingNativeTitleBar(false) has already taken effect - must be queried after it.
         const int titleBarHeight = getTitleBarHeight();
         setSize(w, h + titleBarHeight);
-        centreWithSize(getWidth(), getHeight());
+        UiState::restorePosition(*this, UiState::Windows::animatorImportScene);
+    }
+
+    ~ImportSceneDialog() override
+    {
+        UiState::rememberPosition(*this, UiState::Windows::animatorImportScene);
     }
 
     void closeButtonPressed() override

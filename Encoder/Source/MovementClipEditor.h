@@ -6,6 +6,9 @@
 #include "ClipEditorCloseGuard.h"
 #include "../../Common/AmbiSourceSet.h"
 #include "../../Common/PointSelection.h"
+#include "../../Common/TableColumnCallback.h"
+#include "../../Common/NumericColumnCustomComponent.h"
+#include "../../Common/CheckBoxCustomComponent.h"
 
 class TimelineComponent;
 
@@ -151,6 +154,136 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(CoordinateValueControl)
 };
 
+// Inline editor for a Spline/Polygon clip's waypoint list - X/Y/Z typed per row, plus a "Break"
+// flag marking where a new disjoint sub-path starts. Built on the same TableColumnCallback +
+// NumericColumnCustomComponent/CheckBoxCustomComponent pieces the source and group tables use, so
+// cell editing behaves identically to the rest of the app.
+class WaypointTableListModel : public juce::TableListBoxModel, public TableColumnCallback
+{
+public:
+    enum ColumnIds { ColumnIndex = 1, ColumnX, ColumnY, ColumnZ, ColumnBreak };
+
+    WaypointTableListModel(juce::Array<MovementWaypoint>& pointsRef, juce::TableListBox& tableRef)
+        : points(pointsRef), table(tableRef) {}
+
+    // Fired after any cell edit, so the host can refresh the preview immediately rather than
+    // waiting for its 150ms poll.
+    std::function<void()> onWaypointEdited;
+
+    void setScalingInfo(ScalingInfo* scaling) { pScalingInfo = scaling; }
+
+    int getNumRows() override { return points.size(); }
+
+    void paintRowBackground(juce::Graphics& g, int rowNumber, int, int, bool rowIsSelected) override
+    {
+        auto& lf = table.getLookAndFeel();
+        auto base = lf.findColour(juce::ListBox::backgroundColourId);
+        g.fillAll(rowIsSelected ? base.brighter(0.3f)
+                                : (rowNumber % 2 ? base : base.brighter(0.04f)));
+    }
+
+    void paintCell(juce::Graphics& g, int rowNumber, int columnId, int width, int height, bool) override
+    {
+        if (columnId != ColumnIndex || rowNumber >= points.size())
+            return;
+
+        // A segment break is also drawn as a line above the row, so the sub-path grouping is
+        // readable at a glance without reading the checkbox column.
+        if (points.getReference(rowNumber).startsNewSegment && rowNumber > 0)
+        {
+            g.setColour(juce::Colours::orange.withAlpha(0.8f));
+            g.fillRect(0, 0, width, 2);
+        }
+
+        g.setColour(table.getLookAndFeel().findColour(juce::ListBox::textColourId));
+        g.setFont(juce::FontOptions(13.0f));
+        g.drawText(juce::String(rowNumber + 1), 4, 0, width - 6, height, juce::Justification::centredLeft);
+    }
+
+    juce::Component* refreshComponentForCell(int rowNumber, int columnId, bool,
+                                             juce::Component* existingComponentToUpdate) override
+    {
+        if (columnId == ColumnBreak)
+        {
+            auto* box = static_cast<CheckBoxCustomComponent*>(existingComponentToUpdate);
+            if (box == nullptr) box = new CheckBoxCustomComponent(*this);
+            box->setRowAndColumn(rowNumber, columnId);
+            return box;
+        }
+
+        if (columnId == ColumnX || columnId == ColumnY || columnId == ColumnZ)
+        {
+            auto* cell = static_cast<NumericColumnCustomComponent*>(existingComponentToUpdate);
+            if (cell == nullptr) cell = new NumericColumnCustomComponent(*this);
+            cell->setRowAndColumn(rowNumber, columnId);
+            return cell;
+        }
+
+        delete existingComponentToUpdate;
+        return nullptr;
+    }
+
+    double getValue(int columnId, int rowNumber) override
+    {
+        if (rowNumber < 0 || rowNumber >= points.size()) return 0.0;
+        const auto& wp = points.getReference(rowNumber);
+
+        switch (columnId)
+        {
+            case ColumnX:     return wp.x;
+            case ColumnY:     return wp.y;
+            case ColumnZ:     return wp.z;
+            case ColumnBreak: return wp.startsNewSegment ? 1.0 : 0.0;
+            default:          return 0.0;
+        }
+    }
+
+    void setValue(int columnId, int rowNumber, double newValue) override
+    {
+        if (rowNumber < 0 || rowNumber >= points.size()) return;
+        auto& wp = points.getReference(rowNumber);
+
+        switch (columnId)
+        {
+            case ColumnX:     wp.x = newValue; break;
+            case ColumnY:     wp.y = newValue; break;
+            case ColumnZ:     wp.z = newValue; break;
+            case ColumnBreak: wp.startsNewSegment = !juce::exactlyEqual(newValue, 0.0); break;
+            default: return;
+        }
+
+        table.repaint(); // the index column draws the break marker
+        if (onWaypointEdited) onWaypointEdited();
+    }
+
+    SliderRange getSliderRange(int) override
+    {
+        // CartesianMin/Max already substitute a large-but-finite bound in "infinite" mode, so this
+        // must not gate on IsInfinite() - the same rule the coordinate sliders follow.
+        if (pScalingInfo != nullptr)
+            return SliderRange(pScalingInfo->CartesianMin(), pScalingInfo->CartesianMax(), 0.001);
+        return SliderRange(-10.0, 10.0, 0.001);
+    }
+
+    juce::TableListBox* getTable() override { return &table; }
+    juce::String getTableText(const int, const int) override { return {}; }
+    void setTableText(const int, const int, const juce::String&) override {}
+
+    // The first waypoint always begins the first sub-path, so its own Break flag would be
+    // meaningless - greyed out rather than hidden, so the column stays readable.
+    bool getEnabled(const int columnId, const int rowNumber) override
+    {
+        return !(columnId == ColumnBreak && rowNumber == 0);
+    }
+
+private:
+    juce::Array<MovementWaypoint>& points;
+    juce::TableListBox& table;
+    ScalingInfo* pScalingInfo = nullptr;
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(WaypointTableListModel)
+};
+
 class MovementClipEditor : public juce::Component, public juce::ChangeListener,
                             public ClipEditorCloseGuard, private juce::Timer
 {
@@ -219,11 +352,50 @@ private:
     CoordinateValueControl radiusChangeSlider;
     juce::Label radiusChangeLabel;
 
-    // MoveTo (Cartesian/Polar) ends at a different point than it started, so a non-palindrome
-    // repeat always jumps at the repeat boundary - unlike Circle/Spiral, which stay at least close
-    // to their start angle/radius every pass. Shared by createControls() (initial state) and
-    // onMovementTypeChanged() (live updates).
-    static bool isMoveToType(MovementType type) { return type == MovementType::MoveToCartesian || type == MovementType::MoveToPolar; }
+    // Per-type parameters - each row is only laid out (and only counted in
+    // getMovementControlsHeight()) for the types that actually use it, see the show*() predicates.
+    CoordinateValueControl tensionSlider;     // Spline
+    juce::Label tensionLabel;
+    CoordinateValueControl heightRiseSlider;  // Helix
+    juce::Label heightRiseLabel;
+    CoordinateValueControl freqASlider;       // Lissajous (X frequency) / Rose (petal count)
+    juce::Label freqALabel;
+    CoordinateValueControl freqBSlider;       // Lissajous (Y frequency)
+    juce::Label freqBLabel;
+    CoordinateValueControl phaseSlider;       // Lissajous / Rose
+    juce::Label phaseLabel;
+    CoordinateValueControl randomSeedSlider;  // Random Walk
+    juce::Label randomSeedLabel;
+
+    // Spline/Polygon waypoint list. Edits mutate currentClip.waypoints directly - the same live
+    // mutation ActionClipEditor does with currentClip.actions, and safe for the same reason: dirty
+    // detection compares against the separate dirtyBaseline snapshot, not against currentClip.
+    juce::TableListBox waypointTable;
+    std::unique_ptr<WaypointTableListModel> waypointModel;
+    juce::TextButton addWaypointButton{"Add"}, removeWaypointButton{"Remove"};
+
+    int getWaypointTableHeight() const { return 132; }
+    void addWaypoint();
+    void removeSelectedWaypoint();
+    void refreshWaypointTable();
+    void ensureWaypointsSeeded();
+
+    // Which optional rows the currently selected type shows. getMovementControlsHeight() and
+    // layoutMovementControls() both derive from these, so the reserved height and the laid-out rows
+    // can never drift apart - and the dialog has exactly zero spare vertical space, so a mismatch
+    // would clip the last row immediately.
+    MovementType getSelectedMovementType() const;
+    bool showsPolarToggle() const;
+    bool showsTargetRows() const;
+    bool showsWaypointTable() const;
+    bool showsCount() const;
+    bool showsRadiusChange() const;
+    bool showsTension() const;
+    bool showsHeightRise() const;
+    bool showsFreqA() const;
+    bool showsFreqB() const;
+    bool showsPhase() const;
+    bool showsRandomSeed() const;
 
     void createControls();
     void createCoordinateSlider(CoordinateValueControl& slider, juce::Label& label, const juce::String& name,

@@ -74,10 +74,6 @@ private:
     // edit merged into the rest of the clip) before OK is pressed.
     bool editActionDialog(ActionDefinition& action, const juce::String& title, int editingIndex);
     void updateReferenceFromGroup();
-    // Whether currentClip.actions contains a Rotation action - drives
-    // commonSettings.setRotationConstraintActive(), since only ActionClipEditor (not
-    // CommonClipSettings itself) knows what's in the clip.
-    bool currentClipHasRotation() const;
 
     // Clip editors have no per-control change notification, so the preview is kept live by
     // polling the Duration field instead - currentClip.actions is already kept live by

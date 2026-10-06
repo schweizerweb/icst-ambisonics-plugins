@@ -28,13 +28,12 @@
 // making a constant real speed look like it's decelerating on screen).
 //
 // Looping semantics intentionally differ by type, matching what repeating the real clip would
-// actually look like: MoveTo/Circle/Spiral/Stretch have a well-defined 0..1 progress tied to clip
-// length, so they wrap and restart each loop. Rotation and Jitter have no such bound in the real
-// engine (rotation accumulates forever, jitter has no cycle) - the preview lets them run forever
-// too, rather than forcing an artificial reset.
+// actually look like: MoveTo/Circle/Spiral/Stretch/Rotation all have a well-defined 0..1 progress
+// tied to clip length, so they wrap and restart each loop. Jitter is the only unbounded one (noise
+// has no cycle) - the preview lets it run forever rather than forcing an artificial reset.
 //
 // Interactive: Movement's Start/Target/Center point(s) can be dragged directly here instead of only
-// typed into sliders - see the DraggedHandle enum and the mouse handlers below. This component
+// typed into sliders - see HandleRef and the mouse handlers below. This component
 // doesn't own clip data, so a drag is reported via onPointDragged rather than committed here; the
 // host editor (MovementClipEditor) writes it into its own controls/model, the same as any other
 // edit, so Apply/Cancel/dirty-detection all keep working unchanged. Action clips have no draggable
@@ -125,15 +124,35 @@ public:
     // held at its previous value). The host editor writes this into its own coordinate sliders.
     std::function<void(bool isStartHandle, juce::Vector3D<double> newWorldPos)> onPointDragged;
 
+    // Spline/Polygon waypoint editing. Dragging fires continuously like onPointDragged; adding is
+    // bound to cmd/ctrl-click (never a bare click, which would make any stray click in the panel
+    // silently append a point) and removing to a double-click on an existing handle.
+    std::function<void(int index, juce::Vector3D<double> newWorldPos)> onWaypointDragged;
+    std::function<void(juce::Vector3D<double> worldPos)> onWaypointAdded;
+    std::function<void(int insertIndex, juce::Vector3D<double> worldPos)> onWaypointInserted;
+    std::function<void(int index)> onWaypointRemoved;
+
 private:
     static constexpr int numMembers = 3;
     static constexpr int traceSamples = 200;
 
     // Which handle (if any) is currently being dragged or hovered - see findHandleAt()/mouseDown().
-    enum class DraggedHandle { None, MovementStart, MovementTarget };
+    // A waypoint path has arbitrarily many handles, so a handle is identified by kind + index
+    // rather than by a bare enum value.
+    enum class HandleKind { None, MovementStart, MovementTarget, Waypoint };
 
-    DraggedHandle draggedHandle = DraggedHandle::None;
-    DraggedHandle hoveredHandle = DraggedHandle::None;
+    struct HandleRef
+    {
+        HandleKind kind = HandleKind::None;
+        int index = -1; // waypoint index; unused for the other kinds
+
+        bool operator==(const HandleRef& other) const { return kind == other.kind && index == other.index; }
+        bool operator!=(const HandleRef& other) const { return !(*this == other); }
+        bool isSet() const { return kind != HandleKind::None; }
+    };
+
+    HandleRef draggedHandle;
+    HandleRef hoveredHandle;
     bool draggedPanelIsXY = true;
 
     // The offset between where the user actually clicked and the handle's exact screen position,
@@ -142,9 +161,21 @@ private:
 
     static constexpr float handleHitRadiusPx = 9.0f;
 
-    bool isHandleActive(DraggedHandle h) const
+    // Deliberately wider than the handle radius: hitting a thin line needs more tolerance than
+    // hitting a drawn dot, and a handle always wins the double-click anyway (removal is checked
+    // first), so the two radii overlapping can't make a waypoint harder to delete.
+    static constexpr float pathHitRadiusPx = 12.0f;
+
+    bool isHandleActive(HandleRef h) const
     {
         return draggedHandle == h || hoveredHandle == h;
+    }
+
+    juce::Vector3D<double> waypointPosition(int index) const
+    {
+        if (index < 0 || index >= movementClip.waypoints.size()) return {};
+        const auto& wp = movementClip.waypoints.getReference(index);
+        return { wp.x, wp.y, wp.z };
     }
 
     // First ActionDefinition of this type with real timing, or nullptr. Note the real engine
@@ -162,7 +193,6 @@ private:
     void timerCallback() override
     {
         constexpr double tickSeconds = 1.0 / 30.0;
-        constexpr ms_t tickMs = 33;
 
         if (hasMovementClip)
         {
@@ -193,22 +223,10 @@ private:
                 recomputeSceneScale();
             }
 
-            // Shared with computeCurrentFormation()'s Stretch handling below - both read from the
-            // same wrapping stretchProgress clock, matching how a real ActionClip's Repetitions/
-            // Palindrome apply uniformly to every action within it (AnimatorEngine::processActiveActions
-            // computes exactly one cycleState per clip too, not one per action).
-            const auto actionCycle = AnimatorMath::computeCycleState(stretchProgress, actionClip.repetitions, actionClip.palindrome);
-
-            for (const auto& actionDef : actionClip.actions)
-            {
-                if (actionDef.getAction() == ActionType::RotationX ||
-                    actionDef.getAction() == ActionType::RotationY ||
-                    actionDef.getAction() == ActionType::RotationZ)
-                {
-                    accumulatedRotation += AnimatorMath::calculateRotationTickRadians(actionDef, tickMs, actionClip.length) * actionCycle.direction;
-                }
-            }
-
+            // Rotation needs no per-tick bookkeeping here any more: like Stretch, it's an absolute
+            // function of stretchProgress, evaluated in computeCurrentFormation() below. It used to
+            // accumulate into a member that was never reset between loops, so a previewed rotation
+            // drifted further on every pass.
             jitterElapsedSeconds += tickSeconds;
         }
 
@@ -216,30 +234,17 @@ private:
         repaint();
     }
 
-    static juce::Vector3D<double> rotateVector(juce::Vector3D<double> v, juce::Vector3D<double> anglesRad)
+    // Rotates an offset by a group orientation, indexing the matrix exactly as
+    // AmbiGroup::getAbsSourcePoint() does (AmbiGroup.cpp:473-475), so the preview and real playback
+    // agree on direction and axis rather than approximating each other.
+    static juce::Vector3D<double> rotateVector(juce::Vector3D<double> v, const juce::Quaternion<double>& orientation)
     {
-        // Sequential X -> Y -> Z rotation - a deliberate visual simplification of the real engine's
-        // internal quaternion/point-rotation mode split (not exposed to clip data), good enough to
-        // judge speed/direction/axis at a glance.
-        {
-            const double c = std::cos(anglesRad.x), s = std::sin(anglesRad.x);
-            const double y = v.y * c - v.z * s;
-            const double z = v.y * s + v.z * c;
-            v.y = y; v.z = z;
-        }
-        {
-            const double c = std::cos(anglesRad.y), s = std::sin(anglesRad.y);
-            const double x = v.x * c + v.z * s;
-            const double z = -v.x * s + v.z * c;
-            v.x = x; v.z = z;
-        }
-        {
-            const double c = std::cos(anglesRad.z), s = std::sin(anglesRad.z);
-            const double x = v.x * c - v.y * s;
-            const double y = v.x * s + v.y * c;
-            v.x = x; v.y = y;
-        }
-        return v;
+        const auto m = orientation.getRotationMatrix();
+
+        return juce::Vector3D<double>(
+            m.mat[0] * v.x + m.mat[1] * v.y + m.mat[2]  * v.z,
+            m.mat[4] * v.x + m.mat[5] * v.y + m.mat[6]  * v.z,
+            m.mat[8] * v.x + m.mat[9] * v.y + m.mat[10] * v.z);
     }
 
     static juce::Vector3D<double> baseOffsetDirection(int index)
@@ -262,6 +267,23 @@ private:
         if (!hasMovementClip) return;
 
         fullTrace.ensureStorageAllocated(traceSamples + 1);
+
+        // Waypoint paths get their arc-length table built ONCE here rather than per sample.
+        // calculatePosition() would otherwise rebuild it on all 201 calls, and this runs on every
+        // 150ms poll AND on every drag tick - the one place where that cost actually matters.
+        if (movementTypeUsesWaypoints(movementClip.movementType))
+        {
+            const auto path = AnimatorMath::buildWaypointPath(movementClip);
+
+            for (int i = 0; i <= traceSamples; ++i)
+            {
+                const double p = (double)i / (double)traceSamples;
+                const auto cycle = AnimatorMath::computeCycleState(p, movementClip.repetitions, movementClip.palindrome);
+                fullTrace.add(AnimatorMath::evaluateWaypointPath(path, cycle.cycleProgress, movementStart));
+            }
+            return;
+        }
+
         for (int i = 0; i <= traceSamples; ++i)
         {
             const double p = (double)i / (double)traceSamples;
@@ -287,7 +309,7 @@ private:
         // live feedback, which would otherwise re-fit the camera mid-drag and break the 1:1
         // screen<->world mapping screenToWorld()/the drag formulas assume. mouseUp() calls this
         // once more explicitly to re-fit after the drag ends.
-        if (draggedHandle != DraggedHandle::None) return;
+        if (draggedHandle.isSet()) return;
 
         if (pScalingInfo != nullptr && !pScalingInfo->IsInfinite())
         {
@@ -344,6 +366,9 @@ private:
             : referencePosition;
 
         double stretch = 1.0;
+        // Identity, spelled out - juce::Quaternion<double>() is the ZERO quaternion.
+        AnimatorMath::RotationState rotation;
+
         if (hasActionClip)
         {
             if (auto* stretchAction = findAction(ActionType::Stretch))
@@ -351,6 +376,14 @@ private:
                 const auto actionCycle = AnimatorMath::computeCycleState(stretchProgress, actionClip.repetitions, actionClip.palindrome);
                 stretch = AnimatorMath::calculateStretch(*stretchAction, actionCycle.cycleProgress, actionClip.length, stretchInitial, hasReferenceStretchFlag);
             }
+
+            // The preview has no live group orientation to inherit, so it passes "no captured start"
+            // and relative sweeps start from identity. A clip with a defined start angle is
+            // world-absolute anyway, so it previews exactly as it will play.
+            rotation = AnimatorMath::computeClipRotation(actionClip,
+                                                         AnimatorMath::rotationPhase(stretchProgress, actionClip.repetitions, actionClip.palindrome),
+                                                         juce::Quaternion<double>(juce::Vector3D<double>(0.0, 0.0, 0.0), 1.0),
+                                                         false);
         }
 
         const double magnitude = offsetMagnitude();
@@ -362,7 +395,8 @@ private:
             if (hasActionClip)
             {
                 offset = offset * stretch;
-                offset = rotateVector(offset, accumulatedRotation);
+                if (rotation.hasRotation)
+                    offset = rotateVector(offset, rotation.orientation);
 
                 for (const auto& actionDef : actionClip.actions)
                 {
@@ -433,7 +467,7 @@ private:
 
     struct HandleHit
     {
-        DraggedHandle kind = DraggedHandle::None;
+        HandleRef handle;
         bool isXYPanel = true;
         juce::Point<float> screenPos;
     };
@@ -443,14 +477,16 @@ private:
         HandleHit best;
         float bestDist = handleHitRadiusPx;
 
-        auto consider = [&](DraggedHandle kind, bool isXY, juce::Point<float> candidateScreenPos)
+        auto consider = [&](HandleRef handle, bool isXY, juce::Point<float> candidateScreenPos)
         {
             const float d = screenPos.getDistanceFrom(candidateScreenPos);
-            if (d <= bestDist) { bestDist = d; best = { kind, isXY, candidateScreenPos }; }
+            if (d <= bestDist) { bestDist = d; best = { handle, isXY, candidateScreenPos }; }
         };
 
         if (!hasMovementClip)
             return best;
+
+        const bool waypointType = movementTypeUsesWaypoints(movementClip.movementType);
 
         for (bool isXY : { true, false })
         {
@@ -459,13 +495,86 @@ private:
 
             const auto geom = getPanelGeometry(isXY);
 
-            juce::Vector3D<double> targetWorld(movementClip.targetPointGroup.getX(), movementClip.targetPointGroup.getY(), movementClip.targetPointGroup.getZ());
-            consider(DraggedHandle::MovementTarget, isXY, worldToScreen(targetWorld, geom, isXY));
+            if (waypointType)
+            {
+                // The path's own points are the only positional handles for these types - the
+                // target/centre point isn't used at all.
+                for (int i = 0; i < movementClip.waypoints.size(); ++i)
+                    consider({ HandleKind::Waypoint, i }, isXY, worldToScreen(waypointPosition(i), geom, isXY));
+            }
+            else
+            {
+                juce::Vector3D<double> targetWorld(movementClip.targetPointGroup.getX(), movementClip.targetPointGroup.getY(), movementClip.targetPointGroup.getZ());
+                consider({ HandleKind::MovementTarget, -1 }, isXY, worldToScreen(targetWorld, geom, isXY));
+            }
 
             if (movementClip.useStartPoint)
             {
                 juce::Vector3D<double> startWorld(movementClip.startPointGroup.getX(), movementClip.startPointGroup.getY(), movementClip.startPointGroup.getZ());
-                consider(DraggedHandle::MovementStart, isXY, worldToScreen(startWorld, geom, isXY));
+                consider({ HandleKind::MovementStart, -1 }, isXY, worldToScreen(startWorld, geom, isXY));
+            }
+        }
+
+        return best;
+    }
+
+    struct PathInsertion
+    {
+        bool valid = false;
+        int insertIndex = 0;             // index the new waypoint takes, i.e. the end of the span hit
+        juce::Vector3D<double> worldPos; // snapped onto the curve, not the raw click position
+    };
+
+    // Nearest point on the drawn path to a click, for double-click-to-insert. Walks the actual
+    // spans rather than the chords between waypoints, so it follows a Spline's bulge as well as a
+    // Polygon's straight edges (for a Polygon the two are the same thing).
+    //
+    // The returned position is the point ON the curve, not where the user clicked: inserting there
+    // leaves a Polygon's shape completely unchanged, so the gesture reads as "give me a handle here"
+    // rather than "drag the path to my cursor". The user drags the new handle afterwards.
+    PathInsertion findPathInsertionAt(juce::Point<float> screenPos) const
+    {
+        PathInsertion best;
+
+        if (!hasMovementClip || !movementTypeUsesWaypoints(movementClip.movementType))
+            return best;
+        if (movementClip.waypoints.size() < 2)
+            return best;
+
+        const auto path = AnimatorMath::buildWaypointPath(movementClip);
+        float bestDist = pathHitRadiusPx;
+
+        for (bool isXY : { true, false })
+        {
+            if (!getPanelBounds(isXY).contains(screenPos.roundToInt()))
+                continue;
+
+            const auto geom = getPanelGeometry(isXY);
+
+            for (const auto& sub : path.subPaths)
+            {
+                // Spans run firstIndex..lastIndex-1. The gap BETWEEN two sub-paths is deliberately
+                // not a span, so double-clicking along an instant jump inserts nothing - there's no
+                // path there to add a point to.
+                for (int span = sub.firstIndex; span < sub.lastIndex; ++span)
+                {
+                    constexpr int steps = 24; // per span - dense enough that the hit radius never slips through
+
+                    for (int s = 0; s <= steps; ++s)
+                    {
+                        const auto world = AnimatorMath::evaluateWaypointSpan(path, span, (double)s / (double)steps,
+                                                                              sub.firstIndex, sub.lastIndex);
+                        const float d = screenPos.getDistanceFrom(worldToScreen(world, geom, isXY));
+
+                        if (d <= bestDist)
+                        {
+                            bestDist = d;
+                            best.valid = true;
+                            best.insertIndex = span + 1;
+                            best.worldPos = world;
+                        }
+                    }
+                }
             }
         }
 
@@ -477,20 +586,20 @@ private:
     void mouseMove(const juce::MouseEvent& e) override
     {
         const auto hit = findHandleAt(e.position);
-        setMouseCursor(hit.kind != DraggedHandle::None ? juce::MouseCursor::DraggingHandCursor
-                                                        : juce::MouseCursor::NormalCursor);
-        if (hit.kind != hoveredHandle)
+        setMouseCursor(hit.handle.isSet() ? juce::MouseCursor::DraggingHandCursor
+                                          : juce::MouseCursor::NormalCursor);
+        if (hit.handle != hoveredHandle)
         {
-            hoveredHandle = hit.kind;
+            hoveredHandle = hit.handle;
             repaint();
         }
     }
 
     void mouseExit(const juce::MouseEvent&) override
     {
-        if (hoveredHandle != DraggedHandle::None)
+        if (hoveredHandle.isSet())
         {
-            hoveredHandle = DraggedHandle::None;
+            hoveredHandle = {};
             repaint();
         }
     }
@@ -498,20 +607,95 @@ private:
     void mouseDown(const juce::MouseEvent& e) override
     {
         const auto hit = findHandleAt(e.position);
-        draggedHandle = hit.kind;
-        if (draggedHandle == DraggedHandle::None)
+        draggedHandle = hit.handle;
+
+        if (draggedHandle.isSet())
+        {
+            draggedPanelIsXY = hit.isXYPanel;
+            dragGrabOffsetScreen = hit.screenPos - e.position;
+            return;
+        }
+
+        // Empty space: append a waypoint, but only on an explicit cmd/ctrl-click. A bare click must
+        // stay inert - it's also how the user focuses the dialog or dismisses a selection.
+        if (!hasMovementClip || !movementTypeUsesWaypoints(movementClip.movementType)) return;
+        if (!(e.mods.isCommandDown() || e.mods.isCtrlDown())) return;
+        if (onWaypointAdded == nullptr) return;
+
+        for (bool isXY : { true, false })
+        {
+            if (!getPanelBounds(isXY).contains(e.position.roundToInt()))
+                continue;
+
+            // The axis this panel doesn't control is inherited from the last waypoint, so a point
+            // added in the XY panel lands at the path's current height rather than at z = 0.
+            const auto held = movementClip.waypoints.isEmpty()
+                ? juce::Vector3D<double>()
+                : waypointPosition(movementClip.waypoints.size() - 1);
+
+            onWaypointAdded(screenToWorld(e.position, getPanelGeometry(isXY), isXY, held));
+            return;
+        }
+    }
+
+    void mouseDoubleClick(const juce::MouseEvent& e) override
+    {
+        // On a handle: remove it. Removal lives here rather than on a modifier-click because there's
+        // no click-vs-drag discrimination in mouseDown - a modifier-click would both move the handle
+        // and delete it.
+        const auto hit = findHandleAt(e.position);
+
+        if (hit.handle.isSet())
+        {
+            if (hit.handle.kind != HandleKind::Waypoint || onWaypointRemoved == nullptr)
+                return; // the Start/Target handles have no double-click meaning
+
+            const int index = hit.handle.index;
+
+            // Both references point at an index that's about to shift - clear them before the list
+            // changes, or a later drag would address the wrong (or a past-the-end) waypoint.
+            draggedHandle = {};
+            hoveredHandle = {};
+
+            onWaypointRemoved(index);
+            return;
+        }
+
+        // Not on a handle, but on the path itself: insert a waypoint there, BETWEEN the two it falls
+        // between rather than appended, so the path keeps its shape and the new point is immediately
+        // draggable. This is the discoverable counterpart to cmd/ctrl-click, which appends to the end.
+        if (onWaypointInserted == nullptr)
             return;
 
-        draggedPanelIsXY = hit.isXYPanel;
-        dragGrabOffsetScreen = hit.screenPos - e.position;
+        const auto insertion = findPathInsertionAt(e.position);
+        if (!insertion.valid)
+            return;
+
+        // Same index-shift hazard as removal: everything from insertIndex on moves up by one.
+        draggedHandle = {};
+        hoveredHandle = {};
+
+        onWaypointInserted(insertion.insertIndex, insertion.worldPos);
     }
 
     void mouseDrag(const juce::MouseEvent& e) override
     {
-        if (draggedHandle == DraggedHandle::None) return;
+        if (!draggedHandle.isSet()) return;
         const auto geom = getPanelGeometry(draggedPanelIsXY);
 
-        const bool isStart = (draggedHandle == DraggedHandle::MovementStart);
+        if (draggedHandle.kind == HandleKind::Waypoint)
+        {
+            if (draggedHandle.index < 0 || draggedHandle.index >= movementClip.waypoints.size())
+                return; // the list changed under us (e.g. a removal) - drop the stale drag
+
+            const auto newWorld = screenToWorld(e.position + dragGrabOffsetScreen, geom, draggedPanelIsXY,
+                                                 waypointPosition(draggedHandle.index));
+            if (onWaypointDragged)
+                onWaypointDragged(draggedHandle.index, newWorld);
+            return;
+        }
+
+        const bool isStart = (draggedHandle.kind == HandleKind::MovementStart);
         juce::Vector3D<double> currentWorld = isStart
             ? juce::Vector3D<double>(movementClip.startPointGroup.getX(), movementClip.startPointGroup.getY(), movementClip.startPointGroup.getZ())
             : juce::Vector3D<double>(movementClip.targetPointGroup.getX(), movementClip.targetPointGroup.getY(), movementClip.targetPointGroup.getZ());
@@ -522,7 +706,7 @@ private:
 
     void mouseUp(const juce::MouseEvent&) override
     {
-        draggedHandle = DraggedHandle::None;
+        draggedHandle = {};
         recomputeSceneScale(); // the last drag tick's setMovementClip() skipped this - refit now
         repaint();
     }
@@ -586,13 +770,41 @@ private:
 
         if (hasMovementClip)
         {
-            juce::Vector3D<double> targetWorld(movementClip.targetPointGroup.getX(), movementClip.targetPointGroup.getY(), movementClip.targetPointGroup.getZ());
-            drawPointHandle(g, toScreen(targetWorld), juce::Colours::orange, isHandleActive(DraggedHandle::MovementTarget));
+            if (movementTypeUsesWaypoints(movementClip.movementType))
+            {
+                for (int i = 0; i < movementClip.waypoints.size(); ++i)
+                {
+                    const bool breaksHere = i > 0 && movementClip.waypoints.getReference(i).startsNewSegment;
+                    const auto screenPos = toScreen(waypointPosition(i));
+
+                    // A point that begins a new sub-path is drawn in the "jump" colour and ringed,
+                    // so the discontinuity is visible in the path itself and not only in the table.
+                    drawPointHandle(g, screenPos,
+                                     breaksHere ? juce::Colours::orangered : juce::Colours::yellow,
+                                     isHandleActive({ HandleKind::Waypoint, i }));
+
+                    if (breaksHere)
+                    {
+                        g.setColour(juce::Colours::orangered.withAlpha(0.8f));
+                        g.drawEllipse(screenPos.x - 8.0f, screenPos.y - 8.0f, 16.0f, 16.0f, 1.2f);
+                    }
+
+                    g.setColour(juce::Colours::white.withAlpha(0.75f));
+                    g.setFont(juce::FontOptions(9.0f));
+                    g.drawText(juce::String(i + 1), juce::Rectangle<float>(screenPos.x + 5.0f, screenPos.y - 12.0f, 20.0f, 10.0f),
+                               juce::Justification::topLeft);
+                }
+            }
+            else
+            {
+                juce::Vector3D<double> targetWorld(movementClip.targetPointGroup.getX(), movementClip.targetPointGroup.getY(), movementClip.targetPointGroup.getZ());
+                drawPointHandle(g, toScreen(targetWorld), juce::Colours::orange, isHandleActive({ HandleKind::MovementTarget, -1 }));
+            }
 
             if (movementClip.useStartPoint)
             {
                 juce::Vector3D<double> startWorld(movementClip.startPointGroup.getX(), movementClip.startPointGroup.getY(), movementClip.startPointGroup.getZ());
-                drawPointHandle(g, toScreen(startWorld), juce::Colours::yellow, isHandleActive(DraggedHandle::MovementStart));
+                drawPointHandle(g, toScreen(startWorld), juce::Colours::lightgreen, isHandleActive({ HandleKind::MovementStart, -1 }));
             }
         }
     }
@@ -622,7 +834,6 @@ private:
     bool hasActionClip = false;
     double stretchProgress = 0.0;
     double stretchInitial = 1.0;
-    juce::Vector3D<double> accumulatedRotation;
     double jitterElapsedSeconds = 0.0;
 
     juce::Vector3D<double> referencePosition;

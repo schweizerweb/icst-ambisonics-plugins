@@ -20,6 +20,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/Constants.h"
+#include "../../Common/UiState.h"
 
 #define EXT_IMPORT_FAIL -1
 #define EXT_IMPORT_SUCCESS 1
@@ -39,12 +40,14 @@ private:
 public:
     static int importFromFile(AmbiDataSet* pDataSet, bool keepExistingData)
     {
-        FileChooser chooser("Import from TXT", File(), "*.txt");
+        FileChooser chooser("Import from TXT", UiState::startingFile(UiState::Folders::pointsTxt), "*.txt");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
             return 0;
         }
+
+        UiState::rememberFolder(UiState::Folders::pointsTxt, chooser.getResult());
 
         FileInputStream stream(chooser.getResult());
         Array<ExternalDataSet> points;
@@ -129,12 +132,14 @@ public:
 
     static int exportToFile(AmbiDataSet* pDataSet)
     {
-        FileChooser chooser("Export to file", File(), "*.txt");
+        FileChooser chooser("Export to file", UiState::startingFile(UiState::Folders::pointsTxt), "*.txt");
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
             return 0;
         }
+
+        UiState::rememberFolder(UiState::Folders::pointsTxt, chooser.getResult());
 
         if(chooser.getResult().exists())
         {

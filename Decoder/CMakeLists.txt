@@ -177,6 +177,7 @@ target_sources(AmbiDecoder
 	../Common/TrackColors.h
 	../Common/TrackColorSelector.h
 	../Common/TreeViewItemHelp.h
+	../Common/UiState.h
 	../Common/VarDelayBuffer.cpp
 	../Common/VarDelayBuffer.h
 	../Common/ZoomSettings.cpp

@@ -1466,8 +1466,11 @@ juce::String TimelineComponent::generateClipFullInfo(int timelineIndex, int laye
     if (isMovementClip)
     {
         const auto& movementClip = static_cast<const MovementClip&>(clip);
+        info << "Type: " << movementTypeToString(movementClip.movementType) << "\n";
         info << (movementClip.useStartPoint ? "Defined start position" : "Undefined start position") << "\n";
-        // Add movement-specific info if needed
+
+        if (movementTypeUsesWaypoints(movementClip.movementType))
+            info << "Waypoints: " << movementClip.waypoints.size() << "\n";
     }
     else
     {

@@ -1,6 +1,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/AdditionalWindow.h"
+#include "../../Common/UiState.h"
 #include "ClipEditorCloseGuard.h"
 #include "MovementClipEditor.h"
 #include "ActionClipEditor.h"
@@ -24,7 +25,16 @@ public:
         // Use the provided size + title bar height
         const int titleBarHeight = getTitleBarHeight();
         setSize(width, height + titleBarHeight);
-        centreWithSize(getWidth(), getHeight());
+
+        // Position only - the size comes from the hosted editor, which also resizes itself later
+        // (MovementClipEditor does, per movement type). Movement and action editors deliberately
+        // share one key: it's "where the user keeps the clip editor", not a per-type preference.
+        UiState::restorePosition(*this, UiState::Windows::animatorClipEditor);
+    }
+
+    ~ClipEditorDialog() override
+    {
+        UiState::rememberPosition(*this, UiState::Windows::animatorClipEditor);
     }
 
     void closeButtonPressed() override

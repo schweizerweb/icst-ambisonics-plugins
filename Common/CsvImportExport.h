@@ -20,6 +20,7 @@
 #pragma once
 #include "JuceHeader.h"
 #include "../../Common/Constants.h"
+#include "../../Common/UiState.h"
 
 #define SEPARATOR ";"
 #define CSV_IMPORT_FAIL -1
@@ -41,12 +42,14 @@ private:
 public:
     static int importFromCsv(AmbiDataSet* pDataSet, bool keepExistingData)
     {
-        FileChooser chooser("Import from CSV", File(), "*.csv");
+        FileChooser chooser("Import from CSV", UiState::startingFile(UiState::Folders::pointsCsv), "*.csv");
         bool ok = chooser.browseForFileToOpen();
         if (!ok)
         {
             return 0;
         }
+
+        UiState::rememberFolder(UiState::Folders::pointsCsv, chooser.getResult());
 
         FileInputStream stream(chooser.getResult());
         Array<CsvDataSet> points;
@@ -110,12 +113,14 @@ public:
 
     static int exportToCsv(AmbiDataSet* pDataSet)
     {
-        FileChooser chooser("Export to CSV", File(), "*.csv");
+        FileChooser chooser("Export to CSV", UiState::startingFile(UiState::Folders::pointsCsv), "*.csv");
         bool ok = chooser.browseForFileToSave(true);
         if (!ok)
         {
             return 0;
         }
+
+        UiState::rememberFolder(UiState::Folders::pointsCsv, chooser.getResult());
 
         if(chooser.getResult().exists())
         {

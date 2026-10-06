@@ -2,6 +2,7 @@
 #include "TimelineComponent.h"
 #include "CommonClipSettings.h"
 #include "ClipEditorDialog.h"
+#include "../../Common/UiState.h"
 
 MovementClipEditor::MovementClipEditor(TimelineComponent& timeline, int timelineIdx, int clipIdx)
     : timelineComp(timeline), timelineIndex(timelineIdx), clipIndex(clipIdx)
@@ -43,7 +44,10 @@ void MovementClipEditor::resized()
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
     const int previewGroupHeight = getPreviewHeight();
     const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    const int movementGroupHeight = getMovementControlsHeight();
+    // + 40 for the GroupComponent's own inset - movementGroupArea is handed to layoutMovementControls
+    // already reduced(8, 20), i.e. 40px shorter. Without this the last row laid out (the waypoint
+    // Add/Remove buttons, for Spline/Polygon) absorbs the entire shortfall and renders squashed.
+    const int movementGroupHeight = getMovementControlsHeight() + 40;
     const int buttonHeight = 28;
 
     // Clip properties and preview side by side, sharing one row
@@ -85,7 +89,7 @@ int MovementClipEditor::getTotalRequiredHeight() const
     const int clipGroupHeight = commonSettings.getRequiredHeight() + 40;
     const int previewGroupHeight = getPreviewHeight();
     const int topRowHeight = juce::jmax(clipGroupHeight, previewGroupHeight);
-    const int movementGroupHeight = getMovementControlsHeight();
+    const int movementGroupHeight = getMovementControlsHeight() + 40; // + GroupComponent inset, see resized()
     const int buttonHeight = 28;
     const int rowSpacing = 8; // one gap: top row -> movement group
 
@@ -168,6 +172,14 @@ MovementClip MovementClipEditor::buildClipFromControls()
 
     clip.count = countSlider.getValue();
     clip.radiusChange = radiusChangeSlider.getValue();
+    clip.tension = tensionSlider.getValue();
+    clip.heightRise = heightRiseSlider.getValue();
+    clip.freqRatioA = freqASlider.getValue();
+    clip.freqRatioB = freqBSlider.getValue();
+    clip.phaseDeg = phaseSlider.getValue();
+    clip.randomSeed = (int)randomSeedSlider.getValue();
+    // waypoints are carried over from currentClip (which the table and the preview's drag handles
+    // mutate live), so nothing to copy from a control here.
 
     // Convert coordinates based on display mode for storage
     if (usePolarDisplay.getToggleState())
@@ -204,7 +216,7 @@ void MovementClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
-    commonSettings.setPalindromeRequiredForRepeat(isMoveToType(currentClip.movementType));
+    commonSettings.setPalindromeRequiredForRepeat(movementTypeRequiresPalindromeForRepeat(currentClip.movementType));
 
     addAndMakeVisible(preview);
     preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
@@ -237,10 +249,10 @@ void MovementClipEditor::createControls()
     movementTypeLabel.setJustificationType(juce::Justification::centredLeft);
     
     addAndMakeVisible(movementTypeCombo);
-    movementTypeCombo.addItem("MoveTo (Cartesian)", static_cast<int>(MovementType::MoveToCartesian) + 1);
-    movementTypeCombo.addItem("MoveTo (Polar)", static_cast<int>(MovementType::MoveToPolar) + 1);
-    movementTypeCombo.addItem("Circle", static_cast<int>(MovementType::Circle) + 1);
-    movementTypeCombo.addItem("Spiral", static_cast<int>(MovementType::Spiral) + 1);
+    // Driven from movementTypeToString() so the combo, the timeline tooltip and the enum can't
+    // drift apart as types are added.
+    for (int i = 0; i <= static_cast<int>(MovementType::RandomWalk); ++i)
+        movementTypeCombo.addItem(movementTypeToString(static_cast<MovementType>(i)), i + 1);
     movementTypeCombo.setSelectedId(static_cast<int>(currentClip.movementType) + 1);
     movementTypeCombo.onChange = [this] { onMovementTypeChanged(); };
     
@@ -268,6 +280,45 @@ void MovementClipEditor::createControls()
     
     createStandardSlider(countSlider, countLabel, "Rotations:", currentClip.count);
     createStandardSlider(radiusChangeSlider, radiusChangeLabel, "Radius change / rotation:", currentClip.radiusChange);
+
+    // Per-type parameters. Like count/radiusChange these are created once from currentClip and
+    // then only ever READ by buildClipFromControls() - deliberately never re-read from currentClip
+    // by any update function, which is what would clobber unsaved edits.
+    createStandardSlider(tensionSlider, tensionLabel, "Tension (0=round, 1=straight):", currentClip.tension);
+    tensionSlider.setRange(0.0, 1.0, 0.01);
+    tensionSlider.setValue(currentClip.tension);
+
+    createStandardSlider(heightRiseSlider, heightRiseLabel, "Height rise:", currentClip.heightRise);
+    createStandardSlider(freqASlider, freqALabel, "Frequency X:", currentClip.freqRatioA);
+    createStandardSlider(freqBSlider, freqBLabel, "Frequency Y:", currentClip.freqRatioB);
+
+    createStandardSlider(phaseSlider, phaseLabel, "Phase:", currentClip.phaseDeg);
+    phaseSlider.setRange(-360.0, 360.0, 1.0);
+    phaseSlider.setValue(currentClip.phaseDeg);
+
+    createStandardSlider(randomSeedSlider, randomSeedLabel, "Seed:", currentClip.randomSeed);
+    randomSeedSlider.setRange(0.0, 99999.0, 1.0);
+    randomSeedSlider.setValue(currentClip.randomSeed);
+
+    // Waypoint table (Spline/Polygon)
+    waypointModel = std::make_unique<WaypointTableListModel>(currentClip.waypoints, waypointTable);
+    waypointModel->setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
+    waypointModel->onWaypointEdited = [this] { preview.setMovementClip(buildClipFromControls()); };
+
+    addAndMakeVisible(waypointTable);
+    waypointTable.setModel(waypointModel.get());
+    waypointTable.setHeaderHeight(22);
+    waypointTable.getHeader().addColumn("#", WaypointTableListModel::ColumnIndex, 34, 34, 34);
+    waypointTable.getHeader().addColumn("X", WaypointTableListModel::ColumnX, 90);
+    waypointTable.getHeader().addColumn("Y", WaypointTableListModel::ColumnY, 90);
+    waypointTable.getHeader().addColumn("Z", WaypointTableListModel::ColumnZ, 90);
+    waypointTable.getHeader().addColumn("Break", WaypointTableListModel::ColumnBreak, 54, 54, 54);
+
+    addAndMakeVisible(addWaypointButton);
+    addWaypointButton.onClick = [this] { addWaypoint(); };
+
+    addAndMakeVisible(removeWaypointButton);
+    removeWaypointButton.onClick = [this] { removeSelectedWaypoint(); };
     
     // Create apply current position buttons
     createApplyCurrentPositionButton(applyCurrentStartButton, startXSlider, startYSlider, startZSlider);
@@ -291,6 +342,69 @@ void MovementClipEditor::createControls()
         ySlider.setValue(converted.y);
         zSlider.setValue(converted.z);
         preview.setMovementClip(buildClipFromControls());
+    };
+
+    // Waypoint handles mutate currentClip.waypoints directly - unlike Start/Target there's no
+    // slider to funnel them through, and the table is a view onto that same array. Each one pushes
+    // to the preview immediately rather than waiting for the 150ms poll, so the handle doesn't lag
+    // the cursor.
+    preview.onWaypointDragged = [this](int index, juce::Vector3D<double> newWorldPos)
+    {
+        if (index < 0 || index >= currentClip.waypoints.size()) return;
+
+        auto& wp = currentClip.waypoints.getReference(index);
+        wp.x = newWorldPos.x;
+        wp.y = newWorldPos.y;
+        wp.z = newWorldPos.z;
+
+        waypointTable.repaint();
+        preview.setMovementClip(buildClipFromControls());
+    };
+
+    preview.onWaypointAdded = [this](juce::Vector3D<double> worldPos)
+    {
+        MovementWaypoint wp;
+        wp.x = worldPos.x;
+        wp.y = worldPos.y;
+        wp.z = worldPos.z;
+        currentClip.waypoints.add(wp);
+
+        refreshWaypointTable();
+        waypointTable.selectRow(currentClip.waypoints.size() - 1);
+    };
+
+    // Double-clicking the path inserts there rather than appending, so the shape is preserved. The
+    // new point inherits its neighbour's break flag handling implicitly: it's placed AFTER the span's
+    // first point, mid-sub-path, so it never starts a segment of its own.
+    preview.onWaypointInserted = [this](int insertIndex, juce::Vector3D<double> worldPos)
+    {
+        if (insertIndex < 0 || insertIndex > currentClip.waypoints.size()) return;
+
+        MovementWaypoint wp;
+        wp.x = worldPos.x;
+        wp.y = worldPos.y;
+        wp.z = worldPos.z;
+        wp.startsNewSegment = false;
+
+        currentClip.waypoints.insert(insertIndex, wp);
+
+        refreshWaypointTable();
+        waypointTable.selectRow(insertIndex);
+        preview.setMovementClip(buildClipFromControls());
+    };
+
+    preview.onWaypointRemoved = [this](int index)
+    {
+        if (index < 0 || index >= currentClip.waypoints.size()) return;
+
+        currentClip.waypoints.remove(index);
+
+        // Row 0 always begins the first sub-path, so a break flag shuffled up into it is
+        // meaningless (and its table cell is disabled, so the user couldn't clear it themselves).
+        if (!currentClip.waypoints.isEmpty())
+            currentClip.waypoints.getReference(0).startsNewSegment = false;
+
+        refreshWaypointTable();
     };
 
     // Captured last, after every control above has been populated from currentClip - see
@@ -415,7 +529,7 @@ void MovementClipEditor::updateSliderLabelsAndRanges()
         // Update target label based on movement type
         MovementType currentType = static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
         juce::String targetLabel = "Target ";
-        if (currentType == MovementType::Circle || currentType == MovementType::Spiral)
+        if (movementTypeUsesTargetAsCentre(currentType))
             targetLabel = "Center ";
 
         // targetLabel is already a juce::String here, so appending the degree symbol via operator+
@@ -470,7 +584,7 @@ void MovementClipEditor::updateSliderLabelsAndRanges()
         // Update target label based on movement type
         MovementType currentType = static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
         juce::String targetLabel = "Target ";
-        if (currentType == MovementType::Circle || currentType == MovementType::Spiral)
+        if (movementTypeUsesTargetAsCentre(currentType))
             targetLabel = "Center ";
         
         targetXLabel.setText(targetLabel + "X:", juce::dontSendNotification);
@@ -587,24 +701,33 @@ void MovementClipEditor::onMovementTypeChanged()
         updateSliderLabelsAndRanges();
     }
     
-    // Set default values for disabled controls
-    if (newType != MovementType::Circle && newType != MovementType::Spiral)
-    {
-        countSlider.setValue(1.0f);
-    }
-    
-    if (newType != MovementType::Spiral)
-    {
-        radiusChangeSlider.setValue(0.0f);
-    }
+    // Reset parameters the new type doesn't use, so a clip doesn't silently carry a stale value
+    // from a type it no longer is. This lives here (an explicit user type change) and NOT in
+    // updateControlVisibility(), which also fires from unrelated toggles - see the note there.
+    if (!showsCount())        countSlider.setValue(1.0);
+    if (!showsRadiusChange()) radiusChangeSlider.setValue(0.0);
+    if (!showsHeightRise())   heightRiseSlider.setValue(0.0);
 
-    // A MoveTo clip ends at a different point than it started (that's the whole point of it) - a
-    // non-palindrome repeat would snap instantly from the target back to the start at every repeat
-    // boundary, so Repetitions > 1 requires Palindrome for this type, same mechanism as the
-    // Rotation-action constraint in CommonClipSettings.
-    commonSettings.setPalindromeRequiredForRepeat(isMoveToType(newType));
+    // An open-ended path (MoveTo, Spline, Polygon, Random Walk) ends somewhere other than where it
+    // started, so a non-palindrome repeat snaps visibly at every repeat boundary - the same
+    // mechanism as the Rotation-action constraint in CommonClipSettings.
+    commonSettings.setPalindromeRequiredForRepeat(movementTypeRequiresPalindromeForRepeat(newType));
 
     updateControlVisibility();
+    ensureWaypointsSeeded();
+
+    // The row set just changed, so the dialog's required height did too. The window follows because
+    // ClipEditorDialog uses setContentOwned(..., resizeToFitContent=true) - setResizable(false,false)
+    // only blocks the user dragging its edges. Without this the last row would clip immediately,
+    // since the layout has no spare vertical space at all.
+    setSize(getTotalRequiredWidth(), getTotalRequiredHeight());
+
+    // ClipEditorDialog only centres itself at construction, so a grown dialog would otherwise creep
+    // off the bottom of the display.
+    // Keep the window where the user put it and only pull it back on-screen if the new size
+    // pushed it off - re-centring here would yank the dialog out from under the cursor mid-edit.
+    if (auto* dialog = findParentComponentOfClass<juce::DialogWindow>())
+        UiState::constrainToDisplay(*dialog);
 }
 
 void MovementClipEditor::updateControlVisibility()
@@ -630,50 +753,187 @@ void MovementClipEditor::updateControlVisibility()
     startZLabel.setAlpha(startAlpha);
     applyCurrentStartButton.setAlpha((startPositionEnabled && currentPositionValid) ? 1.0f : 0.5f);
     
-    // Update count slider enablement (always visible)
-    bool countEnabled = (currentType == MovementType::Circle || currentType == MovementType::Spiral);
-    countSlider.setEnabled(countEnabled);
-    countLabel.setEnabled(countEnabled);
-    countSlider.setAlpha(countEnabled ? 1.0f : 0.5f);
-    countLabel.setAlpha(countEnabled ? 1.0f : 0.5f);
-    
-    // Set count to default value of 1 when not enabled
-    if (!countEnabled && countSlider.getValue() != 1.0f)
+    // Per-type rows are now SHOWN or HIDDEN rather than merely dimmed, and crucially their values
+    // are no longer reset here. Resetting on every visibility update was destructive: this function
+    // also runs from useStartPosition.onClick, so toggling an unrelated checkbox would silently
+    // wipe a Spiral's radiusChange or a Circle's count. Type-switch defaults now live solely in
+    // onMovementTypeChanged(), which is an explicit user action.
+    usePolarDisplay.setVisible(showsPolarToggle());
+
+    const bool targetVisible = showsTargetRows();
+    targetXSlider.setVisible(targetVisible);
+    targetYSlider.setVisible(targetVisible);
+    targetZSlider.setVisible(targetVisible);
+    targetXLabel.setVisible(targetVisible);
+    targetYLabel.setVisible(targetVisible);
+    targetZLabel.setVisible(targetVisible);
+    applyCurrentTargetButton.setVisible(targetVisible);
+
+    const bool tableVisible = showsWaypointTable();
+    waypointTable.setVisible(tableVisible);
+    addWaypointButton.setVisible(tableVisible);
+    removeWaypointButton.setVisible(tableVisible);
+
+    auto setRowVisible = [](juce::Component& label, juce::Component& control, bool visible)
     {
-        countSlider.setValue(1.0f);
-    }
-    
-    // Update radius change slider enablement (always visible)
-    bool radiusChangeEnabled = (currentType == MovementType::Spiral);
-    radiusChangeSlider.setEnabled(radiusChangeEnabled);
-    radiusChangeLabel.setEnabled(radiusChangeEnabled);
-    radiusChangeSlider.setAlpha(radiusChangeEnabled ? 1.0f : 0.5f);
-    radiusChangeLabel.setAlpha(radiusChangeEnabled ? 1.0f : 0.5f);
-    
-    // Set radius change to default value of 0 when not enabled
-    if (!radiusChangeEnabled && radiusChangeSlider.getValue() != 0.0f)
+        label.setVisible(visible);
+        control.setVisible(visible);
+    };
+
+    setRowVisible(countLabel, countSlider, showsCount());
+    setRowVisible(radiusChangeLabel, radiusChangeSlider, showsRadiusChange());
+    setRowVisible(tensionLabel, tensionSlider, showsTension());
+    setRowVisible(heightRiseLabel, heightRiseSlider, showsHeightRise());
+    setRowVisible(freqALabel, freqASlider, showsFreqA());
+    setRowVisible(freqBLabel, freqBSlider, showsFreqB());
+    setRowVisible(phaseLabel, phaseSlider, showsPhase());
+    setRowVisible(randomSeedLabel, randomSeedSlider, showsRandomSeed());
+
+    // Rose reuses the Lissajous "Frequency X" control as its petal count, and Lissajous relabels
+    // the start controls because it's the one type that does not begin at its start point.
+    freqALabel.setText(currentType == MovementType::Rose ? "Petals:" : "Frequency X:", juce::dontSendNotification);
+    countLabel.setText(currentType == MovementType::RandomWalk ? "Wander cycles:" : "Rotations:", juce::dontSendNotification);
+}
+
+MovementType MovementClipEditor::getSelectedMovementType() const
+{
+    return static_cast<MovementType>(movementTypeCombo.getSelectedId() - 1);
+}
+
+void MovementClipEditor::refreshWaypointTable()
+{
+    waypointTable.updateContent();
+    waypointTable.repaint();
+    preview.setMovementClip(buildClipFromControls());
+}
+
+// Switching to Spline/Polygon with nothing in the list would otherwise leave the clip with no path
+// at all - the group would just hold still for the clip's whole duration with no hint why. Seeding
+// a short two-point path makes the type immediately do something visible and draggable.
+void MovementClipEditor::ensureWaypointsSeeded()
+{
+    if (!movementTypeUsesWaypoints(getSelectedMovementType()) || !currentClip.waypoints.isEmpty())
+        return;
+
+    const auto startPos = currentPositionValid ? currentPosition : juce::Vector3D<double>();
+
+    MovementWaypoint first;
+    first.x = startPos.x;
+    first.y = startPos.y;
+    first.z = startPos.z;
+    currentClip.waypoints.add(first);
+
+    MovementWaypoint second = first;
+    second.x += 1.0;
+    currentClip.waypoints.add(second);
+
+    refreshWaypointTable();
+}
+
+void MovementClipEditor::addWaypoint()
+{
+    // Append just past the last point so the new one is visible and separable rather than landing
+    // exactly on top of its neighbour (a zero-length span contributes no time and can't be grabbed).
+    MovementWaypoint wp;
+    if (!currentClip.waypoints.isEmpty())
     {
-        radiusChangeSlider.setValue(0.0f);
+        wp = currentClip.waypoints.getReference(currentClip.waypoints.size() - 1);
+        wp.x += 1.0;
+        wp.startsNewSegment = false;
     }
+    else if (currentPositionValid)
+    {
+        wp.x = currentPosition.x;
+        wp.y = currentPosition.y;
+        wp.z = currentPosition.z;
+    }
+
+    currentClip.waypoints.add(wp);
+    refreshWaypointTable();
+    waypointTable.selectRow(currentClip.waypoints.size() - 1);
+}
+
+void MovementClipEditor::removeSelectedWaypoint()
+{
+    const int selected = waypointTable.getSelectedRow();
+    if (selected < 0 || selected >= currentClip.waypoints.size())
+        return;
+
+    currentClip.waypoints.remove(selected);
+
+    // The first waypoint always starts the first sub-path, so a break flag that has shuffled up
+    // into row 0 is meaningless - clear it rather than leaving an uneditable stale flag there.
+    if (!currentClip.waypoints.isEmpty())
+        currentClip.waypoints.getReference(0).startsNewSegment = false;
+
+    refreshWaypointTable();
+}
+
+// Waypoint paths carry their coordinates in the table, which is XYZ-only, so the polar toggle and
+// the target/centre rows have nothing to act on for them.
+bool MovementClipEditor::showsPolarToggle() const   { return !movementTypeUsesWaypoints(getSelectedMovementType()); }
+bool MovementClipEditor::showsTargetRows() const    { return !movementTypeUsesWaypoints(getSelectedMovementType()); }
+bool MovementClipEditor::showsWaypointTable() const { return movementTypeUsesWaypoints(getSelectedMovementType()); }
+
+bool MovementClipEditor::showsCount() const
+{
+    const auto type = getSelectedMovementType();
+    return type == MovementType::Circle || type == MovementType::Spiral
+        || type == MovementType::Helix || type == MovementType::Lissajous
+        || type == MovementType::Rose || type == MovementType::RandomWalk;
+}
+
+bool MovementClipEditor::showsRadiusChange() const
+{
+    const auto type = getSelectedMovementType();
+    return type == MovementType::Spiral || type == MovementType::Helix;
+}
+
+bool MovementClipEditor::showsTension() const    { return getSelectedMovementType() == MovementType::Spline; }
+bool MovementClipEditor::showsHeightRise() const { return getSelectedMovementType() == MovementType::Helix; }
+bool MovementClipEditor::showsFreqB() const      { return getSelectedMovementType() == MovementType::Lissajous; }
+bool MovementClipEditor::showsRandomSeed() const { return getSelectedMovementType() == MovementType::RandomWalk; }
+
+bool MovementClipEditor::showsFreqA() const
+{
+    const auto type = getSelectedMovementType();
+    return type == MovementType::Lissajous || type == MovementType::Rose;
+}
+
+bool MovementClipEditor::showsPhase() const
+{
+    const auto type = getSelectedMovementType();
+    return type == MovementType::Lissajous || type == MovementType::Rose;
 }
 
 int MovementClipEditor::getMovementControlsHeight() const
 {
     const int rowHeight = 28;
     const int verticalSpacing = 8;
-    
-    // Fixed number of rows since all controls are always visible
-    const int fixedRows = 1 +  // movement type combo
-                          1 +  // polar display checkbox
-                          1 +  // use start position checkbox
-                          3 +  // start sliders
-                          1 +  // start button
-                          3 +  // target sliders
-                          1 +  // target button
-                          1 +  // count slider (always visible)
-                          1;   // radius change slider (always visible)
-    
-    return (fixedRows * rowHeight) + (fixedRows * verticalSpacing);
+
+    // Only the rows this type actually shows - must stay in lockstep with layoutMovementControls().
+    int rows = 1 +  // movement type combo
+               1 +  // use start position checkbox
+               3 +  // start sliders
+               1;   // start button
+
+    if (showsPolarToggle())   rows += 1;
+    if (showsTargetRows())    rows += 3 + 1; // target sliders + apply button
+    if (showsCount())         rows += 1;
+    if (showsRadiusChange())  rows += 1;
+    if (showsTension())       rows += 1;
+    if (showsHeightRise())    rows += 1;
+    if (showsFreqA())         rows += 1;
+    if (showsFreqB())         rows += 1;
+    if (showsPhase())         rows += 1;
+    if (showsRandomSeed())    rows += 1;
+
+    int height = (rows * rowHeight) + (rows * verticalSpacing);
+
+    if (showsWaypointTable())
+        height += getWaypointTableHeight() + rowHeight + verticalSpacing; // table + Add/Remove row
+
+    return height;
 }
 
 void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
@@ -691,12 +951,15 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     movementTypeCombo.setBounds(typeArea.withTrimmedRight(rightMargin));
     
     area.removeFromTop(verticalSpacing);
-    
-    // Polar display checkbox
-    auto polarArea = area.removeFromTop(rowHeight);
-    usePolarDisplay.setBounds(polarArea.withTrimmedLeft(labelLeftMargin));
-    
-    area.removeFromTop(verticalSpacing);
+
+    // Polar display checkbox (hidden for waypoint paths, whose table is XYZ-only)
+    if (showsPolarToggle())
+    {
+        auto polarArea = area.removeFromTop(rowHeight);
+        usePolarDisplay.setBounds(polarArea.withTrimmedLeft(labelLeftMargin));
+
+        area.removeFromTop(verticalSpacing);
+    }
     
     // Start position checkbox
     auto checkboxArea = area.removeFromTop(rowHeight);
@@ -725,38 +988,63 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     
     area.removeFromTop(verticalSpacing);
     
-    // Target position controls
-    auto targetXArea = area.removeFromTop(rowHeight);
-    targetXLabel.setBounds(targetXArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-    targetXSlider.setBounds(targetXArea.withTrimmedRight(rightMargin));
-    
-    auto targetYArea = area.removeFromTop(rowHeight);
-    targetYLabel.setBounds(targetYArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-    targetYSlider.setBounds(targetYArea.withTrimmedRight(rightMargin));
-    
-    auto targetZArea = area.removeFromTop(rowHeight);
-    targetZLabel.setBounds(targetZArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-    targetZSlider.setBounds(targetZArea.withTrimmedRight(rightMargin));
-    
-    area.removeFromTop(buttonSpacing);
-    
-    // Target position apply button
-    auto targetButtonArea = area.removeFromTop(rowHeight);
-    applyCurrentTargetButton.setBounds(targetButtonArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
-    
-    area.removeFromTop(verticalSpacing);
-    
-    // Count slider (ALWAYS VISIBLE)
-    auto countArea = area.removeFromTop(rowHeight);
-    countLabel.setBounds(countArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-    countSlider.setBounds(countArea.withTrimmedRight(rightMargin));
-    
-    area.removeFromTop(verticalSpacing);
-    
-    // Radius change slider (ALWAYS VISIBLE)
-    auto radiusArea = area.removeFromTop(rowHeight);
-    radiusChangeLabel.setBounds(radiusArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-    radiusChangeSlider.setBounds(radiusArea.withTrimmedRight(rightMargin));
+    // Target/centre position controls - replaced by the waypoint table for Spline/Polygon
+    if (showsTargetRows())
+    {
+        auto targetXArea = area.removeFromTop(rowHeight);
+        targetXLabel.setBounds(targetXArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
+        targetXSlider.setBounds(targetXArea.withTrimmedRight(rightMargin));
+
+        auto targetYArea = area.removeFromTop(rowHeight);
+        targetYLabel.setBounds(targetYArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
+        targetYSlider.setBounds(targetYArea.withTrimmedRight(rightMargin));
+
+        auto targetZArea = area.removeFromTop(rowHeight);
+        targetZLabel.setBounds(targetZArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
+        targetZSlider.setBounds(targetZArea.withTrimmedRight(rightMargin));
+
+        area.removeFromTop(buttonSpacing);
+
+        auto targetButtonArea = area.removeFromTop(rowHeight);
+        applyCurrentTargetButton.setBounds(targetButtonArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
+
+        area.removeFromTop(verticalSpacing);
+    }
+
+    // One optional parameter row - must stay in lockstep with getMovementControlsHeight().
+    auto layoutParamRow = [&](bool visible, juce::Label& label, CoordinateValueControl& control)
+    {
+        if (!visible) return;
+
+        auto rowArea = area.removeFromTop(rowHeight);
+        label.setBounds(rowArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
+        control.setBounds(rowArea.withTrimmedRight(rightMargin));
+
+        area.removeFromTop(verticalSpacing);
+    };
+
+    layoutParamRow(showsCount(), countLabel, countSlider);
+    layoutParamRow(showsRadiusChange(), radiusChangeLabel, radiusChangeSlider);
+    layoutParamRow(showsTension(), tensionLabel, tensionSlider);
+    layoutParamRow(showsHeightRise(), heightRiseLabel, heightRiseSlider);
+    layoutParamRow(showsFreqA(), freqALabel, freqASlider);
+    layoutParamRow(showsFreqB(), freqBLabel, freqBSlider);
+    layoutParamRow(showsPhase(), phaseLabel, phaseSlider);
+    layoutParamRow(showsRandomSeed(), randomSeedLabel, randomSeedSlider);
+
+    // Waypoint table with its Add/Remove row underneath
+    if (showsWaypointTable())
+    {
+        auto tableArea = area.removeFromTop(getWaypointTableHeight());
+        waypointTable.setBounds(tableArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
+
+        area.removeFromTop(verticalSpacing);
+
+        auto buttonArea = area.removeFromTop(rowHeight).withTrimmedLeft(labelLeftMargin);
+        addWaypointButton.setBounds(buttonArea.removeFromLeft(110));
+        buttonArea.removeFromLeft(8);
+        removeWaypointButton.setBounds(buttonArea.removeFromLeft(110));
+    }
 }
 
 void MovementClipEditor::updateCurrentPosition(bool force)

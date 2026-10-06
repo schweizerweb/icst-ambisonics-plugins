@@ -2,6 +2,7 @@
 #include "TimelineComponent.h"
 #include "CommonClipSettings.h"
 #include "ClipEditorDialog.h"
+#include "../../Common/UiState.h"
 
 ActionClipEditor::ActionClipEditor(TimelineComponent& timeline, int timelineIdx, int clipIdx)
     : timelineComp(timeline), timelineIndex(timelineIdx), clipIndex(clipIdx)
@@ -56,16 +57,6 @@ void ActionClipEditor::timerCallback()
     clip.palindrome = commonSettings.getLivePalindrome();
     clip.repetitions = commonSettings.getLiveRepeatCount();
     preview.setActionClip(clip);
-}
-
-bool ActionClipEditor::currentClipHasRotation() const
-{
-    for (const auto& actionDef : currentClip.actions)
-        if (actionDef.getAction() == ActionType::RotationX ||
-            actionDef.getAction() == ActionType::RotationY ||
-            actionDef.getAction() == ActionType::RotationZ)
-            return true;
-    return false;
 }
 
 void ActionClipEditor::resized()
@@ -231,7 +222,10 @@ void ActionClipEditor::createControls()
     addAndMakeVisible(commonSettings);
     commonSettings.setDisplayInSeconds(timelineComp.isDisplayTimeInSeconds());
     commonSettings.setClipData(currentClip);
-    commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
+    // No palindrome constraint here (it stays at its default of false, unlike MovementClipEditor's):
+    // rotation used to need Palindrome for any repeat because an incremental sweep had no way to undo
+    // itself at a cycle boundary. AnimatorMath::rotationPhase now ramps continuously for a bare
+    // repeat, so N repeats are N consecutive turns with nothing to undo.
 
     addAndMakeVisible(preview);
     preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
@@ -311,7 +305,6 @@ void ActionClipEditor::addAction()
         currentClip.actions.add(newAction);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
-        commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
     }
 }
 
@@ -323,7 +316,6 @@ void ActionClipEditor::removeSelectedAction()
         currentClip.actions.remove(selected);
         actionsList.updateContent();
         preview.setActionClip(currentClip);
-        commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
     }
 }
 
@@ -338,7 +330,6 @@ void ActionClipEditor::editAction(int index)
             currentClip.actions.getReference(index) = action;
             actionsList.updateContent();
             preview.setActionClip(currentClip);
-            commonSettings.setPalindromeRequiredForRepeat(currentClipHasRotation());
         }
     }
 }
@@ -371,7 +362,18 @@ bool ActionClipEditor::editActionDialog(ActionDefinition& action, const juce::St
     options.useNativeTitleBar = true;
     options.resizable = false;
 
-    const bool accepted = options.runModal() != 0;
+    // Hand-rolled instead of options.runModal(), purely so the window can be repositioned before it
+    // becomes visible, and read back afterwards. runModal() is create() + runModalLoop() with
+    // deleteWhenDismissed set, which would delete the window before we could save its position;
+    // owning it here keeps it alive across both calls. create() leaves it sized, centred on this
+    // editor and hidden, so an unknown position keeps that centring rather than jumping elsewhere.
+    std::unique_ptr<juce::DialogWindow> dialog(options.create());
+    UiState::restorePosition(*dialog, UiState::Windows::animatorActionEdit, /*centreIfUnknown*/ false);
+
+    const bool accepted = dialog->runModalLoop() != 0;
+
+    UiState::rememberPosition(*dialog, UiState::Windows::animatorActionEdit);
+    dialog.reset();
 
     // Whether accepted or cancelled, the dialog's live edits are gone now - restore the preview
     // to the clip's actual (unedited, or already-committed-by-the-caller) state.
