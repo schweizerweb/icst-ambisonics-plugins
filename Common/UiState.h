@@ -70,7 +70,7 @@ public:
                                    const juce::String& suggestedFileName = {},
                                    const juce::File& fallbackFolder = {})
     {
-        auto folder = juce::File(properties().getValue(key));
+        auto folder = juce::File(readValue(key));
 
         if (!folder.isDirectory())
             folder = fallbackFolder;
@@ -92,8 +92,7 @@ public:
         if (!folder.isDirectory())
             return;
 
-        properties().setValue(key, folder.getFullPathName());
-        properties().saveIfNeeded();
+        writeValue(key, folder.getFullPathName());
     }
 
     // ---- dialog positions ----------------------------------------------------------------------
@@ -118,7 +117,7 @@ public:
     static bool restorePosition(juce::ResizableWindow& window, const juce::String& key,
                                 bool centreIfUnknown = true, bool restoreSize = false)
     {
-        const auto saved = properties().getValue(key);
+        const auto saved = readValue(key);
 
         juce::StringArray tokens;
         tokens.addTokens(saved, false);
@@ -154,10 +153,9 @@ public:
         if (bounds.getWidth() <= 0 || bounds.getHeight() <= 0)
             return;
 
-        properties().setValue(key, juce::String(bounds.getX()) + " " + juce::String(bounds.getY())
-                                   + " " + juce::String(bounds.getWidth())
-                                   + " " + juce::String(bounds.getHeight()));
-        properties().saveIfNeeded();
+        writeValue(key, juce::String(bounds.getX()) + " " + juce::String(bounds.getY())
+                        + " " + juce::String(bounds.getWidth())
+                        + " " + juce::String(bounds.getHeight()));
     }
 
     // Keeps a window's top-left where it is but pulls it back on-screen if its new size pushed it
@@ -172,21 +170,29 @@ public:
     }
 
 private:
-    static juce::PropertiesFile& properties()
+    static juce::PropertiesFile::Options fileOptions()
     {
-        static std::unique_ptr<juce::PropertiesFile> file = [
-        ]
-        {
-            juce::PropertiesFile::Options options;
-            options.applicationName     = "ICST AmbiPlugins";
-            options.filenameSuffix      = "settings";
-            options.folderName          = "ICST AmbiPlugins";
-            options.osxLibrarySubFolder = "Application Support";
-            options.commonToAllUsers    = false;
+        juce::PropertiesFile::Options options;
+        options.applicationName     = "ICST AmbiPlugins";
+        options.filenameSuffix      = "settings";
+        options.folderName          = "ICST AmbiPlugins";
+        options.osxLibrarySubFolder = "Application Support";
+        options.commonToAllUsers    = false;
+        return options;
+    }
 
-            return std::make_unique<juce::PropertiesFile>(options);
-        }();
+    // Both helpers hold the PropertiesFile only for the duration of the call - see the note at the
+    // top of this file for why it must never be cached.
+    static juce::String readValue(const juce::String& key)
+    {
+        juce::PropertiesFile file(fileOptions());
+        return file.getValue(key);
+    }
 
-        return *file;
+    static void writeValue(const juce::String& key, const juce::String& value)
+    {
+        juce::PropertiesFile file(fileOptions());
+        file.setValue(key, value);
+        file.saveIfNeeded(); // ~PropertiesFile would too, but flush before the Timer base unwinds
     }
 };
