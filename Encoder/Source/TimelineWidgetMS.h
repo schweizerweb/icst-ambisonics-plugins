@@ -15,6 +15,7 @@ public:
     void setModels(juce::OwnedArray<TimelineModel>* models);
     void setSelectionControl(PointSelection* pPointSelection);
     void setSourceSet(AmbiSourceSet* pSources);
+    void setZoomSettings(ZoomSettings* pZoom);
     void setPlayheadProvider(std::function<PlayheadSnapshot()> provider);
     
     void paint(juce::Graphics& g) override;

@@ -5,6 +5,7 @@
 #include "AnimatorMath.h"
 #include "../../Common/PerlinNoise.h"
 #include "../../Common/ScalingInfo.h"
+#include "../../Common/ZoomSettings.h"
 
 // Small looping radar-style preview for the Movement/Action clip editors - two square panels
 // stacked in portrait order (top-down XY, front XZ below), showing a synthetic "formation" (one
@@ -61,6 +62,43 @@ public:
     {
         pScalingInfo = scaling;
         recomputeSceneScale();
+    }
+
+    // The main radar's zoom - only consulted in real-world view, and only when the project has no
+    // finite distance scaler to take a world size from.
+    void setZoomSettings(ZoomSettings* zoom)
+    {
+        pZoomSettings = zoom;
+        recomputeSceneScale();
+    }
+
+    // false (default): frame the clip's own content, so a small movement still fills the panel.
+    // true: show the clip at the scene's real scale, so you can judge where it sits in the room
+    // rather than only what shape it traces.
+    void setRealWorldView(bool shouldUseRealWorld)
+    {
+        if (realWorldView == shouldUseRealWorld)
+            return;
+
+        realWorldView = shouldUseRealWorld;
+        recomputeSceneScale();
+        repaint();
+    }
+
+    bool isRealWorldView() const { return realWorldView; }
+
+    // The world radius the panel's circle represents in real-world view: the distance scaler when the
+    // project has one, otherwise whatever the main radar is currently zoomed to. Returns 0 when
+    // neither is available, which is what makes the toggle report itself unavailable.
+    double getRealWorldRadius() const
+    {
+        if (pScalingInfo != nullptr && !pScalingInfo->IsInfinite())
+            return (double)pScalingInfo->CartesianMax();
+
+        if (pZoomSettings != nullptr)
+            return (double)pZoomSettings->getCurrentRadius();
+
+        return 0.0;
     }
 
     // Called on an initial push and then polled periodically (clip editors have no per-control
@@ -308,6 +346,20 @@ private:
     // computed it from referencePosition's own distance from the origin, which made the exact same
     // formation look a different size purely depending on where in the scene the group happened to
     // be ("rotation near the centre looks much bigger than at the corners").
+    // Where an Action preview's formation sits.
+    //
+    // Real-world view uses the group's actual position, which is the entire point of that view.
+    // Auto-fit deliberately does NOT: its scale is derived from the formation's own extent (a stretch
+    // factor, a jitter amplitude - see recomputeSceneScale), with no idea where the group happens to
+    // be. Anchoring at the live position then pushed the formation straight off the panel as soon as
+    // the group was moved away from the origin in the main radar - the action appeared to vanish.
+    // An action is a transformation ABOUT the group, so framing it centred is also what you want to
+    // look at; where the group sits is what real-world view is for.
+    juce::Vector3D<double> actionAnchor() const
+    {
+        return realWorldView ? referencePosition : juce::Vector3D<double>();
+    }
+
     void recomputeSceneScale()
     {
         // Frozen during any drag - the drag write-back calls setMovementClip() on every tick for
@@ -316,10 +368,23 @@ private:
         // once more explicitly to re-fit after the drag ends.
         if (draggedHandle.isSet()) return;
 
-        if (pScalingInfo != nullptr && !pScalingInfo->IsInfinite())
+        // Real-world view: the panel's circle IS the scene boundary, so a world coordinate at that
+        // radius lands exactly on it (1.0, not the 0.85 headroom the auto-fit below uses - there the
+        // circle is only decoration, here it means something).
+        //
+        // This applies to movement and action previews alike. The action preview used to have no
+        // real-world option at all and always framed its own synthetic formation, which is why it
+        // looked like a fixed little world of its own.
+        if (realWorldView)
         {
-            sceneScale = 0.85 / juce::jmax(0.05, (double)pScalingInfo->CartesianMax());
-            return;
+            const double radius = getRealWorldRadius();
+
+            if (radius > 0.0)
+            {
+                sceneScale = 1.0 / juce::jmax(0.05, radius);
+                return;
+            }
+            // No scaler and no zoom to borrow - fall through to the auto-fit rather than show nothing.
         }
 
         if (hasMovementClip)
@@ -375,7 +440,7 @@ private:
 
         currentAnchor = hasMovementClip
             ? AnimatorMath::calculatePosition(movementClip, easedMovement, movementStart, referencePosition)
-            : referencePosition;
+            : actionAnchor();
 
         double stretch = 1.0;
         // Identity, spelled out - juce::Quaternion<double>() is the ZERO quaternion.
@@ -842,6 +907,8 @@ private:
     }
 
     ScalingInfo* pScalingInfo = nullptr;
+    ZoomSettings* pZoomSettings = nullptr;
+    bool realWorldView = false;
 
     MovementClip movementClip;
     bool hasMovementClip = false;

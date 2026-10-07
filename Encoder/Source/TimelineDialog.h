@@ -96,6 +96,7 @@ public:
         auto* timeline = new TimelineWidgetMS(pEngine);
         timeline->setModels(pProcessor->getTimelines());
         timeline->setSourceSet(pProcessor->getSources());
+        timeline->setZoomSettings(pProcessor->getZoomSettingsPointer());
         timeline->setSelectionControl(pPointSelection);
         timeline->setPlayheadProvider([pProcessor]() -> PlayheadSnapshot
         {

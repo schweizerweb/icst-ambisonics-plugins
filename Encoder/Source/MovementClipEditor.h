@@ -355,6 +355,17 @@ private:
 
     // Per-type parameters - each row is only laid out (and only counted in
     // getMovementControlsHeight()) for the types that actually use it, see the show*() predicates.
+    // Switches the preview between framing the clip's own content and showing it at the scene's
+    // real scale - see ClipPreviewComponent::setRealWorldView.
+    juce::ToggleButton realWorldToggle;
+    InfoIconButton realWorldInfo { "Real-world scale: the preview circle becomes the scene boundary, "
+                                   "so you can see where the clip sits in the room rather than only "
+                                   "what shape it traces.\n\n"
+                                   "The boundary is the project's distance scaler when it has one; "
+                                   "otherwise it follows the main radar's current zoom.\n\n"
+                                   "Unticked, the preview zooms to the clip's own extent so that even "
+                                   "a tiny movement fills the panel." };
+
     // Spline/Polygon: joins each sub-path's last waypoint back to its first.
     juce::ToggleButton closedPathToggle;
     InfoIconButton closedPathInfo { "Closed path: each sub-path runs from its last waypoint back to "

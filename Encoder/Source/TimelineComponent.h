@@ -9,6 +9,7 @@
 #include <cmath>
 
 class ClipEditorDialogManager;
+class ZoomSettings;
 
 class TimelineComponent : public juce::Component,
                           public juce::ScrollBar::Listener,
@@ -21,6 +22,10 @@ public:
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
     void setSelectionControl(PointSelection* pPointSelection);
     void setSourceSet(AmbiSourceSet* pSources);
+    // The main radar's zoom, used by the clip previews' real-world view when the project has no
+    // finite distance scaler to borrow a world size from.
+    void setZoomSettings(ZoomSettings* pZoom) { pZoomSettings = pZoom; }
+    ZoomSettings* getZoomSettings() const { return pZoomSettings; }
     void setStatusMessageFunction(std::function<void(const juce::AttributedString&)> function);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
@@ -181,6 +186,7 @@ private:
         juce::Rectangle<int> selectionRectangle;
     };
 
+    ZoomSettings* pZoomSettings = nullptr;
     juce::OwnedArray<TimelineModel>* timelines = nullptr;
     int currentTimelineIndex = 0;
     

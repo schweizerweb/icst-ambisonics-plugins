@@ -70,6 +70,18 @@ private:
     // dialogs. The Actions group then sits underneath at full width - its rows are full sentences,
     // which read far better across the whole dialog than down a narrow column.
     int getFixedColumnHeight() const { return 610; }
+
+    // Switches the preview between framing the clip's own content and showing it at the scene's
+    // real scale - see ClipPreviewComponent::setRealWorldView.
+    juce::ToggleButton realWorldToggle;
+    InfoIconButton realWorldInfo { "Real-world scale: the preview circle becomes the scene boundary, "
+                                   "so you can see where the clip sits in the room rather than only "
+                                   "what shape it traces.\n\n"
+                                   "The boundary is the project's distance scaler when it has one; "
+                                   "otherwise it follows the main radar's current zoom.\n\n"
+                                   "Unticked, the preview zooms to the clip's own extent so that even "
+                                   "a tiny movement fills the panel." };
+
     void layoutActionControls(juce::Rectangle<int> area);
     void addAction();
     void removeSelectedAction();

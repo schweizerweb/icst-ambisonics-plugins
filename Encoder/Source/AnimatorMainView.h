@@ -23,6 +23,7 @@ public:
     void setTimelines(juce::OwnedArray<TimelineModel>* timelines);
     void setSelectionControl(PointSelection* pPointSelection);
     void setSourceSet(AmbiSourceSet* pSources);
+    void setZoomSettings(ZoomSettings* pZoom);
     void setPlayheadPosition(ms_t timeMs);
     void setAutoFollow(bool shouldAutoFollow);
 

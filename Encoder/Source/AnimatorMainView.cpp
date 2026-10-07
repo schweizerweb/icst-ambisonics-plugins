@@ -224,6 +224,11 @@ void AnimatorMainView::setSourceSet(AmbiSourceSet *pSources)
     timelineViewport->getTimelineComponent()->setSourceSet(pSources);
 }
 
+void AnimatorMainView::setZoomSettings(ZoomSettings* pZoom)
+{
+    timelineViewport->getTimelineComponent()->setZoomSettings(pZoom);
+}
+
 void AnimatorMainView::setPlayheadPosition(ms_t timeMs)
 {
     timelineViewport->getTimelineComponent()->setPlayheadPosition(timeMs);

@@ -93,7 +93,14 @@ void ActionClipEditor::resized()
     area.removeFromLeft(8); // spacing between columns
 
     previewGroup.setBounds(area);
-    preview.setBounds(area.reduced(8, 20));
+
+    // The view toggle sits under the radars, inside the Preview group it belongs to.
+    auto previewContent = area.reduced(8, 20);
+    auto previewFlagRow = previewContent.removeFromBottom(24);
+    realWorldInfo.setBounds(previewFlagRow.removeFromRight(22).reduced(1, 2));
+    previewFlagRow.removeFromRight(4);
+    realWorldToggle.setBounds(previewFlagRow);
+    preview.setBounds(previewContent);
 }
 
 void ActionClipEditor::paint(juce::Graphics& g)
@@ -231,6 +238,16 @@ void ActionClipEditor::createControls()
 
     addAndMakeVisible(preview);
     preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
+    preview.setZoomSettings(timelineComp.getZoomSettings());
+
+    addAndMakeVisible(realWorldToggle);
+    realWorldToggle.setButtonText("Real-world scale");
+    realWorldToggle.onClick = [this] { preview.setRealWorldView(realWorldToggle.getToggleState()); };
+    addAndMakeVisible(realWorldInfo);
+
+    // Nothing to scale to without either a finite distance scaler or a main-radar zoom.
+    realWorldToggle.setEnabled(preview.getRealWorldRadius() > 0.0);
+
     preview.setActionClip(currentClip);
     updateReferenceFromGroup();
     

@@ -23,6 +23,11 @@ void TimelineWidgetMS::setSelectionControl(PointSelection* pPointSelection)
     mainView->setSelectionControl(pPointSelection);
 }
 
+void TimelineWidgetMS::setZoomSettings(ZoomSettings* pZoom)
+{
+    mainView->setZoomSettings(pZoom);
+}
+
 void TimelineWidgetMS::setSourceSet(AmbiSourceSet *pSources)
 {
     mainView->setSourceSet(pSources);
