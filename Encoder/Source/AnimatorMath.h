@@ -86,6 +86,8 @@ namespace AnimatorMath
         double x2 = 2.0 / 3.0, y2 = 2.0 / 3.0;
         bool enabled = false;
         bool perRepetition = true;
+        // Palindrome only - see Clip::easePerDirection.
+        bool perDirection = true;
     };
 
     // Distance covered at elapsed fraction x. The curve is parametric, so this first solves
@@ -165,7 +167,16 @@ namespace AnimatorMath
         if (!curve.perRepetition)
             return bezierEase(curve, progress);
 
-        const int totalSegments = juce::jmax(1, repeatCount) * (palindrome ? 2 : 1);
+        // How many segments the curve is divided across - the ONLY thing that distinguishes the
+        // scopes from one another:
+        //   palindrome + perDirection : 2 per repetition, so each leg of the out-and-back eases.
+        //   palindrome, not perDirection : 1 per repetition, so a single curve spans the whole
+        //       go-and-back. The turnaround then happens where the curve reaches half its travel,
+        //       which is deliberately NOT the halfway point in time.
+        //   no palindrome : 1 per repetition.
+        const int segmentsPerRepeat = (palindrome && curve.perDirection) ? 2 : 1;
+        const int totalSegments = juce::jmax(1, repeatCount) * segmentsPerRepeat;
+
         if (totalSegments <= 1)
             return bezierEase(curve, progress);
 
@@ -192,6 +203,7 @@ namespace AnimatorMath
         curve.y2 = clip.easeY2;
         curve.enabled = clip.easingEnabled;
         curve.perRepetition = clip.easePerRepetition;
+        curve.perDirection = clip.easePerDirection;
 
         return applyEasing(curve, progress, clip.repetitions, clip.palindrome);
     }
@@ -331,6 +343,8 @@ namespace AnimatorMath
         double totalLength = 0.0;
         bool isSpline = false;
         double tension = 0.0;
+        // Each sub-path runs from its last waypoint back to its first, so the figure closes.
+        bool closed = false;
     };
 
     inline juce::Vector3D<double> waypointAt(const juce::Array<MovementWaypoint>& points, int index)
@@ -338,6 +352,22 @@ namespace AnimatorMath
         if (points.isEmpty()) return {};
         const auto& wp = points.getReference(juce::jlimit(0, points.size() - 1, index));
         return { wp.x, wp.y, wp.z };
+    }
+
+    // Resolves a waypoint index within one sub-path. An open path clamps at its ends (so the end
+    // tangents are built by duplicating the end point); a closed one wraps, which is what both joins
+    // the last point back to the first and makes a closed spline's tangents continuous across that
+    // join rather than flattening there.
+    inline int wrapWaypointIndex(int index, int first, int last, bool closed)
+    {
+        const int count = last - first + 1;
+        if (count <= 0)
+            return first;
+
+        if (!closed)
+            return juce::jlimit(first, last, index);
+
+        return first + ((index - first) % count + count) % count;
     }
 
     // One span of a waypoint path. Polygon lerps; Spline uses a Cardinal (tension-weighted
@@ -351,14 +381,14 @@ namespace AnimatorMath
     inline juce::Vector3D<double> evaluateWaypointSpan(const WaypointPath& path, int spanIndex, double u,
                                                         int subFirst, int subLast)
     {
-        const auto p1 = waypointAt(path.points, spanIndex);
-        const auto p2 = waypointAt(path.points, spanIndex + 1);
+        const auto p1 = waypointAt(path.points, wrapWaypointIndex(spanIndex,     subFirst, subLast, path.closed));
+        const auto p2 = waypointAt(path.points, wrapWaypointIndex(spanIndex + 1, subFirst, subLast, path.closed));
 
         if (!path.isSpline)
             return p1 + (p2 - p1) * u;
 
-        const auto p0 = waypointAt(path.points, juce::jmax(subFirst, spanIndex - 1));
-        const auto p3 = waypointAt(path.points, juce::jmin(subLast, spanIndex + 2));
+        const auto p0 = waypointAt(path.points, wrapWaypointIndex(spanIndex - 1, subFirst, subLast, path.closed));
+        const auto p3 = waypointAt(path.points, wrapWaypointIndex(spanIndex + 2, subFirst, subLast, path.closed));
 
         const double c = juce::jlimit(0.0, 1.0, path.tension);
         const auto m1 = (p2 - p0) * (0.5 * (1.0 - c));
@@ -388,6 +418,7 @@ namespace AnimatorMath
         path.points = clip.waypoints;
         path.isSpline = (clip.movementType == MovementType::Spline);
         path.tension = clip.tension;
+        path.closed = clip.closedPath;
 
         const int n = path.points.size();
         if (n == 0) return path;
@@ -409,7 +440,11 @@ namespace AnimatorMath
             seed.spanIndex = first;
             sub.samples.add(seed);
 
-            for (int span = first; span < i - 1; ++span)
+            // A closed sub-path walks one span further - from its last waypoint back to its first.
+            // Skipped for a lone point, where that span would be zero-length anyway.
+            const int lastSpan = (path.closed && (i - 1) > first) ? (i - 1) : (i - 2);
+
+            for (int span = first; span <= lastSpan; ++span)
             {
                 const int steps = path.isSpline ? samplesPerSplineSpan : 1;
                 auto previous = evaluateWaypointSpan(path, span, 0.0, sub.firstIndex, sub.lastIndex);

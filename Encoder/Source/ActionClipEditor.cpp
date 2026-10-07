@@ -77,22 +77,23 @@ void ActionClipEditor::resized()
 
     area.removeFromBottom(8);
 
-    // Landscape: Clip Properties | Preview | Actions, side by side - see MovementClipEditor, which
-    // needed this once the speed curve made the clip panel taller.
+    // Actions span the full width along the bottom - the rows are whole sentences ("Increase stretch
+    // factor by 0.3 per second, starting at 1"), which a narrow column truncated.
+    auto actionsArea = area.removeFromBottom(getActionsControlsHeight() + 40);
+    actionsGroup.setBounds(actionsArea);
+    layoutActionControls(actionsArea.reduced(8, 20));
+
+    area.removeFromBottom(8);
+
+    // Clip Properties | Preview above it, both the full remaining height.
     auto clipGroupArea = area.removeFromLeft(getClipPropertiesWidth());
     clipGroup.setBounds(clipGroupArea);
     commonSettings.setBounds(clipGroupArea.reduced(8, 20));
 
     area.removeFromLeft(8); // spacing between columns
 
-    auto previewArea = area.removeFromLeft(getPreviewWidth());
-    previewGroup.setBounds(previewArea);
-    preview.setBounds(previewArea.reduced(8, 20));
-
-    area.removeFromLeft(8);
-
-    actionsGroup.setBounds(area);
-    layoutActionControls(area.reduced(8, 20));
+    previewGroup.setBounds(area);
+    preview.setBounds(area.reduced(8, 20));
 }
 
 void ActionClipEditor::paint(juce::Graphics& g)
@@ -104,20 +105,16 @@ int ActionClipEditor::getTotalRequiredHeight() const
 {
     const int margins = 10 * 2;
     const int buttonHeight = 28;
-    const int rowSpacing = 8; // columns -> buttons
+    const int rowSpacing = 2 * 8; // top row -> actions, actions -> buttons
 
-    // As tall as the tallest column, not the clip panel PLUS the actions panel. The + 40 on each is
-    // the GroupComponent inset, since resized() hands out each content area already reduced(8, 20).
-    const int columnHeight = juce::jmax(commonSettings.getRequiredHeight() + 40,
-                                        juce::jmax(getPreviewHeight(),
-                                                   getActionsControlsHeight() + 40));
-
-    return margins + columnHeight + rowSpacing + buttonHeight;
+    // Fixed, like MovementClipEditor - the dialog must not change size as its contents change.
+    return margins + getFixedColumnHeight() + rowSpacing
+         + (getActionsControlsHeight() + 40) + buttonHeight;
 }
 
 int ActionClipEditor::getTotalRequiredWidth() const
 {
-    return 10 * 2 + getClipPropertiesWidth() + 8 + getPreviewWidth() + 8 + getActionsWidth();
+    return 10 * 2 + getClipPropertiesWidth() + 8 + getPreviewWidth();
 }
 
 bool ActionClipEditor::applyChanges()

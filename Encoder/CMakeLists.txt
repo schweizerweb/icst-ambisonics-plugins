@@ -56,6 +56,7 @@ SET(SRC_FILES
 	../Source/ClipEditorDialog.h
 	../Source/ClipEditorDialogManager.h
 	../Source/ImportSceneDialog.h
+	../Source/InfoIconButton.h
 	../Source/PreferencesDialog.h
 	../Source/ComponentArguments.h
 	../Source/CustomOscBase.cpp

@@ -107,6 +107,10 @@ struct Clip
     // clip, so the repetitions themselves speed up/slow down. Meaningless at repetitions == 1
     // without palindrome, where the editor hides the control.
     bool easePerRepetition = true;
+    // Palindrome only: true shapes each LEG of the out-and-back separately (so both the outward and
+    // the return journey ease), false stretches one curve across the whole go-and-back, which moves
+    // the turnaround off the temporal midpoint. Ignored when palindrome is off.
+    bool easePerDirection = true;
 
     ms_t end() const { return start + length; }
 
@@ -120,7 +124,8 @@ struct Clip
                easingEnabled == other.easingEnabled &&
                juce::exactlyEqual(easeX1, other.easeX1) && juce::exactlyEqual(easeY1, other.easeY1) &&
                juce::exactlyEqual(easeX2, other.easeX2) && juce::exactlyEqual(easeY2, other.easeY2) &&
-               easePerRepetition == other.easePerRepetition;
+               easePerRepetition == other.easePerRepetition &&
+               easePerDirection == other.easePerDirection;
     }
     bool operator!=(const Clip& other) const { return !(*this == other); }
 };
@@ -145,6 +150,7 @@ inline void writeClipBase(juce::XmlElement& x, const Clip& c)
     x.setAttribute("easeX2", c.easeX2);
     x.setAttribute("easeY2", c.easeY2);
     x.setAttribute("easePerRepetition", c.easePerRepetition ? 1 : 0);
+    x.setAttribute("easePerDirection", c.easePerDirection ? 1 : 0);
 }
 
 inline void readClipBase(Clip& c, const juce::XmlElement& x)
@@ -170,6 +176,7 @@ inline void readClipBase(Clip& c, const juce::XmlElement& x)
     c.easeX2 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeX2", 2.0 / 3.0));
     c.easeY2 = juce::jlimit(0.0, 1.0, x.getDoubleAttribute("easeY2", 2.0 / 3.0));
     c.easePerRepetition = x.getBoolAttribute("easePerRepetition", true);
+    c.easePerDirection = x.getBoolAttribute("easePerDirection", true);
 }
 
 struct MovementClip : public Clip
@@ -189,6 +196,10 @@ struct MovementClip : public Clip
     juce::Array<MovementWaypoint> waypoints;
 
     double tension = 0.0;         // Spline only: 0 = roundest Catmull-Rom, 1 = straight (matches Polygon)
+    // Spline/Polygon: join the last waypoint of each sub-path back to its first, so the figure is a
+    // closed loop. A closed path ends where it began, which is also what lets it repeat without
+    // Palindrome - see movementClipRequiresPalindromeForRepeat().
+    bool closedPath = false;
     double heightRise = 0.0;      // Helix only: total Z travel over the clip (a distance - rescaled on import)
     double freqRatioA = 3.0;      // Lissajous: X frequency. Rose: petal count k
     double freqRatioB = 2.0;      // Lissajous only: Y frequency
@@ -212,6 +223,7 @@ struct MovementClip : public Clip
                juce::exactlyEqual(radiusChange, other.radiusChange) &&
                waypoints == other.waypoints &&
                juce::exactlyEqual(tension, other.tension) &&
+               closedPath == other.closedPath &&
                juce::exactlyEqual(heightRise, other.heightRise) &&
                juce::exactlyEqual(freqRatioA, other.freqRatioA) &&
                juce::exactlyEqual(freqRatioB, other.freqRatioB) &&
@@ -220,6 +232,17 @@ struct MovementClip : public Clip
     }
     bool operator!=(const MovementClip& other) const { return !(*this == other); }
 };
+
+// Whether THIS clip would jump at a repeat boundary, as opposed to whether its type generally
+// would. A closed Spline/Polygon finishes on the waypoint it started from, so it can repeat
+// perfectly well without Palindrome - which the type-only rule above cannot express.
+inline bool movementClipRequiresPalindromeForRepeat(const MovementClip& clip)
+{
+    if (movementTypeUsesWaypoints(clip.movementType) && clip.closedPath)
+        return false;
+
+    return movementTypeRequiresPalindromeForRepeat(clip.movementType);
+}
 
 struct MovementLayer
 {
@@ -506,6 +529,7 @@ struct TimelineModel
             xClip->setAttribute("count", c.count);
             xClip->setAttribute("radiusChange", c.radiusChange);
             xClip->setAttribute("tension", c.tension);
+            xClip->setAttribute("closedPath", c.closedPath ? 1 : 0);
             xClip->setAttribute("heightRise", c.heightRise);
             xClip->setAttribute("freqRatioA", c.freqRatioA);
             xClip->setAttribute("freqRatioB", c.freqRatioB);
@@ -603,6 +627,7 @@ struct TimelineModel
                     c.count = xClip->getDoubleAttribute("count", 1.0);
                     c.radiusChange = xClip->getDoubleAttribute("radiusChange", 0.0);
                     c.tension = juce::jlimit(0.0, 1.0, xClip->getDoubleAttribute("tension", 0.0));
+                    c.closedPath = xClip->getBoolAttribute("closedPath", false);
                     c.heightRise = xClip->getDoubleAttribute("heightRise", 0.0);
                     c.freqRatioA = xClip->getDoubleAttribute("freqRatioA", 3.0);
                     c.freqRatioB = xClip->getDoubleAttribute("freqRatioB", 2.0);

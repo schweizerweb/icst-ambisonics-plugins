@@ -62,13 +62,14 @@ private:
     int getActionsControlsHeight() const;
     // Preview sits beside (not below) the Clip Properties group, in portrait orientation (two
     // square panels stacked) - narrower but taller than the old side-by-side layout.
-    int getClipPropertiesWidth() const { return 280; }
-    int getPreviewWidth() const { return 190; }
-    int getPreviewHeight() const { return 320; }
-    // Actions sit in a third column rather than underneath, matching MovementClipEditor so the
-    // two clip dialogs are shaped alike. Wider than the movement column because the action
-    // descriptions are full sentences.
-    int getActionsWidth() const { return 460; }
+    int getClipPropertiesWidth() const { return 300; }
+    int getPreviewWidth() const { return 280; }
+
+    // Matches MovementClipEditor's fixed column height, so Clip Properties is tall enough to hold
+    // the speed curve editor inline and the preview radars get the same generous area in both
+    // dialogs. The Actions group then sits underneath at full width - its rows are full sentences,
+    // which read far better across the whole dialog than down a narrow column.
+    int getFixedColumnHeight() const { return 610; }
     void layoutActionControls(juce::Rectangle<int> area);
     void addAction();
     void removeSelectedAction();

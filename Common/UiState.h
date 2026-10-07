@@ -56,7 +56,6 @@ public:
         static constexpr const char* animatorActionEdit = "window.animatorActionEdit";
         static constexpr const char* animatorTimeline   = "window.animatorTimeline";
         static constexpr const char* animatorImportScene = "window.animatorImportScene";
-        static constexpr const char* speedCurve         = "window.speedCurve";
         static constexpr const char* preferences        = "window.preferences";
     };
 

@@ -9,6 +9,7 @@
 #include "../../Common/TableColumnCallback.h"
 #include "../../Common/NumericColumnCustomComponent.h"
 #include "../../Common/CheckBoxCustomComponent.h"
+#include "InfoIconButton.h"
 
 class TimelineComponent;
 
@@ -354,8 +355,21 @@ private:
 
     // Per-type parameters - each row is only laid out (and only counted in
     // getMovementControlsHeight()) for the types that actually use it, see the show*() predicates.
+    // Spline/Polygon: joins each sub-path's last waypoint back to its first.
+    juce::ToggleButton closedPathToggle;
+    InfoIconButton closedPathInfo { "Closed path: each sub-path runs from its last waypoint back to "
+                                    "its first, so the figure is a loop rather than an open line.\n\n"
+                                    "Because a closed path finishes where it started, it can also be "
+                                    "repeated without Palindrome - an open one would snap back to its "
+                                    "beginning at every repeat." };
+
     CoordinateValueControl tensionSlider;     // Spline
     juce::Label tensionLabel;
+    // "Tension (0=round, 1=straight):" didn't fit the label column, so the range explanation moved
+    // behind an icon - the same treatment as Muted/Palindrome in CommonClipSettings.
+    InfoIconButton tensionInfo { "Tension controls how round the spline is between its waypoints.\n\n"
+                                 "0 = roundest (a Catmull-Rom curve through the points).\n"
+                                 "1 = completely straight, which looks identical to a Polygon." };
     CoordinateValueControl heightRiseSlider;  // Helix
     juce::Label heightRiseLabel;
     CoordinateValueControl freqASlider;       // Lissajous (X frequency) / Rose (petal count)
@@ -407,14 +421,29 @@ private:
     int getMovementControlsHeight() const;
     // Preview sits beside (not below) the Clip Properties group, in portrait orientation (two
     // square panels stacked) - narrower but taller than the old side-by-side layout.
-    int getClipPropertiesWidth() const { return 280; }
-    int getPreviewWidth() const { return 190; }
-    int getPreviewHeight() const { return 320; }
-    // Movement Properties sits in a third column rather than underneath, so the dialog stays
-    // landscape. Wide enough for the waypoint table's 358px of columns plus margins.
-    int getMovementPropertiesWidth() const { return 430; }
+    int getClipPropertiesWidth() const { return 300; }
+    // Wider than it was, and paired with the fixed column height below this gives the two radar
+    // panels roughly double the area they had - the preview is the thing you actually read while
+    // designing a movement.
+    int getPreviewWidth() const { return 280; }
+    // Narrowed to pay for the preview. Still wide enough for the waypoint table's columns plus the
+    // widest label ("Radius change / rotation:") and its value control.
+    int getMovementPropertiesWidth() const { return 370; }
+
+    // ONE height for every movement type, rather than one that grows and shrinks as the type combo
+    // changes. Sized for the tallest type (Lissajous) with room to spare, so the dialog never jumps
+    // and the Clip Properties column is tall enough to hold the speed curve editor inline. Columns
+    // that need less simply have slack - except the waypoint table, which stretches into it.
+    int getFixedColumnHeight() const { return 610; }
+
+    // Movement Properties stops this far short of the other two columns, and Apply/Cancel sit in the
+    // gap - so the buttons tuck into the layout instead of adding a band of their own underneath.
+    int getButtonInsetHeight() const { return 36; } // 28px buttons + 8px gap
     void layoutMovementControls(juce::Rectangle<int> area);
     void updateControlVisibility();
+    // Whether THIS clip would jump at a repeat boundary - depends on the closed flag, not just
+    // the movement type, so it is recomputed whenever either changes.
+    void refreshPalindromeConstraint();
     void updateCoordinateSystem();
     void updateSliderLabelsAndRanges();  // New method to update UI based on coordinate system
     juce::Vector3D<double> getCurrentPositionInSelectedSystem() const;  // New method to get position in current coordinate system

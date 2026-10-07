@@ -40,20 +40,9 @@ void MovementClipEditor::resized()
 {
     auto area = getLocalBounds().reduced(10);
 
-    const int buttonHeight = 28;
-
-    // Buttons come off the bottom first, so the three columns simply share whatever is left and
-    // each ends up the same height - no column can be squashed by a mis-estimated row.
-    auto buttonArea = area.removeFromBottom(buttonHeight).reduced(10, 0);
-    cancelButton.setBounds(buttonArea.removeFromRight(80));
-    buttonArea.removeFromRight(8); // Button spacing
-    applyButton.setBounds(buttonArea.removeFromRight(80));
-
-    area.removeFromBottom(8);
-
-    // Landscape: Clip Properties | Preview | Movement Properties, side by side. Stacking Movement
-    // Properties underneath made the dialog ~980px tall for a Spiral once the speed curve was added
-    // to the clip panel, which no longer fits a laptop screen.
+    // Landscape: Clip Properties | Preview | Movement Properties, side by side, all the same fixed
+    // height whatever the movement type. Stacking Movement Properties underneath made the dialog
+    // ~980px tall for a Spiral, and sizing it per type made it jump every time the type changed.
     auto clipGroupArea = area.removeFromLeft(getClipPropertiesWidth());
     clipGroup.setBounds(clipGroupArea);
     commonSettings.setBounds(clipGroupArea.reduced(8, 20));
@@ -66,8 +55,18 @@ void MovementClipEditor::resized()
 
     area.removeFromLeft(8);
 
-    movementGroup.setBounds(area);
-    layoutMovementControls(area.reduced(8, 20));
+    // Movement Properties stops short of the other two columns, and Apply/Cancel occupy the gap it
+    // leaves - the buttons sit inside the layout rather than in a band of their own below everything.
+    auto movementColumn = area;
+    auto movementArea = movementColumn.removeFromTop(movementColumn.getHeight() - getButtonInsetHeight());
+    movementGroup.setBounds(movementArea);
+    layoutMovementControls(movementArea.reduced(8, 20));
+
+    movementColumn.removeFromTop(8); // gap between the group box and the buttons
+
+    cancelButton.setBounds(movementColumn.removeFromRight(80));
+    movementColumn.removeFromRight(8); // Button spacing
+    applyButton.setBounds(movementColumn.removeFromRight(80));
 }
 
 void MovementClipEditor::paint(juce::Graphics& g)
@@ -77,18 +76,13 @@ void MovementClipEditor::paint(juce::Graphics& g)
 
 int MovementClipEditor::getTotalRequiredHeight() const
 {
-    const int margins = 10 * 2;
-    const int buttonHeight = 28;
-    const int rowSpacing = 8; // columns -> buttons
-
-    // All three groups are columns now, so the dialog is as tall as the tallest one rather than as
-    // tall as the clip panel PLUS the movement panel. The + 40 on each is the GroupComponent's own
-    // inset, since resized() hands each group's content area out already reduced(8, 20).
-    const int columnHeight = juce::jmax(commonSettings.getRequiredHeight() + 40,
-                                        juce::jmax(getPreviewHeight(),
-                                                   getMovementControlsHeight() + 40));
-
-    return margins + columnHeight + rowSpacing + buttonHeight;
+    // Deliberately a constant, not derived from the current movement type: the dialog must not
+    // resize when the type combo changes. getMovementControlsHeight() is still the authority on
+    // whether a type FITS - see the assertion in layoutMovementControls().
+    //
+    // No separate button row: Apply/Cancel live in the gap under the (shorter) Movement Properties
+    // column, so the columns' own height is the whole content height.
+    return 10 * 2 + getFixedColumnHeight();
 }
 
 int MovementClipEditor::getTotalRequiredWidth() const
@@ -172,6 +166,7 @@ MovementClip MovementClipEditor::buildClipFromControls()
     clip.count = countSlider.getValue();
     clip.radiusChange = radiusChangeSlider.getValue();
     clip.tension = tensionSlider.getValue();
+    clip.closedPath = closedPathToggle.getToggleState();
     clip.heightRise = heightRiseSlider.getValue();
     clip.freqRatioA = freqASlider.getValue();
     clip.freqRatioB = freqBSlider.getValue();
@@ -217,7 +212,7 @@ void MovementClipEditor::createControls()
     commonSettings.setClipData(currentClip);
     // See ActionClipEditor: the curve needs sub-poll feedback while being dragged.
     commonSettings.onCurveEdited = [this] { preview.setMovementClip(buildClipFromControls()); };
-    commonSettings.setPalindromeRequiredForRepeat(movementTypeRequiresPalindromeForRepeat(currentClip.movementType));
+    refreshPalindromeConstraint();
 
     addAndMakeVisible(preview);
     preview.setScalingInfo(pSourceSet != nullptr ? pSourceSet->getScalingInfo() : nullptr);
@@ -264,6 +259,18 @@ void MovementClipEditor::createControls()
     bool defaultPolarDisplay = currentClip.movementType == MovementType::MoveToPolar;
     usePolarDisplay.setToggleState(defaultPolarDisplay, juce::dontSendNotification);
     usePolarDisplay.onClick = [this] { updateCoordinateSystem(); };
+
+    addAndMakeVisible(closedPathToggle);
+    closedPathToggle.setButtonText("Closed path");
+    closedPathToggle.setToggleState(currentClip.closedPath, juce::dontSendNotification);
+    closedPathToggle.onClick = [this]
+    {
+        // Closing the path removes the jump at a repeat boundary, so the Palindrome lock has to be
+        // re-evaluated as soon as it changes.
+        refreshPalindromeConstraint();
+        preview.setMovementClip(buildClipFromControls());
+    };
+    addAndMakeVisible(closedPathInfo);
     
     addAndMakeVisible(useStartPosition);
     useStartPosition.setButtonText("Use Defined Start Position");
@@ -285,7 +292,8 @@ void MovementClipEditor::createControls()
     // Per-type parameters. Like count/radiusChange these are created once from currentClip and
     // then only ever READ by buildClipFromControls() - deliberately never re-read from currentClip
     // by any update function, which is what would clobber unsaved edits.
-    createStandardSlider(tensionSlider, tensionLabel, "Tension (0=round, 1=straight):", currentClip.tension);
+    createStandardSlider(tensionSlider, tensionLabel, "Tension:", currentClip.tension);
+    addAndMakeVisible(tensionInfo);
     tensionSlider.setRange(0.0, 1.0, 0.01);
     tensionSlider.setValue(currentClip.tension);
 
@@ -310,9 +318,9 @@ void MovementClipEditor::createControls()
     waypointTable.setModel(waypointModel.get());
     waypointTable.setHeaderHeight(22);
     waypointTable.getHeader().addColumn("#", WaypointTableListModel::ColumnIndex, 34, 34, 34);
-    waypointTable.getHeader().addColumn("X", WaypointTableListModel::ColumnX, 90);
-    waypointTable.getHeader().addColumn("Y", WaypointTableListModel::ColumnY, 90);
-    waypointTable.getHeader().addColumn("Z", WaypointTableListModel::ColumnZ, 90);
+    waypointTable.getHeader().addColumn("X", WaypointTableListModel::ColumnX, 80);
+    waypointTable.getHeader().addColumn("Y", WaypointTableListModel::ColumnY, 80);
+    waypointTable.getHeader().addColumn("Z", WaypointTableListModel::ColumnZ, 80);
     waypointTable.getHeader().addColumn("Break", WaypointTableListModel::ColumnBreak, 54, 54, 54);
 
     addAndMakeVisible(addWaypointButton);
@@ -712,23 +720,29 @@ void MovementClipEditor::onMovementTypeChanged()
     // An open-ended path (MoveTo, Spline, Polygon, Random Walk) ends somewhere other than where it
     // started, so a non-palindrome repeat snaps visibly at every repeat boundary - the same
     // mechanism as the Rotation-action constraint in CommonClipSettings.
-    commonSettings.setPalindromeRequiredForRepeat(movementTypeRequiresPalindromeForRepeat(newType));
+    refreshPalindromeConstraint();
 
     updateControlVisibility();
     ensureWaypointsSeeded();
 
-    // The row set just changed, so the dialog's required height did too. The window follows because
-    // ClipEditorDialog uses setContentOwned(..., resizeToFitContent=true) - setResizable(false,false)
-    // only blocks the user dragging its edges. Without this the last row would clip immediately,
-    // since the layout has no spare vertical space at all.
-    setSize(getTotalRequiredWidth(), getTotalRequiredHeight());
+    // The row set just changed, so the Movement Properties column has to be laid out again.
+    //
+    // This used to happen as a side effect of setSize(getTotalRequiredWidth(), getTotalRequiredHeight()),
+    // back when the dialog grew and shrank with the movement type. Both are constants now, so that
+    // call became a no-op and took the relayout with it - leaving newly shown controls at whatever
+    // bounds they last had. Ask for the relayout directly instead of relying on a size change.
+    resized();
+}
 
-    // ClipEditorDialog only centres itself at construction, so a grown dialog would otherwise creep
-    // off the bottom of the display.
-    // Keep the window where the user put it and only pull it back on-screen if the new size
-    // pushed it off - re-centring here would yank the dialog out from under the cursor mid-edit.
-    if (auto* dialog = findParentComponentOfClass<juce::DialogWindow>())
-        UiState::constrainToDisplay(*dialog);
+void MovementClipEditor::refreshPalindromeConstraint()
+{
+    // Built from the LIVE controls rather than currentClip: this runs from the movement-type combo
+    // and the closed-path toggle, both of which fire before those values are written back.
+    MovementClip probe = currentClip;
+    probe.movementType = getSelectedMovementType();
+    probe.closedPath = closedPathToggle.getToggleState();
+
+    commonSettings.setPalindromeRequiredForRepeat(movementClipRequiresPalindromeForRepeat(probe));
 }
 
 void MovementClipEditor::updateControlVisibility()
@@ -783,7 +797,9 @@ void MovementClipEditor::updateControlVisibility()
 
     setRowVisible(countLabel, countSlider, showsCount());
     setRowVisible(radiusChangeLabel, radiusChangeSlider, showsRadiusChange());
+    setRowVisible(closedPathToggle, closedPathInfo, showsWaypointTable());
     setRowVisible(tensionLabel, tensionSlider, showsTension());
+    tensionInfo.setVisible(showsTension());
     setRowVisible(heightRiseLabel, heightRiseSlider, showsHeightRise());
     setRowVisible(freqALabel, freqASlider, showsFreqA());
     setRowVisible(freqBLabel, freqBSlider, showsFreqB());
@@ -927,23 +943,36 @@ int MovementClipEditor::getMovementControlsHeight() const
     height += coordinateBlock;                     // start X/Y/Z + "apply current"
     if (showsTargetRows())    height += coordinateBlock;
 
-    if (showsCount())         height += row;
-    if (showsRadiusChange())  height += row;
-    if (showsTension())       height += row;
-    if (showsHeightRise())    height += row;
-    if (showsFreqA())         height += row;
-    if (showsFreqB())         height += row;
-    if (showsPhase())         height += row;
-    if (showsRandomSeed())    height += row;
+    // Parameter rows are packed with no gap between them (see layoutMovementControls), so they cost
+    // one rowHeight each plus a single trailing gap for the block.
+    int paramRows = 0;
+    if (showsCount())         ++paramRows;
+    if (showsRadiusChange())  ++paramRows;
+    if (showsTension())       ++paramRows;
+    if (showsHeightRise())    ++paramRows;
+    if (showsFreqA())         ++paramRows;
+    if (showsFreqB())         ++paramRows;
+    if (showsPhase())         ++paramRows;
+    if (showsRandomSeed())    ++paramRows;
 
+    if (paramRows > 0)
+        height += paramRows * rowHeight + verticalSpacing;
+
+    // The table stretches into whatever the fixed-height column leaves over, so this is only its
+    // minimum - enough to be usable if a future type ever squeezes it. The closed-path toggle sits
+    // above it on its own row.
     if (showsWaypointTable())
-        height += getWaypointTableHeight() + verticalSpacing + rowHeight; // table + Add/Remove row
+        height += row + verticalSpacing + getWaypointTableHeight() + verticalSpacing + rowHeight;
 
     return height;
 }
 
 void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
 {
+    // The column is a fixed height for every movement type, so a type whose controls don't fit would
+    // silently clip its last row rather than growing the dialog. Catch that here instead.
+    jassert(getMovementControlsHeight() <= area.getHeight());
+
     const int rowHeight = 28;
     const int labelWidth = 170; // wide enough for "Radius change / rotation:"
     const int verticalSpacing = 8;
@@ -1018,38 +1047,60 @@ void MovementClipEditor::layoutMovementControls(juce::Rectangle<int> area)
     }
 
     // One optional parameter row - must stay in lockstep with getMovementControlsHeight().
-    auto layoutParamRow = [&](bool visible, juce::Label& label, CoordinateValueControl& control)
+    //
+    // Packed with no gap between consecutive rows, matching the Start/Target coordinate rows just
+    // above. They used to carry a full verticalSpacing each, which made the parameter block at the
+    // bottom look loose next to the tightly-packed coordinates above it.
+    auto layoutParamRow = [&](bool visible, juce::Label& label, CoordinateValueControl& control,
+                              InfoIconButton* info = nullptr)
     {
         if (!visible) return;
 
         auto rowArea = area.removeFromTop(rowHeight);
-        label.setBounds(rowArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin));
-        control.setBounds(rowArea.withTrimmedRight(rightMargin));
+        auto labelArea = rowArea.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin);
 
-        area.removeFromTop(verticalSpacing);
+        // The icon sits at the right-hand end of the label column, so it never eats into the value
+        // control and the rows stay aligned whether or not a row has one.
+        if (info != nullptr)
+            info->setBounds(labelArea.removeFromRight(rowHeight).reduced(2, 3));
+
+        label.setBounds(labelArea);
+        control.setBounds(rowArea.withTrimmedRight(rightMargin));
     };
 
     layoutParamRow(showsCount(), countLabel, countSlider);
     layoutParamRow(showsRadiusChange(), radiusChangeLabel, radiusChangeSlider);
-    layoutParamRow(showsTension(), tensionLabel, tensionSlider);
+    layoutParamRow(showsTension(), tensionLabel, tensionSlider, &tensionInfo);
     layoutParamRow(showsHeightRise(), heightRiseLabel, heightRiseSlider);
     layoutParamRow(showsFreqA(), freqALabel, freqASlider);
     layoutParamRow(showsFreqB(), freqBLabel, freqBSlider);
     layoutParamRow(showsPhase(), phaseLabel, phaseSlider);
     layoutParamRow(showsRandomSeed(), randomSeedLabel, randomSeedSlider);
 
-    // Waypoint table with its Add/Remove row underneath
+    // Closed-path toggle, directly above the waypoint table it applies to.
     if (showsWaypointTable())
     {
-        auto tableArea = area.removeFromTop(getWaypointTableHeight());
-        waypointTable.setBounds(tableArea.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
+        auto closedRow = area.removeFromTop(rowHeight);
+        auto closedArea = closedRow.removeFromLeft(labelWidth).withTrimmedLeft(labelLeftMargin);
+        closedPathInfo.setBounds(closedArea.removeFromRight(rowHeight).reduced(2, 3));
+        closedPathToggle.setBounds(closedArea);
+    }
 
+    // Waypoint table with its Add/Remove row underneath. The buttons come off the BOTTOM first so
+    // the table takes every remaining pixel of the fixed-height column - a Spline needs far fewer
+    // rows than a Lissajous, and that slack is worth far more as visible waypoints than as padding.
+    if (showsWaypointTable())
+    {
         area.removeFromTop(verticalSpacing);
 
-        auto buttonArea = area.removeFromTop(rowHeight).withTrimmedLeft(labelLeftMargin);
+        auto buttonArea = area.removeFromBottom(rowHeight).withTrimmedLeft(labelLeftMargin);
         addWaypointButton.setBounds(buttonArea.removeFromLeft(110));
         buttonArea.removeFromLeft(8);
         removeWaypointButton.setBounds(buttonArea.removeFromLeft(110));
+
+        area.removeFromBottom(verticalSpacing);
+
+        waypointTable.setBounds(area.withTrimmedLeft(labelLeftMargin).withTrimmedRight(rightMargin));
     }
 }
 

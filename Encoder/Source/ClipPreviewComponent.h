@@ -568,10 +568,14 @@ private:
 
             for (const auto& sub : path.subPaths)
             {
-                // Spans run firstIndex..lastIndex-1. The gap BETWEEN two sub-paths is deliberately
-                // not a span, so double-clicking along an instant jump inserts nothing - there's no
-                // path there to add a point to.
-                for (int span = sub.firstIndex; span < sub.lastIndex; ++span)
+                // Spans run firstIndex..lastIndex-1, plus the closing span back to firstIndex when
+                // the path is closed. The gap BETWEEN two sub-paths is deliberately not a span, so
+                // double-clicking along an instant jump inserts nothing - there's no path there to
+                // add a point to.
+                const int lastSpan = (path.closed && sub.lastIndex > sub.firstIndex)
+                                   ? sub.lastIndex : sub.lastIndex - 1;
+
+                for (int span = sub.firstIndex; span <= lastSpan; ++span)
                 {
                     constexpr int steps = 24; // per span - dense enough that the hit radius never slips through
 

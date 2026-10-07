@@ -1,37 +1,28 @@
 #pragma once
 #include "JuceHeader.h"
 #include "AnimatorMath.h"
-#include "../../Common/AdditionalWindow.h"
-#include "../../Common/UiState.h"
+#include "InfoIconButton.h"
 
-// Visual editor for a clip's speed curve: a cubic Bezier from the bottom-left corner to the
-// top-right, where x is elapsed time and y is distance covered. The slope therefore IS the speed,
-// which is why the editor canvas is kept square - in a wide, short box a constant speed reads as a
-// shallow line and the whole point is lost.
+// Editor for a clip's speed curve: a cubic Bezier from the bottom-left corner to the top-right,
+// where x is elapsed time and y is distance covered. The slope therefore IS the speed, which is why
+// the canvas is kept square - in a wide, short box a constant speed reads as a shallow line and the
+// whole point is lost.
 //
-// One component, two modes. Thumbnail mode is small, non-interactive and lives permanently in
-// CommonClipSettings so the clip's timing is visible at a glance; clicking it opens Editor mode in
-// a popup, which has the room for draggable handles and presets. That split exists because the
-// clip-properties column is only 280px wide and a Spline movement editor is already ~856px tall -
-// a full inline editor would push it past what fits on a laptop screen.
+// This sits inline in the clip editors' Clip Properties column. It used to be a small thumbnail that
+// opened a popup, because the column wasn't tall enough for the real thing; now that both clip
+// dialogs are a fixed height with full-height columns, the editor fits where it belongs and the
+// popup is gone.
 class SpeedCurveComponent : public juce::Component,
                             public juce::SettableTooltipClient
 {
 public:
-    enum class Mode { Thumbnail, Editor };
-
-    explicit SpeedCurveComponent(Mode modeToUse) : mode(modeToUse)
+    SpeedCurveComponent()
     {
         setOpaque(false);
-        if (mode == Mode::Thumbnail)
-            setMouseCursor(juce::MouseCursor::PointingHandCursor);
     }
 
     // Fired whenever the curve changes, so the host can push it into its clip and the preview.
     std::function<void()> onCurveChanged;
-
-    // Thumbnail mode only: the user clicked, open the editor.
-    std::function<void()> onClicked;
 
     void setCurve(const AnimatorMath::EasingCurve& newCurve)
     {
@@ -51,28 +42,23 @@ public:
     void paint(juce::Graphics& g) override
     {
         auto box = getCurveBounds();
-        const bool isEditor = (mode == Mode::Editor);
 
-        // An explicit dark panel rather than a translucent wash: this draws on AdditionalWindow's
-        // hardcoded white in the popup and on the editor's grey inline, and a translucent fill
-        // would come out a different colour in each.
+        // An explicit dark panel rather than a translucent wash, so it looks the same whatever it is
+        // drawn on top of.
         g.setColour(juce::Colour(0xff20242b));
         g.fillRoundedRectangle(box, 3.0f);
 
-        if (isEditor)
+        g.setColour(juce::Colours::white.withAlpha(0.07f));
+        for (int i = 1; i < 4; ++i)
         {
-            g.setColour(juce::Colours::white.withAlpha(0.07f));
-            for (int i = 1; i < 4; ++i)
-            {
-                const float gx = box.getX() + box.getWidth() * (float)i / 4.0f;
-                const float gy = box.getY() + box.getHeight() * (float)i / 4.0f;
-                g.drawLine(gx, box.getY(), gx, box.getBottom(), 1.0f);
-                g.drawLine(box.getX(), gy, box.getRight(), gy, 1.0f);
-            }
+            const float gx = box.getX() + box.getWidth() * (float)i / 4.0f;
+            const float gy = box.getY() + box.getHeight() * (float)i / 4.0f;
+            g.drawLine(gx, box.getY(), gx, box.getBottom(), 1.0f);
+            g.drawLine(box.getX(), gy, box.getRight(), gy, 1.0f);
         }
 
-        // Constant speed, dashed so it can never be mistaken for the curve itself - without it
-        // there's no reference to judge the curve's deviation against.
+        // Constant speed, dashed so it can never be mistaken for the curve itself - without it there
+        // is no reference to judge the curve's deviation against.
         {
             juce::Path reference, dashed;
             reference.startNewSubPath(box.getBottomLeft());
@@ -81,15 +67,15 @@ public:
             const float dashes[] = { 4.0f, 4.0f };
             juce::PathStrokeType(1.0f).createDashedStroke(dashed, reference, dashes, 2);
 
-            g.setColour(juce::Colours::white.withAlpha(isEditor ? 0.3f : 0.22f));
+            g.setColour(juce::Colours::white.withAlpha(0.3f));
             g.fillPath(dashed);
         }
 
         g.setColour(juce::Colours::white.withAlpha(0.2f));
         g.drawRoundedRectangle(box, 3.0f, 1.0f);
 
-        // The curve, sampled in x - which is exactly what the engine evaluates, so what is drawn
-        // here is literally what plays.
+        // The curve, sampled in x - exactly what the engine evaluates, so what is drawn here is
+        // literally what plays.
         juce::Path path;
         constexpr int samples = 96;
         for (int i = 0; i <= samples; ++i)
@@ -100,26 +86,20 @@ public:
         }
 
         g.setColour(curve.enabled ? juce::Colour(0xff6fa8ff) : juce::Colours::grey);
-        g.strokePath(path, juce::PathStrokeType(isEditor ? 2.5f : 1.8f));
-
-        if (!isEditor)
-            return;
+        g.strokePath(path, juce::PathStrokeType(2.5f));
 
         // Handles, each tied back to the corner it belongs to, so it reads as a Bezier rather than
         // as two loose dots floating in a box.
-        const auto origin = toScreen(box, 0.0, 0.0);
-        const auto corner = toScreen(box, 1.0, 1.0);
         const auto h1 = toScreen(box, curve.x1, curve.y1);
         const auto h2 = toScreen(box, curve.x2, curve.y2);
 
         g.setColour(juce::Colours::white.withAlpha(0.3f));
-        g.drawLine({ origin, h1 }, 1.0f);
-        g.drawLine({ corner, h2 }, 1.0f);
+        g.drawLine({ toScreen(box, 0.0, 0.0), h1 }, 1.0f);
+        g.drawLine({ toScreen(box, 1.0, 1.0), h2 }, 1.0f);
 
         drawHandle(g, h1, draggedHandle == 1);
         drawHandle(g, h2, draggedHandle == 2);
 
-        // Corner markers, so it's obvious which end is the clip's start and which its end.
         g.setColour(juce::Colours::white.withAlpha(0.45f));
         g.setFont(11.0f);
         g.drawText("start", (int)box.getX() + 4, (int)box.getBottom() - 16, 60, 14, juce::Justification::left);
@@ -128,12 +108,6 @@ public:
 
     void mouseDown(const juce::MouseEvent& e) override
     {
-        if (mode == Mode::Thumbnail)
-        {
-            if (onClicked) onClicked();
-            return;
-        }
-
         auto box = getCurveBounds();
         const float d1 = e.position.getDistanceFrom(toScreen(box, curve.x1, curve.y1));
         const float d2 = e.position.getDistanceFrom(toScreen(box, curve.x2, curve.y2));
@@ -146,7 +120,7 @@ public:
 
     void mouseDrag(const juce::MouseEvent& e) override
     {
-        if (mode != Mode::Editor || draggedHandle == 0) return;
+        if (draggedHandle == 0) return;
 
         auto box = getCurveBounds();
         const double x = juce::jlimit(0.0, 1.0, (double)((e.position.x - box.getX()) / box.getWidth()));
@@ -155,7 +129,7 @@ public:
         if (draggedHandle == 1) { curve.x1 = x; curve.y1 = y; }
         else                    { curve.x2 = x; curve.y2 = y; }
 
-        // Clamping to the box is not cosmetic: it's what guarantees x(t) stays monotonic, i.e. that
+        // Clamping to the box is not cosmetic: it is what guarantees x(t) stays monotonic, i.e. that
         // time can never run backwards mid-clip. See AnimatorMath::EasingCurve.
         clampHandles();
         repaint();
@@ -167,7 +141,7 @@ public:
         if (draggedHandle != 0) { draggedHandle = 0; repaint(); }
     }
 
-    // The presets are just handle positions - no separate code path - so choosing one and then
+    // The presets are just handle positions - no separate code path - so picking one and then
     // dragging from it behaves exactly as expected.
     struct Preset { const char* name; double x1, y1, x2, y2; };
 
@@ -196,12 +170,8 @@ private:
 
     juce::Rectangle<float> getCurveBounds() const
     {
-        auto area = getLocalBounds().toFloat().reduced(mode == Mode::Editor ? 12.0f : 1.0f);
-
-        if (mode != Mode::Editor)
-            return area;
-
         // Square, so slope reads as speed rather than as an artifact of the aspect ratio.
+        auto area = getLocalBounds().toFloat().reduced(8.0f);
         const float side = juce::jmin(area.getWidth(), area.getHeight());
         return area.withSizeKeepingCentre(side, side);
     }
@@ -229,198 +199,246 @@ private:
         curve.y2 = juce::jlimit(0.0, 1.0, curve.y2);
     }
 
-    Mode mode;
     AnimatorMath::EasingCurve curve;
     int draggedHandle = 0; // 0 none, 1 or 2 = which control point
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpeedCurveComponent)
 };
 
-// Contents of the popup: the square editor, an enable toggle, the preset buttons and the
-// per-repetition/whole-clip scope choice.
+// The whole speed-curve control as it sits in the Clip Properties column: an enable toggle that
+// doubles as the section heading, the square canvas with the preset buttons beside it, and the
+// per-repetition scope.
+//
+// The canvas sits on the LEFT with the presets stacked to its right, rather than everything in one
+// column - that keeps the canvas as large as the panel width allows while costing only its own
+// height, instead of the presets and scope each adding a row underneath.
 class SpeedCurveEditorComponent : public juce::Component
 {
 public:
     SpeedCurveEditorComponent()
     {
-        addAndMakeVisible(editor);
-        editor.onCurveChanged = [this] { enableOnEdit(); notify(); };
-
         addAndMakeVisible(enabledToggle);
-        enabledToggle.setButtonText("Use speed curve");
-        enabledToggle.setTooltip("When off, the clip plays at a constant speed and the curve below is ignored.");
+        enabledToggle.setButtonText("Speed curve");
+        enabledToggle.setTooltip("Shape how the clip's progress runs over its length. "
+                                 "The dashed diagonal is constant speed.");
         enabledToggle.onClick = [this]
         {
-            editor.setEnabledCurve(enabledToggle.getToggleState());
+            canvas.setEnabledCurve(enabledToggle.getToggleState());
             updateEnablement();
             notify();
         };
 
-        for (const auto& p : SpeedCurveComponent::presets())
+        addAndMakeVisible(canvas);
+        // Any edit implies wanting the curve, so switch it on rather than discarding the drag. The
+        // toggle is for A/B-ing a curve already shaped, not a gate to be found first.
+        canvas.onCurveChanged = [this] { enableOnEdit(); notify(); };
+
+        for (const auto& preset : SpeedCurveComponent::presets())
         {
-            auto* b = presetButtons.add(new juce::TextButton(p.name));
+            auto* b = presetButtons.add(new juce::TextButton(preset.name));
             addAndMakeVisible(b);
-            b->onClick = [this, p] { editor.applyPreset(p); };
+            b->setConnectedEdges(juce::Button::ConnectedOnTop | juce::Button::ConnectedOnBottom);
+            b->onClick = [this, preset]
+            {
+                canvas.applyPreset(preset);
+                enableOnEdit();
+                notify();
+            };
         }
 
-        addAndMakeVisible(captionLabel);
-        captionLabel.setText("Horizontal is time, vertical is distance covered. "
-                             "The dashed line is constant speed - drag the two handles away from it.",
-                             juce::dontSendNotification);
-        captionLabel.setJustificationType(juce::Justification::topLeft);
-        captionLabel.setFont(juce::Font(juce::FontOptions(12.0f)));
-        captionLabel.setColour(juce::Label::textColourId, juce::Colours::white.withAlpha(0.6f));
+        addAndMakeVisible(perRepetitionToggle);
+        perRepetitionToggle.setButtonText("Per repetition");
+        perRepetitionToggle.setToggleState(true, juce::dontSendNotification);
+        // Turning this off removes the segmentation entirely, which is what "Per direction" divides,
+        // so the two have to be re-evaluated together.
+        perRepetitionToggle.onClick = [this] { updateScopeEnablement(); notify(); };
 
-        addAndMakeVisible(scopeLabel);
-        scopeLabel.setText("Applies to:", juce::dontSendNotification);
+        addAndMakeVisible(perRepetitionInfo);
 
-        addAndMakeVisible(scopeCombo);
-        scopeCombo.addItem("Each repetition", 1);
-        scopeCombo.addItem("Whole clip", 2);
-        scopeCombo.setTooltip("Each repetition: every cycle eases identically. "
-                              "Whole clip: time is warped across all repetitions, so the repetitions "
-                              "themselves speed up or slow down.");
-        scopeCombo.onChange = [this]
-        {
-            auto c = editor.getCurve();
-            c.perRepetition = (scopeCombo.getSelectedId() != 2);
-            editor.setCurve(c);
-            notify();
-        };
+        addAndMakeVisible(perDirectionToggle);
+        perDirectionToggle.setButtonText("Per direction");
+        perDirectionToggle.setToggleState(true, juce::dontSendNotification);
+        perDirectionToggle.onClick = [this] { notify(); };
 
-        setSize(430, 390);
+        addAndMakeVisible(perDirectionInfo);
     }
 
     std::function<void(const AnimatorMath::EasingCurve&)> onCurveChanged;
 
     void setCurve(const AnimatorMath::EasingCurve& c)
     {
-        editor.setCurve(c);
+        canvas.setCurve(c);
         enabledToggle.setToggleState(c.enabled, juce::dontSendNotification);
-        scopeCombo.setSelectedId(c.perRepetition ? 1 : 2, juce::dontSendNotification);
-        updateEnablement();
+        perRepetitionToggle.setToggleState(c.perRepetition, juce::dontSendNotification);
+        perDirectionToggle.setToggleState(c.perDirection, juce::dontSendNotification);
+        updateEnablement(); // also refreshes the two scope toggles
     }
 
-    // The scope choice is meaningless with a single forward cycle, so it's hidden rather than left
-    // as a control that silently does nothing.
-    void setScopeRelevant(bool relevant)
+    AnimatorMath::EasingCurve getCurve() const
     {
-        scopeLabel.setVisible(relevant);
-        scopeCombo.setVisible(relevant);
+        auto c = canvas.getCurve();
+        c.enabled = enabledToggle.getToggleState();
+        c.perRepetition = perRepetitionToggle.getToggleState();
+        c.perDirection = perDirectionToggle.getToggleState();
+        return c;
+    }
+
+    // Both controls stay VISIBLE and are greyed out when they'd have no effect - a control that
+    // vanishes as you change Repetitions or Palindrome is harder to find than one that is simply
+    // inactive, and keeping them in place means the panel's height never changes.
+    void setScopeApplicable(bool repetitionApplicable, bool directionApplicable)
+    {
+        repetitionApplies = repetitionApplicable;
+        directionApplies = directionApplicable;
+        updateScopeEnablement();
+    }
+
+    // Reported so the host can keep the clip in step when "Per repetition" is pinned on at a single
+    // repetition - otherwise the stored value and the shown value could disagree.
+    bool isPerRepetitionPinned() const { return !repetitionApplies; }
+
+    static int getRowHeight()  { return 24; }
+    static int getRowSpacing() { return 6; }
+
+    // Height needed for a given panel WIDTH: the canvas is square and takes whatever width is left
+    // beside the preset column, so the width decides how tall the whole thing is.
+    static int getRequiredHeight(int width)
+    {
+        const int canvasSide = juce::jmax(minCanvasSide, width - presetColumnWidth - presetGap);
+
+        // Both scope rows are always budgeted, even though each hides when irrelevant - otherwise
+        // ticking Palindrome would have to grow the dialog, which is exactly what the fixed height
+        // exists to prevent.
+        return getRowHeight() + getRowSpacing()                      // enable toggle
+             + canvasSide + getRowSpacing()                          // canvas (square)
+             + 2 * getRowHeight() + getRowSpacing();                 // per-repetition + per-direction
     }
 
     void resized() override
     {
-        auto area = getLocalBounds().reduced(14);
+        auto area = getLocalBounds();
 
-        enabledToggle.setBounds(area.removeFromTop(24));
-        area.removeFromTop(2);
-        captionLabel.setBounds(area.removeFromTop(32));
-        area.removeFromTop(8);
+        enabledToggle.setBounds(area.removeFromTop(getRowHeight()));
+        area.removeFromTop(getRowSpacing());
 
-        auto scopeRow = area.removeFromBottom(26);
-        scopeLabel.setBounds(scopeRow.removeFromLeft(78));
-        scopeCombo.setBounds(scopeRow.removeFromLeft(180));
-        area.removeFromBottom(10);
-
-        // Presets stacked down the right so the canvas keeps as much square area as possible.
-        auto presetColumn = area.removeFromRight(104);
-        for (auto* b : presetButtons)
+        // Laid out bottom-up: Per direction below Per repetition. Both rows are always present.
+        auto layoutScopeRow = [&](juce::ToggleButton& toggle, InfoIconButton& info)
         {
-            b->setBounds(presetColumn.removeFromTop(26));
-            presetColumn.removeFromTop(5);
-        }
+            auto scopeRow = area.removeFromBottom(getRowHeight());
+            info.setBounds(scopeRow.removeFromRight(getRowHeight()).reduced(2, 2));
+            scopeRow.removeFromRight(4);
+            toggle.setBounds(scopeRow);
+        };
 
-        area.removeFromRight(12);
-        editor.setBounds(area);
+        layoutScopeRow(perDirectionToggle, perDirectionInfo);
+        layoutScopeRow(perRepetitionToggle, perRepetitionInfo);
+        area.removeFromBottom(getRowSpacing());
+
+        // Presets down the right, canvas takes the rest and stays square.
+        auto presetColumn = area.removeFromRight(presetColumnWidth);
+        area.removeFromRight(presetGap);
+        canvas.setBounds(area);
+
+        const int buttons = presetButtons.size();
+        if (buttons > 0)
+        {
+            const int spacing = 3;
+            const int each = juce::jmax(16, (presetColumn.getHeight() - (buttons - 1) * spacing) / buttons);
+
+            for (auto* b : presetButtons)
+            {
+                b->setBounds(presetColumn.removeFromTop(each));
+                presetColumn.removeFromTop(spacing);
+            }
+        }
     }
 
 private:
-    void paint(juce::Graphics& g) override
+    static constexpr int presetColumnWidth = 96;
+    static constexpr int presetGap = 8;
+    static constexpr int minCanvasSide = 110;
+
+    void updateScopeEnablement()
     {
-        // AdditionalWindow's DialogWindow background is hardcoded white; without this, Labels and
-        // ToggleButtons (which paint a transparent background) use this app's light text colour and
-        // become invisible - the enable toggle in particular vanished completely. Matches the other
-        // animator dialogs, which each carry this same override for the same reason.
-        g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
+        const bool curveOn = enabledToggle.getToggleState();
+
+        // At a single repetition "Per repetition" is redundant: off (ease the whole clip) and on
+        // with "Per direction" off (ease the one repetition) describe the same single segment. So it
+        // is pinned ON rather than merely greyed - otherwise a clip left with it off would strand
+        // "Per direction", which only has meaning inside a segmented curve.
+        if (!repetitionApplies && !perRepetitionToggle.getToggleState())
+            perRepetitionToggle.setToggleState(true, juce::dontSendNotification);
+
+        perRepetitionToggle.setEnabled(curveOn && repetitionApplies);
+
+        // "Per direction" divides the per-repetition segmentation, so it means nothing once that is
+        // switched off - even with Palindrome on.
+        perDirectionToggle.setEnabled(curveOn && directionApplies && perRepetitionToggle.getToggleState());
+
+        perRepetitionToggle.setAlpha(perRepetitionToggle.isEnabled() ? 1.0f : 0.5f);
+        perDirectionToggle.setAlpha(perDirectionToggle.isEnabled() ? 1.0f : 0.5f);
     }
 
-    // Deliberately leaves the canvas and presets INTERACTIVE even when the curve is switched off.
-    // Gating them behind the toggle meant that opening the editor on any clip that didn't already
-    // have a curve - i.e. every existing clip, since the default is off - presented a dead panel
-    // with no obvious way in. The toggle is for A/B-ing a curve you have already shaped, so touching
-    // the curve simply switches it on (see enableOnEdit()). Only the alpha changes, as a hint that
-    // the curve is currently not in effect.
     void updateEnablement()
     {
-        editor.setAlpha(enabledToggle.getToggleState() ? 1.0f : 0.65f);
+        // With the curve switched off, everything that shapes it goes inactive too - the toggle is
+        // the one live control, so there is no question about what to click first.
+        //
+        // The info icons are the deliberate exception: they explain why a control is greyed out,
+        // which is exactly when that explanation is worth reading.
+        const bool curveOn = enabledToggle.getToggleState();
+
+        canvas.setEnabled(curveOn);
+        canvas.setAlpha(curveOn ? 1.0f : 0.4f);
+
+        for (auto* b : presetButtons)
+            b->setEnabled(curveOn);
+
+        updateScopeEnablement();
     }
 
-    // Any edit to the curve implies wanting it, so switch it on rather than silently discarding the
-    // drag. Applies to preset buttons too, since those route through editor.onCurveChanged.
     void enableOnEdit()
     {
         if (enabledToggle.getToggleState())
             return;
 
         enabledToggle.setToggleState(true, juce::dontSendNotification);
-        editor.setEnabledCurve(true);
+        canvas.setEnabledCurve(true);
         updateEnablement();
     }
 
     void notify()
     {
-        auto c = editor.getCurve();
-        c.enabled = enabledToggle.getToggleState();
-        c.perRepetition = (scopeCombo.getSelectedId() != 2);
-        if (onCurveChanged) onCurveChanged(c);
+        if (onCurveChanged)
+            onCurveChanged(getCurve());
     }
 
-    SpeedCurveComponent editor { SpeedCurveComponent::Mode::Editor };
+    SpeedCurveComponent canvas;
     juce::ToggleButton enabledToggle;
     juce::OwnedArray<juce::TextButton> presetButtons;
-    juce::Label captionLabel;
-    juce::Label scopeLabel;
-    juce::ComboBox scopeCombo;
+    juce::ToggleButton perRepetitionToggle;
+    juce::ToggleButton perDirectionToggle;
+    bool repetitionApplies = false;
+    bool directionApplies = false;
+
+    InfoIconButton perRepetitionInfo
+    {
+        "Per repetition: every cycle of this clip eases identically - three repetitions give three "
+        "identical eased moves.\n\n"
+        "Off: the curve warps time across the whole clip instead, so the repetitions themselves "
+        "speed up or slow down over the clip's length.\n\n"
+        "Only has an effect when Repetitions is above 1, or Palindrome is on."
+    };
+
+    InfoIconButton perDirectionInfo
+    {
+        "Palindrome plays each repetition out and then back again. This decides whether the speed "
+        "curve describes one LEG of that journey or the whole round trip.\n\n"
+        "On: the outward leg and the return leg each follow the curve, so both ease the same way.\n\n"
+        "Off: a single curve is stretched across the whole go-and-back. The turnaround then happens "
+        "where the curve reaches half its travel, which need not be halfway through in time - an "
+        "ease-out, for instance, races out and creeps back."
+    };
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(SpeedCurveEditorComponent)
-};
-
-// Popup window, following PreferencesDialog's pattern exactly - including the deferred close, since
-// the callback deletes this window and must not run from inside its own close-button dispatch.
-class SpeedCurveDialog : public AdditionalWindow
-{
-public:
-    SpeedCurveDialog(std::unique_ptr<juce::Component> content, std::function<void()> onCloseRequested)
-        : AdditionalWindow("Speed Curve", content.get()), closeCallback(std::move(onCloseRequested))
-    {
-        const int w = content->getWidth();
-        const int h = content->getHeight();
-
-        setAlwaysOnTop(true);
-        setContentOwned(content.release(), true);
-        setResizable(false, false);
-        setUsingNativeTitleBar(false);
-
-        const int titleBarHeight = getTitleBarHeight();
-        setSize(w, h + titleBarHeight);
-        UiState::restorePosition(*this, UiState::Windows::speedCurve);
-    }
-
-    ~SpeedCurveDialog() override
-    {
-        UiState::rememberPosition(*this, UiState::Windows::speedCurve);
-    }
-
-    void closeButtonPressed() override
-    {
-        if (closeCallback)
-        {
-            auto callback = closeCallback;
-            juce::MessageManager::callAsync([callback] { callback(); });
-        }
-    }
-
-private:
-    std::function<void()> closeCallback;
 };
